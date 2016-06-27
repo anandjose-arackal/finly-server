@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160627065859) do
+ActiveRecord::Schema.define(version: 20160627124008) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -24,8 +24,9 @@ ActiveRecord::Schema.define(version: 20160627065859) do
 
   create_table "companies", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.boolean  "active",                 default: true, null: false
   end
 
   create_table "company_configurations", force: :cascade do |t|
@@ -44,11 +45,14 @@ ActiveRecord::Schema.define(version: 20160627065859) do
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
 
   create_table "contacts", force: :cascade do |t|
-    t.string   "email",      limit: 255
-    t.string   "name",       limit: 255
-    t.string   "number",     limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "email",            limit: 255
+    t.string   "name",             limit: 255
+    t.string   "number",           limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "contactable_id",   limit: 4
+    t.string   "contactable_type", limit: 255
+    t.string   "designation",      limit: 255
   end
 
   create_table "currencies", force: :cascade do |t|
@@ -88,8 +92,9 @@ ActiveRecord::Schema.define(version: 20160627065859) do
     t.integer  "employee_id",         limit: 4
     t.integer  "payroll_id",          limit: 4
     t.integer  "default_currency_id", limit: 4
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "mobile_verified",                 default: true, null: false
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
@@ -122,11 +127,16 @@ ActiveRecord::Schema.define(version: 20160627065859) do
     t.datetime "created_at",                                      null: false
     t.datetime "updated_at",                                      null: false
     t.integer  "company_id",             limit: 4,                null: false
+    t.string   "name",                   limit: 255
+    t.integer  "mobile_number",          limit: 4
+    t.boolean  "active"
+    t.integer  "user_type_id",           limit: 4,                null: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["user_type_id"], name: "index_users_on_user_type_id", using: :btree
 
   add_foreign_key "amounts", "currencies"
   add_foreign_key "company_configurations", "companies"
@@ -134,4 +144,5 @@ ActiveRecord::Schema.define(version: 20160627065859) do
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "users", "user_types"
 end

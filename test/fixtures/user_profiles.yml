@@ -1,19 +1,1 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  user_id: 
-  avatar: 
-  kyc_verified: false
-  gcm_sender_id: MyString
-  employee_id: 
-  payroll_id: 
-  crrency_id: 
-
-two:
-  user_id: 
-  avatar: 
-  kyc_verified: false
-  gcm_sender_id: MyString
-  employee_id: 
-  payroll_id: 
-  crrency_id: 
