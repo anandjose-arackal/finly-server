@@ -1,0 +1,2 @@
+class CompanyService
+end
