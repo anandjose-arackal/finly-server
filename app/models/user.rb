@@ -10,14 +10,30 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :user_type_id, presence: true
-  validates :email, presence: true
+  validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
 
   has_many :team_mapping, class_name: "UserManagerMapping"
 
   after_create do
     self.build_profile.save
-    self.team_mapping.build(default: true)
+    self.team_mapping.build(default: true).save
+  end
+
+  def admin?
+
+  end
+
+  def finance_manager?
+
+  end
+
+  def manager?
+
+  end
+
+  def employee?
+
   end
 
 end

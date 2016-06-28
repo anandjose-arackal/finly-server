@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160627124008) do
+ActiveRecord::Schema.define(version: 20160628114043) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -62,23 +62,34 @@ ActiveRecord::Schema.define(version: 20160627124008) do
     t.datetime "updated_at",               null: false
   end
 
+  create_table "policies", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "company_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
+
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                     limit: 4
     t.integer  "manager_id",                  limit: 4
-    t.integer  "financial_manager_id",        limit: 4
+    t.integer  "finance_manager_id",          limit: 4
     t.integer  "approves_to_user_id",         limit: 4
     t.integer  "approves_finance_to_user_id", limit: 4
     t.integer  "greater_than_amount_id",      limit: 4
     t.boolean  "default",                               default: false, null: false
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
+    t.integer  "policy_id",                   limit: 4
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_user_id"], name: "index_user_manager_mappings_on_approves_finance_to_user_id", using: :btree
   add_index "user_manager_mappings", ["approves_to_user_id"], name: "index_user_manager_mappings_on_approves_to_user_id", using: :btree
-  add_index "user_manager_mappings", ["financial_manager_id"], name: "index_user_manager_mappings_on_financial_manager_id", using: :btree
+  add_index "user_manager_mappings", ["finance_manager_id"], name: "index_user_manager_mappings_on_finance_manager_id", using: :btree
   add_index "user_manager_mappings", ["greater_than_amount_id"], name: "index_user_manager_mappings_on_greater_than_amount_id", using: :btree
   add_index "user_manager_mappings", ["manager_id"], name: "index_user_manager_mappings_on_manager_id", using: :btree
+  add_index "user_manager_mappings", ["policy_id"], name: "index_user_manager_mappings_on_policy_id", using: :btree
   add_index "user_manager_mappings", ["user_id"], name: "index_user_manager_mappings_on_user_id", using: :btree
 
   create_table "user_profiles", force: :cascade do |t|
@@ -141,6 +152,8 @@ ActiveRecord::Schema.define(version: 20160627124008) do
   add_foreign_key "amounts", "currencies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "policies", "companies"
+  add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "users", "companies"
