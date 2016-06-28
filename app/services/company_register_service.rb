@@ -34,8 +34,8 @@ class CompanyRegisterService < BaseService
     end
 
     unless company.save && company.configuration.save
-      errors.add(company.errors.full_messages)
-      errors.add(company.configuration.errors.full_messages)
+      errors << company.errors.full_messages
+      errors << company.configuration.errors.full_messages
       return false
     end
     company.reload
@@ -49,8 +49,8 @@ class CompanyRegisterService < BaseService
     if contact.save and admin.save
       return true
     end
-    errors.add(contact.errors.full_messages)
-    errors.add(admin.errors.full_messages)
+    errors << contact.errors.full_messages
+    errors << admin.errors.full_messages
     false
   end
 
@@ -58,7 +58,7 @@ class CompanyRegisterService < BaseService
     errors.clear
     items.each do |item|
       unless item.valid?
-        errors.add(item.errors.full_messages)
+        errors << item.errors.full_messages
       end
     end
     return false unless errors.blank?
@@ -72,10 +72,10 @@ class CompanyRegisterService < BaseService
     checker.each do |item|
       item_val = self.send(item)
       if item_val.blank?
-        errors.add "#{item.to_s.humanize} cannot be empty"
+        errors << "#{item.to_s.humanize} cannot be empty"
       end
     end
-    return false unless errors.items.blank?
+    return false unless errors.blank?
     true
   end
 

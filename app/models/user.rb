@@ -8,6 +8,11 @@ class User < ActiveRecord::Base
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   belongs_to :user_type
 
+  validates :company_id, presence: true
+  validates :user_type_id, presence: true
+  validates :email, presence: true
+  validates :name, presence: true
+
   has_many :team_mapping, class_name: "UserManagerMapping"
 
   after_create do

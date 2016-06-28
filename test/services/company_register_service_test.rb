@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CompanyServiceTest < ActiveSupport::TestCase
+class CompanyRegisterServiceTest < ActiveSupport::TestCase
 
   test "company name is required for registration" do
     reg = CompanyRegisterService.new("")
