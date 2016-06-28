@@ -6,6 +6,7 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :approves_finance_to_user, class_name: "User"
   belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
   belongs_to :policy
+  accepts_nested_attributes_for :greater_than_amount
 
   validate :valid_default
   validate :valid_non_default
@@ -22,14 +23,19 @@ class UserManagerMapping < ActiveRecord::Base
   scope :approves_to, -> { where 'approves_to_user_id IS NOT NULL' }
   scope :approves_finance_to, -> { where 'approves_finance_to_user_id IS NOT NULL' }
   scope :amount, ->(currency_id, value) do
-    item = joins(:greater_than_amount).where('value <= ? AND currency_id = ?', value, currency_id)
-               .order('value DESC').limit(1)
-    if item.present?
-      item.first
-    else
+    if value.blank? or currency_id.blank?
       self.default
+    else
+      item = joins(:greater_than_amount).where('value <= ? AND currency_id = ?', value, currency_id).order('value DESC').limit(1)
+      if item.present?
+        item.first
+      else
+        self.default
+      end
     end
   end
+  scope :manager_team, ->(policy_id, manager_id) { where policy_id: policy_id, manager_id: manager_id }
+  scope :finance_team, ->(policy_id, finance_manager_id) { where policy_id: policy_id, finance_manager_id: finance_manager_id }
 
   private
   def valid_default
@@ -43,6 +49,5 @@ class UserManagerMapping < ActiveRecord::Base
       errors.add(:greater_than_amount, "cannot be blank")
     end
   end
-
 
 end

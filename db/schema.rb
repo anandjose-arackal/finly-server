@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160628114043) do
+ActiveRecord::Schema.define(version: 20160628131936) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -111,7 +111,17 @@ ActiveRecord::Schema.define(version: 20160628114043) do
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
   add_index "user_profiles", ["user_id"], name: "index_user_profiles_on_user_id", using: :btree
 
-  create_table "user_types", force: :cascade do |t|
+  create_table "user_role_mappings", force: :cascade do |t|
+    t.integer  "user_id",      limit: 4
+    t.integer  "user_role_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "user_role_mappings", ["user_id"], name: "index_user_role_mappings_on_user_id", using: :btree
+  add_index "user_role_mappings", ["user_role_id"], name: "index_user_role_mappings_on_user_role_id", using: :btree
+
+  create_table "user_roles", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
@@ -141,13 +151,11 @@ ActiveRecord::Schema.define(version: 20160628114043) do
     t.string   "name",                   limit: 255
     t.integer  "mobile_number",          limit: 4
     t.boolean  "active",                             default: true, null: false
-    t.integer  "user_type_id",           limit: 4,                  null: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
-  add_index "users", ["user_type_id"], name: "index_users_on_user_type_id", using: :btree
 
   add_foreign_key "amounts", "currencies"
   add_foreign_key "company_configurations", "companies"
@@ -156,6 +164,7 @@ ActiveRecord::Schema.define(version: 20160628114043) do
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
+  add_foreign_key "user_role_mappings", "user_roles"
+  add_foreign_key "user_role_mappings", "users"
   add_foreign_key "users", "companies"
-  add_foreign_key "users", "user_types"
 end

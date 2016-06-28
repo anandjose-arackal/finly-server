@@ -3,9 +3,10 @@ class CompanyRegisterService < BaseService
   attr_accessor :contact_name, :contact_email, :contact_number, :contact_designation
   attr_accessor :admin_name, :admin_email, :admin_number, :admin_password
 
-  def initialize(name)
+  def initialize(name, logo = nil)
     super()
     self.name = name
+    self.logo = logo
   end
 
   def contact(contact_designation, contact_name, contact_email, contact_number)
@@ -33,7 +34,7 @@ class CompanyRegisterService < BaseService
       company.configuration.logo = self.logo
     end
 
-    unless company.save && company.configuration.save
+    unless company.save and company.configuration.save
       errors << company.errors.full_messages
       errors << company.configuration.errors.full_messages
       return false
@@ -44,7 +45,8 @@ class CompanyRegisterService < BaseService
     contact = company.contacts.build(email: self.contact_email, designation: self.contact_designation, name: self.contact_name, number: self.contact_number)
 
     # Create admin
-    admin = company.users.build(name: admin_name, email: admin_email, user_type_id: 4, password: self.admin_password, password_confirmation: self.admin_password)
+    admin = company.users.build(name: admin_name, email: admin_email, password: self.admin_password,
+                                password_confirmation: self.admin_password, role_mapping_attributes: [{user_role_id: 1}])
 
     if contact.save and admin.save
       return true
