@@ -7,8 +7,9 @@ class User < ActiveRecord::Base
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
-  has_many :user_roles,  through: :role_mapping
+  has_many :user_roles, through: :role_mapping
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
+  has_many :tags, class_name: 'UserTag', dependent: :destroy
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
