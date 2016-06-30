@@ -33,8 +33,8 @@ class ExpenseService < BaseService
   def update_expense(params=nil)
     return if params.blank?
     expense_params = load_expense_params params
-    expense = load_expense expense_params[:id]
-    if expense.update(expense_params)
+    expense = load_expense expense_params[:id] || expense_params[:expense_id]
+    if expense && expense.update(expense_params)
       expense.reload
       return expense
     end
@@ -45,7 +45,7 @@ class ExpenseService < BaseService
 
   end
 
-  # will come in report
+  # todo - will come in report
   # def reject_expenses(id, memo=nil)
   #   return if id.blank?
   #   expense = load_expense id

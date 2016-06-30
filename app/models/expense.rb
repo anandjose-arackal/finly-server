@@ -13,5 +13,14 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
-  validates
+  # to ensure two expenses don't have the same foreign key
+  validates :amount_id, uniqueness: true
+  validate :no_future_date
+
+  def no_future_date
+    if date > Date.today
+      errors.add(:date, "cannot be in the futute!")
+    end
+  end
+  
 end
