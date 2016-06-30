@@ -39,7 +39,7 @@ class UserManagerMapping < ActiveRecord::Base
 
   private
   def valid_default
-    if default and greater_than_amount.present? and greater_than_amount.value > 0
+    if default and greater_than_amount.present?
       errors.add(:cannot, "set greater than amount for default configuration")
     end
   end
