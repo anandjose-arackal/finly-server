@@ -6,6 +6,15 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+def random(low, high)
+  rand * (high - low) + low
+end
+
+def random_integer(low, high)
+  random(low, high+1).to_i
+end
+
+
 if UserRole.count == 0
   UserRole.create(id: 1, name: "Admin")
   UserRole.create(id: 2, name: "Finance Manager")
@@ -74,6 +83,14 @@ if ExpenseStatus.count ==0
 end
 
 if Expense.count == 0
-  # e = Expense.create(amount_attributes: {value: 100, currency_id: 1}, expense_status_attributes: {name: "Unsubmitted", order: 1}, expense_type_attributes: {name: "Manual Expense"}, note: "Sup", date: Date.today, user_id: 1)
+  200.times do |i|
+    e = Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
+                       expense_status_id: random_integer(1, 3),
+                       expense_type_id: random_integer(1, 4),
+                       note: "test note #{i}",
+                       date: Date.today,
+                       user_id: random_integer(1, 10),
+                       manual_expense_attributes: {merchant: "Test merchant #{i}"})
+  end
 end
 

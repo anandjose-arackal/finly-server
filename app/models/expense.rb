@@ -12,4 +12,6 @@ class Expense < ActiveRecord::Base
   delegate :expense_type, to: :expense_type
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
+
+  validates
 end

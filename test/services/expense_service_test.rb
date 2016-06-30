@@ -21,12 +21,7 @@ class ExpenseServiceTest < ActiveSupport::TestCase
                      }
     @user = User.first
     @es = ExpenseService.new(@user)
-    @expense = @user.expenses.create(amount_attributes: {value: 123, currency_id: 1},
-                                     expense_status_id: 1,
-                                     expense_type_id: 1,
-                                     note: "Sup",
-                                     date: Date.today,
-                                     manual_expense_attributes: {merchant: "Uber"})
+    @expense = @user.expenses.first
   end
 
   test 'should create and edit an expense from params' do
@@ -36,12 +31,13 @@ class ExpenseServiceTest < ActiveSupport::TestCase
       assert expense
     end
 
+    # editing the expense
     @update_params[:expense][:id] = expense.id
     edited_expense = @es.update_expense(@update_params)
     assert_equal "Uber", edited_expense.merchant_name
     assert_equal "New note", edited_expense.note
     assert_equal Date.tomorrow, edited_expense.date
-    # editing the expense
+
   end
 
   test 'should destroy an expense from id' do
@@ -57,6 +53,8 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     expenses = @es.user_expenses
     assert "Uber", expenses.first.merchant_name
   end
+
+  test
 
 
 end
