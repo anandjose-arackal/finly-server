@@ -60,14 +60,20 @@ if User.count == 0
 end
 
 if ExpenseType.count ==0
-
+  ExpenseType.create(name: "Manual")
+  ExpenseType.create(name: "Card")
+  ExpenseType.create(name: "Distance")
+  ExpenseType.create(name: "Time")
+  ExpenseType.create(name: "Per Diem")
 end
 
 if ExpenseStatus.count ==0
-
+  ExpenseStatus.create(name: "Unsubmitted", order: 1)
+  ExpenseStatus.create(name: "Submitted", order: 2)
+  ExpenseStatus.create(name: "Rejected", order: 3)
 end
 
 if Expense.count == 0
-  e = Expense.create(amount_attributes: {value: 100, currency_id: 1}, expense_status_attributes: {name: "Unsubmitted", order: 1}, expense_type_attributes: {name: "Manual Expense"}, note: "Sup", date: Date.today, user_id: 1)
+  # e = Expense.create(amount_attributes: {value: 100, currency_id: 1}, expense_status_attributes: {name: "Unsubmitted", order: 1}, expense_type_attributes: {name: "Manual Expense"}, note: "Sup", date: Date.today, user_id: 1)
 end
 

@@ -9,4 +9,13 @@ class Amount < ActiveRecord::Base
   #   return item
   # end
 
+  # delegated from expense model
+  def amount_value
+    self.value
+  end
+
+  def currency_id
+    self.currency.country_code
+  end
+
 end
