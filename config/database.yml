@@ -16,6 +16,7 @@ default: &default
   username: sreeram
   password: sreeram
   host: localhost
+  socket: /var/run/mysqld/mysqld.sock
 
 development:
   <<: *default

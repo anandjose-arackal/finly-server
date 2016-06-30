@@ -22,6 +22,21 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     @user = User.first
     @es = ExpenseService.new(@user)
     @expense = @user.expenses.first
+    @invalid_expense_params = {expense: {amount: 100,
+                                         merchant: "Olacabs",
+                                         note: "Sup dawg",
+                                         expense_status_id: 1,
+                                         expense_type_id: 1,
+                                         date: Date.tomorrow,
+                                         currency_id: 1},
+                              }
+
+  end
+
+  test 'cannot create expense in the future' do
+    assert_no_difference '@user.expenses.count' do
+      expense = @es.add_expense @invalid_expense_params
+    end
   end
 
   test 'should create and edit an expense from params' do
