@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160629104508) do
+ActiveRecord::Schema.define(version: 20160629173936) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -21,6 +21,18 @@ ActiveRecord::Schema.define(version: 20160629104508) do
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "categories", force: :cascade do |t|
+    t.integer  "company_id",   limit: 4,                  null: false
+    t.string   "name",         limit: 255,                null: false
+    t.string   "gl_code",      limit: 255
+    t.string   "payroll_code", limit: 255
+    t.boolean  "active",                   default: true, null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
+
+  add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
 
   create_table "companies", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -44,6 +56,17 @@ ActiveRecord::Schema.define(version: 20160629104508) do
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
 
+  create_table "company_tags", force: :cascade do |t|
+    t.integer  "company_id", limit: 4,                  null: false
+    t.string   "name",       limit: 255,                null: false
+    t.string   "gl_code",    limit: 255
+    t.boolean  "active",                 default: true, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "company_tags", ["company_id"], name: "index_company_tags_on_company_id", using: :btree
+
   create_table "contacts", force: :cascade do |t|
     t.string   "email",            limit: 255
     t.string   "name",             limit: 255
@@ -65,11 +88,49 @@ ActiveRecord::Schema.define(version: 20160629104508) do
   create_table "policies", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.integer  "company_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "default",                default: false, null: false
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
+
+  create_table "policy_configurations", force: :cascade do |t|
+    t.integer  "policy_id",                limit: 4,                 null: false
+    t.boolean  "require_category",                   default: false, null: false
+    t.boolean  "default_reimbursable_set",           default: false, null: false
+    t.boolean  "default_billable_set",               default: false, null: false
+    t.integer  "report_currency_id",       limit: 4
+    t.integer  "technical_contact_id",     limit: 4
+    t.boolean  "mandate_expense_tagging",            default: false, null: false
+    t.integer  "default_tag_id",           limit: 4
+    t.boolean  "active",                             default: true,  null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+  end
+
+  add_index "policy_configurations", ["default_tag_id"], name: "index_policy_configurations_on_default_tag_id", using: :btree
+  add_index "policy_configurations", ["policy_id"], name: "index_policy_configurations_on_policy_id", using: :btree
+  add_index "policy_configurations", ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id", using: :btree
+  add_index "policy_configurations", ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id", using: :btree
+
+  create_table "policy_user_mappings", force: :cascade do |t|
+    t.integer  "user_id",             limit: 4, null: false
+    t.integer  "policy_id",           limit: 4, null: false
+    t.integer  "policy_user_role_id", limit: 4, null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
+  add_index "policy_user_mappings", ["policy_user_role_id"], name: "index_policy_user_mappings_on_policy_user_role_id", using: :btree
+  add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
+
+  create_table "policy_user_roles", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                     limit: 4
@@ -190,9 +251,15 @@ ActiveRecord::Schema.define(version: 20160629104508) do
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
   add_foreign_key "amounts", "currencies"
+  add_foreign_key "categories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_tags", "companies"
   add_foreign_key "policies", "companies"
+  add_foreign_key "policy_configurations", "policies"
+  add_foreign_key "policy_user_mappings", "policies"
+  add_foreign_key "policy_user_mappings", "policy_user_roles"
+  add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"

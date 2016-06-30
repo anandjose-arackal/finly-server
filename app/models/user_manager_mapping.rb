@@ -34,8 +34,10 @@ class UserManagerMapping < ActiveRecord::Base
       end
     end
   end
+  scope :exact_amount, ->(currency_id, value) { where value: value, currency_id: currency_id }
   scope :manager_team, ->(policy_id, manager_id) { where policy_id: policy_id, manager_id: manager_id }
   scope :finance_team, ->(policy_id, finance_manager_id) { where policy_id: policy_id, finance_manager_id: finance_manager_id }
+  scope :company, ->(company_id){ joins(:policy).where(company_id: company_id) }
 
   private
   def valid_default
