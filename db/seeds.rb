@@ -58,3 +58,16 @@ if User.count == 0
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
 
 end
+
+if ExpenseType.count ==0
+
+end
+
+if ExpenseStatus.count ==0
+
+end
+
+if Expense.count == 0
+  e = Expense.create(amount_attributes: {value: 100, currency_id: 1}, expense_status_attributes: {name: "Unsubmitted", order: 1}, expense_type_attributes: {name: "Manual Expense"}, note: "Sup", date: Date.today, user_id: 1)
+end
+

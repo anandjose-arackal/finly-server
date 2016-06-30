@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160628131936) do
+ActiveRecord::Schema.define(version: 20160630084358) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -61,6 +61,45 @@ ActiveRecord::Schema.define(version: 20160628131936) do
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
   end
+
+  create_table "expense_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "order",      limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "expense_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.integer  "amount_id",         limit: 4
+    t.integer  "expense_status_id", limit: 4
+    t.text     "note",              limit: 65535
+    t.datetime "date"
+    t.integer  "user_id",           limit: 4
+    t.integer  "expense_type_id",   limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "manager_memo",      limit: 255
+  end
+
+  add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
+  add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
+  add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
+  add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
+
+  create_table "manual_expenses", force: :cascade do |t|
+    t.integer  "expense_id", limit: 4
+    t.string   "merchant",   limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
 
   create_table "policies", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -160,6 +199,11 @@ ActiveRecord::Schema.define(version: 20160628131936) do
   add_foreign_key "amounts", "currencies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "expenses", "amounts"
+  add_foreign_key "expenses", "expense_statuses"
+  add_foreign_key "expenses", "expense_types"
+  add_foreign_key "expenses", "users"
+  add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "policies", "companies"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
