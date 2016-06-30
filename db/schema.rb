@@ -62,6 +62,45 @@ ActiveRecord::Schema.define(version: 20160630084358) do
     t.datetime "updated_at",               null: false
   end
 
+  create_table "expense_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "order",      limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "expense_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.integer  "amount_id",         limit: 4
+    t.integer  "expense_status_id", limit: 4
+    t.text     "note",              limit: 65535
+    t.datetime "date"
+    t.integer  "user_id",           limit: 4
+    t.integer  "expense_type_id",   limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "manager_memo",      limit: 255
+  end
+
+  add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
+  add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
+  add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
+  add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
+
+  create_table "manual_expenses", force: :cascade do |t|
+    t.integer  "expense_id", limit: 4
+    t.string   "merchant",   limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
+
   create_table "policies", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.integer  "company_id", limit: 4
@@ -127,6 +166,16 @@ ActiveRecord::Schema.define(version: 20160630084358) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "user_tags", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "name",       limit: 255,                null: false
+    t.boolean  "active",                 default: true, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "user_tags", ["user_id"], name: "index_user_tags_on_user_id", using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "",   null: false
     t.string   "encrypted_password",     limit: 255, default: "",   null: false
@@ -157,14 +206,42 @@ ActiveRecord::Schema.define(version: 20160630084358) do
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "version_associations", force: :cascade do |t|
+    t.integer "version_id",       limit: 4
+    t.string  "foreign_key_name", limit: 255, null: false
+    t.integer "foreign_key_id",   limit: 4
+  end
+
+  add_index "version_associations", ["foreign_key_name", "foreign_key_id"], name: "index_version_associations_on_foreign_key", using: :btree
+  add_index "version_associations", ["version_id"], name: "index_version_associations_on_version_id", using: :btree
+
+  create_table "versions", force: :cascade do |t|
+    t.string   "item_type",      limit: 191,        null: false
+    t.integer  "item_id",        limit: 4,          null: false
+    t.string   "event",          limit: 255,        null: false
+    t.string   "whodunnit",      limit: 255
+    t.text     "object",         limit: 4294967295
+    t.datetime "created_at"
+    t.integer  "transaction_id", limit: 4
+  end
+
+  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
+  add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
+
   add_foreign_key "amounts", "currencies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "expenses", "amounts"
+  add_foreign_key "expenses", "expense_statuses"
+  add_foreign_key "expenses", "expense_types"
+  add_foreign_key "expenses", "users"
+  add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "policies", "companies"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
+  add_foreign_key "user_tags", "users"
   add_foreign_key "users", "companies"
 end

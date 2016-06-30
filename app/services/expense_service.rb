@@ -1,6 +1,7 @@
 class ExpenseService < BaseService
 
   def initialize(current_user)
+    super()
     @user = current_user
   end
 
@@ -34,11 +35,16 @@ class ExpenseService < BaseService
     return if params.blank?
     expense_params = load_expense_params params
     expense = load_expense expense_params[:id] || expense_params[:expense_id]
-    if expense && expense.update(expense_params)
+    unless expense
+      return false
+    end
+    if expense.update(expense_params)
       expense.reload
       return expense
+    else
+      errors << expense.errors.full_messages
+      return false
     end
-    false
   end
 
   def report_expenses

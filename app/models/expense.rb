@@ -17,10 +17,11 @@ class Expense < ActiveRecord::Base
   validates :amount_id, uniqueness: true
   validate :no_future_date
 
+  # cannot add an expense with future date
   def no_future_date
     if date > Date.today
       errors.add(:date, "cannot be in the futute!")
     end
   end
-  
+
 end

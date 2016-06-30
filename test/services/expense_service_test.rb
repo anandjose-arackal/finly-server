@@ -16,7 +16,7 @@ class ExpenseServiceTest < ActiveSupport::TestCase
                                 note: "New note",
                                 expense_status_id: 2,
                                 expense_type_id: 1,
-                                date: Date.tomorrow,
+                                date: Date.yesterday,
                                 currency_id: 1},
                      }
     @user = User.first
@@ -36,7 +36,7 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     edited_expense = @es.update_expense(@update_params)
     assert_equal "Uber", edited_expense.merchant_name
     assert_equal "New note", edited_expense.note
-    assert_equal Date.tomorrow, edited_expense.date
+    assert_equal Date.yesterday, edited_expense.date
 
   end
 
@@ -53,8 +53,6 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     expenses = @es.user_expenses
     assert "Uber", expenses.first.merchant_name
   end
-
-  test
 
 
 end
