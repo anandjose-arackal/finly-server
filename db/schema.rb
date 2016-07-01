@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160701064303) do
+ActiveRecord::Schema.define(version: 20160701090033) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -119,9 +119,12 @@ ActiveRecord::Schema.define(version: 20160701064303) do
     t.string   "image_content_type", limit: 255
     t.integer  "image_file_size",    limit: 4
     t.datetime "image_updated_at"
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
+  add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|

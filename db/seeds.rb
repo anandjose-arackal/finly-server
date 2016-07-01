@@ -94,3 +94,8 @@ if Expense.count == 0
   end
 end
 
+if Receipt.count == 0
+  receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"),
+                            user_id: 1)
+end
+
