@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160630084358) do
+ActiveRecord::Schema.define(version: 20160701064303) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -109,6 +109,20 @@ ActiveRecord::Schema.define(version: 20160630084358) do
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
+
+  create_table "receipts", force: :cascade do |t|
+    t.integer  "expense_id",         limit: 4
+    t.integer  "user_id",            limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.string   "image_file_name",    limit: 255
+    t.string   "image_content_type", limit: 255
+    t.integer  "image_file_size",    limit: 4
+    t.datetime "image_updated_at"
+  end
+
+  add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
+  add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                     limit: 4
@@ -237,6 +251,8 @@ ActiveRecord::Schema.define(version: 20160630084358) do
   add_foreign_key "expenses", "users"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "policies", "companies"
+  add_foreign_key "receipts", "expenses"
+  add_foreign_key "receipts", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"

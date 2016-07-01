@@ -4,10 +4,13 @@ class Expense < ActiveRecord::Base
   belongs_to :user
   belongs_to :expense_type
 
+  has_many :receipts, as: :attachment
+
   has_one :manual_expense, dependent: :destroy
 
   accepts_nested_attributes_for :amount, :expense_status, :expense_type, :manual_expense
 
+  # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
   delegate :expense_type, to: :expense_type
   delegate :expense_status, to: :expense_status
@@ -23,5 +26,6 @@ class Expense < ActiveRecord::Base
       errors.add(:date, "cannot be in the futute!")
     end
   end
+
 
 end

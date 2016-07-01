@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
   has_many :tags, class_name: 'UserTag', dependent: :destroy
   has_many :expenses
+  has_many :receipts
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile

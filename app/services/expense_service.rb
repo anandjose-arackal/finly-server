@@ -51,6 +51,15 @@ class ExpenseService < BaseService
 
   end
 
+  # accepts receipt and expense
+  def attach_receipt_to_expense
+
+  end
+
+  def detach_receipt_from_expense
+
+  end
+
   # todo - will come in report
   # def reject_expenses(id, memo=nil)
   #   return if id.blank?

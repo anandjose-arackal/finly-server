@@ -69,5 +69,4 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     assert "Uber", expenses.first.merchant_name
   end
 
-
 end
