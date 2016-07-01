@@ -53,15 +53,17 @@ class ExpenseService < BaseService
   end
 
   # accepts receipt and expense
-  def add_receipt_to_expense(receipt_params = {}, expense_id = nil)
-    return if receipt_params.blank? || expense_id.nil?
-    expense = @user.expenses.find_by(id: expense_id)
+  def add_receipt_to_expense(params = {}, expense_id = nil)
+    return if params.blank? || expense_id.nil?
+    receipt_params = load_receipt_params params
+    expense = load_expense expense_id
     return unless expense
+    # create the expense associated with the expense
     attach = expense.receipts.create(receipt_params)
     # associating the current user with the receipt
     attach.user = @user
     if attach.save
-      return expense
+      return attach
     else
       errors << attach.errors.full_messages
       false
@@ -147,6 +149,10 @@ class ExpenseService < BaseService
     # other conditions based on type of expense can go here
     end
     expense_params
+  end
+
+  def load_receipt_params(params)
+    receipt_params = params[:receipt].slice(:image)
   end
 
   def load_expense(id)

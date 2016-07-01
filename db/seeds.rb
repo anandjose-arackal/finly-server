@@ -86,7 +86,7 @@ if Expense.count == 0
   200.times do |i|
     e = Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
                        expense_status_id: random_integer(1, 3),
-                       expense_type_id: random_integer(1, 4),
+                       expense_type_id: 1,
                        note: "test note #{i}",
                        date: Date.today,
                        user_id: random_integer(1, 10),
@@ -97,5 +97,7 @@ end
 if Receipt.count == 0
   receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"),
                             user_id: 1)
+  receipt.parent = Expense.where(user_id: 1).where(expense_type_id: 1).first
+  receipt.save
 end
 

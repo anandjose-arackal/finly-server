@@ -3,6 +3,7 @@ require 'test_helper'
 class ExpenseServiceTest < ActiveSupport::TestCase
 
   def setup
+    @image = File.open(Rails.root + "app/assets/images/1363397.jpg", "r")
     @expense_params = {expense: {amount: 100,
                                  merchant: "Olacabs",
                                  note: "Sup dawg",
@@ -19,9 +20,6 @@ class ExpenseServiceTest < ActiveSupport::TestCase
                                 date: Date.yesterday,
                                 currency_id: 1},
                      }
-    @user = User.first
-    @es = ExpenseService.new(@user)
-    @expense = @user.expenses.first
     @invalid_expense_params = {expense: {amount: 100,
                                          merchant: "Olacabs",
                                          note: "Sup dawg",
@@ -31,6 +29,13 @@ class ExpenseServiceTest < ActiveSupport::TestCase
                                          currency_id: 1},
                               }
 
+    @user = User.first
+    @es = ExpenseService.new(@user)
+    @expense = @user.expenses.first
+    @second_expense = @user.expenses.second
+    @receipt_params = {receipt: {image: @image}}
+    @receipt = @expense.receipts.first
+    @second_receipt = Receipt.create(user_id: 1, image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"))
   end
 
   test 'cannot create expense in the future' do
@@ -67,6 +72,33 @@ class ExpenseServiceTest < ActiveSupport::TestCase
   test "should return a user's expenses with manual expense details" do
     expenses = @es.user_expenses
     assert "Uber", expenses.first.merchant_name
+  end
+
+  test 'must add a receipt to an expense' do
+    receipt = nil
+    assert_difference '@expense.receipts.count', 1 do
+      receipt = @es.add_receipt_to_expense(@receipt_params, @expense.id)
+    end
+    assert_equal @expense.id, receipt.parent.id # i.e. receipt has successfully been associated with expense
+    assert_equal receipt.user.id, @user.id # i.e. receipt still belongs to user
+  end
+
+  test 'must detach an existing receipt from expense' do
+    assert_difference '@expense.receipts.count', -1 do
+      @receipt = @es.detach_receipt_from_expense(@receipt.id, @expense.id)
+    end
+    assert_not @receipt.parent # i.e. receipt has successfully been dissociated with expense
+    assert_equal @receipt.user.id, @user.id # i.e. receipt still belongs to user
+  end
+
+  test 'must attach an existing receipt to an expense' do
+    assert_equal 0, @second_expense.receipts.count, "Expense already has receipts." # i.e. no receipts associated with this expense
+    assert_nil @second_receipt.parent # i.e. the receipt does not have a parent
+    assert_difference '@second_expense.receipts.count', 1 do
+      @second_receipt = @es.attach_receipt_to_expense(@second_receipt.id, @second_expense.id)
+    end
+    assert_not_nil @second_receipt.parent, "Receipt not assigned a parent."
+    assert_equal @second_expense.id, @second_receipt.parent.id
   end
 
 end
