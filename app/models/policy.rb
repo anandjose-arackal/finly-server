@@ -4,6 +4,7 @@ class Policy < ActiveRecord::Base
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
   has_many :users, through: :user_mapping
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
+  has_many :user_role_mappings, dependent: :destroy
 
   scope :default, -> { find_by default: true }
   scope :non_default, -> { where default: false }

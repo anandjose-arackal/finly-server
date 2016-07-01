@@ -19,6 +19,8 @@ class User < ActiveRecord::Base
   validates :name, presence: true
   # validate :valid_role
 
+  scope :by_user, ->(user_id) { find_by id: user_id }
+
   after_create do
     self.build_profile.save if self.profile.blank?
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
@@ -28,24 +30,34 @@ class User < ActiveRecord::Base
     self.user_roles
   end
 
-  def admin?
-    self.roles.admin.present?
+  def admin?(policy=nil)
+    mapping = role_mapping
+    mapping = mapping.policy(policy.id) if policy.present?
+    mapping.admin.present?
   end
 
-  def finance_manager?
-    self.roles.finance_manager.present?
+  def finance_manager?(policy=nil)
+    mapping = role_mapping
+    mapping = mapping.policy(policy.id) if policy.present?
+    mapping.finance_manager.present?
   end
 
-  def manager?
-    self.roles.manager.present?
+  def manager?(policy=nil)
+    mapping = role_mapping
+    mapping = mapping.policy(policy.id) if policy.present?
+    mapping.manager.present?
   end
 
-  def employee?
-    self.roles.employee.present?
+  def employee?(policy=nil)
+    mapping = role_mapping
+    mapping = mapping.policy(policy.id) if policy.present?
+    mapping.employee.present?
   end
 
-  def auditor?
-    self.roles.auditor.present?
+  def auditor?(policy=nil)
+    mapping = role_mapping
+    mapping = mapping.policy(policy.id) if policy.present?
+    mapping.auditor.present?
   end
 
   private

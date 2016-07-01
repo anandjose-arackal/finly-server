@@ -1,7 +1,8 @@
-class UserTeamService
+class UserTeamService < BaseService
   attr_accessor :user
 
   def initialize(user)
+    super()
     self.user = user
   end
 
@@ -126,6 +127,20 @@ class UserTeamService
     errors.blank?
   end
 
+  def update_role(params={})
+    errors.clear
+    load_role_update params
+    existing_roles = user.role_mapping.policy(@policy_id).map(&:user_role_id)
+    new_roles = params[:user_role]
+    new_roles = [new_roles] unless new_roles.is_a? Array
+    roles_to_add = new_roles - existing_roles
+    roles_to_remove = existing_roles - new_roles
+    user.role_mapping.policy(@policy_id).role(roles_to_remove).delete_all
+    roles_to_add.each do |role_id|
+      user.role_mapping.create(policy_id: @policy_id, user_role_id: role_id)
+    end
+  end
+
   private
   def load_retrieve(params={})
     @admin_view = nil
@@ -182,6 +197,11 @@ class UserTeamService
       errors << 'Another manager is already configured for the given amount' if mapping.approves_finance_to.present?
     end
     errors.blank?
+  end
+
+  def load_role_update(params={})
+    @policy_id = params[:policy_id]
+    @roles = self.user.roles
   end
 
 end

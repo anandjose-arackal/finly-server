@@ -14,14 +14,6 @@ if UserRole.count == 0
   UserRole.create(id: 5, name: "Auditor")
 end
 
-if PolicyUserRole.count == 0
-  PolicyUserRole.create(id: 1, name: "Admin")
-  PolicyUserRole.create(id: 2, name: "Finance Manager")
-  PolicyUserRole.create(id: 3, name: "Manager")
-  PolicyUserRole.create(id: 4, name: "Employee")
-  PolicyUserRole.create(id: 5, name: "Auditor")
-end
-
 if Currency.count == 0
   Currency.create(country: "India", country_code: "INR")
 end
@@ -67,7 +59,7 @@ if User.count == 0
 end
 
 if Policy.non_default.count == 0
-  p = PolicyCreateService.new.create_policy(c, 'Test Policy')
+  p = PolicyCreateService.new.create_policy(c,a, 'Test Policy')
   p.configuration.update_attribute(:require_category, true) if p.present?
   PolicyUserService.new(p).add_user(u[0])
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)

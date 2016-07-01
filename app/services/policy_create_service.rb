@@ -1,12 +1,17 @@
 class PolicyCreateService < BaseService
 
-  def create_policy(company, name)
+  def create_policy(company, user, name)
     errors.clear
     cloned_policy = company.policies.default.deep_clone except: [:users, :user_mapping]
     cloned_policy.name = name
     cloned_policy.default = false
     errors << cloned_policy.errors.full_messages unless cloned_policy.save
-    return cloned_policy if errors.blank?
+    if errors.blank?
+      user_service = PolicyUserService.new(cloned_policy)
+      # Add the creating user as admin
+      user_service.add_user user, [UserRole.admin_id]
+      return cloned_policy
+    end
     false
   end
 

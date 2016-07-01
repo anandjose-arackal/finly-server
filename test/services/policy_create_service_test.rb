@@ -5,6 +5,7 @@ class PolicyCreateServiceTest < ActiveSupport::TestCase
   def setup
     @company = Company.first
     @policy = @company.policies.non_default.first
+    @admin = User.find_by(email: 'admin@finlytest.io')
     @user = User.find_by(email: 'user0@finlytest.io')
     @manager = User.find_by(email: 'manager0@finlytest.io')
     @manager4 = User.find_by(email: 'manager4@finlytest.io')
@@ -13,18 +14,18 @@ class PolicyCreateServiceTest < ActiveSupport::TestCase
   test 'creating a new policy should clone the existing company policy' do
     # Policy cannot be created unless name is provided
     policy_create_service = PolicyCreateService.new
-    assert_not policy_create_service.create_policy(@company, nil)
+    assert_not policy_create_service.create_policy(@company,@admin, nil)
     assert policy_create_service.errors.present?
 
     # Successfully created a new policy by cloning companies default policy
-    new_policy = policy_create_service.create_policy(@company, 'Test')
+    new_policy = policy_create_service.create_policy(@company,@admin, 'Test')
     assert new_policy.present? and new_policy.valid?
     assert policy_create_service.errors.blank?
     assert_not new_policy.default
     assert @company.policies.default.user_team_mapping.count, new_policy.user_team_mapping.count
 
     # Company cannot have two policies with the same names
-    assert_not policy_create_service.create_policy @company, 'Test'
+    assert_not policy_create_service.create_policy @company,@admin, 'Test'
     assert policy_create_service.errors.present?
   end
 
