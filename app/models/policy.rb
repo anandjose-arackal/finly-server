@@ -15,6 +15,8 @@ class Policy < ActiveRecord::Base
   validate :valid_name
   validate :one_default_per_company
 
+  has_paper_trail
+
   after_create do
     self.build_configuration.save unless self.configuration.present?
   end

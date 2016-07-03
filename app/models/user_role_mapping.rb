@@ -3,6 +3,8 @@ class UserRoleMapping < ActiveRecord::Base
   belongs_to :user_role
   belongs_to :policy
 
+  has_paper_trail
+
   scope :role, ->(role_id) { where user_role_id: role_id }
   scope :policy, ->(policy_id) { where policy_id: policy_id }
   scope :admin, -> { where(user_role_id: UserRole.admin_id) }

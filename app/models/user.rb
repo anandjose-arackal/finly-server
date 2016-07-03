@@ -10,6 +10,8 @@ class User < ActiveRecord::Base
   has_many :user_roles, through: :role_mapping
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
   has_many :tags, class_name: 'UserTag', dependent: :destroy
+  has_many :policy_user_mappings
+  has_many :policies, through: :policy_user_mappings
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile

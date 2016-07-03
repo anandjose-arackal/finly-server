@@ -118,7 +118,7 @@ class UserTeamService < BaseService
       errors.add << 'Non default configuration cannot be reset'
       return false
     end
-    self.user.team_mapping.policy(@policy_id).delete_all
+    self.user.team_mapping.policy(@policy_id).destroy_all
     self.user.team_mapping.policy(nil).each do |item|
       clone = item.dup
       clone.policy_id = @policy_id
@@ -135,7 +135,7 @@ class UserTeamService < BaseService
     new_roles = [new_roles] unless new_roles.is_a? Array
     roles_to_add = new_roles - existing_roles
     roles_to_remove = existing_roles - new_roles
-    user.role_mapping.policy(@policy_id).role(roles_to_remove).delete_all
+    user.role_mapping.policy(@policy_id).role(roles_to_remove).destroy_all
     roles_to_add.each do |role_id|
       user.role_mapping.create(policy_id: @policy_id, user_role_id: role_id)
     end
@@ -155,14 +155,8 @@ class UserTeamService < BaseService
     @mappings = self.user.team_mapping
     @amount = params[:amount]
     @currency_id = params[:currency_id]
-    view = params[:view]
-    if view == 'admin'
-      @admin_view = true
-    elsif view == 'manager'
-      @manager_view = true
-    elsif view == 'finance'
-      @finance_view = true
-    end
+
+    load_view params
   end
 
   def load_update(params={})

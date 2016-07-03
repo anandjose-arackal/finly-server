@@ -8,4 +8,6 @@ class PolicyUserMapping < ActiveRecord::Base
   # Used in PolicyUserService to get single user belonging to the policy
   scope :policy_user_map, ->(policy, user) { find_by policy: policy, user: user }
 
+  has_paper_trail
+
 end
