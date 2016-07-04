@@ -232,12 +232,12 @@ ActiveRecord::Schema.define(version: 20160629173936) do
   add_index "version_associations", ["version_id"], name: "index_version_associations_on_version_id", using: :btree
 
   create_table "versions", force: :cascade do |t|
-    t.string   "item_type",      limit: 191,        null: false
-    t.integer  "item_id",        limit: 4,          null: false
-    t.string   "event",          limit: 255,        null: false
+    t.string   "item_type",      limit: 191,                      null: false
+    t.integer  "item_id",        limit: 4,                        null: false
+    t.string   "event",          limit: 255,                      null: false
     t.string   "whodunnit",      limit: 255
     t.text     "object",         limit: 4294967295
-    t.datetime "created_at"
+    t.datetime "created_at",                        precision: 6
     t.integer  "transaction_id", limit: 4
   end
 

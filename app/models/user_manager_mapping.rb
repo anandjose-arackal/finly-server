@@ -1,4 +1,6 @@
 class UserManagerMapping < ActiveRecord::Base
+  include PolicyVersion
+
   belongs_to :user
   belongs_to :manager, class_name: "User"
   belongs_to :finance_manager, class_name: "User"
@@ -8,7 +10,6 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :policy
   accepts_nested_attributes_for :greater_than_amount
 
-  has_paper_trail
 
   validate :valid_default
   validate :valid_non_default

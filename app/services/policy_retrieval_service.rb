@@ -1,10 +1,6 @@
 class PolicyRetrievalService < BaseService
 
-  def self.for_report(report_id)
-
-  end
-
-  def self.set_version(report_id)
+  def self.for_report(report)
 
   end
 
