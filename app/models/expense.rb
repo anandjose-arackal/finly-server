@@ -16,7 +16,8 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
-  # to ensure two expenses don't have the same foreign key
+
+
   # validates :amount_id, uniqueness: true
   validate :no_future_date
 

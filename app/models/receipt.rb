@@ -14,7 +14,7 @@ class Receipt < ActiveRecord::Base
   def validate_expense_user
     if self.user && self.parent
       if self.user.id != self.parent.user.id
-        errors.add(:base, "Parent expense does not belong to same user as this user.")
+        errors.add(:base, "Parent expense does not belong to current user.")
       end
     end
   end

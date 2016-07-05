@@ -18,6 +18,7 @@ class ExpenseService < BaseService
       return expense
     else
       errors << expense.errors.full_messages
+      return false
     end
   end
 

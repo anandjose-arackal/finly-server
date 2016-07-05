@@ -30,9 +30,11 @@ class ExpenseServiceTest < ActiveSupport::TestCase
                               }
 
     @user = User.first
+    @other_user = User.second
     @es = ExpenseService.new(@user)
     @expense = @user.expenses.first
     @second_expense = @user.expenses.second
+    @other_expense = @other_user.expenses.first
     @receipt_params = {receipt: {image: @image}}
     @receipt = @expense.receipts.first
     @second_receipt = Receipt.create(user_id: 1, image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"))
@@ -99,6 +101,10 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     end
     assert_not_nil @second_receipt.parent, "Receipt not assigned a parent."
     assert_equal @second_expense.id, @second_receipt.parent.id
+  end
+
+  test "cannot attach receipt to someone else's expense" do
+
   end
 
 end
