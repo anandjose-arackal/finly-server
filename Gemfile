@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
-
+# Gem to show db schema in model file
+gem 'annotate'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'

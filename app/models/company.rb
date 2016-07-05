@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: companies
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  active     :boolean          default(TRUE), not null
+#
+
 class Company < ActiveRecord::Base
   has_many :users
   has_many :contacts, as: :contactable

@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: expenses
+#
+#  id                :integer          not null, primary key
+#  amount_id         :integer
+#  expense_status_id :integer
+#  note              :text(65535)
+#  date              :datetime
+#  user_id           :integer
+#  expense_type_id   :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  manager_memo      :string(255)
+#
+
 class Expense < ActiveRecord::Base
   belongs_to :amount
   belongs_to :expense_status
@@ -27,6 +43,5 @@ class Expense < ActiveRecord::Base
       errors.add(:date, "cannot be in the futute!")
     end
   end
-
 
 end

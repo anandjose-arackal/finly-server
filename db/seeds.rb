@@ -107,3 +107,13 @@ if Receipt.count == 0
   receipt.save
 end
 
+if ExpenseRuleType.count == 0
+  e = ExpenseRuleType.create!(name: "Require Receipt")
+  e = ExpenseRuleType.create!(name: "Require Note")
+end
+
+if RuleType.count == 0
+  e = RuleType.create!(name: "Warning")
+  e = RuleType.create!(name: "Blocking")
+end
+

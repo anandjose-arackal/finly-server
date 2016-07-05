@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: policies
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  company_id :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  default    :boolean          default(FALSE), not null
+#
+
 class Policy < ActiveRecord::Base
   belongs_to :company
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
