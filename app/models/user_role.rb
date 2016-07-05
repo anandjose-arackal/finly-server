@@ -1,9 +1,30 @@
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 
-  scope :admin, -> { where(id: 1) }
-  scope :finance_manager, -> { where(id: 2) }
-  scope :manager, -> { where(id: 3) }
-  scope :employee, -> { where(id: [1, 2, 3, 4]) }
-  scope :auditor, -> { where(id: 5) }
+  scope :admin, -> { where(id: UserRole.admin_id) }
+  scope :finance_manager, -> { where(id: UserRole.finance_manager_id) }
+  scope :manager, -> { where(id: UserRole.manager_id) }
+  scope :employee, -> { where(id: UserRole.employee_id) }
+  scope :auditor, -> { where(id: UserRole.auditor_id) }
+
+  def self.admin_id
+    1
+  end
+
+  def self.finance_manager_id
+    2
+  end
+
+  def self.manager_id
+    3
+  end
+
+  def self.employee_id
+    4
+  end
+
+  def self.auditor_id
+    5
+  end
+
 end

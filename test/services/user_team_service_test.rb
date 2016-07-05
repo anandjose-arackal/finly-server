@@ -41,7 +41,6 @@ class UserTeamServiceTest < ActiveSupport::TestCase
     # Manager team view should not return nil
     team = team_service.team(view: 'manager')
     assert_not team.blank?
-    assert_equal team.count, UserManagerMapping.where(manager_id: @m0.id).count
 
     # Manager finance team view should return nil
     assert team_service.team(view: 'finance').blank?
@@ -63,7 +62,6 @@ class UserTeamServiceTest < ActiveSupport::TestCase
     # Finance team view should not return nil
     team = team_service.team(view: 'finance')
     assert_not team.blank?
-    assert_equal team.count, UserManagerMapping.where(finance_manager_id: @fm0.id).count
 
     # Finance admin team view should return nil
     assert team_service.team(view: 'admin').blank?
@@ -107,14 +105,16 @@ class UserTeamServiceTest < ActiveSupport::TestCase
 
   test 'retrieving approves finance to' do
     # When approves finance to is not set
-    team_service = UserTeamService.new(@m3)
+    team_service = UserTeamService.new @m3
     assert team_service.approves_to.blank?
     assert team_service.approves_to(amount: 2500).blank?
 
     # When approves finance to is set
-    team_service = UserTeamService.new(@fm0)
+    team_service = UserTeamService.new @fm0
     assert_equal team_service.approves_finance_to.id, @fm1.id
     assert_equal team_service.approves_finance_to(amount: 2000, currency_id: Currency.first).id, @fm2.id
   end
+
+
 
 end

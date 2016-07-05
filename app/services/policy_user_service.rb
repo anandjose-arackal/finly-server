@@ -1,0 +1,57 @@
+class PolicyUserService < BaseService
+  attr_accessor :policy
+
+  def initialize(policy)
+    super()
+    self.policy = policy
+  end
+
+  def add_user(user, user_roles=[])
+    errors.clear
+    if user.blank?
+      errors << 'No user selected'
+      return false
+    end
+    if self.policy.users.find_by(id: user.id).present?
+      errors << 'User already added'
+      return false
+    end
+
+    # Add user to policy mapping
+    self.policy.user_mapping.create(user: user)
+
+    # Add user configuration
+    user.team_mapping.policy(nil).each do |item|
+      cloned_item = item.dup
+      cloned_item.update_attribute(:policy_id, self.policy.id)
+    end
+
+    # Add user roles
+    user_roles = [UserRole.employee_id] unless user_roles.present?
+    UserTeamService.new(user).update_role(policy_id: policy.id, user_role: user_roles)
+    true
+  end
+
+  def remove_user(user)
+    errors.clear
+    if user.blank?
+      errors << 'No user selected'
+      return false
+    end
+
+    if self.policy.users.find_by(id: user.id).blank?
+      errors << 'User not found in policy'
+      return false
+    end
+
+    # Remove user configuration
+    user.team_mapping.policy(policy.id).destroy_all
+
+    # Remove user roles
+    user.role_mapping.policy(policy.id).destroy_all
+
+    # Remove user
+    self.policy.users.destroy(user) if user.present?
+  end
+
+end

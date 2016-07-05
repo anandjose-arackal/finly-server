@@ -65,7 +65,13 @@ if User.count == 0
   fm[0].team_mapping.default.update_attributes(approves_finance_to_user: fm[1])
   fm[0].team_mapping.build(approves_finance_to_user: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
+end
 
+if Policy.non_default.count == 0
+  p = PolicyCreateService.new.create_policy(c,a, 'Test Policy')
+  p.configuration.update_attribute(:require_category, true) if p.present?
+  PolicyUserService.new(p).add_user(u[0])
+  u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
 end
 
 if ExpenseType.count ==0
