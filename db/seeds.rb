@@ -117,3 +117,10 @@ if RuleType.count == 0
   e = RuleType.create!(name: "Blocking")
 end
 
+if BudgetPeriod.count == 0
+  b = BudgetPeriod.create!(name: "Day")
+  b = BudgetPeriod.create!(name: "Week")
+  b = BudgetPeriod.create!(name: "Month")
+  b = BudgetPeriod.create!(name: "Year")
+end
+

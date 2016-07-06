@@ -13,9 +13,13 @@
 #
 
 class ExpenseRule < ActiveRecord::Base
-  belongs_to :amount
+  belongs_to :greater_than_amount, class_name: "Amount"
   belongs_to :category
 
   belongs_to :rule_type
   belongs_to :expense_rule_type
+
+  accepts_nested_attributes_for :greater_than_amount
+
+  delegate :amount_value, to: :greater_than_amount
 end
