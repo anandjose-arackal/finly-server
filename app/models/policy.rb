@@ -18,6 +18,9 @@ class Policy < ActiveRecord::Base
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
   has_many :user_role_mappings, dependent: :destroy
 
+  has_many :expense_rules
+  has_many :budget_rules
+
   scope :default, -> { find_by default: true }
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
@@ -31,6 +34,13 @@ class Policy < ActiveRecord::Base
 
   after_create do
     self.build_configuration.save unless self.configuration.present?
+  end
+
+  def rules_count
+    count = 0
+    count += self.expense_rules.count
+    count += self.budget_rules.count
+    return count
   end
 
   private
@@ -47,4 +57,5 @@ class Policy < ActiveRecord::Base
       errors.add(:company, 'cannot have more than one default policy') if default_policy.present? and default_policy != self
     end
   end
+
 end

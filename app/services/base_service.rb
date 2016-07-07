@@ -20,4 +20,5 @@ class BaseService
       @personal_view = true
     end
   end
+
 end

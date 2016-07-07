@@ -19,6 +19,7 @@ class Expense < ActiveRecord::Base
   belongs_to :expense_status
   belongs_to :user
   belongs_to :expense_type
+  belongs_to :category
 
   has_many :receipts, as: :parent
 
@@ -32,7 +33,9 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
+  delegate :category_name, to :category
 
+  delegate :receipt_file_name, to: :receipt
 
   # validates :amount_id, uniqueness: true
   validate :no_future_date

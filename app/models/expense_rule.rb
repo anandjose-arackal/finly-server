@@ -18,8 +18,10 @@ class ExpenseRule < ActiveRecord::Base
 
   belongs_to :rule_type
   belongs_to :expense_rule_type
+  belongs_to :policy
 
   accepts_nested_attributes_for :greater_than_amount
 
   delegate :amount_value, to: :greater_than_amount
+  delegate :type, to: :rule_type
 end

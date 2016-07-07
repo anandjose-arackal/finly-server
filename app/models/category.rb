@@ -14,4 +14,10 @@
 
 class Category < ActiveRecord::Base
   belongs_to :company
+
+  # returns the name of the category if it's active
+  def category_name
+    return self.name if self.active
+    false
+  end
 end

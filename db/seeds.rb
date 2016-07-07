@@ -38,6 +38,10 @@ else
   c = Company.first
 end
 
+if c.categories.count == 0
+  cat = c.categories.create!(name: "Test category")
+end
+
 if User.count == 0
   a = User.create(company: Company.first, name: "Finly Admin", email: "admin@finlytest.io",
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 1}])
@@ -72,6 +76,8 @@ if Policy.non_default.count == 0
   p.configuration.update_attribute(:require_category, true) if p.present?
   PolicyUserService.new(p).add_user(u[0])
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
+
+  p = PolicyCreateService.new.create_policy(c,a, 'Another test Policy')
 end
 
 if ExpenseType.count ==0
@@ -110,6 +116,7 @@ end
 if ExpenseRuleType.count == 0
   e = ExpenseRuleType.create!(name: "Require Receipt")
   e = ExpenseRuleType.create!(name: "Require Note")
+  e = ExpenseRuleType.create!(name: "Disallow Expense")
 end
 
 if RuleType.count == 0
@@ -122,5 +129,17 @@ if BudgetPeriod.count == 0
   b = BudgetPeriod.create!(name: "Week")
   b = BudgetPeriod.create!(name: "Month")
   b = BudgetPeriod.create!(name: "Year")
+end
+
+if p.rules_count ==0
+  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 100, currency_id: 1},
+                              category_id: 1,
+                              days_after: 20,
+                              rule_type_id: 1,
+                              expense_rule_type_id: 2)
+  b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
+                             category_id: 1,
+                             budget_period_id: 3,
+                             rule_type_id: 1)
 end
 

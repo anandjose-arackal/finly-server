@@ -36,6 +36,10 @@ class Receipt < ActiveRecord::Base
     end
   end
 
+  def receipt_file_name
+    self.image_file_name
+  end
+
   def belongs_to?(user)
     user.receipts.find_by(id: self.id)
   end

@@ -1,19 +1,24 @@
 class ViolationService < BaseService
 
+  attr_accessor :warning_messages
+
   def initialize(current_user)
     @user = current_user
-
+    warning_messages = {}
   end
 
   def violations(policy, report)
 
-    # placeholder for rules - can later be loaded from rules engine, or any other method
-    expense_rules = policy.expense_rules
-    budget_rules = policy.budget_rules
-
-    # currently loading as an array of expenses, will later be loaded from report
-    expenses = report
-
+    # # placeholder for rules - can later be loaded from rules engine, or any other method
+    # expense_rules = policy.expense_rules
+    # budget_rules = policy.budget_rules
+    #
+    # # currently loading as an array of expenses, will later be loaded from report
+    # expenses = report
+    #
+    # ###### change this later to retrieve the policy from the report
+    # policy = PolicyRetrievalService.list(@user).first
+    # warning_messages = apply_policy_for_report(report)
 
   end
 
@@ -47,32 +52,23 @@ class ViolationService < BaseService
         return false
       end
     end
-    if rule.days_before
-      time_elapsed = (Date.today - expense.date).to_i
-      if time_elapsed <= rule.days_before
-        expense.auto_approved = true
-      else
-        return false
-      end
-    end
-
     message
   end
 
 
   # checks the passed expense against the passed rule
-  def check_rule(rule, expense, rule_name, manager = nil)
+  def check_rule(rule, expense, manager = nil)
     warning = "Expenses"
     broken = false
     # first check if there's a violation with the common criteria
-    message = check_violation(expense, rule, manager)
+    message = check_expense_rule_violation(expense, rule, manager)
     # checking if the specific rule is actually broken
-    case rule_name
-      when 'receipt'
+    case rule.expense_rule_type_id
+      when 1
         if expense.receipt_file_name
           message = false # i.e. the rule is not broken because there is a receipt
         end
-      when 'note'
+      when 2
         if expense.note && !expense.note.blank?
           message = false # i.e. the rule is not broken because there is a note
         end
@@ -80,26 +76,37 @@ class ViolationService < BaseService
         # do nothing
     end
     if message
-      expense.auto_approved = true if rule_name == 'auto_approve'
       warning += message
       broken = true
     end
-    warning += " require a receipt." if rule_name == 'receipt'
-    warning += " require a note." if rule_name == 'note'
-    warning += " are not allowed." if rule_name == 'disallow'
+    warning += " require a receipt." if rule.expense_rule_type_id == 1
+    warning += " require a note." if rule.expense_rule_type_id == 2
+    warning += " are not allowed." if rule.expense_rule_type_id == 3
 
-    if broken && rule_name!='auto_approve'
-      if rule.rule_type == 'warning'
-        if self.warning_messages[expense.id]['warning'][rule_name].nil?
-          self.warning_messages[expense.id]['warning'][rule_name] = [warning]
+    # initializing the rule name
+    case rule.expense_rule_type_id
+      when 1
+        rule_name = 'receipt'
+      when 2
+        rule_name = 'note'
+      when 3
+        rule_name = 'disallow'
+      else
+        # do nothing
+    end
+
+    if broken
+      if rule.type == 'warning'
+        if warning_messages[expense.id]['warning'][rule_name].nil?
+          warning_messages[expense.id]['warning'][rule_name] = [warning]
         else
-          self.warning_messages[expense.id]['warning'][rule_name] << warning
+          warning_messages[expense.id]['warning'][rule_name] << warning
         end
-      elsif rule.rule_type == 'blocking'
-        if self.warning_messages[expense.id]['blocking'][rule_name].nil?
-          self.warning_messages[expense.id]['blocking'][rule_name] = [warning]
+      elsif rule.type == 'blocking'
+        if warning_messages[expense.id]['blocking'][rule_name].nil?
+          warning_messages[expense.id]['blocking'][rule_name] = [warning]
         else
-          self.warning_messages[expense.id]['blocking'][rule_name] << warning
+          warning_messages[expense.id]['blocking'][rule_name] << warning
         end
       end
     end
@@ -109,7 +116,7 @@ class ViolationService < BaseService
     user = expense.user
     total_expenses = 0
     # all user reports with the associated budget
-    user.reports.where(policy_id: policy.id).where.not(id: self.id).each do |budget_report|
+    user.reports.where(policy_id: rule.policy_id).where.not(id: self.id).each do |budget_report|
       if category
         total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).sum(:amount), :precision => 2).to_f
       else
@@ -131,19 +138,19 @@ class ViolationService < BaseService
     if rule.amount
       if rule.period
         # setting the start and end date based on the kind of period set by the user
-        if rule.period == 'month'
+        if rule.period == 'Month'
           start_date = expense.date.beginning_of_month
           end_date = expense.date.end_of_month
           budget_message = " for the month of " + start_date.strftime("%B") + ", " + start_date.strftime("%Y")
-        elsif rule.period == 'week'
+        elsif rule.period == 'Week'
           start_date = expense.date.beginning_of_week
           end_date = expense.date.end_of_week
           budget_message = " for the week beginning " + start_date.to_s
-        elsif rule.period == 'year'
+        elsif rule.period == 'Year'
           start_date = expense.date.beginning_of_year
           end_date = expense.date.end_of_year
           budget_message = " for the year " + start_date.strftime("%Y")
-        elsif rule.period == 'day'
+        elsif rule.period == 'Day'
           start_date = end_date = expense.date
           budget_message = " for date " + start_date.strftime("%B %d, %Y")
         end
@@ -154,24 +161,32 @@ class ViolationService < BaseService
           category = nil
         end
         if budget_violation?(expense, rule, start_date, end_date, category)
-          if rule.rule_type == 'warning'
+          if rule.type == 'Warning'
             if category
-              self.warning_messages[expense.id]['warning'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount.to_s
+              warning_messages[expense.id]['Warning'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount.to_s
             else
-              self.warning_messages[expense.id]['warning']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount.to_s
+              warning_messages[expense.id]['Warning']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount.to_s
             end
             return
-          elsif rule.rule_type == 'blocking'
+          elsif rule.type == 'Blocking'
             if category
-              self.warning_messages[expense.id]['blocking'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount.to_s
+              warning_messages[expense.id]['Blocking'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount.to_s
             else
-              self.warning_messages[expense.id]['warning']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount.to_s
+              warning_messages[expense.id]['Blocking']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount.to_s
             end
             return
           end
         end
       end
     end
+  end
+
+  def apply_policy_for_report(report = nil)
+    unless report
+      errors << "No report passed."
+      return false
+    end
+
   end
 
 

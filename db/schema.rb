@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160705164520) do
+ActiveRecord::Schema.define(version: 20160707083000) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -121,11 +121,13 @@ ActiveRecord::Schema.define(version: 20160705164520) do
     t.datetime "updated_at",                       null: false
     t.integer  "rule_type_id",           limit: 4
     t.integer  "expense_rule_type_id",   limit: 4
+    t.integer  "policy_id",              limit: 4
   end
 
   add_index "expense_rules", ["category_id"], name: "index_expense_rules_on_category_id", using: :btree
   add_index "expense_rules", ["expense_rule_type_id"], name: "index_expense_rules_on_expense_rule_type_id", using: :btree
   add_index "expense_rules", ["greater_than_amount_id"], name: "index_expense_rules_on_greater_than_amount_id", using: :btree
+  add_index "expense_rules", ["policy_id"], name: "index_expense_rules_on_policy_id", using: :btree
   add_index "expense_rules", ["rule_type_id"], name: "index_expense_rules_on_rule_type_id", using: :btree
 
   create_table "expense_statuses", force: :cascade do |t|
@@ -151,9 +153,11 @@ ActiveRecord::Schema.define(version: 20160705164520) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.string   "manager_memo",      limit: 255
+    t.integer  "category_id",       limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
+  add_index "expenses", ["category_id"], name: "index_expenses_on_category_id", using: :btree
   add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
@@ -361,8 +365,10 @@ ActiveRecord::Schema.define(version: 20160705164520) do
   add_foreign_key "company_tags", "companies"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
+  add_foreign_key "expense_rules", "policies"
   add_foreign_key "expense_rules", "rule_types"
   add_foreign_key "expenses", "amounts"
+  add_foreign_key "expenses", "categories"
   add_foreign_key "expenses", "expense_statuses"
   add_foreign_key "expenses", "expense_types"
   add_foreign_key "expenses", "users"

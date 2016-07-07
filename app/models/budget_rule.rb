@@ -20,4 +20,7 @@ class BudgetRule < ActiveRecord::Base
   belongs_to :rule_type
 
   accepts_nested_attributes_for :amount, :budget_period
+
+  delegate :period, to: :budget_period
+  delegate :type, to: :rule_type
 end
