@@ -12,6 +12,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  manager_memo      :string(255)
+#  category_id       :integer
 #
 
 class Expense < ActiveRecord::Base
@@ -33,7 +34,7 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
-  delegate :category_name, to :category
+  delegate :category_name, to: :category
 
   delegate :receipt_file_name, to: :receipt
 

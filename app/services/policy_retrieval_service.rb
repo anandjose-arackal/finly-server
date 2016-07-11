@@ -5,7 +5,7 @@ class PolicyRetrievalService < BaseService
   end
 
 
-  def self.list(user, params={})
+  def list(user, params={})
     if user.blank?
       errors << 'No user selected'
       return false

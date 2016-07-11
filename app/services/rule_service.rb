@@ -2,13 +2,15 @@ class RuleService < BaseService
 
   def initialize(current_user)
     super()
+    # currently assumes that the user calling this cannot be anyone but admin
+    # todo - checks inside here to determine whether user is admin
     @user = current_user
   end
 
   def add_expense_rule(params)
     # retrieving policies from the policy retrieval service
-    policy = retrieve_policy params[:policy_id]
     rule_params = retrieve_expense_rule_params params
+    policy = retrieve_policy rule_params[:policy_id]
     rule = policy.expense_rules.create!(rule_params)
     if rule.save
       return rule
@@ -31,8 +33,8 @@ class RuleService < BaseService
 
   def add_budget_rule(params)
     # retrieving policies from the policy retrieval service
-    policy = retrieve_policy params[:policy_id]
     rule_params = retrieve_budget_rule_params params
+    policy = retrieve_policy rule_params[:policy_id]
     rule = policy.budget_rules.create!(rule_params)
     if rule.save
       return rule
@@ -68,12 +70,16 @@ class RuleService < BaseService
 
   def retrieve_expense_rule_params(params = {})
     return if params.blank?
-    params.require(:expense_rule)
+    expense_rule_params = params[:expense_rule].except(:amount, :currency_id)
+    expense_rule_params[:greater_than_amount_attributes] = {value: params[:expense_rule][:amount], currency_id: params[:expense_rule][:currency_id]}
+    expense_rule_params
   end
 
   def retrieve_budget_rule_params(params = {})
     return if params.blank?
-    params.require(:budget_rule)
+    budget_rule_params = params[:budget_rule].except(:amount, :currency_id)
+    budget_rule_params[:amount_attributes] = {value: params[:expense_rule][:amount], currency_id: params[:expense_rule][:currency_id]}
+    budget_rule_params
   end
 
   def load_expense_rule(params = {})
@@ -87,7 +93,7 @@ class RuleService < BaseService
   end
 
   def retrieve_policy(policy_id)
-    PolicyRetrievalService.list(@user, view: 'admin').where(id: policy_id)
+    PolicyRetrievalService.new.list(@user, view: 'admin').where(id: policy_id).first
   end
 
 end

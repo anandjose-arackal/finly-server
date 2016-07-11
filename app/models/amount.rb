@@ -20,11 +20,12 @@ class Amount < ActiveRecord::Base
   #   return item
   # end
 
-  # delegated from expense model
+  # method that returns the amount value
   def amount_value
     self.value
   end
 
+  # method that returns the currency code
   def currency_id
     self.currency.country_code
   end

@@ -64,6 +64,8 @@ class User < ActiveRecord::Base
     self.user_roles
   end
 
+
+
   def admin?(policy=nil)
     mapping = role_mapping
     mapping = mapping.policy(policy.id) if policy.present?

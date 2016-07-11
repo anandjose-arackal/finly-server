@@ -131,7 +131,8 @@ if BudgetPeriod.count == 0
   b = BudgetPeriod.create!(name: "Year")
 end
 
-if p.rules_count ==0
+p = Policy.find(3)
+if p.rules_count == 0
   r = p.expense_rules.create!(greater_than_amount_attributes: {value: 100, currency_id: 1},
                               category_id: 1,
                               days_after: 20,

@@ -7,18 +7,19 @@ class ViolationService < BaseService
     warning_messages = {}
   end
 
+  # checks for policy violations in a report and returns returns false if there aren't any
   def violations(policy, report)
 
-    # # placeholder for rules - can later be loaded from rules engine, or any other method
+    # placeholder for rules - can later be loaded from rules engine, or any other method
     # expense_rules = policy.expense_rules
     # budget_rules = policy.budget_rules
-    #
-    # # currently loading as an array of expenses, will later be loaded from report
-    # expenses = report
-    #
-    # ###### change this later to retrieve the policy from the report
-    # policy = PolicyRetrievalService.list(@user).first
-    # warning_messages = apply_policy_for_report(report)
+
+    # currently loading as an array of expenses, will later be loaded from report
+    expenses = report
+
+    ###### change this later to retrieve the policy from the report
+    policy = PolicyRetrievalService.list(@user).first
+    apply_policy_for_report(report, policy)
 
   end
 
@@ -57,7 +58,7 @@ class ViolationService < BaseService
 
 
   # checks the passed expense against the passed rule
-  def check_rule(rule, expense, manager = nil)
+  def check_expense_rule(rule, expense, manager = nil)
     warning = "Expenses"
     broken = false
     # first check if there's a violation with the common criteria
@@ -135,7 +136,7 @@ class ViolationService < BaseService
   end
 
   def check_budget(rule, expense)
-    if rule.amount
+    if rule.amount_value
       if rule.period
         # setting the start and end date based on the kind of period set by the user
         if rule.period == 'Month'
@@ -181,12 +182,19 @@ class ViolationService < BaseService
     end
   end
 
-  def apply_policy_for_report(report = nil)
-    unless report
-      errors << "No report passed."
+  def apply_policy_for_report(report = nil, policy = nil)
+    unless report || policy
+      errors << "No report or policy passed."
       return false
     end
-
+    report.expenses.each do |expense|
+      policy.expense_rules.each do |rule|
+        check_expense_rule rule, expense
+      end
+      policy.budget_rules.each do |rule|
+        check_budget rule, expense
+      end
+    end
   end
 
 

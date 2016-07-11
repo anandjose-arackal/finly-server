@@ -10,6 +10,7 @@
 #  updated_at             :datetime         not null
 #  rule_type_id           :integer
 #  expense_rule_type_id   :integer
+#  policy_id              :integer
 #
 
 class ExpenseRule < ActiveRecord::Base
@@ -24,4 +25,6 @@ class ExpenseRule < ActiveRecord::Base
 
   delegate :amount_value, to: :greater_than_amount
   delegate :type, to: :rule_type
+  delegate :category_name, to: :category
+
 end

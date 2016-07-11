@@ -26,6 +26,11 @@ class Policy < ActiveRecord::Base
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
 
+
+  delegate :expense_rules_count, to: :expense_rules
+  delegate :budget_rules_count, to: :budget_rules
+
+
   validates :company_id, presence: true
   validate :valid_name
   validate :one_default_per_company
@@ -34,6 +39,14 @@ class Policy < ActiveRecord::Base
 
   after_create do
     self.build_configuration.save unless self.configuration.present?
+  end
+
+  def expense_rules_count
+    self.expense_rules.count
+  end
+
+  def budget_rules_count
+    self.budget_rules.count
   end
 
   def rules_count

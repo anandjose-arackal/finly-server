@@ -6,6 +6,8 @@ class PolicyUserService < BaseService
     self.policy = policy
   end
 
+
+  # adds a particular user and his associated role within the policy
   def add_user(user, user_roles=[])
     errors.clear
     if user.blank?
