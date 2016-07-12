@@ -50,4 +50,8 @@ class ReportTrackingAction < ActiveRecord::Base
     10
   end
 
+  def self.take_control_id
+    11
+  end
+
 end

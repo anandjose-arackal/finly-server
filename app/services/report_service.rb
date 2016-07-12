@@ -15,10 +15,13 @@ class ReportService < BaseService
 
   def create(params={})
     return false unless validate require_user: true
-    report = user.reports.build status: ReportStatus.open, controlling_user: user
+    report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
     report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
     if report.save
       if report_track.save
+        if params[:expenses].present?
+          add_expense params[:expenses]
+        end
         return report
       end
       report.destroy
@@ -52,6 +55,9 @@ class ReportService < BaseService
     if report.update_attributes report_status_id: ReportStatus.processing_id, controlling_user_id: manager.id, memo: memo
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.submit_id, report_status_id: ReportStatus.processing_id, memo: memo
       if track.save
+        report.expenses.each do |expense|
+          expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
+        end
         return true
       end
       errors << track.errors.full_messages
@@ -73,6 +79,9 @@ class ReportService < BaseService
     if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.retract_id, report_status_id: ReportStatus.retracted_id
       if track.save
+        report.expenses.each do |expense|
+          expense.update_attribute(:expense_status_id, ExpenseStatus.unsubmitted_id)
+        end
         return true
       end
       errors << track.errors.full_messages
@@ -81,7 +90,7 @@ class ReportService < BaseService
     false
   end
 
-  def approve(params)
+  def approve(params={})
     return false unless validate require_user: true, require_report: true
     auto_approve = params[:auto_approve]
     unless report.controlling_user.id == user.id
@@ -100,7 +109,9 @@ class ReportService < BaseService
       user_team_service = UserTeamService.new(report.user)
       manager = user_team_service.finance_manager(currency: report_detail_service.currency, amount: report_detail_service.total_amount)
     end
-    if report.update_attributes report_status_id: status, controlling_user_id: manager.id
+    manager_id = nil
+    manager_id = manager.id if manager.present?
+    if report.update_attributes report_status_id: status, controlling_user_id: manager_id
       if auto_approve
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
       else
@@ -115,12 +126,7 @@ class ReportService < BaseService
     false
   end
 
-  def reject_to_users
-
-  end
-
   def reject(to_user, memo)
-    errors.clear
 
   end
 
@@ -140,40 +146,83 @@ class ReportService < BaseService
 
   end
 
+  def share_with(users)
+
+  end
+
+  def rejectable_to_users
+    return false unless validate require_report: true
+    report.associated_users(user)
+  end
+
   def add_expense(expense_ids)
     return false unless validate require_user: true, require_report: true
+    unless report.user.id == user.id
+      errors << 'Only report owners can add expenses to report'
+      return false
+    end
     if expense_ids.blank?
       errors << 'Expense not found'
       return false
     end
-    expenses = user.expenses.unreported.where(id: expense_ids)
+    expenses = user.expenses.unreported.with_id(expense_ids)
     if expenses.blank?
       errors << 'Expense not found'
       return false
     end
-    expenses.each { |expense| expense.update_attribute(:report_id, report.id) }
+    unless report.open? or report.retracted?
+      errors << 'Cannot add expenses to report unless report is in open or retracted state'
+      return false
+    end
+    expenses.each { |expense| expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil) }
     report.reload
-    # if expenses.is_a?(Expense)
-    #   if expenses.user.id != self.user.id
-    #     errors << 'User does not have permission to add this expense to the report'
-    #     return false
-    #   end
-    #   expenses.update_attribute(:report, report)
-    # else
-    #   if expenses.where.not(user_id: user.id).present?
-    #     errors << 'User does not have permission to add these expenses to the report'
-    #     return false
-    #   end
-    #   expenses.update_all(report_id: report.id)
-    # end
   end
 
-  def remove_expense
-
+  def remove_expense(expense_ids)
+    return false unless validate require_user: true, require_report: true
+    unless report.user.id == user.id
+      errors << 'Only report owners can remove expenses from report'
+      return false
+    end
+    if expense_ids.blank?
+      errors << 'Expense not found'
+      return false
+    end
+    expenses = report.expenses.with_id(expense_ids)
+    if expenses.blank?
+      errors << 'Expense not found'
+      return false
+    end
+    unless report.open? or report.retracted?
+      errors << 'Cannot remove expenses from report unless report is in open or retracted state'
+      return false
+    end
+    expenses.each { |expense| expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.unreported_id) }
+    report.reload
   end
 
-  def reject_expense
-
+  def reject_expense(expense_ids, params={})
+    return false unless validate require_user: true, require_report: true
+    unless report.controlling_user_id.present? and report.controlling_user.id == user.id
+      errors << 'You do not control the report to perform the following action'
+      return false
+    end
+    if expense_ids.blank?
+      errors << 'Expense not found'
+      return false
+    end
+    expenses = report.expenses.with_id(expense_ids)
+    if expenses.blank?
+      errors << 'Expense not found'
+      return false
+    end
+    unless report.processing? or report.approved?
+      errors << 'Cannot reject expenses from report unless report is in processing state'
+      return false
+    end
+    expenses.each { |expense| expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.rejected_id,
+                                                        manager_memo: params[:memo], rejecting_manager: user) }
+    report.reload
   end
 
   def edit_expense

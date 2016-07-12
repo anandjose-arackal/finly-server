@@ -36,6 +36,33 @@ class Report < ActiveRecord::Base
     end
   end
 
+  # Used to retrieve all the users associated with this report. If user before is provided,
+  # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  def associated_users(user_before = nil)
+    return nil if tracks.blank?
+    trackings = tracks.without_take_control_action
+    if user_before.present?
+      track = trackings.find_by(action_user_id: user_before.id)
+      unless track.blank?
+        trackings = trackings.created_before(track.created_at)
+      end
+    end
+    user_ids = trackings.map(&:action_user_id).uniq
+    if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
+      if controlling_for_user_id.present?
+        user_ids << controlling_for_user_id
+      else
+        user_ids << controlling_user_id
+      end
+    end
+    if user_ids.size > 0
+      # Order is MySQL Specific
+      user_ids = user_ids.reverse!
+      return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})" )
+    end
+    nil
+  end
+
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end

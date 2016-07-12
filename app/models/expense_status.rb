@@ -25,8 +25,12 @@ class ExpenseStatus < ActiveRecord::Base
     2
   end
 
-  def self.rejected_id
+  def self.submitted_id
     3
+  end
+
+  def self.rejected_id
+    4
   end
 
 end

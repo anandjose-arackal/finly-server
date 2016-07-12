@@ -15,4 +15,21 @@ module ReportServiceTestHelper
     report_service.add_expense(expenses)
   end
 
+  def dummy_report_flow(user, params={})
+    report_service = ReportService.new(user: user)
+    report = report_service.create
+    return report if params[:create]
+    report_service = ReportService.new(user: user, report: report)
+    add_dummy_expenses(user, report)
+    return report if params[:create_and_add_expenses]
+    report_service.submit
+    return report if params[:submit] or report.controlling_user.blank?
+    while report.processing?
+      report_service = ReportService.new(user: report.controlling_user, report: report)
+      report_service.approve
+    end
+    return report if params[:submit] or report[:final_approve]
+
+  end
+
 end

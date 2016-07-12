@@ -45,6 +45,7 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create(id: 8, name: 'reimburse')
   ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
   ReportTrackingAction.create(id: 10, name: 'close')
+  ReportTrackingAction.create(id: 11, name: 'take_control')
 end
 
 if Currency.count == 0
@@ -113,9 +114,10 @@ if ExpenseType.count ==0
 end
 
 if ExpenseStatus.count ==0
-  ExpenseStatus.create(id: 1, name: "Unsubmitted", order: 1)
-  ExpenseStatus.create(id: 2,name: "Submitted", order: 2)
-  ExpenseStatus.create(id: 3,name: "Rejected", order: 3)
+  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
+  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
+  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
+  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
 end
 
 if Expense.count == 0
