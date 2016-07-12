@@ -52,7 +52,7 @@ class Expense < ActiveRecord::Base
 
   # cannot add an expense with future date
   def no_future_date
-    if date > Date.today
+    if date.present? and date > Date.today
       errors.add(:date, "cannot be in the future!")
     end
   end

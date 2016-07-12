@@ -47,7 +47,7 @@ class RuleService < BaseService
   def edit_expense_rule(params)
     rule_params = retrieve_expense_rule_params params
     rule = load_expense_rule params
-    if rule.update(rule_params)
+    if rule.update_attributes(rule_params)
       return rule
     else
       errors << rule.errors.full_messages
@@ -58,7 +58,7 @@ class RuleService < BaseService
   def edit_budget_rule(params)
     rule_params = retrieve_expense_rule_params params
     rule = load_budget_rule params
-    if rule.update(rule_params)
+    if rule.update_attributes(rule_params)
       return rule
     else
       errors << rule.errors.full_messages

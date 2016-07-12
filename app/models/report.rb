@@ -25,6 +25,7 @@ class Report < ActiveRecord::Base
   belongs_to :forwarding_to, class_name: 'User'
   has_many :tracks, class_name: 'ReportTrack'
   has_many :expenses
+  has_many :comments, class_name: 'ReportComment'
 
   validates :user, presence: true
   validates :status, presence: true
@@ -58,7 +59,7 @@ class Report < ActiveRecord::Base
     if user_ids.size > 0
       # Order is MySQL Specific
       user_ids = user_ids.reverse!
-      return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})" )
+      return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
     end
     nil
   end

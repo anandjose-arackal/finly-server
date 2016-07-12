@@ -16,16 +16,13 @@ class ReportService < BaseService
   def create(params={})
     return false unless validate require_user: true
     report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
-    report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
     if report.save
-      if report_track.save
-        if params[:expenses].present?
-          add_expense params[:expenses]
-        end
-        return report
+      report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
+      report_track.save
+      if params[:expenses].present?
+        add_expense params[:expenses]
       end
-      report.destroy
-      errors << report_track.errors.full_messages
+      return report
     end
     errors << report.errors.full_messages
     false
@@ -54,13 +51,14 @@ class ReportService < BaseService
     memo = params[:memo]
     if report.update_attributes report_status_id: ReportStatus.processing_id, controlling_user_id: manager.id, memo: memo
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.submit_id, report_status_id: ReportStatus.processing_id, memo: memo
-      if track.save
-        report.expenses.each do |expense|
-          expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
-        end
-        return true
+      track.save
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_submit_id
+      comment.save
+      report.expenses.each do |expense|
+        expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
       end
-      errors << track.errors.full_messages
+      return true
+
     end
     errors << report.errors.full_messages
     false
@@ -78,13 +76,13 @@ class ReportService < BaseService
     end
     if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.retract_id, report_status_id: ReportStatus.retracted_id
-      if track.save
-        report.expenses.each do |expense|
-          expense.update_attribute(:expense_status_id, ExpenseStatus.unsubmitted_id)
-        end
-        return true
+      track.save
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_retract_id
+      comment.save
+      report.expenses.each do |expense|
+        expense.update_attribute(:expense_status_id, ExpenseStatus.unsubmitted_id)
       end
-      errors << track.errors.full_messages
+      return true
     end
     errors << report.errors.full_messages
     false
@@ -113,14 +111,15 @@ class ReportService < BaseService
     manager_id = manager.id if manager.present?
     if report.update_attributes report_status_id: status, controlling_user_id: manager_id
       if auto_approve
+        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_auto_approve_id
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
       else
+        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_approve_id
         track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status
       end
-      if track.save
-        return true
-      end
-      errors << track.errors.full_messages
+      track.save
+      comment.save
+      return true
     end
     errors << report.errors.full_messages
     false
@@ -174,7 +173,15 @@ class ReportService < BaseService
       errors << 'Cannot add expenses to report unless report is in open or retracted state'
       return false
     end
-    expenses.each { |expense| expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil) }
+    retracted = report.retracted?
+    expenses.each do |expense|
+      if expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
+        if retracted
+          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense_id: expense.id
+          comment.save
+        end
+      end
+    end
     report.reload
   end
 
@@ -197,7 +204,15 @@ class ReportService < BaseService
       errors << 'Cannot remove expenses from report unless report is in open or retracted state'
       return false
     end
-    expenses.each { |expense| expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.unreported_id) }
+    retracted = report.retracted?
+    expenses.each do |expense|
+      if expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
+        if retracted
+          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_remove_id, expense_id: expense.id
+          comment.save
+        end
+      end
+    end
     report.reload
   end
 
@@ -220,17 +235,32 @@ class ReportService < BaseService
       errors << 'Cannot reject expenses from report unless report is in processing state'
       return false
     end
-    expenses.each { |expense| expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.rejected_id,
-                                                        manager_memo: params[:memo], rejecting_manager: user) }
+    expenses.each do |expense|
+      if expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.rejected_id,
+                                   manager_memo: params[:memo], rejecting_manager: user)
+        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_reject_id, expense_id: expense.id, content: params[:memo]
+        comment.save
+      end
+    end
     report.reload
   end
 
-  def edit_expense
+# Callback to create comments in reports when expense is updated
+  def expense_updated(expense)
 
   end
 
-  def rename_report
-
+  def rename_report(name)
+    return false unless validate require_report: true
+    old_name = report.name
+    report.name = name
+    if report.save
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id, updated_field: 'name', updated_from: old_name, updated_to: report.name
+      comment.save
+      return true
+    end
+    errors << report.errors.full_messages
+    false
   end
 
   def attach_receipt
@@ -238,6 +268,10 @@ class ReportService < BaseService
   end
 
   def delete_report
+
+  end
+
+  def archive_report
 
   end
 

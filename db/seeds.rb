@@ -46,6 +46,28 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
   ReportTrackingAction.create(id: 10, name: 'close')
   ReportTrackingAction.create(id: 11, name: 'take_control')
+  ReportTrackingAction.create(id: 12, name: 'delete')
+  ReportTrackingAction.create(id: 13, name: 'archive')
+end
+
+if ReportCommentAction.count == 0
+  ReportCommentAction.create(id: 1, name: 'report_comment')
+  ReportCommentAction.create(id: 2, name: 'report_retract')
+  ReportCommentAction.create(id: 3, name: 'report_submit')
+  ReportCommentAction.create(id: 4, name: 'report_approve')
+  ReportCommentAction.create(id: 5, name: 'report_auto_approve')
+  ReportCommentAction.create(id: 6, name: 'report_reject')
+  ReportCommentAction.create(id: 7, name: 'report_unapprove')
+  ReportCommentAction.create(id: 8, name: 'report_reimburse')
+  ReportCommentAction.create(id: 9, name: 'report_reimbursement_received')
+  ReportCommentAction.create(id: 10, name: 'report_close')
+  ReportCommentAction.create(id: 11, name: 'report_take_control')
+  ReportCommentAction.create(id: 12, name: 'report_update')
+  ReportCommentAction.create(id: 13, name: 'report_attach_receipt')
+  ReportCommentAction.create(id: 14, name: 'expense_add')
+  ReportCommentAction.create(id: 15, name: 'expense_remove')
+  ReportCommentAction.create(id: 16, name: 'expense_reject')
+  ReportCommentAction.create(id: 17, name: 'expense_update')
 end
 
 if Currency.count == 0

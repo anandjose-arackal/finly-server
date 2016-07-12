@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  report_id: 
+  user_id: 
+  report_comment_action_id: 
+  expense_id: 
+  updated_field: MyString
+  updated_from: MyString
+  updated_to: MyString
+  rejected_to_id: 1
+  content: MyText
+
+two:
+  report_id: 
+  user_id: 
+  report_comment_action_id: 
+  expense_id: 
+  updated_field: MyString
+  updated_from: MyString
+  updated_to: MyString
+  rejected_to_id: 1
+  content: MyText

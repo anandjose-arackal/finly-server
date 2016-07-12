@@ -54,4 +54,12 @@ class ReportTrackingAction < ActiveRecord::Base
     11
   end
 
+  def self.delete_id
+    12
+  end
+
+  def self.archive_id
+    13
+  end
+
 end

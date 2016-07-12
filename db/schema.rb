@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160711162157) do
+ActiveRecord::Schema.define(version: 20160712175130) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -231,6 +231,32 @@ ActiveRecord::Schema.define(version: 20160711162157) do
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
 
+  create_table "report_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "report_comments", force: :cascade do |t|
+    t.integer  "report_id",                limit: 4,     null: false
+    t.integer  "report_comment_action_id", limit: 4,     null: false
+    t.integer  "user_id",                  limit: 4
+    t.integer  "expense_id",               limit: 4
+    t.string   "updated_field",            limit: 255
+    t.text     "updated_from",             limit: 65535
+    t.text     "updated_to",               limit: 65535
+    t.integer  "rejected_to_id",           limit: 4
+    t.text     "content",                  limit: 65535
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "report_comments", ["expense_id"], name: "index_report_comments_on_expense_id", using: :btree
+  add_index "report_comments", ["rejected_to_id"], name: "index_report_comments_on_rejected_to_id", using: :btree
+  add_index "report_comments", ["report_comment_action_id"], name: "index_report_comments_on_report_comment_action_id", using: :btree
+  add_index "report_comments", ["report_id"], name: "index_report_comments_on_report_id", using: :btree
+  add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
+
   create_table "report_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.integer  "order",      limit: 4
@@ -433,6 +459,10 @@ ActiveRecord::Schema.define(version: 20160711162157) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "users"
+  add_foreign_key "report_comments", "expenses"
+  add_foreign_key "report_comments", "report_comment_actions"
+  add_foreign_key "report_comments", "reports"
+  add_foreign_key "report_comments", "users"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"
