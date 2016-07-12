@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160707083000) do
+ActiveRecord::Schema.define(version: 20160711162157) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -150,16 +150,19 @@ ActiveRecord::Schema.define(version: 20160707083000) do
     t.datetime "date"
     t.integer  "user_id",           limit: 4
     t.integer  "expense_type_id",   limit: 4
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
     t.string   "manager_memo",      limit: 255
+    t.integer  "report_id",         limit: 4
     t.integer  "category_id",       limit: 4
+    t.boolean  "reimbursable",                    default: false, null: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
   add_index "expenses", ["category_id"], name: "index_expenses_on_category_id", using: :btree
   add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
+  add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
 
   create_table "manual_expenses", force: :cascade do |t|
@@ -226,6 +229,55 @@ ActiveRecord::Schema.define(version: 20160707083000) do
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
+
+  create_table "report_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.integer  "order",      limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "report_tracking_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "report_tracks", force: :cascade do |t|
+    t.integer  "report_id",                 limit: 4,   null: false
+    t.integer  "action_user_id",            limit: 4
+    t.integer  "report_tracking_action_id", limit: 4
+    t.integer  "report_status_id",          limit: 4,   null: false
+    t.string   "memo",                      limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
+  add_index "report_tracks", ["report_id"], name: "index_report_tracks_on_report_id", using: :btree
+  add_index "report_tracks", ["report_status_id"], name: "index_report_tracks_on_report_status_id", using: :btree
+  add_index "report_tracks", ["report_tracking_action_id"], name: "index_report_tracks_on_report_tracking_action_id", using: :btree
+
+  create_table "reports", force: :cascade do |t|
+    t.string   "name",                    limit: 255,               null: false
+    t.integer  "user_id",                 limit: 4,                 null: false
+    t.integer  "report_status_id",        limit: 4,                 null: false
+    t.integer  "policy_id",               limit: 4
+    t.datetime "submitted_at",                        precision: 6
+    t.integer  "controlling_user_id",     limit: 4,                 null: false
+    t.integer  "controlling_for_user_id", limit: 4
+    t.integer  "forwarding_to_id",        limit: 4
+    t.string   "memo",                    limit: 255
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+  end
+
+  add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
+  add_index "reports", ["controlling_user_id"], name: "index_reports_on_controlling_user_id", using: :btree
+  add_index "reports", ["forwarding_to_id"], name: "index_reports_on_forwarding_to_id", using: :btree
+  add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
+  add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
+  add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
   create_table "rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -371,6 +423,7 @@ ActiveRecord::Schema.define(version: 20160707083000) do
   add_foreign_key "expenses", "categories"
   add_foreign_key "expenses", "expense_statuses"
   add_foreign_key "expenses", "expense_types"
+  add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "policies", "companies"
@@ -379,6 +432,12 @@ ActiveRecord::Schema.define(version: 20160707083000) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "users"
+  add_foreign_key "report_tracks", "report_statuses"
+  add_foreign_key "report_tracks", "report_tracking_actions"
+  add_foreign_key "report_tracks", "reports"
+  add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_statuses"
+  add_foreign_key "reports", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"

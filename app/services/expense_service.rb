@@ -1,4 +1,5 @@
 class ExpenseService < BaseService
+  attr_accessor :user
 
   def initialize(current_user)
     super()

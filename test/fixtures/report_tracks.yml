@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  report_id: 
+  owner_id: 1
+  controlling_user_id: 1
+  report_status_id: 
+  received_from_id: 1
+  forwarding_to_id: 1
+  previous_tracking_id: 1
+  next_tracking_id: 1
+  report_tracking_action_id: 
+  action_user_id: 1
+  memo: MyString
+
+two:
+  report_id: 
+  owner_id: 1
+  controlling_user_id: 1
+  report_status_id: 
+  received_from_id: 1
+  forwarding_to_id: 1
+  previous_tracking_id: 1
+  next_tracking_id: 1
+  report_tracking_action_id: 
+  action_user_id: 1
+  memo: MyString

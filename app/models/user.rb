@@ -44,9 +44,13 @@ class User < ActiveRecord::Base
   has_many :receipts
   has_many :policy_user_mappings
   has_many :policies, through: :policy_user_mappings
+  has_many :reports
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
+
+  has_paper_trail
 
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}

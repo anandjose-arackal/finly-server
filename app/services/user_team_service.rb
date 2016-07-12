@@ -32,24 +32,32 @@ class UserTeamService < BaseService
     # todo validate if its better to go with rescue when manager is not assigned or have a seperate check which might result in 2 queries
     # return nil unless self.user.team_mapping.manager.present? # todo sample check
     # return @mapping.default.manager if @default
-    @mappings.manager.policy(@policy_id).amount(@currency_id, @amount).manager rescue nil
+    obj = @mappings.manager.policy(@policy_id).amount(@currency_id, @amount).manager rescue nil
+    return nil unless obj.present? and obj.is_a?(User)
+    obj
   end
 
   def finance_manager(params={})
     load_retrieve params
-    @mappings.finance_manager.policy(@policy_id).amount(@currency_id, @amount).finance_manager rescue nil
+    obj = @mappings.finance_manager.policy(@policy_id).amount(@currency_id, @amount).finance_manager rescue nil
+    return nil unless obj.present? and obj.is_a?(User)
+    obj
   end
 
   def approves_to(params={})
     return nil unless user.manager?
     load_retrieve params
-    @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).approves_to_user rescue nil
+    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).approves_to_user rescue nil
+    return nil unless obj.present? and obj.is_a?(User)
+    obj
   end
 
   def approves_finance_to(params={})
     return nil unless user.finance_manager?
     load_retrieve params
-    @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).approves_finance_to_user rescue nil
+    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).approves_finance_to_user rescue nil
+    return nil unless obj.present? and obj.is_a?(User)
+    obj
   end
 
   # Update service
@@ -152,6 +160,15 @@ class UserTeamService < BaseService
     @amount = nil
 
     @policy_id = params[:policy_id]
+    @policy_version_timestamp = params[:policy_version]
+    if @policy_id.blank? and params[:policy] and params[:policy].present? and params[:policy].is_a?(Policy)
+      @policy_id = params[:policy].id
+    end
+    if @policy_id.blank? and params[:report] and params[:report].present? and params[:report].is_a?(Report)
+      @policy_id = params[:report].policy_id
+      # todo when report is created add submitted at field for calculating version
+      # @policy_version_timestamp = params[:report].submitted_at
+    end
     @mappings = self.user.team_mapping
     @amount = params[:amount]
     @currency_id = params[:currency_id]

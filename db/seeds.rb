@@ -23,8 +23,32 @@ if UserRole.count == 0
   UserRole.create(id: 5, name: "Auditor")
 end
 
+if ReportStatus.count == 0
+  ReportStatus.create(id: 1, name: 'Open', order: 1)
+  ReportStatus.create(id: 2, name: 'Retracted', order: 2)
+  ReportStatus.create(id: 3, name: 'Rejected', order: 3)
+  ReportStatus.create(id: 4, name: 'Processing', order: 4)
+  ReportStatus.create(id: 5, name: 'Approved', order: 5)
+  ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
+  ReportStatus.create(id: 7, name: 'Reimbursement Confirmed', order: 7)
+  ReportStatus.create(id: 8, name: 'Closed', order: 8)
+end
+
+if ReportTrackingAction.count == 0
+  ReportTrackingAction.create(id: 1, name: 'create')
+  ReportTrackingAction.create(id: 2, name: 'retract')
+  ReportTrackingAction.create(id: 3, name: 'submit')
+  ReportTrackingAction.create(id: 4, name: 'approve')
+  ReportTrackingAction.create(id: 5, name: 'auto_approve')
+  ReportTrackingAction.create(id: 6, name: 'reject')
+  ReportTrackingAction.create(id: 7, name: 'unapprove')
+  ReportTrackingAction.create(id: 8, name: 'reimburse')
+  ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
+  ReportTrackingAction.create(id: 10, name: 'close')
+end
+
 if Currency.count == 0
-  Currency.create(country: "India", country_code: "INR")
+  Currency.create(id: 1, country: "India", country_code: "INR")
 end
 
 if Amount.count == 0
@@ -72,26 +96,26 @@ if User.count == 0
 end
 
 if Policy.non_default.count == 0
-  p = PolicyCreateService.new.create_policy(c,a, 'Test Policy')
+  p = PolicyCreateService.new.create_policy(c, a, 'Test Policy')
   p.configuration.update_attribute(:require_category, true) if p.present?
   PolicyUserService.new(p).add_user(u[0])
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
 
-  p = PolicyCreateService.new.create_policy(c,a, 'Another test Policy')
+  p = PolicyCreateService.new.create_policy(c, a, 'Another test Policy')
 end
 
 if ExpenseType.count ==0
-  ExpenseType.create(name: "Manual")
-  ExpenseType.create(name: "Card")
-  ExpenseType.create(name: "Distance")
-  ExpenseType.create(name: "Time")
-  ExpenseType.create(name: "Per Diem")
+  ExpenseType.create(id: 1, name: "Manual")
+  ExpenseType.create(id: 2, name: "Card")
+  ExpenseType.create(id: 3, name: "Distance")
+  ExpenseType.create(id: 4, name: "Time")
+  ExpenseType.create(id: 5, name: "Per Diem")
 end
 
 if ExpenseStatus.count ==0
-  ExpenseStatus.create(name: "Unsubmitted", order: 1)
-  ExpenseStatus.create(name: "Submitted", order: 2)
-  ExpenseStatus.create(name: "Rejected", order: 3)
+  ExpenseStatus.create(id: 1, name: "Unsubmitted", order: 1)
+  ExpenseStatus.create(id: 2,name: "Submitted", order: 2)
+  ExpenseStatus.create(id: 3,name: "Rejected", order: 3)
 end
 
 if Expense.count == 0
@@ -108,7 +132,7 @@ end
 
 if Receipt.count == 0
   receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"),
-                            user_id: 1)
+                           user_id: 1)
   receipt.parent = Expense.where(user_id: 1).where(expense_type_id: 1).first
   receipt.save
 end

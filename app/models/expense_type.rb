@@ -15,4 +15,23 @@ class ExpenseType < ActiveRecord::Base
     self.name
   end
 
+  def self.manual_expense_id
+    1
+  end
+
+  def self.card_expense_id
+    2
+  end
+
+  def self.distance_expense_id
+    3
+  end
+
+  def self.time_expense_id
+    4
+  end
+
+  def self.per_diem_expense_id
+    5
+  end
 end

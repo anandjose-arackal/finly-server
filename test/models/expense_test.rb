@@ -12,6 +12,9 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  manager_memo      :string(255)
+#  report_id         :integer
+#  category_id       :integer
+#  reimbursable      :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

@@ -1,7 +1,8 @@
 class PolicyRetrievalService < BaseService
 
   def self.for_report(report)
-
+    return report.user.company.default_policy unless report.policy.present?
+    report.policy
   end
 
 

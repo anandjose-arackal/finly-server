@@ -11,4 +11,8 @@
 
 class Currency < ActiveRecord::Base
   has_many :amounts
+
+  def self.default_currency_id
+    1
+  end
 end

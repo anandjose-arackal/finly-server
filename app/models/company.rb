@@ -22,6 +22,10 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
+  def default_policy
+    self.policies.default
+  end
+
   private
   def init_config_present
     self.build_configuration.save unless self.configuration.present?

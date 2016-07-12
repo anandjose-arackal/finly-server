@@ -19,6 +19,14 @@
 class PolicyConfiguration < ActiveRecord::Base
   include PolicyVersion
   belongs_to :policy
+  belongs_to :report_currency, class_name: 'Currency'
 
   scope :for_policy, ->(policy_id){find_by id: policy_id}
+
+  before_save do
+    if self.report_currency_id.blank?
+      self.report_currency_id = Currency.default_currency_id
+    end
+  end
+
 end

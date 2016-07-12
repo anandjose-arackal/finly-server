@@ -12,7 +12,9 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  manager_memo      :string(255)
+#  report_id         :integer
 #  category_id       :integer
+#  reimbursable      :boolean          default(FALSE), not null
 #
 
 class Expense < ActiveRecord::Base
@@ -21,6 +23,7 @@ class Expense < ActiveRecord::Base
   belongs_to :user
   belongs_to :expense_type
   belongs_to :category
+  belongs_to :report
 
   has_many :receipts, as: :parent
 
@@ -34,8 +37,11 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
-  delegate :category_name, to: :category
+  scope :reimbursable, -> { where reimbursable: true }
+  scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
+  scope :unreported, -> { where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]) }
 
+  delegate :category_name, to: :category
   delegate :receipt_file_name, to: :receipt
 
   # validates :amount_id, uniqueness: true
@@ -44,8 +50,28 @@ class Expense < ActiveRecord::Base
   # cannot add an expense with future date
   def no_future_date
     if date > Date.today
-      errors.add(:date, "cannot be in the futute!")
+      errors.add(:date, "cannot be in the future!")
     end
+  end
+
+  def manual_expense?
+    self.expense_type_id == ExpenseType.manual_expense_id
+  end
+
+  def card_expense?
+    self.expense_type_id == ExpenseType.card_expense_id
+  end
+
+  def distance_expense?
+    self.expense_type_id == ExpenseType.distance_expense_id
+  end
+
+  def time_expense?
+    self.expense_type_id == ExpenseType.time_expense_id
+  end
+
+  def per_diem_expense?
+    self.expense_type_id == ExpenseType.per_diem_expense_id
   end
 
 end

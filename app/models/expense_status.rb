@@ -16,4 +16,17 @@ class ExpenseStatus < ActiveRecord::Base
   def expense_status
     self.name
   end
+
+  def self.unreported_id
+    1
+  end
+
+  def self.unsubmitted_id
+    2
+  end
+
+  def self.rejected_id
+    3
+  end
+
 end
