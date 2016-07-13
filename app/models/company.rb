@@ -26,6 +26,10 @@ class Company < ActiveRecord::Base
     self.policies.default
   end
 
+  def get_active_users
+    self.users.where(active: true)
+  end
+
   private
   def init_config_present
     self.build_configuration.save unless self.configuration.present?

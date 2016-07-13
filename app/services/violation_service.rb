@@ -10,12 +10,8 @@ class ViolationService < BaseService
   # checks for policy violations in a report and returns returns false if there aren't any
   def violations(policy, report)
 
-    # placeholder for rules - can later be loaded from rules engine, or any other method
-    # expense_rules = policy.expense_rules
-    # budget_rules = policy.budget_rules
-
-    # currently loading as an array of expenses, will later be loaded from report
-    expenses = report
+    # loading expenses from report
+    expenses = report.expenses
 
     ###### change this later to retrieve the policy from the report
     policy = PolicyRetrievalService.list(@user).first
@@ -115,6 +111,7 @@ class ViolationService < BaseService
 
   def budget_violation?(expense, rule, start_date, end_date, category = nil)
     user = expense.user
+    report = expense.report
     total_expenses = 0
     # all user reports with the associated budget
     user.reports.where(policy_id: rule.policy_id).where.not(id: self.id).each do |budget_report|
@@ -125,9 +122,9 @@ class ViolationService < BaseService
       end
     end
     if category
-      total_expenses += number_with_precision(self.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).sum(:amount), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).sum(:amount), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(self.expenses.where('date >= ? && date <= ?', start_date, end_date).sum(:amount), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).sum(:amount), :precision => 2).to_f
     end
     if total_expenses > rule.amount
       return true
@@ -196,6 +193,5 @@ class ViolationService < BaseService
       end
     end
   end
-
 
 end

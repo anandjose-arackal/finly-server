@@ -62,8 +62,10 @@ else
   c = Company.first
 end
 
-if c.categories.count == 0
-  cat = c.categories.create!(name: "Test category")
+if c.categories.count ==
+  10.times do |i|
+    cat = c.categories.create!(name: "Test category #{i+1}")
+  end
 end
 
 if User.count == 0
@@ -112,7 +114,7 @@ if ExpenseType.count ==0
   ExpenseType.create(id: 5, name: "Per Diem")
 end
 
-if ExpenseStatus.count ==0
+if ExpenseStatus.count == 0
   ExpenseStatus.create(id: 1, name: "Unsubmitted", order: 1)
   ExpenseStatus.create(id: 2,name: "Submitted", order: 2)
   ExpenseStatus.create(id: 3,name: "Rejected", order: 3)
@@ -126,7 +128,8 @@ if Expense.count == 0
                        note: "test note #{i}",
                        date: Date.today,
                        user_id: random_integer(1, 10),
-                       manual_expense_attributes: {merchant: "Test merchant #{i}"})
+                       category_id: random_integer(1, 10),
+                       manual_expense_attributes: {merchant: "Test merchant #{random_integer(1, 10)}"})
   end
 end
 

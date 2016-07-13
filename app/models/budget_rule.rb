@@ -24,5 +24,6 @@ class BudgetRule < ActiveRecord::Base
   delegate :period, to: :budget_period
   delegate :type, to: :rule_type
   delegate :amount_value, to: :amount
+  delegate :category_name, to: :category
 
 end
