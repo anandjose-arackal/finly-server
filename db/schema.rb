@@ -294,7 +294,6 @@ ActiveRecord::Schema.define(version: 20160712175130) do
     t.datetime "submitted_at",                        precision: 6
     t.integer  "controlling_user_id",     limit: 4
     t.integer  "controlling_for_user_id", limit: 4
-    t.integer  "forwarding_to_id",        limit: 4
     t.string   "memo",                    limit: 255
     t.datetime "created_at",                                        null: false
     t.datetime "updated_at",                                        null: false
@@ -302,7 +301,6 @@ ActiveRecord::Schema.define(version: 20160712175130) do
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
   add_index "reports", ["controlling_user_id"], name: "index_reports_on_controlling_user_id", using: :btree
-  add_index "reports", ["forwarding_to_id"], name: "index_reports_on_forwarding_to_id", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree

@@ -155,14 +155,14 @@ if Receipt.count == 0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
+  e = ExpenseRuleType.create!(name: 'Require Receipt')
+  e = ExpenseRuleType.create!(name: 'Require Note')
+  e = ExpenseRuleType.create!(name: 'Disallow Expense')
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
+  e = RuleType.create!(name: 'Warning')
+  e = RuleType.create!(name: 'Blocking')
 end
 
 if BudgetPeriod.count == 0

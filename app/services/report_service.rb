@@ -295,7 +295,7 @@ class ReportService < BaseService
       errors << 'User cannot take control of this report'
       return false
     end
-    unless report.closed?
+    if report.is_closed?
       errors << 'User cannot take control of this report as the report is closed'
       return false
     end
@@ -303,7 +303,7 @@ class ReportService < BaseService
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.take_control_id,
                                   report_status_id: report.status_id, memo: memo
       track.save
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_take_control_id, memo: memo
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_take_control_id, content: memo
       comment.save
       return true
     end
@@ -487,7 +487,7 @@ class ReportService < BaseService
       return true
     end
     errors << receipt.errors.full_messages
-    return false
+    false
   end
 
   # will just remove the association between expense and receipt

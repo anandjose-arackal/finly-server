@@ -22,7 +22,6 @@ class Report < ActiveRecord::Base
   belongs_to :policy
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :forwarding_to, class_name: 'User'
   has_many :tracks, class_name: 'ReportTrack', dependent: :destroy
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy

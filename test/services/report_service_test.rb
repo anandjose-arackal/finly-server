@@ -657,8 +657,54 @@ class ReportServiceTest < ActiveSupport::TestCase
 
   test 'take_control flow' do
     # Only admins and policy admins can take control of the report
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true
+    controlling_user = report.controlling_user
+    m1 = User.find_by(email: 'manager1@finlytest.io')
+    rs = ReportService.new(user: m1, report: report)
+    assert report.processing?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.take_control
+      end
+    end
+    assert_not_equal m1.id, report.controlling_user.id
+    assert_equal controlling_user.id, report.controlling_user.id
+    assert rs.errors.present?
+
+    admin= User.find_by(email: 'admin@finlytest.io')
+
     # Admins can take control of report only when its in processing state
-    #
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, final_approve: true
+    rs = ReportService.new(user: admin, report: report)
+    assert report.approved?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.take_control
+      end
+    end
+    assert report.approved?
+    assert rs.errors.present?
+
+    # Admin can take control of the report for the controlling_user only
+    # Once admin takes control, controlling user is assigned as the admin and controlling_for user is assigned as the original_controlling_user
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true
+    rs = ReportService.new(user: admin, report: report)
+    controlling_user = report.controlling_user
+    assert report.processing?
+    assert_difference 'ReportComment.count', 1 do
+      assert_difference 'ReportTrack.count', 1 do
+        rs.take_control
+      end
+    end
+    assert report.processing?
+    assert_equal report.controlling_for_user.id,controlling_user.id
+    assert report.controlling_user.id, admin.id
+    assert rs.errors.blank?
+    rs.approve
+    assert report.controlling_user.email, 'manager1@finlytest.io'
   end
 
   # todo test comments
