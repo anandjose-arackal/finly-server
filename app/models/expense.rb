@@ -2,19 +2,20 @@
 #
 # Table name: expenses
 #
-#  id                :integer          not null, primary key
-#  amount_id         :integer
-#  expense_status_id :integer
-#  note              :text(65535)
-#  date              :datetime
-#  user_id           :integer
-#  expense_type_id   :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  manager_memo      :string(255)
-#  report_id         :integer
-#  category_id       :integer
-#  reimbursable      :boolean          default(FALSE), not null
+#  id                   :integer          not null, primary key
+#  amount_id            :integer
+#  expense_status_id    :integer
+#  note                 :text(65535)
+#  date                 :datetime
+#  user_id              :integer
+#  expense_type_id      :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  manager_memo         :text(65535)
+#  rejecting_manager_id :integer
+#  report_id            :integer
+#  category_id          :integer
+#  reimbursable         :boolean          default(FALSE), not null
 #
 
 class Expense < ActiveRecord::Base
@@ -24,6 +25,7 @@ class Expense < ActiveRecord::Base
   belongs_to :expense_type
   belongs_to :category
   belongs_to :report
+  belongs_to :rejecting_manager, class_name: 'User'
 
   has_many :receipts, as: :parent
 
@@ -37,6 +39,7 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
+  scope :with_id, ->(ids){where id: ids}
   scope :reimbursable, -> { where reimbursable: true }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]) }
@@ -49,7 +52,7 @@ class Expense < ActiveRecord::Base
 
   # cannot add an expense with future date
   def no_future_date
-    if date > Date.today
+    if date.present? and date > Date.today
       errors.add(:date, "cannot be in the future!")
     end
   end
@@ -72,6 +75,22 @@ class Expense < ActiveRecord::Base
 
   def per_diem_expense?
     self.expense_type_id == ExpenseType.per_diem_expense_id
+  end
+
+  def unreported?
+    expense_status_id == ExpenseStatus.unreported_id
+  end
+
+  def unsubmitted?
+    expense_status_id == ExpenseStatus.unsubmitted_id
+  end
+
+  def submitted?
+    expense_status_id == ExpenseStatus.submitted_id
+  end
+
+  def rejected?
+    expense_status_id == ExpenseStatus.rejected_id
   end
 
 end

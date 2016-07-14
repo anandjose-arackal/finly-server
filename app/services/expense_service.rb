@@ -34,14 +34,20 @@ class ExpenseService < BaseService
     end
   end
 
-  def update_expense(params=nil)
-    return if params.blank?
+  def update_expense(user, params=nil)
+    return true if params.blank?
+    if user.blank?
+      errors << 'User not provided while updating expense'
+      return false
+    end
     expense_params = load_expense_params params
     expense = load_expense expense_params[:id] || expense_params[:expense_id]
     unless expense
       return false
     end
-    if expense.update(expense_params)
+    if expense.update_attributes(expense_params)
+      # Callback to create comments in report when an expense is edited
+      ReportService.new(user: user, report: report).expense_updated(self) if report_id.present? and user.present?
       expense.reload
       return expense
     else
@@ -131,7 +137,7 @@ class ExpenseService < BaseService
   #   expense = load_expense id
   #   return if expense.blank?
   #   # making the expense unsubmitted with the memo
-  #   if expense.update(manager_memo: memo, expense_status_id: 1)
+  #   if expense.update_attributes(manager_memo: memo, expense_status_id: 1)
   #     return true
   #   else
   #     errors << expense.errors.full_messages
@@ -148,7 +154,7 @@ class ExpenseService < BaseService
       expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
       expense_params.delete(:merchant)
 
-    # other conditions based on type of expense can go here
+      # other conditions based on type of expense can go here
     end
     expense_params
   end

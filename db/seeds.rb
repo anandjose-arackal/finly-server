@@ -31,7 +31,7 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
   ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
   ReportStatus.create(id: 7, name: 'Reimbursement Confirmed', order: 7)
-  ReportStatus.create(id: 8, name: 'Closed', order: 8)
+  ReportStatus.create(id: 8, name: 'Archived', order: 8)
 end
 
 if ReportTrackingAction.count == 0
@@ -44,7 +44,26 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create(id: 7, name: 'unapprove')
   ReportTrackingAction.create(id: 8, name: 'reimburse')
   ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
-  ReportTrackingAction.create(id: 10, name: 'close')
+  ReportTrackingAction.create(id: 10, name: 'take_control')
+end
+
+if ReportCommentAction.count == 0
+  ReportCommentAction.create(id: 1, name: 'report_comment')
+  ReportCommentAction.create(id: 2, name: 'report_retract')
+  ReportCommentAction.create(id: 3, name: 'report_submit')
+  ReportCommentAction.create(id: 4, name: 'report_approve')
+  ReportCommentAction.create(id: 5, name: 'report_auto_approve')
+  ReportCommentAction.create(id: 6, name: 'report_reject')
+  ReportCommentAction.create(id: 7, name: 'report_unapprove')
+  ReportCommentAction.create(id: 8, name: 'report_reimburse')
+  ReportCommentAction.create(id: 9, name: 'report_reimbursement_received')
+  ReportCommentAction.create(id: 10, name: 'report_take_control')
+  ReportCommentAction.create(id: 11, name: 'report_update')
+  ReportCommentAction.create(id: 12, name: 'report_attach_receipt')
+  ReportCommentAction.create(id: 13, name: 'expense_add')
+  ReportCommentAction.create(id: 14, name: 'expense_remove')
+  ReportCommentAction.create(id: 15, name: 'expense_reject')
+  ReportCommentAction.create(id: 16, name: 'expense_update')
 end
 
 if Currency.count == 0
@@ -100,7 +119,7 @@ end
 if Policy.non_default.count == 0
   p = PolicyCreateService.new.create_policy(c, a, 'Test Policy')
   p.configuration.update_attribute(:require_category, true) if p.present?
-  PolicyUserService.new(p).add_user(u[0])
+  PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
 
   p = PolicyCreateService.new.create_policy(c, a, 'Another test Policy')
@@ -114,10 +133,11 @@ if ExpenseType.count ==0
   ExpenseType.create(id: 5, name: "Per Diem")
 end
 
-if ExpenseStatus.count == 0
-  ExpenseStatus.create(id: 1, name: "Unsubmitted", order: 1)
-  ExpenseStatus.create(id: 2,name: "Submitted", order: 2)
-  ExpenseStatus.create(id: 3,name: "Rejected", order: 3)
+if ExpenseStatus.count ==0
+  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
+  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
+  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
+  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
 end
 
 if Expense.count == 0

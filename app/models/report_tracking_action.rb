@@ -46,7 +46,7 @@ class ReportTrackingAction < ActiveRecord::Base
     9
   end
 
-  def self.close_id
+  def self.take_control_id
     10
   end
 

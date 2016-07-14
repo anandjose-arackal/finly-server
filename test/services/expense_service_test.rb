@@ -55,7 +55,7 @@ class ExpenseServiceTest < ActiveSupport::TestCase
 
     # editing the expense
     @update_params[:expense][:id] = expense.id
-    edited_expense = @es.update_expense(@update_params)
+    edited_expense = @es.update_expense(expense.user, @update_params)
     assert_equal "Uber", edited_expense.merchant_name
     assert_equal "New note", edited_expense.note
     assert_equal Date.yesterday, edited_expense.date

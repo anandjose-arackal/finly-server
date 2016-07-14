@@ -28,37 +28,16 @@ class PolicyUserServiceTest < ActiveSupport::TestCase
     assert @policy.users.find_by(id: @user2.id).blank?
     assert team_service.mappings(policy_id: @policy.id).blank?
     assert @policy_user_service.add_user(@user2)
-    assert_equal @user2.role_mapping.policy(@policy.id).count, 1
-    assert @policy.users.by_user(@user2.id).present?
+    assert @policy.users.with_id(@user2.id).present?
     assert team_service.mappings(policy_id: @policy.id).present?
-    assert_equal @user2.role_mapping.policy(@policy.id).count, 1
-    assert @user2.employee?(@policy)
-    assert_not @user2.manager?(@policy)
-    assert_not @user2.manager?(@policy)
-    assert_not @user2.admin?(@policy)
-    assert_not @user2.auditor?(@policy)
+    assert @user2.employee?
+    assert_not @user2.manager?
+    assert_not @user2.finance_manager?
+    assert_not @user2.admin?
+    assert_not @user2.auditor?
     assert_equal team_service.mappings(policy_id: @policy.id).count, (pre_count+1)
 
-    # Adding user by specifying role should assign the specific role to the user
-    assert_not @user3.admin?
-    assert @policy_user_service.add_user(@user3, UserRole.admin_id)
-    assert_equal @user3.role_mapping.policy(@policy.id).count, 1
-    assert @user3.admin?(@policy)
-    assert_not @user3.finance_manager?(@policy)
-    assert_not @user3.manager?(@policy)
-    assert_not @user3.employee?(@policy)
-    assert_not @user3.auditor?(@policy)
-
-    # Can assign a user multiple roles in a policy
-    assert_not @user4.admin?
-    assert_not @user4.manager?
-    assert @policy_user_service.add_user(@user4, [UserRole.admin_id, UserRole.manager_id])
-    assert_equal @user4.role_mapping.policy(@policy.id).count, 2
-    assert @user4.admin?(@policy)
-    assert_not @user4.finance_manager?(@policy)
-    assert @user4.manager?(@policy)
-    assert_not @user4.employee?(@policy)
-    assert_not @user4.auditor?(@policy)
+    # Can add a user as an admin to a policy
 
     # Cannot add already added users
     pre_count = team_service.mappings(policy_id: @policy.id).count
@@ -91,9 +70,8 @@ class PolicyUserServiceTest < ActiveSupport::TestCase
 
     # Removing a user shold remove associated user roles
     assert @policy_user_service.add_user(@user3)
-    assert @user3.role_mapping.policy(@policy.id).count > 0
+    assert @user3.role_mapping.count > 0
     assert @policy_user_service.remove_user(@user3)
-    assert @user3.role_mapping.policy(@policy.id).blank?
   end
 
 end

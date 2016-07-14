@@ -13,8 +13,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: sreeram
-  password: sreeram
+  username: root
+  password: smart22
   host: localhost
   socket: /var/run/mysqld/mysqld.sock
 
@@ -51,5 +51,5 @@ test:
 production:
   <<: *default
   database: Finly_production
-  username: sreeram
+  username: Finly
   password: <%= ENV['FINLY_DATABASE_PASSWORD'] %>

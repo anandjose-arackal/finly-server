@@ -8,7 +8,7 @@ class PolicyUserService < BaseService
 
 
   # adds a particular user and his associated role within the policy
-  def add_user(user, user_roles=[])
+  def add_user(user, is_admin=false)
     errors.clear
     if user.blank?
       errors << 'No user selected'
@@ -20,17 +20,13 @@ class PolicyUserService < BaseService
     end
 
     # Add user to policy mapping
-    self.policy.user_mapping.create(user: user)
+    self.policy.user_mapping.create(user: user, admin: is_admin)
 
     # Add user configuration
     user.team_mapping.policy(nil).each do |item|
       cloned_item = item.dup
       cloned_item.update_attribute(:policy_id, self.policy.id)
     end
-
-    # Add user roles
-    user_roles = [UserRole.employee_id] unless user_roles.present?
-    UserTeamService.new(user).update_role(policy_id: policy.id, user_role: user_roles)
     true
   end
 
@@ -48,9 +44,6 @@ class PolicyUserService < BaseService
 
     # Remove user configuration
     user.team_mapping.policy(policy.id).destroy_all
-
-    # Remove user roles
-    user.role_mapping.policy(policy.id).destroy_all
 
     # Remove user
     self.policy.users.destroy(user) if user.present?

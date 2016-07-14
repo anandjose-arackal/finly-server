@@ -8,7 +8,7 @@
 #  report_status_id        :integer          not null
 #  policy_id               :integer
 #  submitted_at            :datetime
-#  controlling_user_id     :integer          not null
+#  controlling_user_id     :integer
 #  controlling_for_user_id :integer
 #  forwarding_to_id        :integer
 #  memo                    :string(255)
