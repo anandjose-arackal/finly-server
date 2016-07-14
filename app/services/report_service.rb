@@ -45,6 +45,7 @@ class ReportService < BaseService
     return false unless validate require_user: true
     report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
     if report.save
+      self.report = report
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
       if params[:expenses].present?
@@ -76,7 +77,9 @@ class ReportService < BaseService
       return approve(auto_approve: true)
     end
     memo = params[:memo]
-    if report.update_attributes report_status_id: ReportStatus.processing_id, controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo
+    submitted_at = report.submitted_at
+    submitted_at = DateTime.now if submitted_at.blank?
+    if report.update_attributes report_status_id: ReportStatus.processing_id, controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo, submitted_at: submitted_at
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.submit_id, report_status_id: ReportStatus.processing_id, memo: memo
       track.save
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_submit_id
@@ -133,10 +136,10 @@ class ReportService < BaseService
     end
     manager_id = nil
     manager_id = manager.id if manager.present?
-    # If reimbursable expenses are present
-    if manager_id.blank? and report.is_reimbursable? and UserTeamService.new(user).finance_manager_for?(report)
-      manager_id = user.id
-    end
+    # # If reimbursable expenses are present
+    # if manager_id.blank? and report.is_reimbursable? and UserTeamService.new(user).finance_manager_for?(report)
+    #   manager_id = user.id
+    # end
     if report.update_attributes report_status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: nil
       if auto_approve
         comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_auto_approve_id
@@ -193,20 +196,21 @@ class ReportService < BaseService
   end
 
   def unapprove
-    return false unless validate require_user: true, require_report:true
-    if report.controlling_user.id == user.id
-      errors << 'User has not approved the report to unapprove it'
+    return false unless validate require_user: true, require_report: true
+    if report.user.id == user.id
+      errors << 'User cannot unapprove this report'
       return false
     end
-    unless report.processing?
-      errors << 'Cannot unapprove this report after the report is approved'
+    unless report.processing? or report.approved?
+      errors << 'Cannot unapprove this report'
       return false
     end
-    unless report.controlling_user.present? and report.associated_users(report.controlling_user).with_id(user.id).present?
+    associated_users = report.associated_users(report.controlling_user)
+    unless (report.controlling_user.present? or report.approved?) and associated_users.present? and associated_users.with_id(user.id).present?
       errors << 'User has not yet reviewed the report to unapprove it'
       return false
     end
-    if report.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil
+    if report.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil, report_status_id: ReportStatus.processing_id
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.unapprove_id, report_status_id: ReportStatus.processing_id
       track.save
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_unapprove_id
@@ -217,47 +221,47 @@ class ReportService < BaseService
     false
   end
 
-  def reimburse(params={})
-    return false unless validate require_report: true, require_user: true
-    unless report.controlling_user.present? and report.controlling_user.id == user.id and user.finance_manager?
-      errors << 'User cannot perform this action on the report'
-      return false
-    end
-    unless report.approved?
-      errors << 'Report cannot be marked as reimbursed currently'
-      return false
-    end
-    unless report.is_reimbursable?
-      errors << 'Report does not have any reimbursable expense to be marked as reimbursed'
-      return false
-    end
-    if report.update_attributes controlling_user: report.user, controlling_for_user: nil, report_status_id: ReportStatus.reimbursed_id, memo: params[:memo]
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimburse_id, report_status_id: ReportStatus.reimbursed_id
-      track.save
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimburse_id
-      comment.save
-      return true
-    end
-    errors << report.errors.full_messages
-    false
-  end
-
-  def reimburse_confirm
-    return false unless validate owner: true
-    unless report.reimbursed?
-      errors << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
-      return false
-    end
-    if report.update_attributes controlling_user: nil, controlling_for_user: nil, status: ReportStatus.reimbursement_received_id, memo: nil
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursement_received_id, report_status_id: ReportStatus.reimbursement_received_id
-      track.save
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursement_received_id
-      comment.save
-      return true
-    end
-    errors << report.errors.full_messages
-    false
-  end
+  # def reimburse(params={})
+  #   return false unless validate require_report: true, require_user: true
+  #   unless report.controlling_user.present? and report.controlling_user.id == user.id and user.finance_manager?
+  #     errors << 'User cannot perform this action on the report'
+  #     return false
+  #   end
+  #   unless report.approved?
+  #     errors << 'Report cannot be marked as reimbursed currently'
+  #     return false
+  #   end
+  #   unless report.is_reimbursable?
+  #     errors << 'Report does not have any reimbursable expense to be marked as reimbursed'
+  #     return false
+  #   end
+  #   if report.update_attributes controlling_user: report.user, controlling_for_user: nil, report_status_id: ReportStatus.reimbursed_id, memo: params[:memo]
+  #     track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimburse_id, report_status_id: ReportStatus.reimbursed_id
+  #     track.save
+  #     comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimburse_id
+  #     comment.save
+  #     return true
+  #   end
+  #   errors << report.errors.full_messages
+  #   false
+  # end
+  #
+  # def reimburse_confirm
+  #   return false unless validate owner: true
+  #   unless report.reimbursed?
+  #     errors << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
+  #     return false
+  #   end
+  #   if report.update_attributes controlling_user: nil, controlling_for_user: nil, status: ReportStatus.reimbursement_received_id, memo: nil
+  #     track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursement_received_id, report_status_id: ReportStatus.reimbursement_received_id
+  #     track.save
+  #     comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursement_received_id
+  #     comment.save
+  #     return true
+  #   end
+  #   errors << report.errors.full_messages
+  #   false
+  # end
 
   def delete_report
     return false unless validate owner: true
@@ -274,11 +278,11 @@ class ReportService < BaseService
 
   def archive_report
     return false unless validate owner: true
-    unless report.closed?
+    unless report.is_closed?
       errors << 'Report is still not completely processed to archive it'
       return false
     end
-    if report.update_attribute status: ReportStatus.archived_id
+    if report.update_attributes report_status_id: ReportStatus.archived_id
       return true
     end
     errors << report.errors.full_messages
@@ -315,6 +319,21 @@ class ReportService < BaseService
     return false unless validate require_report: true
     return nil unless report.processing?
     report.associated_users(user)
+  end
+
+  def expense_created_in_report(expense)
+    return false unless validate require_report: true, require_user: true
+    comment = report.comments.build report: report, user: user, report_comment_action: ReportCommentAction.expense_add_id, expense: expense
+    if comment.save
+      return true
+    end
+    errors << comment.errors.full_messages
+    false
+  end
+
+  # Callback to create comments in reports when expense is updated
+  def expense_updated_in_report(expense)
+
   end
 
   def add_expense(expense_ids)
@@ -421,21 +440,78 @@ class ReportService < BaseService
     false
   end
 
-  # Callback to create comments in reports when expense is updated
-  def expense_updated(expense)
-
+  def load_receipt_params(params)
+    params[:receipt].slice(:image)
   end
 
-  def attach_receipt
-
+  # accepts receipt and expense
+  def add_receipt_to_report(params = {})
+    return false unless validate owner: true
+    unless report.open? or report.retracted?
+      errors << 'Cannot attach receipt unless report is open or retracted'
+      return false
+    end
+    unless params.present?
+      errors << 'Params is empty'
+      return false
+    end
+    receipt_params = load_receipt_params params
+    # create the receipt associated with the report
+    attach = report.receipts.build(receipt_params)
+    # associating the current user with the receipt
+    attach.user = user
+    if attach.save
+      return true
+    end
+    errors << attach.errors.full_messages
+    false
   end
 
-  def detach_receipt
-
+  def attach_receipt_to_report(receipt_id)
+    return false unless validate owner: true
+    unless report.open? or report.retracted?
+      errors << 'Cannot attach receipt unless report is open or retracted'
+      return false
+    end
+    unless receipt_id.present?
+      errors << 'Receipt not found'
+      return false
+    end
+    receipt = user.receipts.find_by(id: receipt_id)
+    if receipt.parent
+      errors << 'Receipt is already attached to another expense.'
+      return false
+    end
+    receipt.parent = report
+    if receipt.save
+      return true
+    end
+    errors << receipt.errors.full_messages
+    return false
   end
 
-  def create_new_expense(params)
-
+  # will just remove the association between expense and receipt
+  def detach_receipt_from_expense(receipt_id)
+    return false unless validate owner: true
+    unless report.open? or report.retracted?
+      errors << 'Cannot detach receipt unless report is open or retracted'
+      return false
+    end
+    unless receipt_id.present?
+      errors << 'Receipt not found'
+      return false
+    end
+    receipt = user.receipts.find_by(id: receipt_id)
+    if receipt.nil? || receipt.parent_id != expense_id
+      errors << 'Receipt does not belong to this report.'
+      return false
+    end
+    receipt.parent_id = receipt.parent_type = nil
+    if receipt.save
+      return true
+    end
+    errors << receipt.errors.full_messages
+    false
   end
 
   def export(format)
@@ -453,11 +529,28 @@ class ReportService < BaseService
     false
   end
 
-  def assign_to_policy
-
+  def assign_policy(policy_id)
+    return false unless validate owner: true
+    unless report.open? or report.retracted?
+      errors << 'Cannot assign policy unless report is retracted'
+      return false
+    end
+    if report.policy_id == policy_id
+      return true
+    end
+    if report.update_attribute(:policy_id, policy_id, submitted_at: nil)
+      return true
+    end
+    errors << report.errors.full_messages
+    false
   end
 
   private
+  # Used for internal validates of each of the functions in report_service object.
+  # require_user: check if report_service has been initialized with user.
+  # require_report: checks if report_service has been initialized with report.
+  # controlling_user: checks if report_service has been initialized with the controlling user of the report
+  # owner: checks if report_service is initialized
   def validate(params={})
     errors.clear
     require_report = (params[:require_report] or params[:controlling_user] or params[:owner])

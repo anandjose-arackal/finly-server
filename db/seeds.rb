@@ -29,9 +29,7 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 3, name: 'Rejected', order: 3)
   ReportStatus.create(id: 4, name: 'Processing', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
-  ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
-  ReportStatus.create(id: 7, name: 'Reimbursement Confirmed', order: 7)
-  ReportStatus.create(id: 8, name: 'Archived', order: 8)
+  ReportStatus.create(id: 6, name: 'Archived', order: 6)
 end
 
 if ReportTrackingAction.count == 0
@@ -42,9 +40,7 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create(id: 5, name: 'auto_approve')
   ReportTrackingAction.create(id: 6, name: 'reject')
   ReportTrackingAction.create(id: 7, name: 'unapprove')
-  ReportTrackingAction.create(id: 8, name: 'reimburse')
-  ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
-  ReportTrackingAction.create(id: 10, name: 'take_control')
+  ReportTrackingAction.create(id: 8, name: 'take_control')
 end
 
 if ReportCommentAction.count == 0
@@ -55,15 +51,13 @@ if ReportCommentAction.count == 0
   ReportCommentAction.create(id: 5, name: 'report_auto_approve')
   ReportCommentAction.create(id: 6, name: 'report_reject')
   ReportCommentAction.create(id: 7, name: 'report_unapprove')
-  ReportCommentAction.create(id: 8, name: 'report_reimburse')
-  ReportCommentAction.create(id: 9, name: 'report_reimbursement_received')
-  ReportCommentAction.create(id: 10, name: 'report_take_control')
-  ReportCommentAction.create(id: 11, name: 'report_update')
-  ReportCommentAction.create(id: 12, name: 'report_attach_receipt')
-  ReportCommentAction.create(id: 13, name: 'expense_add')
-  ReportCommentAction.create(id: 14, name: 'expense_remove')
-  ReportCommentAction.create(id: 15, name: 'expense_reject')
-  ReportCommentAction.create(id: 16, name: 'expense_update')
+  ReportCommentAction.create(id: 8, name: 'report_take_control')
+  ReportCommentAction.create(id: 9, name: 'report_update')
+  ReportCommentAction.create(id: 10, name: 'report_attach_receipt')
+  ReportCommentAction.create(id: 11, name: 'expense_add')
+  ReportCommentAction.create(id: 12, name: 'expense_remove')
+  ReportCommentAction.create(id: 13, name: 'expense_reject')
+  ReportCommentAction.create(id: 14, name: 'expense_update')
 end
 
 if Currency.count == 0

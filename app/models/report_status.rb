@@ -16,8 +16,6 @@ class ReportStatus < ActiveRecord::Base
   scope :rejected, -> { find_by(id: ReportStatus.rejected_id) }
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
-  scope :reimbursed, -> { find_by(id: ReportStatus.reimbursed_id) }
-  scope :reimbursement_received, -> { find_by(id: ReportStatus.reimbursement_received_id) }
   scope :archived, -> { find_by(id: ReportStatus.archived_id) }
 
   def open?
@@ -38,14 +36,6 @@ class ReportStatus < ActiveRecord::Base
 
   def approved?
     self.id == ReportStatus.approved_id
-  end
-
-  def reimbursed?
-    self.id == ReportStatus.reimbursed_id
-  end
-
-  def reimbursement_received?
-    self.id == ReportStatus.reimbursement_received_id
   end
 
   def archived?
@@ -72,16 +62,8 @@ class ReportStatus < ActiveRecord::Base
     5
   end
 
-  def self.reimbursed_id
-    6
-  end
-
-  def self.reimbursement_received_id
-    7
-  end
-
   def self.archived_id
-    8
+    6
   end
 
 end

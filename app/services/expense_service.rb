@@ -16,6 +16,7 @@ class ExpenseService < BaseService
     expense_params = load_expense_params params
     expense = @user.expenses.build(expense_params)
     if expense.save
+      ReportService.new(user: @user, report: expense.report).expense_created_in_report(self) if expense.report_id.present? and @user.present?
       return expense
     else
       errors << expense.errors.full_messages
@@ -47,7 +48,7 @@ class ExpenseService < BaseService
     end
     if expense.update_attributes(expense_params)
       # Callback to create comments in report when an expense is edited
-      ReportService.new(user: user, report: report).expense_updated(self) if report_id.present? and user.present?
+      ReportService.new(user: user, report: report).expense_updated_in_report(self) if report_id.present? and user.present?
       expense.reload
       return expense
     else

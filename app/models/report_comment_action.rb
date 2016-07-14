@@ -38,40 +38,32 @@ class ReportCommentAction < ActiveRecord::Base
     7
   end
 
-  def self.report_reimburse_id
+  def self.report_take_control_id
     8
   end
 
-  def self.report_reimbursement_received_id
+  def self.report_update_id
     9
   end
 
-  def self.report_take_control_id
+  def self.report_attach_receipt_id
     10
   end
 
-  def self.report_update_id
+  def self.expense_add_id
     11
   end
 
-  def self.report_attach_receipt_id
+  def self.expense_remove_id
     12
   end
 
-  def self.expense_add_id
+  def self.expense_reject_id
     13
   end
 
-  def self.expense_remove_id
-    14
-  end
-
-  def self.expense_reject_id
-    15
-  end
-
   def self.expense_update_id
-    16
+    14
   end
 
 end

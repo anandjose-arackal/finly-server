@@ -23,12 +23,17 @@ class Report < ActiveRecord::Base
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
   belongs_to :forwarding_to, class_name: 'User'
-  has_many :tracks, class_name: 'ReportTrack'
+  has_many :tracks, class_name: 'ReportTrack', dependent: :destroy
   has_many :expenses
-  has_many :comments, class_name: 'ReportComment'
+  has_many :comments, class_name: 'ReportComment', dependent: :destroy
+  has_many :receipts, as: :parent
 
   validates :user, presence: true
   validates :status, presence: true
+
+  scope :with_id, ->(id) { where id: id }
+  scope :non_archived, -> { where.not report_status_id: ReportStatus.archived_id }
+  scope :archived, -> { where report_status_id: ReportStatus.archived_id }
 
   before_save do
     if self.name.blank?
@@ -41,9 +46,12 @@ class Report < ActiveRecord::Base
       expenses.each do |expense|
         expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
       end
+      receipts.each do |receipt|
+        receipt.parent_id = receipt.parent_type = nil
+        receipt.save
+      end
     end
   end
-
 
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
@@ -75,49 +83,42 @@ class Report < ActiveRecord::Base
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
-  
+
   def status_id
     self.report_status_id
   end
 
   def open?
-    self.status_id == 1
+    self.status_id == ReportStatus.open_id
   end
 
   def retracted?
-    self.status_id == 2
+    self.status_id == ReportStatus.retracted_id
   end
 
   def rejected?
-    self.status_id == 3
+    self.status_id == ReportStatus.rejected_id
   end
 
   def processing?
-    self.status_id == 4
+    self.status_id == ReportStatus.processing_id
   end
 
   def approved?
-    self.status_id == 5
+    self.status_id == ReportStatus.approved_id
   end
 
-  def reimbursed?
-    self.status_id == 6
+  def archived?
+    self.status_id == ReportStatus.archived_id
   end
 
-  def reimbursement_confirmed?
-    self.status_id == 7
-  end
-
-  def closed?
-    self.status_id == 8
-  end
-
-  def is_reimbursable?
-    expenses.reimbursable.present?
-  end
+  # def is_reimbursable?
+  #   expenses.reimbursable.present?
+  # end
 
   def is_closed?
-    report.reimbursement_confirmed? or (report.approved? and not report.is_reimbursable?)
+    approved?
+    # report.reimbursement_confirmed? or (report.approved? and not report.is_reimbursable?)
   end
 
 end

@@ -384,8 +384,8 @@ class ReportServiceTest < ActiveSupport::TestCase
     # Can only be rejected when in processing state
     u = User.find_by(email: 'user0@finlytest.io')
     r = dummy_report_flow u, final_approve: true, reimbursable: true
-    assert r.controlling_user.present?
-    rs = ReportService.new(user: r.controlling_user, report: r)
+    assert r.controlling_user.blank?
+    rs = ReportService.new(user: User.find_by(email: 'finance1@finlytest.io'), report: r)
     assert r.approved?
     assert_no_difference 'ReportTrack.count' do
       rs.reject r.user
@@ -443,10 +443,10 @@ class ReportServiceTest < ActiveSupport::TestCase
     ReportService.new(user: report.controlling_user, report: report).approve
     ReportService.new(user: report.controlling_user, report: report).approve
 
-    # Can only be unapproved in processing state
-    r = dummy_report_flow user, final_approve: true, reimbursable: true
+    # Can only be unapproved in processing state or in approved state
+    r = dummy_report_flow user, create: true, reimbursable: true
     u = User.find_by(email: 'manager1@finlytest.io')
-    assert r.approved?
+    assert r.open?
     rs = ReportService.new(user: u, report: r)
     assert rs.rejectable_to_users.blank?
     assert_no_difference 'ReportComment.count' do
@@ -454,7 +454,7 @@ class ReportServiceTest < ActiveSupport::TestCase
         rs.unapprove
       end
     end
-    assert r.approved?
+    assert r.open?
     assert rs.errors.present?
 
     # Can only be unapproved by managers and only if it was previously approved by the manager
@@ -473,7 +473,7 @@ class ReportServiceTest < ActiveSupport::TestCase
     assert rs.errors.present?
 
     # Successful unapprove
-    # Report status is still set to processing when unapproved
+    # Report status is set to processing when unapproved
     # When unapproved controlling user is updated to the unapproving user
     user = User.find_by(email: 'user0@finlytest.io')
     report = dummy_report_flow user, submit: true, reimbursable: true
@@ -495,80 +495,170 @@ class ReportServiceTest < ActiveSupport::TestCase
     assert report.processing?
     assert rs.errors.blank?
     assert_equal report.controlling_user.id, unapproving_user.id
-  end
 
-  test 'reimburse flow' do
-    user = User.find_by email: 'user0@finlytest.io'
-
-    # Can only be reimbursed once approved
-    report = dummy_report_flow user, submit: true, reimbursable: true
-    rs = ReportService.new user: report.controlling_user, report: report
-    assert report.processing?
-    assert_no_difference 'ReportComment.count' do
-      assert_no_difference 'ReportTrack.count' do
-        rs.reimburse
-      end
-    end
-    assert report.processing?
-    assert rs.errors.present?
-
-    # Can only be reimbursed by the final finance manager
+    # Unapproving report in approved state
+    user = User.find_by(email: 'user0@finlytest.io')
     report = dummy_report_flow user, final_approve: true, reimbursable: true
-    rs = ReportService.new user: User.find_by(email: 'finance0@finlytest.io'), report: report
-    assert report.approved?
-    assert_no_difference 'ReportComment.count' do
-      assert_no_difference 'ReportTrack.count' do
-        rs.reimburse
-      end
-    end
-    assert report.approved?
-    assert rs.errors.present?
 
-    # Can only reimburse if the report has reimbursable expenses in it
-    report = dummy_report_flow user, final_approve: true, reimbursable: false
-    rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
     assert report.approved?
-    assert_no_difference 'ReportComment.count' do
-      assert_no_difference 'ReportTrack.count' do
-        rs.reimburse
-      end
-    end
-    assert report.approved?
-    assert rs.errors.present?
-
-    # Successful reimbursement
-    # After reimbursement, reports controlling user is report owner
-    # Can add a memo while reimbursing the report
-    # Once reimbursed report is marked as reimbursed
-    report = dummy_report_flow user, final_approve: true, reimbursable: true
-    rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
-    assert report.approved?
-    memo = 'test memo reimburse'
+    rs = ReportService.new(user: report.controlling_user, report: report)
+    assert rs.rejectable_to_users.blank?
+    unapproving_user = report.associated_users.second
+    rs = ReportService.new(user: unapproving_user, report: report)
     assert_difference 'ReportComment.count', 1 do
       assert_difference 'ReportTrack.count', 1 do
-        rs.reimburse memo: memo
+        rs.unapprove
       end
     end
-    assert report.reimbursed?
+    assert report.processing?
     assert rs.errors.blank?
-    assert_equal report.controlling_user.id, report.user.id
-
+    assert_equal report.controlling_user.id, unapproving_user.id
   end
 
-  test 'reimburse_confirm flow' do
-
-  end
+  # test 'reimburse flow' do
+  #   user = User.find_by email: 'user0@finlytest.io'
+  #
+  #   # Can only be reimbursed once approved
+  #   report = dummy_report_flow user, submit: true, reimbursable: true
+  #   rs = ReportService.new user: report.controlling_user, report: report
+  #   assert report.processing?
+  #   assert_no_difference 'ReportComment.count' do
+  #     assert_no_difference 'ReportTrack.count' do
+  #       rs.reimburse
+  #     end
+  #   end
+  #   assert report.processing?
+  #   assert rs.errors.present?
+  #
+  #   # Can only be reimbursed by the final finance manager
+  #   report = dummy_report_flow user, final_approve: true, reimbursable: true
+  #   rs = ReportService.new user: User.find_by(email: 'finance0@finlytest.io'), report: report
+  #   assert report.approved?
+  #   assert_no_difference 'ReportComment.count' do
+  #     assert_no_difference 'ReportTrack.count' do
+  #       rs.reimburse
+  #     end
+  #   end
+  #   assert report.approved?
+  #   assert rs.errors.present?
+  #
+  #   # Can only reimburse if the report has reimbursable expenses in it
+  #   report = dummy_report_flow user, final_approve: true, reimbursable: false
+  #   rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
+  #   assert report.approved?
+  #   assert_no_difference 'ReportComment.count' do
+  #     assert_no_difference 'ReportTrack.count' do
+  #       rs.reimburse
+  #     end
+  #   end
+  #   assert report.approved?
+  #   assert rs.errors.present?
+  #
+  #   # Successful reimbursement
+  #   # After reimbursement, reports controlling user is report owner
+  #   # Can add a memo while reimbursing the report
+  #   # Once reimbursed report is marked as reimbursed
+  #   report = dummy_report_flow user, final_approve: true, reimbursable: true
+  #   rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
+  #   assert report.approved?
+  #   memo = 'test memo reimburse'
+  #   assert_difference 'ReportComment.count', 1 do
+  #     assert_difference 'ReportTrack.count', 1 do
+  #       rs.reimburse memo: memo
+  #     end
+  #   end
+  #   assert report.reimbursed?
+  #   assert rs.errors.blank?
+  #   assert_equal report.controlling_user.id, report.user.id
+  #
+  # end
+  #
+  # test 'reimburse_confirm flow' do
+  #
+  # end
 
   test 'delete_report flow' do
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true, reimbursable: true
+    rs = ReportService.new(user: user, report: report)
+    # Report can only be delted in open or retracted view
+    assert report.processing?
+    rs = ReportService.new(user: user, report: report)
+    assert_no_difference 'ReportTrack.count' do
+      assert_no_difference 'ReportComment.count' do
+        rs.delete_report
+      end
+    end
+    assert report.processing?
+    assert rs.errors.present?
 
+    rs.retract
+    assert report.retracted?
+    assert rs.errors.blank?
+
+    # Report can only be deleted by its owner
+    rs = ReportService.new(user: User.find_by(email: 'manager0@finlytest.io'), report: report)
+    assert report.retracted?
+    assert_no_difference 'ReportTrack.count' do
+      assert_no_difference 'ReportComment.count' do
+        rs.delete_report
+      end
+    end
+    assert report.retracted?
+    assert rs.errors.present?
+
+    # Successful retract
+    # When a report is deleted, all expenses are moved to unreported state
+    rs = ReportService.new(user: user, report: report)
+    id = report.id
+    expenses = report.expenses
+    assert report.retracted?
+    assert_difference 'ReportTrack.count', -(report.tracks.count) do
+      assert_difference 'ReportComment.count', -(report.comments.count) do
+        rs.delete_report
+      end
+    end
+    assert user.reports.with_id(id).blank?
+    assert rs.errors.blank?
+    expenses.reload
+    expenses.each do |expense|
+      assert expense.report_id.blank?
+    end
   end
 
   test 'archive_report flow' do
+    # Report can only be archived by the user
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, final_approve: true
+    rs = ReportService.new(user: report.controlling_user, report: report)
+    assert report.approved?
+    rs.archive_report
+    assert rs.errors.present?
+    assert report.approved?
 
+    # Report can only be archived when once approved
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true
+    rs = ReportService.new(user: user, report: report)
+    assert report.processing?
+    rs.archive_report
+    assert rs.errors.present?
+    assert report.processing?
+
+    # Archiving a report sets it status as archived
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, final_approve: true
+    rs = ReportService.new(user: user, report: report)
+    assert report.approved?
+    rs.archive_report
+    assert rs.errors.blank?
+    assert report.archived?
   end
 
   test 'take_control flow' do
-
+    # Only admins and policy admins can take control of the report
+    # Admins can take control of report only when its in processing state
+    #
   end
 
   # todo test comments
