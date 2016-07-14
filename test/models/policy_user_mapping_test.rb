@@ -5,6 +5,7 @@
 #  id         :integer          not null, primary key
 #  user_id    :integer          not null
 #  policy_id  :integer          not null
+#  admin      :boolean          default(FALSE), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

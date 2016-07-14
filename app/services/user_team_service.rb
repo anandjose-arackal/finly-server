@@ -21,6 +21,34 @@ class UserTeamService < BaseService
     nil
   end
 
+  def manager_for?(report)
+    emp = report.user
+    return false if report.blank?
+    rds = ReportDetailService.new(report)
+    policy = report.policy
+    policy = rds.policy unless policy.blank?
+    m = UserTeamService.new(emp).manager(report: report)
+    while m.present?
+      return true if m.id == self.user.id
+      m = UserTeamService.new(m).approves_to(report: report)
+    end
+    false
+  end
+
+  def finance_manager_for?(report)
+    emp = report.user
+    return false if report.blank?
+    rds = ReportDetailService.new(report)
+    policy = report.policy
+    policy = rds.policy unless policy.blank?
+    m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+    while m.present?
+      return true if m.id == self.user.id
+      m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+    end
+    false
+  end
+
   # Retrieve service
   def mappings(params={})
     load_retrieve params
@@ -47,6 +75,7 @@ class UserTeamService < BaseService
   def approves_to(params={})
     return nil unless user.manager?
     load_retrieve params
+    @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new.list(user).with_id(@policy_id).present?
     obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).approves_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
@@ -55,6 +84,7 @@ class UserTeamService < BaseService
   def approves_finance_to(params={})
     return nil unless user.finance_manager?
     load_retrieve params
+    @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new.list(user).with_id(@policy_id).present?
     obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).approves_finance_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
@@ -154,26 +184,43 @@ class UserTeamService < BaseService
     @admin_view = nil
     @manager_view = nil
     @finance_view = nil
-    @mappings = nil
-    @policy_id = nil
-    @currency_id = nil
-    @amount = nil
-
-    @policy_id = params[:policy_id]
-    @policy_version_timestamp = params[:policy_version]
-    if @policy_id.blank? and params[:policy] and params[:policy].present? and params[:policy].is_a?(Policy)
-      @policy_id = params[:policy].id
-    end
-    if @policy_id.blank? and params[:report] and params[:report].present? and params[:report].is_a?(Report)
-      @policy_id = params[:report].policy_id
-      # todo when report is created add submitted at field for calculating version
-      # @policy_version_timestamp = params[:report].submitted_at
-    end
     @mappings = self.user.team_mapping
-    @amount = params[:amount]
-    @currency_id = params[:currency_id]
+    if params[:policy_id]
+      @policy_id = params[:policy_id]
+      @currency_id = params[:currency_id]
+      @amount = params[:amount]
+    elsif params[:policy].present?
+      policy = params[:policy]
+      @policy_id = policy.id
+      if params[:currenc_id].present?
+        @currency_id = params[:currency_id]
+      else
+        @currency_id = policy.configuration.default_currency
+      end
+      @amount = params[:amount]
+    elsif params[:report.present?]
+      report = params[:report]
+      rds = ReportDetailService.new(report)
+      policy = rds.policy
+      @policy_id = policy.id
+      @currency_id = rds.currency
+      @amount = rds.total_amount
+    end
 
     load_view params
+
+
+    # @policy_version_timestamp = params[:policy_version]
+    # if @policy_id.blank? and params[:policy] and params[:policy].present? and params[:policy].is_a?(Policy)
+    #   @policy_id = params[:policy].id
+    # end
+    # if @policy_id.blank? and params[:report] and params[:report].present? and params[:report].is_a?(Report)
+    #   @policy_id = params[:report].policy_id
+    #   # todo when report is created add submitted at field for calculating version
+    #   # @policy_version_timestamp = params[:report].submitted_at
+    # end
+
+
   end
 
   def load_update(params={})

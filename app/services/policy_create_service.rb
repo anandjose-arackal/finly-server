@@ -9,7 +9,7 @@ class PolicyCreateService < BaseService
     if errors.blank?
       user_service = PolicyUserService.new(cloned_policy)
       # Add the creating user as admin
-      user_service.add_user user, [UserRole.admin_id]
+      user_service.add_user user, true
       return cloned_policy
     end
     false

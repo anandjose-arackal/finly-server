@@ -77,4 +77,20 @@ class Expense < ActiveRecord::Base
     self.expense_type_id == ExpenseType.per_diem_expense_id
   end
 
+  def unreported?
+    expense_status_id == ExpenseStatus.unreported_id
+  end
+
+  def unsubmitted?
+    expense_status_id == ExpenseStatus.unsubmitted_id
+  end
+
+  def submitted?
+    expense_status_id == ExpenseStatus.submitted_id
+  end
+
+  def rejected?
+    expense_status_id == ExpenseStatus.rejected_id
+  end
+
 end

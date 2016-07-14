@@ -5,20 +5,16 @@
 #  id           :integer          not null, primary key
 #  user_id      :integer          not null
 #  user_role_id :integer          not null
-#  policy_id    :integer
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #
 
 class UserRoleMapping < ActiveRecord::Base
-  include PolicyVersion
 
   belongs_to :user
   belongs_to :user_role
-  belongs_to :policy
 
   scope :role, ->(role_id) { where user_role_id: role_id }
-  scope :policy, ->(policy_id) { where policy_id: policy_id }
   scope :admin, -> { where(user_role_id: UserRole.admin_id) }
   scope :finance_manager, -> { where(user_role_id: UserRole.finance_manager_id) }
   scope :manager, -> { where(user_role_id: UserRole.manager_id) }

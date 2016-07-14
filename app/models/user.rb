@@ -57,7 +57,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true
   # validate :valid_role
 
-  scope :by_user, ->(user_id) { find_by id: user_id }
+  scope :with_id, ->(user_id) { where id: user_id }
 
   after_create do
     self.build_profile.save if self.profile.blank?
@@ -68,35 +68,32 @@ class User < ActiveRecord::Base
     self.user_roles
   end
 
-
-
-  def admin?(policy=nil)
+  def admin?
     mapping = role_mapping
-    mapping = mapping.policy(policy.id) if policy.present?
     mapping.admin.present?
   end
 
-  def finance_manager?(policy=nil)
+  def policy_admin?(policy)
+    policy_user_mappings.policy(policy.id).admin.present?
+  end
+
+  def finance_manager?
     mapping = role_mapping
-    mapping = mapping.policy(policy.id) if policy.present?
     mapping.finance_manager.present?
   end
 
-  def manager?(policy=nil)
+  def manager?
     mapping = role_mapping
-    mapping = mapping.policy(policy.id) if policy.present?
     mapping.manager.present?
   end
 
-  def employee?(policy=nil)
+  def employee?
     mapping = role_mapping
-    mapping = mapping.policy(policy.id) if policy.present?
     mapping.employee.present?
   end
 
-  def auditor?(policy=nil)
+  def auditor?
     mapping = role_mapping
-    mapping = mapping.policy(policy.id) if policy.present?
     mapping.auditor.present?
   end
 

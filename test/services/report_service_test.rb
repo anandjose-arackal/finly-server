@@ -77,6 +77,28 @@ class ReportServiceTest < ActiveSupport::TestCase
 
   end
 
+  test 'next reviewer for report' do
+    user = User.find_by(email: 'user0@finlytest.io')
+    r = ReportService.new(user: user).create
+    assert_equal 'manager0@finlytest.io', ReportService.new(user: user, report: r).next_reviewer_for_report.email
+    add_dummy_expenses(user, r)
+    ReportService.new(user: user, report: r).submit
+    assert r.processing?
+    assert_equal 'manager1@finlytest.io', ReportService.new(user: r.controlling_user, report: r).next_reviewer_for_report.email
+    ReportService.new(user: r.controlling_user, report: r).approve
+    assert r.processing?
+    assert_equal 'finance0@finlytest.io', ReportService.new(user: r.controlling_user, report: r).next_reviewer_for_report.email
+    ReportService.new(user: r.controlling_user, report: r).approve
+    assert r.processing?
+    assert_equal 'finance1@finlytest.io', ReportService.new(user: r.controlling_user, report: r).next_reviewer_for_report.email
+    ReportService.new(user: r.controlling_user, report: r).approve
+    assert r.processing?
+    assert ReportService.new(user: r.controlling_user, report: r).next_reviewer_for_report.blank?
+    ReportService.new(user: r.controlling_user, report: r).approve
+    assert r.approved?
+    assert r.controlling_user.blank?
+  end
+
   test 'report submission' do
     user = User.last
 
@@ -189,7 +211,7 @@ class ReportServiceTest < ActiveSupport::TestCase
     assert report_service.errors.blank?
     assert report.retracted?
 
-    # Report can only be retracted when in processing, approved states
+    # Report can only be retracted when in processing states
     assert report.retracted?
     report_service = ReportService.new(report: report, user: report.user)
     assert report_service.errors.blank?
@@ -265,19 +287,46 @@ class ReportServiceTest < ActiveSupport::TestCase
     assert approves_to.present?
     assert report.controlling_user.id, approves_to.id
 
-    # After approval, if approving manager does not have approves_to assigned, report is marked as approved and finance manager is assigned as controlling manager
+    # After approval, if approving manager does not have approves_to assigned, report is still in processing state and finance manager is assigned as controlling manager
     assert report.processing?
     report_service = ReportService.new(user: approves_to, report: report)
     assert report_service.errors.blank?
     assert_difference 'ReportTrack.count', 1 do
       report_service.approve
     end
-    assert report.approved?
+    assert report.processing?
     finance_manager = UserTeamService.new(report.user).finance_manager(report: report)
     assert finance_manager.present?
     assert report.controlling_user.id, finance_manager.id
 
-    # When auto-approval, report is marked as approved. If finance manager is assigned, finance manager is assigned as reports controlling user
+    # After finance approval, if approving manager has a finance_approves_to, report is still in processing state finance_approves_to manager is assigned as the controlling manager
+    controlling_user = report.controlling_user
+    report_service = ReportService.new(user: controlling_user, report: report)
+    assert report_service.errors.blank?
+    assert report.processing?
+    assert_difference 'ReportTrack.count', 1 do
+      report_service.approve
+    end
+    assert_not_equal report.controlling_user.id, controlling_user.id
+    assert report_service.errors.blank?
+    assert report.processing?
+    approves_to = UserTeamService.new(controlling_user).approves_finance_to(view: 'manager', report: report)
+    assert approves_to.present?
+    assert report.controlling_user.id, approves_to.id
+
+    # After final finance approval, report is marked as approved
+    controlling_user = report.controlling_user
+    report_service = ReportService.new(user: controlling_user, report: report)
+    assert report_service.errors.blank?
+    assert report.processing?
+    assert_difference 'ReportTrack.count', 1 do
+      report_service.approve
+    end
+    assert report.controlling_user.blank?
+    assert report_service.errors.blank?
+    assert report.approved?
+
+    # When auto-approval due to no manager or finance manager assigned, report is marked as approved and controlling user is set to nil
     u = User.first
     r = dummy_report_flow u, create_and_add_expenses: true
     assert UserTeamService.new(u).manager(report: r).blank?
@@ -288,8 +337,238 @@ class ReportServiceTest < ActiveSupport::TestCase
     # After final approval, if the user does not have a finance manager assigned, report is set to approved state and left hanging for admin to take control
     assert r.controlling_user.blank?
 
+    # When report is approved, if report contains reimbursable expenses, final finance manager is set as the controlling user of the report
+    # When report is approved, if final approver is not a finance manager and report contains reimbursable expenses, reports controlling user is set as nil
     # Auto approval should set the tracking status as auto-approved and have nil as action_user
     # todo track action ids verification
+  end
+
+  test 'test reject flow' do
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true, reimbursable: true
+    assert report.present?
+    assert report.processing?
+    ReportService.new(user: report.controlling_user, report: report).approve
+    ReportService.new(user: report.controlling_user, report: report).approve
+
+    # Report service reject will fail unless user is provided to it
+    report_service = ReportService.new(report: report)
+    assert report_service.errors.blank?
+    assert report.processing?
+    assert_no_difference 'ReportTrack.count' do
+      report_service.reject report.user
+    end
+    assert report.processing?
+    assert report_service.errors.present?
+
+    # Report service reject will fail unless report is provided to it
+    report_service = ReportService.new(user: user)
+    assert report_service.errors.blank?
+    assert report.processing?
+    assert_no_difference 'ReportTrack.count' do
+      report_service.reject report.user
+    end
+    assert report.processing?
+    assert report_service.errors.present?
+
+    # Can only be rejected by controlling manager
+    report_service = ReportService.new(user: User.first, report: report)
+    assert report_service.errors.blank?
+    assert report.processing?
+    assert_no_difference 'ReportTrack.count' do
+      report_service.reject report.user
+    end
+    assert report.processing?
+    assert report_service.errors.present?
+
+    # Can only be rejected when in processing state
+    u = User.find_by(email: 'user0@finlytest.io')
+    r = dummy_report_flow u, final_approve: true, reimbursable: true
+    assert r.controlling_user.present?
+    rs = ReportService.new(user: r.controlling_user, report: r)
+    assert r.approved?
+    assert_no_difference 'ReportTrack.count' do
+      rs.reject r.user
+    end
+    assert r.approved?
+    assert rs.errors.present?
+
+    # Successful rejection with memo
+    # If no user is selected while rejecting, report is rejected back to the report owner
+    # If report is rejected back to report owner, report is set to rejected state and all expenses are set to unsubmitted state
+    report_service = ReportService.new(user: report.controlling_user, report: report)
+    assert report_service.errors.blank?
+    assert report.processing?
+    assert report.expenses.first.submitted?
+    memo = 'test memo'
+    assert_difference 'ReportComment.count', 1 do
+      assert_difference 'ReportTrack.count', 1 do
+        report_service.reject nil, memo
+      end
+    end
+    assert report.rejected?
+    assert report.expenses.first.unsubmitted?
+    assert_equal report.controlling_user_id, report.user.id
+    assert_equal report.memo, memo
+    assert report_service.errors.blank?
+
+    # Can be rejected to anyone in the chain of users who interacted with the report
+    # If report is rejected back to a manager, report is set to processing state
+    # After rejection report controlling user is marked as the person report was rejected to
+    report = dummy_report_flow user, submit: true, reimbursable: true
+    assert report.processing?
+    ReportService.new(user: report.controlling_user, report: report).approve
+    ReportService.new(user: report.controlling_user, report: report).approve
+    rs = ReportService.new(user: report.controlling_user, report: report)
+    rejectable_users = rs.rejectable_to_users
+    assert_equal rejectable_users.size, 3
+    memo = 'memo number 2'
+    assert_difference 'ReportComment.count', 1 do
+      assert_difference 'ReportTrack.count', 1 do
+        rs.reject(rejectable_users.second, memo)
+      end
+    end
+    assert report.processing?
+    assert_equal report.controlling_user.id, rejectable_users.second.id
+    assert_equal report.memo, memo
+
+    # Rejecting report should generate respective mailers and comments
+  end
+
+  test 'test unapprove flow' do
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true, reimbursable: true
+    assert report.present?
+    assert report.processing?
+    ReportService.new(user: report.controlling_user, report: report).approve
+    ReportService.new(user: report.controlling_user, report: report).approve
+
+    # Can only be unapproved in processing state
+    r = dummy_report_flow user, final_approve: true, reimbursable: true
+    u = User.find_by(email: 'manager1@finlytest.io')
+    assert r.approved?
+    rs = ReportService.new(user: u, report: r)
+    assert rs.rejectable_to_users.blank?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.unapprove
+      end
+    end
+    assert r.approved?
+    assert rs.errors.present?
+
+    # Can only be unapproved by managers and only if it was previously approved by the manager
+    r = dummy_report_flow user, submit: true, reimbursable: true
+    u = User.find_by(email: 'finance0@finlytest.io')
+    assert r.processing?
+    rs = ReportService.new(user: u, report: r)
+    assert rs.rejectable_to_users.present?
+    assert rs.rejectable_to_users.with_id(u.id).blank?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.unapprove
+      end
+    end
+    assert r.processing?
+    assert rs.errors.present?
+
+    # Successful unapprove
+    # Report status is still set to processing when unapproved
+    # When unapproved controlling user is updated to the unapproving user
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, submit: true, reimbursable: true
+    assert report.present?
+    assert report.processing?
+    ReportService.new(user: report.controlling_user, report: report).approve
+    ReportService.new(user: report.controlling_user, report: report).approve
+
+    assert report.processing?
+    rs = ReportService.new(user: report.controlling_user, report: report)
+    assert rs.rejectable_to_users.present?
+    unapproving_user = rs.rejectable_to_users.second
+    rs = ReportService.new(user: unapproving_user, report: report)
+    assert_difference 'ReportComment.count', 1 do
+      assert_difference 'ReportTrack.count', 1 do
+        rs.unapprove
+      end
+    end
+    assert report.processing?
+    assert rs.errors.blank?
+    assert_equal report.controlling_user.id, unapproving_user.id
+  end
+
+  test 'reimburse flow' do
+    user = User.find_by email: 'user0@finlytest.io'
+
+    # Can only be reimbursed once approved
+    report = dummy_report_flow user, submit: true, reimbursable: true
+    rs = ReportService.new user: report.controlling_user, report: report
+    assert report.processing?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.reimburse
+      end
+    end
+    assert report.processing?
+    assert rs.errors.present?
+
+    # Can only be reimbursed by the final finance manager
+    report = dummy_report_flow user, final_approve: true, reimbursable: true
+    rs = ReportService.new user: User.find_by(email: 'finance0@finlytest.io'), report: report
+    assert report.approved?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.reimburse
+      end
+    end
+    assert report.approved?
+    assert rs.errors.present?
+
+    # Can only reimburse if the report has reimbursable expenses in it
+    report = dummy_report_flow user, final_approve: true, reimbursable: false
+    rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
+    assert report.approved?
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        rs.reimburse
+      end
+    end
+    assert report.approved?
+    assert rs.errors.present?
+
+    # Successful reimbursement
+    # After reimbursement, reports controlling user is report owner
+    # Can add a memo while reimbursing the report
+    # Once reimbursed report is marked as reimbursed
+    report = dummy_report_flow user, final_approve: true, reimbursable: true
+    rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
+    assert report.approved?
+    memo = 'test memo reimburse'
+    assert_difference 'ReportComment.count', 1 do
+      assert_difference 'ReportTrack.count', 1 do
+        rs.reimburse memo: memo
+      end
+    end
+    assert report.reimbursed?
+    assert rs.errors.blank?
+    assert_equal report.controlling_user.id, report.user.id
+
+  end
+
+  test 'reimburse_confirm flow' do
+
+  end
+
+  test 'delete_report flow' do
+
+  end
+
+  test 'archive_report flow' do
+
+  end
+
+  test 'take_control flow' do
+
   end
 
   # todo test comments

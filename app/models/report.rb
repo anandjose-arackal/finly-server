@@ -8,7 +8,7 @@
 #  report_status_id        :integer          not null
 #  policy_id               :integer
 #  submitted_at            :datetime
-#  controlling_user_id     :integer          not null
+#  controlling_user_id     :integer
 #  controlling_for_user_id :integer
 #  forwarding_to_id        :integer
 #  memo                    :string(255)
@@ -29,13 +29,21 @@ class Report < ActiveRecord::Base
 
   validates :user, presence: true
   validates :status, presence: true
-  validates :controlling_user, presence: true
 
   before_save do
     if self.name.blank?
       self.name = Report.get_default_name(self.user)
     end
   end
+
+  before_destroy do
+    if self.expenses.present?
+      expenses.each do |expense|
+        expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
+      end
+    end
+  end
+
 
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
@@ -67,37 +75,49 @@ class Report < ActiveRecord::Base
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
+  
+  def status_id
+    self.report_status_id
+  end
 
   def open?
-    self.status.id == 1
+    self.status_id == 1
   end
 
   def retracted?
-    self.status.id == 2
+    self.status_id == 2
   end
 
   def rejected?
-    self.status.id == 3
+    self.status_id == 3
   end
 
   def processing?
-    self.status.id == 4
+    self.status_id == 4
   end
 
   def approved?
-    self.status.id == 5
+    self.status_id == 5
   end
 
   def reimbursed?
-    self.status.id == 6
+    self.status_id == 6
   end
 
   def reimbursement_confirmed?
-    self.status.id == 7
+    self.status_id == 7
   end
 
   def closed?
-    self.status.id == 8
+    self.status_id == 8
+  end
+
+  def is_reimbursable?
+    expenses.reimbursable.present?
+  end
+
+  def is_closed?
+    report.reimbursement_confirmed? or (report.approved? and not report.is_reimbursable?)
   end
 
 end

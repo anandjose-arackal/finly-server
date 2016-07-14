@@ -6,7 +6,7 @@ class CreateReports < ActiveRecord::Migration
       t.references :report_status, index: true, foreign_key: true, null: false
       t.references :policy, index: true, foreign_key: true
       t.datetime :submitted_at, limit: 6
-      t.integer :controlling_user_id,:references => "user", index: true, foreign_key: true, null: false
+      t.integer :controlling_user_id,:references => "user", index: true, foreign_key: true
       t.integer :controlling_for_user_id,:references => "user", index: true, foreign_key: true
       t.integer :forwarding_to_id,:references => "user", index: true, foreign_key: true
       t.string :memo

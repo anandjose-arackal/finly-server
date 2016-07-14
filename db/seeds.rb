@@ -31,7 +31,7 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
   ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
   ReportStatus.create(id: 7, name: 'Reimbursement Confirmed', order: 7)
-  ReportStatus.create(id: 8, name: 'Closed', order: 8)
+  ReportStatus.create(id: 8, name: 'Archived', order: 8)
 end
 
 if ReportTrackingAction.count == 0
@@ -44,10 +44,7 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create(id: 7, name: 'unapprove')
   ReportTrackingAction.create(id: 8, name: 'reimburse')
   ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
-  ReportTrackingAction.create(id: 10, name: 'close')
-  ReportTrackingAction.create(id: 11, name: 'take_control')
-  ReportTrackingAction.create(id: 12, name: 'delete')
-  ReportTrackingAction.create(id: 13, name: 'archive')
+  ReportTrackingAction.create(id: 10, name: 'take_control')
 end
 
 if ReportCommentAction.count == 0
@@ -60,14 +57,13 @@ if ReportCommentAction.count == 0
   ReportCommentAction.create(id: 7, name: 'report_unapprove')
   ReportCommentAction.create(id: 8, name: 'report_reimburse')
   ReportCommentAction.create(id: 9, name: 'report_reimbursement_received')
-  ReportCommentAction.create(id: 10, name: 'report_close')
-  ReportCommentAction.create(id: 11, name: 'report_take_control')
-  ReportCommentAction.create(id: 12, name: 'report_update')
-  ReportCommentAction.create(id: 13, name: 'report_attach_receipt')
-  ReportCommentAction.create(id: 14, name: 'expense_add')
-  ReportCommentAction.create(id: 15, name: 'expense_remove')
-  ReportCommentAction.create(id: 16, name: 'expense_reject')
-  ReportCommentAction.create(id: 17, name: 'expense_update')
+  ReportCommentAction.create(id: 10, name: 'report_take_control')
+  ReportCommentAction.create(id: 11, name: 'report_update')
+  ReportCommentAction.create(id: 12, name: 'report_attach_receipt')
+  ReportCommentAction.create(id: 13, name: 'expense_add')
+  ReportCommentAction.create(id: 14, name: 'expense_remove')
+  ReportCommentAction.create(id: 15, name: 'expense_reject')
+  ReportCommentAction.create(id: 16, name: 'expense_update')
 end
 
 if Currency.count == 0
@@ -121,7 +117,7 @@ end
 if Policy.non_default.count == 0
   p = PolicyCreateService.new.create_policy(c, a, 'Test Policy')
   p.configuration.update_attribute(:require_category, true) if p.present?
-  PolicyUserService.new(p).add_user(u[0])
+  PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
 
   p = PolicyCreateService.new.create_policy(c, a, 'Another test Policy')

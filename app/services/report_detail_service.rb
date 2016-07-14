@@ -14,8 +14,12 @@ class ReportDetailService < BaseService
     report.expenses.with_amount.sum(:value)
   end
 
+  def policy
+    PolicyRetrievalService.for_report(self.report)
+  end
+
   def currency
-    PolicyRetrievalService.for_report(self.report).configuration.report_currency
+    policy.configuration.report_currency
   end
 
   def controlling_user

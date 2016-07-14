@@ -16,7 +16,6 @@ class Policy < ActiveRecord::Base
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
   has_many :users, through: :user_mapping
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
-  has_many :user_role_mappings, dependent: :destroy
 
   has_many :expense_rules
   has_many :budget_rules
@@ -25,7 +24,7 @@ class Policy < ActiveRecord::Base
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
-
+  scope :with_id, -> (id) { find_by id: id }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
