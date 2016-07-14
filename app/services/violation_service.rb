@@ -4,18 +4,23 @@ class ViolationService < BaseService
 
   def initialize(current_user)
     @user = current_user
-    warning_messages = {}
+    self.warning_messages = {}
   end
 
   # checks for policy violations in a report and returns returns false if there aren't any
   def violations(policy, report)
-
-    # loading expenses from report
-    expenses = report.expenses
-
-    ###### change this later to retrieve the policy from the report
-    policy = PolicyRetrievalService.list(@user).first
-    apply_policy_for_report(report, policy)
+    unless report || policy
+      errors << "No report or policy passed."
+      return false
+    end
+    report.expenses.each do |expense|
+      policy.expense_rules.each do |rule|
+        check_expense_rule rule, expense
+      end
+      policy.budget_rules.each do |rule|
+        check_budget rule, expense
+      end
+    end
 
   end
 
@@ -180,18 +185,7 @@ class ViolationService < BaseService
   end
 
   def apply_policy_for_report(report = nil, policy = nil)
-    unless report || policy
-      errors << "No report or policy passed."
-      return false
-    end
-    report.expenses.each do |expense|
-      policy.expense_rules.each do |rule|
-        check_expense_rule rule, expense
-      end
-      policy.budget_rules.each do |rule|
-        check_budget rule, expense
-      end
-    end
+
   end
 
 end
