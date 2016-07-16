@@ -76,9 +76,9 @@ else
 end
 
 if c.categories.count ==
-  10.times do |i|
-    cat = c.categories.create!(name: "Test category #{i+1}")
-  end
+    10.times do |i|
+      c.categories.create!(name: "Test category #{i+1}")
+    end
 end
 
 if User.count == 0
@@ -116,7 +116,7 @@ if Policy.non_default.count == 0
   PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
 
-  p = PolicyCreateService.new.create_policy(c, a, 'Another test Policy')
+  PolicyCreateService.new.create_policy(c, a, 'Another test Policy')
 end
 
 if ExpenseType.count ==0
@@ -136,7 +136,7 @@ end
 
 if Expense.count == 0
   200.times do |i|
-    e = Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
+    Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
                        expense_status_id: random_integer(1, 3),
                        expense_type_id: 1,
                        note: "test note #{i}",
@@ -155,33 +155,38 @@ if Receipt.count == 0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: 'Require Receipt')
-  e = ExpenseRuleType.create!(name: 'Require Note')
-  e = ExpenseRuleType.create!(name: 'Disallow Expense')
+  ExpenseRuleType.create!(name: 'Require Receipt')
+  ExpenseRuleType.create!(name: 'Require Note')
+  ExpenseRuleType.create!(name: 'Disallow Expense')
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: 'Warning')
-  e = RuleType.create!(name: 'Blocking')
+  RuleType.create!(name: 'Warning')
+  RuleType.create!(name: 'Blocking')
 end
 
 if BudgetPeriod.count == 0
-  b = BudgetPeriod.create!(name: "Day")
-  b = BudgetPeriod.create!(name: "Week")
-  b = BudgetPeriod.create!(name: "Month")
-  b = BudgetPeriod.create!(name: "Year")
+  BudgetPeriod.create!(name: "Day")
+  BudgetPeriod.create!(name: "Week")
+  BudgetPeriod.create!(name: "Month")
+  BudgetPeriod.create!(name: "Year")
 end
 
 p = Policy.find(3)
 if p.rules_count == 0
-  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 100, currency_id: 1},
+  p.expense_rules.create!(greater_than_amount_attributes: {value: 100, currency_id: 1},
                               category_id: 1,
                               days_after: 20,
                               rule_type_id: 1,
                               expense_rule_type_id: 2)
-  b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
+  p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
                              category_id: 1,
                              budget_period_id: 3,
                              rule_type_id: 1)
 end
 
+if PaymentType.count == 0
+  PaymentType.create(id: 1, name: 'advance')
+  PaymentType.create(id: 2, name: 'debt_clearance')
+  PaymentType.create(id: 3, name: 'reimbursement')
+end

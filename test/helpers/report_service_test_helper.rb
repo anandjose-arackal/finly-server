@@ -1,12 +1,12 @@
 module ReportServiceTestHelper
 
-  def add_dummy_expenses(user, report, reimbursable=false)
+  def add_dummy_expenses(user, report)
     report_service = ReportService.new(user: user, report: report)
     expense_service = ExpenseService.new(user)
     expenses = []
     expenses_ids = []
     5.times.each do
-      e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name, reimbursable: reimbursable, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1})
+      e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1})
       expenses << e
       expenses_ids << e.id
     end
@@ -15,15 +15,11 @@ module ReportServiceTestHelper
   end
 
   def dummy_report_flow(user, params={})
-    reimbursable = false
-    if params[:reimbursable].present?
-      reimbursable = params[:reimbursable]
-    end
     report_service = ReportService.new(user: user)
     report = report_service.create
     return report if params[:create]
     report_service = ReportService.new(user: user, report: report)
-    add_dummy_expenses(user, report, reimbursable)
+    add_dummy_expenses(user, report)
     return report if params[:create_and_add_expenses]
     report_service.submit
     return report if params[:submit] or report.controlling_user.blank?

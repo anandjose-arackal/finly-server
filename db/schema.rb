@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160712175130) do
+ActiveRecord::Schema.define(version: 20160715045254) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -21,6 +21,18 @@ ActiveRecord::Schema.define(version: 20160712175130) do
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "balance_sheets", force: :cascade do |t|
+    t.integer  "user_id",                  limit: 4
+    t.integer  "cash_in_hand_id",          limit: 4
+    t.integer  "pending_reimbursement_id", limit: 4
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
+  add_index "balance_sheets", ["pending_reimbursement_id"], name: "index_balance_sheets_on_pending_reimbursement_id", using: :btree
+  add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
   create_table "budget_periods", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -150,13 +162,12 @@ ActiveRecord::Schema.define(version: 20160712175130) do
     t.datetime "date"
     t.integer  "user_id",              limit: 4
     t.integer  "expense_type_id",      limit: 4
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.text     "manager_memo",         limit: 65535
     t.integer  "rejecting_manager_id", limit: 4
     t.integer  "report_id",            limit: 4
     t.integer  "category_id",          limit: 4
-    t.boolean  "reimbursable",                       default: false, null: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -174,6 +185,28 @@ ActiveRecord::Schema.define(version: 20160712175130) do
   end
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
+
+  create_table "payment_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.integer  "amount_id",          limit: 4,     null: false
+    t.date     "date",                             null: false
+    t.integer  "payment_type_id",    limit: 4,     null: false
+    t.integer  "initiating_user_id", limit: 4,     null: false
+    t.integer  "receiving_user_id",  limit: 4,     null: false
+    t.text     "note",               limit: 65535
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
+  add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
+  add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
+  add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "policies", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -287,16 +320,20 @@ ActiveRecord::Schema.define(version: 20160712175130) do
   add_index "report_tracks", ["report_tracking_action_id"], name: "index_report_tracks_on_report_tracking_action_id", using: :btree
 
   create_table "reports", force: :cascade do |t|
-    t.string   "name",                    limit: 255,               null: false
-    t.integer  "user_id",                 limit: 4,                 null: false
-    t.integer  "report_status_id",        limit: 4,                 null: false
+    t.string   "name",                    limit: 255,                               null: false
+    t.integer  "user_id",                 limit: 4,                                 null: false
+    t.integer  "report_status_id",        limit: 4,                                 null: false
     t.integer  "policy_id",               limit: 4
     t.datetime "submitted_at",                        precision: 6
     t.integer  "controlling_user_id",     limit: 4
     t.integer  "controlling_for_user_id", limit: 4
     t.string   "memo",                    limit: 255
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.datetime "created_at",                                                        null: false
+    t.datetime "updated_at",                                                        null: false
+    t.integer  "reimbursement_id",        limit: 4
+    t.integer  "reimbursement_amount_id", limit: 4
+    t.integer  "expense_total_id",        limit: 4
+    t.boolean  "accounted",                                         default: false, null: false
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -430,6 +467,7 @@ ActiveRecord::Schema.define(version: 20160712175130) do
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
   add_foreign_key "amounts", "currencies"
+  add_foreign_key "balance_sheets", "users"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "budget_periods"
   add_foreign_key "budget_rules", "categories"
@@ -450,6 +488,8 @@ ActiveRecord::Schema.define(version: 20160712175130) do
   add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
   add_foreign_key "manual_expenses", "expenses"
+  add_foreign_key "payments", "amounts"
+  add_foreign_key "payments", "payment_types"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"

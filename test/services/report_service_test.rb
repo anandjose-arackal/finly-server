@@ -345,7 +345,7 @@ class ReportServiceTest < ActiveSupport::TestCase
 
   test 'test reject flow' do
     user = User.find_by(email: 'user0@finlytest.io')
-    report = dummy_report_flow user, submit: true, reimbursable: true
+    report = dummy_report_flow user, submit: true
     assert report.present?
     assert report.processing?
     ReportService.new(user: report.controlling_user, report: report).approve
@@ -383,7 +383,7 @@ class ReportServiceTest < ActiveSupport::TestCase
 
     # Can only be rejected when in processing state
     u = User.find_by(email: 'user0@finlytest.io')
-    r = dummy_report_flow u, final_approve: true, reimbursable: true
+    r = dummy_report_flow u, final_approve: true
     assert r.controlling_user.blank?
     rs = ReportService.new(user: User.find_by(email: 'finance1@finlytest.io'), report: r)
     assert r.approved?
@@ -415,7 +415,7 @@ class ReportServiceTest < ActiveSupport::TestCase
     # Can be rejected to anyone in the chain of users who interacted with the report
     # If report is rejected back to a manager, report is set to processing state
     # After rejection report controlling user is marked as the person report was rejected to
-    report = dummy_report_flow user, submit: true, reimbursable: true
+    report = dummy_report_flow user, submit: true
     assert report.processing?
     ReportService.new(user: report.controlling_user, report: report).approve
     ReportService.new(user: report.controlling_user, report: report).approve
@@ -437,14 +437,14 @@ class ReportServiceTest < ActiveSupport::TestCase
 
   test 'test unapprove flow' do
     user = User.find_by(email: 'user0@finlytest.io')
-    report = dummy_report_flow user, submit: true, reimbursable: true
+    report = dummy_report_flow user, submit: true
     assert report.present?
     assert report.processing?
     ReportService.new(user: report.controlling_user, report: report).approve
     ReportService.new(user: report.controlling_user, report: report).approve
 
     # Can only be unapproved in processing state or in approved state
-    r = dummy_report_flow user, create: true, reimbursable: true
+    r = dummy_report_flow user, create: true
     u = User.find_by(email: 'manager1@finlytest.io')
     assert r.open?
     rs = ReportService.new(user: u, report: r)
@@ -458,7 +458,7 @@ class ReportServiceTest < ActiveSupport::TestCase
     assert rs.errors.present?
 
     # Can only be unapproved by managers and only if it was previously approved by the manager
-    r = dummy_report_flow user, submit: true, reimbursable: true
+    r = dummy_report_flow user, submit: true
     u = User.find_by(email: 'finance0@finlytest.io')
     assert r.processing?
     rs = ReportService.new(user: u, report: r)
@@ -476,7 +476,7 @@ class ReportServiceTest < ActiveSupport::TestCase
     # Report status is set to processing when unapproved
     # When unapproved controlling user is updated to the unapproving user
     user = User.find_by(email: 'user0@finlytest.io')
-    report = dummy_report_flow user, submit: true, reimbursable: true
+    report = dummy_report_flow user, submit: true
     assert report.present?
     assert report.processing?
     ReportService.new(user: report.controlling_user, report: report).approve
@@ -498,7 +498,7 @@ class ReportServiceTest < ActiveSupport::TestCase
 
     # Unapproving report in approved state
     user = User.find_by(email: 'user0@finlytest.io')
-    report = dummy_report_flow user, final_approve: true, reimbursable: true
+    report = dummy_report_flow user, final_approve: true
 
     assert report.approved?
     rs = ReportService.new(user: report.controlling_user, report: report)
@@ -519,7 +519,7 @@ class ReportServiceTest < ActiveSupport::TestCase
   #   user = User.find_by email: 'user0@finlytest.io'
   #
   #   # Can only be reimbursed once approved
-  #   report = dummy_report_flow user, submit: true, reimbursable: true
+  #   report = dummy_report_flow user, submit: true
   #   rs = ReportService.new user: report.controlling_user, report: report
   #   assert report.processing?
   #   assert_no_difference 'ReportComment.count' do
@@ -531,7 +531,7 @@ class ReportServiceTest < ActiveSupport::TestCase
   #   assert rs.errors.present?
   #
   #   # Can only be reimbursed by the final finance manager
-  #   report = dummy_report_flow user, final_approve: true, reimbursable: true
+  #   report = dummy_report_flow user, final_approve: true
   #   rs = ReportService.new user: User.find_by(email: 'finance0@finlytest.io'), report: report
   #   assert report.approved?
   #   assert_no_difference 'ReportComment.count' do
@@ -543,7 +543,7 @@ class ReportServiceTest < ActiveSupport::TestCase
   #   assert rs.errors.present?
   #
   #   # Can only reimburse if the report has reimbursable expenses in it
-  #   report = dummy_report_flow user, final_approve: true, reimbursable: false
+  #   report = dummy_report_flow user, final_approve: true
   #   rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
   #   assert report.approved?
   #   assert_no_difference 'ReportComment.count' do
@@ -558,7 +558,7 @@ class ReportServiceTest < ActiveSupport::TestCase
   #   # After reimbursement, reports controlling user is report owner
   #   # Can add a memo while reimbursing the report
   #   # Once reimbursed report is marked as reimbursed
-  #   report = dummy_report_flow user, final_approve: true, reimbursable: true
+  #   report = dummy_report_flow user, final_approve: true
   #   rs = ReportService.new user: User.find_by(email: 'finance1@finlytest.io'), report: report
   #   assert report.approved?
   #   memo = 'test memo reimburse'
@@ -579,7 +579,7 @@ class ReportServiceTest < ActiveSupport::TestCase
 
   test 'delete_report flow' do
     user = User.find_by(email: 'user0@finlytest.io')
-    report = dummy_report_flow user, submit: true, reimbursable: true
+    report = dummy_report_flow user, submit: true
     rs = ReportService.new(user: user, report: report)
     # Report can only be delted in open or retracted view
     assert report.processing?

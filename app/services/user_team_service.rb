@@ -49,6 +49,19 @@ class UserTeamService < BaseService
     false
   end
 
+  def final_finance_manager(report)
+    emp = report.user
+    return false if report.blank?
+    rds = ReportDetailService.new(report)
+    policy = report.policy
+    policy = rds.policy unless policy.blank?
+    m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+    while m.present?
+      m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+    end
+    m
+  end
+
   # Retrieve service
   def mappings(params={})
     load_retrieve params

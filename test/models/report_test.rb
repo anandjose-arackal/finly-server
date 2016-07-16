@@ -10,10 +10,13 @@
 #  submitted_at            :datetime
 #  controlling_user_id     :integer
 #  controlling_for_user_id :integer
-#  forwarding_to_id        :integer
 #  memo                    :string(255)
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  reimbursement_id        :integer
+#  reimbursement_amount_id :integer
+#  expense_total_id        :integer
+#  accounted               :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

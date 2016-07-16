@@ -45,6 +45,9 @@ class User < ActiveRecord::Base
   has_many :policy_user_mappings
   has_many :policies, through: :policy_user_mappings
   has_many :reports
+  has_one :balance_sheet
+  has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
@@ -62,6 +65,7 @@ class User < ActiveRecord::Base
   after_create do
     self.build_profile.save if self.profile.blank?
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
+    self.build_balance_sheet.save if self.balance_sheet.blank?
   end
 
   def roles

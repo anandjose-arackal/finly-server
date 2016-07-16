@@ -10,10 +10,13 @@
 #  submitted_at            :datetime
 #  controlling_user_id     :integer
 #  controlling_for_user_id :integer
-#  forwarding_to_id        :integer
 #  memo                    :string(255)
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  reimbursement_id        :integer
+#  reimbursement_amount_id :integer
+#  expense_total_id        :integer
+#  accounted               :boolean          default(FALSE), not null
 #
 
 class Report < ActiveRecord::Base
@@ -26,6 +29,9 @@ class Report < ActiveRecord::Base
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
+  belongs_to :reimbursement, class_name: 'Payment'
+  belongs_to :reimbursement_amount, class_name: 'Amount'
+  belongs_to :expense_total, class_name: 'Amount'
 
   validates :user, presence: true
   validates :status, presence: true
@@ -33,11 +39,16 @@ class Report < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :non_archived, -> { where.not report_status_id: ReportStatus.archived_id }
   scope :archived, -> { where report_status_id: ReportStatus.archived_id }
+  scope :with_amount, -> { joins :amounts }
+  scope :approved, -> { where report_status_id: [ReportStatus.approved_id, ReportStatus.archived_id] }
+  scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
+  scope :accounted, -> { where accounted: true }
 
   before_save do
     if self.name.blank?
       self.name = Report.get_default_name(self.user)
     end
+    self.expense_total.create(value: 0, currency: Currency.first) if self.expense_total.blank?
   end
 
   before_destroy do

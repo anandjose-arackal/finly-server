@@ -15,7 +15,6 @@
 #  rejecting_manager_id :integer
 #  report_id            :integer
 #  category_id          :integer
-#  reimbursable         :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

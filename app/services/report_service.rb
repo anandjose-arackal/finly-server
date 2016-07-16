@@ -136,6 +136,9 @@ class ReportService < BaseService
     end
     manager_id = nil
     manager_id = manager.id if manager.present?
+    if manager_id.blank?
+
+    end
     # # If reimbursable expenses are present
     # if manager_id.blank? and report.is_reimbursable? and UserTeamService.new(user).finance_manager_for?(report)
     #   manager_id = user.id
@@ -147,6 +150,9 @@ class ReportService < BaseService
       else
         comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_approve_id
         track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status
+      end
+      if report.approved?
+        SettlementService.new(user).report_approved report
       end
       track.save
       comment.save
@@ -181,13 +187,21 @@ class ReportService < BaseService
     if to_user.id != report.user.id
       status = ReportStatus.processing_id
     end
+    prev_status = report.status
     if report.update_attributes report_status_id: status, controlling_user_id: to_user.id, controlling_for_user_id: nil, memo: memo
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: memo
       track.save
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: to_user.id, content: memo
       comment.save
-      report.expenses.each do |expense|
-        expense.update_attribute :expense_status_id, ExpenseStatus.unsubmitted_id
+      # Reset expenses status to unsubmitted if report is rejected
+      if status == ReportStatus.rejected_id
+        report.expenses.each do |expense|
+          expense.update_attribute :expense_status_id, ExpenseStatus.unsubmitted_id
+        end
+      end
+      # Recalculate settlement when report is unapproved from an approved state
+      if prev_status.approved?
+        SettlementService.new(user).report_unapproved report
       end
       return true
     end
@@ -333,7 +347,7 @@ class ReportService < BaseService
 
   # Callback to create comments in reports when expense is updated
   def expense_updated_in_report(expense)
-
+    recompute_total
   end
 
   def add_expense(expense_ids)
@@ -364,6 +378,7 @@ class ReportService < BaseService
         end
       end
     end
+    recompute_total
     report.reload
   end
 
@@ -395,6 +410,7 @@ class ReportService < BaseService
         end
       end
     end
+    recompute_total
     report.reload
   end
 
@@ -424,6 +440,7 @@ class ReportService < BaseService
         comment.save
       end
     end
+    recompute_total
     report.reload
   end
 
@@ -543,6 +560,14 @@ class ReportService < BaseService
     end
     errors << report.errors.full_messages
     false
+  end
+
+  def recompute_total
+    return false unless validate require_report: true
+    total_amount = report.expenses.with_amount.sum(:value)
+    exp_total =report.expenses_total
+    exp_total.value = total_amount
+    exp_total.save
   end
 
   private
