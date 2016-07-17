@@ -13,7 +13,6 @@ class ReceiptServiceTest < ActiveSupport::TestCase
   test 'must create a receipt for user' do
     assert_difference '@user.receipts.count', 1 do
       receipt = @rs.create_receipt @receipt_params
-      debugger
       assert_equal "1363397.jpg", receipt.image_file_name
     end
   end

@@ -1,6 +1,8 @@
 require 'test_helper'
 
+require 'helpers/report_service_test_helper'
 class SettlementServiceTest < ActiveSupport::TestCase
+  include ReportServiceTestHelper
 
   def setup
     @admin = User.first
@@ -66,19 +68,176 @@ class SettlementServiceTest < ActiveSupport::TestCase
   end
 
   test 'computing settlements on report approval' do
-    # Computing requires report
-    # Can only be recomputed when approved and the report is unaccounted
-    # When a report is approved and unaccounted, the cash in hand is deducted from the total amount
-    # If cash_in_hand - total_amount is negative, the difference is added as pending reimbursements to balance sheet
+    pr = @ss.pending_reimbursement.precision_value
+    r = dummy_report_flow @user, final_approve: true
+    assert r.approved?
+    assert r.controlling_user.blank?
+    assert @ss.require_reimbursement? r
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount > 0
+    assert_equal pr, @ss.pending_reimbursement.precision_value - report_amount
+
+    old_pr = @ss.pending_reimbursement.precision_value
+    r = dummy_report_flow @user, final_approve: true
+    pr = @ss.pending_reimbursement.precision_value
+    report_amount = ReportDetailService.new(r).total_amount
+    assert_equal pr, (old_pr + report_amount).round(2)
+
+    old_pr = @ss.pending_reimbursement.precision_value
+    r = dummy_report_flow @user, final_approve: true
+    pr = @ss.pending_reimbursement.precision_value
+    report_amount = ReportDetailService.new(r).total_amount
+    assert_equal pr, (old_pr + report_amount).round(2)
+
+    # Adding a 0 cash advance and submitting a report for 1000 should make the reimbursable amount as 1000 and cash in hand as 0
     # Once calculated, report is marked as accounted
+    assert_equal @ss.cash_in_hand.precision_value, 0
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 0
+    amount = 1000
+    expected_reimbursable_amount = 1000
+    expected_cash_in_advance = 0
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    assert_equal @ss.cash_in_hand.precision_value, expected_cash_in_advance
+    assert_equal (old_pr + r.reimbursement_amount.precision_value).round(2), @ss.pending_reimbursement.precision_value
+
+    # Adding a 500 cash advance and submitting a report for 1000 should make the reimbursable amount as 500 and cash in hand as 0
+    assert_equal @ss.cash_in_hand.precision_value, 0
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 500
+    amount = 1000
+    expected_reimbursable_amount = 500
+    expected_cash_in_advance = 0
+    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    assert_equal @ss.cash_in_hand.precision_value, expected_cash_in_advance
+    assert_equal (old_pr + r.reimbursement_amount.precision_value).round(2), @ss.pending_reimbursement.precision_value
+
+    # Adding a 1000 cash advance and submitting a report for 1000 should make the reimbursable amount as 0 and cash in hand as 0
+    assert_equal @ss.cash_in_hand.precision_value, 0
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 1000
+    amount = 1000
+    expected_reimbursable_amount = 0
+    expected_cash_in_advance = 0
+    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    assert_equal @ss.cash_in_hand.precision_value, expected_cash_in_advance
+    assert_equal (old_pr + r.reimbursement_amount.precision_value).round(2), @ss.pending_reimbursement.precision_value
+
+    # Adding a 5000 cash advance and submitting a report for 1000 should make the reimbursable amount as 0 and cash in hand as 4000
+    assert_equal @ss.cash_in_hand.precision_value, 0
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 5000
+    amount = 1000
+    expected_reimbursable_amount = 0
+    expected_cash_in_advance = 4000
+    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    assert_equal @ss.cash_in_hand.precision_value, expected_cash_in_advance
+    assert_equal (old_pr + r.reimbursement_amount.precision_value).round(2), @ss.pending_reimbursement.precision_value
+
   end
 
   test 'settlements on report unapproval' do
+    # When no cash advance was given prior the expense
+    # When recomputed report is marked as unaccounted
+    # Reports reimbursement_pending amount is set to 0
+    assert_equal @ss.cash_in_hand.precision_value, 0
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 0
+    amount = 1000
+    expected_reimbursable_amount = 1000
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    rs = ReportService.new(user: User.find_by(email: 'manager0@finlytest.io'), report: r)
+    assert rs.unapprove
+    assert_not r.accounted?
+    assert_equal @ss.cash_in_hand.precision_value, cash_advance
+    assert_equal @ss.pending_reimbursement.precision_value, 0
+    assert_equal old_pr.round(2), @ss.pending_reimbursement.precision_value
+
+    # When partial cash advance was given prior to the expense
+    assert_equal @ss.cash_in_hand.precision_value, 0
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 500
+    amount = 1000
+    expected_reimbursable_amount = 500
+    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    rs = ReportService.new(user: User.find_by(email: 'manager0@finlytest.io'), report: r)
+    assert rs.unapprove
+    assert_not r.accounted?
+    assert_equal @ss.cash_in_hand.precision_value, cash_advance
+    assert_equal @ss.pending_reimbursement.precision_value, 0
+    assert_equal old_pr.round(2), @ss.pending_reimbursement.precision_value
+
+    # When complete cash advance was given prior to the expenses
+    # When a report is processing and accounted, the report total amount is added to cash in hand amount of the user balance sheet
+    old_cash_in_hand = 500
+    assert_equal @ss.cash_in_hand.precision_value, 500
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 500
+    amount = 1000
+    expected_reimbursable_amount = 0
+    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    rs = ReportService.new(user: User.find_by(email: 'manager0@finlytest.io'), report: r)
+    assert rs.unapprove
+    assert_not r.accounted?
+    assert_equal @ss.cash_in_hand.precision_value, old_cash_in_hand + cash_advance
+    assert_equal @ss.pending_reimbursement.precision_value, 0
+    assert_equal old_pr.round(2), @ss.pending_reimbursement.precision_value
+
+    # When additional cash advance was given prior to the expense
+    assert_equal @ss.cash_in_hand.precision_value, 1000
+    old_cash_in_hand = 1000
+    old_pr = @ss.pending_reimbursement.precision_value
+    cash_advance = 1000
+    amount = 1000
+    expected_reimbursable_amount = 0
+    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert r.accounted?
+    report_amount = ReportDetailService.new(r).total_amount
+    assert report_amount, amount
+    assert_equal r.reimbursement_amount.precision_value, expected_reimbursable_amount
+    rs = ReportService.new(user: User.find_by(email: 'manager0@finlytest.io'), report: r)
+    assert rs.unapprove
+    assert_not r.accounted?
+    assert_equal @ss.cash_in_hand.precision_value, cash_advance + old_cash_in_hand
+    assert_equal @ss.pending_reimbursement.precision_value, 0
+    assert_equal old_pr.round(2), @ss.pending_reimbursement.precision_value
+
     # Computing requires report
     # Can only be recomputed when processing and report is accounted
-    # When a report is processing and accounted, the report total amount is added to cash in hand amount ofthe user balance sheet
-    # Reports reimbursement_pending amount is set to 0
-    # When recomputed report is marked as unaccounted
   end
 
   test 'adding reimbursement' do

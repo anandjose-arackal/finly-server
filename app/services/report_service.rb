@@ -100,7 +100,7 @@ class ReportService < BaseService
       errors << 'Only report owners can retract report'
       return false
     end
-    unless report.status.processing?
+    unless report.processing?
       errors << 'Cannot retract report'
       return false
     end
@@ -132,7 +132,11 @@ class ReportService < BaseService
     manager = next_reviewer_for_report
     status = ReportStatus.processing_id
     if auto_approve or manager.blank?
+      settlement = SettlementService.new(report.user)
       status = ReportStatus.approved_id
+      unless settlement.require_reimbursement?(report)
+        status = ReportStatus.closed_id
+      end
     end
     manager_id = nil
     manager_id = manager.id if manager.present?
@@ -151,11 +155,19 @@ class ReportService < BaseService
         comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_approve_id
         track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status
       end
-      if report.approved?
-        SettlementService.new(user).report_approved report
-      end
       track.save
       comment.save
+      # Recompute settlement
+      unless report.processing?
+        SettlementService.new.report_approved report
+      end
+      # Add comments stating report has been closed as no reimbursements required
+       if report.closed?
+        comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.report_closed_id
+        track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.closed_id, report_status_id: ReportStatus.closed_id
+        comment.save
+        track.save
+      end
       return true
     end
     errors << report.errors.full_messages
@@ -187,7 +199,6 @@ class ReportService < BaseService
     if to_user.id != report.user.id
       status = ReportStatus.processing_id
     end
-    prev_status = report.status
     if report.update_attributes report_status_id: status, controlling_user_id: to_user.id, controlling_for_user_id: nil, memo: memo
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: memo
       track.save
@@ -198,10 +209,6 @@ class ReportService < BaseService
         report.expenses.each do |expense|
           expense.update_attribute :expense_status_id, ExpenseStatus.unsubmitted_id
         end
-      end
-      # Recalculate settlement when report is unapproved from an approved state
-      if prev_status.approved?
-        SettlementService.new(user).report_unapproved report
       end
       return true
     end
@@ -215,20 +222,25 @@ class ReportService < BaseService
       errors << 'User cannot unapprove this report'
       return false
     end
-    unless report.processing? or report.approved?
+    unless report.can_unapprove?
       errors << 'Cannot unapprove this report'
       return false
     end
     associated_users = report.associated_users(report.controlling_user)
-    unless (report.controlling_user.present? or report.approved?) and associated_users.present? and associated_users.with_id(user.id).present?
+    unless associated_users.present? and associated_users.with_id(user.id).present?
       errors << 'User has not yet reviewed the report to unapprove it'
       return false
     end
+    prev_status = report.status
     if report.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil, report_status_id: ReportStatus.processing_id
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.unapprove_id, report_status_id: ReportStatus.processing_id
       track.save
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_unapprove_id
       comment.save
+      # Recalculate settlement when report is unapproved from an approved/closed state
+      if prev_status.approved? or prev_status.closed?
+        SettlementService.new.report_unapproved report
+      end
       return true
     end
     errors << report.errors.full_messages
@@ -259,23 +271,23 @@ class ReportService < BaseService
   #   errors << report.errors.full_messages
   #   false
   # end
-  #
-  # def reimburse_confirm
-  #   return false unless validate owner: true
-  #   unless report.reimbursed?
-  #     errors << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
-  #     return false
-  #   end
-  #   if report.update_attributes controlling_user: nil, controlling_for_user: nil, status: ReportStatus.reimbursement_received_id, memo: nil
-  #     track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursement_received_id, report_status_id: ReportStatus.reimbursement_received_id
-  #     track.save
-  #     comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursement_received_id
-  #     comment.save
-  #     return true
-  #   end
-  #   errors << report.errors.full_messages
-  #   false
-  # end
+
+  def reimbursement_confirm
+    return false unless validate owner: true
+    unless report.reimbursed?
+      errors << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
+      return false
+    end
+    if report.update_attributes controlling_user: nil, controlling_for_user: nil, status: ReportStatus.reimbursement_confirmed_id, memo: nil
+      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursement_confirmed_id, report_status_id: ReportStatus.reimbursement_received_id
+      track.save
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursement_confirmed_id
+      comment.save
+      return true
+    end
+    errors << report.errors.full_messages
+    false
+  end
 
   def delete_report
     return false unless validate owner: true
@@ -292,11 +304,11 @@ class ReportService < BaseService
 
   def archive_report
     return false unless validate owner: true
-    unless report.is_closed?
+    unless report.can_archive?
       errors << 'Report is still not completely processed to archive it'
       return false
     end
-    if report.update_attributes report_status_id: ReportStatus.archived_id
+    if report.update_attributes archived: true
       return true
     end
     errors << report.errors.full_messages
@@ -309,8 +321,8 @@ class ReportService < BaseService
       errors << 'User cannot take control of this report'
       return false
     end
-    if report.is_closed?
-      errors << 'User cannot take control of this report as the report is closed'
+    unless report.can_take_control?
+      errors << 'User cannot take control of this report'
       return false
     end
     if report.update_attributes controlling_user: user, controlling_for_user: report.controlling_user, memo: memo
@@ -347,7 +359,7 @@ class ReportService < BaseService
 
   # Callback to create comments in reports when expense is updated
   def expense_updated_in_report(expense)
-    recompute_total
+
   end
 
   def add_expense(expense_ids)
@@ -378,7 +390,6 @@ class ReportService < BaseService
         end
       end
     end
-    recompute_total
     report.reload
   end
 
@@ -410,7 +421,6 @@ class ReportService < BaseService
         end
       end
     end
-    recompute_total
     report.reload
   end
 
@@ -440,7 +450,6 @@ class ReportService < BaseService
         comment.save
       end
     end
-    recompute_total
     report.reload
   end
 
@@ -560,14 +569,6 @@ class ReportService < BaseService
     end
     errors << report.errors.full_messages
     false
-  end
-
-  def recompute_total
-    return false unless validate require_report: true
-    total_amount = report.expenses.with_amount.sum(:value)
-    exp_total =report.expenses_total
-    exp_total.value = total_amount
-    exp_total.save
   end
 
   private

@@ -332,8 +332,8 @@ ActiveRecord::Schema.define(version: 20160715045254) do
     t.datetime "updated_at",                                                        null: false
     t.integer  "reimbursement_id",        limit: 4
     t.integer  "reimbursement_amount_id", limit: 4
-    t.integer  "expense_total_id",        limit: 4
     t.boolean  "accounted",                                         default: false, null: false
+    t.boolean  "archived",                                          default: false, null: false
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

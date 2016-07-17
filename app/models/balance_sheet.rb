@@ -31,35 +31,41 @@ class BalanceSheet < ActiveRecord::Base
       errors.add(:value, 'cannot be less than 0')
       return false
     end
-    self.cash_in_hand.value += value
-    self.cash_in_hand.save
-    true
+    cih= self.cash_in_hand
+    cih.value += value
+    if cih.save
+      return true
+    end
+    false
   end
 
   def subtract_cash_in_hand(value, currency=nil)
     if value <= 0
       return
     end
-    self.cash_in_hand.value -= value
-    self.cash_in_hand.value = 0 if self.cash_in_hand.value < 0
-    self.cash_in_hand.save
+    cih = self.cash_in_hand
+    cih.value -= value
+    cih.value = 0 if cih.value < 0
+    cih.save
   end
 
   def add_pending_reimbursement(value, currency=nil)
     if value <= 0
       return
     end
-    self.pending_reimbursement.value += value
-    self.pending_reimbursement.save
+    pr = self.pending_reimbursement
+    pr.value += value
+    pr.save
   end
 
   def subtract_pending_reimbursement(value, currency=nil)
     if value <= 0
       return
     end
-    self.pending_reimbursement.value -= value
-    self.pending_reimbursement.value = 0 if self.pending_reimbursement.value < 0
-    self.pending_reimbursement.save
+    pr = self.pending_reimbursement
+    pr.value -= value
+    pr.value = 0 if pr.value < 0
+    pr.save
   end
 
 end

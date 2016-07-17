@@ -1,9 +1,20 @@
 class SettlementService < BaseService
   attr_accessor :user
 
-  def initialize(user)
+  def initialize(user = nil)
     super()
     self.user= user
+  end
+
+  # Check if user has sufficient cash in hand for the report expenses.
+  def require_reimbursement?(report)
+    rds = ReportDetailService.new(report)
+    report_total = rds.total_amount
+    latest_expense = rds.latest_expense
+    date = nil
+    date = latest_expense.date if latest_expense.present?
+    cash = cash_in_hand date
+    cash.value - report_total < 0
   end
 
   def cash_in_hand(date = nil)
@@ -78,11 +89,15 @@ class SettlementService < BaseService
   end
 
   def report_approved(report)
+    return false unless validate_report report, false
+    user = report.user
     rds = ReportDetailService.new(report)
     balance_sheet = user.balance_sheet
     total_amount = rds.total_amount
     currency = rds.currency
-    cash_in_hand = balance_sheet.cash_in_hand rds.latest_expense
+    latest_date = nil
+    latest_date = rds.latest_expense.date if rds.latest_expense.present?
+    cash_in_hand = balance_sheet.cash_in_hand latest_date
     pending_reimbursement = 0
     new_cash_in_hand_value = cash_in_hand.value - total_amount
     if new_cash_in_hand_value < 0
@@ -90,17 +105,32 @@ class SettlementService < BaseService
     end
     user.balance_sheet.subtract_cash_in_hand total_amount, currency
     user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
-    report.reimbursement_amount.create value: pending_reimbursement, currency: currency
+    if report.reimbursement_amount.blank?
+      ra = Amount.new(value: pending_reimbursement, currency: currency)
+      ra.save
+      report.reimbursement_amount = ra
+    else
+      ra = report.reimbursement_amount
+      ra.value = pending_reimbursement
+      ra.currency = currency
+      ra.save
+    end
+    report.accounted = true
+    report.save
   end
 
   def report_unapproved(report)
+    return false unless validate_report report, true
+    user = report.user
     rds = ReportDetailService.new(report)
     total_amount = rds.total_amount
     currency = rds.currency
     pending_reimbursement = 0
     pending_reimbursement = report.reimbursement_amount.value if report.reimbursement_amount.present?
-    user.balance_sheet.add_cash_in_hand total_amount, currency
+    user.balance_sheet.add_cash_in_hand (total_amount - pending_reimbursement), currency
     user.balance_sheet.subtract_pending_reimbursement pending_reimbursement, currency
+    report.reimbursement_amount.update(value: 0) if report.reimbursement_amount.present?
+    report.update(accounted: false)
   end
 
   private
@@ -140,10 +170,15 @@ class SettlementService < BaseService
     errors.blank?
   end
 
-  def validate(report)
+  def validate_report(report, should_be_accounted)
     errors.clear
     if report.blank?
       errors << 'Report not found'
+    end
+    if should_be_accounted and not report.accounted?
+      errors << 'Report not yet accounted'
+    elsif not should_be_accounted and report.accounted?
+      errors << 'Report already accounted'
     end
     errors.blank?
   end
