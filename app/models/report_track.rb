@@ -17,6 +17,7 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :report_status
   belongs_to :tracking_action, class_name: 'ReportTrackingAction'
   belongs_to :action_user, class_name: 'User'
+  belongs_to :payment
 
   default_scope { order('created_at ASC') }
 

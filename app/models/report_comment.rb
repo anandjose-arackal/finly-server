@@ -22,6 +22,7 @@ class ReportComment < ActiveRecord::Base
   belongs_to :report_comment_action
   belongs_to :expense
   belongs_to :rejected_to, class_name: 'User'
+  belongs_to :payment
 
   def generate_text(user)
 

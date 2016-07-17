@@ -283,6 +283,7 @@ ActiveRecord::Schema.define(version: 20160715045254) do
     t.text     "content",                  limit: 65535
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
+    t.integer  "payment_id",               limit: 4
   end
 
   add_index "report_comments", ["expense_id"], name: "index_report_comments_on_expense_id", using: :btree
@@ -312,6 +313,7 @@ ActiveRecord::Schema.define(version: 20160715045254) do
     t.string   "memo",                      limit: 255
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
+    t.integer  "payment_id",                limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree

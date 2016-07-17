@@ -62,7 +62,7 @@ class SettlementService < BaseService
     balance_sheet = user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement value, currency
       reports.each do |report|
-        report.update(:payment, payment)
+        ReportService.new(user: initiating_user, report: report).mark_as_reimbursed payment
       end
       return true
     end

@@ -241,11 +241,102 @@ class SettlementServiceTest < ActiveSupport::TestCase
   end
 
   test 'adding reimbursement' do
+    # When reimbursing amount is less than the total reimbursement amount of the reports
+    amount = 2000
+    cih = @ss.cash_in_hand.precision_value
+    assert_equal cih, 0
+    reimbursement_amount = 500
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert_equal r.reimbursement_amount.precision_value, amount
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        assert_not @ss.add_reimbursement(@admin, [r.id], Date.today, reimbursement_amount, Currency.first)
+      end
+    end
+    assert r.approved?
+    assert @ss.errors.present?
+    assert_equal @ss.pending_reimbursement.precision_value, amount
+
+    # When reimbursing amount is greater than the total reimbursement amount of the reports
+    old_amount = 2000
+    amount = 2000
+    cih = @ss.cash_in_hand.precision_value
+    assert_equal cih, 0
+    reimbursement_amount = 5000
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert_equal r.reimbursement_amount.precision_value, amount
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count' do
+        assert_not @ss.add_reimbursement(@admin, [r.id], Date.today, reimbursement_amount, Currency.first)
+      end
+    end
+    assert r.approved?
+    assert @ss.errors.present?
+    assert_equal @ss.pending_reimbursement.precision_value, amount + old_amount
+
+    # Successful reimbursement adding reimbursement amount equal to the pending reimbursements
+    # Reimbursing a report marks it as reimbursed.
+    # Once reimbursed, the payment ID is added to all the reports and the reports are marked as reimbursed
+    old_amount = 4000
+    amount = 2000
+    cih = @ss.cash_in_hand.precision_value
+    assert_equal cih, 0
+    reimbursement_amount = 2000
+    r = dummy_report_flow @user, final_approve: true, amount: amount
+    assert_equal r.reimbursement_amount.precision_value, amount
+    assert_difference 'ReportComment.count', 1 do
+      assert_difference 'ReportTrack.count', 1 do
+        assert @ss.add_reimbursement(@admin, [r.id], Date.today, reimbursement_amount, Currency.first)
+      end
+    end
+    assert @ss.errors.blank?
+    assert_equal @ss.pending_reimbursement.precision_value, old_amount
+    r.reload
+    assert r.reimbursed?
+    assert r.reimbursement.present?
+
+
+    # When multiple reports are being reimbursed reimbursement amount should match the sum of reimbursable amount of the reports
+    reports = @user.reports.approved
+    report_ids = reports.pluck(:id)
+    old_amount = 4000
+    cih = @ss.cash_in_hand.precision_value
+    assert_equal cih, 0
+    reimbursement_amount = 3000
+    assert_no_difference 'ReportComment.count' do
+      assert_no_difference 'ReportTrack.count'do
+        assert_not @ss.add_reimbursement(@admin, report_ids, Date.today, reimbursement_amount, Currency.first)
+      end
+    end
+    assert @ss.errors.present?
+    assert_equal @ss.pending_reimbursement.precision_value, old_amount
+    reports.each do |report|
+      assert report.reload.approved?
+      assert report.reimbursement.blank?
+    end
+
+    # Can reimburse multiple reports
+    reports = @user.reports.approved
+    report_ids = reports.pluck(:id)
+    old_amount = 4000
+    cih = @ss.cash_in_hand.precision_value
+    assert_equal cih, 0
+    reimbursement_amount = 4000
+    assert_difference 'ReportComment.count', report_ids.count do
+      assert_difference 'ReportTrack.count', report_ids.count do
+        assert @ss.add_reimbursement(@admin, report_ids, Date.today, reimbursement_amount, Currency.first)
+      end
+    end
+    assert @ss.errors.blank?
+    assert_equal @ss.pending_reimbursement.precision_value, 0
+    reports.each do |report|
+      assert report.reload.reimbursed?
+      assert report.reimbursement.present?
+    end
+
     # Adding reimbursement requires initiating user, date, amount value and currency
     # Can only be added by users final finance manager and admin
     # Report should be selected while adding reimbursement
-    # Reimbursement amount should always be equal to the the sum of pending reimbursement amount of the selected reports
-    # Once reimbursed, the payment ID is added to all the reports and the reports are marked as reimbursed
   end
 
 end

@@ -162,7 +162,7 @@ class ReportService < BaseService
         SettlementService.new.report_approved report
       end
       # Add comments stating report has been closed as no reimbursements required
-       if report.closed?
+      if report.closed?
         comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.report_closed_id
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.closed_id, report_status_id: ReportStatus.closed_id
         comment.save
@@ -244,6 +244,29 @@ class ReportService < BaseService
       return true
     end
     errors << report.errors.full_messages
+    false
+  end
+
+  def mark_as_reimbursed(payment)
+    return false unless validate require_user: true, require_report: true
+    unless payment.present?
+      errors << 'Require payment details to mark the report as reimbursed'
+      return false
+    end
+    unless report.reimbursement_pending?
+      errors << 'Report cannot be reimbursed'
+      return false
+    end
+    # Mark the controlling user as the reports owner so he can mark the report as payment_received
+    if report.update(reimbursement: payment, report_status_id: ReportStatus.reimbursed_id, controlling_user: report.user, controlling_for_user:nil)
+      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id,
+                                  report_status_id: ReportStatus.reimbursed_id, payment: payment
+      track.save
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursed_id, payment: payment
+      comment.save
+      return true
+    end
+    errors = errors + report.errors.full_messages
     false
   end
 

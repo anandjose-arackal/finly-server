@@ -38,7 +38,7 @@ class Report < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
-  scope :with_amount, -> { joins :amounts }
+  scope :with_amount, -> { joins :reimbursement_amount }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }

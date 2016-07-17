@@ -19,6 +19,8 @@ class Payment < ActiveRecord::Base
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :receiving_user, class_name: 'User'
   has_many :reports
+  has_many :report_comments
+  has_many :report_tracks
 
   accepts_nested_attributes_for :amount
 
