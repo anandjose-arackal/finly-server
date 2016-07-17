@@ -51,6 +51,7 @@ gem 'font-awesome-rails'
 gem 'opro'
 # gem for devise authentication
 gem 'devise'
+gem 'devise_invitable'
 
 gem 'has_scope'
 

@@ -26,28 +26,37 @@
 #  name                   :string(255)
 #  mobile_number          :integer
 #  active                 :boolean          default(TRUE), not null
+#  invitation_token       :string(255)
+#  invitation_created_at  :datetime
+#  invitation_sent_at     :datetime
+#  invitation_accepted_at :datetime
+#  invitation_limit       :integer
+#  invited_by_id          :integer
+#  invited_by_type        :string(255)
+#  invitations_count      :integer          default(0)
 #
 
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
+  devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
 
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
-  has_many :user_roles, through: :role_mapping
+  has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
   has_many :tags, class_name: 'UserTag', dependent: :destroy
-  has_many :expenses
-  has_many :receipts
-  has_many :policy_user_mappings
-  has_many :policies, through: :policy_user_mappings
-  has_many :reports
-  has_one :balance_sheet
-  has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
-  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :expenses, dependent: :destroy
+  has_many :receipts, dependent: :destroy
+  has_many :policy_user_mappings, dependent: :destroy
+  has_many :policies, through: :policy_user_mappings, dependent: :destroy
+  has_many :reports, dependent: :destroy
+  has_one :balance_sheet, dependent: :destroy
+  has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :invitations, :class_name => self.to_s, :as => :invited_by
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping

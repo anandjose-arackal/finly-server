@@ -15,8 +15,8 @@
 #  updated_at              :datetime         not null
 #  reimbursement_id        :integer
 #  reimbursement_amount_id :integer
-#  expense_total_id        :integer
 #  accounted               :boolean          default(FALSE), not null
+#  archived                :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

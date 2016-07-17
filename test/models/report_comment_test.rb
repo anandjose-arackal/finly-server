@@ -14,6 +14,7 @@
 #  content                  :text(65535)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  payment_id               :integer
 #
 
 require 'test_helper'

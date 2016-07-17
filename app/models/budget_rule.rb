@@ -13,6 +13,7 @@
 #
 
 class BudgetRule < ActiveRecord::Base
+  include PolicyVersion
   belongs_to :category
   belongs_to :amount
   belongs_to :budget_period
