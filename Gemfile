@@ -6,6 +6,15 @@ gem 'annotate'
 gem 'rails', '4.2.6'
 # Use mysql as the database for Active Record
 gem 'mysql2', '>= 0.3.13', '< 0.5'
+
+
+#Bundles for pagination
+gem 'will_paginate'
+
+
+# gem for jquery ui in rails app
+gem 'jquery-ui-rails'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -23,6 +32,7 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
+
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -43,12 +53,19 @@ gem 'faker'
 
 gem 'paper_trail', '~> 5.1.1'
 
+
+gem 'turboboost'
+
 gem 'remotipart', '~> 1.0'
+
+
+gem 'bootbox-rails', '~>0.4'
 
 # gem for font awesome
 gem 'font-awesome-rails'
-# gem for oauth authentication
+
 gem 'opro'
+
 # gem for devise authentication
 gem 'devise'
 gem 'devise_invitable'
