@@ -88,7 +88,7 @@
       margin-top: 60px;
       font-weight: 200;
       letter-spacing: 1px;">Interested in joining us early? Please send in your contact email-id.</p>
-  <form data-remote data-turboboost method="post" action="<%= registration_index_path %>">
+  <form data-remote data-turboboost method="post" action="<%= %>">
     <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
     <input class="inputWorkEmail" name="register[email]" type="text" placeholder="Work Email">
     <button id="addComment" class="requestDemo" type="submit">Request Early Access</button>

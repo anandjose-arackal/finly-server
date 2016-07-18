@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160718063641) do
+ActiveRecord::Schema.define(version: 20160718102230) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -162,13 +162,12 @@ ActiveRecord::Schema.define(version: 20160718063641) do
     t.date     "date"
     t.integer  "user_id",              limit: 4
     t.integer  "expense_type_id",      limit: 4
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.text     "manager_memo",         limit: 65535
     t.integer  "rejecting_manager_id", limit: 4
     t.integer  "report_id",            limit: 4
     t.integer  "category_id",          limit: 4
-    t.boolean  "reimbursable",                       default: false, null: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -203,6 +202,35 @@ ActiveRecord::Schema.define(version: 20160718063641) do
   end
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
+
+  create_table "opro_auth_grants", force: :cascade do |t|
+    t.string   "code",                    limit: 255
+    t.string   "access_token",            limit: 255
+    t.string   "refresh_token",           limit: 255
+    t.text     "permissions",             limit: 65535
+    t.datetime "access_token_expires_at"
+    t.integer  "user_id",                 limit: 4
+    t.integer  "application_id",          limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "opro_auth_grants", ["access_token"], name: "index_opro_auth_grants_on_access_token", unique: true, using: :btree
+  add_index "opro_auth_grants", ["code"], name: "index_opro_auth_grants_on_code", unique: true, using: :btree
+  add_index "opro_auth_grants", ["refresh_token"], name: "index_opro_auth_grants_on_refresh_token", unique: true, using: :btree
+
+  create_table "opro_client_apps", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.string   "app_id",      limit: 255
+    t.string   "app_secret",  limit: 255
+    t.text     "permissions", limit: 65535
+    t.integer  "user_id",     limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "opro_client_apps", ["app_id", "app_secret"], name: "index_opro_client_apps_on_app_id_and_app_secret", unique: true, using: :btree
+  add_index "opro_client_apps", ["app_id"], name: "index_opro_client_apps_on_app_id", unique: true, using: :btree
 
   create_table "payment_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -347,7 +375,6 @@ ActiveRecord::Schema.define(version: 20160718063641) do
     t.datetime "submitted_at",                        precision: 6
     t.integer  "controlling_user_id",     limit: 4
     t.integer  "controlling_for_user_id", limit: 4
-    t.integer  "forwarding_to_id",        limit: 4
     t.string   "memo",                    limit: 255
     t.datetime "created_at",                                                        null: false
     t.datetime "updated_at",                                                        null: false
@@ -359,7 +386,6 @@ ActiveRecord::Schema.define(version: 20160718063641) do
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
   add_index "reports", ["controlling_user_id"], name: "index_reports_on_controlling_user_id", using: :btree
-  add_index "reports", ["forwarding_to_id"], name: "index_reports_on_forwarding_to_id", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
@@ -458,7 +484,7 @@ ActiveRecord::Schema.define(version: 20160718063641) do
     t.datetime "updated_at",                                        null: false
     t.integer  "company_id",             limit: 4,                  null: false
     t.string   "name",                   limit: 255
-    t.integer  "mobile_number",          limit: 4
+    t.string   "mobile_number",          limit: 255
     t.boolean  "active",                             default: true, null: false
     t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
