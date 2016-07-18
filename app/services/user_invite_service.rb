@@ -1,7 +1,7 @@
 class UserInviteService < BaseService
   attr_accessor :user
 
-  def initialize(user)
+  def initialize(user=nil)
     super()
     self.user = user
   end
@@ -32,11 +32,11 @@ class UserInviteService < BaseService
 
   def resend_invite(email)
     errors.clear
-    unless User.find_by_email(email).present?
+    unless User.invitation_not_accepted.find_by_email(email).present?
       errors << 'Invite not found'
       return false
     end
-    u = User.invite!(email: email)do |u|
+    u = User.invite!(email: email) do |u|
       u.skip_invitation = true
     end
     if u
@@ -44,6 +44,10 @@ class UserInviteService < BaseService
     end
     self.errors = errors + u.errors.full_messages
     false
+  end
+
+  def update_invite(params={})
+
   end
 
   def accept_invitation(params={})
@@ -72,7 +76,6 @@ class UserInviteService < BaseService
       errors << 'Invite not found'
       return false
     end
-    # todo validate if destroying user is inviting user or admin and if the user has not yet accepted the invite
     unless self.user.admin? or self.user == user.invited_by
       errors << 'Only inviting users can delete invites'
       return false

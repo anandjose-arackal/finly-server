@@ -124,7 +124,7 @@ class UserInviteServiceTest < ActiveSupport::TestCase
     end
     assert User.find_by_email('user111@finlytest.io').present?
 
-    assert_difference 'User.count',-1 do
+    assert_difference 'User.count', -1 do
       assert UserInviteService.new(@admin).destroy_invite(user.id)
     end
     assert User.find_by_email('user111@finlytest.io').blank?
@@ -132,8 +132,56 @@ class UserInviteServiceTest < ActiveSupport::TestCase
     # Invites can only be destroyed before joining
   end
 
-  test 'accept invite flow do' do
+  test 'update invite flow do' do
 
+  end
+
+  test 'accept invite flow do' do
+    # Successful accept
+    u = User.new(company_id: @manager.company_id, email: 'user110@finlytest.io',
+                 role_mapping_attributes: [{user_role_id: 4}],
+                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}])
+    u.invite! do |u|
+      u.skip_invitation = true
+    end
+    token = u.raw_invitation_token
+    uis = UserInviteService.new
+    name = 'test name'
+    password = 'password'
+    mobile_number = '9986676713'
+    assert uis.accept_invitation(invitation_token: token, name: name, password: password, mobile_number: mobile_number)
+    u = User.invitation_accepted.find_by_email('user110@finlytest.io')
+    assert u.present?
+    assert_equal u.mobile_number, mobile_number
+    assert_equal u.name, name
+
+    # invitation token, name, mobile number and password is required to accept invites
+    u = User.new(company_id: @manager.company_id, email: 'user111@finlytest.io',
+                 role_mapping_attributes: [{user_role_id: 4}],
+                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}])
+    u.invite! do |u|
+      u.skip_invitation = true
+    end
+    token = u.raw_invitation_token
+    uis = UserInviteService.new
+    name = 'test name'
+    password = 'password'
+    mobile_number = '9986676713'
+    assert_not uis.accept_invitation(invitation_token: token, name: nil, password: password, mobile_number: mobile_number)
+    u = User.invitation_accepted.find_by_email('user111@finlytest.io')
+    assert u.blank?
+
+    assert_not uis.accept_invitation(invitation_token: token, name: name, password: password, mobile_number: nil)
+    u = User.invitation_accepted.find_by_email('user111@finlytest.io')
+    assert u.blank?
+
+    assert_not uis.accept_invitation(invitation_token: token, name: name, password: nil, mobile_number: mobile_number)
+    u = User.invitation_accepted.find_by_email('user111@finlytest.io')
+    assert u.blank?
+
+    assert uis.accept_invitation(invitation_token: token, name: name, password: password, mobile_number: mobile_number)
+    u = User.invitation_accepted.find_by_email('user111@finlytest.io')
+    assert u.present?
   end
 
 end
