@@ -1,0 +1,210 @@
+#show_report{
+
+  padding-bottom: 30px;
+  #newReport{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+
+
+  .reportDiv {
+    float: left;
+    background-color: white;
+    width: 880px;
+    margin-left: 95px;
+    margin-top: 25px;
+    padding: 30px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .065);
+  }
+
+  #sendBtn, #cancelExpense {
+    line-height: 32px;
+    margin-top: 18px;
+    margin-right: 2.5%;
+    height: 34px;
+    padding: 0 26px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    float: right;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  #cancelBtn {
+    margin-right: 9.5%;
+    border-radius: 1px;
+  }
+
+  .righButtons {
+    color: white;
+    padding: 6px 8px 6px 8px;
+    width: 180px;
+    background-color: #8394AE;
+    border: 1px solid transparent;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-top: 7px;
+  }
+
+
+  .splitSections {
+    border-bottom: 1px solid #d8d8d8;
+    height: 60px;
+    line-height: 60px;
+  }
+
+  .expenseDetailInput {
+    display: inline-block;
+    position: relative;
+    width: 400px;
+    height: 38px;
+    padding: 9px 7px;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    border-radius: 1px;
+    box-shadow: inset 0 1px 2px rgba(130, 137, 150, .1);
+    border: 1px solid #ddd;
+    color: #818990 !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+  }
+
+
+
+  .expenseDetailLabel {
+    width: 90px;
+    text-align: right;
+    padding-right: 20px;
+    color: rgba(85, 85, 85, 0.96);
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
+
+  #receiptEditPencil, #receiptRemove {
+    height: 30px;
+    width: 30px;
+    position: fixed;
+    right: 15px;
+    border-radius: 20px;
+    margin-top: -13px;
+    font-size: 15px;
+    padding-left: 1px;
+    line-height: 30px;
+  }
+
+  .editExpenseButton {
+    font-size: 11px;
+    padding: 5px;
+    border: none;
+    float: right;
+    letter-spacing: 1px;
+    margin-right: 20px;
+    font-weight: 500;
+    height: 34px;
+    width: 65px;
+  }
+
+  .totalDivider {
+    border-top: 1px solid #d8d8d8;
+    margin-top: 20px;
+    text-align: right;
+    padding-right: 70px;
+    padding-top: 20px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .active {
+    background-color: #93c178 !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  .inactive {
+    background-color: indianred !important;
+    color: white !important;
+    border: none !important;
+    margin-top: 5px;
+  }
+
+  .btn {
+    width: 85px;
+    border-radius: 1px;
+    font-size: 11px;
+    background-color: #f9f9f9;
+    border: 1px solid #dfdfdf;
+    color: #999;
+    outline: white;
+    cursor: default;
+  }
+
+  #receipt {
+    width: 23.6%;
+    margin: 0 0.5% 1% 0.5%;
+    display: inline-block;
+    border: 1px solid #d8d8d8;
+  }
+
+  .receipt {
+    height: 290px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  .receipt img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .receipt-content {
+    border-top: 2px solid #ddd;
+  }
+
+  .expenseInfo {
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+    background-color: #e7e7e7;
+    color: #666;
+    font-size: 12px;
+    font-weight: 200;
+
+  }
+
+  .liExpense {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .listExpenseInfo {
+    display: inline-block;
+    width: 70px;
+    line-height: 0;
+    margin-left: 10px;
+  }
+
+  #approveBtn, #denyBtn, #approvedBtn, #deniedBtn {
+    width: 50%;
+    float: left;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    line-height: 20px;
+    -moz-transition: background-color 200ms ease;
+    -webkit-transition: background-color 200ms ease;
+    background-color: #f9f9f9;
+    border: 1px solid #dfdfdf;
+    color: #999;
+  }
+
+
+}

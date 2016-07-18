@@ -1,0 +1,61 @@
+<% provide(:searchDiv, "generalPlaceholder") %>
+<div style="position: fixed;background-color: #f5f6f9; z-index: 5;padding: 0; margin: 0">
+
+  <form data-remote data-turboboost action="" method="get">
+    <div id="searchdiv" class="input-group" style="margin-bottom: 20px;">
+
+
+      <input type="search" id="lower_header_search_bar" name="filter_search" style="border-radius: 1px 1px 1px 1px" class="form-control" >
+
+      <span class="input-group-addon" style="background-color: #BFE1AB;border-radius: 1px 1px 1px 1px;cursor: pointer" onclick="$('#lower_header_search_bar').submit();"><span class="fa fa-search" style="color: #555"></span></span>
+    </div>
+  </form>
+
+  <div class="showFilteringSidebar" onclick="showFilterList()">
+    Filter
+  </div>
+<!--
+  < % if is_personal_view %>-->
+      <div class="newTransaction" onclick="loadNewExpense()">Add Expense</div>
+ <!-- < % end %>
+ --> <hr style="border-top: 1px solid #9EACC9; padding: 0; margin: 0; clear: both">
+
+
+<!--  <script>
+    function loadNewExpense() {
+      Turbolinks.visit("< %= new_user_expense_path(current_user) %>")
+    }
+
+    function openExpensesList() {
+      if (< %= is_admin_view %>) {
+        Turbolinks.visit(" < %= admin_company_expenses_path %>")
+      } else if (< %= is_manager_view %>) {
+        Turbolinks.visit("< %= admin_expenses_path %>")
+      } else {
+        Turbolinks.visit("< %= user_expenses_path(current_user) %>")
+      }
+    }
+
+    function showExportModal() {
+      $('#exportExpenseReceipt').modal({
+        keyboard: false
+      });
+
+    }
+  </script>-->
+
+</div>
+
+
+<style>
+
+  #searchdiv {
+    width: 40%;
+    margin-top: 40px;
+    margin-left: 15%;
+    float: left;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+</style>

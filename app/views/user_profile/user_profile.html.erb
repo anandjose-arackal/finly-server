@@ -1,0 +1,133 @@
+<!--Add Roboto Font -->
+<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
+<body id="userProfileAccount">
+
+<ul class="innerul">
+  <li class="active" data-switch="#my_profile"><a href="#" data-turbolinks="false">My Profile
+    <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
+  <li data-switch="#policies_assigned"><a href="#" data-turbolinks="false">Policies Assigned
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
+  <li data-switch="#administering_policies"><a href="#" data-turbolinks="false">Policies Administered
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
+  <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
+  <li data-switch="#bank_account"><a href="#" data-turbolinks="false">Bank Account
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
+  <li data-switch="#change_password"><a href="#" data-turbolinks="false">Change Password
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
+  <li data-switch="#accounting"><a href="#" data-turbolinks="false">Accounting
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
+</ul>
+
+<div id="page-2" class="innerdiv" style="background: white">
+
+  <!-- Hidden blocks that you show when requested. -->
+
+
+  <div class="divsections" id="my_profile">
+
+    <h3 class="divsection_heading">My Profile</h3>
+
+    <%= render 'my_profile' %>
+
+
+  </div>
+
+  <div class="divsections" id="policies_assigned" style="display: none">
+
+    <h3 id="divsection_heading">Policies Assigned</h3>
+
+    <hr style="margin-top: 20px">
+
+
+  </div>
+
+
+  <div class="divsections" id="cards_assigned" style="display: none">
+
+    <h3 id="divsection_heading">Cards Assigned</h3>
+
+
+    <hr style="margin-top: 20px">
+
+
+  </div>
+
+
+  <div class="divsections" id="bank_account" style="display: none">
+
+    <h3 id="divsection_heading">Bank Account</h3>
+
+    <!--<button onclick="temperory()"> add</button>-->
+
+
+    <hr style="margin-top: 20px">
+
+
+  </div>
+
+
+  <div class="divsections" id="change_password" style="display: none">
+
+    <%= render 'change_password' %>
+
+
+  </div>
+
+
+  <div class="divsections" id="accounting" style="display: none">
+
+    <h3 id="divsection_heading">Accounting</h3>
+
+    <!--<button onclick="temperory()"> add</button>-->
+
+
+    <hr style="margin-top: 20px">
+
+
+  </div>
+
+</div>
+
+
+</body>
+
+<script>
+
+  var selector, elems, makeActive;
+
+  selector = '.innerul li';
+  elems = document.querySelectorAll(selector);
+
+  makeActive = function () {
+    for (var i = 0; i < elems.length; i++)
+      elems[i].classList.remove('active');
+
+    this.classList.add('active');
+  };
+
+  for (var i = 0; i < elems.length; i++)
+    elems[i].addEventListener('mousedown', makeActive);
+
+
+  $('[data-switch]').on('click', function (e) {
+    var $page = $('#page-2'),
+        blockToShow = e.currentTarget.getAttribute('data-switch');
+
+    // Hide all children.
+    $page.children().hide();
+
+    // And show the requested component.
+    $page.children(blockToShow).show();
+
+  });
+
+
+</script>

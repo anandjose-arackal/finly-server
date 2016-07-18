@@ -1,0 +1,188 @@
+// Place all the styles related to the People controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#people {
+
+  #inviteTeamMembers {
+
+    .dialogInputStyle {
+      width: 80%;
+      margin-left: 40px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      border-radius: 1px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 0px #eee inset;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      vertical-align: middle;
+      color: #444;
+      line-height: 20px;
+      padding: 16px;
+    }
+
+    .sendButton {
+
+      margin-bottom: 20px;
+      margin-left: 40px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      height: 45px;
+      resize: vertical;
+
+    }
+  }
+  .navblock {
+    margin-top: 20px;
+    border: 1px solid #d8d8d8;
+
+    .listHeaders {
+      height: 100%;
+      background-color: #CFE8DA;
+      padding: 10px 16px;
+      border-bottom: 1px solid #d8d8d8;
+      font-size: 14px;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+      text-transform: uppercase;
+      font-weight: 400;
+      color: #777;
+      margin: 0;
+
+      .listOptions {
+        background-color: #fff;
+        border-top: 1px solid #e5e5e5;
+        margin-top: -1px;
+        padding: 10px 16px;
+        cursor: pointer;
+        position: relative;
+        zoom: 1;
+
+        .listOptionsNumbers {
+          float: right;
+          color: #aaa;
+        }
+      }
+    }
+  }
+
+  .innerdiv{
+    background: white;
+
+    #divsection_heading {
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: #333;
+      border-bottom: 1px solid #DDD;
+      margin-bottom: 30px;
+      padding: 0 0 10px 0;
+    }
+  }
+
+
+  .active {
+
+    background-color: white;
+    text-decoration: none;
+  }
+
+
+  #eachRow {
+    cursor: pointer;
+    background-color: white;
+    margin-top: 1px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    .fa-pencil{
+      font-size: 15px; color: black;margin-top: 18px;
+      margin-left: 25px;
+      opacity: 0.6;
+    }
+
+    .roundCircle {
+      display: block;
+      height: 50px;
+      width: 50px;
+      line-height: 50px;
+      -moz-border-radius: 30px;
+      border-radius: 60px;
+
+    }
+  }
+
+  #user_info {
+
+    .profile_subheading {
+      width: 30%;
+      clear: both;
+      float: left;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+      margin-top: 30px;
+    }
+
+    .profile_info {
+      float: right;
+      font-size: 12px;
+      margin-top: 30px;
+      width: 70%;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+    }
+
+  }
+
+  .invite {
+    width: 100%;
+    padding: 10px 16px;
+    margin-bottom: 0;
+    letter-spacing: 1px;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+
+  .show {
+    display: block;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+
+    a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+  }
+
+  .editProfileDialogHeaders {
+    font-size: 14px;
+    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    padding: 20px 0 5px 40px;
+    color: #777;
+  }
+
+  .spanEditProfile {
+    color: #a0a0a0;
+    text-transform: lowercase;
+    font-size: 10px;
+    font-weight: 300;
+  }
+
+  .arrow{
+
+    float: right;
+  }
+
+}

@@ -1,0 +1,77 @@
+#userProfileAccount {
+  .innerdiv {
+    width: 80%;
+    float: right;
+    display: inline-block;
+    padding: 5px 25px 5px 25px;
+    height: 100vh;
+
+    #divsection_heading {
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: #333;
+      border-bottom: 1px solid #DDD;
+      margin-bottom: 30px;
+      padding: 0 0 10px 0;
+    }
+  }
+
+  .active {
+
+    background-color: white;
+    text-decoration: none;
+  }
+
+  .arrow {
+
+    float: right;
+    vertical-align: middle;
+    font-size: 14px;
+    padding-right: 22px;
+
+  }
+
+  #change_password {
+
+    input[type=password] {
+      height: 34px;
+      width: 25%;
+    }
+
+  }
+
+  input[id*="shortaddress"] {
+    width: 34.5%;
+    margin-top: 15px;
+  }
+
+  h4[id*="subheading"] {
+    font-size: 14px;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: #777;
+  }
+
+  #my_profile {
+
+    .profile_subheading {
+      width: 30%;
+      clear: both;
+      float: left;
+      margin-top: 30px;
+    }
+
+    .profile_values {
+      float: right;
+      font-size: 12px;
+      margin-top: 30px;
+      width: 70%;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+    }
+
+  }
+
+}

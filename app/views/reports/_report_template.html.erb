@@ -1,0 +1,211 @@
+<body>
+
+<%= render 'shared/lower_header' %>
+
+<!--<form data-remote data-turboboost id="allReportsFilters" action="" method="get">
+  &lt;!&ndash; applied filters &ndash;&gt;
+  <div id="showPreviousFilters" style="min-height: 20px;">
+    < % param = get_old_filters(params, 2) # i.e get filters for expenses  %>
+    < % param.each do |item| %>
+        < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+    < % end %>
+  </div>
+</form>-->
+
+<div class="row" style="margin-top: 120px; padding-left: 20%; padding-right: 12.5%; margin-bottom: 40px">
+
+  <div class="col-sm-8" style="border: 1px solid #d8d8d8;background-color: #CFE8DA">
+    <div>
+      <div id="headerTitle" style="background-color: #CFE8DA;border-bottom: 1px solid #d8d8d8; padding-top: 5px; padding-bottom: 5px">
+      </div>
+      <div style="background-color: white">
+
+        <div class="row" style="background-color: white;border-bottom: 2px solid #d8d8d8;">
+        <!--  < % path = admin_company_users_path if is_admin_view %>
+          < % path = admin_users_path if is_manager_view %>
+          <form data-remote data-turboboost action="< %= path %>" method="get">
+            < % params.each do |key, value| %>
+                < % if key.start_with?('filter') && key != 'filter_search' %>
+                    <input type="text" hidden="hidden" name="< %= key %>" value="< %= value %>">
+                < % end %>
+            < % end %>
+
+          </form>-->
+        </div>
+      </div>
+      <!--<div id="my-posts">
+        < %= yield :reports %>
+      </div>
+      <div id="infinite-scrolling" style="display: none">
+        < %= will_paginate @reports if @reports.present? %>
+      </div>-->
+
+
+      <!-- DELETE THIS AFTER TEST -->
+      <div id="reportRow" class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px;cursor: pointer; " onclick="location.href = <%= show_report_url %>">
+        <div class="col-md-2" style="margin-top: 6px;"><img style="max-width: 35px;
+            margin-left: 10px;
+            color: #6B7EA6;" aria-hidden="true" src="<%= asset_path 'report.png' %>"/></div>
+        <div class="col-md-6" style="margin-left: -25px">
+              <p userTarget="reportname" style="line-height: 80%;font-weight: 300; margin-top: 5px;font-size: 13px;font-weight: 600;">RePoRt That IS to BE Deleted</p>
+
+          <i style="font-size: 10px; text-align: center;
+              border-radius: 30px;
+              padding: 5px;text-transform: uppercase; font-style: normal;">Some status</i>
+        </div>
+        <div class="col-md-2">
+          <p style="text-align: center;
+              margin-top: 15px;
+              font-size: 16px;"><span>&#8377</span></p>
+        </div>
+        <div class="col-md-2">
+
+          <i class="fa fa-pencil" style="font-size: 15px; color: black;margin-top: 18px;
+              margin-left: 25px;
+              opacity: 0.6;"> </i>
+
+        </div>
+
+
+      </div>
+
+      <script>
+
+        function changeBackground(element){
+          $(element).css('background-color', 'rgb(255, 255, 187)');
+        }
+
+      </script>
+
+
+    </div>
+
+  </div>
+  <div class="col-sm-4">
+    <form data-remote data-turboboost action="" method="post">
+      <input name="authenticity_token" value="" hidden="hidden">
+     <!-- < % if is_personal_view %>
+     -->     <button class="invite" type="submit">
+            CREATE NEW REPORT
+          </button>
+  <!--    < % end %>
+  -->  </form>
+
+  <!--  <div class="navblock" style=" < % unless is_personal_view %> margin-top: 0
+      < % end %>">-->
+    <div class="navblock" style="margin-top: 0">
+      <p class="listHeaders">Date Submitted</p>
+
+      <form data-remote data-turboboost id="filterForm" action="" method="get" style="background-color: white">
+        <div style="padding: 16px 0 8px 16px;"><label style="font-weight: 400;margin-top: 3px">From</label>
+          <input id="dateFrom" type="date" name="filter_date[from]" onchange="setDate(this)" value="" style="font-size: 14px;float: right;border: 1px solid #d8d8d8;margin-right: 30px;color: #2E2F30;padding: 3px;background-color: beige;border-radius: 1px;line-height: normal !important;width: 60%;">
+        </div>
+        <div style="padding: 8px 0 16px 16px"><label style="font-weight: 400; margin-top: 3px">To</label>
+          <input id="dateTo" type="date" name="filter_date[to]" value="" onchange="setDate(this)" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: beige;border-radius: 1px;line-height: normal !important;width: 60%;">
+        </div>
+        <input id="filterStatus" type="text" hidden="hidden" name="filter_status" value="" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: white;border-radius: 1px;line-height: normal !important;width: 60%;">
+      </form>
+    </div>
+
+    <div class="navblock">
+      <p class="listHeaders">STATUS</p>
+
+ <!--     < % if is_personal_view %>
+          <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
+            <span class="listOptionsNumbers">< %= @unsubmitted_count %></span>
+          </div>
+      < % end %>-->
+      <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
+        <span class="listOptionsNumbers"><%=  %></span>
+      </div>
+      <div class="listOptions" id="submittedReportsSelector" onclick="reloadPageWithStatus(1)"> Submitted
+        <span class="listOptionsNumbers"><%=  %></span>
+      </div>
+      <div class="listOptions" id="approvedReportsSelector" onclick="reloadPageWithStatus(2)"> Approved
+        <span class="listOptionsNumbers"><%=  %></span>
+      </div>
+      <div class="listOptions" id="rejectedReportsSelector" onclick="reloadPageWithStatus(3)"> Rejected
+        <span class="listOptionsNumbers"><%= %></span>
+      </div>
+      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(4)"> Retracted
+        <span class="listOptionsNumbers"><%=  %></span>
+      </div>
+      <div class="listOptions" id="allReportsSelector" onclick="reloadPageWithStatus(null)"> All
+        <span class="listOptionsNumbers"><%=  %></span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+<script>
+
+  $(document).ready(function () {
+/*
+
+    < % if  params[:filter_status] == "0"%>
+    $('#unsubmittedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('UNSUBMITTED');
+    < % elsif   params[:filter_status] == "1"%>
+    $('#submittedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('SUBMITTED');
+    < % elsif   params[:filter_status] == "2"%>
+    $('#closedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('CLOSED');
+    < % elsif   params[:filter_status] == "3"%>
+    $('#reopenedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('REOPENED');
+    < % else %>
+    $('#headerTitle').text('ALL');
+    $('#allReportsSelector').css("background", "#FFFFBB")
+    < % end %>
+*/
+
+
+  });
+
+
+  function showList() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
+
+  function setDate(element) {
+    if (element == null)
+      return;
+    var val = element.valueAsDate;
+    if (val == null) {
+      $('form#filterForm').submit();
+      return;
+    }
+    var day = val.getDate();
+    var month = val.getMonth();
+    var year = val.getFullYear();
+    console.log("date : " + day + " - " + month + " - " + year);
+    if (day != null && month != null && year != null) {
+      $('form#filterForm').submit();
+    }
+  }
+
+  function reloadPageWithStatus(id) {
+    $('#filterStatus').val(id);
+    $('form#filterForm').submit();
+  }
+
+  function loadNewReport() {
+ /*   Turbolinks.visit("< %= new_user_report_path(current_user) %>")
+ */
+
+  }
+
+  function closeFilter(id) {
+    var div = $('#' + id);
+    div.attr('form', "");
+    div.remove();
+    $('#allReportsFilters').submit()
+  }
+
+
+</script>

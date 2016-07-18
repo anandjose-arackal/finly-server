@@ -1,0 +1,11 @@
+<!--< % provide(:title, current_user.name) %>
+< % provide(:searchDiv,"reportPlaceholder" )%>
+
+< % content_for :reports do %>
+    < % if @reports.present? %>
+        < % @reports.each do |report| %>
+            < %= render partial: 'report', locals: {report: report} %>
+        < % end %>
+    < % end %>
+< % end %>-->
+<%= render 'report_template' %>

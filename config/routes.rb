@@ -25,6 +25,21 @@
 #
 
 Rails.application.routes.draw do
+  get 'organization_account' => 'organization_account#organization_account'
+
+  get 'policy' => 'organization_account#policy', as: :policy
+
+  get 'user_profile' => 'user_profile#user_profile'
+
+  get 'people' => 'people#people'
+
+  get 'reports' => 'reports#reports'
+
+  get 'reports/show_report' => 'reports#show_report', as: :show_report
+
+  root 'organization_account#organization_account'
+
+  devise_for :users
   mount_opro_oauth
 
   root 'static_pages#home'

@@ -1,0 +1,55 @@
+
+#searchdiv {
+  width: 40%;
+  margin-top: 40px;
+  margin-left: 15%;
+  float: left;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+.showFilteringSidebar {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  float: left;
+  border-radius: 2px;
+  background-color: white;
+  height: 34px;
+  margin: 40px 0 0 14px;
+  line-height: 32px;
+  padding: 0 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #777;
+}
+
+
+.newTransaction {
+  border-radius: 1px;
+  height: 34px;
+  border: none;
+  outline: none;
+  margin-top: 40px;
+  background-color: #93c178;
+  color: #fff;
+  float: right;
+  margin-right: 12.5%;
+  line-height: 34px;
+  padding: 0 26px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+  cursor: pointer;
+  -moz-transition: background-color 200ms ease;
+  -webkit-transition: background-color 200ms ease;
+  transition: background-color 200ms ease;
+}
+
+
+.newTransaction:focus{
+  outline: 1px solid #4C842B;
+}

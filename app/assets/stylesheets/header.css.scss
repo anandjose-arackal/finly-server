@@ -1,0 +1,113 @@
+.topbarContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+
+
+  .canSwitch {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .topbar {
+    background-color: #46568b;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    padding-left: 11.5%;
+    padding-right: 11.5%;
+    font-size: 18px;
+    text-align: center;
+    height: 68px;
+    -moz-transition: background-color 300ms;
+    -webkit-transition: background-color 300ms;
+    transition: background-color 300ms;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .navbar-brand {
+    color: white;
+    font-weight: 800;
+    font-size: 32px;
+    padding: 7px 15px !important;
+    margin-top: 15px;
+    float: left;
+  }
+
+
+  #topNav .viewToggle .viewSummary {
+    height: 30px;
+    margin-top: 8px;
+    line-height: 1;
+    padding-left: 10px;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    right: 0;
+    z-index: 2;
+    min-width: 160px;
+    padding: 12px 0 12px 0;
+    font-size: 14px;
+    background-color: #fff;
+    line-height: normal;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  .dropdown {
+    height: 44px;
+    margin: 12px 0;
+    float: left;
+    min-width: 200px;
+    margin-right: 20px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .viewSummary {
+    height: 30px;
+    margin-top: 8px;
+    line-height: 1;
+    padding-left: 10px;
+  }
+
+  #viewToggleDropdown {
+    margin-top: 0;
+    text-decoration: none;
+    padding: 0;
+    top: 60px;
+    left: 0;
+    width: 200px;
+    border-radius: 1px;
+  }
+
+
+  #viewToggleDropdown li a{
+    padding-top: 12px;
+    padding-bottom: 20px;
+  }
+
+  #headerNavigation {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    text-align: center;
+
+  }
+
+  #headerNavigation li {
+    float: left;
+    display: inline;
+
+  }
+
+  #headerNavigation li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 24px 24px;
+    display: inline-block;
+  }
+
+}
