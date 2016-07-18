@@ -30,11 +30,11 @@ if ExportField.count == 0
 end
 
 if UserRole.count == 0
-  UserRole.create(id: 1, name: "Admin")
-  UserRole.create(id: 2, name: "Finance Manager")
-  UserRole.create(id: 3, name: "Manager")
-  UserRole.create(id: 4, name: "Employee")
-  UserRole.create(id: 5, name: "Auditor")
+  UserRole.create id: 1, name: 'Admin'
+  UserRole.create id: 2, name: 'Finance Manager'
+  UserRole.create id: 3, name: 'Manager'
+  UserRole.create id: 4, name: 'Employee'
+  UserRole.create id: 5, name: 'Auditor'
 end
 
 if ReportStatus.count == 0
@@ -83,7 +83,7 @@ if ReportCommentAction.count == 0
 end
 
 if Currency.count == 0
-  Currency.create(id: 1, country: "India", country_code: "INR")
+  Currency.create(id: 1, country: 'India', country_code: 'INR')
 end
 
 if Amount.count == 0

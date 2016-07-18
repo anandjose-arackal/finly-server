@@ -6,6 +6,66 @@ class ExportService < BaseService
     self.company = company
   end
 
+  def add_export_field(params={})
+    errors.clear
+    strong_params = {}
+    params.each do |key, value|
+      if key == :export_field_id or key == :name
+        strong_params[key] = value
+      end
+    end
+    unless strong_params.present?
+      errors << 'Nothing to update'
+      return false
+    end
+    pref = company.export_preferences.build(strong_params)
+    if pref.save
+      return true
+    end
+    self.errors = errors + pref.errors.full_messages
+    false
+  end
+
+  def remove_export_field(params={})
+    errors.clear
+    export_preference = company.preferences.with_id(params[:id])
+    unless export_preference.present?
+      errors << 'Preference not found'
+      return false
+    end
+    export_preference = export_preference.first
+    if export_preference.destroy
+      return true
+    end
+    self.errors = errors + export_preference.errors.full_messages
+    false
+  end
+
+  def update_export_field(params={})
+    errors.clear
+    export_preference = company.preferences.with_id(params[:id])
+    unless export_preference.present?
+      errors << 'Preference not found'
+      return false
+    end
+    export_preference = export_preference.first
+    strong_params = {}
+    params.each do |key, value|
+      if key == :export_field_id or key == :name
+        strong_params[key] = value
+      end
+    end
+    unless strong_params.present?
+      errors << 'Nothing to update'
+      return false
+    end
+    if export_preference.update(strong_params)
+      return true
+    end
+    self.errors = errors + export_preference.errors.full_messages
+    false
+  end
+
   def export_as_csv(report)
     errors.clear
     if report.blank?
@@ -27,6 +87,15 @@ class ExportService < BaseService
     end
   end
 
+  def export_as_pdf(report)
+
+  end
+
+  def export_as_xls(report)
+
+  end
+
+  # todo
   # def export_as_xls(report)
   #   errors.clear
   #   if report.blank?
