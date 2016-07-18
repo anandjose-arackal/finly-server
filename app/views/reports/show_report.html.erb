@@ -13,7 +13,7 @@
 <div id="newReport">
   <div style="height: 70px; background-color: white;">
     <p style="color: #a0a0a0; font-weight: 500; display: inline-block;vertical-align: middle; line-height: 70px;margin-left: 9.5%;letter-spacing: 1px ">REPORT</p>
-    <button onclick="redirectBack()" id="cancelBtn">Back</button>
+    <button onclick="redirectBack()" class="grey-button" id="cancelBtn">Back</button>
    <!-- < % if (@report.unsubmitted? || @report.retracted? || @report.rejected?) && is_personal_view %>
 
         <button
@@ -486,10 +486,10 @@
 <div class="modal fade" id="newExpenseModal" role="dialog" style="margin-top: 5%;">
   <div class="modal-dialog modal-md" style="background-color: white">
 
-    <form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="<%= user_expenses_path(current_user) %>">
+ <!--   <form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="< %= user_expenses_path(current_user) %>">
 
-      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-      <input type="text" hidden="hidden" name="expense[report_id]" value="<%= @report.id %>"/>
+      < %= hidden_field_tag :authenticity_token, form_authenticity_token %>
+      <input type="text" hidden="hidden" name="expense[report_id]" value="< %= @report.id %>"/>-->
 
 
       <div style="width: 100%;margin: 0 auto;display: block; max-width: 940px;">
@@ -541,11 +541,11 @@
 
           <div class="splitSections">
             <p class="splitSideHeader">CATEGORY:</p>
-            <select name="expense[category_id]" id="newExpenseCategory">
-              <% current_company.get_active_categories.each do |cat| %>
-                  <option value="<%= cat.id %>"><%= cat.name %></option>
-              <% end %>
-            </select>
+          <!--  <select name="expense[category_id]" id="newExpenseCategory">
+              < % current_company.get_active_categories.each do |cat| %>
+                  <option value="< %= cat.id %>">< %= cat.name %></option>
+              < % end %>
+            </select>-->
 
           </div>
 
@@ -565,8 +565,8 @@
         </div>
 
       </div>
-
-    </form>
+<!--
+    </form>-->
   </div>
 </div>
 
@@ -791,20 +791,13 @@
 
     $('#newExpenseModal').modal('hide');
   }
-  function redirectBack() {
-//    var a = document.createElement('a');
-//    a.href = document.referrer;
-//    back = a.pathname;
-//    if (back != '< %= #get_reports_path %>') {
-    Turbolinks.visit('<%= ej get_reports_path %>')
-//      return;
-//    }
-//    window.history.back();
+  function redirectBack() {/*
+    Turbolinks.visit('< %= ej get_reports_path %>')*/
   }
 
   function makeHeaderEditable() {
-    $('#updateNameModal').modal('show');
-    $('#modalInputName').val("<%= @report.name %>");
+    $('#updateNameModal').modal('show');/*
+    $('#modalInputName').val("< %= @report.name %>");*/
   }
 
   function validate(evt) {
@@ -933,13 +926,15 @@
     $('form#createReportFromExpenses').submit();
   }
 
+/*
   function getExpensePath(id) {
-    <% if is_admin_view || is_manager_view%>
+    < % if is_admin_view || is_manager_view%>
     return "/admin/expenses/" + id;
-    <%else%>
-    return "<%="/users/#{current_user.id}/expenses/"%>" + id;
-    <%end%>
+    < %else%>
+    return "< %="/users/#{current_user.id}/expenses/"%>" + id;
+    < %end%>
   }
+*/
 
   function readFile(input) {
 
