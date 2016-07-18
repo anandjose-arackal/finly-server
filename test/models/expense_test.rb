@@ -6,7 +6,7 @@
 #  amount_id            :integer
 #  expense_status_id    :integer
 #  note                 :text(65535)
-#  date                 :datetime
+#  date                 :date
 #  user_id              :integer
 #  expense_type_id      :integer
 #  created_at           :datetime         not null
@@ -15,6 +15,7 @@
 #  rejecting_manager_id :integer
 #  report_id            :integer
 #  category_id          :integer
+#  reimbursable         :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

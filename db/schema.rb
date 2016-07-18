@@ -162,12 +162,13 @@ ActiveRecord::Schema.define(version: 20160717153003) do
     t.date     "date"
     t.integer  "user_id",              limit: 4
     t.integer  "expense_type_id",      limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.text     "manager_memo",         limit: 65535
     t.integer  "rejecting_manager_id", limit: 4
     t.integer  "report_id",            limit: 4
     t.integer  "category_id",          limit: 4
+    t.boolean  "reimbursable",                       default: false, null: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -329,6 +330,7 @@ ActiveRecord::Schema.define(version: 20160717153003) do
     t.datetime "submitted_at",                        precision: 6
     t.integer  "controlling_user_id",     limit: 4
     t.integer  "controlling_for_user_id", limit: 4
+    t.integer  "forwarding_to_id",        limit: 4
     t.string   "memo",                    limit: 255
     t.datetime "created_at",                                                        null: false
     t.datetime "updated_at",                                                        null: false
@@ -340,6 +342,7 @@ ActiveRecord::Schema.define(version: 20160717153003) do
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
   add_index "reports", ["controlling_user_id"], name: "index_reports_on_controlling_user_id", using: :btree
+  add_index "reports", ["forwarding_to_id"], name: "index_reports_on_forwarding_to_id", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
@@ -438,7 +441,7 @@ ActiveRecord::Schema.define(version: 20160717153003) do
     t.datetime "updated_at",                                        null: false
     t.integer  "company_id",             limit: 4,                  null: false
     t.string   "name",                   limit: 255
-    t.string   "mobile_number",          limit: 255
+    t.integer  "mobile_number",          limit: 4
     t.boolean  "active",                             default: true, null: false
     t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"

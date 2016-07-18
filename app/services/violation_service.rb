@@ -28,7 +28,7 @@ class ViolationService < BaseService
       self.warning_messages[expense.id]['expense_blocking'] = {}
       self.warning_messages[expense.id]['budget_warning'] = {}
       self.warning_messages[expense.id]['budget_blocking'] = {}
-      
+
 
       policy.expense_rules.each do |rule|
         check_expense_rule rule, expense
