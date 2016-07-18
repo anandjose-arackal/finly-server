@@ -1,4 +1,8 @@
 source 'https://rubygems.org'
+
+# Gem pundit for permission check in actions etc.
+gem 'pundit'
+
 # Gem to show db schema in model file
 gem 'annotate'
 

@@ -10,7 +10,6 @@
 #  submitted_at            :datetime
 #  controlling_user_id     :integer
 #  controlling_for_user_id :integer
-#  forwarding_to_id        :integer
 #  memo                    :string(255)
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
