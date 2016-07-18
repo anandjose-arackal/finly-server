@@ -14,13 +14,27 @@ def random_integer(low, high)
   random(low, high+1).to_i
 end
 
+if ExportField.count == 0
+  ExportField.create(id: 1, name: 'Employee Name')
+  ExportField.create(id: 2, name: 'Employee ID')
+  ExportField.create(id: 3, name: 'Payroll ID')
+  ExportField.create(id: 4, name: 'Report ID')
+  ExportField.create(id: 5, name: 'Report name')
+  ExportField.create(id: 6, name: 'Report Status')
+  ExportField.create(id: 7, name: 'Expense ID')
+  ExportField.create(id: 8, name: 'Expense Merchant')
+  ExportField.create(id: 9, name: 'Expense Currency')
+  ExportField.create(id: 10, name: 'Expense Amount')
+  ExportField.create(id: 11, name: 'Expense Date')
+  ExportField.create(id: 12, name: 'Expense Category Name')
+end
 
 if UserRole.count == 0
-  UserRole.create(id: 1, name: "Admin")
-  UserRole.create(id: 2, name: "Finance Manager")
-  UserRole.create(id: 3, name: "Manager")
-  UserRole.create(id: 4, name: "Employee")
-  UserRole.create(id: 5, name: "Auditor")
+  UserRole.create id: 1, name: 'Admin'
+  UserRole.create id: 2, name: 'Finance Manager'
+  UserRole.create id: 3, name: 'Manager'
+  UserRole.create id: 4, name: 'Employee'
+  UserRole.create id: 5, name: 'Auditor'
 end
 
 if ReportStatus.count == 0
@@ -69,7 +83,7 @@ if ReportCommentAction.count == 0
 end
 
 if Currency.count == 0
-  Currency.create(id: 1, country: "India", country_code: "INR")
+  Currency.create(id: 1, country: 'India', country_code: 'INR')
 end
 
 if Amount.count == 0

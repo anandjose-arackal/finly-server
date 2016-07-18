@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160717153003) do
+ActiveRecord::Schema.define(version: 20160718063641) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -177,6 +177,23 @@ ActiveRecord::Schema.define(version: 20160717153003) do
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
+
+  create_table "export_fields", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "export_preferences", force: :cascade do |t|
+    t.integer  "company_id",      limit: 4,   null: false
+    t.integer  "export_field_id", limit: 4,   null: false
+    t.string   "name",            limit: 255, null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "export_preferences", ["company_id"], name: "index_export_preferences_on_company_id", using: :btree
+  add_index "export_preferences", ["export_field_id"], name: "index_export_preferences_on_export_field_id", using: :btree
 
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
@@ -503,6 +520,8 @@ ActiveRecord::Schema.define(version: 20160717153003) do
   add_foreign_key "expenses", "expense_types"
   add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
+  add_foreign_key "export_preferences", "companies"
+  add_foreign_key "export_preferences", "export_fields"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"

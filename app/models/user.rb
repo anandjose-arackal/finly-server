@@ -24,7 +24,7 @@
 #  updated_at             :datetime         not null
 #  company_id             :integer          not null
 #  name                   :string(255)
-#  mobile_number          :integer
+#  mobile_number          :string(255)
 #  active                 :boolean          default(TRUE), not null
 #  invitation_token       :string(255)
 #  invitation_created_at  :datetime
@@ -61,6 +61,9 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
+
+  delegate :employee_id, to: :profile
+  delegate :payroll_id, to: :profile
 
   has_paper_trail
 

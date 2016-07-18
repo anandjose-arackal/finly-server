@@ -19,7 +19,6 @@ class UserInviteService < BaseService
       return false
     end
 
-    # todo remove skip invite after testing
     u = User.invite!(params, self.user) do |u|
       u.skip_invitation = true
     end

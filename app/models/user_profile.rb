@@ -25,4 +25,5 @@ class UserProfile < ActiveRecord::Base
   has_attached_file :avatar, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}
 
   validates :user_id, presence: true
+
 end

@@ -24,7 +24,7 @@
 #  updated_at             :datetime         not null
 #  company_id             :integer          not null
 #  name                   :string(255)
-#  mobile_number          :integer
+#  mobile_number          :string(255)
 #  active                 :boolean          default(TRUE), not null
 #  invitation_token       :string(255)
 #  invitation_created_at  :datetime
