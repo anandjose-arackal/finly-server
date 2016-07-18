@@ -10,10 +10,13 @@
 #  submitted_at            :datetime
 #  controlling_user_id     :integer
 #  controlling_for_user_id :integer
-#  forwarding_to_id        :integer
 #  memo                    :string(255)
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  reimbursement_id        :integer
+#  reimbursement_amount_id :integer
+#  accounted               :boolean          default(FALSE), not null
+#  archived                :boolean          default(FALSE), not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

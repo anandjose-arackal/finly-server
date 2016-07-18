@@ -10,10 +10,13 @@
 #  submitted_at            :datetime
 #  controlling_user_id     :integer
 #  controlling_for_user_id :integer
-#  forwarding_to_id        :integer
 #  memo                    :string(255)
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  reimbursement_id        :integer
+#  reimbursement_amount_id :integer
+#  accounted               :boolean          default(FALSE), not null
+#  archived                :boolean          default(FALSE), not null
 #
 
 class Report < ActiveRecord::Base
@@ -22,13 +25,25 @@ class Report < ActiveRecord::Base
   belongs_to :policy
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :forwarding_to, class_name: 'User'
-  has_many :tracks, class_name: 'ReportTrack'
+  has_many :tracks, class_name: 'ReportTrack', dependent: :destroy
   has_many :expenses
-  has_many :comments, class_name: 'ReportComment'
+  has_many :comments, class_name: 'ReportComment', dependent: :destroy
+  has_many :receipts, as: :parent
+  belongs_to :reimbursement, class_name: 'Payment'
+  belongs_to :reimbursement_amount, class_name: 'Amount'
 
   validates :user, presence: true
   validates :status, presence: true
+
+  scope :with_id, ->(id) { where id: id }
+  scope :non_archived, -> { where.not archived: false }
+  scope :archived, -> { where archived: true }
+  scope :with_amount, -> { joins :reimbursement_amount }
+  scope :approved, -> { where report_status_id: ReportStatus.approved_id }
+  scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
+  scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
+  scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
+  scope :accounted, -> { where accounted: true }
 
   before_save do
     if self.name.blank?
@@ -41,13 +56,16 @@ class Report < ActiveRecord::Base
       expenses.each do |expense|
         expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
       end
+      receipts.each do |receipt|
+        receipt.parent_id = receipt.parent_type = nil
+        receipt.save
+      end
     end
   end
 
-
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
-  def associated_users(user_before = nil)
+  def associated_users(user_before = nil, ordered = false)
     return nil if tracks.blank?
     trackings = tracks.without_take_control_action
     if user_before.present?
@@ -67,6 +85,7 @@ class Report < ActiveRecord::Base
     if user_ids.size > 0
       # Order is MySQL Specific
       user_ids = user_ids.reverse!
+      user_ids.reject! { |id| id.blank? }
       return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
     end
     nil
@@ -75,49 +94,65 @@ class Report < ActiveRecord::Base
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
-  
+
   def status_id
     self.report_status_id
   end
 
   def open?
-    self.status_id == 1
+    self.status_id == ReportStatus.open_id
   end
 
   def retracted?
-    self.status_id == 2
+    self.status_id == ReportStatus.retracted_id
   end
 
   def rejected?
-    self.status_id == 3
+    self.status_id == ReportStatus.rejected_id
   end
 
   def processing?
-    self.status_id == 4
+    self.status_id == ReportStatus.processing_id
   end
 
   def approved?
-    self.status_id == 5
+    self.status_id == ReportStatus.approved_id
   end
 
   def reimbursed?
-    self.status_id == 6
+    self.status_id == ReportStatus.reimbursed_id
   end
 
   def reimbursement_confirmed?
-    self.status_id == 7
+    self.status_id == ReportStatus.reimbursement_confirmed_id
   end
 
   def closed?
-    self.status_id == 8
+    self.status_id == ReportStatus.closed_id
   end
 
-  def is_reimbursable?
-    expenses.reimbursable.present?
+  def reimbursement_pending?
+    approved? and reimbursement_amount.present? and reimbursement_amount.value > 0
   end
 
-  def is_closed?
-    report.reimbursement_confirmed? or (report.approved? and not report.is_reimbursable?)
+  def can_archive?
+    reimbursed? or reimbursement_confirmed? or closed?
+  end
+
+  def can_unapprove?
+    processing? or approved? or closed?
+  end
+
+  def can_take_control?
+    processing?
+  end
+
+  def archived?
+    self.archived
+  end
+
+  def accounted?
+    self.accounted
   end
 
 end

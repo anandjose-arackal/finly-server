@@ -14,6 +14,7 @@
 #
 
 class ExpenseRule < ActiveRecord::Base
+  include PolicyVersion
   belongs_to :greater_than_amount, class_name: "Amount"
   belongs_to :category
 

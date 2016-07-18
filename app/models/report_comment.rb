@@ -14,6 +14,7 @@
 #  content                  :text(65535)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  payment_id               :integer
 #
 
 class ReportComment < ActiveRecord::Base
@@ -22,6 +23,7 @@ class ReportComment < ActiveRecord::Base
   belongs_to :report_comment_action
   belongs_to :expense
   belongs_to :rejected_to, class_name: 'User'
+  belongs_to :payment
 
   def generate_text(user)
 

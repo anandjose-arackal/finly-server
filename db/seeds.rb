@@ -31,20 +31,21 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
   ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
   ReportStatus.create(id: 7, name: 'Reimbursement Confirmed', order: 7)
-  ReportStatus.create(id: 8, name: 'Archived', order: 8)
+  ReportStatus.create(id: 8, name: 'Closed', order: 8)
 end
 
 if ReportTrackingAction.count == 0
-  ReportTrackingAction.create(id: 1, name: 'create')
-  ReportTrackingAction.create(id: 2, name: 'retract')
-  ReportTrackingAction.create(id: 3, name: 'submit')
-  ReportTrackingAction.create(id: 4, name: 'approve')
-  ReportTrackingAction.create(id: 5, name: 'auto_approve')
-  ReportTrackingAction.create(id: 6, name: 'reject')
-  ReportTrackingAction.create(id: 7, name: 'unapprove')
-  ReportTrackingAction.create(id: 8, name: 'reimburse')
-  ReportTrackingAction.create(id: 9, name: 'reimbursement_received')
-  ReportTrackingAction.create(id: 10, name: 'take_control')
+  ReportTrackingAction.create id: 1, name: 'Create'
+  ReportTrackingAction.create id: 2, name: 'Retract'
+  ReportTrackingAction.create id: 3, name: 'Submit'
+  ReportTrackingAction.create id: 4, name: 'Approve'
+  ReportTrackingAction.create id: 5, name: 'Auto Approve'
+  ReportTrackingAction.create id: 6, name: 'Reject'
+  ReportTrackingAction.create id: 7, name: 'Unapprove'
+  ReportTrackingAction.create id: 8, name: 'Take Control'
+  ReportTrackingAction.create id: 9, name: 'Reimbursed'
+  ReportTrackingAction.create id: 10, name: 'Reimbursement Confirmed'
+  ReportTrackingAction.create id: 11, name: 'Closed'
 end
 
 if ReportCommentAction.count == 0
@@ -55,15 +56,16 @@ if ReportCommentAction.count == 0
   ReportCommentAction.create(id: 5, name: 'report_auto_approve')
   ReportCommentAction.create(id: 6, name: 'report_reject')
   ReportCommentAction.create(id: 7, name: 'report_unapprove')
-  ReportCommentAction.create(id: 8, name: 'report_reimburse')
-  ReportCommentAction.create(id: 9, name: 'report_reimbursement_received')
-  ReportCommentAction.create(id: 10, name: 'report_take_control')
-  ReportCommentAction.create(id: 11, name: 'report_update')
-  ReportCommentAction.create(id: 12, name: 'report_attach_receipt')
-  ReportCommentAction.create(id: 13, name: 'expense_add')
-  ReportCommentAction.create(id: 14, name: 'expense_remove')
-  ReportCommentAction.create(id: 15, name: 'expense_reject')
-  ReportCommentAction.create(id: 16, name: 'expense_update')
+  ReportCommentAction.create(id: 8, name: 'report_take_control')
+  ReportCommentAction.create(id: 9, name: 'report_update')
+  ReportCommentAction.create(id: 10, name: 'report_reimbursed')
+  ReportCommentAction.create(id: 11, name: 'report_reimbursement_confirmed')
+  ReportCommentAction.create(id: 12, name: 'report_closed')
+  ReportCommentAction.create(id: 13, name: 'report_attach_receipt')
+  ReportCommentAction.create(id: 14, name: 'expense_add')
+  ReportCommentAction.create(id: 15, name: 'expense_remove')
+  ReportCommentAction.create(id: 16, name: 'expense_reject')
+  ReportCommentAction.create(id: 17, name: 'expense_update')
 end
 
 if Currency.count == 0
@@ -202,3 +204,8 @@ if p.rules_count == 0
                              rule_type_id: 2)
 end
 
+if PaymentType.count == 0
+  PaymentType.create(id: 1, name: 'advance')
+  PaymentType.create(id: 2, name: 'debt_clearance')
+  PaymentType.create(id: 3, name: 'reimbursement')
+end

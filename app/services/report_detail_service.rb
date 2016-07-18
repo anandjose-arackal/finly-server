@@ -11,7 +11,13 @@ class ReportDetailService < BaseService
   end
 
   def total_amount
-    report.expenses.with_amount.sum(:value)
+    return report.expenses.with_amount.sum(:value).round(2) if report.expenses.present?
+    0
+  end
+
+  def latest_expense
+    return nil unless report.expenses.count > 0
+    report.expenses.sort_latest_first.first
   end
 
   def policy

@@ -38,16 +38,20 @@ class ReportTrackingAction < ActiveRecord::Base
     7
   end
 
-  def self.reimburse_id
+  def self.take_control_id
     8
   end
 
-  def self.reimbursement_received_id
+  def self.reimbursed_id
     9
   end
 
-  def self.take_control_id
+  def self.reimbursement_confirmed_id
     10
+  end
+
+  def self.closed_id
+    11
   end
 
 end

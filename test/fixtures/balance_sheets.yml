@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: balance_sheets
+#
+#  id                       :integer          not null, primary key
+#  user_id                  :integer
+#  cash_in_hand_id          :integer
+#  pending_reimbursement_id :integer
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 
+  cash_in_hand_id: 1
+  pending_reimbursement_id: 1
+
+two:
+  user_id: 
+  cash_in_hand_id: 1
+  pending_reimbursement_id: 1

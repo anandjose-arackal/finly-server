@@ -30,4 +30,8 @@ class Amount < ActiveRecord::Base
     self.currency.country_code
   end
 
+  def precision_value
+    self.value.round(2)
+  end
+
 end

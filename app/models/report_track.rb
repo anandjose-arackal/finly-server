@@ -10,6 +10,7 @@
 #  memo                      :string(255)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  payment_id                :integer
 #
 
 class ReportTrack < ActiveRecord::Base
@@ -17,6 +18,7 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :report_status
   belongs_to :tracking_action, class_name: 'ReportTrackingAction'
   belongs_to :action_user, class_name: 'User'
+  belongs_to :payment
 
   default_scope { order('created_at ASC') }
 

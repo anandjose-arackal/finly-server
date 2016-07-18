@@ -15,7 +15,6 @@
 #  rejecting_manager_id :integer
 #  report_id            :integer
 #  category_id          :integer
-#  reimbursable         :boolean          default(FALSE), not null
 #
 
 class Expense < ActiveRecord::Base
@@ -39,10 +38,10 @@ class Expense < ActiveRecord::Base
   delegate :expense_status, to: :expense_status
   delegate :merchant_name, to: :manual_expense
 
-  scope :with_id, ->(ids){where id: ids}
-  scope :reimbursable, -> { where reimbursable: true }
+  scope :with_id, ->(ids) { where id: ids }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
-  scope :unreported, -> { where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]) }
+  scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
+  scope :sort_latest_first, -> { order 'date DESC' }
 
   delegate :category_name, to: :category
 

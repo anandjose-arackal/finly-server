@@ -1,0 +1,48 @@
+# == Schema Information
+#
+# Table name: payments
+#
+#  id                 :integer          not null, primary key
+#  amount_id          :integer          not null
+#  date               :date             not null
+#  payment_type_id    :integer          not null
+#  initiating_user_id :integer          not null
+#  receiving_user_id  :integer          not null
+#  note               :text(65535)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+
+class Payment < ActiveRecord::Base
+  belongs_to :amount
+  belongs_to :payment_type
+  belongs_to :initiating_user, class_name: 'User'
+  belongs_to :receiving_user, class_name: 'User'
+  has_many :reports
+  has_many :report_comments
+  has_many :report_tracks
+
+  accepts_nested_attributes_for :amount
+
+  scope :advance, -> { where payment_type_id: PaymentType.advance_id }
+  scope :reimbursement, -> { where payment_type_id: PaymentType.reimbursement_id }
+  scope :debt_clearance, -> { where payment_type_id: PaymentType.debt_clearance_id }
+  scope :received_by_user, ->(user_id) { where receiving_user: user_id }
+  scope :initiated_by_user, ->(user_id) { where receiving_user: user_id }
+  scope :transferred_to_user, -> { where.not payment_type: PaymentType.debt_clearance_id }
+  scope :with_amount, -> { joins :amounts }
+  scope :made_before, ->(date) { where 'date <= ?', date }
+  scope :made_after, ->(date) { where 'date >= ?', date }
+
+  def advance?
+    self.payment_type_id == PaymentType.advance_id
+  end
+
+  def reimbursement?
+    self.payment_type_id == PaymentType.reimbursement_id
+  end
+
+  def debt_clearance?
+    self.payment_type_id == PaymentType.debt_clearance_id
+  end
+end

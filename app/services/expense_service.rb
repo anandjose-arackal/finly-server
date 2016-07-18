@@ -16,6 +16,7 @@ class ExpenseService < BaseService
     expense_params = load_expense_params params
     expense = @user.expenses.build(expense_params)
     if expense.save
+      ReportService.new(user: @user, report: expense.report).expense_created_in_report(self) if expense.report_id.present? and @user.present?
       return expense
     else
       errors << expense.errors.full_messages
