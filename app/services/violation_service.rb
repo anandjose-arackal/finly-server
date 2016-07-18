@@ -1,19 +1,35 @@
 class ViolationService < BaseService
 
+  include ActionView::Helpers::NumberHelper
+
   attr_accessor :warning_messages
 
   def initialize(current_user)
     @user = current_user
+
+    # setting up the structure of the warning_messages hash
     self.warning_messages = {}
   end
 
   # checks for policy violations in a report and returns returns false if there aren't any
-  def violations(policy, report)
-    unless report || policy
-      errors << "No report or policy passed."
+  def violations(policy=nil, report=nil)
+    if report.nil?
+      errors << "No report passed."
       return false
     end
+    if policy.nil?
+      return true
+    end
+
     report.expenses.each do |expense|
+      # initializing the warning_messages hash
+      self.warning_messages[expense.id] = {}
+      self.warning_messages[expense.id]['expense_warning'] = {}
+      self.warning_messages[expense.id]['expense_blocking'] = {}
+      self.warning_messages[expense.id]['budget_warning'] = {}
+      self.warning_messages[expense.id]['budget_blocking'] = {}
+      
+
       policy.expense_rules.each do |rule|
         check_expense_rule rule, expense
       end
@@ -37,7 +53,7 @@ class ViolationService < BaseService
     end
     if rule.category_id
       if expense.category_id == rule.category_id
-        message += " and belonging to category " + expense.category_name.name
+        message += " and belonging to category " + expense.category_name
       else
         return false
       end
@@ -54,6 +70,7 @@ class ViolationService < BaseService
         return false
       end
     end
+
     message
   end
 
@@ -67,7 +84,7 @@ class ViolationService < BaseService
     # checking if the specific rule is actually broken
     case rule.expense_rule_type_id
       when 1
-        if expense.receipt_file_name
+        if expense.receipts_count > 0
           message = false # i.e. the rule is not broken because there is a receipt
         end
       when 2
@@ -98,17 +115,17 @@ class ViolationService < BaseService
     end
 
     if broken
-      if rule.type == 'warning'
-        if warning_messages[expense.id]['warning'][rule_name].nil?
-          warning_messages[expense.id]['warning'][rule_name] = [warning]
+      if rule.type == 'Warning'
+        if self.warning_messages[expense.id]['expense_warning'][rule_name].nil?
+          self.warning_messages[expense.id]['expense_warning'][rule_name] = [warning]
         else
-          warning_messages[expense.id]['warning'][rule_name] << warning
+          self.warning_messages[expense.id]['expense_warning'][rule_name] << warning
         end
-      elsif rule.type == 'blocking'
-        if warning_messages[expense.id]['blocking'][rule_name].nil?
-          warning_messages[expense.id]['blocking'][rule_name] = [warning]
+      elsif rule.type == 'Blocking'
+        if self.warning_messages[expense.id]['expense_blocking'][rule_name].nil?
+          self.warning_messages[expense.id]['expense_blocking'][rule_name] = [warning]
         else
-          warning_messages[expense.id]['blocking'][rule_name] << warning
+          self.warning_messages[expense.id]['expense_blocking'][rule_name] << warning
         end
       end
     end
@@ -119,19 +136,19 @@ class ViolationService < BaseService
     report = expense.report
     total_expenses = 0
     # all user reports with the associated budget
-    user.reports.where(policy_id: rule.policy_id).where.not(id: self.id).each do |budget_report|
+    user.reports.where(policy_id: rule.policy_id).where.not(id: report.id).each do |budget_report|
       if category
-        total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).sum(:amount), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).sum(:amount), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
       end
     end
     if category
-      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).sum(:amount), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).sum(:amount), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
     end
-    if total_expenses > rule.amount
+    if total_expenses > rule.amount_value
       return true
     end
     false
@@ -166,26 +183,22 @@ class ViolationService < BaseService
         if budget_violation?(expense, rule, start_date, end_date, category)
           if rule.type == 'Warning'
             if category
-              warning_messages[expense.id]['Warning'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount.to_s
+              self.warning_messages[expense.id]['budget_warning'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount_value.to_s
             else
-              warning_messages[expense.id]['Warning']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount.to_s
+              self.warning_messages[expense.id]['budget_warning']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount_value.to_s
             end
             return
           elsif rule.type == 'Blocking'
             if category
-              warning_messages[expense.id]['Blocking'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount.to_s
+              self.warning_messages[expense.id]['budget_blocking'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount_value.to_s
             else
-              warning_messages[expense.id]['Blocking']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount.to_s
+              self.warning_messages[expense.id]['budget_blocking']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount_value.to_s
             end
             return
           end
         end
       end
     end
-  end
-
-  def apply_policy_for_report(report = nil, policy = nil)
-
   end
 
 end

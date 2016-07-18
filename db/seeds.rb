@@ -143,12 +143,12 @@ end
 if Expense.count == 0
   200.times do |i|
     e = Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
-                       expense_status_id: random_integer(1, 3),
+                       expense_status_id: 1,
                        expense_type_id: 1,
                        note: "test note #{i}",
                        date: Date.today,
                        user_id: random_integer(1, 10),
-                       category_id: random_integer(1, 10),
+                       category_id: 1,
                        manual_expense_attributes: {merchant: "Test merchant #{random_integer(1, 10)}"})
   end
 end
@@ -180,14 +180,25 @@ end
 
 p = Policy.find(3)
 if p.rules_count == 0
-  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 100, currency_id: 1},
+  # warning rule that requires a receipt for expenses above 50
+  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
                               category_id: 1,
-                              days_after: 20,
+                              rule_type_id: 1,
+                              expense_rule_type_id: 1)
+  # warning rule that requires a note for expense above 50
+  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
+                              category_id: 1,
                               rule_type_id: 1,
                               expense_rule_type_id: 2)
+
+  # setting monthly budget for category 1 as 100 in INR
   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
                              category_id: 1,
                              budget_period_id: 3,
                              rule_type_id: 1)
+  # set monthly budget for all expenses as 150 INR
+  b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
+                             budget_period_id: 3,
+                             rule_type_id: 2)
 end
 

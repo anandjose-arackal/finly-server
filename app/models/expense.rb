@@ -45,10 +45,16 @@ class Expense < ActiveRecord::Base
   scope :unreported, -> { where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]) }
 
   delegate :category_name, to: :category
-  delegate :receipt_file_name, to: :receipt
+
 
   # validates :amount_id, uniqueness: true
   validate :no_future_date
+
+
+  # returns the number of receipts attached to this expense
+  def receipts_count
+    self.receipts.count
+  end
 
   # cannot add an expense with future date
   def no_future_date

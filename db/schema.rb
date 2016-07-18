@@ -147,7 +147,7 @@ ActiveRecord::Schema.define(version: 20160712175130) do
     t.integer  "amount_id",            limit: 4
     t.integer  "expense_status_id",    limit: 4
     t.text     "note",                 limit: 65535
-    t.datetime "date"
+    t.date     "date"
     t.integer  "user_id",              limit: 4
     t.integer  "expense_type_id",      limit: 4
     t.datetime "created_at",                                         null: false

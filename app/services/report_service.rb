@@ -45,6 +45,7 @@ class ReportService < BaseService
     return false unless validate require_user: true
     report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
     if report.save
+      self.report = report
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
       if params[:expenses].present?

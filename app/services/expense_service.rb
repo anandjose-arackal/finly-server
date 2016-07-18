@@ -47,7 +47,7 @@ class ExpenseService < BaseService
     end
     if expense.update_attributes(expense_params)
       # Callback to create comments in report when an expense is edited
-      ReportService.new(user: user, report: report).expense_updated(self) if report_id.present? and user.present?
+      ReportService.new(user: user, report: report).expense_updated(self) if expense.report_id.present? and user.present?
       expense.reload
       return expense
     else
@@ -66,8 +66,8 @@ class ExpenseService < BaseService
     receipt_params = load_receipt_params params
     expense = load_expense expense_id
     return unless expense
-    # create the expense associated with the expense
-    attach = expense.receipts.create(receipt_params)
+    # build the expense associated with the expense
+    attach = expense.receipts.build(receipt_params)
     # associating the current user with the receipt
     attach.user = @user
     if attach.save

@@ -4,7 +4,7 @@ class CreateExpenses < ActiveRecord::Migration
       t.references :amount, index: true, foreign_key: true
       t.references :expense_status, index: true, foreign_key: true
       t.text :note
-      t.datetime :date
+      t.date :date
       t.references :user, index: true, foreign_key: true
       t.references :expense_type, index: true, foreign_key: true
 

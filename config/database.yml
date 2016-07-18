@@ -13,8 +13,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: root
-  password: smart22
+  username: sreeram
+  password: sreeram
   host: localhost
   socket: /var/run/mysqld/mysqld.sock
 
