@@ -14,4 +14,9 @@ module ApplicationHelper
     return false
   end
 
+  def param
+    return ''
+
+  end
+
 end

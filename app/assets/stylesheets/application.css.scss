@@ -191,6 +191,54 @@ body {
   margin-top: 10px;
 }
 
+#flashContainer {
+
+  .holder {
+    position: fixed;
+    width: 50%;
+    margin-top: 100px;
+    top: 0;
+    left: 0;
+    text-align: center;
+    font-weight: 200;
+    font-size: 18px;
+    border-radius: 1px;
+    margin-left: 25%;
+    display: inline-block;
+    z-index: 1500;
+  }
+
+  .alert {
+    height: 60px;
+    margin: 10px 0 10px 0px;
+  }
+
+  .alert-failure, .alert-failure i, .alert-alert, .alert-danger {
+    background-color: #FF685C;
+    font-weight: 300;
+    color: white;
+
+  }
+
+  .alert-success {
+    background-color: #465c8b;
+    color: white;
+  }
+
+  .alert-notice {
+
+    color: white  !important;
+    background-color: #93c178;
+  }
+
+  #flashClose {
+    float: right;
+    color: white;
+    cursor: pointer;
+    margin-top: -10px;
+  }
+}
+
 /*
 Common styling
 */
@@ -213,8 +261,14 @@ Common styling
   text-transform: uppercase;
 }
 
-.red-button {
+.grey-button {
 
+  border-radius: 2px;
+  background-color: #f9f9f9;
+  border: 1px solid #dfdfdf;
+  color: #999;
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
 .roundCircle {

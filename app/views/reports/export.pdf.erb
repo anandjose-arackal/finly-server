@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<% provide(:title, "Download Report") %>
+<body>
+
+<p style="font-weight: 600; ">Finly</p>
+<div class="reportDiv">
+  <button id="statusText" style="cursor: default;background-color: #374F76; border-radius: 18px; color: white; padding: 4px 23px 4px 23px; font-size: 12px; border-color: transparent">
+    <%= @status %>
+  </button>
+  <label style="margin-left: 20px">ID: </label> <span><%= @report.id %></span>
+  <label style="float: right;margin-top: 5px"> Report Policy:
+    <% if @policy %>
+        <%= @policy.name %>
+    <% end %>
+  </label>
+  <div>
+    <h3 id="header" style="font-weight: 300;color: black;font-size: 22px;"><%= @report.name %></h3>
+
+    <hr style="border-top: 1px solid #d8d8d8;">
+
+    <div style="margin-top: 20px">
+      <label style="font-weight: 400; margin-right: 103px ">To:</label><span style="font-weight: bold"> <%= @manager_name %></span>
+    </div>
+    <div style="margin-top: 5px">
+      <label style="font-weight: 400; margin-right: 81px">From:</label><span style="font-weight: bold">   <%= @report.user.name %> </span>
+    </div>
+    <div style="margin-top: 5px">
+      <span style="font-weight: 400; margin-right: 75px">Dates:</span><span style="font-weight: bold">   <%= @report.get_date_string %></span>
+    </div>
+    <div style="margin-bottom: 20px; margin-top: 5px">
+      <label style="font-weight: 400; margin-right: 35px">Expenditure:</label><span style="font-weight: bold"><span>   &#8377</span><%= @total %></span>
+    </div>
+
+
+    <% @expenses.each do |section| %>
+        <div>
+          <hr style="
+          border-top: 1px solid #d8d8d8;
+          ">
+          <h5 style="color: #374F76"><%= section[:category_name] %> -
+            <span>&#8377</span> <%= section[:category_total] %></h5>
+
+
+          <table width="100%">
+            <tr width="100%" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8;">
+              <th width="15%" style="padding: 10px">DATE</th>
+              <th width="30%">MERCHANT</th>
+              <th width="35%">NOTE</th>
+              <th width="20%">TOTAL</th>
+            </tr>
+
+            <% section[:expenses].each do |expense| %>
+                <tr style="margin-top: 10px">
+                  <td width="15%" style="text-align: center">
+                    <%= expense.date.strftime("%d-%b-%y") %>
+                  </td>
+                  <td width="30%" style="padding: 5px"><%= expense.merchant %></td>
+                  <td width="35%" style="padding: 5px"><%= expense.note %></td>
+                  <td width="20%" style="text-align: center"><span>&#8377</span><%= "#{expense.amount}" %></td>
+                </tr>
+
+            <% end %>
+            <!--  <tr class="totalDivider"><span>&#8377</span>< %= section[:category_total] %>
+              </tr>
+  -->
+          </table>
+
+        </div>
+    <% end %>
+
+  </div>
+
+  <hr style="
+  border-top: 1px solid #d8d8d8;
+  ">
+
+  <h3 style="color: #5d6e73; font-size: 16px">Report History & Comments</h3>
+
+  <!-- RENDERING COMMENTS FOR THIS REPORT -->
+
+  <div id="commentsContainer" class="container-fluid">
+
+    <table width="100%">
+      <% @comments.each do |comment| %>
+          <tr style="padding-top: 10px;padding-bottom: 10px; background-color: rgba(239, 242, 248, 0.41)">
+            <td width="60px" style="padding-left: 25px">
+              <span style="font-size: 14px; margin-top: 5px; text-align: center" class="roundCircle"><%= comment.user_name[0..1].upcase %></span>
+            </td>
+            <td id="commenter" style="padding-left: 25px">
+              <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%= comment.user_name %></p>
+
+              <p id="theComment" style="font-size: 12px; font-weight: 300;"><%= comment.content %></p>
+
+              <p id="commentDate" style="font-size: 12px; color: #a3a7ab; font-weight: 300; line-height: 15%">
+                <%= comment.created_at.strftime("%d %b %y") %></p>
+            </td>
+          </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <!-- END OF COMMENTS -->
+
+</div>
+
+</body>
+
+<style>
+
+  .topbarContainer {
+    visibility: hidden;
+  }
+
+  .reportDiv {
+    background-color: white;
+    width: 100%;
+    padding: 30px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .065);
+  }
+
+  .totalDivider {
+    border-top: 1px solid #d8d8d8;
+    margin-top: 20px;
+    text-align: right;
+    padding-right: 70px;
+    padding-top: 20px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .active {
+    background-color: #93c178 !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  .inactive {
+    background-color: indianred !important;
+    color: white !important;
+    border: none !important;
+    margin-top: 5px;
+  }
+
+  .btn {
+    width: 85px;
+    border-radius: 1px;
+    font-size: 11px;
+    background-color: #f9f9f9;
+    border: 1px solid #dfdfdf;
+    color: #999;
+    outline: white;
+    cursor: default;
+  }
+
+  #approveBtn, #denyBtn {
+    font-size: 10px;
+    line-height: 20px;
+  }
+
+  .roundCircle {
+    display: block;
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    background-color: #9EACC9;
+    color: white;
+    text-align: center;
+    font-size: 1em;
+  }
+
+</style>
