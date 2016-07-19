@@ -1,0 +1,5 @@
+$('#manager_report_options_div').replaceWith("<%= j render partial:'reports/manager_report_options' %>");
+$("#reportExpenseReviewButtons<%=@expense.id%>").replaceWith("<%= j render partial:'reports/approval', locals: {expense: @expense} %>");
+<% if @expense.report.closed?%>
+$('#allReviewingCompleted').modal('show');
+<% end %>

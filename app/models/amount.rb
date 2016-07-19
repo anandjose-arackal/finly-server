@@ -10,6 +10,7 @@
 #
 
 class Amount < ActiveRecord::Base
+  include MathUtil
   belongs_to :currency
 
   # def self.get(currency_id, value, force_create: false)
@@ -31,7 +32,7 @@ class Amount < ActiveRecord::Base
   end
 
   def precision_value
-    self.value.round(2)
+    super(self.value)
   end
 
 end

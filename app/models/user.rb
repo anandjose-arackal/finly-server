@@ -52,7 +52,17 @@ class User < ActiveRecord::Base
   has_many :receipts, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
+
   has_many :reports, dependent: :destroy
+  has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
+  has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
+  has_many :interacted_reports, source: :report, through: :report_tracks
+  has_many :manager_report_tracks, -> { manager_role }, class_name: 'ReportTrack', foreign_key: :action_user_id
+  has_many :manager_reports, source: :report, through: :manager_report_tracks
+  has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :action_user_id
+  has_many :finance_reports, source: :report, through: :finance_report_tracks
+
+  has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy

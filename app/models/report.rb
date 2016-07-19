@@ -35,7 +35,14 @@ class Report < ActiveRecord::Base
   validates :user, presence: true
   validates :status, presence: true
 
-  scope :with_id, ->(id) { where id: id }
+  scope :with_id, ->(id, params={}) do
+    if params[:single]
+      find_by_id id
+    else
+      where id: id
+    end
+  end
+  scope :with_user, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
@@ -44,6 +51,9 @@ class Report < ActiveRecord::Base
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
   scope :accounted, -> { where accounted: true }
+  scope :owner, ->(user_id) { where user_id: user_id }
+  scope :non_owner, ->(user_id) { where.not user_id: user_id }
+  scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
 
   before_save do
     if self.name.blank?

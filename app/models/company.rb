@@ -31,6 +31,10 @@ class Company < ActiveRecord::Base
     self.users.where(active: true)
   end
 
+  def all_reports
+    Report.not_open.with_user(self.users.pluck(:id))
+  end
+
   private
   def init_config_present
     self.build_configuration.save unless self.configuration.present?

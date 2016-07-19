@@ -1,0 +1,16 @@
+<div id="receipt">
+  <div class="receipt">
+    <img class="receipt-image" src="<%= expense.receipts.first.image.url if expense.receipts.present? %>">
+  </div>
+  <div class="receipt-content">
+    <ul class="expenseInfo">
+      <li class="liExpense">
+        <span class="listExpenseInfo">Date:</span><span class="spanExpenseInfo"><%= expense.date.strftime("%d-%b-%y") %></span>
+      </li>
+      <li class="liExpense">
+        <span class="listExpenseInfo">Merchant:</span><span class="spanExpenseInfo"><%= expense.merchant_name %></span></li>
+      <li class="liExpense">
+        <span class="listExpenseInfo">Total:</span><span class="spanExpenseInfo"><%= expense.amount.precision_value %></span></li>
+    </ul>
+  </div>
+</div>

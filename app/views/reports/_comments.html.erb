@@ -1,0 +1,37 @@
+<div id="commentsContainer" class="container-fluid">
+
+  <form data-remote data-turboboost id="addCommentForm" action="<%= report_comment_path(report_id: @report.id, view: params[:view]) %>" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <input name="report_id" id="reportIDForComment" type="hidden">
+    <div class="row" style="padding-top: 10px;padding-bottom: 10px; background-color: rgba(239, 242, 248, 0.41)">
+      <div class="col-md-1">
+        <span style="font-size: 14px; margin-top: 10px" class="roundCircle"><%= current_user.name[0..1].upcase %></span>
+      </div>
+      <div id="commenter" class="col-md-11">
+        <textarea form="addCommentForm" name="comment" style="border-radius: 1px"></textarea>
+        <button style="margin-top: 10px;
+            background-color: #93c178;
+            color: white;
+            border: none;font-size: 10px;padding: 5px;
+        ">POST COMMENT
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <% @comments.each do |comment| %>
+      <div class="row" style="padding-top: 10px;padding-bottom: 10px; background-color: rgba(239, 242, 248, 0.41)">
+        <div class="col-md-1">
+          <!--<span style="font-size: 14px; margin-top: 5px" class="roundCircle">< %= #comment.user_name[0..1].upcase %></span>-->
+        </div>
+        <div id="commenter" class="col-md-11">
+          <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%=  %></p>
+
+          <p id="theComment" style="font-size: 12px; font-weight: 300;"><%= comment.generate(current_user) %></p>
+
+          <p id="commentDate" style="font-size: 12px; color: #a3a7ab; font-weight: 300; line-height: 20%">
+            <%= comment.created_at.strftime("%d %b %y") %></p>
+        </div>
+      </div>
+  <% end %>
+</div>

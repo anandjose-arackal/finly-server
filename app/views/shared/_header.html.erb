@@ -6,7 +6,7 @@
       <a class="navbar-brand" style="color: white; font-family: 'Bree Serif', serif; font-weight: 800;font-size: 32px;margin-top: 15px; float: left" href="<%= root_path %>" data-turbolinks="false">F</a>
     </div>
 
-   <!-- < % if logged_in? %>
+   <!-- <% if logged_in? %>
    -->     <ul class="nav navbar-nav topButton">
           <div class="dropdown canSwitch " onclick="showDropDown()" style="cursor: pointer">
             <span class="viewSummary">
@@ -18,13 +18,13 @@
             <span class="icon fa fa-chevron-down" style="margin-left: 70px ;color: white;opacity: 0.8;margin-top: 12px; font-size: 16px"></span>
 
             <ul id="viewToggleDropdown" class="dropdown-menu">
-              <!--   < % if current_user.admin? %>
-                     <li> < %= link_to "Admin View", admin_company_reports_path, turbolink: false %></li>
-                     <li> < %= link_to "Manager View", admin_reports_path(filter_status: 1), turbolink: false %></li>
-                 < % elsif current_user.manager? %>
-                     <li> < %= link_to "Manager View", admin_reports_path(filter_status: 1), turbolink: false %></li>
-                 < % end %>
-                <li> < %= link_to "Personal View", user_expenses_path(current_user), turbolink: false %></li>
+              <!--   <% if current_user.admin? %>
+                     <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: false %></li>
+                     <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: false %></li>
+                 <% elsif current_user.manager? %>
+                     <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: false %></li>
+                 <% end %>
+                <li> <%= link_to "Personal View", reports_path, turbolink: false %></li>
          -->
               <li> Personal View</li>
 
@@ -51,19 +51,19 @@
               <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
                 the App</a></li>
             <li><a href="#" data-turbolinks="false" style="height: 45px;">Support</a></li>
-            < % if logged_in? %>
-                <li>< %= link_to "Log out", destroy_user_session_path, method: "delete" %></li>
-            < % end %>-->
+            -->
             <li>
               <a href="<%= organization_account_path %>" style="height: 45px;">Organization Account</a>
             </li>
             <li>
               <a href="<%= user_profile_path %>" style="height: 45px;">My Account</a>
             </li>
-
+            <% if logged_in? %>
+            <li><%= link_to "Log out", destroy_user_session_path, method: "delete" %></li>
+            <% end %>
           </ul>
         </ul>
-  <!--  < % end %>
+  <!--  <% end %>
 -->
     <ul id="headerNavigation">
       <li>
@@ -73,10 +73,10 @@
         <a href="<%= people_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
       </li>
       <li>
-        <a href="<%= expenses_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
+        <a href="" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
       </li>
       <li>
-        <a href="<%= settlement_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+        <a href="" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
       </li>
 
 <!--      < % if !logged_in? %>

@@ -1,0 +1,8 @@
+$('#my-posts').append('<%= j render @reports %>');
+<% if @reports.next_page %>
+$('.pagination').replaceWith('<%= j will_paginate @reports %>');
+<% else %>
+$(window).off('scroll');
+$('.pagination').remove();
+<% end %>
+
