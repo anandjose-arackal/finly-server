@@ -7,7 +7,11 @@ class ReportsController < ApplicationController
     rs = ReportService.new(user: current_user)
     if rs.create
       redirect_to report_path(rs.report)
+    else
+      flash[:error] = rs.errors
+      render_flash_message
     end
+
   end
 
   def index
@@ -58,8 +62,11 @@ class ReportsController < ApplicationController
     fetch_report
     rs = ReportService.new(user: current_user, report: @report)
     if rs.submit
-      show
+      redirect_to report_path(rs.report)
+      return
     end
+    flash[:error] = rs.errors
+    render_flash_message
   end
 
   def retract
