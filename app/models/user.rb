@@ -64,6 +64,7 @@ class User < ActiveRecord::Base
 
   delegate :employee_id, to: :profile
   delegate :payroll_id, to: :profile
+  delegate :company_name, to: :company
 
   has_paper_trail
 

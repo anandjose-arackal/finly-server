@@ -27,6 +27,9 @@ class ExpenseService < BaseService
   def remove_expense(id = nil)
     return if id.blank?
     expense = load_expense id
+    unless expense
+      errors << 'Expense does not belong to user.'
+    end
     if expense.destroy
       return true
     else
@@ -44,6 +47,7 @@ class ExpenseService < BaseService
     expense_params = load_expense_params params
     expense = load_expense expense_params[:id] || expense_params[:expense_id]
     unless expense
+      errors << 'Expense does not belong to user.'
       return false
     end
     if expense.update_attributes(expense_params)
@@ -164,6 +168,7 @@ class ExpenseService < BaseService
     receipt_params = params[:receipt].slice(:image)
   end
 
+  # if expense belongs to user, it returns the expense, otherwise false
   def load_expense(id)
     @user.expenses.find_by(id: id)
   end

@@ -1,12 +1,8 @@
-<!--
-<form data-remote data-turboboost id="changePassword" action="< %= update_admin_user_path %>" method="post">-->
-<!-- < %= hidden_field_tag :authenticity_token, form_authenticity_token %>
--->
 
 
 <h4 class="profile_subheading">Organization Name:</h4>
 
-<p class="profile_values"> Company Name comes here </p>
+<p class="profile_values"> <%= current_user.company_name %></p>
 
 
 <h4 class="profile_subheading">Address:</h4>
@@ -17,24 +13,29 @@
 
 <h4 class="profile_subheading">Name:</h4>
 
-<p class="profile_values"></p>
+<p class="profile_values"><%= current_user.name %></p>
 
 <h4 class="profile_subheading">Email:</h4>
 
-<p class="profile_values"></p>
+<p class="profile_values"><%= current_user.email %></p>
 
 <!--<h4 id="profile_subheading">Mobile:</h4>-->
 <!--<input class="profile_values form-control" name="user[number]" value="">-->
 
 <!--<input type="submit" class="abaButton" id="save_button" value="Update">-->
 
+<% if @manager %>
+
 <h4 class="profile_subheading">Reporting manager:</h4>
 
-<p class="profile_values"></p>
+<p class="profile_values"><%= @manager.name %></p>
+
+<% else %>
 
 <h4 class="profile_subheading">Reporting manager:</h4>
 
 <p class="profile_values"> No Reporting Manager. [ Submitted reports will be auto-approved ] </p>
-<!--
-</form>-->
+
+<% end %>
+
 <hr style="margin-top: 20px">

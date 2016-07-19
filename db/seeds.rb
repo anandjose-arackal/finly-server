@@ -123,6 +123,7 @@ if User.count == 0
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
   end
 
+
   m[0].team_mapping.default.update_attributes(approves_to_user: m[1])
   m[0].team_mapping.build(approves_to_user: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
   u[0].team_mapping.build(manager: m[3], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save

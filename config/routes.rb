@@ -61,7 +61,6 @@ Rails.application.routes.draw do
 
   get 'policy' => 'organization_account#policy', as: :policy
 
-  get 'user_profile' => 'user_profile#user_profile'
 
   get 'people' => 'people#people'
 
@@ -76,6 +75,10 @@ Rails.application.routes.draw do
   get 'about', to: 'static_pages#about'
 
   get 'features', to: 'static_pages#features'
+
+  get 'users/profile', to: 'users#profile', as: :user_profile
+
+  post 'users/update_password', to: 'users#update_password', as: :update_user_password
 
   devise_for :users
 

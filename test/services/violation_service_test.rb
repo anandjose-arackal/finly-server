@@ -111,7 +111,7 @@ class ViolationServiceTest < ActiveSupport::TestCase
 
     # checking if the violations are now removed
     @violation_service.violations(@policy, @report)
-    
+
     ids = @report.expenses.pluck(:id)
     ids.each do |id|
       assert @violation_service.warning_messages[id]['budget_blocking'].empty?

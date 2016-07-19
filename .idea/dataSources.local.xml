@@ -3,20 +3,20 @@
   <component name="dataSourceStorageLocal">
     <data-source name="Rails Finly: development" uuid="fbab48e0-986c-4f79-be2a-402d3ef63553">
       <secret-storage>master_key</secret-storage>
-      <user-name>root</user-name>
+      <user-name>sreeram</user-name>
       <schema-pattern>finly_development.*</schema-pattern>
       <default-schemas>finly_development.*</default-schemas>
     </data-source>
     <data-source name="Rails Finly: test" uuid="06ce423d-14f0-43ba-9cbf-fcce2afb4b89">
-      <user-name>root</user-name>
-      <user-password>dfd9dfc7dfcbdfd8dfdedf98df98</user-password>
+      <user-name>sreeram</user-name>
+      <user-password>dfd9dfd8dfcfdfcfdfd8dfcbdfc7</user-password>
       <schema-pattern>finly_test.*</schema-pattern>
       <default-schemas>finly_test.*</default-schemas>
     </data-source>
     <data-source name="Rails Finly: production" uuid="026a6823-e71d-4004-9d70-b242a445cfa3">
       <first-sync>true</first-sync>
-      <user-name>Finly</user-name>
-      <user-password>df96df8fdf97df8adfefdfe4dffcdff1df8ddfecdfe3dfe4dfe6dff3dff5dfeedfebdffedfebdfe8dfebdff9dfefdff5dffadfebdff9dff9dffddfe5dff8dfeedf8ddff7df8adf8fdf94</user-password>
+      <user-name>sreeram</user-name>
+      <user-password>dfd9dfd8dfcfdfcfdfd8dfcbdfc7</user-password>
     </data-source>
   </component>
 </project>
