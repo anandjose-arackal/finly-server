@@ -1,0 +1,16 @@
+<% provide(:title, current_user.name) %>
+<% provide(:searchDiv, "reportPlaceholder") %>
+
+<% content_for :reports do %>
+    <% if @reports.present? %>
+        <% @reports.each do |report| %>
+            <%= render partial: 'report_row', locals: {report: report} %>
+        <% end %>
+    <% end %>
+    <% if @interacted_reports.present? %>
+        <% @interacted_reports.each do |report| %>
+            <%= render partial: 'report_row', locals: {report: report} %>
+        <% end %>
+    <% end %>
+<% end %>
+<%= render 'report_template' %>

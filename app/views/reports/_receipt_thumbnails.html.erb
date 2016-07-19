@@ -1,0 +1,13 @@
+<div style="display: inline;float: right;">
+  <input type="checkbox" id="reportFullPageToggleCheckbox"><label id="reportFullPageToggle" style="font-weight: 400;
+    margin-left: 10px;
+    font-size: 12px;">Include full page images in PDF</label></div>
+<div style="margin-top: 20px">
+  <% @expenses.each do |section| %>
+      <% section[:expenses].each do |expense| %>
+          <% unless (expense.receipts.blank? or expense.receipts.first.image.url == "/assets/original/missing.png") %>
+              <%= render partial: 'reports/thumbnails', locals: {expense: expense} %>
+          <% end %>
+      <% end %>
+  <% end %>
+</div>

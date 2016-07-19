@@ -62,20 +62,24 @@ class ReportCommentAction < ActiveRecord::Base
     13
   end
 
-  def self.expense_add_id
+  def self.report_detach_receipt_id
     14
   end
 
-  def self.expense_remove_id
+  def self.expense_add_id
     15
   end
 
-  def self.expense_reject_id
+  def self.expense_remove_id
     16
   end
 
-  def self.expense_update_id
+  def self.expense_reject_id
     17
+  end
+
+  def self.expense_update_id
+    18
   end
 
 end

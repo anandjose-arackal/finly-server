@@ -76,10 +76,11 @@ if ReportCommentAction.count == 0
   ReportCommentAction.create(id: 11, name: 'report_reimbursement_confirmed')
   ReportCommentAction.create(id: 12, name: 'report_closed')
   ReportCommentAction.create(id: 13, name: 'report_attach_receipt')
-  ReportCommentAction.create(id: 14, name: 'expense_add')
-  ReportCommentAction.create(id: 15, name: 'expense_remove')
-  ReportCommentAction.create(id: 16, name: 'expense_reject')
-  ReportCommentAction.create(id: 17, name: 'expense_update')
+  ReportCommentAction.create(id: 14, name: 'report_detach_receipt')
+  ReportCommentAction.create(id: 15, name: 'expense_add')
+  ReportCommentAction.create(id: 16, name: 'expense_remove')
+  ReportCommentAction.create(id: 17, name: 'expense_reject')
+  ReportCommentAction.create(id: 18, name: 'expense_update')
 end
 
 if Currency.count == 0
@@ -98,9 +99,9 @@ else
 end
 
 if c.categories.count ==
-  10.times do |i|
-    cat = c.categories.create!(name: "Test category #{i+1}")
-  end
+    10.times do |i|
+      cat = c.categories.create!(name: "Test category #{i+1}")
+    end
 end
 
 if User.count == 0
@@ -131,6 +132,10 @@ if User.count == 0
   fm[0].team_mapping.default.update_attributes(approves_finance_to_user: fm[1])
   fm[0].team_mapping.build(approves_finance_to_user: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
+
+  User.all.each do |user|
+    user.confirm
+  end
 end
 
 if Policy.non_default.count == 0
@@ -159,19 +164,19 @@ end
 
 if Expense.count == 0
   200.times do |i|
-    e = Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
-                       expense_status_id: 1,
-                       expense_type_id: 1,
-                       note: "test note #{i}",
-                       date: Date.today,
-                       user_id: random_integer(1, 10),
-                       category_id: 1,
-                       manual_expense_attributes: {merchant: "Test merchant #{random_integer(1, 10)}"})
+    Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
+                   expense_status_id: 1,
+                   expense_type_id: 1,
+                   note: "test note #{i}",
+                   date: Date.today,
+                   user_id: random_integer(1, 10),
+                   category_id: 1,
+                   manual_expense_attributes: {merchant: "Test merchant #{random_integer(1, 10)}"})
   end
 end
 
 if Receipt.count == 0
-  receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"),
+  receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
                            user_id: 1)
   receipt.parent = Expense.where(user_id: 1).where(expense_type_id: 1).first
   receipt.save
@@ -223,4 +228,42 @@ if PaymentType.count == 0
   PaymentType.create(id: 1, name: 'advance')
   PaymentType.create(id: 2, name: 'debt_clearance')
   PaymentType.create(id: 3, name: 'reimbursement')
+end
+
+if Report.count == 0
+  User.all.each do |user|
+    3.times.each do
+      report = ReportService.new(user: user).create
+      report_service = ReportService.new(user: user, report: report)
+      expense_service = ExpenseService.new(user)
+      expenses = []
+      expenses_ids = []
+      5.times.each do
+        e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name,
+                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1,
+                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                                         user_id: 1}]})
+        expenses << e
+        expenses_ids << e.id
+      end
+      report_service.add_expense(expenses_ids)
+    end
+    3.times.each do
+      report = ReportService.new(user: user).create
+      report_service = ReportService.new(user: user, report: report)
+      expense_service = ExpenseService.new(user)
+      expenses = []
+      expenses_ids = []
+      5.times.each do
+        e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name,
+                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1,
+                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                                         user_id: 1}]})
+        expenses << e
+        expenses_ids << e.id
+      end
+      report_service.add_expense(expenses_ids)
+      report_service.submit
+    end
+  end
 end

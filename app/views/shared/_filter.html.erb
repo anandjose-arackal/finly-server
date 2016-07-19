@@ -1,0 +1,331 @@
+<ul id="firstList">
+  <li class="firstListItem">
+    <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Filter</a>
+  </li>
+
+  <% if params["filter_date"].blank? || (params["filter_date"]["from"].blank? && params["filter_date"]["to"].blank?) || params["filter_date"]["type"].blank? %>
+      <li><a id="dates" href="#" data-turbolinks="false">Dates</a></li>
+  <% end %>
+  <% if params["filter_status"].blank? && !is_personal_view %>
+      <li><a id="status" href="#" data-turbolinks="false">Status</a></li>
+  <% end %>
+  <% if params["filter_amount"].blank? || params["filter_amount"]["value"].blank? %>
+      <li><a id="amount" href="#" data-turbolinks="false">Amount</a></li>
+  <% end %>
+  <% if is_admin_view %>
+      <% if params["filter_user_id"].blank? %>
+          <li><a id="user" href="#" data-turbolinks="false">User</a></li>
+      <% end %>
+      <% if params["filter_manager_id"].blank? %>
+          <li><a id="manager" href="#" data-turbolinks="false">Manager</a></li>
+      <% end %>
+  <% end %>
+  <% if params["filter_merchant"].blank? %>
+      <li><a id="merchant" href="#" data-turbolinks="false">Merchant</a></li>
+  <% end %>
+  <% if params["filter_category_id"].blank? %>
+      <li><a id="category" href="#" data-turbolinks="false">Category</a></li>
+  <% end %>
+  <% if params["filter_receipt"].blank? %>
+      <li><a id="receipt" href="#" data-turbolinks="false">Receipt</a></li>
+  <% end %>
+  <% if params["filter_sort"].blank? || params["filter_sort"]["sort_by"].blank? %>
+      <li><a id="sortby" href="#" data-turbolinks="false">Sort By</a></li>
+  <% end %>
+
+
+</ul>
+
+
+<div id="subFilter">
+
+
+  <!-- Dates Filter -->
+  <% if params["filter_date"].blank? || (params["filter_date"]["from"].blank? && params["filter_date"]["to"].blank?) || params["filter_date"]["type"].blank? %>
+
+      <ul id="datesFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Dates</a>
+        </li>
+
+
+        <!-- TODO add ability to choose start date and end date -->
+
+        <p id="datesFilterPara2" class="filterText">
+          Range:</p>
+        <select id="datesFilterSelect" class="selectors" onchange="handleCustom(this)" name="filter_date[from]">
+          <option style="display:none" value="" selected="selected"></option>
+          <option value="<%= Date.today %>">Today</option>
+          <option value="<%= 2.days.ago.strftime("%Y/%m/%d") %>">Last two days</option>
+          <option value="<%= 1.week.ago.strftime("%Y/%m/%d") %>">This week</option>
+          <!-- todo custom dates for filters -->
+          <option value="custom">Custom</option>
+        </select>
+
+        <div id="customDatesSelector" hidden="hidden">
+          <p id="datesFilterPara2" class="filterText">
+            From:</p>
+          <input type="date" id="customDatesSelectorFrom"  class="selectors" style="padding-left: 0px; padding-right: 0px" placeholder="Date from">
+
+          <p id="datesFilterPara2" class="filterText">
+            To:</p>
+          <input type="date" id="customDatesSelectorTo"  class="selectors" style="padding-left: 0px; padding-right: 0px;margin-bottom: 20px" placeholder="Date to">
+        </div>
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+      </ul>
+  <% end %>
+
+
+  <!-- Status Filter -->
+  <% if (params["filter_status"].blank? || params["filter_status"].blank?) && !is_personal_view %>
+      <ul id="statusFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Section</a>
+        </li>
+
+        <select name="filter_status" class="selectors" style=" margin-top: 15px;">
+          <option style="display:none" value="" selected="selected"></option>
+          <option value="1">Submitted</option>
+          <option value="2">Approved</option>
+          <option value="3">Declined</option>
+        </select>
+
+        <hr class="listDivider">
+
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+      </ul>
+  <% end %>
+
+  <!-- Amount Filter -->
+
+  <% if params["filter_amount"].blank? || params["filter_amount"]["value"].blank? %>
+      <ul id="amountFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Amount</a>
+        </li>
+
+        <select name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+          <option style="display:none" value="" selected="selected"></option>
+          <option value="lteq">Less Than</option>
+          <option value="eq">Equal To</option>
+          <option value="gteq">Greater Than</option>
+        </select>
+
+
+        <input type="text" name="filter_amount[value]" class=" filterInput" placeholder="0.00">
+
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+      </ul>
+  <% end %>
+
+  <!-- Merchant Filter  -->
+
+  <% if params["filter_merchant"].blank? || params["filter_merchant"].blank? %>
+      <ul id="merchantFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Merchant</a>
+        </li>
+        <div id="ui-widgetMerchant" style="padding-top: 12px">
+          <select id="combobox" name="filter_merchant">
+            <option value="" selected="selected">Select one...</option>
+            <% if @merchants %>
+                <% @merchants.each do |merchant| %>
+                    <option value="<%= merchant %>"><%= merchant %></option>
+                <% end %>
+            <% end %>
+          </select>
+        </div>
+
+        <hr class="listDivider">
+
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+        </li>
+
+      </ul>
+
+  <% end %>
+
+  <!-- Category Filter  -->
+
+  <% if params["filter_category_id"].blank? || params["filter_category_id"].blank? %>
+      <ul id="categoryFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Category</a>
+        </li>
+
+        <p id="categoryFilterPara1" class="filterText"> Select Category:</p>
+
+        <select name="filter_category_id" class="selectors" style="padding-top: 10px">
+          <option style="display:none" value="" selected="selected"></option>
+  <!--        < % @categories.each do |cat| %>
+              <option value="< %= cat.id %>">< %= cat.name %></option>
+          < % end %>-->
+        </select>
+
+        <hr class="listDivider">
+
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+
+      </ul>
+  <% end %>
+
+  <!-- Receipt Filter  -->
+
+  <% if params["filter_receipt"].blank? || params["filter_receipt"].blank? %>
+      <ul id="receiptFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Receipt</a>
+        </li>
+        <select name="filter_receipt" class="selectors" style=" margin-top: 15px;">
+          <option style="display:none" value="" selected="selected"></option>
+          <option value="present">Has Receipt</option>
+          <option value="nil">No Receipt</option>
+        </select>
+
+        <hr class="listDivider">
+
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+      </ul>
+  <% end %>
+
+  <!-- Sort By -->
+
+  <% if params["filter_sort"].blank? || params["filter_sort"]["sort_by"].blank? %>
+      <ul id="sortFilterList" class="filterList">
+        <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+          <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Sort
+          By</a>
+        </li>
+
+        <p id="sortFilterPara1" class="filterText"> Attribute:</p>
+        <select class="selectors" style="padding: 0px" name="filter_sort[sort_by]">
+          <option style="display:none" value="" selected="selected"></option>
+          <option value="date">Expense</option>
+          <option value="created_at">Submission</option>
+        </select>
+
+        <p id="sortFilterPara2" class="filterText">
+          Range:</p>
+        <select id="sortFilterSelect" name="filter_sort[order]" class="selectors">
+          <option style="display:none" value="" selected="selected"></option>
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
+
+        <hr class="listDivider" style="padding-top: 0;margin-top: 0">
+
+        <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+      </ul>
+  <% end %>
+
+
+  <!-- User Filter  -->
+
+  <% if is_admin_view %>
+
+      <% if params["filter_user_id"].blank? || params["filter_user_id"].blank? %>
+          <ul id="userFilterList" class="filterList">
+            <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+              <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">User</a>
+            </li>
+
+            <div id="ui-widgetUser" class="filterInput" style="padding-top: 12px">
+              <select id="combobox2" name="filter_user_id">
+                <option value="" selected="selected">Select user...</option>
+                <% @users.each do |user| %>
+                    <option value="<%= user.id %>"><%= user.name %></option>
+                <% end %>
+              </select>
+            </div>
+
+            <hr class="listDivider">
+
+            <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+          </ul>
+      <% end %>
+  <% end %>
+
+
+
+  <!-- Manager Filter  -->
+
+  <% if is_admin_view %>
+
+      <% if params["filter_manager_id"].blank? || params["filter_manager_id"].blank? %>
+
+          <ul id="managerFilterList" class="filterList">
+            <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
+              <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Manager</a>
+            </li>
+            <div id="ui-widgetManager" style="padding-top: 12px">
+              <select id="combobox3" name="filter_manager_id">
+                <option value="" selected="selected">Select user...</option>
+                <% @managers.each do |manager| %>
+                    <option value="<%= manager.id %>"><%= manager.name %></option>
+                <% end %>
+              </select>
+            </div>
+
+            <hr class="listDivider">
+
+            <input type="submit" class="abaButton" id="applyFiltersBtn" value="Apply Filter">
+
+          </ul>
+      <% end %>
+
+  <% end %>
+
+
+</div>
+
+
+<style>
+
+  #ui-widgetUser .custom-combobox-input {
+    background: white;
+  !important;
+    background-color: white;
+  !important;
+    width: 135px;
+    height: 38px;
+    margin-left: -17px;
+    padding: 10px 16px;
+    border-radius: 1px;
+    text-indent: 5px;
+  }
+
+  #ui-widgetManager .custom-combobox-input, #ui-widgetMerchant .custom-combobox-input {
+    background: white;
+  !important;
+    background-color: white;
+  !important;
+    width: 135px;
+    height: 38px;
+    margin-left: 17px;
+    padding: 10px 16px;
+    border-radius: 1px;
+    text-indent: 5px;
+  }
+
+
+</style>
+<script>
+  function handleCustom(element) {
+    if (element.value == 'custom') {
+      $('#customDatesSelector').show();
+      $('#customDatesSelectorFrom').attr('name','filter_date[from]');
+      $('#customDatesSelectorTo').attr('name','filter_date[to]')
+    } else {
+      $('#customDatesSelectorFrom').attr('name',null);
+      $('#customDatesSelectorTo').attr('name',null)
+      $('#customDatesSelector').hide();
+    }
+  }
+</script>

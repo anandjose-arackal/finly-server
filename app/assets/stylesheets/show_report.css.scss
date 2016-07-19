@@ -33,10 +33,6 @@
     font-weight: 500;
   }
 
-  #cancelBtn {
-    margin-right: 9.5%;
-    border-radius: 1px;
-  }
 
   .righButtons {
     color: white;
@@ -206,5 +202,16 @@
     color: #999;
   }
 
+
+  .grey-button{
+    height: 34px;
+    margin: 18px 60px 0 0;
+    color: #999;
+    float: right;
+    padding: 0 26px;
+    letter-spacing: 1px;
+    font-weight: 500;
+    border-radius: 1px;
+  }
 
 }

@@ -15,6 +15,21 @@ class ReportService < BaseService
 
   end
 
+  def user_role_for_report
+    return nil unless validate controlling_user: true
+    user = report.controlling_for_user
+    user = report.controlling_user if user.blank?
+    uts = UserTeamService.new(user)
+    if user.id == report.user.id
+      return UserRole.employee_id
+    end
+    if user.manager? and uts.manager_for?(report)
+      return UserRole.manager_id
+    elsif user.finance_manager? and uts.finance_manager_for?(report)
+      return UserRole.finance_manager_id
+    end
+  end
+
   def next_reviewer_for_report
     return false unless validate controlling_user: true
     user = report.controlling_for_user
@@ -140,9 +155,7 @@ class ReportService < BaseService
     end
     manager_id = nil
     manager_id = manager.id if manager.present?
-    if manager_id.blank?
-
-    end
+    user_role = user_role_for_report
     # # If reimbursable expenses are present
     # if manager_id.blank? and report.is_reimbursable? and UserTeamService.new(user).finance_manager_for?(report)
     #   manager_id = user.id
@@ -153,7 +166,8 @@ class ReportService < BaseService
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
       else
         comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_approve_id
-        track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status
+        track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status,
+                                    user_report_role_id: user_role
       end
       track.save
       comment.save
@@ -202,7 +216,8 @@ class ReportService < BaseService
     if report.update_attributes report_status_id: status, controlling_user_id: to_user.id, controlling_for_user_id: nil, memo: memo
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: memo
       track.save
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: to_user.id, content: memo
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: to_user.id, content: memo,
+                                      user_report_role_id: UserRole.employee_id
       comment.save
       # Reset expenses status to unsubmitted if report is rejected
       if status == ReportStatus.rejected_id
@@ -258,7 +273,7 @@ class ReportService < BaseService
       return false
     end
     # Mark the controlling user as the reports owner so he can mark the report as payment_received
-    if report.update(reimbursement: payment, report_status_id: ReportStatus.reimbursed_id, controlling_user: report.user, controlling_for_user:nil)
+    if report.update(reimbursement: payment, report_status_id: ReportStatus.reimbursed_id, controlling_user: report.user, controlling_for_user: nil)
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id,
                                   report_status_id: ReportStatus.reimbursed_id, payment: payment
       track.save
@@ -570,11 +585,11 @@ class ReportService < BaseService
   def comment(content)
     return false unless validate require_report: true, require_user: true
     return true if content.blank?
-    ReportComment comment = report.comments.build(report_comment_action_id: ReportCommentAction.report_comment_id, user_id: user.id, content: content)
+    comment = report.comments.build(report_comment_action_id: ReportCommentAction.report_comment_id, user_id: user.id, content: content)
     if comment.save
       return true
     end
-    errors << comment.errors.full_messages
+    self.errors = comment.errors.full_messages
     false
   end
 

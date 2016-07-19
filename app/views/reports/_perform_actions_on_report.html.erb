@@ -1,0 +1,57 @@
+<% if is_personal_view %>
+    <% if @report.open? || @report.retracted? %>
+
+        <button class="righButtons" style="margin-left: 10px; margin-top: 2px;" onclick="showNewExpense()"> ADD NEW
+          EXPENSE
+        </button>
+
+        <div>
+          <button class="righButtons" onclick="showExistingExpensesModal()" style="margin-left: 10px"> ADD EXISTING
+            EXPENSE
+          </button>
+        </div>
+    <% end %>
+    <% if @report.processing? %>
+        <form data-remote data-turboboost data-confirm="Are you sure you want to retract this report?" action="<%= report_retract_path(@report, view: params[:view]) %>" method="post">
+          <input name="_method" type="hidden" value="patch"/>
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          <button type="submit" class="righButtons" style="margin-left: 10px"> RETRACT REPORT
+          </button>
+        </form>
+    <% end %>
+
+    <div>
+      <button onclick="location.href='<%= ej report_export_path(@report, view: params[:view])%>.csv'" class="righButtons" style="margin-left: 10px">
+        EXPORT CSV
+      </button>
+    </div>
+
+    <div>
+      <button onclick="location.href='<%= ej report_export_path(@report, view: params[:view])%>.pdf'" class="righButtons" style="margin-left: 10px">
+        EXPORT PDF
+      </button>
+    </div>
+    <% if @report.open? %>
+        <div>
+          <form data-remote data-turboboost data-confirm="Are you sure you want to delete this report? No expense will be deleted in the process." action="<%= report_path(@report, view: params[:view]) %>" method="post">
+            <input name="_method" type="hidden" value="delete"/>
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <button type="submit" class="righButtons" style="margin-left: 10px">DELETE</button>
+          </form>
+        </div>
+    <% end %>
+<% else %>
+    <div>
+      <button onclick="location.href='<%= ej report_export_path(@report, view: params[:view])%>.csv'" class="righButtons" style="margin-left: 10px;
+          margin-top: 2px; width: 155px">
+        EXPORT CSV
+      </button>
+    </div>
+
+    <div>
+      <button onclick="location.href='<%= ej report_export_path(@report, view: params[:view])%>.pdf'" class="righButtons" style="margin-left: 10px;
+          margin-top: 10px;width: 155px">
+        EXPORT PDF
+      </button>
+    </div>
+<% end %>

@@ -30,7 +30,8 @@ class Expense < ActiveRecord::Base
 
   has_one :manual_expense, dependent: :destroy
 
-  accepts_nested_attributes_for :amount, :expense_status, :expense_type, :manual_expense
+  accepts_nested_attributes_for :amount, :manual_expense
+  accepts_nested_attributes_for :receipts
 
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
@@ -41,7 +42,9 @@ class Expense < ActiveRecord::Base
   scope :with_id, ->(ids) { where id: ids }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
-  scope :sort_latest_first, -> { order 'date DESC' }
+  scope :sort_date_desc, -> { order 'date DESC' }
+  scope :sort_date_asc, -> { order 'date ASC' }
+  scope :with_category, ->(category_id) { where category_id: category_id }
 
   delegate :category_name, to: :category
 

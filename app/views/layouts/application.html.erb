@@ -16,3 +16,102 @@
 
 </body>
 </html>
+
+
+<script>
+
+  var formDisabled = false;
+  var disabledTimer;
+  var clickDisabled = false;
+  var clickTimer;
+
+  $(document).ready(function () {
+
+    formDisabled = false;
+    $(".alert").delay(6000).fadeOut(2000);
+    Turboboost.handleFormDisabling = false;
+
+    $("input:submit").on('click', function (e) {
+      disableClick(e);
+    });
+
+    $("button").on('click', function (e) {
+      disableClick(e);
+    });
+
+    function disableClick(e) {
+      if (clickDisabled) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+      clickDisabled = true;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(doneClicking, 300);
+    }
+
+    function doneClicking() {
+      clickDisabled = false;
+    }
+
+    $('form').on('submit', function (e) {
+      console.log('disabledCheck: ' + formDisabled);
+      if (formDisabled) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+      formDisabled = true;
+      clearTimeout(disabledTimer);
+      disabledTimer = setTimeout(enableForm, 10000);
+    });
+
+    function enableForm() {
+      console.log('disabledCheck: auto-enabling form after 10seconds');
+      formDisabled = false;
+    }
+
+    $(document).on("turboboost:success", function (e, flash) {
+      formDisabled = false;
+      if (flash != null && flash != undefined) {
+        var dynamicFlashContainer = document.getElementById("dynamicFlashContainer");
+        while (dynamicFlashContainer.firstChild) {
+          dynamicFlashContainer.removeChild(dynamicFlashContainer.firstChild);
+        }
+        for (var key in flash) {
+          if (flash.hasOwnProperty(key)) {
+            var value = flash[key];
+            var clone = null;
+            var itm = null;
+            if (value == 'failure') {
+              itm = document.getElementById("dynamic_flash_failure");
+              clone = itm.cloneNode(true);
+            } else {
+              itm = document.getElementById("dynamic_flash_success");
+              clone = itm.cloneNode(true);
+            }
+            clone.hidden = null;
+            clone.appendChild(document.createTextNode(value));
+            $(clone).delay(6000).fadeOut(2000);
+            dynamicFlashContainer.appendChild(clone);
+          }
+        }
+        $(dynamicFlashContainer).show();
+      }
+    });
+
+    $(document).on("turboboost:error", function (e, flash) {
+      formDisabled = false;
+    });
+
+  });
+
+  function closeConfirmModal() {
+    formDisabled = false;
+    $('#confirmationModal').modal('hide');
+  }
+
+  function closeAllFlash(element) {
+    $(element).parent().hide();
+  }
+
+</script>

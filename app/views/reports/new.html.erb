@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<% provide(:title, "New Report") %>
+<body style="padding: 0; background-color: #f5f6f9">
+<div id="newReport">
+  <div style="height: 70px; background-color: white;">
+
+    <p style="color: #a0a0a0; font-weight: 500; display: inline-block;vertical-align: middle; line-height: 70px;margin-left: 9.5%;letter-spacing: 1px ">
+      NEW REPORT </p>
+
+    <button onclick="" id="cancelBtn">Cancel</button>
+
+    <button id="sendBtn">Send</button>
+    <button id="markAsClosedBtn">Mark As Closed</button>
+
+  </div>
+
+</div>
+
+<div style="float: left;background-color: white; width: 70%;margin-left: 7%; margin-top: 20px;padding: 30px;border: 1px solid #ddd;box-shadow: 0 1px 5px 0 rgba(0,0,0,.065)">
+  <button style="background-color: #374F76; border-radius: 18px; color: white; padding: 4px 23px 4px 23px; font-size: 12px; border-color: transparent">
+    Open
+  </button>
+  <label style="margin-left: 20px">ID: </label> <span>23232</span>
+
+  <div>
+    <h3 id="header" style="font-weight: 300;color: #00A5D5;font-size: 22px; float: left">New Expense Rep - 14 Apr
+      2016</h3>
+    <span class="fa fa-pencil" style="margin: 24px 0 0 15px;color: #00A5D5;font-size: 13px" onclick="makeHeaderEditable()"></span>
+
+    <hr>
+
+    <div>
+      <label style="font-weight: 400; width: 90px">To:</label><span style="font-weight: bold">   -- </span>
+    </div>
+    <div>
+      <label style="font-weight: 400;width: 90px">From:</label><span style="font-weight: bold"> myemailid@yours.com </span>
+    </div>
+    <div>
+      <label style="font-weight: 400;width: 90px">Dates:</label><span style="font-weight: bold"> -- </span>
+    </div>
+
+
+    <div style="text-align: center;display: none">
+
+      <i class="fa fa-sticky-note-o" style="font-size: 100px; opacity: 0.4; margin-top: 50px " aria-hidden="true"></i>
+      <p style="margin: 0; font-size: 17px;color: #5d6e73 "> No Expenses yet</p>
+      <p style="color: #5d6e73"> You can add some using the buttons on the right</p>
+
+    </div>
+
+    <div>
+
+      <hr>
+
+      <h6>Category Name</h6>
+
+      <hr>
+
+      <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8" >
+        <div class="col-md-3"> DATE</div>
+        <div class="col-md-5"> MERCHANT</div>
+        <div class="col-md-2"> EXPENSE</div>
+        <div class="col-md-2"> TOTAL</div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-1">
+          <span class="fa fa-close"></span>
+        </div>
+        <div class="col-md-1"><span class="fa fa-edit"></span>
+        </div>
+        <div class="col-md-1">12th Apr 1990
+        </div>
+        <div class="col-md-5"> Wesen Hotels</div>
+        <div class="col-md-2"> 245</div>
+        <div class="col-md-2"> 245</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div style="margin-left: 10px; margin-top: 20px ">
+  <button class="righButtons" style="margin-left: 10px; margin-top: 2px"> ADD NEW EXPENSE</button>
+  <div>
+    <button class="righButtons" style="margin-left: 10px"> ADD EXISTING EXPENSE</button>
+  </div>
+  <div>
+    <button class="righButtons" style="margin-left: 10px"> DELETE</button>
+  </div>
+</div>
+<body>
+
+<script>
+
+  function makeHeaderEditable() {
+
+  }
+
+</script>
+
+<style>
+
+  .topbarContainer {
+    visibility: hidden;
+  }
+
+  #markAsClosedBtn, #sendBtn {
+    color: #fff;
+    background-color: #93c178;
+    line-height: 32px;
+    margin-top: 18px;
+    margin-right: 2.5%;
+    height: 34px;
+    padding: 0 26px;
+    border-radius: 1px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    border-style: none;
+    float: right;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  #cancelBtn {
+    margin-right: 9.5%;
+    border-radius: 1px;
+  }
+
+  .righButtons {
+    color: white;
+    padding: 6px 8px 6px 8px;
+    width: 185px;
+    background-color: #8394AE;
+    border: 1px solid transparent;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-top: 7px;
+  }
+
+
+</style>

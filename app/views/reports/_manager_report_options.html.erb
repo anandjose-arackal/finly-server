@@ -1,0 +1,30 @@
+<div id="manager_report_options_div">
+  <% unless is_personal_view %>
+      <% if @report.processing? && !@block_violations %>
+          <form data-confirm="Are you sure you want to approve the report?" data-remote data-turboboost action="<%= report_approve_path(@report, view: params[:view]) %>" method="post">
+            <input name="_method" type="hidden" value="patch"/>
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <button id="approveAllButton" class="righButtons" type="submit" style="margin-left: 10px;width: 155px">APPROVE
+              REPORT
+            </button>
+          </form>
+      <% end %>
+      <% if @report.approved? %>
+          <button form="reopenReportAdminForm" class="righButtons" type="submit" style="margin-left: 10px;width: 155px ">UNAPPROVE
+            REPORT
+          </button>
+          <form data-remote data-turboboost data-confirm="Are you sure you want to unapprove this report?" id="reopenReportAdminForm" action="<%= report_unapprove_path(@report, view: params[:view]) %>" method="post">
+            <input name="_method" type="hidden" value="patch"/>
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          </form>
+      <% elsif @report.processing? %>
+          <button form="closeReportAdminForm" class="righButtons" type="submit" style="margin-left: 10px;width: 155px ">REJECT
+            REPORT
+          </button>
+          <form data-remote data-turboboost data-confirm="Are you sure you want to reject this report?" id="closeReportAdminForm" action="<%= report_reject_path(@report, view: params[:view]) %>" method="post">
+            <input name="_method" type="hidden" value="patch"/>
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          </form>
+      <% end %>
+  <% end %>
+</div>

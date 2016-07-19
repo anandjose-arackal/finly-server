@@ -1,0 +1,33 @@
+<div id="reportExpenseReviewButtons<%= expense.id %>">
+
+   <button id="approveButton<%= expense.id %>" onclick="showDenyModal(<%=expense.id%>)" type="submit" class=" btn"> Reject</button>
+
+</div>
+
+<style>
+
+  .active {
+    background-color: #93c178 !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  .inactive {
+    background-color: indianred !important;
+    color: white !important;
+    border: none !important;
+    margin-top: 5px;
+  }
+
+  .btn {
+    width: 85px;
+    border-radius: 1px;
+    font-size: 11px;
+    background-color: #f9f9f9;
+    border: 1px solid #dfdfdf;
+    color: #999;
+    outline: white;
+    cursor: default;
+  }
+
+</style>

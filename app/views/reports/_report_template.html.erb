@@ -2,15 +2,15 @@
 
 <%= render 'shared/lower_header' %>
 
-<!--<form data-remote data-turboboost id="allReportsFilters" action="" method="get">
-  &lt;!&ndash; applied filters &ndash;&gt;
+<form data-remote data-turboboost id="allReportsFilters" action="" method="get">
+  <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
-    < % param = get_old_filters(params, 2) # i.e get filters for expenses  %>
-    < % param.each do |item| %>
-        < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
-    < % end %>
+    <% param = get_old_filters(params, 2) # i.e get filters for expenses    %>
+    <% param.each do |item| %>
+        <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+    <% end %>
   </div>
-</form>-->
+</form>
 
 <div class="row" style="margin-top: 120px; padding-left: 20%; padding-right: 12.5%; margin-bottom: 40px">
 
@@ -21,33 +21,32 @@
       <div style="background-color: white">
 
         <div class="row" style="background-color: white;border-bottom: 2px solid #d8d8d8;">
-        <!--  < % path = admin_company_users_path if is_admin_view %>
-          < % path = admin_users_path if is_manager_view %>
-          <form data-remote data-turboboost action="< %= path %>" method="get">
-            < % params.each do |key, value| %>
-                < % if key.start_with?('filter') && key != 'filter_search' %>
-                    <input type="text" hidden="hidden" name="< %= key %>" value="< %= value %>">
-                < % end %>
-            < % end %>
+          <form data-remote data-turboboost action="<%= reports_path %>" method="get">
+            <% params.each do |key, value| %>
+                <% if key.start_with?('filter') && key != 'filter_search' %>
+                    <input type="text" hidden="hidden" name="<%= key %>" value="<%= value %>">
+                <% end %>
+            <% end %>
 
-          </form>-->
+          </form>
         </div>
       </div>
-      <!--<div id="my-posts">
-        < %= yield :reports %>
+      <div id="my-posts">
+        <%= yield :reports %>
       </div>
       <div id="infinite-scrolling" style="display: none">
-        < %= will_paginate @reports if @reports.present? %>
-      </div>-->
+        <%= will_paginate @reports if @reports.present? %>
+      </div>
 
 
       <!-- DELETE THIS AFTER TEST -->
-      <div id="reportRow" class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px;cursor: pointer; " onclick="location.href = <%= show_report_url %>">
+      <!--<div id="reportRow" class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px;cursor: pointer; " onclick="location.href = < %= show_report_url %>">
         <div class="col-md-2" style="margin-top: 6px;"><img style="max-width: 35px;
             margin-left: 10px;
-            color: #6B7EA6;" aria-hidden="true" src="<%= asset_path 'report.png' %>"/></div>
+            color: #6B7EA6;" aria-hidden="true" src="< %= asset_path 'report.png' %>"/></div>
         <div class="col-md-6" style="margin-left: -25px">
-              <p userTarget="reportname" style="line-height: 80%;font-weight: 300; margin-top: 5px;font-size: 13px;font-weight: 600;">RePoRt That IS to BE Deleted</p>
+          <p userTarget="reportname" style="line-height: 80%;font-weight: 300; margin-top: 5px;font-size: 13px;font-weight: 600;">RePoRt
+            That IS to BE Deleted</p>
 
           <i style="font-size: 10px; text-align: center;
               border-radius: 30px;
@@ -67,11 +66,11 @@
         </div>
 
 
-      </div>
+      </div>-->
 
       <script>
 
-        function changeBackground(element){
+        function changeBackground(element) {
           $(element).css('background-color', 'rgb(255, 255, 187)');
         }
 
@@ -82,17 +81,18 @@
 
   </div>
   <div class="col-sm-4">
-    <form data-remote data-turboboost action="" method="post">
-      <input name="authenticity_token" value="" hidden="hidden">
-     <!-- < % if is_personal_view %>
-     -->     <button class="invite" type="submit">
-            CREATE NEW REPORT
-          </button>
-  <!--    < % end %>
-  -->  </form>
+    <form data-remote data-turboboost action="<%= reports_path(view: params[:view]) %>" method="post">
+      <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+      <!-- < % if is_personal_view %>
+      -->
+      <button class="invite" type="submit">
+        CREATE NEW REPORT
+      </button>
+      <!--    < % end %>
+      -->  </form>
 
-  <!--  <div class="navblock" style=" < % unless is_personal_view %> margin-top: 0
-      < % end %>">-->
+    <!--  <div class="navblock" style=" < % unless is_personal_view %> margin-top: 0
+        < % end %>">-->
     <div class="navblock" style="margin-top: 0">
       <p class="listHeaders">Date Submitted</p>
 
@@ -110,28 +110,28 @@
     <div class="navblock">
       <p class="listHeaders">STATUS</p>
 
- <!--     < % if is_personal_view %>
-          <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
-            <span class="listOptionsNumbers">< %= @unsubmitted_count %></span>
-          </div>
-      < % end %>-->
+      <!--     < % if is_personal_view %>
+               <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
+                 <span class="listOptionsNumbers">< %= @unsubmitted_count %></span>
+               </div>
+           < % end %>-->
       <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
-        <span class="listOptionsNumbers"><%=  %></span>
+        <span class="listOptionsNumbers"><%= %></span>
       </div>
       <div class="listOptions" id="submittedReportsSelector" onclick="reloadPageWithStatus(1)"> Submitted
-        <span class="listOptionsNumbers"><%=  %></span>
+        <span class="listOptionsNumbers"><%= %></span>
       </div>
       <div class="listOptions" id="approvedReportsSelector" onclick="reloadPageWithStatus(2)"> Approved
-        <span class="listOptionsNumbers"><%=  %></span>
+        <span class="listOptionsNumbers"><%= %></span>
       </div>
       <div class="listOptions" id="rejectedReportsSelector" onclick="reloadPageWithStatus(3)"> Rejected
         <span class="listOptionsNumbers"><%= %></span>
       </div>
       <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(4)"> Retracted
-        <span class="listOptionsNumbers"><%=  %></span>
+        <span class="listOptionsNumbers"><%= %></span>
       </div>
       <div class="listOptions" id="allReportsSelector" onclick="reloadPageWithStatus(null)"> All
-        <span class="listOptionsNumbers"><%=  %></span>
+        <span class="listOptionsNumbers"><%= %></span>
       </div>
     </div>
 
@@ -144,25 +144,25 @@
 <script>
 
   $(document).ready(function () {
-/*
+    /*
 
-    < % if  params[:filter_status] == "0"%>
-    $('#unsubmittedReportsSelector').css("background", "#FFFFBB")
-    $('#headerTitle').text('UNSUBMITTED');
-    < % elsif   params[:filter_status] == "1"%>
-    $('#submittedReportsSelector').css("background", "#FFFFBB")
-    $('#headerTitle').text('SUBMITTED');
-    < % elsif   params[:filter_status] == "2"%>
-    $('#closedReportsSelector').css("background", "#FFFFBB")
-    $('#headerTitle').text('CLOSED');
-    < % elsif   params[:filter_status] == "3"%>
-    $('#reopenedReportsSelector').css("background", "#FFFFBB")
-    $('#headerTitle').text('REOPENED');
-    < % else %>
-    $('#headerTitle').text('ALL');
-    $('#allReportsSelector').css("background", "#FFFFBB")
-    < % end %>
-*/
+     < % if  params[:filter_status] == "0"%>
+     $('#unsubmittedReportsSelector').css("background", "#FFFFBB")
+     $('#headerTitle').text('UNSUBMITTED');
+     < % elsif   params[:filter_status] == "1"%>
+     $('#submittedReportsSelector').css("background", "#FFFFBB")
+     $('#headerTitle').text('SUBMITTED');
+     < % elsif   params[:filter_status] == "2"%>
+     $('#closedReportsSelector').css("background", "#FFFFBB")
+     $('#headerTitle').text('CLOSED');
+     < % elsif   params[:filter_status] == "3"%>
+     $('#reopenedReportsSelector').css("background", "#FFFFBB")
+     $('#headerTitle').text('REOPENED');
+     < % else %>
+     $('#headerTitle').text('ALL');
+     $('#allReportsSelector').css("background", "#FFFFBB")
+     < % end %>
+     */
 
 
   });
@@ -195,8 +195,8 @@
   }
 
   function loadNewReport() {
- /*   Turbolinks.visit("< %= new_user_report_path(current_user) %>")
- */
+    /*   Turbolinks.visit("< %= new_user_report_path(current_user) %>")
+     */
 
   }
 

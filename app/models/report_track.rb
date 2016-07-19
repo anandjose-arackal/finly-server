@@ -7,6 +7,7 @@
 #  action_user_id            :integer
 #  report_tracking_action_id :integer
 #  report_status_id          :integer          not null
+#  user_report_role_id       :integer
 #  memo                      :string(255)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
@@ -19,10 +20,15 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :tracking_action, class_name: 'ReportTrackingAction'
   belongs_to :action_user, class_name: 'User'
   belongs_to :payment
+  belongs_to :user_report_role, class_name: 'UserRole'
 
   default_scope { order('created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
   scope :without_take_control_action, -> { where.not report_tracking_action_id: ReportTrackingAction.take_control_id }
+  scope :manager_role, -> { where user_report_role_id: UserRole.manager_id }
+  scope :finance_manager_role, -> { where user_report_role_id: UserRole.finance_manager_id }
+  scope :admin, -> { where user_report_role_id: UserRole.admin_id }
+  scope :owner, -> { where user_report_role_id: UserRole.employee_id }
 
 end

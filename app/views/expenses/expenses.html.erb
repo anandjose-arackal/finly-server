@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<!--
+
+< % provide(:title, current_user.name) %>
+< % @path_expenses = user_expenses_path(current_user) %>
+-->
+
+<body id="expenses">
+
+<%= render 'shared/lower_header' %>
+<form data-remote data-turboboost id="allFilters" action="<%= @path_expenses %>" method="get">
+  <!-- search bar -->
+  <div id="showPreviousFilters">
+    <!-- < % param = get_old_filters(params, 1) %>
+     < % param.each do |item| %>
+         < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+     < % end %>-->
+  </div>
+  <%= render 'shared/filter' %>
+</form>
+
+
+<% if param.blank? && @expenses.blank? %>
+    <div id="noexpensesview" style="margin-top: 22%">
+
+      <img id="emptyPlaceholderImage" src="<%= asset_path 'checkbox-multiple-blank.png' %>" alt="No Expenses">
+
+      <p id="emptyPlaceholder">Welcome to Finly! <br>
+        Looks like there aren't any pending expenses.</p>
+
+    </div>
+
+<% else %>
+    <div class="row" style="border-bottom: none">
+      <div id="centerBlockOfExpenses">
+        <div class="txSubListHeader" style="/*position: fixed;
+            width: 500px;
+            z-index: 2;*/">
+          <% if is_personal_view %>   <input type="checkbox" id="checkAll" style="margin-right: 4px">
+          <% end %>
+          <h3 id="pendingExpensesHeader" style="color: #2B4072" tooltip="These expenses are awaiting approval by an admin" tooltip-placement="top">
+            Expenses
+            <span class="ng-binding">[<%= @counts %>]</span>
+          </h3>
+
+          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= user_reports_path(current_user) %>" method="post">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <input id="createReportExpenseIds" name="expense_id" type="text">
+          </form>
+          <button onclick="createReportFromSelectedExpenses();" id="createReport" onclick="">CREATE REPORT
+          </button>
+        </div>
+        <div id="centerListOfExpenses" class="txtListItems" style="/*margin-top: 40px*/">
+
+          <%= render @expenses unless @expenses.blank? %>
+
+        </div>
+
+      </div>
+
+      <div id="detailsOfExpense" style="background-color: transparent; border: none; border-top: 1px solid #d8d8d8; border-bottom: 1px solid #d8d8d8" class="scrollbar">
+        <div style="background-color: white; border: 1px solid #d8d8d8; border-top: none">
+          <div id="expenseDetailsColumn">
+            <div style="padding: 20px">
+              <a data-turbolinks="false" target="_blank" id="expenseReceiptHref">
+                <img id="expenseReceipt" style="max-width: 100px; max-height: 200px; float: right" src="<%= asset_path 'missing.png' %>">
+              </a>
+
+              <p id="symbol">&#8377</p>
+
+              <p id="expenseAmount"></p>
+
+              <p id="name"></p>
+
+              <p id="expenseMerchant"></p>
+
+              <p id="date" style="line-height: 200%"></p>
+
+              <div style="display:none">
+                <p id="expenseID"></p>
+              </div>
+
+              <hr style="margin-top: 10px;margin-bottom: 10px">
+
+              <p style="font-size: 12px; line-height: 150%;  color: #a3a7ab; font-weight: 300">NOTE</p>
+
+              <p id="note"></p>
+              <hr>
+              <p style="font-size: 12px; line-height: 250%;  color: #a3a7ab; font-weight: 300">CATEGORY</p>
+              <input type="text" hidden="hidden" id="expenseDetailsCategoryId" form="allFilters"/>
+
+              <p onclick="addCategoryFilter()" id="category" style="color: #4C842B; font-size: 14px; cursor: pointer"></p>
+              <hr>
+
+              <div id="approvedExpense" style="display:none"></div>
+              <div id="declinedExpense" style="display:none"></div>
+
+              <ul id="adjacentLinks" style=" margin: 0; padding: 0;">
+
+                <li>
+                  <form data-remote data-turboboost enctype="multipart/form-data" id="editExpenseAddReceipt" hidden="hidden" method="post">
+                    <input name="_method" type="hidden" value="patch"/>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>">
+                    <input class="form-control" id="receiptSelectFile" type="file" name="expense[receipt]" accept=".png,.jpg,.pdf,.jpeg" onchange="submitFile()"/>
+                    <input id="receiptSubmitFile" type="submit" name="commit" value="Submit" class="btn btn-primary"/>
+                  </form>
+
+                  <a href="#" data-turbolinks="false" onclick="selectFile()" data-toggle="tooltip" title="Attach receipt or image">Add
+                    Receipt</a></li>
+                <% if is_personal_view %>
+                    <li>
+                      <a href="#" data-turbolinks="false" onclick="openModal('delete')" data-toggle="tooltip" title="Delete and cancel this expense">Delete</a>
+                    </li>
+                <% end %>
+
+                <li>
+                  <a href="#" data-turbolinks="false" onclick="openModal('edit')" data-toggle="tooltip" title="Edit">Edit</a>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <form data-remote data-turboboost id="editExpenseForm" method="post">
+
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <input name="_method" type="hidden" value="patch"/>
+
+          <div id="editExpenseDetailsColumn" style="display: none; background-color: white; border: 1px solid #d8d8d8" ;>
+            <div style="padding: 20px">
+
+
+              <p id="editName" style="font-size: 15px; font-weight: 800; line-height: 20%; ">Veekshith C Rai</p>
+
+              <p style="float: left;font-weight: 500;font-size: 16px;margin-top: 5px">&#8377</p>
+
+              <input id="editExpenseAmount" name=expense[amount] style="font-weight: 500;font-size: 16px;width: 100px; height: 30px">
+
+              <p class="editExpensePara">EXPENSE DATE</p>
+
+              <input id="editExpenseDate" type="date" name="expense[date]" width="40%" style="border:none; font-size: 14px ;color: #2E2F30 ; background-color: white;outline: none; ">
+
+              <p class="editExpensePara">MERCHANT</p>
+              <input id="editExpenseMerchant" type="text" name="expense[merchant]" class="form-control" style="margin-top: 4px">
+
+
+              <p class="editExpensePara">NOTE</p>
+              <textarea id="editExpenseNote" name="expense[note]" style="font-size: 14px;overflow: hidden;margin-top: 4px"></textarea>
+
+              <p class="editExpensePara">CATEGORY</p>
+              <select name="expense[category_id]" style="font-size:14px;" id="expenseCategory">
+                <% current_company.get_active_categories.each do |cat| %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% end %>
+              </select>
+
+            </div>
+
+            <div class="bottomBar" style="background-color: white">
+              <button type="submit" class="bottomBarButtons">Save</button>
+              <button form="" data-turbolinks="false" id="bottomBarCancel" onclick="closeEditForm()" class="bottomBarButtons" style="background: #e0e0e0; color: #333333">Cancel
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <div id="infinite-scrolling" style="display: none" class="row pagination-wrapper">
+      <%= will_paginate(@expenses) unless @expenses.blank? %>
+    </div>
+<% end %>
+
+<!--All Modals -->
+
+<div class="modal fade" id="exportModal" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9 ">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center;">Export Expenses</h4>
+      </div>
+      <div class="modal-body" style="text-align: center">
+        <p>This feature will be coming soon.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">Cancel this
+          Expense</h4>
+      </div>
+      <form data-remote data-turboboost id="deleteExpenseButton" method="post">
+        <input name="_method" type="hidden" value="delete"/>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+      </form>
+      <div class="modal-body" style=" padding-left: 40px;padding-right: 40px">
+        <p>Are you sure you want to cancel this expense?</p>
+        <button class="sendButton" form="deleteExpenseButton" type="submit">YES</button>
+        <button class="sendButton" onclick="closeDeleteModal()" style="background: #cccccc;color: #2E2F30">NEVERMIND</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="exportExpenseReceipt" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9 ">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">Export
+          Expenses</h4>
+      </div>
+      <div class="modal-body" style=" padding-left: 40px;padding-right: 40px">
+        <p>You will be exporting 1 selected expenses.</p>
+        <button class="sendButton" type="submit">EXPORT TO CSV</button>
+        <button class="sendButton" type="submit">EXPORT TO PDF</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="denyModal" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9 ">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">Deny this
+          Expense</h4>
+      </div>
+
+      <form data-remote data-turboboost id="denyExpenseButtonForm" method="post">
+        <input name="_method" type="hidden" value="put"/>
+        <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+        <input name="status" type="number" value="3" hidden="hidden">
+
+        <div class="modal-body" style=" padding-left: 40px;padding-right: 40px">
+          <p>Are you sure you want to deny this expense?</p>
+
+          <div>
+            <input class="form-control" style="border-radius: 1px" type="text" name="comment" placeholder="Optional Note">
+          </div>
+          <div style="text-align: right">
+            <button class="sendButton" onclick="closeDenyModal()" style="background: #cccccc;color: #2E2F30">NEVERMIND</button>
+            <button style="margin-left: 30px" class="sendButton" type="submit">Deny</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!--All Modals Ends here  -->
+
+</body>
+
+<style>
+
+
+  <% if  param.blank? && @expenses.blank?  %>
+
+  #searchdiv, .showFilteringSidebar {
+    visibility: hidden;
+  }
+
+  <% end %>
+
+</style>
+
+
+<script>
+  $(document).ready(function () {
+
+
+    <% if  param.blank? && @expenses.blank? %>
+    $('.showFilteringSidebar').css("visibility", "hidden");
+    <% end %>
+
+    <% unless @expense.blank? %>
+    var firstChild = document.getElementById('centerBlockRowsItem_<%= @expense.id.to_s%>');
+    if (firstChild != null) {
+      firstChild.click();
+    }
+    <% end %>
+
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+    $("#firstList").hide();
+    $("#subFilter").hide();
+
+    $('#detailsOfExpense').css({'height': (($(window).height()) - 170 - $('#showPreviousFilters').height()) + 'px'});
+
+
+    //event called after file is chosen
+
+    $("input#receiptSelectFile").change(function () {
+
+      var icon = " fa fa-file";
+      var text = " ";
+      var user = " ";
+      var time = " ";
+
+      var commentToBeAdded = getComment(icon, text, user, time);
+      $('#commentsContainer').append($(commentToBeAdded))
+
+    });
+
+  });
+
+  // Select all checkboxes
+
+  $("#checkAll").change(function () {
+    $("input:checkbox").prop('checked', $(this).prop("checked"));
+    makeButtonVisible();
+  });
+
+  function makeButtonVisible() {
+
+    if ($("input:checkbox:checked").length > 0) {
+      $('#createReport').show();
+    }
+    else {
+      $('#createReport').hide();
+    }
+  }
+
+  function addCategoryFilter() {
+    var expenseDetailsCategoryId = $('#expenseDetailsCategoryId');
+    expenseDetailsCategoryId.attr("name", "filter_category_id");
+    $('#allFilters').submit();
+  }
+
+  function closeDenyModal() {
+    $('#denyModal').modal('hide');
+
+  }
+
+  function selectFile() {
+    $("#receiptSelectFile").click();
+  }
+
+  function submitFile() {
+    $("#receiptSubmitFile").click();
+
+  }
+
+  function removeAllSelectedRowBgColors() {
+
+    $('div#centerListOfExpenses').children("div").css("background-color", 'white');
+
+  }
+
+  $("div").click(function (e) {
+    if (e.target.type == "checkbox") {
+      e.stopPropagation();
+    } else {
+      var $checkbox = $(this).find(':checkbox');
+      $checkbox.attr('checked', !$checkbox.attr('checked'));
+    }
+  });
+
+
+  function onClickCenterBlockExpenses(expenseID, amount, name, merchant, note, date, receipt, category, categoryId, receiptUrl, entireRow) {
+
+
+    removeAllSelectedRowBgColors();
+
+    $(entireRow).css("background-color", '#FFFFBB');
+
+    document.getElementById("centerBlockOfExpenses").style.marginLeft = "175px";
+
+    $("#detailsOfExpense").show();
+
+    if ($('#firstList').is(":visible") || $('#subFilter').is(":visible")) {
+      removeAllFilters();
+    }
+
+    $('p#name').text(name);
+    $('p#expenseMerchant').text(merchant);
+    $('p#note').text(note);
+    $('p#category').text(category);
+    $('#expenseDetailsCategoryId').val(categoryId);
+    $('p#date').text(date);
+    $('p#expenseAmount').text(amount);
+    $('p#expenseID').text(expenseID);
+    var imageElement = $('img#expenseReceipt');
+    var href = $('#expenseReceiptHref');
+    if (receipt != null) {
+      if (receiptUrl != "/assets/original/missing.png")
+        href.attr("href", receiptUrl);
+      else
+        href.attr("href", null);
+      imageElement.attr("src", "");
+      imageElement.attr("src", receipt);
+      if (receiptUrl == "/assets/original/missing.png")
+        imageElement.attr("src", "<%= asset_path 'missing.png'%>");
+      imageElement.show();
+    } else {
+      href.attr("href", "");
+      imageElement.attr("src", "<%= asset_path 'missing.png'%>");
+      imageElement.hide();
+    }
+
+    var myNode = document.getElementById("expenseComments");
+    if (myNode != null)
+      while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+      }
+
+    $('#editExpenseAddReceipt').attr("action", getExpensePath(expenseID));
+    $('#approveExpenseButtonForm').attr("action", getReviewExpensePath(expenseID));
+
+  }
+
+  // JS function that shows the filters and activates the filters view or vice versa
+  function showFilterList() {
+
+    removeAllSelectedRowBgColors();
+
+    if ($('#firstList').is(":visible") || $('#subFilter').is(":visible")) {
+
+      removeAllFilters();
+      document.getElementById("centerBlockOfExpenses").style.marginLeft = "300px";
+
+    } else {
+
+      $("#firstList").show();
+      $("#detailsOfExpense").hide();
+
+      document.getElementById("centerBlockOfExpenses").style.marginLeft = "30px";
+
+      document.getElementById("noexpensesview").style.margin = "100px";
+
+    }
+
+  }
+
+  function openModal(option) {
+
+    switch (option) {
+
+      case "export":
+        $('#exportModal').modal({
+          keyboard: false
+        });
+        break;
+
+      case "comment":
+        $('#commentModal').modal({
+          keyboard: false
+        });
+        var expenseID = document.getElementById("expenseID").innerHTML;
+        document.getElementById("addCommentForm").action = getAddCommentPath(expenseID);
+        document.getElementById("expenseIDForComment").value = expenseID;
+        break;
+
+
+      case "addReceipt":
+        if (window.File) {
+          $("#receiptSelectFile").click();
+
+        } else {
+
+          alert('The File APIs are not fully supported in this browser. ');
+        }
+
+        break;
+
+      case "delete":
+
+        $('#deleteModal').modal({
+          keyboard: false
+        });
+        expenseID = document.getElementById("expenseID").innerHTML;
+        document.getElementById("deleteExpenseButton").action = getExpensePath(expenseID);
+        break;
+
+
+      case "edit":
+
+        $('#expenseDetailsColumn').hide();
+        $('#expenseComments').hide();
+
+        $('#editExpenseDetailsColumn').show();
+
+        $('p#editName').text(document.getElementById("name").innerHTML);
+        $('input#editExpenseAmount').val(document.getElementById("expenseAmount").innerHTML);
+        $('#editExpenseDate').val(document.getElementById("date").innerHTML);
+        $('#editExpenseMerchant').val(document.getElementById("expenseMerchant").innerHTML);
+        $('#editExpenseNote').val(document.getElementById("note").innerHTML);
+
+        expenseID = document.getElementById("expenseID").innerHTML;
+        document.getElementById("editExpenseForm").action = getExpensePath(expenseID);
+
+        break;
+
+      case "deny":
+
+        $('#denyModal').modal({
+          keyboard: false
+        });
+
+        expenseID = document.getElementById("expenseID").innerHTML;
+        document.getElementById("denyExpenseButtonForm").action = getReviewExpensePath(expenseID);
+        break;
+
+    }
+
+  }
+
+  function closeEditForm() {
+    $('#expenseDetailsColumn').show();
+    $('#expenseComments').show();
+
+    $('#editExpenseDetailsColumn').hide();
+
+  }
+
+  function closeDeleteModal() {
+    $('#deleteModal').modal('hide');
+  }
+
+
+  function backButton() {
+
+    //showFilterList()
+    removeAllFilters();
+
+    $("#firstList").show();
+
+    if ($('#noexpensesview').is(":visible")) {
+
+      document.getElementById("noexpensesview").style.margin = "100px";
+    }
+
+  }
+
+  function removeAllFilters() {
+    $("#firstList").hide();
+    $("#subFilter").hide();
+    $(".filterList").hide();
+
+    if ($('#noexpensesview').is(":visible")) {
+
+      document.getElementById("noexpensesview").style.margin = "100px auto";
+
+    }
+  }
+
+  // on click listeners for removing filters
+
+  $("#oldFilterAmount").on('click', function () {
+    $("#oldFilterAmountType").remove();
+    $("#oldFilterAmountValue").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldFilterDate").on('click', function () {
+    $("#oldFilterDateType").remove();
+    $("#oldFilterDateFrom").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldFilterSort").on('click', function () {
+    $("#oldFilterSortBy").remove();
+    $("#oldFilterSortOrder").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_category_id").on('click', function () {
+    $("#inputOldfilter_category_id").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_merchant").on('click', function () {
+    $("#inputOldfiltermerchant").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_user_id").on('click', function () {
+    $("#inputOldfilter_user_id").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_manager_id").on('click', function () {
+    $("#inputOldfilter_manager_id").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_status").on('click', function () {
+    $("#inputOldfilter_status").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_receipt").on('click', function () {
+    $("#inputOldfilter_receipt").remove();
+    $("#allFilters").submit();
+  });
+
+  $("#oldfilter_search").on('click', function () {
+    $("#inputOldfilter_search").remove();
+    $("#allFilters").submit();
+  });
+
+
+  $("#firstList").children('li').click(function () {
+    var rssId = $(this).children('a').attr('id');
+
+    if (rssId != "listHeader") {
+      $("#firstList").hide();
+      $("#subFilter").show();
+
+    }
+
+    switch (rssId) {
+
+      case "dates":
+        $("#datesFilterList").show();
+        break;
+
+      case "status":
+        $("#statusFilterList").show();
+        break;
+
+      case "amount":
+        $("#amountFilterList").show();
+
+        break;
+
+      case "user":
+        $("#userFilterList").show();
+
+        break;
+
+      case "manager":
+        $("#managerFilterList").show();
+
+        break;
+
+
+      case "merchant":
+        $("#merchantFilterList").show();
+
+        break;
+
+
+      case "category":
+        $("#categoryFilterList").show();
+
+        break;
+
+      case "warnings":
+        $("#warningsFilterList").show();
+
+        break;
+
+      case "receipt":
+        $("#receiptFilterList").show();
+
+        break;
+
+      case "reimbursable":
+        $("#reimbursableFilterList").show();
+
+        break;
+
+      case "sortby":
+        $("#sortFilterList").show();
+
+        break;
+
+    }
+
+  });
+
+  // jquery ui code for combobox
+  (function ($) {
+    $.widget("custom.combobox", {
+      _create: function () {
+        this.wrapper = $("<span>")
+            .addClass("custom-combobox")
+            .insertAfter(this.element);
+
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+
+      _createAutocomplete: function () {
+        var selected = this.element.children(":selected"),
+            value = selected.val() ? selected.text() : "";
+
+        this.input = $("<input>")
+            .appendTo(this.wrapper)
+            .val(value)
+            .attr("title", "")
+            .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
+            .autocomplete({
+              delay: 0,
+              minLength: 0,
+              source: $.proxy(this, "_source")
+            })
+            .tooltip({
+              tooltipClass: "ui-state-highlight"
+            });
+
+        this._on(this.input, {
+          autocompleteselect: function (event, ui) {
+            ui.item.option.selected = true;
+            this._trigger("select", event, {
+              item: ui.item.option
+            });
+          },
+
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+
+      _createShowAllButton: function () {
+        var input = this.input,
+            wasOpen = false;
+
+        $("<a>")
+            .attr("tabIndex", -1)
+            .attr("title", "Show All Items")
+            .tooltip()
+            .appendTo(this.wrapper)
+            .button({
+              icons: {
+                primary: "ui-icon-triangle-1-s"
+              },
+              text: false
+            })
+            .removeClass("ui-corner-all")
+            .addClass("custom-combobox-toggle ui-corner-right")
+            .mousedown(function () {
+              wasOpen = input.autocomplete("widget").is(":visible");
+            })
+            .click(function () {
+              input.focus();
+
+              // Close if already visible
+              if (wasOpen) {
+                return;
+              }
+
+              // Pass empty string as value to search for, displaying all results
+              input.autocomplete("search", "");
+            });
+      },
+
+      _source: function (request, response) {
+        var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+        response(this.element.children("option").map(function () {
+          var text = $(this).text();
+          if (this.value && ( !request.term || matcher.test(text) ))
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }));
+      },
+
+      _removeIfInvalid: function (event, ui) {
+
+        // Selected an item, nothing to do
+        if (ui.item) {
+          return;
+        }
+
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+            valueLowerCase = value.toLowerCase(),
+            valid = false;
+        this.element.children("option").each(function () {
+          if ($(this).text().toLowerCase() === valueLowerCase) {
+            this.selected = valid = true;
+            return false;
+          }
+        });
+
+        // Found a match, nothing to do
+        if (valid) {
+          return;
+        }
+
+        // Remove invalid value
+        this.input
+            .val("")
+            .attr("title", value + " didn't match any item")
+            .tooltip("open");
+        this.element.val("");
+        this._delay(function () {
+          this.input.tooltip("close").attr("title", "");
+        }, 2500);
+        this.input.autocomplete("instance").term = "";
+      },
+
+      _destroy: function () {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })(jQuery);
+
+  $(function () {
+    $("#combobox").combobox();
+    $("#combobox2").combobox();
+    $("#combobox3").combobox();
+    $("#toggle").click(function () {
+      $("#combobox").toggle();
+    });
+  });
+
+  function createReportFromSelectedExpenses() {
+    var array = []
+    $("input:checkbox[name=expenses_id]:checked").each(function () {
+      array.push($(this).val());
+    });
+    $('#createReportExpenseIds').val(array);
+    $('form#createReportFromExpenses').submit();
+  }
+
+  function closeFilter(id) {
+    var div = $('#' + id);
+    div.attr('form', "");
+    div.remove();
+    $('#allFilters').submit()
+  }
+
+  /*function getExpensePath(id){
+   return "< %="/users/#{current_user.id}/expenses/"%>" + id;
+   }
+   function getAddCommentPath(id) {
+   return "< %="/users/#{current_user.id}/expenses/"%>" + id + "/new_comment";
+   }*/
+
+
+  function getReviewExpensePath(id) {
+    return "";
+  }
+
+</script>
