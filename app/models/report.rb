@@ -35,13 +35,9 @@ class Report < ActiveRecord::Base
   validates :user, presence: true
   validates :status, presence: true
 
-  scope :with_id, ->(id, params={}) do
-    if params[:single]
-      find_by_id id
-    else
-      where id: id
-    end
-  end
+  default_scope { order report_status_id: :asc }
+
+  scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
@@ -163,6 +159,10 @@ class Report < ActiveRecord::Base
 
   def accounted?
     self.accounted
+  end
+
+  def controlling_user?(user)
+    self.controlling_user == user
   end
 
 end

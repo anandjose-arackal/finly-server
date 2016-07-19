@@ -1,16 +1,16 @@
 <div id="flashContainer" class="holder">
   <% flash.each do |message_type, message| %>
-    <% unless message.blank? %>
-      <% if message.kind_of?(Array) %>
-          <% message.each do |m| %>
-              <div class="alert alert-<%= message_type %>"><%= m %>
+      <% unless message.blank? %>
+          <% if message.kind_of?(Array) %>
+              <% message.each do |m| %>
+                  <div class="alert alert-<%= message_type %>"><%= m %>
+                    <i id="flashClose" class="fa fa-close" onclick="closeAllFlash(this)"></i></div>
+              <% end %>
+          <% else %>
+              <div class="alert alert-<%= message_type %>"><%= message %>
                 <i id="flashClose" class="fa fa-close" onclick="closeAllFlash(this)"></i></div>
           <% end %>
-      <% else %>
-          <div class="alert alert-<%= message_type %>"><%= message %>
-            <i id="flashClose" class="fa fa-close" onclick="closeAllFlash(this)"></i></div>
       <% end %>
-    <% end %>
   <% end %>
   <div id="dynamicFlashContainer" class="holder"></div>
   <div class="alert alert-success" id="dynamic_flash_success" hidden="hidden">

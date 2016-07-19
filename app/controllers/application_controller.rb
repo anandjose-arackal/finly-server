@@ -65,11 +65,11 @@ class ApplicationController < ActionController::Base
         if request.present? && request.referrer.present?
           redirect_to request.referrer
         else
-          render partial: 'shared/flash_message', replace: "#flashContainer"
+          render partial: 'shared/flash_message', replace: '#flashContainer'
         end
       end
       format.js do
-        render partial: 'shared/flash_message', replace: "#flashContainer"
+        render partial: 'shared/flash_message', replace: '#flashContainer'
       end
       format.json {}
     end

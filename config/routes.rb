@@ -89,14 +89,17 @@ Rails.application.routes.draw do
   get 'people' => 'people#people'
 
   resources :reports
+  get 'export/report(.:format)' => 'export#report', as: :export_report
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
-    get 'export' => 'reports#export', as: :export
     patch 'retract' => 'reports#retract', as: :retract
     patch 'submit' => 'reports#submit', as: :submit
     patch 'approve' => 'reports#approve', as: :approve
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
+    patch 'reimburse' => 'reports#reimburse', as: :reimburse
+    patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+    patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     post 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
   end

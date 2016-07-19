@@ -116,7 +116,7 @@ class ReportService < BaseService
       return false
     end
     unless report.processing?
-      errors << 'Cannot retract report'
+      errors << 'Cannot retract report as the report is not in processing state'
       return false
     end
     if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil
@@ -576,10 +576,6 @@ class ReportService < BaseService
     end
     errors << receipt.errors.full_messages
     false
-  end
-
-  def export(format)
-
   end
 
   def comment(content)

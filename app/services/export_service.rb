@@ -92,7 +92,23 @@ class ExportService < BaseService
   end
 
   def export_as_xls(report)
-
+    errors.clear
+    if report.blank?
+      errors << 'No reports selected to export'
+      return false
+    end
+    if report.is_a?(Report)
+      report = [report]
+    end
+    preferences = company.export_preferences
+    @column_names = preferences.pluck(:name)
+    @data = []
+    report.each do |r|
+      r.expenses.each do |e|
+        @data << retrieve_data(preferences, r, e)
+      end
+    end
+    {header: @column_names, data: @data}
   end
 
   # todo
