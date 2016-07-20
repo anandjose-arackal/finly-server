@@ -1,0 +1,417 @@
+<!--Add Roboto Font -->
+<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
+<body style="overflow: hidden">
+
+<div class="inner" style=" border-bottom: 1px solid #e6e6e6;margin-bottom: 20px;">
+  <ul class="innerul">
+    <li style="padding: 20px; background: beige">
+      <%= @policy.name %>
+    </li>
+    <li class="active" data-switch="#expense_rules"><a href="#" data-turbolinks="false">Expenses Rules
+      <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#policies"><a href="#" data-turbolinks="false">Auto Approval
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#policy_members"><a href="#" data-turbolinks="false">Policy Members
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+  </ul>
+
+  <div id="page-2" class="innerdiv" style="background: white; overflow: scroll">
+
+    <!-- Hidden blocks that you show when requested. -->
+
+    <!-- EDIT CATEGORIES -->
+
+    <div class="divsections " id="account_manager" style="display: none">
+
+      <h3 id="divsection_heading">Account Manager</h3>
+
+      <!--<button onclick="temperory()"> add</button>-->
+
+      <p>Please choose the format of the csv, and the respective column names you want to export.</p>
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+    <div class="divsections" id="policy_members" style="display: none">
+
+      <h3 id="divsection_heading">Policy Members</h3>
+
+
+      <%= render 'policy_members' %>
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+    <div class="divsections" id="expense_rules">
+
+      <h3 id="divsection_heading">Expense Rules</h3>
+
+
+      <%= render 'expense_rules' %>
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="modal fade" id="assignExistingUsersToPolicy" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9 ; height: 60px">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+
+        <form hidden="hidden" data-remote data-turboboost id="addUsersToPolicyForm" method="post">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          <input id="addUserToPolicyIds" name="users_id" type="text">
+        </form>
+
+        <button id="addUsersToPolicyButton" onclick="addUsersToPolicyFromList()" type="button" style="float: right;
+            background: #465c8b;
+            margin-right: 20px;
+            color: white;
+            font-size: 10px;outline: none;
+            padding: 5px;
+            letter-spacing: 1px;display: none">INVITE
+        </button>
+
+
+        <h4 class="modal-title" style="font-weight: 400;border-bottom: #d8d8d8">Invite Employees To Policy</h4>
+      </div>
+      <div class="modal-body" style="padding: 0">
+
+        <form data-remote data-turboboost id="usersPolicyList" action="<%= policy_invitable_users_path(@policy) %>" method="post" style="float: left;width: 25%;">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          <section id="filterSection">
+            <div style="font-size: 18px;
+                margin-left: 20px;
+                margin-top: 10px;
+                margin-bottom: 10px;"> Filters
+            </div>
+            <input id="filterUserName" name="filter_name" style="width: 81%;margin-left: 20px; padding: 5px;" placeholder="User Name">
+            <input id="filterUserMailId" name="filter_email" style="width: 81%;margin-left: 20px;margin-top: 10px; padding: 5px;" placeholder="User Email Id">
+
+
+            <p style="margin-left: 20px;
+                font-size: 18px;
+                margin-top: 15px;">Managed by:</p>
+            <select name="filter_manager_id" class="selectors" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px" onchange="$('form#usersPolicyList').submit();">
+              <option value="" selected="selected">None</option>
+              <% if @managers.present? %>
+                  <% @managers.each do |manager| %>
+                      <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <% end %>
+              <% end %>
+            </select>
+          </section>
+
+        </form>
+        <section id="addUsersSection" style="background-color: white;margin-left: 25%; min-height: 250px;
+            width: 75%; border-left: 1px solid #d8d8d8">
+          <div class="row" style="margin: 0;font-size: 10px; text-align: left; padding: 10px 0 10px 0;height: 30px;border-bottom: 1px solid #d8d8d8;">
+            <div class="col-md-1"><input type="checkbox" id="checkAll" style="margin-right: 4px"></div>
+            <div class="col-md-3" style="padding-left: 20px">User Name</div>
+            <div class="col-md-4" style="padding-left: 25px">Email Id</div>
+            <div class="col-md-4" style="text-align: center;padding-left: 38px">Manager</div>
+          </div>
+          <div id="invitableUsersContainer">
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="inviteUsersToPolicy" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+    <input name="pending_invite[policy_id]" value="" id="policyInviteId" type="hidden">
+
+
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9 ">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">INVITE EMPLOYEES
+          TO POLICY</h4>
+      </div>
+      <p style="font-size: 14px;
+          font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+          text-transform: uppercase;
+          font-weight: 400; padding: 20px 0 5px 40px;
+          color: #777;">Email</p>
+      <input type="text" name="pending_invite[user_email]" class="dialogInputStyle" placeholder="example@company.com, two@asa.com">
+        <textarea class="dialogInputStyle" id="modalInputComment" class="form-control" name="pending_invite[note]"
+                  placeholder="Add a note (optional)" style="margin-top: 20px;"></textarea>
+
+      <!--     < % if @user.admin? %>
+      --> <label class="editProfileDialogHeaders">Assign Admin Role?</label>
+
+      <label class="radio-inline" style="font-size: 12px">
+        <input id="adminTrue" type="radio" name="admin" style="font-size: 8px" value="1">Yes
+      </label>
+      <label class="radio-inline" style="font-size: 12px">
+        <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
+      </label>
+      <!--     < % end %>
+      -->
+      <hr style=" margin: 15px 0 0 0">
+
+      <label class="editProfileDialogHeaders">Assign Manager Role?</label>
+
+      <label class="radio-inline" style="font-size: 12px">
+        <input id="managerTrue" type="radio" name="manager" style="font-size: 8px" value="1">Yes
+      </label>
+      <label class="radio-inline" style="font-size: 12px">
+        <input id="managerTrue" type="radio" name="manager" value="0" checked="checked" style="font-size: 8px">No
+      </label>
+
+      <hr style=" margin: 15px 0 0 0">
+      <label class="editProfileDialogHeaders">Managed By
+        <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
+      </label>
+
+      <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
+        <datalist id="suggestionList">
+          <option value="-1">None</option>
+        </datalist>
+      </select>
+      <button style="margin-top: 20px" id="inviteUsersSubmitButton" class="sendButton" type="submit">INVITE</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="policyMemberSettings" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9;">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="font-weight: 400;border-bottom: #d8d8d8">Policy Member settings</h4>
+
+      </div>
+
+      <div class="modal-body">
+        <label style="margin-top: 0">Employee Email: </label>
+        <span style="margin-left: 30px"> MaryJain@spidey.com</span>
+        <label>Policy Admin
+          <span style="font-size: 10px; font-weight: 400 "> (Policy Admins can take control of any of the reports submitted by the employees belonging to this policy)</span>
+        </label>
+
+        <div>
+          <span class="radio-inline" style="font-size: 12px">
+            <input id="dialogAdminTrue" type="radio" name="admin" style="font-size: 8px" value="1" form="updateUserForm">Yes
+          </span>
+          <span class="radio-inline" style="font-size: 12px">
+            <input id="dialogAdminFalse" type="radio" name="admin" style="font-size: 8px" checked="checked" value="0" form="updateUserForm">No
+          </span>
+        </div>
+        <label>Approves To:</label>
+        <select name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
+          <option style="display:none" value="" selected="selected"></option>
+          <option>Manager 1</option>
+          <option>Manager 2</option>
+          <option>Manager 3</option>
+        </select>
+
+        <p>Does MaryJain@spidey.com have reports to approve? If so, who do they forward these approved reports to? (This
+          is usually to someone in accounting or finance)</p>
+
+        <label>If Report Total is Over:</label> <input type="number" placeholder="Amount">
+
+        <div>
+          <label>Then Approves To:</label>
+          <select name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+            <option style="display:none" value="" selected="selected"></option>
+            <option>Manager 1</option>
+            <option>Manager 2</option>
+            <option>Manager 3</option>
+          </select>
+        </div>
+        <p>If the report exceeds the amount above, who does mary.jain@spidey.com forward those approved reports to?</p>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+
+<style>
+
+
+  body {
+    background-color: #f5f5f5;
+  }
+
+  #exportForm p {
+    font-weight: 500;
+  }
+
+  #exportForm span {
+    font-size: 13px;
+  }
+
+  #exportForm hr {
+    margin-right: 40%;
+  }
+
+  .active {
+
+    background-color: white;
+    text-decoration: none;
+  }
+
+  .arrow {
+
+    float: right;
+    vertical-align: middle;
+    font-size: 14px;
+    padding-right: 22px;
+
+  }
+
+  #chartSelector > a:active {
+    color: black;
+    font-size: larger;
+    text-decoration: none;
+  }
+
+  #policyMemberSettings .modal-body {
+    padding: 30px;
+  }
+
+  #policyMemberSettings label {
+    margin-top: 20px;
+  }
+
+  #policyMemberSettings p {
+
+    font-size: 12px;
+    font-weight: 400
+  }
+</style>
+
+<script>
+
+  var selector, elems, makeActive;
+
+  selector = '.innerul li';
+  elems = document.querySelectorAll(selector);
+
+  makeActive = function () {
+    for (var i = 0; i < elems.length; i++)
+      elems[i].classList.remove('active');
+
+    this.classList.add('active');
+  };
+
+  for (var i = 0; i < elems.length; i++)
+    elems[i].addEventListener('mousedown', makeActive);
+
+
+  $('[data-switch]').on('click', function (e) {
+    var $page = $('#page-2'),
+        blockToShow = e.currentTarget.getAttribute('data-switch');
+
+    // Hide all children.
+    $page.children().hide();
+
+    // And show the requested component.
+    $page.children(blockToShow).show();
+
+  });
+
+  //  $( "#assignExistingUsersToPolicy" ).on('show', function(){
+  //    $.clearInput();
+  //  });
+
+  $('#assignExistingUsersToPolicy').on('hidden.bs.modal', function (e) {
+    $.clearInput();
+  })
+
+  $.clearInput = function () {
+    policyList = $('form#usersPolicyList')
+    policyList.find('input[type=text], input[type=date], input[type=number], input[type=email], textarea, select').val('');
+    policyList.submit();
+  };
+
+  $(document).ready(function () {
+
+    $('[data-toggle="popover"]').popover({
+      placement: 'top',
+      trigger: 'hover',
+      html: true
+    });
+
+    $('form#usersPolicyList').submit();
+
+    //setup before functions
+    var typingTimer;                //timer identifier
+    var doneTypingInterval = 1000;  //time in ms, 1 second for example
+    var $input = $('#filterUserName');
+    var $input2 = $('#filterUserMailId');
+
+//on keyup, start the countdown
+    $input.on('keyup', function () {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    });
+
+//on keydown, clear the countdown
+    $input.on('keydown', function () {
+      clearTimeout(typingTimer);
+    });
+
+    //on keyup, start the countdown
+    $input2.on('keyup', function () {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    });
+
+//on keydown, clear the countdown
+    $input2.on('keydown', function () {
+      clearTimeout(typingTimer);
+    });
+
+//user is "finished typing," do something
+    function doneTyping() {
+      //do something
+      $('form#usersPolicyList').submit();
+    }
+
+  });
+
+
+  //  function addNewCategory() {
+  //
+  //    if (document.getElementById('newCategory').value) {
+  //      var row = getCategoryRow(document.getElementById('newCategory').value);
+  //
+  //      document.getElementById("categoriesList").appendChild(row);
+  //      var divider = getDivider();
+  //
+  //      document.getElementById("categoriesList").appendChild(divider);
+  //
+  //      // todo add server call here to add to the list of categories
+  //
+  //    } else {
+  //      alert("Enter new category");
+  //    }
+  //
+  //  }
+
+</script>

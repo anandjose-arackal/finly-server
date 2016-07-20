@@ -6,6 +6,9 @@ class PolicyUserService < BaseService
     self.policy = policy
   end
 
+  def invitable_users
+    policy.company.users.without_id(policy.users.pluck(:id))
+  end
 
   # adds a particular user and his associated role within the policy
   def add_user(user, is_admin=false)

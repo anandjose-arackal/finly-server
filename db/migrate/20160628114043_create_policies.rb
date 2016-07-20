@@ -3,6 +3,7 @@ class CreatePolicies < ActiveRecord::Migration
     create_table :policies do |t|
       t.string :name
       t.references :company, index: true, foreign_key: true
+      t.integer :owner_id, :references => "User", index: true, foreign_key: true
 
       t.timestamps null: false
     end

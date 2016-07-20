@@ -27,7 +27,6 @@ class ExpenseService < BaseService
   def add_expense(params=nil)
     return if params.blank?
     expense_params = load_expense_params params
-    debugger
     expense = @user.expenses.build(expense_params)
     if expense.save
       ReportService.new(user: @user, report: expense.report).expense_created_in_report(self) if expense.report_id.present? and @user.present?

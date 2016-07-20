@@ -19,7 +19,6 @@ class Company < ActiveRecord::Base
   has_many :export_preferences, dependent: :destroy
   accepts_nested_attributes_for :configuration
 
-
   after_create :init_config_present
 
   validates :name, presence: true
@@ -45,6 +44,17 @@ class Company < ActiveRecord::Base
     Report.not_open.with_user(self.users.pluck(:id))
   end
 
+  def admins
+    users.with_roles.only_admins
+  end
+
+  def managers
+    users.with_roles.only_managers
+  end
+
+  def finance_managers
+    users.with_roles.only_finance_managers
+  end
 
   private
   def init_config_present
