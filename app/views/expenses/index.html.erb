@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<!--
 
-< % provide(:title, current_user.name) %>
-< % @path_expenses = user_expenses_path(current_user) %>
--->
+<% provide(:title, current_user.name) %>
+
 
 <body id="expenses">
 
 <%= render 'shared/lower_header' %>
-<form data-remote data-turboboost id="allFilters" action="<%= @path_expenses %>" method="get">
+<form data-remote data-turboboost id="allFilters" action="<%= expenses_path %>" method="get">
   <!-- search bar -->
   <div id="showPreviousFilters">
     <!-- < % param = get_old_filters(params, 1) %>
@@ -20,7 +18,7 @@
 </form>
 
 
-<% if param.blank? && @expenses.blank? %>
+<% if @expenses.blank? %>
     <div id="noexpensesview" style="margin-top: 22%">
 
       <img id="emptyPlaceholderImage" src="<%= asset_path 'checkbox-multiple-blank.png' %>" alt="No Expenses">
@@ -43,7 +41,7 @@
             <span class="ng-binding">[<%= @counts %>]</span>
           </h3>
 
-          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= user_reports_path(current_user) %>" method="post">
+          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
             <input id="createReportExpenseIds" name="expense_id" type="text">
           </form>
@@ -150,7 +148,7 @@
 
               <p class="editExpensePara">CATEGORY</p>
               <select name="expense[category_id]" style="font-size:14px;" id="expenseCategory">
-                <% current_company.get_active_categories.each do |cat| %>
+                <% current_company.active_categories.each do |cat| %>
                     <option value="<%= cat.id %>"><%= cat.name %></option>
                 <% end %>
               </select>
@@ -266,7 +264,7 @@
 <style>
 
 
-  <% if  param.blank? && @expenses.blank?  %>
+  <% if @expenses.blank?  %>
 
   #searchdiv, .showFilteringSidebar {
     visibility: hidden;
@@ -281,7 +279,7 @@
   $(document).ready(function () {
 
 
-    <% if  param.blank? && @expenses.blank? %>
+    <% if @expenses.blank? %>
     $('.showFilteringSidebar').css("visibility", "hidden");
     <% end %>
 

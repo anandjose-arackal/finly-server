@@ -19,6 +19,7 @@ class Company < ActiveRecord::Base
   has_many :export_preferences, dependent: :destroy
   accepts_nested_attributes_for :configuration
 
+
   after_create :init_config_present
 
   validates :name, presence: true
@@ -31,6 +32,11 @@ class Company < ActiveRecord::Base
     self.users.where(active: true)
   end
 
+  def active_categories
+    # using the categories scope active
+    self.categories.active
+  end
+
   def company_name
     self.name
   end
@@ -38,6 +44,7 @@ class Company < ActiveRecord::Base
   def all_reports
     Report.not_open.with_user(self.users.pluck(:id))
   end
+
 
   private
   def init_config_present

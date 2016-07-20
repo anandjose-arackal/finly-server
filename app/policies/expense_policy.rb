@@ -7,12 +7,12 @@ class ExpensePolicy < ApplicationPolicy
     @user_team_service = UserTeamService.new(@user)
   end
 
-  def create?
-    if @user.finance_manager? or @user.auditor?
-      return false
-    end
-    return true
-  end
+  # def create?
+  #   if @user.finance_manager? or @user.auditor?
+  #     return false
+  #   end
+  #   return true
+  # end
 
   def update?
     if @user.employee?

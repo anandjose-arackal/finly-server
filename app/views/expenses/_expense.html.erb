@@ -1,0 +1,44 @@
+<div id="centerBlockRows" style="background-color:white;cursor: pointer" class="container-fluid" onclick="onClickCenterBlockExpenses('<%=expense.id%>', '<%=expense.amount_value%>', '<%=j expense.user_name%>', '<%=j expense.merchant_name%>', '<%=j expense.note%>', '<%=expense.date%>', '<%=expense.receipts.first%>','<%=expense.category_name%>','<%=expense.category_id%>', '<%=expense.receipts.first.image.url if expense.receipts.first %>', this)">
+
+  <div class="row">
+    <% if is_personal_view %>
+        <div id="checkbox" style="margin-top: 20px" class="col-sm-1">
+          <input type="checkbox" name="expenses_id" value="<%= expense.id %>" onclick="makeButtonVisible()">
+        </div>
+    <% end %>
+    <div class="col-sm-1" style="margin-top: 12px; <% if is_personal_view %> margin-left: -10px
+      <% end %>">
+      <span class="roundCircle"><%= expense.user_name.split(' ').first[0] + expense.user_name.split(' ').first[1] %></span>
+    </div>
+    <div
+    <% if is_personal_view %>  class="col-sm-8"
+    <% else %> class="col-sm-9"
+    <% end %>style="line-height: 70%;color: black;">
+      <p expensetarget="name" style="line-height: 135%"><%= expense.user_name %>
+        <span style="font-weight: 300"> at </span> <%= expense.merchant_name %> </p>
+
+      <p expensetarget="note" style="line-height: 135%">
+        <% if expense.note.blank? %> - No Note -
+        <% else %>  <%= expense.note %>
+        <% end %></p>
+
+      <p expensetarget="date"><%= "#{expense.date.strftime("%d %b %Y")} . #{expense.category_name}" %>  </p>
+    </div>
+    <div expensetarget="expense" class="col-sm-2"><%= expense.amount_value %>
+    </div>
+
+  </div>
+
+</div>
+<style>
+
+  .row {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    padding-right: 30px;
+    border-bottom: solid 1px #d8d8d8;
+  }
+
+
+</style>
+

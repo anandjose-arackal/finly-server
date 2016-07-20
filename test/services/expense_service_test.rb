@@ -3,7 +3,7 @@ require 'test_helper'
 class ExpenseServiceTest < ActiveSupport::TestCase
 
   def setup
-    @image = File.open(Rails.root + "app/assets/images/1363397.jpg", "r")
+    @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
     @expense_params = {expense: {amount: 100,
                                  merchant: "Olacabs",
                                  note: "Sup dawg",
@@ -37,7 +37,7 @@ class ExpenseServiceTest < ActiveSupport::TestCase
     @other_expense = @other_user.expenses.first
     @receipt_params = {receipt: {image: @image}}
     @receipt = @expense.receipts.first
-    @second_receipt = Receipt.create(user_id: 1, image: File.open(Rails.root + "app/assets/images/1363397.jpg", "r"))
+    @second_receipt = Receipt.create(user_id: 1, image: File.open(Rails.root + "app/assets/images/1363397.png", "r"))
   end
 
   test 'cannot create expense in the future' do

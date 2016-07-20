@@ -124,6 +124,10 @@ class User < ActiveRecord::Base
     mapping.auditor.present?
   end
 
+  def user_name
+    self.name
+  end
+
   private
   # def valid_role
   #   if self.role_mapping.count == 0

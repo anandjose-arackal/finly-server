@@ -7,7 +7,6 @@
 #  action_user_id            :integer
 #  report_tracking_action_id :integer
 #  report_status_id          :integer          not null
-#  user_report_role_id       :integer
 #  memo                      :string(255)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null

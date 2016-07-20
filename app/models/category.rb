@@ -20,4 +20,7 @@ class Category < ActiveRecord::Base
     return self.name if self.active
     false
   end
+
+
+  scope :active, -> {where active: true}
 end

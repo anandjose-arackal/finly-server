@@ -1,19 +1,33 @@
 class ExpenseService < BaseService
-  attr_accessor :user
+  attr_accessor :user, :params
 
-  def initialize(current_user)
+  def initialize(current_user, params = {})
     super()
     @user = current_user
+    @user_team_service = UserTeamService.new(@user)
+    self.params = params
   end
 
-  def user_expenses
+  def list_expenses
     return nil unless @user
-    @user.expenses.includes(:manual_expense)
+    load_view self.params
+    if @personal_view
+      return @user.expenses.unreported.includes(:manual_expense)
+    elsif @manager_view
+      user_ids = @user_team_service.team(self.params).pluck(:user_id)
+      return Expense.where(user_id: user_ids)
+    elsif @finance_view
+      user_ids = @user_team_service.team(self.params).pluck(:user_id)
+      return Expense.where(user_id: user_ids)
+    else
+      # do nothing
+    end
   end
 
   def add_expense(params=nil)
     return if params.blank?
     expense_params = load_expense_params params
+    debugger
     expense = @user.expenses.build(expense_params)
     if expense.save
       ReportService.new(user: @user, report: expense.report).expense_created_in_report(self) if expense.report_id.present? and @user.present?
@@ -153,14 +167,14 @@ class ExpenseService < BaseService
   private
 
   def load_expense_params(params = {})
-    expense_params = params[:expense].except(:amount, :currency_id)
-    expense_params[:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
-    if params[:expense][:merchant].present?
-      expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
-      expense_params.delete(:merchant)
-
-      # other conditions based on type of expense can go here
-    end
+    expense_params = params[:expense].except(:amount, :merchant, :currency_id)
+    # expense_params[:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
+    # if params[:expense][:merchant].present?
+    #   expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
+    #   expense_params.delete(:merchant)
+    #
+    #   # other conditions based on type of expense can go here
+    # end
     expense_params
   end
 

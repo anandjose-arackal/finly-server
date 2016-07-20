@@ -10,9 +10,13 @@
   <li data-switch="#policies_assigned"><a href="#" data-turbolinks="false">Policies Assigned
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
+
+  <% if current_user.admin? %>
   <li data-switch="#administering_policies"><a href="#" data-turbolinks="false">Policies Administered
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
+  <% end %>
+
   <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
@@ -44,6 +48,7 @@
   <div class="divsections" id="policies_assigned" style="display: none">
 
     <h3 id="divsection_heading">Policies Assigned</h3>
+
 
     <hr style="margin-top: 20px">
 

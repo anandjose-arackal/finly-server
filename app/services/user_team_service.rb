@@ -205,7 +205,7 @@ class UserTeamService < BaseService
     elsif params[:policy].present?
       policy = params[:policy]
       @policy_id = policy.id
-      if params[:currenc_id].present?
+      if params[:currency_id].present?
         @currency_id = params[:currency_id]
       else
         @currency_id = policy.configuration.default_currency

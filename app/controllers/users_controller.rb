@@ -20,6 +20,11 @@ class UsersController < ApplicationController
     redirect_to request.referrer
   end
 
+  # action to retrieve a particular user's details in the employees screen - only for admin, obviously
+  def user_details
+
+  end
+
   private
 
   def load_service_objects
