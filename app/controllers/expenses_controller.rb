@@ -54,6 +54,15 @@ class ExpensesController < ApplicationController
     redirect_to expenses_path
   end
 
+  def add_receipt
+    if @expense_service.add_receipt_to_expense(expense_params, params[:id] || params[:expense_id])
+      flash[:success] = "receipt added!"
+    else
+      flash[:danger] = "Error. Please try again"
+    end
+    redirect_to expenses_path
+  end
+
   def attach_receipt
 
   end

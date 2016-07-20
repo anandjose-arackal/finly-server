@@ -155,6 +155,7 @@ class ExpenseService < BaseService
   def load_expense_params(params = {})
     expense_params = params[:expense].except(:amount, :merchant, :currency_id)
 
+    # todo - add logic here to take into account expenses edited within reports
     # for manual expenses only
     expense_params[:expense_type_id] = 1
     # i.e. it's an unsubmitted expense
