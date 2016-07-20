@@ -1,0 +1,271 @@
+#settlements{
+
+  #firstList, .filterList {
+    display: none;
+    float: left;
+    list-style-type: none;
+    padding: 0;
+    margin-left: 12.5%;
+    width: 180px;
+    background-color: #f1f1f1;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+
+  }
+
+
+  #firstSpanItem {
+    float: right;
+    padding-top: 5%;
+    margin-right: 5%;
+    opacity: 0.7;
+  }
+
+  #listHeader {
+    font-size: 14px;
+    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  #firstList > li a, .filterList > li a, li[target="_list"] {
+    display: block;
+    color: #515151;
+    padding: 8px 0 8px 16px;
+    text-decoration: none;
+  }
+
+  .firstListItem {
+    background-color: #e9e9e9;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .selectors {
+    width: 135px;
+    border-radius: 3px;
+    border: 1px solid #d8d8d8;
+    outline: none;
+    margin-top: 2px;
+    margin-left: 5px;
+    padding: 10px 16px;
+    font-size: 14px;
+    background-color: #fff;
+    height: 38px;
+    text-indent: 10px;
+    margin-left: 10%;
+  }
+
+  #datesFilterPara1, #sortFilterPara1 {
+    margin-top: 15px;
+  }
+
+  #datesFilterPara2, #sortFilterPara2 {
+    margin-top: 5px;
+  }
+
+  #datesFilterSelect, #sortFilterSelect {
+    margin-bottom: 10%;
+  }
+
+  .filterText {
+    margin-left: 10%;
+    margin-top: 15px;
+    font-size: 14px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  .leftPadding {
+    padding-left: 22px;
+  }
+
+  .fa-chevron-left {
+    font-family: "FontAwesome";
+    margin-left: 10%;
+    font-size: 14px;
+    margin-top: 11.5px;
+    float: left;
+    margin-right: 5%;
+    opacity: 0.8;
+    float: left;
+    cursor: pointer;
+  }
+
+  .sendButton {
+    color: #fff;
+    background-color: #93c178;
+    line-height: 38px;
+    padding: 0 24px;
+    border-radius: 3px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    border-style: none;
+    margin-top: 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    -moz-transition: background-color 200ms ease;
+    -webkit-transition: background-color 200ms ease;
+    transition: background-color 200ms ease;
+  }
+
+  .abaButton {
+    color: #fff;
+    background-color: #93c178;
+    line-height: 38px;
+    padding: 0 24px;
+    border-radius: 3px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    border-style: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    -moz-transition: background-color 200ms ease;
+    -webkit-transition: background-color 200ms ease;
+    transition: background-color 200ms ease;
+    width: 140px;
+    margin-left: 10%;
+    margin-bottom: 15px;
+  }
+
+  .filterInput {
+    width: 135px;
+    margin-top: 15px;
+    margin-bottom: 10%;
+    margin-left: 5px;
+    height: 38px;
+    margin-left: 10%;
+    padding: 10px 16px;
+    text-indent: 5px;
+  }
+
+  /*
+    Filter Styling Ends
+  */
+
+
+
+  #centerBlockOfExpenses {
+    width: 700px;
+    display: inline-block;
+    margin-left: 300px;
+
+
+
+  }
+
+  .txSubListHeader {
+    padding: 10px 8px;
+    margin-bottom: -1px;
+    background-color: #efefef;
+    border: 1px solid #d8d8d8;
+  }
+
+  .headerOfTables {
+
+    display: inline;
+    font-size: 14px;
+    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: #777;
+    margin: 0;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+  }
+
+  .txtListItems {
+    border: 1px solid #d8d8d8;
+  }
+
+  #centerBlockRows > .row {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    background: white;
+    padding-right: 30px;
+    border-bottom: solid 1px #d8d8d8;
+  }
+
+  .roundCircle {
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+
+
+  }
+
+  .scrollbar {
+    height: 500px;
+    overflow: auto;
+
+  }
+
+
+  .addPayment {
+    color: #fff;
+    background-color: #93c178;
+    line-height: 36px;
+    padding: 0 22px;
+    border-radius: 3px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    border-style: none;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    -moz-transition: background-color 200ms ease;
+    -webkit-transition: background-color 200ms ease;
+    transition: background-color 200ms ease;
+    width: 120px;
+
+  }
+
+
+
+  #showPreviousFilters {
+    background-color: transparent;
+    margin-top: 100px;
+    margin-left: 16.3%;
+    margin-bottom: -100px;
+
+    p {
+      background-color: #31B0B6;
+      color: white;
+      padding-left: 10px;
+      height: 34px;
+      font-size: 12px;
+      display: inline-block;
+      line-height: 34px;
+      border-radius: 3px;
+      border-radius: 3px;
+      margin-right: 10px;
+    }
+  }
+
+
+  #showPreviousFilters span {
+    background-color: #2692A9;
+    padding-left: 12px;
+    height: 34px;
+    line-height: 34px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .custom-combobox-input{
+    background: white;
+    width: 135px;
+    margin-left: 20px;
+    margin-top: 10px;
+    border-radius: 1px;
+  }
+
+
+
+
+}

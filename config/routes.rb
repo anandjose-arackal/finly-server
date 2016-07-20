@@ -121,6 +121,11 @@ Rails.application.routes.draw do
 
   end
 
+  get 'expenses' => 'expenses#expenses'
+
+  get 'settlement' => 'settlement#settlement'
+
+  get 'user_settlement' => 'settlement#user_settlement'
   mount_opro_oauth
 
   root 'static_pages#home'
@@ -155,7 +160,7 @@ Rails.application.routes.draw do
   #     member do
   #       get 'short'
   #       post 'toggle'
-  #     end
+  #     ends
   #
   #     collection do
   #       get 'sold'
