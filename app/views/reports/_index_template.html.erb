@@ -1,20 +1,14 @@
 <% provide(:title, current_user.name) %>
-<% provide(:searchDiv,"reportPlaceholder" )%>
+<% provide(:searchDiv, "reportPlaceholder") %>
 
 <body style="background-color: #f5f6f9">
 
 <%= render 'shared/lower_header' %>
 
-<form data-remote data-turboboost id="allReportsFilters" action="
-<% if current_user.admin? %>
-<%= admin_company_reports_path %>
-<% else %>
-<%= user_reports_path(current_user) %>
-<% end %>
-" method="get">
+<form data-remote data-turboboost id="allReportsFilters" action="<%= reports_path(view: params[:view]) %>" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
-    <% param = get_old_filters(params, 2) # i.e get filters for expenses %>
+    <% param = get_old_filters(params, 2) # i.e get filters for expenses  %>
     <% param.each do |item| %>
         <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
     <% end %>
@@ -124,15 +118,15 @@
     background-color: #f5f5f5;
   }
 
-  .showFilteringSidebar{
+  .showFilteringSidebar {
     visibility: hidden;
   }
 
-  #searchdiv{
+  #searchdiv {
     margin-left: 23% !important;
   }
 
-  .newTransaction{
+  .newTransaction {
     display: none;
   }
 

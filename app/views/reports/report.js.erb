@@ -1,0 +1,4 @@
+$('.modal').remove();
+$('.modal-backdrop').remove();
+$('body').removeClass('modal-open');
+$('#container').replaceWith('<%= j render 'reports/report_show' %>');

@@ -35,13 +35,10 @@ class Report < ActiveRecord::Base
   validates :user, presence: true
   validates :status, presence: true
 
-  scope :with_id, ->(id, params={}) do
-    if params[:single]
-      find_by_id id
-    else
-      where id: id
-    end
-  end
+  default_scope { order report_status_id: :asc }
+
+  scope :with_id, ->(id) { where id: id }
+  scope :without_id, ->(id) { where.not id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
@@ -145,6 +142,10 @@ class Report < ActiveRecord::Base
     approved? and reimbursement_amount.present? and reimbursement_amount.value > 0
   end
 
+  def can_submit?
+    open? or retracted? or rejected?
+  end
+
   def can_archive?
     reimbursed? or reimbursement_confirmed? or closed?
   end
@@ -163,6 +164,18 @@ class Report < ActiveRecord::Base
 
   def accounted?
     self.accounted
+  end
+
+  def controlling_user?(user)
+    self.controlling_user == user
+  end
+
+  def relative_status_name(user)
+    if processing? and controlling_user? user
+      return 'Pending Review'
+    end
+    name = status.name
+    name[0].upcase + name[1..name.length]
   end
 
 end

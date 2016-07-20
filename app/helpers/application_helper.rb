@@ -35,6 +35,13 @@ module ApplicationHelper
     false
   end
 
+  def load_params(p={})
+    return p if params.blank?
+    p = {} if p.blank?
+    p[:view] = params[:view] if p[:view].blank? and params[:view].present?
+    p
+  end
+
   # type is 1 for expense, 2 for report
   def get_old_filters(old_params, type=1)
     param = []

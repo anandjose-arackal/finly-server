@@ -53,15 +53,15 @@ class ReportStatus < ActiveRecord::Base
     1
   end
 
-  def self.retracted_id
+  def self.processing_id
     2
   end
 
-  def self.rejected_id
+  def self.retracted_id
     3
   end
 
-  def self.processing_id
+  def self.rejected_id
     4
   end
 

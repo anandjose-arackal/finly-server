@@ -78,7 +78,7 @@ class ReportService < BaseService
       errors << 'Only report owners can submit reports'
       return false
     end
-    unless report.status.open? or report.status.retracted?
+    unless report.can_submit?
       errors << 'Cannot submit this report'
       return false
     end
@@ -116,7 +116,7 @@ class ReportService < BaseService
       return false
     end
     unless report.processing?
-      errors << 'Cannot retract report'
+      errors << 'Cannot retract report as the report is not in processing state'
       return false
     end
     if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil
@@ -213,11 +213,12 @@ class ReportService < BaseService
     if to_user.id != report.user.id
       status = ReportStatus.processing_id
     end
+    user_role = user_role_for_report
     if report.update_attributes report_status_id: status, controlling_user_id: to_user.id, controlling_for_user_id: nil, memo: memo
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: memo
+      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: memo,
+                                  user_report_role_id: user_role
       track.save
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: to_user.id, content: memo,
-                                      user_report_role_id: UserRole.employee_id
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: to_user.id, content: memo
       comment.save
       # Reset expenses status to unsubmitted if report is rejected
       if status == ReportStatus.rejected_id
@@ -302,8 +303,8 @@ class ReportService < BaseService
   #   if report.update_attributes controlling_user: report.user, controlling_for_user: nil, report_status_id: ReportStatus.reimbursed_id, memo: params[:memo]
   #     track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimburse_id, report_status_id: ReportStatus.reimbursed_id
   #     track.save
-  #     comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimburse_id
-  #     comment.save
+  #     name_comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimburse_id
+  #     name_comment.save
   #     return true
   #   end
   #   errors << report.errors.full_messages
@@ -329,7 +330,7 @@ class ReportService < BaseService
 
   def delete_report
     return false unless validate owner: true
-    unless report.open? or report.retracted?
+    unless report.can_submit?
       errors << 'Report cannot be deleted unless the report is retracted'
       return false
     end
@@ -491,6 +492,47 @@ class ReportService < BaseService
     report.reload
   end
 
+  def update_report(params={})
+    return false unless validate controlling_user: true
+    unless report.retracted? or report.open?
+      errors << 'Cannot update report unless retracted'
+      return false
+    end
+    name_comment = nil
+    policy_comment = nil
+    update = false
+    if params[:name].present? and params[:name] != report.name
+      name_comment = report.comments.build user: user,
+                                           report_comment_action_id: ReportCommentAction.report_update_id,
+                                           updated_field: 'name', updated_from: report.name,
+                                           updated_to: params[:name] if report.retracted?
+      report.name = params[:name]
+      update = true
+    end
+    if params[:policy_id].present?
+      new_policy_id = params[:policy_id]
+      if new_policy_id == 'nil'
+        new_policy_id = nil
+      end
+      policy_comment = report.comments.build user: user,
+                                           report_comment_action_id: ReportCommentAction.report_update_id,
+                                           updated_field: 'policy', updated_from: report.policy_id,
+                                           updated_to: new_policy_id if report.retracted?
+      report.policy_id = params[:policy_id]
+      update = true
+    end
+    unless update
+      true
+    end
+    if report.save
+      name_comment.save if name_comment.present?
+      policy_comment.save if policy_comment.present?
+      return true
+    end
+    errors << report.errors.full_messages
+    false
+  end
+
   def rename_report(name)
     return false unless validate controlling_user: true
     old_name = report.name
@@ -576,10 +618,6 @@ class ReportService < BaseService
     end
     errors << receipt.errors.full_messages
     false
-  end
-
-  def export(format)
-
   end
 
   def comment(content)

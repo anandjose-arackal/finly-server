@@ -18,7 +18,7 @@
         color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
         '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
         '<%= ej expense.date %>','<%= ej category_name %>','<%= ej expense.category_id %>',
-        '<%= ej(expense.receipts.first.image) if expense.receipts.present? %>','<%= ej(expense.receipts.first.url) if expense.receipts.present? %>',
+        '<%= ej(expense.receipts.first.image) if expense.receipts.present? %>','<%= ej(expense.receipts.first.image.url) if expense.receipts.present? %>',
         '<%= formatted_violations @violation_messages[expense.id]['blocking'] if @policy %>',
         '<%= formatted_violations @violation_messages[expense.id]['warning'] if @policy %>')">VIEW
 
