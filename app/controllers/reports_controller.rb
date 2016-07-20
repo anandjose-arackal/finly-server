@@ -105,6 +105,7 @@ class ReportsController < ApplicationController
   end
 
   private
+
   def load_view_for_report
     load_expenses_for_views
     load_info_for_views

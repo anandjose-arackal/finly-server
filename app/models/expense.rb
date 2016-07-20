@@ -40,6 +40,49 @@ class Expense < ActiveRecord::Base
   delegate :merchant_name, to: :manual_expense
   delegate :user_name, to: :user
 
+  # scopes for the filters
+  scope :filter_amount, -> (type, value) do
+    case type
+      when 'lteq'
+        joins(:amount).select('expenses.*').where('value <= ?', value)
+      when 'gteq'
+        joins(:amount).select('expenses.*').where('value >= ?', value)
+      when 'eq'
+        joins(:amount).select('expenses.*').where('value = ?', value)
+      else
+        # do nothing
+    end
+  end
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+
+    unless date_from.blank? && date_to.blank?
+      type_val = :date
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = Date.today if date_to.blank?
+      expenses = arel_table
+      where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
+    end
+  end
+  scope :filter_category_id, -> (category_id) {where category_id: category_id}
+  scope :filter_merchant, -> (merchant_name) do
+    joins(:manual_expense).select('expenses.*').where('merchant like ?', "%#{merchant_name}%")
+  end
+  scope :filter_status_id, -> (status_id) {where expense_status_id: status_id}
+  scope :filter_search, -> (value) do
+    joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant_name like ? OR note like ?', "%#{value}%")
+  end
+
+  # todo - revisit this once you figure out how to filter based on presence of children
+  scope :filter_receipt, -> (value) do
+    case value
+      when 'present'
+        joins(:receipts).select('expenses.*').where('')
+      when 'nil'
+        joins(:receipts).select('expenses.*')
+    end
+  end
+
+
   scope :with_id, ->(ids) { where id: ids }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }

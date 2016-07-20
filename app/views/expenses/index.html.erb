@@ -9,6 +9,7 @@
 <form data-remote data-turboboost id="allFilters" action="<%= expenses_path %>" method="get">
   <!-- search bar -->
   <div id="showPreviousFilters">
+    <!-- todo - tweak previous filter code to show filters
     <!-- < % param = get_old_filters(params, 1) %>
      < % param.each do |item| %>
          < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
@@ -420,6 +421,11 @@
 
   }
 
+  function getExpensePath(id) {
+
+
+  }
+
   // JS function that shows the filters and activates the filters view or vice versa
   function showFilterList() {
 
@@ -480,7 +486,7 @@
           keyboard: false
         });
         expenseID = document.getElementById("expenseID").innerHTML;
-        document.getElementById("deleteExpenseButton").action = getExpensePath(expenseID);
+        document.getElementById("deleteExpenseButton").action = '/expenses/' + expenseID;
         break;
 
 
@@ -498,7 +504,7 @@
         $('#editExpenseNote').val(document.getElementById("note").innerHTML);
 
         expenseID = document.getElementById("expenseID").innerHTML;
-        document.getElementById("editExpenseForm").action = getExpensePath(expenseID);
+        document.getElementById("editExpenseForm").action = '/expenses/' + expenseID;
 
         break;
 
