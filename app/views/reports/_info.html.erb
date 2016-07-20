@@ -1,0 +1,19 @@
+<div id="infoContainer">
+  <h3 id="header" style="font-weight: 300;color: #00A5D5;font-size: 22px; float: left"> <%= @report.name %> </h3>
+  <span class="fa fa-pencil" style="margin: 24px 0 0 15px;color: #00A5D5;font-size: 13px" onclick="makeHeaderEditable()"></span>
+
+  <hr style="border-top: 1px solid #d8d8d8;">
+
+  <div>
+    <label style="font-weight: 400; width: 90px">To:</label><span style="font-weight: bold"> <%= @manager_name %> </span>
+  </div>
+  <div>
+    <label style="font-weight: 400;width: 90px">From:</label><span style="font-weight: bold"> <%= @report.user.name %>  </span>
+  </div>
+  <div>
+    <label style="font-weight: 400;width: 90px">Dates:</label><span style="font-weight: bold"> <%= @date_string %></span>
+  </div>
+  <div>
+    <label style="font-weight: 400;width: 90px">Expenditure:</label><span style="font-weight: bold"> <%= "\u20B9#{@total}" %> </span>
+  </div>
+</div>

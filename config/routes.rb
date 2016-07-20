@@ -101,7 +101,7 @@ Rails.application.routes.draw do
     patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
-    post 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+    delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
   end
 
   mount_opro_oauth
