@@ -1,0 +1,96 @@
+<body style="background-color: #f5f6f9;">
+
+
+<div style="margin: 50px 170px 0px 5px;background: white;
+    padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
+  <p style="font-size: 24px;
+      font-weight: 600;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Company Policy List</p>
+
+  <hr>
+
+  <% unless @policies.present? %>
+      <div>
+        <p> No Policies to Display.</p>
+      </div>
+  <% end %>
+
+  <div id="policyListTable"
+  >
+    <table>
+      <thead>
+      <tr>
+        <th style="width: 30%;">Policy Name</th>
+        <th style="width:  40%;">Owner</th>
+        <th style="width:  30%;"></th>
+      </tr>
+      </thead>
+
+
+      <!-- deleting a particular policy -->
+      <input name="_method" type="hidden" value="delete"/>
+      <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+
+      <% @policies.each do |policy| %>
+          <tr>
+            <td style="width: 30%;"><%= policy.name %></td>
+            <!--<td style="width: 40%;">< %= policy.owner.name if policy.owner_id.present? %></td>-->
+            <td style="width: 40%;">
+              <button id="showReportsButton" onclick="">View Reports</button>
+              <i class="fa fa-trash-o"></i></td>
+          </tr>
+      <% end %>
+    </table>
+  </div>
+
+
+</div>
+<div style="margin: 50px 0px 0px 710px;background: white;
+    padding: 15px;border: 1px solid #d8d8d8; width: 270px; position: fixed">
+  <p style="font-size: 24px;
+      font-weight: 600;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Add new policy</p>
+  <hr>
+  <form id="policyCreate" data-remote data-turboboost action="<%= policies_path %>" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+    <input type="text" id="policyName" name="name" style="height: 40px;
+        padding: 10px;" placeholder="Enter name of policy">
+
+    <p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy
+      applied to: </p>
+    <input type="radio" name="users" value="everyone" checked> Everyone <br>
+    <input type="radio" name="users" value=""> Invite Employees Later <br>
+
+    <input type="submit" class="abaButton" onclick="return validate()" style="border-radius: 1px;margin-top: 20px;margin-left: 0px" id="createPolicy" value="Create">
+  </form>
+  <a onclick="$('form#policyCreate').submit()">Create</a>
+</div>
+
+
+</body>
+
+
+
+<script>
+
+  function validate() {
+    var x;
+    x = document.getElementById("policyName").value.trim();
+    if (x == "") {
+      alert("Enter a Policy Name");
+      return false;
+    }
+    ;
+  }
+
+  function getPolicyReportsPath(policyId) {
+
+    path = '/admin/company/reports?filter_policy_id=' + policyId;
+
+    return path;
+
+  }
+
+</script>
+

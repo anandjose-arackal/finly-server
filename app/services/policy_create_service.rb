@@ -1,7 +1,26 @@
 class PolicyCreateService < BaseService
+  attr_accessor :user
 
-  def create_policy(company, user, name)
+  def initialize(user)
+    super()
+    self.user = user
+  end
+
+  def create_policy(name)
     errors.clear
+    unless user.present?
+      errors << 'User not found'
+      return false
+    end
+    unless user.admin?
+      errors << 'Only admins can create policies'
+      return false
+    end
+    if name.blank?
+      errors << 'Cannot create policy without a name'
+      return false
+    end
+    company = user.company
     cloned_policy = company.policies.default.deep_clone except: [:users, :user_mapping]
     cloned_policy.name = name
     cloned_policy.default = false

@@ -105,7 +105,7 @@ class RuleService < BaseService
   end
 
   def retrieve_policy(policy_id)
-    PolicyRetrievalService.new.list(@user, view: 'admin').where(id: policy_id).first
+    PolicyRetrievalService.new(@user).list(view: 'admin').where(id: policy_id).first
   end
 
 end

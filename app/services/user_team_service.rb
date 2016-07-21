@@ -21,6 +21,25 @@ class UserTeamService < BaseService
     nil
   end
 
+  def new_team(role_id, params={})
+    errors.clear
+    unless user.present?
+      errors << 'User not found'
+      return false
+    end
+    include_indirect_associations = params[:include_indirect_associations]
+    case role_id
+      when UserRole.finance_manager_id
+        if include_indirect_associations
+          UserManagerMapping
+        else
+
+        end
+      when UserRole.manager_id
+
+    end
+  end
+
   def manager_for?(report)
     emp = report.user
     return false if report.blank?
@@ -88,7 +107,7 @@ class UserTeamService < BaseService
   def approves_to(params={})
     return nil unless user.manager?
     load_retrieve params
-    @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new.list(user).with_id(@policy_id).present?
+    @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
     obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).approves_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
@@ -97,7 +116,7 @@ class UserTeamService < BaseService
   def approves_finance_to(params={})
     return nil unless user.finance_manager?
     load_retrieve params
-    @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new.list(user).with_id(@policy_id).present?
+    @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
     obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).approves_finance_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
@@ -208,7 +227,7 @@ class UserTeamService < BaseService
       if params[:currency_id].present?
         @currency_id = params[:currency_id]
       else
-        @currency_id = policy.configuration.default_currency
+        @currency_id = policy.configuration.report_currency
       end
       @amount = params[:amount]
     elsif params[:report.present?]

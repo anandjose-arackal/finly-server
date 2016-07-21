@@ -19,9 +19,26 @@
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
+$background-blue: #f5f6f9;
+$button-green: #93c178;
+
+$button-light-blue: #8394AE;
+$button-dark-blue: #465c8b;
+
+
+$circle-blue: #9EACC9;
+$border-color: #d8d8d8;
+$header-light-green: #CFE8DA;
+
+$button-text-color: #999;
+$button-border: #dfdfdf;
+$button-gray-bg: #f9f9f9;
+
+$header-grey: #efefef;
+
 body {
   padding: 70px 0 0 0;
-  background-color: #f5f6f9;
+  background-color: $background-blue;
 }
 
 #headerNavigation li.active a {
@@ -227,7 +244,7 @@ body {
 
   .alert-notice {
 
-    color: white  !important;
+    color: white !important;
     background-color: #93c178;
   }
 

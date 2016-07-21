@@ -1,0 +1,170 @@
+<div id="policyMembersDiv">
+
+  <button data-toggle="modal" data-target="#inviteUsersToPolicy">Invite Employees
+  </button>
+
+  <button id="assignExistingEmployees" style="margin-left: 10px" data-toggle="modal" data-target="#assignExistingUsersToPolicy">Assign
+    Employees to
+    Policy
+  </button>
+
+  <button id="removeEmployees" style=" background-color: #df524e;margin-left: 10px" onclick="removeUsersFromPolicyList()">Remove
+  </button>
+
+  <label>Show: </label>
+
+  <ul id="people_filter_type" class="segmented-control">
+    <li data-value="all" class="activeMembers">All</li>
+    <li data-value="approvers" class="">Approvers</li>
+    <li data-value="admins" class="">Policy Admins</li>
+  </ul>
+  <!--  <form data-remote data-turboboost data-confirm="Are you sure you want to remove these users?" id="removeusersFromPolicyForm"
+          action="" method="post">
+
+      <input name="_method" type="hidden" value="delete"/>
+      <input name="authenticity_token" value="< %= form_authenticity_token %>" hidden="hidden">
+
+      <input id="removeUsersFromPolicyIds" name="existing_users_id" type="hidden">
+    </form>-->
+
+  <div id="listOfUsers" style="margin-top: 15px; overflow-x: hidden; max-width: 100%">
+    <table style="border-collapse: collapse;
+        border-spacing: 0;
+        margin-top: 5px;
+        width: 100%;
+        word-wrap: break-word;">
+      <thead>
+      <tr>
+        <th style="width: 1%; padding-left: 20px ">
+          <input type="checkbox" style="margin-right: 20px"></th>
+        <th style="width: 32.5%;">Employee</th>
+        <th style="width:  32.5%;">Manager</th>
+        <th style="width:  32.5%;">Finance Manager</th>
+        <th style="width:  34%;">Details</th>
+      </tr>
+      </thead>
+
+      <% @users.each do |user| %>
+          <tr>
+            <td style="width: 1%; padding-left: 20px">
+
+              <!-- deleting a user from policy -->
+              <!--  <form data-confirm="Are you sure you want to remove this user from the policy?" data-remote data-turboboost id="userRemove< %=user.id %>"
+                      action="< %= @policy.id%>/remove_users" method="post">
+
+                  <input name="_method" type="hidden" value="delete"/>
+                  < %= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+                  <input name="existing_user_id" value="< %=user.id%>" type="hidden">
+
+                </form>-->
+
+              <input name="remove_user_id" class="checkboxes" value="<%= user[:user].id %>" type="checkbox"></td>
+
+            <td style="width:  24.5%;"><%= user[:user].email %></td>
+            <td style="width:  24.5%;"><%= user[:manager].email if user[:manager].present? %></td>
+            <td style="width:  24.5%;"><%= user[:finance_manager].email if user[:finance_manager].present? %></td>
+            <td style="width:  25%;">
+              <% if user[:admin] %>
+                  <p>Policy Admin</p>
+              <% end %>
+              <% if user[:approves_to].present? %>
+                  <p>Approves To <%= user[:approves_to].email %></p>
+              <% end %>
+              <% if user[:approves_finance_to].present? %>
+                  <p>Approves Finance To <%= user[:approves_finance_to].email %></p>
+              <% end %>
+            </td>
+
+            <td style="width:  25%;">
+              <i style="cursor: pointer; font-size: 20px" data-toggle="modal" data-target="#policyMemberSettings" class="fa fa-cog"></i>
+            </td>
+          </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+
+<script>
+
+  $('#people_filter_type > li ').click(function () {
+    $('#people_filter_type > li').removeClass();
+    $(this).addClass('activeMembers');
+  });
+
+</script>
+
+
+<style>
+
+  #policyMembersDiv button {
+    text-transform: uppercase;
+    background-color: #93c178;
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-weight: 500;
+    outline: none;
+    height: 30px;
+    border: none;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  #policyMembersDiv th {
+    background: rgba(238, 238, 238, 0.5);
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+    height: 30px;
+    font-weight: 500;
+    color: #404040;
+  }
+
+  #listOfUsers tr {
+
+    margin-top: 20px;
+  }
+
+  #listOfUsers tbody > tr {
+
+    height: 60px;
+  }
+
+  #policyMembersDiv ul {
+    display: inline;
+    padding: 7px 1px 8px 1px;
+  }
+
+  #policyMembersDiv li {
+    display: inline;
+    padding: 7px;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  #policyMembersDiv > label {
+    font-size: 13px;
+    font-weight: 300;
+    margin-left: 30px;
+
+  }
+
+  .segmented-control {
+    border-radius: 3px;
+    background: #f8f8f8;
+    border: 2px solid #ddd;
+    color: #666;
+    height: 34px;
+    display: table;
+  }
+
+  .activeMembers {
+    background-color: #93c178;
+    color: white;
+  }
+</style>
+

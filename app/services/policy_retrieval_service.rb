@@ -1,12 +1,17 @@
 class PolicyRetrievalService < BaseService
+  attr_accessor :user
+
+  def initialize(user)
+    super()
+    self.user= user
+  end
 
   def self.for_report(report)
     return report.user.company.default_policy unless report.policy.present?
     report.policy
   end
 
-
-  def list(user, params={})
+  def list(params={})
     if user.blank?
       errors << 'No user selected'
       return false

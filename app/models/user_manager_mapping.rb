@@ -59,6 +59,8 @@ class UserManagerMapping < ActiveRecord::Base
   scope :finance_team, ->(policy_id, finance_manager_id) { where policy_id: policy_id, finance_manager_id: finance_manager_id }
   scope :company, ->(company_id){ joins(:policy).where(company_id: company_id) }
 
+  scope :has_finance_manager, ->(manager_id){ where finance_manager_id: manager_id }
+
   private
   def valid_default
     if default and greater_than_amount.present?

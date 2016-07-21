@@ -1,51 +1,14 @@
 <!DOCTYPE html>
-
-
 <% provide(:title, "Finly Settlement") %>
-<body id="settlements">
-<div id="employeeSettlement">
-  <div>
-    <p>SETTLEMENT</p>
-    <button onclick="redirectBack()" class="grey-button">Back</button>
-  </div>
-</div>
 
 
-<div>
-  <section>
-    <label>
-      REIMBURSEMENT PENDING
+<!-- Add all reports for a single user
 
-    </label>
-
-    <label>CASH IN HAND</label>
-
-    <button>REIMBURSE</button>
-    <button>SETTLE DEBT</button>
-  </section>
-
-  <section>
-    <button>ADD PAYMENT</button>
-    <button>QUICK LOAD CARD</button>
-  </section>
-</div>
-
-
-<div>
-
-
-  <div id="filteredReports">
-
-    <label>Show: </label>
-    <ul class="segmented-control">
-      <li data-value="all" class="activeMembers">Approved</li>
-      <li data-value="approvers" class="">Reimbursed</li>
-      <li data-value="admins" class="">Closed</li>
-    </ul>
-
-  </div>
-
-
-</div>
-
-</body>
+< % content_for :settlement do %>
+    < % if @settlement.present? %>
+        < % @settlement.each do |settlement| %>
+            < %= render partial: 'settlement_row', locals: {settlement: settlement} %>
+        < % end %>
+    < % end %>
+< % end %>-->
+<%= render 'settlement/settlement_template' %>

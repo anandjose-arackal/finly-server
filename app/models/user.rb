@@ -66,7 +66,7 @@ class User < ActiveRecord::Base
   has_one :balance_sheet, dependent: :destroy
   has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
-  has_many :invitations, :class_name => self.to_s, :as => :invited_by
+  has_many :invitations, :class_name => 'User', :as => :invited_by
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
@@ -84,6 +84,14 @@ class User < ActiveRecord::Base
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
+  scope :without_id, ->(user_id) { where.not id: user_id }
+  scope :filter_name, -> (name) { where("name like ?", "%#{name}%") }
+  scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
+  scope :with_roles, -> { joins :role_mapping }
+  scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id  }
+  scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
+  scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
+  scope :sort_by_name, -> { order(name: :asc)}
 
   after_create do
     self.build_profile.save if self.profile.blank?

@@ -5,7 +5,7 @@
 <form data-remote data-turboboost id="allReportsFilters" action="" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
-    <% param = get_old_filters(params, 2) # i.e get filters for expenses    %>
+    <% param = get_old_filters(params, 2) # i.e get filters for expenses     %>
     <% param.each do |item| %>
         <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
     <% end %>
@@ -38,35 +38,6 @@
         <%= will_paginate @reports if @reports.present? %>
       </div>
 
-
-      <!-- DELETE THIS AFTER TEST -->
-      <!--<div id="reportRow" class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px;cursor: pointer; " onclick="location.href = < %= show_report_url %>">
-        <div class="col-md-2" style="margin-top: 6px;"><img style="max-width: 35px;
-            margin-left: 10px;
-            color: #6B7EA6;" aria-hidden="true" src="< %= asset_path 'report.png' %>"/></div>
-        <div class="col-md-6" style="margin-left: -25px">
-          <p userTarget="reportname" style="line-height: 80%;font-weight: 300; margin-top: 5px;font-size: 13px;font-weight: 600;">RePoRt
-            That IS to BE Deleted</p>
-
-          <i style="font-size: 10px; text-align: center;
-              border-radius: 30px;
-              padding: 5px;text-transform: uppercase; font-style: normal;">Some status</i>
-        </div>
-        <div class="col-md-2">
-          <p style="text-align: center;
-              margin-top: 15px;
-              font-size: 16px;"><span>&#8377</span></p>
-        </div>
-        <div class="col-md-2">
-
-          <i class="fa fa-pencil" style="font-size: 15px; color: black;margin-top: 18px;
-              margin-left: 25px;
-              opacity: 0.6;"> </i>
-
-        </div>
-
-
-      </div>-->
 
       <script>
 
