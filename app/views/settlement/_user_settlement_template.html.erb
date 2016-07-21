@@ -76,7 +76,9 @@
         margin-left: 20px;">
       <label>Show: </label>
       <ul id="people_filter_type" class="segmented-control">
-        <li data-value="all" data-switch="#settlementHistoryTable" class="activeMembers">Settlement History</li>
+        <li data-value="settlementHistory" data-switch="#settlementHistoryTable" class="activeMembers">Settlement
+          History
+        </li>
         <li data-value="approved" data-switch="#approvedTable">Approved Reports</li>
         <li data-value="reimbursed" data-switch="#approvedTable">Reimbursed Reports</li>
         <li data-value="closed" data-switch="#approvedTable">Closed Reports</li>
@@ -140,7 +142,7 @@
       <thead>
       <tr>
         <th style="width: 1%; padding-left: 20px ">
-          <input type="checkbox" id="checkAllReports" style="margin-right: 20px"></th>
+          <input type="checkbox" id="checkAllReports" style="margin-right: 20px;display: none"></th>
         <th style="width: 34.5%;">Report Name</th>
         <th style="width:  49.5%;">Final Approver</th>
         <th style="width:  15%;">Amount</th>
@@ -158,7 +160,7 @@
       <tr>
         <td style="width: 1%; padding-left: 20px">
 
-          <input name="existing_users_id" class="checkboxAllReports" type="checkbox"></td>
+          <input name="existing_users_id" class="checkboxAllReports" type="checkbox" style="display: none"></td>
 
         <td style="width:  34.5%;">admisd_12_32_2003<span style="text-transform: capitalize; font-size: 10px; display: block">report id: 1232</span>
         </td>
@@ -455,13 +457,16 @@
         blockToShow = e.currentTarget.getAttribute('data-switch');
 
 
-    if (blockToShow == "#settlementHistoryTable") {
+    if (e.currentTarget.getAttribute('data-value') == "approved") {
+      $('#bulkReimburseSection').show();
+      $('.checkboxAllReports').show();
+      $('#checkAllReports').show();
 
-      $('#bulkReimburseSection').hide();
 
     } else {
-      $('#bulkReimburseSection').show();
-
+      $('#bulkReimburseSection').hide();
+      $('.checkboxAllReports').hide();
+      $('#checkAllReports').hide();
     }
 
     // Hide all children.
@@ -470,9 +475,12 @@
     // And show the requested component.
     $page.children(blockToShow).show();
 
+
   });
 
   $(document).ready(function () {
+
+    $('#bulkReimburseSection').hide();
 
 
     $("#checkAllApprovedReports").change(function () {
