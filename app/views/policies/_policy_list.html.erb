@@ -34,7 +34,7 @@
       <% @policies.each do |policy| %>
           <tr>
             <td style="width: 30%;"><%= policy.name %></td>
-            <td style="width: 40%;"><%= policy.owner.name if policy.owner_id.present? %></td>
+            <!--<td style="width: 40%;">< %= policy.owner.name if policy.owner_id.present? %></td>-->
             <td style="width: 40%;">
               <button id="showReportsButton" onclick="">View Reports</button>
               <i class="fa fa-trash-o"></i></td>

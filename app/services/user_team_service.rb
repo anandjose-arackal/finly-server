@@ -21,6 +21,25 @@ class UserTeamService < BaseService
     nil
   end
 
+  def new_team(role_id, params={})
+    errors.clear
+    unless user.present?
+      errors << 'User not found'
+      return false
+    end
+    include_indirect_associations = params[:include_indirect_associations]
+    case role_id
+      when UserRole.finance_manager_id
+        if include_indirect_associations
+          UserManagerMapping
+        else
+
+        end
+      when UserRole.manager_id
+
+    end
+  end
+
   def manager_for?(report)
     emp = report.user
     return false if report.blank?
