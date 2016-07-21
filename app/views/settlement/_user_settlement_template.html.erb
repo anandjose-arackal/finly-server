@@ -69,9 +69,11 @@
     border: 1px solid #d8d8d8;
     background-color: white">
 
-  <div id="filteredReports">
+  <div id="filteredReports" style="display: inline-block;
+      width: 580px;">
 
-    <section>
+    <section style="display: inline;
+        margin-left: 20px;">
       <label>Show: </label>
       <ul id="people_filter_type" class="segmented-control">
         <li data-value="all" data-switch="#settlementHistoryTable" class="activeMembers">Settlement History</li>
@@ -81,8 +83,17 @@
       </ul>
     </section>
   </div>
-
-
+  <section id="bulkReimburseSection" style="display: inline-block;
+      margin-left: 25px;">
+    <button class="grey-button" style="padding: 5px;margin-right: 5px;background-color: #8394AE;
+        color: white;
+        width: 100px;" onclick="reimburseReport()">Reimburse
+    </button>
+    <button class="grey-button" style="padding: 5px;background-color: #8394AE;
+        color: white;
+        width: 100px;" onclick="settleReport()">Settle
+    </button>
+  </section>
   <div id="listOfUsers" style="margin-top: 15px; overflow-x: hidden; max-width: 100%">
 
     <table id="settlementHistoryTable">
@@ -131,10 +142,8 @@
         <th style="width: 1%; padding-left: 20px ">
           <input type="checkbox" id="checkAllReports" style="margin-right: 20px"></th>
         <th style="width: 34.5%;">Report Name</th>
-        <th style="width:  34.5%;">Final Approver</th>
+        <th style="width:  49.5%;">Final Approver</th>
         <th style="width:  15%;">Amount</th>
-        <th style="width:  7.5%;"></th>
-        <th style="width:  7.5%;"></th>
       </tr>
       </thead>
       <!--
@@ -153,19 +162,9 @@
 
         <td style="width:  34.5%;">admisd_12_32_2003<span style="text-transform: capitalize; font-size: 10px; display: block">report id: 1232</span>
         </td>
-        <td style="width:  34.5%;"> vivek.a@hapitoe.com</td>
+        <td style="width:  49.5%;"> vivek.a@hapitoe.com</td>
         <td style="width:  15%;"><span>&#8377</span>345</td>
-        <td style="width:  7.5%;">
-          <button class="grey-button" style="padding: 5px;margin-right: 5px;background-color: #8394AE;
-              color: white;
-              width: 100px;" onclick="reimburseReport()">Reimburse
-          </button>
-        </td>
-        <td style="width:  7.5%;">
-          <button class="grey-button" style="padding: 5px;background-color: #8394AE;
-              color: white;
-              width: 100px;" onclick="settleReport()">Settle
-          </button>
+
         </td>
       </tr>
 
@@ -454,6 +453,16 @@
   $('[data-switch]').on('click', function (e) {
     var $page = $('#listOfUsers'),
         blockToShow = e.currentTarget.getAttribute('data-switch');
+
+
+    if (blockToShow == "#settlementHistoryTable") {
+
+      $('#bulkReimburseSection').hide();
+
+    } else {
+      $('#bulkReimburseSection').show();
+
+    }
 
     // Hide all children.
     $page.children().hide();
