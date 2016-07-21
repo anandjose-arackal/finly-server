@@ -88,15 +88,25 @@ class User < ActiveRecord::Base
   scope :filter_name, -> (name) { where("name like ?", "%#{name}%") }
   scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
   scope :with_roles, -> { joins :role_mapping }
-  scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id  }
+  scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
-  scope :sort_by_name, -> { order(name: :asc)}
+  scope :sort_by_name, -> { order(name: :asc) }
+  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 
   after_create do
     self.build_profile.save if self.profile.blank?
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
     self.build_balance_sheet.save if self.balance_sheet.blank?
+  end
+
+  def name_shortened
+    abbr = name[0]
+    parts = name.split
+    if parts.size >= 2
+      abbr += parts.second[0]
+    end
+    abbr.upcase
   end
 
   def roles

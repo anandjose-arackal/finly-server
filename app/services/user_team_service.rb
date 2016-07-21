@@ -6,38 +6,59 @@ class UserTeamService < BaseService
     self.user = user
   end
 
-  def team(params={})
-    load_retrieve params
-    if @admin_view
-      return nil unless user.admin?
-      return user.company.users
-    elsif @manager_view
-      return nil unless user.manager?
-      return UserManagerMapping.manager_team(@policy_id, self.user.id)
-    elsif @finance_view
-      return nil unless user.finance_manager?
-      return UserManagerMapping.finance_team(@policy_id, self.user.id)
-    end
-    nil
-  end
+  # def team(params={})
+  #   load_retrieve params
+  #   if @admin_view
+  #     return nil unless user.admin?
+  #     return user.company.users
+  #   elsif @manager_view
+  #     return nil unless user.manager?
+  #     return UserManagerMapping.manager_team(@policy_id, self.user.id)
+  #   elsif @finance_view
+  #     return nil unless user.finance_manager?
+  #     return UserManagerMapping.finance_team(@policy_id, self.user.id)
+  #   end
+  #   nil
+  # end
 
-  def new_team(role_id, params={})
+  def team(role_id, params={})
     errors.clear
     unless user.present?
       errors << 'User not found'
       return false
     end
-    include_indirect_associations = params[:include_indirect_associations]
+    indirect_associations = params[:indirect_associations]
+    user_ids = []
+    manager_association = nil
+    approves_to_association = nil
     case role_id
       when UserRole.finance_manager_id
-        if include_indirect_associations
-          UserManagerMapping
-        else
-
+        unless user.finance_manager?
+          errors << 'User is not a Finance Manager'
+          return false
         end
+        manager_association = :has_finance_manager
+        approves_to_association = :has_approves_finance_to
       when UserRole.manager_id
-
+        unless user.manager?
+          errors << 'User is not a Manager'
+          return false
+        end
+        manager_association = :has_manager
+        approves_to_association = :has_approves_to
     end
+    return nil if manager_association.blank? or approves_to_association.blank?
+    user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:id)
+    approves_to_ids = UserManagerMapping.send(approves_to_association, user.id).pluck(:id)
+    while indirect_associations and approves_to_ids.present?
+      user_ids += UserManagerMapping.send(manager_association, approves_to_ids).pluck(:id)
+      approves_to_ids = UserManagerMapping.send(approves_to_association, approves_to_ids).pluck(:id)
+    end
+    user_ids.uniq! if user_ids.present?
+    if user_ids.present?
+      return user.company.users.with_id(user_ids)
+    end
+    nil
   end
 
   def manager_for?(report)

@@ -21,7 +21,7 @@ class SettlementService < BaseService
     cash = user.balance_sheet.cash_in_hand
     return cash if date.blank? or date == Date.today
     payments = user.payments.made_after(date)
-    payments_to_user = payments.transferred_to_user.sum(:value)
+    payments_to_user = payments.transferred_to_user.with_amount.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     expenses = reports.with_amount.submitted_after(date).sum(:value)
     value = cash.value + expenses + debt_clearance - payments_to_user

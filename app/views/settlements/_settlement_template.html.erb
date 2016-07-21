@@ -23,56 +23,65 @@
       <h3 class="headerOfTables" style="color: #2B4072" tooltip="Reimbursement amount by/ to all employees" tooltip-placement="top">
         Settlements</h3>
     </div>
-    <div class="txtListItems">
+    <% if @users.present? %>
+        <% @users.each do |user| %>
+            <div class="txtListItems">
 
-      <div id="centerBlockRows" style="cursor: pointer" class="container-fluid">
+              <div id="centerBlockRows" style="cursor: pointer" class="container-fluid">
 
-        <!--
-              <div id="my-posts">
-                < %= yield :reports %>
+                <!--
+                      <div id="my-posts">
+                        < %= yield :reports %>
+                      </div>
+
+                <div id="infinite-scrolling" style="text-align: center" class="row pagination-wrapper">
+                   < %= will_paginate(@settlements) %>
+                 </div>-->
+
+                <a href="<%= settlement_path user %>">
+                  <div class="row" style="padding: 15px; background-color: white">
+
+                    <div class="col-md-1">
+                      <span class="roundCircle"><%= user.name_shortened %></span></div>
+                    <div class="col-md-3" style="line-height: 120%">
+                      <!--<p expensetarget="userId" style="display: none"> 234 </p>-->
+                      <p style="color: #555; font-weight: 600"><%= user.name %></p>
+
+                      <p id="email" expensetarget="name" style="color: #555"><%= user.email %></p>
+
+                    </div>
+                    <div class="col-md-3" style="line-height: 120%">
+                      <label class="header" style="font-size: 10px; color: #555;    font-weight: 500;
+                          text-transform: uppercase;">Cash In Hand</label>
+
+                      <p style="font-size: 15px; font-weight: 400;">
+                        <inline> &#8377</inline>
+                        <%= user.balance_sheet.cash_in_hand.value %>
+                      </p>
+                    </div>
+                    <div class="col-md-2" style="line-height: 120%">
+                      <label expensetarget="name" style="font-size: 10px; color: #555;font-weight: 500;
+                          text-transform: uppercase;;">Reimbursement</label>
+
+                      <p style="font-size: 15px; font-weight: 400;">
+                        <inline> &#8377</inline>
+                        <%= user.balance_sheet.pending_reimbursement.value %>
+                      </p>
+                    </div>
+                    <div class="col-md-3" style="line-height: 120%;text-align: right;margin-top: 10px;">
+
+                      <button class="green-button" style="padding: 5px 10px 5px 10px;" data-toggle="modal" data-target="#settlementModal">Add
+                        Payment
+                      </button>
+
+                    </div>
+                  </div>
+                </a>
               </div>
 
-        <div id="infinite-scrolling" style="text-align: center" class="row pagination-wrapper">
-           < %= will_paginate(@settlements) %>
-         </div>-->
-
-        <a href="<%= user_settlement_url %>">
-        <div class="row" style="padding: 15px; background-color: white">
-
-          <div class="col-md-1">
-            <span class="roundCircle">PA</span></div>
-          <div class="col-md-3" style="line-height: 120%">
-            <p expensetarget="userId" style="display: none"> 234 </p>
-            <p style="color: #555; font-weight: 600">Thomas</p>
-            <p id="email" expensetarget="name" style="color: #555">dodo@bobo.com</p>
-
-          </div>
-          <div class="col-md-3" style="line-height: 120%">
-            <label class="header" style="font-size: 10px; color: #555;    font-weight: 500;
-                text-transform: uppercase;">Cash In Hand</label>
-            <p style="font-size: 15px; font-weight: 400;">
-              <inline> &#8377</inline>
-              345
-            </p>
-          </div>
-          <div class="col-md-2" style="line-height: 120%">
-            <label expensetarget="name" style="font-size: 10px; color: #555;font-weight: 500;
-                text-transform: uppercase;;">Reimbursement</label>
-            <p style="font-size: 15px; font-weight: 400;">
-              <inline> &#8377</inline>
-              345
-            </p>
-          </div>
-          <div class="col-md-3" style="line-height: 120%;text-align: right;margin-top: 10px;">
-
-            <button class="green-button" style="padding: 5px 10px 5px 10px;"  data-toggle="modal" data-target="#settlementModal" >Add Payment</button>
-
-          </div>
-        </div>
-        </a>
-      </div>
-
-    </div>
+            </div>
+        <% end %>
+    <% end %>
   </div>
 
 </div>
@@ -120,7 +129,6 @@
     </div>
   </div>
 </div>
-
 
 
 </body>

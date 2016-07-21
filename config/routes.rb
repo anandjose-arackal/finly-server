@@ -123,11 +123,10 @@ Rails.application.routes.draw do
 
   end
 
+  resources :settlements
+
   get 'expenses' => 'expenses#expenses'
 
-  get 'settlement' => 'settlement#settlement'
-
-  get 'user_settlement' => 'settlement#user_settlement'
   mount_opro_oauth
 
   root 'static_pages#home'

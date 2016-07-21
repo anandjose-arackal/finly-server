@@ -35,7 +35,7 @@ class PoliciesController < ApplicationController
       managers = @policy.company.users.with_id(manager_id)
       if managers.present?
         manager = managers.first
-        manager_team = UserTeamService.new(manager).team(view: 'manager')
+        manager_team = UserTeamService.new(manager).team(UserRole.manager_id)
         new_u = nil
         if manager_team.present?
           new_u = u.with_id(manager_team.pluck(:id))

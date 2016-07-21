@@ -57,9 +57,12 @@ class UserManagerMapping < ActiveRecord::Base
   scope :exact_amount, ->(currency_id, value) { where value: value, currency_id: currency_id }
   scope :manager_team, ->(policy_id, manager_id) { where policy_id: policy_id, manager_id: manager_id }
   scope :finance_team, ->(policy_id, finance_manager_id) { where policy_id: policy_id, finance_manager_id: finance_manager_id }
-  scope :company, ->(company_id){ joins(:policy).where(company_id: company_id) }
+  scope :company, ->(company_id) { joins(:policy).where(company_id: company_id) }
 
-  scope :has_finance_manager, ->(manager_id){ where finance_manager_id: manager_id }
+  scope :has_finance_manager, ->(manager_id) { where finance_manager_id: manager_id }
+  scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_user_id: manager_id }
+  scope :has_manager, ->(manager_id) { where manager_id: manager_id }
+  scope :has_approves_to, ->(manager_id) { where approves_to_user_id: manager_id }
 
   private
   def valid_default
