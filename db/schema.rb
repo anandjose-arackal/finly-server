@@ -257,12 +257,14 @@ ActiveRecord::Schema.define(version: 20160718102230) do
   create_table "policies", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.integer  "company_id", limit: 4
+    t.integer  "owner_id",   limit: 4
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.boolean  "default",                default: false, null: false
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
+  add_index "policies", ["owner_id"], name: "index_policies_on_owner_id", using: :btree
 
   create_table "policy_configurations", force: :cascade do |t|
     t.integer  "policy_id",                limit: 4,                 null: false

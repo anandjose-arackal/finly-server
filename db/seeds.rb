@@ -144,7 +144,10 @@ if Policy.non_default.count == 0
   PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
 
-  PolicyCreateService.new(a).create_policy('Another test Policy')
+  p2 = PolicyCreateService.new(a).create_policy('Another test Policy')
+  u.each do |user|
+    PolicyUserService.new(p2).add_user(user, false)
+  end
 end
 
 if ExpenseType.count ==0

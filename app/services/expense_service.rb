@@ -156,10 +156,14 @@ class ExpenseService < BaseService
     expense_params = params[:expense].except(:amount, :merchant, :currency_id)
 
     # todo - add logic here to take into account expenses edited within reports
+    # in case the method is called from the test cases
+    expense_params[:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]} if params[:expense][:amount_attributes].nil?
+    expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]} if params[:expense][:manual_expense_attributes].nil?
+
     # for manual expenses only
-    expense_params[:expense_type_id] = 1
+    expense_params[:expense_type_id] = 1 if expense_params[:expense_type_id].nil?
     # i.e. it's an unsubmitted expense
-    expense_params[:expense_status_id] = 1
+    expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil?
     expense_params[:id] = params[:id] || params[:expense_id]
     expense_params
   end
