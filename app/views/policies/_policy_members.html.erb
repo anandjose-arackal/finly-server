@@ -3,7 +3,8 @@
   <button data-toggle="modal" data-target="#inviteUsersToPolicy">Invite Employees
   </button>
 
-  <button id="assignExistingEmployees" style="margin-left: 10px" data-toggle="modal" data-target="#assignExistingUsersToPolicy">Assign Employees to
+  <button id="assignExistingEmployees" style="margin-left: 10px" data-toggle="modal" data-target="#assignExistingUsersToPolicy">Assign
+    Employees to
     Policy
   </button>
 
@@ -58,14 +59,21 @@
 
                 </form>-->
 
-              <input name="existing_users_id" class="checkboxes" type="checkbox"></td>
+              <input name="remove_user_id" class="checkboxes" value="<%= user[:user].id %>" type="checkbox"></td>
 
             <td style="width:  24.5%;"><%= user[:user].email %></td>
             <td style="width:  24.5%;"><%= user[:manager].email if user[:manager].present? %></td>
             <td style="width:  24.5%;"><%= user[:finance_manager].email if user[:finance_manager].present? %></td>
-            <td style="width:  25%;"><%= "Policy Admin" if user[:admin] %>
-              <%= "<p>Approves To #{user[:approves_to].email}</p>" if user[:approves_to].present? %>
-              <%= "<p>Approves Finance To #{user[:approves_finance_to].email}</p>" if user[:approves_finance_to].present? %>
+            <td style="width:  25%;">
+              <% if user[:admin] %>
+                  <p>Policy Admin</p>
+              <% end %>
+              <% if user[:approves_to].present? %>
+                  <p>Approves To <%= user[:approves_to].email %></p>
+              <% end %>
+              <% if user[:approves_finance_to].present? %>
+                  <p>Approves Finance To <%= user[:approves_finance_to].email %></p>
+              <% end %>
             </td>
 
             <td style="width:  25%;">

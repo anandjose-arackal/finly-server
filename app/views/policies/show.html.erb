@@ -66,6 +66,11 @@
 
 </div>
 
+<form hidden="hidden" data-remote data-turboboost id="removeUsersFromPolicy" action="<%= policy_remove_users_path(policy_id: @policy.id) %>" method="post">
+  <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+  <input id="removeUserIds" name="user_id" type="text">
+</form>
+
 
 <div class="modal fade" id="assignExistingUsersToPolicy" role="dialog" style="margin-top: 5%; ">
   <div class="modal-dialog modal-md">
@@ -116,7 +121,6 @@
               <% end %>
             </select>
           </section>
-
         </form>
         <section id="addUsersSection" style="background-color: white;margin-left: 25%; min-height: 250px;
             width: 75%; border-left: 1px solid #d8d8d8">
@@ -128,6 +132,10 @@
           </div>
           <div id="invitableUsersContainer">
           </div>
+          <form hidden="hidden" data-remote data-turboboost id="addUsersToPolicy" action="<%= policy_add_users_path(policy_id: @policy.id) %>" method="post">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <input id="addUserIds" name="user_id" type="text">
+          </form>
         </section>
       </div>
     </div>
@@ -339,9 +347,13 @@
   //    $.clearInput();
   //  });
 
-  $('#assignExistingUsersToPolicy').on('hidden.bs.modal', function (e) {
+  $('#assignExistingUsersToPolicy').on('shown.bs.modal', function (e) {
     $.clearInput();
-  })
+  });
+
+  $('#assignExistingUsersToPolicy').on('hidden.bs.modal', function (e) {
+    $('#invitableUsersContainer').empty();
+  });
 
   $.clearInput = function () {
     policyList = $('form#usersPolicyList')
@@ -394,6 +406,35 @@
     }
 
   });
+
+  function addUsersToPolicyFromList() {
+    var array = []
+    $("input:checkbox[name=add_user_id]:checked").each(function () {
+      array.push($(this).val());
+    });
+    $('#addUserIds').val(array);
+    $('form#addUsersToPolicy').submit();
+  }
+
+  function removeUsersFromPolicyList() {
+    var array = []
+    $("input:checkbox[name=remove_user_id]:checked").each(function () {
+      array.push($(this).val());
+    });
+    console.log("removeUserIds : " + array);
+    $('#removeUserIds').val(array);
+    $('form#removeUsersFromPolicy').submit();
+  }
+
+  function makeButtonVisible() {
+
+    if ($("input:checkbox:checked").length > 0) {
+      $('#addUsersToPolicyButton').show();
+    }
+    else {
+      $('#addUsersToPolicyButton').hide();
+    }
+  }
 
 
   //  function addNewCategory() {

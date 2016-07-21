@@ -7,11 +7,11 @@ class PoliciesController < ApplicationController
   def create
     pcs = PolicyCreateService.new(current_user)
     if pcs.create_policy(params[:name])
-      flash[:success] = 'Policy Created'
+      flash.now[:success] = 'Policy Created'
       render_flash_message
       return
     end
-    flash[:failure] = pcs.errors
+    flash.now[:failure] = pcs.errors
     render_flash_message
   end
 
@@ -23,22 +23,12 @@ class PoliciesController < ApplicationController
   def show
     @policy = Policy.find(params[:id])
     @managers = @policy.company.managers
-    @users = []
-    @policy.user_mapping.each do |map|
-      user = map.user
-      uts = UserTeamService.new(user)
-      admin = map.admin
-      manager = uts.manager(policy: @policy)
-      finance_manager = uts.finance_manager(policy: @policy)
-      approves_to = uts.approves_to(policy: @policy)
-      approves_finance_to = uts.approves_finance_to(policy: @policy)
-      @users << {user: user, admin: admin, manager: manager, finance_manager: finance_manager, approves_to: approves_to, approves_finance_to: approves_finance_to}
-    end
+    load_users
   end
 
   def invitable_users
     @policy = Policy.find(params[:policy_id])
-    u = PolicyUserService.new(@policy).invitable_users
+    u = PolicyUserService.new(@policy).invitable_users.sort_by_name
     u = apply_scopes(u)
     manager_id = params[:filter_manager_id]
     if manager_id.present?
@@ -68,12 +58,63 @@ class PoliciesController < ApplicationController
     end
   end
 
+  def add_users
+    @policy = Policy.find(params[:policy_id])
+    ids = []
+    ids = params[:user_id].split(/,/) unless params[:user_id].blank?
+    users = PolicyUserService.new(@policy).invitable_users.with_id(ids)
+    pus = PolicyUserService.new(@policy)
+    if pus.add_users(users)
+      load_users
+      respond_to do |format|
+        format.html {}
+        format.js
+      end
+      return
+    end
+    flash.now[:danger] = pus.errors
+    render_flash_message
+  end
+
+  def remove_users
+    @policy = Policy.find(params[:policy_id])
+    ids = []
+    ids = params[:user_id].split(/,/) unless params[:user_id].blank?
+    users = @policy.users.with_id(ids)
+    pus = PolicyUserService.new(@policy)
+    if pus.remove_users(users)
+      load_users
+      respond_to do |format|
+        format.html {}
+        format.js { render 'add_users' }
+      end
+      return
+    end
+    flash.now[:danger] = pus.errors
+    render_flash_message
+  end
+
   def update
 
   end
 
   def destroy
 
+  end
+
+  private
+  def load_users
+    @users = []
+    @policy.user_mapping.each do |map|
+      user = map.user
+      uts = UserTeamService.new(user)
+      admin = map.admin
+      manager = uts.manager(policy: @policy)
+      finance_manager = uts.finance_manager(policy: @policy)
+      approves_to = uts.approves_to(policy: @policy)
+      approves_finance_to = uts.approves_finance_to(policy: @policy)
+      @users << {user: user, admin: admin, manager: manager, finance_manager: finance_manager, approves_to: approves_to, approves_finance_to: approves_finance_to}
+    end
   end
 
 end

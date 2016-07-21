@@ -33,6 +33,30 @@ class PolicyUserService < BaseService
     true
   end
 
+  # adds a particular user and his associated role within the policy
+  def add_users(users)
+    errors.clear
+    if users.blank?
+      errors << 'No user selected'
+      return false
+    end
+    users.each do |user|
+      if self.policy.users.find_by(id: user.id).present?
+        next
+      end
+
+      # Add user to policy mapping
+      self.policy.user_mapping.create(user: user)
+
+      # Add user configuration
+      user.team_mapping.policy(nil).each do |item|
+        cloned_item = item.dup
+        cloned_item.update_attribute(:policy_id, self.policy.id)
+      end
+    end
+    true
+  end
+
   def remove_user(user)
     errors.clear
     if user.blank?
@@ -50,6 +74,23 @@ class PolicyUserService < BaseService
 
     # Remove user
     self.policy.users.destroy(user) if user.present?
+  end
+
+  def remove_users(users)
+    errors.clear
+    if users.blank?
+      errors << 'No user selected'
+      return false
+    end
+
+    users.each do |user|
+      # Remove user configuration
+      user.team_mapping.policy(policy.id).destroy_all
+
+      # Remove user
+      self.policy.users.destroy(user) if user.present?
+    end
+    true
   end
 
 end

@@ -5,7 +5,7 @@
             <% user = item[:user] %>
             <tr style="margin: 0;font-size: 13px; text-align: left; padding-top: 10px; height: 30px">
               <td style="width: 15% ">
-                <input class="checkboxes" type="checkbox" name="expenses_id" value="<%= user.id %>" onclick="makeButtonVisible()" style="margin: 4px 8px 0 8px"><%= user.name %>
+                <input class="checkboxes" type="checkbox" name="add_user_id" value="<%= user.id %>" onclick="makeButtonVisible()" style="margin: 4px 8px 0 8px"><%= user.name %>
               </td>
               <td style="width: 20% "><%= user.email %></td>
               <td style="width: 30% "><%= item[:manager] %></td>
