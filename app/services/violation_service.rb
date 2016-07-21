@@ -38,6 +38,7 @@ class ViolationService < BaseService
       end
     end
 
+    self.warning_messages
   end
 
   private

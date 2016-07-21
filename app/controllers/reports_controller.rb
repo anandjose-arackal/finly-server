@@ -3,6 +3,7 @@ class ReportsController < ApplicationController
   before_action :authenticate_user!
   before_action :fetch_report, except: [:create, :index, :export]
   before_action :fetch_reports, only: [:index]
+  before_action :load_service_object
 
   def create
     rs = ReportService.new(user: current_user)
@@ -104,7 +105,15 @@ class ReportsController < ApplicationController
     render_flash_message
   end
 
+  def assign_policy
+    handle_update :update_report, nil, update_params
+  end
+
   private
+
+  def load_service_object
+    @violation_service = ViolationService.new(current_user)
+  end
 
   def load_view_for_report
     load_expenses_for_views
@@ -134,6 +143,10 @@ class ReportsController < ApplicationController
         @views[:reimbursement_confirm] = true
       end
     end
+    # code for report policy
+    @policies = @report.user.policies
+    @policy = @report.policy
+    @violation_messages = @violation_service.violations(@policy, @report)
   end
 
   def load_expenses_for_views
