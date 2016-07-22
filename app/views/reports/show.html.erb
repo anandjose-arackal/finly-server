@@ -94,20 +94,16 @@
     $('#receiptEditPencil').hide();
     $('#submittedExpense').hide();
 
-
     if ($('#noReceiptText').is(":visible")) {
-
       $('#noReceiptText').hide();
       $('#receiptRemove').hide();
       $('#hiddenExpenseReceipt').attr("src", "");
 
       $('#viewReceiptUpload').show();
       $('#viewReceiptUpload').height($('#commenter').height() * 4.5);
-
     }
     else {
       $('#hiddenExpenseReceipt').attr("src", $('#expenseReceipt').attr('src'));
-
       $('#receiptRemove').show();
     }
   }

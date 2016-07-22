@@ -22,4 +22,8 @@ class PaymentType < ActiveRecord::Base
   def self.reimbursement_id
     3
   end
+
+  def self.settlement_id
+    3
+  end
 end

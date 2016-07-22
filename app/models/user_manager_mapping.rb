@@ -31,7 +31,7 @@ class UserManagerMapping < ActiveRecord::Base
   validate :valid_default
   validate :valid_non_default
 
-  scope :user, -> (user) { where user_id: user.id }
+  scope :with_user, -> (user_id) { where user_id: user_id }
   scope :default, -> { find_by default: true }
   scope :policy, -> (policy_id) { where policy_id: policy_id }
   scope :sort, ->(sort_by, order) do

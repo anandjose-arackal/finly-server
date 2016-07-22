@@ -124,7 +124,8 @@ Rails.application.routes.draw do
   end
 
   resources :settlements
-
+  post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial
+  post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
   get 'expenses' => 'expenses#expenses'
 
   mount_opro_oauth

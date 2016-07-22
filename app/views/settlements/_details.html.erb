@@ -1,0 +1,50 @@
+<div style="clear: both;
+    width: 900px;
+    margin-top: 220px;
+    margin-left: 140px;
+    padding: 20px;
+    border: 1px solid #d8d8d8;
+    background-color: white">
+
+  <div id="filteredReports" style="display: inline-block;
+      width: 580px;">
+
+    <section style="display: inline;
+        margin-left: 20px;">
+      <label>Show: </label>
+      <ul id="people_filter_type" class="segmented-control">
+        <li data-value="paymentHistory" data-switch="#settlementHistoryTable" <%= 'class="activeMembers"' if @load_type[:payments] %>>Settlement
+          History
+        </li>
+        <li data-value="approved" data-switch="#reportsTable" <%= 'class="activeMembers"' if @load_type[:approved] %>>Approved
+          Reports
+        </li>
+        <li data-value="reimbursed" data-switch="#reportsTable" <%= 'class="activeMembers"' if @load_type[:reimbursed] %> >Reimbursed
+          Reports
+        </li>
+        <li data-value="closed" data-switch="#reportsTable" <%= 'class="activeMembers"' if @load_type[:closed] %>>Closed
+          Reports
+        </li>
+      </ul>
+    </section>
+  </div>
+  <% if @load_type[:approved] %>
+      <section id="bulkReimburseSection" style="display: inline-block;
+          margin-left: 25px;">
+        <button class="grey-button" style="padding: 5px;margin-right: 5px;background-color: #8394AE;
+            color: white;
+            width: 100px;" onclick="reimburseReport()">Reimburse
+        </button>
+        <button class="grey-button" style="padding: 5px;background-color: #8394AE;
+            color: white;
+            width: 100px;" onclick="settleReport()">Settle
+        </button>
+      </section>
+  <% end %>
+
+  <% if @load_type[:payments] %>
+      <%= render 'payment_history' %>
+  <% else %>
+      <%= render 'reports' %>
+  <% end %>
+</div>

@@ -27,6 +27,10 @@ class UserTeamService < BaseService
       errors << 'User not found'
       return false
     end
+    unless role_id.present?
+      errors << 'User role not defined'
+      return false
+    end
     indirect_associations = params[:indirect_associations]
     user_ids = []
     manager_association = nil
@@ -61,30 +65,84 @@ class UserTeamService < BaseService
     nil
   end
 
-  def manager_for?(report)
-    emp = report.user
-    return false if report.blank?
-    rds = ReportDetailService.new(report)
-    policy = report.policy
-    policy = rds.policy unless policy.blank?
-    m = UserTeamService.new(emp).manager(report: report)
-    while m.present?
-      return true if m.id == self.user.id
-      m = UserTeamService.new(m).approves_to(report: report)
+  # Can pass report or user object
+  # Passing a report would check if the user is a manager for the report
+  # Passing a user would check if the user is a direct manager for the given user object
+  # If indirect_associations is set to true in params while passing user object,
+  # it checks if the user is associated as a manager with the given user which includes chains of approvals
+  def manager_for?(obj, params={})
+    errors.clear
+    if obj.is_a?(Report)
+      report = obj
+      emp = report.user
+      rds = ReportDetailService.new(report)
+      policy = report.policy
+      policy = rds.policy unless policy.blank?
+      m = UserTeamService.new(emp).manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      while m.present?
+        return true if m.id == self.user.id
+        m = UserTeamService.new(m).approves_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      end
+    elsif obj.is_a?(User)
+      user = obj
+      emp = UserManagerMapping.has_manager(self.user.id).with_user(user.id)
+      if emp.present?
+        return true
+      end
+      if params[:indirect_associations]
+        approves_to_ids = UserManagerMapping.has_approves_to(self.user.id).pluck(:id)
+        while approves_to_ids.present?
+          emp = UserManagerMapping.has_manager(approves_to_ids).with_user(user.id)
+          if emp.present?
+            return true
+          end
+          approves_to_ids = UserManagerMapping.has_approves_to(approves_to_ids).pluck(:id)
+        end
+      end
+    else
+      errors << 'Invalid Params'
+      return false
     end
     false
   end
 
-  def finance_manager_for?(report)
-    emp = report.user
-    return false if report.blank?
-    rds = ReportDetailService.new(report)
-    policy = report.policy
-    policy = rds.policy unless policy.blank?
-    m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
-    while m.present?
-      return true if m.id == self.user.id
-      m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+  # Can pass report or user object
+  # Passing a report would check if the user is a finance manager for the report
+  # Passing a user would check if the user is a direct finance manager for the given user object
+  # If indirect_associations is set to true in params while passing user object,
+  # it checks if the user is associated as a finance manager with the given user which includes chains of approvals
+  def finance_manager_for?(obj, params={})
+    errors.clear
+    if obj.is_a?(Report)
+      report = obj
+      emp = report.user
+      rds = ReportDetailService.new(report)
+      policy = report.policy
+      policy = rds.policy unless policy.blank?
+      m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      while m.present?
+        return true if m.id == self.user.id
+        m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      end
+    elsif obj.is_a?(User)
+      user = obj
+      emp = UserManagerMapping.has_finance_manager(self.user.id).with_user(user.id)
+      if emp.present?
+        return true
+      end
+      if params[:indirect_associations]
+        approves_to_ids = UserManagerMapping.has_approves_finance_to(self.user.id).pluck(:id)
+        while approves_to_ids.present?
+          emp = UserManagerMapping.has_finance_manager(approves_to_ids).with_user(user.id)
+          if emp.present?
+            return true
+          end
+          approves_to_ids = UserManagerMapping.has_approves_finance_to(approves_to_ids).pluck(:id)
+        end
+      end
+    else
+      errors << 'Invalid Params'
+      return false
     end
     false
   end

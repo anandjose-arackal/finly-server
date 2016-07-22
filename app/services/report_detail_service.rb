@@ -16,6 +16,15 @@ class ReportDetailService < BaseService
     0
   end
 
+  def final_approver
+    return nil unless report.approved? or report.reimbursed? or report.reimbursement_confirmed? or report.closed?
+    tracks = report.tracks.with_action(ReportTrackingAction.approve_id)
+    if tracks.present?
+      return tracks.last.action_user
+    end
+    nil
+  end
+
   def first_date
     return nil unless report.expenses.count > 0
     report.expenses.sort_date_asc.first.date

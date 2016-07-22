@@ -37,7 +37,7 @@ class ExpensesController < ApplicationController
 
   def expense_params
     ###### todo temporary - will be removed after currency is added in main screen###
-    params[:expense][:currency_id] = 1
+    params[:expense][:currency_id] = Currency.first.id
     ##########################################################################
 
     params[:expense][:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
