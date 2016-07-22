@@ -12,7 +12,7 @@ class PolicyCreateService < BaseService
       errors << 'User not found'
       return false
     end
-    unless user.admin?
+    unless user.company_admin?
       errors << 'Only admins can create policies'
       return false
     end

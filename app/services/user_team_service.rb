@@ -36,6 +36,12 @@ class UserTeamService < BaseService
     manager_association = nil
     approves_to_association = nil
     case role_id
+      when UserRole.admin_id
+        unless user.admin?
+          errors << 'User is not an Admin'
+          return false
+        end
+        return admin_team
       when UserRole.finance_manager_id
         unless user.finance_manager?
           errors << 'User is not a Finance Manager'
@@ -171,14 +177,14 @@ class UserTeamService < BaseService
     # todo validate if its better to go with rescue when manager is not assigned or have a seperate check which might result in 2 queries
     # return nil unless self.user.team_mapping.manager.present? # todo sample check
     # return @mapping.default.manager if @default
-    obj = @mappings.manager.policy(@policy_id).amount(@currency_id, @amount).manager rescue nil
+    obj = @mappings.manager.policy(@policy_id).amount(@currency_id, @amount).first.manager rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
 
   def finance_manager(params={})
     load_retrieve params
-    obj = @mappings.finance_manager.policy(@policy_id).amount(@currency_id, @amount).finance_manager rescue nil
+    obj = @mappings.finance_manager.policy(@policy_id).amount(@currency_id, @amount).first.finance_manager rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -187,7 +193,7 @@ class UserTeamService < BaseService
     return nil unless user.manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).approves_to_user rescue nil
+    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -196,7 +202,7 @@ class UserTeamService < BaseService
     return nil unless user.finance_manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).approves_finance_to_user rescue nil
+    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_finance_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -295,7 +301,7 @@ class UserTeamService < BaseService
     @admin_view = nil
     @manager_view = nil
     @finance_view = nil
-    @mappings = self.user.team_mapping
+    @mappings = self.user.team_mapping.with_details
     if params[:policy_id]
       @policy_id = params[:policy_id]
       @currency_id = params[:currency_id]

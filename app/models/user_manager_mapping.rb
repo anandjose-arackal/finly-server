@@ -32,7 +32,8 @@ class UserManagerMapping < ActiveRecord::Base
   validate :valid_non_default
 
   scope :with_user, -> (user_id) { where user_id: user_id }
-  scope :default, -> { find_by default: true }
+  scope :default, -> { where default: true }
+  scope :non_default, -> { where.not default: true }
   scope :policy, -> (policy_id) { where policy_id: policy_id }
   scope :sort, ->(sort_by, order) do
     order.upcase! if order
@@ -63,6 +64,8 @@ class UserManagerMapping < ActiveRecord::Base
   scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_user_id: manager_id }
   scope :has_manager, ->(manager_id) { where manager_id: manager_id }
   scope :has_approves_to, ->(manager_id) { where approves_to_user_id: manager_id }
+
+  scope :with_details, -> {includes :user, :manager, :finance_manager, :approves_to_user, :approves_finance_to_user, :greater_than_amount}
 
   private
   def valid_default

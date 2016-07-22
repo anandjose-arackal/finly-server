@@ -63,7 +63,7 @@
 
 </div>
 
-<form hidden="hidden" data-remote data-turboboost id="removeUsersFromPolicy" action="<%= policy_remove_users_path(policy_id: @policy.id) %>" method="post">
+<form hidden="hidden" data-remote data-turboboost id="removeUsersFromPolicy" action="<%= policy_remove_users_path(load_params policy_id: @policy.id) %>" method="post">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
   <input id="removeUserIds" name="user_id" type="text">
 </form>
@@ -94,7 +94,7 @@
       </div>
       <div class="modal-body" style="padding: 0">
 
-        <form data-remote data-turboboost id="usersPolicyList" action="<%= policy_invitable_users_path(@policy) %>" method="post" style="float: left;width: 25%;">
+        <form data-remote data-turboboost id="usersPolicyList" action="<%= policy_invitable_users_path(load_params policy_id: @policy.id) %>" method="post" style="float: left;width: 25%;">
           <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
           <section id="filterSection">
             <div style="font-size: 18px;
@@ -129,7 +129,7 @@
           </div>
           <div id="invitableUsersContainer">
           </div>
-          <form hidden="hidden" data-remote data-turboboost id="addUsersToPolicy" action="<%= policy_add_users_path(policy_id: @policy.id) %>" method="post">
+          <form hidden="hidden" data-remote data-turboboost id="addUsersToPolicy" action="<%= policy_add_users_path(load_params policy_id: @policy.id) %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
             <input id="addUserIds" name="user_id" type="text">
           </form>
@@ -210,7 +210,7 @@
 
       <div class="modal-body">
         <label style="margin-top: 0">Employee Email: </label>
-        <span style="margin-left: 30px">MaryJain@spidey.com</span>
+        <span id="policyMemberEmailId" style="margin-left: 30px">MaryJain@spidey.com</span>
         <label>Policy Admin
           <span style="font-size: 10px; font-weight: 400 "> (Policy Admins can take control of any of the reports submitted by the employees belonging to this policy)</span>
         </label>
@@ -224,106 +224,126 @@
           </span>
         </div>
 
-        <hr>
-        <label>Submits To:</label>
+        <input hidden="hidden" id="policyMemberSettingsDefaultMappingId">
+        <input hidden="hidden" id="policyMemberSettingsManagerMappingId">
+        <input hidden="hidden" id="policyMemberSettingsFinanceManagerMappingId">
+        <input hidden="hidden" id="policyMemberSettingsApprovesToMappingId">
+        <input hidden="hidden" id="policyMemberSettingsApprovesFinanceToMappingId">
 
-        <select name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
-          <option style="display:none" value="" selected="selected"></option>
-          <option>Manager 1</option>
-          <option>Manager 2</option>
-          <option>Manager 3</option>
-        </select>
-        <p>This is the default manager to whom mary jain will submit her reports to.</p>
+        <div id="policyMemberSettingsEmployeeSection">
+          <hr>
+          <label>Submits To:</label>
 
-        <label>If Report Total is Over:</label> <input type="number" placeholder="Amount">
-
-        <div>
-          <label>Then Submits To:</label>
-          <select name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+          <select id="policyMemberManagerSelector" name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
             <option style="display:none" value="" selected="selected"></option>
-            <option>Manager 1</option>
-            <option>Manager 2</option>
-            <option>Manager 3</option>
+            <% @managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
           </select>
-        </div>
-        <p>If the report exceeds the amount above, who does mary.jain@spidey.com submit those reports to?</p>
 
-        <hr>
-        <label>Finance Manager:</label>
+          <p>This is the default manager to whom mary jain will submit her reports to.</p>
 
-        <select name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
-          <option style="display:none" value="" selected="selected"></option>
-          <option>Manager 1</option>
-          <option>Manager 2</option>
-          <option>Manager 3</option>
-        </select>
-        <p>This is the default finance manager whom mary jain will have her finances approved by.</p>
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberManagerConditionalAmount" type="number" placeholder="Amount">
 
-        <label>If Report Total is Over:</label> <input type="number" placeholder="Amount">
+          <div>
+            <label>Then Submits To:</label>
+            <select id="policyMemberManagerConditionalSelector" name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+              <option style="display:none" value="" selected="selected"></option>
+              <% @managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does mary.jain@spidey.com submit those reports to?</p>
 
-        <div>
-          <label>Then Submits To:</label>
-          <select name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+          <hr>
+          <label>Finance Manager:</label>
+
+          <select id="policyMemberFinanceManager" name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
             <option style="display:none" value="" selected="selected"></option>
-            <option>Manager 1</option>
-            <option>Manager 2</option>
-            <option>Manager 3</option>
+            <% @finance_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
           </select>
+
+          <p>This is the default finance manager whom mary jain will have her finances approved by.</p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberFinanceManagerConditionalAmount" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Submits To:</label>
+            <select id="policyMemberFinanceManagerConditionalManager" name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+              <option style="display:none" value="" selected="selected"></option>
+              <% @finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the finance exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
         </div>
-        <p>If the finance exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
 
         <hr>
-
-        <label>Approves To:</label>
-        <select name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
-          <option style="display:none" value="" selected="selected"></option>
-          <option>Manager 1</option>
-          <option>Manager 2</option>
-          <option>Manager 3</option>
-        </select>
-
-        <p>Does MaryJain@spidey.com have reports to approve? If so, who do they forward these approved reports to? (This
-          is usually to someone in accounting or finance)</p>
-
-        <label>If Report Total is Over:</label> <input type="number" placeholder="Amount">
-
-        <div>
-          <label>Then Approves To:</label>
-          <select name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+        <div id="policyMemberSettingsApprovesToSection">
+          <label>Approves To:</label>
+          <select id="policyMemberApprovesToSelector" name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
             <option style="display:none" value="" selected="selected"></option>
-            <option>Manager 1</option>
-            <option>Manager 2</option>
-            <option>Manager 3</option>
+            <% @managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
           </select>
+
+          <p>Does MaryJain@spidey.com have reports to approve? If so, who do they forward these approved reports to?
+            (This
+            is usually to someone in accounting or finance)</p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberApprovesToConditionalAmount" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Approves To:</label>
+            <select id="policyMemberApprovesToConditionalSelector" name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+              <option style="display:none" value="" selected="selected"></option>
+              <% @managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does mary.jain@spidey.com forward those approved reports
+            to?</p>
+          <hr>
         </div>
-        <p>If the report exceeds the amount above, who does mary.jain@spidey.com forward those approved reports to?</p>
 
-        <hr>
-        <label>Approves Finance To:</label>
 
-        <select name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
-          <option style="display:none" value="" selected="selected"></option>
-          <option>Manager 1</option>
-          <option>Manager 2</option>
-          <option>Manager 3</option>
-        </select>
-        <p>Does MaryJain@spidey.com have finances to approve? If so, who do they forward these approved finances
-          to? </p>
+        <div id="policyMemberSettingsApprovesFinanceToSection">
+          <label>Approves Finance To:</label>
 
-        <label>If Report Total is Over:</label> <input type="number" placeholder="Amount">
-
-        <div>
-          <label>Then Approves Finance To:</label>
-          <select name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+          <select id="policyMemberApprovesFinanceToSelector" name="filter_amount[type]" class="selectors" style=" margin-left: 45px; width: 150px">
             <option style="display:none" value="" selected="selected"></option>
-            <option>Manager 1</option>
-            <option>Manager 2</option>
-            <option>Manager 3</option>
+            <% @finance_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
           </select>
-        </div>
-        <p>If the report exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
 
-        <hr>
+          <p>Does MaryJain@spidey.com have finances to approve? If so, who do they forward these approved finances
+            to? </p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberApprovesFinanceToConditionalAmount" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Approves Finance To:</label>
+            <select id="policyMemberApprovesFinanceToConditionalSelector" name="filter_amount[type]" class="selectors" style=" margin-top: 15px;">
+              <option style="display:none" value="" selected="selected"></option>
+              <% @finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
+          <hr>
+        </div>
 
         <button class="green-button" style="background-color: #465c8b;letter-spacing: 1px;
             padding: 7px 10px 7px 10px;
@@ -517,6 +537,17 @@
     }
   }
 
+  //  function showMemberDetails(email, is_admin, default_mapping_id, default_manager,
+  //                             conditional_manager_id, conditional_manager_amount,conditional_manager_mapping_id,
+  //                             default_finance_manager,
+  //                             conditional_finance_manager, conditional_finance_manager_amount,conditional_finance_manager_mapping_id,
+  //                             default_approves_to,
+  //                             conditional_approves_to, conditional_approves_to_amount,conditional_approves_to_mapping_id,
+  //                             default_approves_finance_to,
+  //                             conditional_approves_finance_to, conditional_approves_finance_to_amount) {
+  //
+  //  }
+
   //  function addNewCategory() {
   //
   //    if (document.getElementById('newCategory').value) {
@@ -534,5 +565,72 @@
   //    }
   //
   //  }
+
+
+  function userSettingsModal(id) {
+    // get the current info in html table
+    var name = $('#policy_member_' + id + '_name').val();
+    var email_id = $('#policy_member_' + id + '_email_id').val();
+    var is_employee = $('#policy_member_' + id + '_is_employee').val();
+    var is_admin = $('#policy_member_' + id + '_is_admin').val();
+    var manager_id = $('#policy_member_' + id + '_manager_id').val();
+    var conditional_manager_id = $('#policy_member_' + id + '_conditional_manager_id').val();
+    var conditional_manager_amount = $('#policy_member_' + id + '_conditional_manager_amount').val();
+    var finance_manager_id = $('#policy_member_' + id + '_finance_manager_id').val();
+    var conditional_finance_manager_id = $('#policy_member_' + id + '_conditional_finance_manager_id').val();
+    var conditional_finance_manager_amount = $('#policy_member_' + id + '_conditional_finance_manager_amount').val();
+    var is_manager = $('#policy_member_' + id + '_is_manager').val();
+    var approves_to = $('#policy_member_' + id + '_approves_to').val();
+    var conditional_approves_to = $('#policy_member_' + id + '_conditional_approves_to').val();
+    var conditional_approves_to_amount = $('#policy_member_' + id + '_conditional_approves_to_amount').val();
+    var is_finance_manager = $('#policy_member_' + id + '_is_finance_manager').val();
+    var approves_finance_to = $('#policy_member_' + id + '_approves_finance_to').val();
+    var conditional_approves_finance_to = $('#policy_member_' + id + '_conditional_approves_finance_to').val();
+    var conditional_approves_finance_to_amount = $('#policy_member_' + id + '_conditional_approves_finance_to_amount').val();
+    var default_mapping_id = $('#policy_member_' + id + '_default_mapping_id').val();
+    var conditional_manager_mapping_id = $('#policy_member_' + id + '_conditional_manager_mapping_id').val();
+    var conditional_finance_manager_mapping_id = $('#policy_member_' + id + '_conditional_finance_manager_mapping_id').val();
+    var conditional_approves_to_mapping_id = $('#policy_member_' + id + '_conditional_approves_to_mapping_id').val();
+    var conditional_approves_finance_to_mapping_id = $('#policy_member_' + id + '_conditional_approves_finance_to_mapping_id').val();
+
+    document.getElementById("policyMemberEmailId").textContent = email_id;
+    $('#policyMemberManagerSelector').val(manager_id);
+    $('#policyMemberManagerConditionalAmount').val(conditional_manager_amount);
+    $('#policyMemberManagerConditionalSelector').val(conditional_manager_id);
+    $('#policyMemberFinanceManager').val(finance_manager_id);
+    $('#policyMemberFinanceManagerConditionalManager').val(conditional_finance_manager_id);
+    $('#policyMemberFinanceManagerConditionalAmount').val(conditional_finance_manager_amount);
+    $('#policyMemberApprovesToSelector').val(approves_to);
+    $('#policyMemberApprovesToConditionalSelector').val(conditional_approves_to);
+    $('#policyMemberApprovesToConditionalAmount').val(conditional_approves_to_amount);
+    $('#policyMemberApprovesFinanceToSelector').val(approves_finance_to);
+    $('#policyMemberApprovesFinanceToConditionalSelector').val(conditional_approves_finance_to);
+    $('#policyMemberApprovesFinanceToConditionalAmount').val(conditional_approves_finance_to_amount);
+    $('#policyMemberSettingsDefaultMappingId').val(default_mapping_id);
+    $('#policyMemberSettingsManagerMappingId').val(conditional_manager_mapping_id);
+    $('#policyMemberSettingsFinanceManagerMappingId').val(conditional_finance_manager_mapping_id);
+    $('#policyMemberSettingsApprovesToMappingId').val(conditional_approves_to_mapping_id);
+    $('#policyMemberSettingsApprovesFinanceToMappingId').val(conditional_approves_finance_to_mapping_id);
+
+    if (is_employee == "true") {
+      $('#policyMemberSettingsEmployeeSection').show();
+    } else {
+      $('#policyMemberSettingsEmployeeSection').hide();
+    }
+
+    if (is_manager == "true") {
+      $('#policyMemberSettingsApprovesToSection').show();
+    } else {
+      $('#policyMemberSettingsApprovesToSection').hide();
+    }
+
+    if (is_finance_manager == "true") {
+      $('#policyMemberSettingsApprovesFinanceToSection').show();
+    } else {
+      $('#policyMemberSettingsApprovesFinanceToSection').hide();
+    }
+
+    $('#policyMemberSettings').modal('show');
+  }
 
 </script>

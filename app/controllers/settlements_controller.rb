@@ -39,8 +39,7 @@ class SettlementsController < ApplicationController
   end
 
   def index
-    @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
-    @users = @users.with_balance_sheet if @users.present?
+    @users = @users.with_roles.only_employees
   end
 
   def show
@@ -70,9 +69,24 @@ class SettlementsController < ApplicationController
 
   def load_user
     user = current_user.company.users.find_by(id: params[:id])
-    if user.present? and UserTeamService.new(current_user).finance_manager_for?(user, indirect_associations: true)
-      @user = user
-      return true
+    if @admin_view
+      if user.present?
+        if current_user.company_admin?
+          @user = user
+          return true
+        elsif current_user.policy_admin?
+          admin_team = UserTeamService.new(current_user).admin_team
+          if admin_team and admin_team.with_id(params[:id]).present?
+            @user = user
+            return true
+          end
+        end
+      end
+    elsif @finance_view
+      if user.present? and UserTeamService.new(current_user).finance_manager_for?(user, indirect_associations: true)
+        @user = user
+        return true
+      end
     end
     flash.now[:danger] = 'User not found'
     render_flash_message
@@ -80,7 +94,11 @@ class SettlementsController < ApplicationController
   end
 
   def load_users
-    @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
+    if @admin_view
+      @users = UserTeamService.new(current_user).team(UserRole.admin_id, indirect_associations: true)
+    elsif @finance_view
+      @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
+    end
     @users = @users.with_balance_sheet if @users.present?
   end
 
