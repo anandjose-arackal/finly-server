@@ -298,18 +298,33 @@
             <div id="listOfApprovedReports" style="clear: both;margin-top: 15px; overflow-x: hidden; max-width: 100%">
               <table>
                 <%= render 'settlements/settlement_reports_header_modal' %>
+                <% if @reports.present? %>
+                    <% @reports.each do |report| %>
+                        <tr>
+                          <td style="width: 1%; padding-left: 20px">
 
-                <tr>
-                  <td style="width: 1%; padding-left: 20px">
+                            <input name="existing_users_id" class="checkboxReimburse" type="checkbox"></td>
 
-                    <input name="existing_users_id" class="checkboxSettle" type="checkbox"></td>
+                          <td style="width:  34.5%;"><%= report[:report].name %>
+                            <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
+                          </td>
+                          <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
+                          <td style="width:  15%;"><span>&#8377</span><%= report[:total_amount] %></td>
+                          </td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                <!--<tr>-->
+                  <!--<td style="width: 1%; padding-left: 20px">-->
 
-                  <td style="width:  39.5%;">admisd_12_32_2003<span style="text-transform: capitalize; font-size: 10px; display: block">report id: 1232</span>
-                  </td>
-                  <td style="width:  39.5%;"> vivek.a@hapitoe.com</td>
-                  <td style="width:  20%;"><span>&#8377</span>345</td>
+                    <!--<input name="existing_users_id" class="checkboxSettle" type="checkbox"></td>-->
 
-                </tr>
+                  <!--<td style="width:  39.5%;">admisd_12_32_2003<span style="text-transform: capitalize; font-size: 10px; display: block">report id: 1232</span>-->
+                  <!--</td>-->
+                  <!--<td style="width:  39.5%;"> vivek.a@hapitoe.com</td>-->
+                  <!--<td style="width:  20%;"><span>&#8377</span>345</td>-->
+
+                <!--</tr>-->
 
               </table>
             </div>
@@ -317,6 +332,12 @@
         </div>
       </form>
 
+      <form hidden="hidden" data-remote data-turboboost id="addSettlementForm" action="<%= settlement_add_payment_path(id: params[:id]) %>" method="post">
+        <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+        <input id="settleReportIds" name="payment[report_id]" type="text">
+        <input name="payment[payment_type]" value="<%= PaymentType.settlement_id %>" type="text">
+        <input name="payment[amount]" id="settlementAmount" type="text">
+      </form>
       <div id="confirmSettlement" style="display: none">
 
         <label>Settlement Amount : &#8377 <span> 500</span>/- </label>
@@ -324,15 +345,15 @@
         <section>
           <label style="margin-top: 8px">Date :</label>
 
-          <input type="date" name="payment[date]" class="form-control date-picker" min="'2000-01-01'" max="'2020-01-01'" name="" style="margin-top: 4px;border-radius: 1px">
+          <input type="date" name="payment[date]" form="addSettlementForm" class="form-control date-picker" min="'2000-01-01'" max="'2020-01-01'" name="" style="margin-top: 4px;border-radius: 1px">
         </section>
 
         <section>
           <label style="margin-top: 8px">Note :</label>
 
-          <textarea id="modalInputComment" name="payment[note]" class="form-control" name="" placeholder="Write a note..." style="margin-top: 4px; border-radius: 1px;resize: vertical"></textarea>
+          <textarea id="modalInputComment" name="payment[note]" form="addSettlementForm" class="form-control" name="" placeholder="Write a note..." style="margin-top: 4px; border-radius: 1px;resize: vertical"></textarea>
         </section>
-        <button id="addNewPayment" class="green-button" style="margin-top: 28px;margin-top: 28px;
+        <button id="addNewPayment" class="green-button" onclick="settle()" style="margin-top: 28px;margin-top: 28px;
             background-color: #465c8b;padding: 10px;display: block;
             width: 150px;">Settle
         </button>
@@ -445,6 +466,18 @@
     $('input#reimburseReportIds').val(ids);
     $('input#reimbursementAmount').val(amount);
     $('form#addReimbursementForm').submit();
+  }
+
+  function settle() {
+    var ids = null;
+    var amount = null;
+    <% if @reports.present? %>
+    ids = "<%= @reports.first[:report].id %>"
+    amount = "<%= @reports.first[:total_amount] %>"
+    <% end %>
+    $('input#settleReportIds').val(ids);
+    $('input#settlementAmount').val(amount);
+    $('form#addSettlementForm').submit();
   }
 
 

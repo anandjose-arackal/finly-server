@@ -24,6 +24,6 @@ class PaymentType < ActiveRecord::Base
   end
 
   def self.settlement_id
-    3
+    4
   end
 end

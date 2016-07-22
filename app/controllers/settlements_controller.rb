@@ -7,17 +7,29 @@ class SettlementsController < ApplicationController
     ss = SettlementService.new(@user)
     result = nil
     param = payment_params
+    success_message = nil
+
     if param[:payment_type] == PaymentType.advance_id.to_s
       result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
+      success_message = 'Advance added'
     elsif param[:payment_type] == PaymentType.debt_clearance_id.to_s
       result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
+      success_message = 'Debt clearance payment added'
     elsif param[:payment_type] == PaymentType.reimbursement_id.to_s
       report_ids = nil
       report_ids = param[:report_id].split if param[:report_id].present?
       result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
+      success_message = 'Reimbursement added'
+    elsif param[:payment_type] == PaymentType.settlement_id.to_s
+      report_ids = nil
+      report_ids = param[:report_id].split if param[:report_id].present?
+      result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
+      success_message = 'Settlement created'
     end
+
     if result
       flash.now[:success] = 'Payment successfully added'
+      flash.now[:success] = success_message if success_message.present?
       redirect_to settlement_path(@user.id)
       return
     end

@@ -29,6 +29,7 @@ class Payment < ActiveRecord::Base
   scope :advance, -> { where payment_type_id: PaymentType.advance_id }
   scope :reimbursement, -> { where payment_type_id: PaymentType.reimbursement_id }
   scope :debt_clearance, -> { where payment_type_id: PaymentType.debt_clearance_id }
+  scope :settlement, -> { where payment_type_id: PaymentType.settlement_id }
   scope :received_by_user, ->(user_id) { where receiving_user: user_id }
   scope :initiated_by_user, ->(user_id) { where receiving_user: user_id }
   scope :transferred_to_user, -> { where.not payment_type: PaymentType.debt_clearance_id }
@@ -47,5 +48,9 @@ class Payment < ActiveRecord::Base
 
   def debt_clearance?
     self.payment_type_id == PaymentType.debt_clearance_id
+  end
+
+  def settlement?
+    self.payment_type_id == PaymentType.settlement_id
   end
 end
