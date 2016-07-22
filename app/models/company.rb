@@ -40,10 +40,6 @@ class Company < ActiveRecord::Base
     self.name
   end
 
-  def all_reports
-    Report.not_open.with_user(self.users.pluck(:id))
-  end
-
   def admins
     users.with_roles.only_admins
   end

@@ -165,7 +165,13 @@ class ReportsController < ApplicationController
 
   def fetch_reports
     if @admin_view
-      @reports = current_user.company.all_reports
+      rs = ReportService.new(user: current_user)
+      @reports = rs.admin_reports
+      unless @reports
+      flash.now[:danger] = rs.errors
+      render_flash_message
+      return false
+      end
     elsif @manager_view
       @reports = current_user.controlling_reports.non_owner(current_user.id)
       @interacted_reports = current_user.manager_reports

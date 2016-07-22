@@ -6,20 +6,20 @@ class UserTeamService < BaseService
     self.user = user
   end
 
-  # def team(params={})
-  #   load_retrieve params
-  #   if @admin_view
-  #     return nil unless user.admin?
-  #     return user.company.users
-  #   elsif @manager_view
-  #     return nil unless user.manager?
-  #     return UserManagerMapping.manager_team(@policy_id, self.user.id)
-  #   elsif @finance_view
-  #     return nil unless user.finance_manager?
-  #     return UserManagerMapping.finance_team(@policy_id, self.user.id)
-  #   end
-  #   nil
-  # end
+  def admin_team
+    errors.clear
+    if user.company_admin?
+      return user.company.users
+    elsif user.policy_admin?
+      users = user.company.users
+      policies = user.admin_policies.pluck(:id)
+      if policies.present?
+         return users.with_id(PolicyUserMapping.with_policy(policies).pluck(:user_id))
+      end
+    end
+    errors << 'User is not an admin'
+    false
+  end
 
   def team(role_id, params={})
     errors.clear
