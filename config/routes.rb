@@ -149,6 +149,9 @@ Rails.application.routes.draw do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
     post 'add_receipt', to: 'expenses#add_receipt'
+  end
+
+  resources :users do
 
   end
 

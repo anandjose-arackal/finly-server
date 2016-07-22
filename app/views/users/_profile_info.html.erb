@@ -1,0 +1,59 @@
+
+<h4 class="profile_subheading">Name:</h4>
+
+<p class="profile_info">@user.name</p>
+
+<h4 class="profile_subheading">Email: @user.email</h4>
+
+<p class="profile_info"></p>
+
+<h4 class="profile_subheading">Mobile:</h4>
+
+<p class="profile_info">@user.mobile_number</p>
+
+
+<h4 class="profile_subheading">Default Reporting manager:</h4>
+
+<% if @default_manager %>
+<p class="profile_info"><%=@default_manager.name%> (<%=@default_manager.email %>) </p>
+<% else %>
+<p class="profile_info"> No Reporting Manager. [ Submitted reports will be auto-approved ] </p>
+<% end %>
+
+
+<label class="profile_subheading">Managed By
+  <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
+</label>
+
+<select class="profile_info" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput" style="float: left; width: 30%">
+  <datalist id="suggestionList">
+    <option value="-1">None</option>
+    <!--    < % @users.each do |user| %>
+            <option value="< %= "#{user.id}" %>">< %= "#{user.name}" %></option>
+        < % end %>-->
+  </datalist>
+</select>
+
+
+<h4 class="profile_subheading">Finance Manager:</h4>
+
+<p class="profile_info"><%= @finance_manager.name %></p>
+
+<label class="profile_subheading">Finance Managed By
+  <span class="spanEditProfile"> (this is the person who will finally approve user's expenses)</span>
+</label>
+
+<select class="profile_info" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput"  style="float: left; width: 30%">
+  <datalist id="suggestionList">
+    <option value="-1">None</option>
+    <!-- < % @users.each do |user| %>
+         <option value="< %= "#{user.id}" %>">< %= "#{user.name}" %></option>
+     < % end %>-->
+  </datalist>
+</select>
+
+<!--
+</form>-->
+
+
+<hr style="margin-top: 20px">

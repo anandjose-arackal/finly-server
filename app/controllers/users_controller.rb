@@ -25,6 +25,13 @@ class UsersController < ApplicationController
 
   end
 
+  # for employee list
+  def index
+    @users = current_company.users.active.paginate(page: params[:page])
+    @manager = UserTeamService.new(current_user).manager(view: 'admin')
+    @finance_manager = UserTeamService.new(current_user).finance_manager(view: 'admin')
+  end
+
   private
 
   def load_service_objects
