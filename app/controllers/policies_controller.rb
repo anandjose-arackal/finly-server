@@ -103,6 +103,22 @@ class PoliciesController < ApplicationController
 
   end
 
+  def update_user_configuration
+    @policy = Policy.find(params[:policy_id])
+    pus = PolicyUserService.new(@policy)
+    if pus.update_configuration params[:policy]
+      load_users
+      flash.now[:success] = 'Configuration updated'
+      respond_to do |format|
+        format.html { redirect_to policy_path(@policy, view: params[:view]) }
+        format.js
+      end
+      return
+    end
+    flash[:failure] = pus.errors
+    render_flash_message
+  end
+
   private
   def load_users
     @users = []
@@ -132,6 +148,11 @@ class PoliciesController < ApplicationController
                  conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
                  conditional_approves_finance_to: conditional_approves_finance_to}
     end
+  end
+
+  def update_user_params
+    params.require(:policy).permit(:admin, :default, :conditional_manager, :conditional_finance_manager,
+                                   :conditional_approves_to, :conditional_approves_finance_to)
   end
 
 end

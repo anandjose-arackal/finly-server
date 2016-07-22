@@ -92,6 +92,7 @@ Rails.application.routes.draw do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
     post 'add_users' => 'policies#add_users', as: :add_users
     post 'remove_users' => 'policies#remove_users', as: :remove_users
+    patch 'update_users_configuration' => 'policies#update_user_configuration', as: :update_user_configuration
   end
 
   get 'organization_account' => 'organization_account#organization_account'
