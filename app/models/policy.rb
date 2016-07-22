@@ -20,7 +20,7 @@ class Policy < ActiveRecord::Base
   has_many :expense_rules
   has_many :budget_rules
 
-  scope :default, -> { where default: true }
+  scope :default, -> { find_by default: true }
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
