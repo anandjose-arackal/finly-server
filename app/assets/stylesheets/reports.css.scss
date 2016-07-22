@@ -3,8 +3,10 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 
-.showFilteringSidebar{
-  visibility: hidden;
+#reports{
+  .showFilteringSidebar{
+    visibility: hidden;
+  }
 }
 
 #searchdiv{

@@ -1,6 +1,27 @@
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
+#policies {
+
+  overflow: hidden;
+
+  .innerdiv {
+
+    #divsection_heading {
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: #333;
+      border-bottom: 1px solid #DDD;
+      margin-bottom: 30px;
+      padding: 0 0 10px 0;
+    }
+
+  }
+}
+
+
+
 #createNewRule{
   margin-bottom: 20px;border-radius: 1px;
   height: 34px;
@@ -163,5 +184,118 @@ vertical-align: top;
     user-select: none;
     background-color: #93c178;
   }
+
+
+
+}
+
+
+#policyMembersDiv {
+
+  button {
+    letter-spacing: 1px;
+    font-weight: 500;
+    height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 11px;
+  }
+
+  th {
+    background: rgba(238, 238, 238, 0.5);
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+    height: 30px;
+    font-weight: 500;
+    color: #404040;
+  }
+
+  ul {
+    display: inline;
+    padding: 7px 1px 8px 1px;
+  }
+
+  li {
+    display: inline;
+    padding: 7px;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+
+
+}
+
+#policyMembersDiv > label {
+  font-size: 13px;
+  font-weight: 300;
+  margin-left: 250px;
+
+}
+
+#listOfUsers tr {
+  margin-top: 20px;
+}
+
+#listOfUsers tbody > tr {
+  height: 60px;
+}
+
+
+.segmented-control {
+  border-radius: 3px;
+  background: #f8f8f8;
+  border: 2px solid #ddd;
+  color: #666;
+  height: 34px;
+  display: table;
+}
+
+.activeMembers {
+  background-color: #93c178;
+  color: white;
+}
+
+
+#policyListTable table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-top: 5px;
+  width: 100%;
+  word-wrap: break-word;
+
+  th {
+    background: rgba(238,238,238,0.5);
+    border-bottom: 1px solid #ddd;
+    color: #404040;
+    padding: 10px 15px 10px 15px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  td {
+    padding: 15px;
+    color: #404040;
+    border-bottom: 1px solid #eee;
+
+    i {
+      font-size: 20px;
+      color: red;
+      float: right;
+    }
+
+    button{
+      padding: 5px;
+      width: 110px;
+      letter-spacing: 1px;
+      font-size: 11px;
+    }
+  }
+
 
 }

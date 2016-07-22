@@ -1,7 +1,4 @@
-<body style="background-color: #f5f6f9;">
-
-
-<div style="margin: 50px 170px 0px 5px;background: white;
+<div style="margin: 0px 170px 0px 5px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
   <p style="font-size: 24px;
       font-weight: 600;
@@ -15,14 +12,12 @@
       </div>
   <% end %>
 
-  <div id="policyListTable"
-  >
+  <div id="policyListTable">
     <table>
       <thead>
       <tr>
-        <th style="width: 30%;">Policy Name</th>
-        <th style="width:  40%;">Owner</th>
-        <th style="width:  30%;"></th>
+        <th style="width: 50%;">Policy Name</th>
+        <th style="width:  50%;"></th>
       </tr>
       </thead>
 
@@ -33,10 +28,9 @@
 
       <% @policies.each do |policy| %>
           <tr>
-            <td style="width: 30%;"><%= policy.name %></td>
-            <!--<td style="width: 40%;">< %= policy.owner.name if policy.owner_id.present? %></td>-->
-            <td style="width: 40%;">
-              <button id="showReportsButton" onclick="">View Reports</button>
+            <td style="width: 50%;"><%= policy.name %></td>
+            <td style="width: 50%;">
+              <button id="showReportsButton" class="green-button" onclick="">View Reports</button>
               <i class="fa fa-trash-o"></i></td>
           </tr>
       <% end %>
@@ -45,7 +39,7 @@
 
 
 </div>
-<div style="margin: 50px 0px 0px 710px;background: white;
+<div style="margin: 0px 0px 0px 695px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 270px; position: fixed">
   <p style="font-size: 24px;
       font-weight: 600;
@@ -62,14 +56,12 @@
     <input type="radio" name="users" value="everyone" checked> Everyone <br>
     <input type="radio" name="users" value=""> Invite Employees Later <br>
 
-    <input type="submit" class="abaButton" onclick="return validate()" style="border-radius: 1px;margin-top: 20px;margin-left: 0px" id="createPolicy" value="Create">
+    <input type="submit" class="green-button" onclick="return validate()" style="    margin-top: 20px;
+        padding: 5px;
+        font-size: 11px;
+        width: 80px;;margin-top: 20px;" id="createPolicy" value="Create">
   </form>
-  <a onclick="$('form#policyCreate').submit()">Create</a>
 </div>
-
-
-</body>
-
 
 
 <script>
@@ -93,4 +85,3 @@
   }
 
 </script>
-

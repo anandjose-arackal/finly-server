@@ -1,0 +1,121 @@
+
+<p>Please choose the format of the csv, and the respective column names you want to export.</p>
+
+<hr style="margin-top: 20px">
+
+<form id="exportForm" data-remote data-turboboost method="post" >
+  <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+
+  <input type="checkbox" name="serial_no" value="1"
+
+         > Include serial number in Export<br>
+
+  <hr style="margin-top: 20px">
+
+  <p> 1st Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [0] %></option>
+ <!-- < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%=  %>">
+
+
+  <hr>
+
+  <p> 2nd Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [1] %></option>
+ <!-- < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="">
+
+
+  <hr>
+
+  <p> 3rd Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [2] %></option>
+ <!-- < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%=  %>">
+  <hr>
+
+  <p> 4th Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [3] %></option>
+ <!-- < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%=  %>">
+  <hr>
+
+  <p> 5th Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [4] %></option>
+<!--  < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%= %>">
+  <hr>
+
+  <p> 6th Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [5] %></option>
+<!--  < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%=  %>">
+  <hr>
+
+  <p> 7th Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= %></option>
+ <!-- < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%=  %>">
+  <hr>
+
+  <p> 8th Column: </p>
+  <span>Export</span> <select class="selectors" name="export[]">
+  <option style="display:none" value="" selected="selected"><%= [7] %></option>
+ <!-- < % @default_preferences.each do |field| %>
+      <option value="< %= field %>">< %= field %></option>
+  < % end %>-->
+  <option value=""></option>
+</select>
+  <span> as </span>
+  <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%= %>">
+  <hr>
+
+  <button class="green-button" style="    width: 80px;
+      padding: 5px;margin-bottom: 30px" id="saveexportconfig" type="submit"> SAVE</button>
+</form>
+
+
+
+</div>

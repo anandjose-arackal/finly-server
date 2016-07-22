@@ -2,19 +2,66 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-#organization_account {
+#organization_account{
 
-  .innerdiv {
+  #divsection_heading {
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: #333;
+    border-bottom: 1px solid #DDD;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #dddddd;
+    margin-bottom: 30px;
+    padding: 0 0 10px 0;
+  }
 
-    #divsection_heading {
-      font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
-      font-size: 22px;
-      font-weight: 300;
-      color: #333;
-      border-bottom: 1px solid #DDD;
-      margin-bottom: 30px;
-      padding: 0 0 10px 0;
+  #export_preferences{
+
+
+
+    input[type=password] {
+      height: 34px;
     }
+
+    input[id*="shortaddress"] {
+      width: 34.5%;
+      margin-top: 15px;
+    }
+
+    h4[id*="subheading"] {
+      font-size: 14px;
+      font-family: 'Roboto Condensed', sans-serif;
+      text-transform: uppercase;
+      font-weight: 400;
+      color: #777;
+    }
+
+    .exportNameInput {
+      height: 36px;
+      padding: 5px;
+      margin-left: 10px;
+      text-transform: capitalize;
+    }
+
+    .selectors {
+      margin: 0 10px 0 10px;
+      text-transform: capitalize;
+    }
+
+    #exportForm p{
+      font-weight: 500;
+    }
+
+    #exportForm span{
+      font-size: 13px;
+    }
+
+    #exportForm hr{
+      margin-right: 40%;
+    }
+
 
   }
 }
