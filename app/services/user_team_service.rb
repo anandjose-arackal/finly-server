@@ -6,64 +6,149 @@ class UserTeamService < BaseService
     self.user = user
   end
 
-  def team(params={})
-    load_retrieve params
-    if @admin_view
-      return nil unless user.admin?
+  def admin_team
+    errors.clear
+    if user.company_admin?
       return user.company.users
-    elsif @manager_view
-      return nil unless user.manager?
-      return UserManagerMapping.manager_team(@policy_id, self.user.id)
-    elsif @finance_view
-      return nil unless user.finance_manager?
-      return UserManagerMapping.finance_team(@policy_id, self.user.id)
+    elsif user.policy_admin?
+      users = user.company.users
+      policies = user.admin_policies.pluck(:id)
+      if policies.present?
+         return users.with_id(PolicyUserMapping.with_policy(policies).pluck(:user_id))
+      end
     end
-    nil
+    errors << 'User is not an admin'
+    false
   end
 
-  def new_team(role_id, params={})
+  def team(role_id, params={})
     errors.clear
     unless user.present?
       errors << 'User not found'
       return false
     end
-    include_indirect_associations = params[:include_indirect_associations]
-    case role_id
-      when UserRole.finance_manager_id
-        if include_indirect_associations
-          UserManagerMapping
-        else
-
-        end
-      when UserRole.manager_id
-
+    unless role_id.present?
+      errors << 'User role not defined'
+      return false
     end
+    indirect_associations = params[:indirect_associations]
+    user_ids = []
+    manager_association = nil
+    approves_to_association = nil
+    case role_id
+      when UserRole.admin_id
+        unless user.admin?
+          errors << 'User is not an Admin'
+          return false
+        end
+        return admin_team
+      when UserRole.finance_manager_id
+        unless user.finance_manager?
+          errors << 'User is not a Finance Manager'
+          return false
+        end
+        manager_association = :has_finance_manager
+        approves_to_association = :has_approves_finance_to
+      when UserRole.manager_id
+        unless user.manager?
+          errors << 'User is not a Manager'
+          return false
+        end
+        manager_association = :has_manager
+        approves_to_association = :has_approves_to
+    end
+    return nil if manager_association.blank? or approves_to_association.blank?
+    user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:id)
+    approves_to_ids = UserManagerMapping.send(approves_to_association, user.id).pluck(:id)
+    while indirect_associations and approves_to_ids.present?
+      user_ids += UserManagerMapping.send(manager_association, approves_to_ids).pluck(:id)
+      approves_to_ids = UserManagerMapping.send(approves_to_association, approves_to_ids).pluck(:id)
+    end
+    user_ids.uniq! if user_ids.present?
+    if user_ids.present?
+      return user.company.users.with_id(user_ids)
+    end
+    nil
   end
 
-  def manager_for?(report)
-    emp = report.user
-    return false if report.blank?
-    rds = ReportDetailService.new(report)
-    policy = report.policy
-    policy = rds.policy unless policy.blank?
-    m = UserTeamService.new(emp).manager(report: report)
-    while m.present?
-      return true if m.id == self.user.id
-      m = UserTeamService.new(m).approves_to(report: report)
+  # Can pass report or user object
+  # Passing a report would check if the user is a manager for the report
+  # Passing a user would check if the user is a direct manager for the given user object
+  # If indirect_associations is set to true in params while passing user object,
+  # it checks if the user is associated as a manager with the given user which includes chains of approvals
+  def manager_for?(obj, params={})
+    errors.clear
+    if obj.is_a?(Report)
+      report = obj
+      emp = report.user
+      rds = ReportDetailService.new(report)
+      policy = report.policy
+      policy = rds.policy unless policy.blank?
+      m = UserTeamService.new(emp).manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      while m.present?
+        return true if m.id == self.user.id
+        m = UserTeamService.new(m).approves_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      end
+    elsif obj.is_a?(User)
+      user = obj
+      emp = UserManagerMapping.has_manager(self.user.id).with_user(user.id)
+      if emp.present?
+        return true
+      end
+      if params[:indirect_associations]
+        approves_to_ids = UserManagerMapping.has_approves_to(self.user.id).pluck(:id)
+        while approves_to_ids.present?
+          emp = UserManagerMapping.has_manager(approves_to_ids).with_user(user.id)
+          if emp.present?
+            return true
+          end
+          approves_to_ids = UserManagerMapping.has_approves_to(approves_to_ids).pluck(:id)
+        end
+      end
+    else
+      errors << 'Invalid Params'
+      return false
     end
     false
   end
 
-  def finance_manager_for?(report)
-    emp = report.user
-    return false if report.blank?
-    rds = ReportDetailService.new(report)
-    policy = report.policy
-    policy = rds.policy unless policy.blank?
-    m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
-    while m.present?
-      return true if m.id == self.user.id
-      m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+  # Can pass report or user object
+  # Passing a report would check if the user is a finance manager for the report
+  # Passing a user would check if the user is a direct finance manager for the given user object
+  # If indirect_associations is set to true in params while passing user object,
+  # it checks if the user is associated as a finance manager with the given user which includes chains of approvals
+  def finance_manager_for?(obj, params={})
+    errors.clear
+    if obj.is_a?(Report)
+      report = obj
+      emp = report.user
+      rds = ReportDetailService.new(report)
+      policy = report.policy
+      policy = rds.policy unless policy.blank?
+      m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      while m.present?
+        return true if m.id == self.user.id
+        m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      end
+    elsif obj.is_a?(User)
+      user = obj
+      emp = UserManagerMapping.has_finance_manager(self.user.id).with_user(user.id)
+      if emp.present?
+        return true
+      end
+      if params[:indirect_associations]
+        approves_to_ids = UserManagerMapping.has_approves_finance_to(self.user.id).pluck(:id)
+        while approves_to_ids.present?
+          emp = UserManagerMapping.has_finance_manager(approves_to_ids).with_user(user.id)
+          if emp.present?
+            return true
+          end
+          approves_to_ids = UserManagerMapping.has_approves_finance_to(approves_to_ids).pluck(:id)
+        end
+      end
+    else
+      errors << 'Invalid Params'
+      return false
     end
     false
   end
@@ -92,14 +177,14 @@ class UserTeamService < BaseService
     # todo validate if its better to go with rescue when manager is not assigned or have a seperate check which might result in 2 queries
     # return nil unless self.user.team_mapping.manager.present? # todo sample check
     # return @mapping.default.manager if @default
-    obj = @mappings.manager.policy(@policy_id).amount(@currency_id, @amount).manager rescue nil
+    obj = @mappings.manager.policy(@policy_id).amount(@currency_id, @amount).first.manager rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
 
   def finance_manager(params={})
     load_retrieve params
-    obj = @mappings.finance_manager.policy(@policy_id).amount(@currency_id, @amount).finance_manager rescue nil
+    obj = @mappings.finance_manager.policy(@policy_id).amount(@currency_id, @amount).first.finance_manager rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -108,7 +193,7 @@ class UserTeamService < BaseService
     return nil unless user.manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).approves_to_user rescue nil
+    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -117,7 +202,7 @@ class UserTeamService < BaseService
     return nil unless user.finance_manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).approves_finance_to_user rescue nil
+    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_finance_to_user rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -217,7 +302,7 @@ class UserTeamService < BaseService
     @admin_view = nil
     @manager_view = nil
     @finance_view = nil
-    @mappings = self.user.team_mapping
+    @mappings = self.user.team_mapping.with_details
     if params[:policy_id]
       @policy_id = params[:policy_id]
       @currency_id = params[:currency_id]

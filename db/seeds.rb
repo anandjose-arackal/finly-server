@@ -100,7 +100,7 @@ end
 
 if c.categories.count ==
     10.times do |i|
-      cat = c.categories.create!(name: "Test category #{i+1}")
+      c.categories.create!(name: "Test category #{i+1}")
     end
 end
 
@@ -124,12 +124,11 @@ if User.count == 0
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
   end
 
-
-  m[0].team_mapping.default.update_attributes(approves_to_user: m[1])
+  m[0].team_mapping.default.first.update_attributes(approves_to_user: m[1])
   m[0].team_mapping.build(approves_to_user: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
   u[0].team_mapping.build(manager: m[3], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
 
-  fm[0].team_mapping.default.update_attributes(approves_finance_to_user: fm[1])
+  fm[0].team_mapping.default.first.update_attributes(approves_finance_to_user: fm[1])
   fm[0].team_mapping.build(approves_finance_to_user: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
 
@@ -142,7 +141,7 @@ if Policy.non_default.count == 0
   p = PolicyCreateService.new(a).create_policy('Test Policy')
   p.configuration.update_attribute(:require_category, true) if p.present?
   PolicyUserService.new(p).add_user(u[0], false)
-  u[0].team_mapping.policy(p).default.update_attribute(:manager_id, m[4].id)
+  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
 
   p2 = PolicyCreateService.new(a).create_policy('Another test Policy')
   u.each do |user|
@@ -228,9 +227,10 @@ if p.rules_count == 0
 end
 
 if PaymentType.count == 0
-  PaymentType.create(id: 1, name: 'advance')
-  PaymentType.create(id: 2, name: 'debt_clearance')
-  PaymentType.create(id: 3, name: 'reimbursement')
+  PaymentType.create(id: 1, name: 'Advance')
+  PaymentType.create(id: 2, name: 'Debt Clearance')
+  PaymentType.create(id: 3, name: 'Reimbursement')
+  PaymentType.create(id: 4, name: 'Settlement')
 end
 
 if Report.count == 0
@@ -242,8 +242,8 @@ if Report.count == 0
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name,
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1,
+        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1}, merchant: Faker::Company.name,
+                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
                                                                          user_id: 1}]})
         expenses << e
@@ -258,8 +258,8 @@ if Report.count == 0
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name,
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1,
+        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1}, merchant: Faker::Company.name,
+                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
                                                                          user_id: 1}]})
         expenses << e
@@ -267,6 +267,26 @@ if Report.count == 0
       end
       report_service.add_expense(expenses_ids)
       report_service.submit
+    end
+    3.times.each do
+      report = ReportService.new(user: user).create
+      report_service = ReportService.new(user: user, report: report)
+      expense_service = ExpenseService.new(user)
+      expenses = []
+      expenses_ids = []
+      5.times.each do
+        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                                         user_id: 1}]})
+        expenses << e
+        expenses_ids << e.id
+      end
+      report_service.add_expense(expenses_ids)
+      report_service.submit
+      while report.controlling_user.present?
+        ReportService.new(user: report.controlling_user, report: report).approve
+      end
     end
   end
 end

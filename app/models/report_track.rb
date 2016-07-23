@@ -30,5 +30,6 @@ class ReportTrack < ActiveRecord::Base
   scope :finance_manager_role, -> { where user_report_role_id: UserRole.finance_manager_id }
   scope :admin, -> { where user_report_role_id: UserRole.admin_id }
   scope :owner, -> { where user_report_role_id: UserRole.employee_id }
+  scope :with_action, ->(action_id) { where report_tracking_action_id: action_id }
 
 end

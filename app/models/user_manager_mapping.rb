@@ -31,9 +31,12 @@ class UserManagerMapping < ActiveRecord::Base
   validate :valid_default
   validate :valid_non_default
 
-  scope :user, -> (user) { where user_id: user.id }
-  scope :default, -> { find_by default: true }
+  scope :with_id, ->(id) { where id: id }
+  scope :with_user, -> (user_id) { where user_id: user_id }
+  scope :default, -> { where default: true }
+  scope :non_default, -> { where.not default: true }
   scope :policy, -> (policy_id) { where policy_id: policy_id }
+  scope :without_policy, ->{ where policy_id: nil }
   scope :sort, ->(sort_by, order) do
     order.upcase! if order
     order("#{sort_by} #{order}") #sort_by: created_at, date etc. order: asc/desc
@@ -57,9 +60,14 @@ class UserManagerMapping < ActiveRecord::Base
   scope :exact_amount, ->(currency_id, value) { where value: value, currency_id: currency_id }
   scope :manager_team, ->(policy_id, manager_id) { where policy_id: policy_id, manager_id: manager_id }
   scope :finance_team, ->(policy_id, finance_manager_id) { where policy_id: policy_id, finance_manager_id: finance_manager_id }
-  scope :company, ->(company_id){ joins(:policy).where(company_id: company_id) }
+  scope :company, ->(company_id) { joins(:policy).where(company_id: company_id) }
 
-  scope :has_finance_manager, ->(manager_id){ where finance_manager_id: manager_id }
+  scope :has_finance_manager, ->(manager_id) { where finance_manager_id: manager_id }
+  scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_user_id: manager_id }
+  scope :has_manager, ->(manager_id) { where manager_id: manager_id }
+  scope :has_approves_to, ->(manager_id) { where approves_to_user_id: manager_id }
+
+  scope :with_details, -> { includes :user, :manager, :finance_manager, :approves_to_user, :approves_finance_to_user, :greater_than_amount }
 
   private
   def valid_default

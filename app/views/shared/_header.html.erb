@@ -6,8 +6,10 @@
       <a class="navbar-brand" style="color: white; font-family: 'Bree Serif', serif; font-weight: 800;font-size: 32px;margin-top: 15px; float: left" href="<%= root_path %>" data-turbolinks="false">F</a>
     </div>
 
-   <!-- <% if logged_in? %>
-   -->     <ul class="nav navbar-nav topButton">
+    <!--
+    <% if logged_in? %>
+   -->
+        <ul class="nav navbar-nav topButton">
           <div class="dropdown canSwitch " onclick="showDropDown()" style="cursor: pointer">
             <span class="viewSummary">
               <!-- ADD OTHER VIEWS -->
@@ -18,16 +20,18 @@
             <span class="icon fa fa-chevron-down" style="margin-left: 70px ;color: white;opacity: 0.8;margin-top: 12px; font-size: 16px"></span>
 
             <ul id="viewToggleDropdown" class="dropdown-menu">
-              <!--   <% if current_user.admin? %>
-                     <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: false %></li>
-                     <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: false %></li>
-                 <% elsif current_user.manager? %>
-                     <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: false %></li>
-                 <% end %>
-                <li> <%= link_to "Personal View", reports_path, turbolink: false %></li>
-         -->
-              <li> Personal View</li>
-
+              <% if current_user.admin? %>
+                  <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: false %></li>
+              <% end %>
+              <% if current_user.manager? %>
+                  <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: false %></li>
+              <% end %>
+              <% if current_user.finance_manager? %>
+                  <li> <%= link_to "Finance View", reports_path(filter_status: 1, view: 'finance'), turbolink: false %></li>
+              <% end %>
+              <% if current_user.employee? %>
+                  <li> <%= link_to "Personal View", reports_path, turbolink: false %></li>
+              <% end %>
             </ul>
           </div>
         </ul>
@@ -37,33 +41,37 @@
           </a>
           <ul class="dropdown-menu cog" style="padding: 0;
               border-radius: 1px;">
-           <!-- < % if current_user.admin? %>
-                <li>
-                  <a href="< %= admin_edit_company_path %>" style="height: 45px;">Organization Account</a>
-                </li>
-            < % end %>
-            <li><a href="< %= edit_user_path(current_user) %>" style="height: 45px;">My Account</a></li>
-            < % if current_user.admin? %>
-                <li><a href="< %= admin_company_policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
-                  Policy</a></li>
-            < % end %>
-            <li>
-              <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
-                the App</a></li>
-            <li><a href="#" data-turbolinks="false" style="height: 45px;">Support</a></li>
-            -->
+            <!-- < % if current_user.admin? %>
+                 <li>
+                   <a href="< %= admin_edit_company_path %>" style="height: 45px;">Organization Account</a>
+                 </li>
+             < % end %>
+             <li><a href="< %= edit_user_path(current_user) %>" style="height: 45px;">My Account</a></li>
+             < % if current_user.admin? %>
+                 <li><a href="< %= admin_company_policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
+                   Policy</a></li>
+             < % end %>
+             <li>
+               <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
+                 the App</a></li>
+             <li><a href="#" data-turbolinks="false" style="height: 45px;">Support</a></li>
+             -->
             <li>
               <a href="<%= organization_account_path %>" style="height: 45px;">Organization Account</a>
             </li>
             <li>
               <a href="<%= user_profile_path %>" style="height: 45px;">My Account</a>
             </li>
-            <% if logged_in? %>
-            <li><%= link_to "Log out", destroy_user_session_path, method: "delete" %></li>
+            <li><a href="<%= policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
+              Policy</a></li>
+            <li>
+              <% if logged_in? %>
+                <li><%= link_to "Log out", destroy_user_session_path, method: "delete" %></li>
             <% end %>
           </ul>
         </ul>
-  <!--  <% end %>
+        <!--
+    <% end %>
 -->
     <ul id="headerNavigation">
       <li>
@@ -76,34 +84,34 @@
         <a href="<%= expenses_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
       </li>
       <li>
-        <a href="<%= settlement_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+        <a href="<%= settlements_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
       </li>
 
-<!--      < % if !logged_in? %>
-          <div style="position: absolute;
-              right: 9%;">
-            <li>
-              <a href="< %= root_path %>" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; padding: 24px 14px; color: #46568b">Home</a>
-            </li>
-            <li>
-              <a onclick="scrollToFeatures()" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; cursor: pointer; padding: 24px 14px; color: #46568b">Features</a>
-            </li>
-            <li>
-              <a href="< %= about_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">About</a>
-            </li>
-            <li>
-              <a href="< %= new_user_session_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">Log
-                In</a></li>
-          </div>
-      < % else %>
-          < % if is_admin_view %>
-              < %= render 'shared/header_admin' %>
-          < % elsif is_manager_view %>
-              < %= render 'shared/header_manager' %>
-          < % else %>
-              < %= render 'shared/header_personal' %>
-          < % end %>
-      < % end %>-->
+      <!--      < % if !logged_in? %>
+                <div style="position: absolute;
+                    right: 9%;">
+                  <li>
+                    <a href="< %= root_path %>" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; padding: 24px 14px; color: #46568b">Home</a>
+                  </li>
+                  <li>
+                    <a onclick="scrollToFeatures()" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; cursor: pointer; padding: 24px 14px; color: #46568b">Features</a>
+                  </li>
+                  <li>
+                    <a href="< %= about_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">About</a>
+                  </li>
+                  <li>
+                    <a href="< %= new_user_session_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">Log
+                      In</a></li>
+                </div>
+            < % else %>
+                < % if is_admin_view %>
+                    < %= render 'shared/header_admin' %>
+                < % elsif is_manager_view %>
+                    < %= render 'shared/header_manager' %>
+                < % else %>
+                    < %= render 'shared/header_personal' %>
+                < % end %>
+            < % end %>-->
     </ul>
 
   </div>

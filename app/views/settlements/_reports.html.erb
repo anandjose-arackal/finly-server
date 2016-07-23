@@ -1,0 +1,46 @@
+<div id="detailsContainer">
+  <div id="listOfUsers" style="margin-top: 15px; overflow-x: hidden; max-width: 100%">
+
+    <table id="reportsTable">
+      <thead>
+      <tr>
+        <% if @load_type[:approved] %>
+
+            <th style="width: 1%; padding-left: 20px ">
+              <input type="checkbox" id="checkAllReports" style="margin-right: 20px;"></th>
+        <% end %>
+        <th style="width: 34.5%;">Report Name</th>
+        <th style="width:  49.5%;">Final Approver</th>
+        <th style="width:  15%;">Amount</th>
+      </tr>
+      </thead>
+      <!--
+             <div id="my-posts">
+               < %= yield :reports %>
+             </div>
+             <div id="infinite-scrolling" style="display: none">
+               < %= will_paginate @reports if @reports.present? %>
+             </div>-->
+
+      <% if @reports.present? %>
+          <% @reports.each do |report| %>
+              <tr>
+                <% if @load_type[:approved] %>
+                    <td style="width: 1%; padding-left: 20px">
+
+                      <input name="existing_users_id" class="checkboxReimburse" type="checkbox" style="margin-right: 20px;"> </td>
+                <% end %>
+
+                <td style="width:  34.5%;"><%= report[:report].name %>
+                  <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
+                </td>
+                <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
+                <td style="width:  15%;"><span>&#8377</span><%= report[:total_amount] %></td>
+                </td>
+              </tr>
+          <% end %>
+      <% end %>
+    </table>
+
+  </div>
+</div>

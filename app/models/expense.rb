@@ -95,6 +95,7 @@ class Expense < ActiveRecord::Base
 
   # validates :amount_id, uniqueness: true
   validate :no_future_date
+  validates :amount, presence: true
 
 
   # returns the number of receipts attached to this expense

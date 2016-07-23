@@ -24,15 +24,19 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
 
+  default_scope {order date: :desc, created_at: :desc}
+
   scope :advance, -> { where payment_type_id: PaymentType.advance_id }
   scope :reimbursement, -> { where payment_type_id: PaymentType.reimbursement_id }
   scope :debt_clearance, -> { where payment_type_id: PaymentType.debt_clearance_id }
+  scope :settlement, -> { where payment_type_id: PaymentType.settlement_id }
   scope :received_by_user, ->(user_id) { where receiving_user: user_id }
   scope :initiated_by_user, ->(user_id) { where receiving_user: user_id }
   scope :transferred_to_user, -> { where.not payment_type: PaymentType.debt_clearance_id }
-  scope :with_amount, -> { joins :amounts }
+  scope :with_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
+  scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
 
   def advance?
     self.payment_type_id == PaymentType.advance_id
@@ -44,5 +48,9 @@ class Payment < ActiveRecord::Base
 
   def debt_clearance?
     self.payment_type_id == PaymentType.debt_clearance_id
+  end
+
+  def settlement?
+    self.payment_type_id == PaymentType.settlement_id
   end
 end

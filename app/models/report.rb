@@ -44,6 +44,7 @@ class Report < ActiveRecord::Base
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
+  scope :closed, -> { where report_status_id: ReportStatus.closed_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
@@ -51,6 +52,7 @@ class Report < ActiveRecord::Base
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
+  scope :include_user, -> { includes :user }
 
   before_save do
     if self.name.blank?

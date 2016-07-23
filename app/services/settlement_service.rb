@@ -1,4 +1,5 @@
 class SettlementService < BaseService
+  include MathUtil
   attr_accessor :user
 
   def initialize(user = nil)
@@ -20,11 +21,12 @@ class SettlementService < BaseService
   def cash_in_hand(date = nil)
     cash = user.balance_sheet.cash_in_hand
     return cash if date.blank? or date == Date.today
-    payments = user.payments.made_after(date)
+    payments = user.payments.made_after(date).with_amount
     payments_to_user = payments.transferred_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
-    expenses = reports.with_amount.submitted_after(date).sum(:value)
-    value = cash.value + expenses + debt_clearance - payments_to_user
+    settlement = payments.settlement.sum(:value)
+    expenses = user.reports.with_amount.submitted_after(date).sum(:value)
+    value = cash.value + expenses + debt_clearance + settlement - payments_to_user
     Amount.new(value: value, currency: cash.currency)
   end
 
@@ -32,10 +34,11 @@ class SettlementService < BaseService
     user.balance_sheet.pending_reimbursement
   end
 
-  def add_cash_advance(initiating_user, date, value, currency=nil)
+  def add_cash_advance(initiating_user, date, note, value, currency=nil)
+    date = parse_date date
     return false unless validate_value value, currency and validate_initiating_user initiating_user and validate_date date
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.advance_id, date: date,
-                                  amount_attributes: {value: value, currency: currency})
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.advance_id, date: date, note: note,
+                                  amount_attributes: {value: value, currency_id: currency})
     balance_sheet = user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(value, currency)
       return true
@@ -45,20 +48,28 @@ class SettlementService < BaseService
     false
   end
 
-  def add_reimbursement(initiating_user, report_ids, date, value, currency=nil)
-    return false unless validate_value value, currency and validate_initiating_user initiating_user and validate_date date
+  def add_reimbursement(initiating_user, report_ids, date, note, val, currency=nil)
+    date = parse_date date
+    if report_ids.blank?
+      errors << 'No reports selected'
+      return false
+    end
+    return false unless validate_value val, currency and validate_initiating_user initiating_user and validate_date date
+    reports = nil
     reports = user.reports.with_id(report_ids).with_amount if report_ids.present?
     unless report_ids.present? and reports.present?
       errors << 'Report not found'
       return false
     end
-    total_amount = reports.sum(:value)
+    value = nil
+    value = val.to_f if val.present?
+    total_amount = precision_value(reports.sum(:value))
     unless value == total_amount
-      errors << 'Reimbursed amount is not matching total pending reimbursement amount for the report'
+      errors << 'Reimbursed amount is not matching total pending reimbursement amount for the selected reports'
       return false
     end
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.reimbursement_id, date: date,
-                                  amount_attributes: {value: value, currency: currency})
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.reimbursement_id, date: date, note: note,
+                                  amount_attributes: {value: value, currency_id: currency})
     balance_sheet = user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement value, currency
       reports.each do |report|
@@ -71,16 +82,60 @@ class SettlementService < BaseService
     false
   end
 
-  def add_debt_to_company_clearance(initiating_user, date, value, currency=nil)
+  def add_debt_to_company_clearance(initiating_user, date, note, value, currency=nil)
+    date = parse_date date
     return false unless validate_value value, currency and validate_initiating_user initiating_user and validate_date date
     balance_sheet = user.balance_sheet
-    unless value <= balance_sheet.cash_in_hand.value
-      errors << 'Debt clearance cannot be greater than the cash in hand amount'
+    value = value.to_f if value.present?
+    cash_in_hand_on_date = cash_in_hand date
+    unless value <= cash_in_hand_on_date.value
+      errors << 'Debt clearance cannot be greater than the cash in hand amount on the date of debt clearance'
       return false
     end
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.debt_clearance_id, date: date,
-                                  amount_attributes: {value: value, currency: currency})
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.debt_clearance_id, date: date, note: note,
+                                  amount_attributes: {value: value, currency_id: currency})
     if payment.save and balance_sheet.subtract_cash_in_hand(value, currency)
+      return true
+    end
+    self.errors = errors + payment.errors.full_messages + balance_sheet.errors.full_messages
+    payment.destroy
+    false
+  end
+
+  # Settle pending reimbursement of the selected reports against cash in hand
+  def settle(initiating_user, report_ids, date, note, val, currency=nil)
+    date = parse_date date
+    if report_ids.blank?
+      errors << 'No reports selected'
+      return false
+    end
+    return false unless validate_value val, currency and validate_initiating_user initiating_user and validate_date date
+    value = val.to_f if val.present?
+    cash_in_hand_on_date = cash_in_hand date
+    unless value <= cash_in_hand_on_date.value
+      errors << 'Settlement amount cannot be greater than the cash in hand amount'
+      return false
+    end
+
+    reports = nil
+    reports = user.reports.with_id(report_ids).with_amount if report_ids.present?
+    unless report_ids.present? and reports.present?
+      errors << 'Report not found'
+      return false
+    end
+    total_amount = precision_value(reports.sum(:value))
+    unless value == total_amount
+      errors << 'Settlement amount is not matching total pending reimbursement amount for the selected reports'
+      return false
+    end
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.settlement_id,
+                                  date: date, note: note,
+                                  amount_attributes: {value: value, currency_id: currency})
+    balance_sheet = user.balance_sheet
+    if payment.save and balance_sheet.subtract_pending_reimbursement value, currency and balance_sheet.subtract_cash_in_hand value, currency
+      reports.each do |report|
+        ReportService.new(user: initiating_user, report: report).mark_as_reimbursed payment
+      end
       return true
     end
     self.errors = errors + payment.errors.full_messages + balance_sheet.errors.full_messages
@@ -136,7 +191,7 @@ class SettlementService < BaseService
   private
   def validate_value(value, currency)
     errors.clear
-    if value.blank? or value <= 0
+    if value.blank? or value.to_i <= 0
       errors<< 'Payment value cannot be less or equal to 0'
     end
     if currency.blank?
@@ -182,5 +237,11 @@ class SettlementService < BaseService
     end
     errors.blank?
   end
+
+  def parse_date(date)
+    return nil if date.blank?
+    Date.parse(date)
+  end
+
 
 end

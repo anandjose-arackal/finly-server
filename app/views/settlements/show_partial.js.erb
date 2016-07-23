@@ -1,0 +1,5 @@
+<% if @load_type[:payments]%>
+$('#detailsContainer').replaceWith("<%= j render partial:'payment_history' %>");
+<%else %>
+$('#detailsContainer').replaceWith("<%= j render partial:'reports' %>");
+<%end%>

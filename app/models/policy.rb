@@ -25,11 +25,10 @@ class Policy < ActiveRecord::Base
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
-  scope :with_id, -> (id) { find_by id: id }
+  scope :with_id, -> (id) { where id: id }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
-
 
   validates :company_id, presence: true
   validate :valid_name

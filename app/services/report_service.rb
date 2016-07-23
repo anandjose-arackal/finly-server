@@ -9,10 +9,18 @@ class ReportService < BaseService
     self.report_detail_service = ReportDetailService.new(self.report)
   end
 
-  # Todo assigning forwarding_to_user for report upon create, submit, approve etc
-
-  def self.list_reports
-
+  def admin_reports
+    errors.clear
+    if user.company_admin?
+      return Report.not_open.with_user(self.users.pluck(:id))
+    elsif user.policy_admin?
+      user_ids = UserTeamService.new(user).admin_team.pluck(:id)
+      return Report.not_open.with_user(user_ids)
+    end
+    unless user.admin?
+      errors << 'User is not an admin'
+      return false
+    end
   end
 
   def user_role_for_report
@@ -515,9 +523,9 @@ class ReportService < BaseService
         new_policy_id = nil
       end
       policy_comment = report.comments.build user: user,
-                                           report_comment_action_id: ReportCommentAction.report_update_id,
-                                           updated_field: 'policy', updated_from: report.policy_id,
-                                           updated_to: new_policy_id if report.retracted?
+                                             report_comment_action_id: ReportCommentAction.report_update_id,
+                                             updated_field: 'policy', updated_from: report.policy_id,
+                                             updated_to: new_policy_id if report.retracted?
       report.policy_id = params[:policy_id]
       update = true
     end

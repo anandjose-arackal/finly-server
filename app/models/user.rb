@@ -52,6 +52,9 @@ class User < ActiveRecord::Base
   has_many :receipts, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
+  has_many :policy_user_mappings, dependent: :destroy
+  has_many :admin_policy_user_mappings, -> { with_policy_not_null }, class_name:'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
+  has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
 
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
@@ -88,7 +91,7 @@ class User < ActiveRecord::Base
   scope :filter_name, -> (name) { where("name like ?", "%#{name}%") }
   scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
   scope :with_roles, -> { joins :role_mapping }
-  scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id  }
+  scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
   scope :sort_by_name, -> { order(name: :asc)}
@@ -98,6 +101,9 @@ class User < ActiveRecord::Base
   scope :filter_search, -> (term) do
 
   end
+  scope :only_employees, -> { where "user_role_mappings.user_role_id = ?", UserRole.employee_id }
+  scope :sort_by_name, -> { order(name: :asc) }
+  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 
   after_create do
     self.build_profile.save if self.profile.blank?
@@ -105,17 +111,34 @@ class User < ActiveRecord::Base
     self.build_balance_sheet.save if self.balance_sheet.blank?
   end
 
+  def name_shortened
+    abbr = name[0]
+    parts = name.split
+    if parts.size >= 2
+      abbr += parts.second[0]
+    end
+    abbr.upcase
+  end
+
   def roles
     self.user_roles
   end
 
-  def admin?
-    mapping = role_mapping
-    mapping.admin.present?
+  def company_admin?
+    role_mapping.admin.present?
   end
 
-  def policy_admin?(policy)
-    policy_user_mappings.policy(policy.id).admin.present?
+  # If policy is passed checks if the user is the admin of the given policy
+  # Else if any policy exists for which the user is an admin
+  def policy_admin?(policy = nil)
+    if policy.blank?
+      return admin_policies.count > 0
+    end
+    admin_policies.with_id(policy.id).present?
+  end
+
+  def admin?
+    company_admin? or policy_admin?
   end
 
   def finance_manager?

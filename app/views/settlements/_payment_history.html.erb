@@ -1,0 +1,42 @@
+<div id="detailsContainer">
+  <table id="settlementHistoryTable">
+    <thead>
+    <tr>
+      <th style="width: 20%;padding-left: 20px">Date</th>
+      <th style="width: 10%;">Action ID:</th>
+      <th style="width:  40%;">Action Taken By</th>
+      <th style="width:  25%;">Amount <span style="display: block">Action Type</span></th>
+      <th style="width: 5%; padding-right: 20px">Reports Info</th>
+    </tr>
+    </thead>
+    <!--
+           <div id="my-posts">
+             < %= yield :reports %>
+           </div>
+           <div id="infinite-scrolling" style="display: none">
+             < %= will_paginate @reports if @reports.present? %>
+           </div>-->
+    <% if @payments.present? %>
+        <% @payments.each do |payment| %>
+            <tr>
+              <td style="width:  20%;padding-left: 20px"> <%= payment.date.strftime("%d-%b-%y") %></td>
+              <td style="width:  10%;"> <%= payment.id %></td>
+              <td style="width:  40%;
+                  line-height: 95%;"><%= payment.initiating_user.name %><span style="display: block;
+                  font-size: 11px;
+                  font-weight: 500;"> Note: </span>
+                <span style="font-size: 10px;"><%= payment.note %></span>
+              </td>
+              <td style="width:  25%;">
+                <span>&#8377</span><%= payment.amount.value %>
+                <div style="display: table; background-color: bisque">
+                  <span style="padding: 10px; font-size: 11px"><%= payment.payment_type.name %></span></div>
+              </td>
+              <td style="width: 5%;padding-right: 20px">
+                <i>info</i>
+              </td>
+            </tr>
+        <% end %>
+    <% end %>
+  </table>
+</div>

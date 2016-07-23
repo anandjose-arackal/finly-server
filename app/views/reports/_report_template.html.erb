@@ -1,11 +1,11 @@
-<body>
+<body id="reports">
 
 <%= render 'shared/lower_header' %>
 
 <form data-remote data-turboboost id="allReportsFilters" action="" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
-    <% param = get_old_filters(params, 2) # i.e get filters for expenses     %>
+    <% param = get_old_filters(params, 2) # i.e get filters for expenses      %>
     <% param.each do |item| %>
         <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
     <% end %>
@@ -54,13 +54,12 @@
   <div class="col-sm-4">
     <form data-remote data-turboboost action="<%= reports_path(view: params[:view]) %>" method="post">
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-      <!-- < % if is_personal_view %>
-      -->
-      <button class="invite" type="submit">
-        CREATE NEW REPORT
-      </button>
-      <!--    < % end %>
-      -->  </form>
+      <% if is_personal_view %>
+          <button class="invite" type="submit">
+            CREATE NEW REPORT
+          </button>
+      <% end %>
+    </form>
 
     <!--  <div class="navblock" style=" < % unless is_personal_view %> margin-top: 0
         < % end %>">-->

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<% provide(:title, "Finly Settlement") %>
+
+
+<!-- Add all reports for a single user
+
+< % content_for :settlement do %>
+    < % if @settlement.present? %>
+        < % @settlement.each do |settlement| %>
+            < %= render partial: 'settlement_row', locals: {settlement: settlement} %>
+        < % end %>
+    < % end %>
+< % end %>-->
+<%= render 'settlement_template' %>

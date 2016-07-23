@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<% provide(:title, "Finly Settlement") %>
+
+<body id="settlements">
+
+<%= render 'settlements/settlement_lower_header' %>
+<!--
+<form data-remote data-turboboost method="get" id="allFilters" action="<%= request.path %>">
+  <div id="showPreviousFilters">
+    < % param = get_old_filters(params) %>
+    < % param.each do |item| %>
+        < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+    < % end %>
+  </div>
+  < %= render 'settlement_filter' %>
+</form>
+-->
+
+<div>
+  <div id="centerBlockOfExpenses" style="margin-top: 110px">
+
+    <div class="txSubListHeader">
+      <h3 class="headerOfTables" style="color: #2B4072" tooltip="Reimbursement amount by/ to all employees" tooltip-placement="top">
+        Settlements</h3>
+    </div>
+    <% if @users.present? %>
+        <% @users.each do |user| %>
+            <div class="txtListItems">
+
+              <div id="centerBlockRows" style="cursor: pointer" class="container-fluid">
+
+                <!--
+                      <div id="my-posts">
+                        < %= yield :reports %>
+                      </div>
+
+                <div id="infinite-scrolling" style="text-align: center" class="row pagination-wrapper">
+                   < %= will_paginate(@settlements) %>
+                 </div>-->
+
+                <a href="<%= settlement_path user %>">
+                  <div class="row" style="padding: 15px; background-color: white">
+
+                    <div class="col-md-1">
+                      <span class="roundCircle"><%= user.name_shortened %></span></div>
+                    <div class="col-md-3" style="line-height: 120%">
+                      <!--<p expensetarget="userId" style="display: none"> 234 </p>-->
+                      <p style="color: #555; font-weight: 600"><%= user.name %></p>
+
+                      <p id="email" expensetarget="name" style="color: #555"><%= user.email %></p>
+
+                    </div>
+                    <div class="col-md-3" style="line-height: 120%">
+                      <label class="header" style="font-size: 10px; color: #555;    font-weight: 500;
+                          text-transform: uppercase;">Cash In Hand</label>
+
+                      <p style="font-size: 15px; font-weight: 400;">
+                        <inline> &#8377</inline>
+                        <%= user.balance_sheet.cash_in_hand.value %>
+                      </p>
+                    </div>
+                    <div class="col-md-2" style="line-height: 120%">
+                      <label expensetarget="name" style="font-size: 10px; color: #555;font-weight: 500;
+                          text-transform: uppercase;;">Reimbursement</label>
+
+                      <p style="font-size: 15px; font-weight: 400;">
+                        <inline> &#8377</inline>
+                        <%= user.balance_sheet.pending_reimbursement.value %>
+                      </p>
+                    </div>
+                    <div class="col-md-3" style="line-height: 120%;text-align: right;margin-top: 10px;">
+
+                      <button class="green-button" style="padding: 5px 10px 5px 10px;" data-toggle="modal" data-target="#settlementModal">Add
+                        Payment
+                      </button>
+
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+            </div>
+        <% end %>
+    <% end %>
+  </div>
+
+</div>
+
+
+<!-- Modal-->
+<div class="modal fade" id="settlementModal" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">New Settlement</h4>
+      </div>
+      <form id="settlementModalForm" method="post" data-remote data-turboboost>
+        <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+
+        <div class="modal-body" style=" padding-left: 40px;padding-right: 40px">
+
+          <label style="margin-top: 8px">Amount</label>
+          <input name="payment[amount]" id="settlementAmount" type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' class="form-control" style="margin-top: 4px; border-radius: 1px">
+          <label style="margin-top: 8px">Date</label>
+
+          <input type="date" name="payment[date]" class="form-control date-picker" min="'2000-01-01'" max="'2020-01-01'" name="" style="margin-top: 4px;border-radius: 1px">
+          <label style="margin-top: 8px">Note</label>
+
+          <textarea id="modalInputComment" name="payment[note]" class="form-control" name="" placeholder="Write a note..." style="margin-top: 4px; border-radius: 1px;resize: vertical"></textarea>
+
+          <div style="margin-top: 16px">
+            <label class="radio-inline">
+              <input type="radio" name="payment[transaction_type]" value="received_by_company" checked="checked">Received
+              By Company
+            </label>
+            <label class="radio-inline" style="margin-left: 36px">
+              <input type="radio" name="payment[transaction_type]" value="paid_by_company">Paid By Company
+            </label>
+          </div>
+
+          <button id="addNewPayment" class="sendButton" style="margin-top: 28px" type="submit">Add
+            New
+            Payment
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+</body>
+
+
+
+<script>
+
+  $(document).ready(function () {
+
+    $("#firstList").hide();
+    $("#subFilter").hide();
+
+
+    $('div#centerBlockRows').on('click', 'div.row', function () {
+
+
+      removeAllSelectedRowBgColors();
+
+      $(this).css("backgroundColor", '#FFFFBB');
+
+      if ($('#firstList').is(":visible") || $('#subFilter').is(":visible")) {
+        removeAllFilters();
+      }
+
+      $('button#addPayment').data('myval', value);
+
+    });
+
+  });
+
+  function removeAllSelectedRowBgColors() {
+
+    $('div#centerBlockRows').children("div").css("backgroundColor", 'white');
+
+  }
+
+
+  function showFilterList() {
+
+    removeAllSelectedRowBgColors();
+
+    if ($('#firstList').is(":visible") || $('#subFilter').is(":visible")) {
+
+      removeAllFilters();
+      document.getElementById("centerBlockOfExpenses").style.marginLeft = "300px";
+
+    } else {
+
+      $("#firstList").show();
+      $("#detailsOfExpense").hide();
+
+      document.getElementById("centerBlockOfExpenses").style.marginLeft = "30px";
+
+      document.getElementById("noexpensesview").style.margin = "100px";
+
+    }
+
+  }
+
+  function backButton() {
+
+
+    //showFilterList()
+    removeAllFilters();
+
+    $("#firstList").show();
+
+    if ($('#noexpensesview').is(":visible")) {
+
+      document.getElementById("noexpensesview").style.margin = "100px auto";
+    }
+
+  }
+
+  function removeAllFilters() {
+    $("#firstList").hide();
+    $("#subFilter").hide();
+    $(".filterList").hide();
+
+    if ($('#noexpensesview').is(":visible")) {
+
+      document.getElementById("noexpensesview").style.margin = "100px auto";
+
+    }
+  }
+
+  function removeAllFilters() {
+    $("#firstList").hide();
+    $("#subFilter").hide();
+    $(".filterList").hide();
+
+    if ($('#noexpensesview').is(":visible")) {
+
+      document.getElementById("noexpensesview").style.margin = "100px auto";
+
+    }
+  }
+
+
+  $("#firstList").children('li').click(function () {
+    var rssId = $(this).children('a').attr('id');
+
+    if (rssId != "listHeader") {
+      $("#firstList").hide();
+      $("#subFilter").show();
+
+    }
+
+    switch (rssId) {
+
+      case "amount":
+        $("#amountFilterList").show();
+
+        break;
+
+      case "user":
+        $("#userFilterList").show();
+
+        break;
+
+      case "manager":
+        $("#managerFilterList").show();
+
+        break;
+
+      case "sortby":
+        $("#sortFilterList").show();
+
+        break;
+
+      case "status":
+        $("#statusFilterList").show();
+
+        break;
+
+    }
+
+  });
+
+  function showSettlementModal(id) {
+
+    if (id == null)
+      id = $('#addPayment').data('myval');
+
+    $('#settlementModalForm').attr('action', '/admin/settlements/' + id + '/new');
+    $('#settlementModal').modal({
+      keyboard: false
+    });
+  }
+
+  // jquery ui code for combobox
+  (function ($) {
+    $.widget("custom.combobox", {
+      _create: function () {
+        this.wrapper = $("<span>")
+            .addClass("custom-combobox")
+            .insertAfter(this.element);
+
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+
+      _createAutocomplete: function () {
+        var selected = this.element.children(":selected"),
+            value = selected.val() ? selected.text() : "";
+
+        this.input = $("<input>")
+            .appendTo(this.wrapper)
+            .val(value)
+            .attr("title", "")
+            .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
+            .autocomplete({
+              delay: 0,
+              minLength: 0,
+              source: $.proxy(this, "_source")
+            })
+            .tooltip({
+              tooltipClass: "ui-state-highlight"
+            });
+
+        this._on(this.input, {
+          autocompleteselect: function (event, ui) {
+            ui.item.option.selected = true;
+            this._trigger("select", event, {
+              item: ui.item.option
+            });
+          },
+
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+
+      _createShowAllButton: function () {
+        var input = this.input,
+            wasOpen = false;
+
+        $("<a>")
+            .attr("tabIndex", -1)
+            .attr("title", "Show All Items")
+            .tooltip()
+            .appendTo(this.wrapper)
+            .button({
+              icons: {
+                primary: "ui-icon-triangle-1-s"
+              },
+              text: false
+            })
+            .removeClass("ui-corner-all")
+            .addClass("custom-combobox-toggle ui-corner-right")
+            .mousedown(function () {
+              wasOpen = input.autocomplete("widget").is(":visible");
+            })
+            .click(function () {
+              input.focus();
+
+              // Close if already visible
+              if (wasOpen) {
+                return;
+              }
+
+              // Pass empty string as value to search for, displaying all results
+              input.autocomplete("search", "");
+            });
+      },
+
+      _source: function (request, response) {
+        var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+        response(this.element.children("option").map(function () {
+          var text = $(this).text();
+          if (this.value && ( !request.term || matcher.test(text) ))
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }));
+      },
+
+      _removeIfInvalid: function (event, ui) {
+
+        // Selected an item, nothing to do
+        if (ui.item) {
+          return;
+        }
+
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+            valueLowerCase = value.toLowerCase(),
+            valid = false;
+        this.element.children("option").each(function () {
+          if ($(this).text().toLowerCase() === valueLowerCase) {
+            this.selected = valid = true;
+            return false;
+          }
+        });
+
+        // Found a match, nothing to do
+        if (valid) {
+          return;
+        }
+
+        // Remove invalid value
+        this.input
+            .val("")
+            .attr("title", value + " didn't match any item")
+            .tooltip("open");
+        this.element.val("");
+        this._delay(function () {
+          this.input.tooltip("close").attr("title", "");
+        }, 2500);
+        this.input.autocomplete("instance").term = "";
+      },
+
+      _destroy: function () {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+  })(jQuery);
+
+  $(function () {
+    $("#combobox").combobox();
+    $("#combobox2").combobox();
+    $("#toggle").click(function () {
+      $("#combobox").toggle();
+    });
+  });
+
+  function closeFilter(id) {
+    var div = $('#' + id);
+    div.attr('form', "");
+    div.remove();
+    $('#allFilters').submit()
+  }
+
+</script>
+
+<style>
+  #searchdiv {
+    margin-left: 23%;
+  }
+</style>

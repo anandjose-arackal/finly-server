@@ -19,52 +19,52 @@ class UserTeamServiceTest < ActiveSupport::TestCase
   test 'employee team view' do
     # Employee team view should return nil
     team_service = UserTeamService.new(@u)
-    assert team_service.team.blank?
+    assert team_service.team(UserRole.employee_id).blank?
 
     # Employee manager team view should return nil
-    assert team_service.team(view: 'manager').blank?
+    assert team_service.team(UserRole.manager_id).blank?
 
     # Employee finance team view should return nil
-    assert team_service.team(view: 'finance').blank?
+    assert team_service.team(UserRole.finance_manager_id).blank?
 
     # Employee admin team view should return nil
-    assert team_service.team(view: 'admin').blank?
+    assert team_service.team(UserRole.admin_id).blank?
   end
 
   test 'manager team view' do
     team_service = UserTeamService.new(@m0)
 
     # When no view is provided, returns nil
-    team = team_service.team
+    team = team_service.team(nil)
     assert team.blank?
 
     # Manager team view should not return nil
-    team = team_service.team(view: 'manager')
+    team = team_service.team(UserRole.manager_id)
     assert_not team.blank?
 
     # Manager finance team view should return nil
-    assert team_service.team(view: 'finance').blank?
+    assert team_service.team(UserRole.finance_manager_id).blank?
 
     # Manager admin team view should return nil
-    assert team_service.team(view: 'admin').blank?
+    assert team_service.team(UserRole.admin_id).blank?
   end
 
   test 'finance team view' do
     team_service = UserTeamService.new(@fm0)
 
     # When no view is provided, returns nil
-    team = team_service.team
+    team = team_service.team(nil)
     assert team.blank?
 
     # Finance manager team view should return nil
-    assert team_service.team(view: 'manager').blank?
+    assert team_service.team(UserRole.manager_id).blank?
 
     # Finance team view should not return nil
-    team = team_service.team(view: 'finance')
+    team = team_service.team(UserRole.finance_manager_id)
     assert_not team.blank?
 
     # Finance admin team view should return nil
-    assert team_service.team(view: 'admin').blank?
+    assert team_service.team(UserRole.admin_id).blank?
   end
 
   test 'retrieving manager' do

@@ -129,6 +129,7 @@ Rails.application.routes.draw do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
     post 'add_users' => 'policies#add_users', as: :add_users
     post 'remove_users' => 'policies#remove_users', as: :remove_users
+    patch 'update_users_configuration' => 'policies#update_user_configuration', as: :update_user_configuration
   end
 
   get 'organization_account' => 'organization_account#organization_account'
@@ -167,11 +168,11 @@ Rails.application.routes.draw do
     post 'update_role', to: 'users#update_role', as: :update_role
   end
 
+  resources :settlements
+  post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial
+  post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
   get 'expenses' => 'expenses#expenses'
 
-  get 'settlement' => 'settlement#settlement'
-
-  get 'user_settlement' => 'settlement#user_settlement'
   mount_opro_oauth
 
   root 'static_pages#home'
