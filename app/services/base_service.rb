@@ -7,7 +7,8 @@ class BaseService
 
   protected
   def load_view(params)
-    view = params[:view]
+    debugger
+    view = params[:view] || params['view']
     case view
       when 'admin'
         @admin_view = true

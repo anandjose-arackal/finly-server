@@ -1,7 +1,7 @@
 <div class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px ">
-  <!--
-    <div class="col-sm-0"><input style="margin-top: 25px" type="checkbox"></div>
-  -->
+
+  <div id="eachRow" class="row" data-toggle="modal" data-target="#showEmployeeProfile" onclick="$('form#userDetailsForm<%=user.id%>').submit()">
+
   <div class="col-sm-2"><span class="roundCircle" style="">VR</span></div>
   <div class="col-sm-8" style="">
     <p userTarget="name" style="line-height: 80%;font-weight: 600; margin-top: 5px"><%= user.name %></p>
@@ -12,7 +12,15 @@
   </div>
   <div class="col-sm-2">
 
-    <button id="editProfile<%= user.id %>" onclick="showEditProfileModal('<%= ej user.id %>','<%=  %>','<%= %>','<%= ej user.active %>')"  type="submit" style="margin: 0; margin-top: 10px;margin-left: 20px; padding: 10px; border: 1px solid #d8d8d8;width: 70%; background-color: #EFEFEF">
+  <form id="userDetailsForm<%=user.id%>" data-remote data-turboboost action="<%= user_details_path(user.id) %>" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+    <button id="editProfile<%= user.id %>" onclick="$('form#userDetailsForm<%=user.id%>').submit()" type="submit" style="margin: 0; margin-top: 10px;margin-left: 20px; padding: 10px; border: 1px solid #d8d8d8;width: 70%; background-color: #EFEFEF">
       <i class="fa fa-pencil" style="font-size: 15px; color: black"> </i></button>
+  </form>
+
+  </div>
+
+
   </div>
 </div>

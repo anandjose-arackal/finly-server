@@ -58,6 +58,16 @@
 #                              PATCH  /expenses/:id(.:format)                             expenses#update
 #                              PUT    /expenses/:id(.:format)                             expenses#update
 #                              DELETE /expenses/:id(.:format)                             expenses#destroy
+#                 user_details POST   /users/:user_id/user_details(.:format)              users#user_details
+#             user_update_team POST   /users/:user_id/update_user_team(.:format)          users#update_team
+#                        users GET    /users(.:format)                                    users#index
+#                              POST   /users(.:format)                                    users#create
+#                     new_user GET    /users/new(.:format)                                users#new
+#                    edit_user GET    /users/:id/edit(.:format)                           users#edit
+#                         user GET    /users/:id(.:format)                                users#show
+#                              PATCH  /users/:id(.:format)                                users#update
+#                              PUT    /users/:id(.:format)                                users#update
+#                              DELETE /users/:id(.:format)                                users#destroy
 #                              GET    /expenses(.:format)                                 expenses#expenses
 #                   settlement GET    /settlement(.:format)                               settlement#settlement
 #              user_settlement GET    /user_settlement(.:format)                          settlement#user_settlement
@@ -152,7 +162,9 @@ Rails.application.routes.draw do
   end
 
   resources :users do
-
+    post 'user_details', to: 'users#user_details', as: :details
+    post 'update_user_team', to: 'users#update_team', as: :update_team
+    post 'update_role', to: 'users#update_role', as: :update_role
   end
 
   get 'expenses' => 'expenses#expenses'

@@ -1,59 +1,92 @@
 
 <h4 class="profile_subheading">Name:</h4>
 
-<p class="profile_info">@user.name</p>
+<p class="profile_info"><%=@user.name%></p>
 
-<h4 class="profile_subheading">Email: @user.email</h4>
+<h4 class="profile_subheading">Email:</h4>
 
-<p class="profile_info"></p>
+<p class="profile_info"><%= @user.email%></p>
 
 <h4 class="profile_subheading">Mobile:</h4>
 
-<p class="profile_info">@user.mobile_number</p>
+<p class="profile_info"><%=@user.mobile_number%></p>
 
 
-<h4 class="profile_subheading">Default Reporting manager:</h4>
+<h4 class="profile_subheading">Reporting managers:</h4>
 
-<% if @default_manager %>
-<p class="profile_info"><%=@default_manager.name%> (<%=@default_manager.email %>) </p>
-<% else %>
+<% @mappings.each do |mapping| %>
+
+<% if mapping.manager %>
+<p class="profile_info"><%=mapping.manager.name%>
+<% @manager_exists = true %>
+<% if mapping.greater_than_amount_id %>
+ for reports greater than <%= mapping.greater_than_amount.value %></p>
+
+<% end %>
+
+      <label class="profile_subheading">Change:
+      </label>
+
+      <form data-remote data-turboboost action="<%= user_update_team_path(@user) %>" method="post">
+        <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+        <input name="user[team_mapping_id]" value="<%= mapping.id%>" type="hidden">
+        <input name="user[user_id]" value="<%= @user.id%>" type="hidden">
+      <select class="profile_info" name="user[manager_id]" list="suggestionList" id="answerInput" style="float: left; width: 30%">
+        <datalist id="suggestionList">
+          <option value="-1">None</option>
+          <% @users.each do |user| %>
+              <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
+          <% end %>
+        </datalist>
+      </select>
+        <input type="submit" class="profile_info" value="Update">
+      </form>
+
+<% end %>
+
+<% end %>
+
+<% if @manager_exists.nil? %>
 <p class="profile_info"> No Reporting Manager. [ Submitted reports will be auto-approved ] </p>
 <% end %>
 
+<h4 class="profile_subheading">Finance managers:</h4>
 
-<label class="profile_subheading">Managed By
-  <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
-</label>
+<% @mappings.each do |mapping| %>
 
-<select class="profile_info" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput" style="float: left; width: 30%">
-  <datalist id="suggestionList">
-    <option value="-1">None</option>
-    <!--    < % @users.each do |user| %>
-            <option value="< %= "#{user.id}" %>">< %= "#{user.name}" %></option>
-        < % end %>-->
-  </datalist>
-</select>
+    <% if mapping.finance_manager %>
+        <p class="profile_info"><%=mapping.finance_manager.name%>
+          <% @finance_manager_exists = true %>
+          <% if mapping.greater_than_amount_id %>
+              for reports greater than <%= mapping.greater_than_amount.value %></p>
 
+          <% end %>
 
-<h4 class="profile_subheading">Finance Manager:</h4>
+          <label class="profile_subheading">Change:
+          </label>
 
-<p class="profile_info"><%= @finance_manager.name %></p>
+          <form data-remote data-turboboost action="<%= user_update_team_path(@user) %>" method="post">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <input name="user[team_mapping_id]" value="<%= mapping.id%>" type="hidden">
+            <input name="user[user_id]" value="<%= @user.id%>" type="hidden">
+            <select class="profile_info" name="user[finance_manager_id]" list="suggestionList" id="answerInput" style="float: left; width: 30%">
+              <datalist id="suggestionList">
+                <option value="-1">None</option>
+                <% @users.each do |user| %>
+                    <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
+                <% end %>
+              </datalist>
+            </select>
+            <input type="submit" class="profile_info" value="Update">
+          </form>
 
-<label class="profile_subheading">Finance Managed By
-  <span class="spanEditProfile"> (this is the person who will finally approve user's expenses)</span>
-</label>
+    <% end %>
 
-<select class="profile_info" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput"  style="float: left; width: 30%">
-  <datalist id="suggestionList">
-    <option value="-1">None</option>
-    <!-- < % @users.each do |user| %>
-         <option value="< %= "#{user.id}" %>">< %= "#{user.name}" %></option>
-     < % end %>-->
-  </datalist>
-</select>
+<% end %>
 
-<!--
-</form>-->
+<% if @manager_exists.nil? %>
+    <p class="profile_info"> No Finance Manager. </p>
+<% end %>
 
 
 <hr style="margin-top: 20px">

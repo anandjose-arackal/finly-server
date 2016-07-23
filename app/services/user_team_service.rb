@@ -126,17 +126,17 @@ class UserTeamService < BaseService
   def update(params={})
     errors.clear
     load_update params
-    if params[:manager_id].present?
-      @mapping.update_attribute(manager_id: params[:manager_id])
+    if params[:manager_id].present? || params['manager_id'].present?
+      @mapping.update_attributes(manager_id: params[:manager_id] || params['manager_id'])
     end
-    if params[:finance_manager_id].present?
-      @mapping.update_attribute(finance_manager_id: params[:finance_manager_id])
+    if params[:finance_manager_id].present? || params['finance_manager_id'].present?
+      @mapping.update_attributes(finance_manager_id: params[:finance_manager_id] || params['finance_manager_id'])
     end
-    if params[:approves_to_user_id].present?
-      @mapping.update_attribute(approves_to_user_id: params[:approves_to_user_id])
+    if params[:approves_to_user_id].present? || params['approves_to_user_id'].present?
+      @mapping.update_attributes(approves_to_user_id: params[:approves_to_user_id] || params['approves_to_user_id'])
     end
-    if params[:approves_finance_to_user_id].present?
-      @mapping.update_attribute(approves_finance_to_user_id: params[:approves_finance_to_user_id])
+    if params[:approves_finance_to_user_id].present? || params['approves_finance_to_user_id'].present?
+      @mapping.update_attributes(approves_finance_to_user_id: params[:approves_finance_to_user_id] || params['approves_finance_to_user_id'])
     end
     errors << @mapping.errors.full_messages
     false if errors.present?
@@ -201,7 +201,8 @@ class UserTeamService < BaseService
     errors.clear
     load_role_update params
     existing_roles = user.role_mapping.policy(@policy_id).map(&:user_role_id)
-    new_roles = params[:user_role]
+    new_role_ids = params[:user_role_id]
+    new_roles = UserRole.find_by(id: new_role_ids)
     new_roles = [new_roles] unless new_roles.is_a? Array
     roles_to_add = new_roles - existing_roles
     roles_to_remove = existing_roles - new_roles
