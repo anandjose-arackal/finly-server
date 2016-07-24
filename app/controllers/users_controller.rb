@@ -26,7 +26,7 @@ class UsersController < ApplicationController
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
     # using current user instead of @user because we need list of users in current user's view
-    @users = current_company.users.t.paginate(page: params[:page])
+    @users = current_company.users.paginate(page: params[:page])
     @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
     render partial: 'users/employee_profile', replace: '#employeeDetailsDiv'
   end
@@ -35,7 +35,7 @@ class UsersController < ApplicationController
   def index
     @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
 
-    @users = current_company.users..paginate(page: params[:page])
+    @users = current_company.users.paginate(page: params[:page])
 
     @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
   end
