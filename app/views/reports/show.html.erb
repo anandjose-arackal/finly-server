@@ -7,7 +7,7 @@
     <% end %>
 <% end %>
 
-<% provide(:title, "Finly Report") %>
+<% provide(:title, 'Finly Report') %>
 <body id="show_report">
 <div id="container">
   <%= render 'reports/report_show' %>
@@ -25,8 +25,9 @@
 <script>
 
   $.clearInput = function () {
-    $('form#existingExpensesList').find('input[type=text], input[type=date], input[type=number], input[type=email], textarea, select').val('');
-    $('form#existingExpensesList').submit();
+    var existingExpenses = $('form#existingExpensesList');
+    existingExpenses.find('input[type=text], input[type=date], input[type=number], input[type=email], textarea, select').val('');
+//    existingExpenses.submit();
   };
 
   $('#closeAddExistingExpenseModal').on('click', function () {
@@ -43,28 +44,27 @@
 
     $(document).on("turboboost:success", function (e, flash) {
       $('#commentTextAreaEditModal').val('');
-
     });
 
-    $('form#existingExpensesList').submit();
+//    $('form#existingExpensesList').submit();
 
     //setup before functions
     var typingTimer;                //timer identifier
     var doneTypingInterval = 1000;  //time in ms, 1 second for example
     var $input = $('#filterMerchant');
 
-//on keyup, start the countdown
+    //on keyup, start the countdown
     $input.on('keyup', function () {
       clearTimeout(typingTimer);
       typingTimer = setTimeout(doneTyping, doneTypingInterval);
     });
 
-//on keydown, clear the countdown
+    //on keydown, clear the countdown
     $input.on('keydown', function () {
       clearTimeout(typingTimer);
     });
 
-//user is "finished typing," do something
+    //user is "finished typing," do something
     function doneTyping() {
       //do something
       $('form#existingExpensesList').submit();
@@ -82,8 +82,9 @@
     $('#hiddenExpenseAmount').val($('#expenseAmount').val());
 
 
-    $('.switchExpenseOneReadOnly').prop('readonly', false);
-    $('.switchExpenseOneReadOnly').css("background", "white");
+    var switchExpenseOneReadOnly = $('.switchExpenseOneReadOnly')
+    switchExpenseOneReadOnly.prop('readonly', false);
+    switchExpenseOneReadOnly.css("background", "white");
 
 
     $('.switchExpenseTwo').show();
@@ -218,6 +219,7 @@
   }
 
   function showExistingExpensesModal() {
+    $('form#existingExpensesList').submit();
     $('#addExistingExpenseModal').modal('show');
   }
 

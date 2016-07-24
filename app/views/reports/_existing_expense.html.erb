@@ -1,13 +1,13 @@
 <div id="existingExpenseItems">
   <table style="width:100%">
-  <% if @existing_expenses.present? %>
-      <% @existing_expenses.each do |expense| %>
+  <% if @unreported_expenses.present? %>
+      <% @unreported_expenses.each do |expense| %>
 
           <tr style="margin: 0;font-size: 13px; text-align: left; padding-top: 10px; height: 30px">
             <td style="width: 15% " ><input class="checkboxes" type="checkbox" name="expenses_id" value="<%= expense.id %>" onclick="makeButtonVisible()" style="margin: 4px 8px 0 8px"><%= expense.date.strftime("%d %b %y") %></td>
-            <td  style="width: 20% " ><%= expense.merchant %></td>
+            <td  style="width: 20% " ><%= expense.merchant_name %></td>
             <td  style="width: 30% "><%= expense.note %></td>
-            <td  style="width: 15%; padding-left: 20px "><span>&#8377</span><%= expense.amount %></td>
+            <td  style="width: 15%; padding-left: 20px "><span>&#8377</span><%= expense.amount.value %></td>
           </tr>
       <% end %>
   <% end %>

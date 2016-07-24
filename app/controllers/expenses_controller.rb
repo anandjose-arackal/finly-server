@@ -71,6 +71,13 @@ class ExpensesController < ApplicationController
 
   end
 
+  def unreported
+    @unreported_expenses = apply_scopes(current_user.expenses.unreported)
+    respond_to do |format|
+      format.js
+    end
+  end
+
 
   private
 

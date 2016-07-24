@@ -163,6 +163,7 @@ Rails.application.routes.draw do
     post 'detach_receipt', to: 'expenses#detach_receipt'
     post 'add_receipt', to: 'expenses#add_receipt'
   end
+  post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details
