@@ -124,6 +124,8 @@
 
 Rails.application.routes.draw do
   # get 'policies' => 'policies#index'
+  devise_for :users
+
   resources :policies, except: [:new, :edit]
   resources :policies do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
@@ -185,7 +187,7 @@ Rails.application.routes.draw do
 
   post 'users/update_password', to: 'users#update_password', as: :update_user_password
 
-  devise_for :users
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
