@@ -1,3 +1,11 @@
+<% @violations_found = false %>
+<% @block_violations = false %>
+<% if @policy %>
+    <% @violation_messages.each do |key, value| %>
+        <% @violations_found = true unless (value['expense_warning'].blank? && value['expense_blocking'].blank? && value['budget_warning'].blank? && value['budget_blocking'].blank?) %>
+        <% @block_violations = true unless (value['expense_blocking'].blank? && value['budget_blocking'].blank?) %>
+    <% end %>
+<% end %>
 <div id="container">
   <div id="newReport">
     <div style="height: 70px; background-color: white;">
@@ -54,11 +62,11 @@
     <% unless @policies.blank? %>
         <label style="float: right;margin-top: 5px"> Report Policy:
           <% if is_personal_view && !@report.processing? && !@report.approved? %>
-              <form id="applyPolicyForm" action="<%= report_assign_policy_path(@report)%>" method="post" style="display: inline-block">
+              <form id="applyPolicyForm" data-remote data-turboboost action="<%= report_assign_policy_path(@report) %>" method="post" style="display: inline-block">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                 <select name="report[policy_id]" onchange="$('form#applyPolicyForm').submit();" class="selectors" style="padding-top: 10px; width: 155px">
-                  <option value=""
-                          <% if @policy.nil? %>    selected="selected"
+                  <option value="nil"
+                          <% if @policy.nil? %> selected="selected"
                           <% end %>
                           >None
                   </option>
@@ -384,7 +392,7 @@
         <div class="modal-header" style="background-color: #e9e9e9 ; height: 60px">
           <button type="button" id="closeAddExistingExpenseModal" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
 
-          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= report_add_expenses_path(@report, view: params[:view]) %>" method="post">
+          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= report_add_expenses_path(@report, load_params) %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
             <input id="createReportExpenseIds" name="expense_id" type="text">
           </form>
@@ -401,8 +409,8 @@
         </div>
         <div class="modal-body" style="padding: 0">
 
-          <!--<form data-remote data-turboboost id="existingExpensesList" action="< %= user_unsubmitted_expenses_path(user_id: current_user.id) %>" method="post">
-            <input name="authenticity_token" value="< %= form_authenticity_token %>" hidden="hidden">
+          <form data-remote data-turboboost id="existingExpensesList" action="<%= expenses_unreported_path(load_params) %>" method="post">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
 
             <section id="filterSection" style="float: left;width: 25%;">
               <div style="font-size: 18px;
@@ -418,9 +426,9 @@
               </div>
               <select placeholder="Select Category" name="filter_category_id" class="selectors" onchange="$('form#existingExpensesList').submit();" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px">
                 <option value="" selected="selected">None</option>
-                < % @categories.each do |cat| %>
-                    <option value="< %= cat.id %>">< %= cat.name %></option>
-                < % end %>
+                <% @categories.each do |cat| %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% end %>
               </select>
               <input id="dateFrom" type="text" onchange="setDate(this)" name="filter_date[type]" value="expense" hidden="hidden">
 
@@ -433,7 +441,7 @@
               </div>
               <input id="filterStatus" type="text" hidden="hidden" name="filter_status" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: white;border-radius: 1px;line-height: normal !important;width: 60%;">
             </section>
-          </form>-->
+          </form>
           <section id="expensesSection" style="background-color: white;margin-left: 25%; min-height: 250px;
               width: 75%; border-left: 1px solid #d8d8d8">
             <div class="row" style="margin: 0;font-size: 10px; text-align: left; padding: 10px 0 10px 0;height: 30px;border-bottom: 1px solid #d8d8d8;">
@@ -452,10 +460,10 @@
   <div class="modal fade" id="newExpenseModal" role="dialog" style="margin-top: 5%;">
     <div class="modal-dialog modal-md" style="background-color: white">
 
-      <!--<form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="< %= user_expenses_path(current_user) %>">
+      <form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="<%= expenses_path(current_user) %>">
 
-        < %= hidden_field_tag :authenticity_token, form_authenticity_token %>
-        <input type="text" hidden="hidden" name="expense[report_id]" value="< %= @report.id %>"/>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="text" hidden="hidden" name="expense[report_id]" value="<%= @report.id %>"/>
 
 
         <div style="width: 100%;margin: 0 auto;display: block; max-width: 940px;">
@@ -473,7 +481,8 @@
               <div id="uppertone" style="border-bottom: 1px solid #465c8b;
                   margin-top: 10px ;
                   padding: 0px ;
-                  margin-bottom: 10px;"><p style="float: left;margin-left: 24px;font-size: 36px; color: white">&#8377</p>
+                  margin-bottom: 10px;">
+                <p style="float: left;margin-left: 24px;font-size: 36px; color: white">&#8377</p>
                 <input id="currency" class="clearInput" type="text" name="expense[amount]" placeholder="0.00" style="border:none; margin-left: 1px; font-size: 34px;width: 70%  ;color: white ; background-color: #465c8b;outline: none" onkeypress='validate(event)'>
                 <hr id="upperhr">
                 <div>
@@ -508,9 +517,9 @@
             <div class="splitSections">
               <p class="splitSideHeader">CATEGORY:</p>
               <select name="expense[category_id]" id="newExpenseCategory">
-                < % current_company.categories.each do |cat| %>
-                    <option value="< %= cat.id %>">< %= cat.name %></option>
-                < % end %>
+                <% current_company.categories.each do |cat| %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% end %>
               </select>
 
             </div>
@@ -532,7 +541,7 @@
 
         </div>
 
-      </form>-->
+      </form>
     </div>
   </div>
 </div>

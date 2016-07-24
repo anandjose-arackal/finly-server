@@ -108,8 +108,8 @@ class ReportService < BaseService
       self.report = report
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
-      if params[:expenses].present?
-        add_expense params[:expenses]
+      if params[:expense_id].present?
+        add_expense params[:expense_id]
       end
       return report
     end
@@ -563,7 +563,7 @@ class ReportService < BaseService
                                              report_comment_action_id: ReportCommentAction.report_update_id,
                                              updated_field: 'policy', updated_from: report.policy_id,
                                              updated_to: new_policy_id if report.retracted?
-      report.policy_id = params[:policy_id]
+      report.policy_id = new_policy_id
       update = true
     end
     unless update

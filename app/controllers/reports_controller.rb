@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
 
   def create
     rs = ReportService.new(user: current_user)
-    if rs.create
+    if rs.create create_params
       redirect_to report_path rs.report, view_params
       return
     end
@@ -32,7 +32,7 @@ class ReportsController < ApplicationController
   end
 
   def add_expenses
-
+    handle_update :add_expense, 'Expenses added to report', params[:expense_id]
   end
 
   def remove_expenses
@@ -109,6 +109,9 @@ class ReportsController < ApplicationController
   end
 
   private
+  def create_params
+    params.require(:report).permit(:expense_id, :name)
+  end
 
   def load_service_object
     @violation_service = ViolationService.new(current_user)

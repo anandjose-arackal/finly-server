@@ -5,7 +5,6 @@ class UsersController < ApplicationController
 
   def profile
     @manager = @user_team_service.manager
-
   end
 
   def update_password
@@ -13,9 +12,9 @@ class UsersController < ApplicationController
     if @user.update_with_password(user_params)
       # Sign in the user by passing validation in case their password changed
       sign_in @user, :bypass_sin_in => true
-      flash[:success] = "Password updated"
+      flash.now[:success] = 'Password updated'
     else
-      flash.now[:danger] = "Password updation failed"
+      flash.now[:danger] = 'Password updation failed'
     end
     redirect_to request.referrer
   end
