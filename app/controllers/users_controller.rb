@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :authenticate_user!
+  #before_action :authenticate_user!
   before_action :load_service_objects
 
   def profile
@@ -22,6 +22,38 @@ class UsersController < ApplicationController
 
   # action to retrieve a particular user's details in the employees screen - only for admin, obviously
   def user_details
+    @user = current_company.users.with_id(params[:user_id]).first
+    # reinitializing the user team service object
+    @user_team_service = UserTeamService.new(@user)
+    # using current user instead of @user because we need list of users in current user's view
+    @users = current_company.users.paginate(page: params[:page])
+    @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
+    render partial: 'users/employee_profile', replace: '#employeeDetailsDiv'
+  end
+
+  # for employee list
+  def index
+    @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
+
+    @users = current_company.users.paginate(page: params[:page])
+
+    @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
+  end
+
+  def update_team
+    @user = current_company.users.with_id(params[:user_id]).first
+    # reinitializing the user team service object
+    @user_team_service = UserTeamService.new(@user)
+    if @user_team_service.update(user_params)
+      flash[:success] = "Team updated!"
+      redirect_to users_path
+    else
+      flash[:danger] = "Error. Try again."
+      redirect_to users_path
+    end
+  end
+
+  def update_role
 
   end
 
@@ -32,7 +64,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:current_password, :password, :password_confirmation)
+    params.require(:user).permit(:current_password, :password, :password_confirmation, :manager_id, :team_mapping_id, :finance_manager_id)
   end
 
 end

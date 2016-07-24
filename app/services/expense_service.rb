@@ -149,31 +149,22 @@ class ExpenseService < BaseService
     end
   end
 
-  # todo - will come in report
-  # def reject_expenses(id, memo=nil)
-  #   return if id.blank?
-  #   expense = load_expense id
-  #   return if expense.blank?
-  #   # making the expense unsubmitted with the memo
-  #   if expense.update_attributes(manager_memo: memo, expense_status_id: 1)
-  #     return true
-  #   else
-  #     errors << expense.errors.full_messages
-  #   end
-  #   false
-  # end
 
   private
 
   def load_expense_params(params = {})
     expense_params = params[:expense].except(:amount, :merchant, :currency_id)
-    # expense_params[:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
-    # if params[:expense][:merchant].present?
-    #   expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
-    #   expense_params.delete(:merchant)
-    #
-    #   # other conditions based on type of expense can go here
-    # end
+
+    # todo - add logic here to take into account expenses edited within reports
+    # in case the method is called from the test cases
+    expense_params[:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]} if params[:expense][:amount_attributes].nil?
+    expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]} if params[:expense][:manual_expense_attributes].nil?
+
+    # for manual expenses only
+    expense_params[:expense_type_id] = 1 if expense_params[:expense_type_id].nil?
+    # i.e. it's an unsubmitted expense
+    expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil?
+    expense_params[:id] = params[:id] || params[:expense_id]
     expense_params
   end
 

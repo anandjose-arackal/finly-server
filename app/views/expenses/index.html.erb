@@ -9,6 +9,7 @@
 <form data-remote data-turboboost id="allFilters" action="<%= expenses_path %>" method="get">
   <!-- search bar -->
   <div id="showPreviousFilters">
+    <!-- todo - tweak previous filter code to show filters
     <!-- < % param = get_old_filters(params, 1) %>
      < % param.each do |item| %>
          < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
@@ -97,9 +98,8 @@
 
                 <li>
                   <form data-remote data-turboboost enctype="multipart/form-data" id="editExpenseAddReceipt" hidden="hidden" method="post">
-                    <input name="_method" type="hidden" value="patch"/>
                     <input name="authenticity_token" value="<%= form_authenticity_token %>">
-                    <input class="form-control" id="receiptSelectFile" type="file" name="expense[receipt]" accept=".png,.jpg,.pdf,.jpeg" onchange="submitFile()"/>
+                    <input class="form-control" id="receiptSelectFile" type="file" name="receipt[image]" accept=".png,.jpg,.pdf,.jpeg" onchange="submitFile()"/>
                     <input id="receiptSubmitFile" type="submit" name="commit" value="Submit" class="btn btn-primary"/>
                   </form>
 
@@ -415,9 +415,14 @@
         myNode.removeChild(myNode.firstChild);
       }
 
-    $('#editExpenseAddReceipt').attr("action", getExpensePath(expenseID));
-    $('#approveExpenseButtonForm').attr("action", getReviewExpensePath(expenseID));
+    document.getElementById("editExpenseAddReceipt").action = '/expenses/' + expenseID + '/add_receipt';
 
+  }
+
+  function getExpensePath(id) {
+
+    path = '/expenses/' + id;
+    return path
   }
 
   // JS function that shows the filters and activates the filters view or vice versa
@@ -480,7 +485,7 @@
           keyboard: false
         });
         expenseID = document.getElementById("expenseID").innerHTML;
-        document.getElementById("deleteExpenseButton").action = getExpensePath(expenseID);
+        document.getElementById("deleteExpenseButton").action = '/expenses/' + expenseID;
         break;
 
 
@@ -498,7 +503,7 @@
         $('#editExpenseNote').val(document.getElementById("note").innerHTML);
 
         expenseID = document.getElementById("expenseID").innerHTML;
-        document.getElementById("editExpenseForm").action = getExpensePath(expenseID);
+        document.getElementById("editExpenseForm").action = '/expenses/' + expenseID;
 
         break;
 

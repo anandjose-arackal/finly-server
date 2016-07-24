@@ -93,4 +93,103 @@ class PolicyUserService < BaseService
     true
   end
 
+  def update_configuration(params={})
+    errors.clear
+    admin = params[:admin]
+    user_id = params[:user_id]
+    if self.policy.blank?
+      errors << 'Policy not found'
+      return false
+    end
+    user = self.policy.users.with_id(user_id)
+    if user.blank?
+      errors << 'User not found in policy'
+      return false
+    end
+    user = user.first
+    if user.blank?
+      errors << 'User not found in policy'
+      return false
+    end
+    mappings = user.team_mapping.policy(@policy.id)
+    return false unless handle_mapping_update user, mappings, params[:default], true
+    return false unless handle_mapping_update user, mappings, params[:conditional_manager]
+    return false unless handle_mapping_update user, mappings, params[:conditional_finance_manager]
+    return false unless handle_mapping_update user, mappings, params[:conditional_approves_to]
+    return false unless handle_mapping_update user, mappings, params[:conditional_approves_finance_to]
+    true
+  end
+
+  private
+  def handle_mapping_update(user, mappings, params={}, default= false)
+    if params[:mapping_id].present?
+      mapping = mappings.with_id(params[:mapping_id])
+      mapping = mapping.first if mapping.present?
+      if mapping.blank?
+        self.errors << 'User configuration load error'
+        return false
+      end
+    else
+      mapping = user.team_mapping.build(user: user, policy: self.policy, greater_than_amount_attributes: {value: 0, currency_id: 1})
+    end
+    if default
+      default_config = nil
+      if params[:manager_id].blank?
+        if default_config.blank?
+          default_config = user.team_mapping.without_policy.default.first
+        end
+        params[:manager_id] = default_config.manager_id
+      end
+      if params[:finance_manager_id].blank?
+        if default_config.blank?
+          default_config = user.team_mapping.without_policy.default.first
+        end
+        params[:finance_manager_id] = default_config.finance_manager_id
+      end
+      if params[:approves_to_user_id].blank?
+        if default_config.blank?
+          default_config = user.team_mapping.without_policy.default.first
+        end
+        params[:approves_to_user_id] = default_config.approves_to_user_id
+      end
+      if params[:approves_finance_to_user_id].blank?
+        if default_config.blank?
+          default_config = user.team_mapping.without_policy.default.first
+        end
+        params[:approves_finance_to_user_id] = default_config.approves_finance_to_user_id
+      end
+    end
+
+    if params[:manager_id].blank? and params[:finance_manager_id].blank? and
+        params[:approves_to_user_id].blank? and params[:approves_finance_to_user_id].blank?
+      unless default
+        if mapping.destroy!
+          return true
+        else
+          self.errors += mapping.errors.full_messages
+          return false
+        end
+      end
+    end
+    mapping.manager_id = params[:manager_id]
+    mapping.finance_manager_id = params[:finance_manager_id]
+    mapping.approves_to_user_id = params[:approves_to_user_id]
+    mapping.approves_finance_to_user_id = params[:approves_finance_to_user_id]
+    amount = params[:amount]
+    if amount.present? and amount.to_f > 0
+      mapping.greater_than_amount.value = amount.to_f
+    else
+      unless default
+        self.errors << 'Cannot set amount value to 0 for conditional managers'
+        return false
+      end
+      mapping.greater_than_amount = nil
+    end
+    if mapping.save
+      return true
+    end
+    self.errors += mapping.errors.full_messages
+    false
+  end
+
 end

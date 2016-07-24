@@ -54,9 +54,8 @@
     <% unless @policies.blank? %>
         <label style="float: right;margin-top: 5px"> Report Policy:
           <% if is_personal_view && !@report.processing? && !@report.approved? %>
-              <form id="applyPolicyForm" action="<%= request.path %>" method="post" style="display: inline-block">
+              <form id="applyPolicyForm" action="<%= report_assign_policy_path(@report)%>" method="post" style="display: inline-block">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                <input name="_method" type="hidden" value="patch"/>
                 <select name="report[policy_id]" onchange="$('form#applyPolicyForm').submit();" class="selectors" style="padding-top: 10px; width: 155px">
                   <option value=""
                           <% if @policy.nil? %>    selected="selected"
@@ -75,9 +74,6 @@
           <% else %>
               <% if @policy %>
                   <%= @policy.name %>
-                  <% if @policy.deactivated_for?(@report.user) %>
-                      (deactivated for user)
-                  <% end %>
               <% else %>
                   None
               <% end %>

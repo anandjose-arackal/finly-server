@@ -94,6 +94,14 @@ class User < ActiveRecord::Base
   scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
+  scope :sort_by_name, -> { order(name: :asc)}
+  scope :active, -> { where active: true}
+
+  # scopes for filters
+  scope :filter_search, -> (term) do
+
+  end
+  scope :only_employees, -> { where "user_role_mappings.user_role_id = ?", UserRole.employee_id }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 

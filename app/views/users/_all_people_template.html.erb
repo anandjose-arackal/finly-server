@@ -1,0 +1,357 @@
+
+<% provide(:title, current_user.name) %>
+
+<body id="people">
+<div class="row" style="margin-top: 60px; padding-left: 20%; padding-right: 12.5%">
+
+  <div class="col-sm-8" style="border: 1px solid #d8d8d8;background-color: #CFE8DA">
+    <div>
+      <div id="headerTitle" style="background-color: #CFE8DA;border-bottom: 1px solid #d8d8d8; padding-top: 5px; padding-bottom: 5px">
+      </div>
+      <div style="background-color: white">
+
+        <div class="row" style="background-color: white;border-bottom: 2px solid #d8d8d8;">
+
+          <!--          < % path = admin_users_path if is_manager_view %>
+                    < % path = admin_company_users_path if is_admin_view %>
+
+                    <form data-remote data-turboboost action="< %= path %>" method="get">
+                      < % params.each do |key, value| %>
+                          < % if key.start_with?('filter') && key != 'filter_search' %>
+                              <input type="text" hidden="hidden" name="< %= key %>" value="< %= value %>">
+                          < % end %>
+                      < % end %>-->
+          <input type="search" name="filter_search" placeholder="Filter by user name..." style="width: 250px;
+              border-radius: 4px;
+              border: 1px solid #d8d8d8;
+              outline: none;
+              padding: 6px 10px;
+              margin: 10px 0px 10px 25px;
+              font-size: 14px;
+              background-position: 99% 50%;
+              background-size: 32px;
+              opacity: 0.5;" value="">
+          <input type="submit" hidden="hidden"/>
+          </form>
+        </div>
+      </div>
+      <div id="employees">
+          <%= yield :people %>
+      </div>
+      <div id="infinite-scrolling" style="display: none">
+          <%= will_paginate @users %>
+      </div>
+
+    </div>
+
+
+  </div>
+
+  <div class="col-sm-4">
+    <button class="invite green-button" data-toggle="modal" data-target="#inviteTeamMembers">
+      Invite Team Members
+    </button>
+    <div class="navblock">
+      <p class="listHeaders">ROLE</p>
+
+      <!--      < % if @user.admin? %>
+                <div class="listOptions" id="adminFilter" onclick="reloadPageWithUserType(1)"> Admin
+                  <span class="listOptionsNumbers">< %= @admin_count %></span>
+                </div>
+            < % end %>
+            <div class="listOptions" id="managerFilter" onclick="reloadPageWithUserType(3)"> Manager
+              <span class="listOptionsNumbers">< %= @manager_count %></span>
+            </div>
+            <div class="listOptions" id="allFilter" onclick="reloadPageWithUserType(-1)"> All
+              <span class="listOptionsNumbers">< %= @users.count %></span>
+            </div>-->
+    </div>
+
+    <div class="navblock">
+      <p class="listHeaders">STATUS</p>
+
+      <!--<div class="listOptions" id="activeStatus" onclick="reloadPageWithUserState(1)"> Active
+        <span class="listOptionsNumbers">< %= @active_users %></span>
+      </div>
+      <div class="listOptions" id="pendingStatus" onclick="reloadPageWithPendingUsers()"> Pending
+        <span class="listOptionsNumbers">< %= @pending_users_count %></span>
+      </div>
+      <div class="listOptions" id="deactivatedStatus" onclick="reloadPageWithUserState(0)"> Deactivated
+        <span class="listOptionsNumbers">< %= @inactive_users %></span>
+      </div>-->
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+
+<div class="modal fade" id="inviteTeamMembers" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <form action="" method="post" data-remote data-turboboost>
+      <input name="authenticity_token" value="" type="hidden">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">INVITE TEAM
+            MEMBERS</h4>
+        </div>
+        <p style="font-size: 14px;
+            font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+            text-transform: uppercase;
+            font-weight: 400; padding: 20px 0 5px 40px;
+            color: #777;">Email</p>
+
+        <input type="text" name="pending_invite[user_email]" class="dialogInputStyle" placeholder="example@company.com, two@asa.com">
+        <textarea class="dialogInputStyle" id="modalInputComment" class="form-control" name="pending_invite[note]"
+                  placeholder="Add a note (optional)" style="margin-top: 20px;"></textarea>
+
+        <!--  < % if @user.admin? %>
+              <label class="editProfileDialogHeaders">Assign Admin Role?</label>
+
+              <label class="radio-inline" style="font-size: 12px">
+                <input id="adminTrue" type="radio" name="admin" style="font-size: 8px" value="1">Yes
+              </label>
+              <label class="radio-inline" style="font-size: 12px">
+                <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
+              </label>
+          < % end %>-->
+        <hr style=" margin: 15px 0 0 0">
+
+        <label class="editProfileDialogHeaders">Assign Manager Role?</label>
+
+        <label class="radio-inline" style="font-size: 12px">
+          <input id="managerTrue" type="radio" name="manager" style="font-size: 8px" value="1">Yes
+        </label>
+        <label class="radio-inline" style="font-size: 12px">
+          <input id="managerTrue" type="radio" name="manager" value="0" checked="checked" style="font-size: 8px">No
+        </label>
+
+        <hr style=" margin: 15px 0 0 0">
+        <label class="editProfileDialogHeaders">Managed By
+          <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
+        </label>
+
+        <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
+          <datalist id="suggestionList">
+            <option value="-1">None</option>
+            <!--   < % @users.each do |user| %>
+                   <option value="< %= "#{user.id}" %>">< %= "#{user.name}" %></option>
+               < % end %>-->
+          </datalist>
+        </select>
+
+        <hr style=" margin: 15px 0 0 0">
+        <label class="editProfileDialogHeaders">Add policy to user
+          <span class="spanEditProfile"> (this policy will hence be available to the user)</span>
+        </label>
+
+        <select name="pending_invite[policy_id]" class="selectors" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px">
+          <option value="" selected="selected">None</option>
+          <!--  < % @policies.each do |policy| %>
+                <option value="< %= policy.id %>">< %= policy.name %></option>
+            < % end %>-->
+        </select>
+
+        <button style="margin-top: 20px" id="inviteUsersSubmitButton" class="green-button sendButton" type="submit">INVITE</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="showEmployeeProfile" role="dialog">
+  <div class="modal-dialog modal-lg" style="width: 95%">
+    <form action="" method="post" data-remote data-turboboost>
+      <input name="authenticity_token" value="" type="hidden">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <%= render 'employee_profile' %>
+
+          <button type="button" class="close" style="opacity: 0.7;position: fixed;
+              right: 20px;
+              top: 20px;" data-dismiss="modal">&times;</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+
+  $(document).ready(function () {
+
+   $("#submitbut").click(function () {
+   $.post("< %= invite_path %>", {
+   email: $('input[id="inputEmail3"]').val()
+   })
+   })
+
+   $("#checkAll").change(function () {
+   $("input:checkbox").prop('checked', $(this).prop("checked"));
+   });
+
+   <% if  params[:filter_type]%>
+   <% if  params[:filter_type] == "1"%>
+   $('#adminFilter').css("background", "#FFFFBB")
+   $('#headerTitle').text('ADMIN');
+   <% elsif   params[:filter_type] == "3"%>
+   $('#managerFilter').css("background", "#FFFFBB")
+   $('#headerTitle').text('MANAGER');
+   <% end %>
+   <% elsif  params[:filter_state] %>
+   <% if  params[:filter_state] == "1"%>
+   $('#activeStatus').css("background", "#FFFFBB")
+   $('#headerTitle').text('ACTIVE');
+   <% elsif   params[:filter_state] == "0"%>
+   $('#deactivatedStatus').css("background", "#FFFFBB")
+   $('#headerTitle').text('DEACTIVATED');
+   <% end %>
+   <% elsif params[:filter_pending_invites]  %>
+   $('#pendingStatus').css("background", "#FFFFBB")
+   $('#headerTitle').text('PENDING');
+   <% else %>
+   $('#headerTitle').text('ALL');
+   $('#allFilter').css("background", "#FFFFBB")
+   <% end %>
+
+   });
+
+   function closeEditProfile() {
+   $('#editProfileDialog').modal('hide');
+   }
+
+   function showList() {
+   document.getElementById("myDropdown").classList.toggle("show");
+   }
+
+   function reloadPageWithPendingUsers() {
+   var url = "/admin/users";
+   if (<%= is_admin_view %>) {
+   url += "/company"
+   }
+   url += '?filter_pending_invites=true';
+   Turbolinks.visit(url)
+   }
+
+   function reloadPageWithUserState(id) {
+   var url = "/admin/users";
+   if (<%= is_admin_view %>) {
+   url += "/company"
+   }
+   if (id != null && id >= 0) {
+   url += "?filter_state=" + id;
+   }
+   Turbolinks.visit(url)
+   }
+
+   function reloadPageWithUserType(id) {
+
+
+   var url = "/admin/users";
+   if (<%= is_admin_view %>) {
+   url += "/company"
+   }
+   if (id != null && id >= 0) {
+   url += "?filter_type=" + id;
+   }
+   Turbolinks.visit(url)
+   }
+
+
+   function showEditProfileModal(id, user_type_id, manager_id, user_mail, user_name, state) {
+
+
+   if (user_type_id == '1') {
+   $('#dialogAdminTrue').prop("checked", true);
+   $('#dialogManagerFalse').prop("checked", true);
+   } else if (user_type_id == '3') {
+   $('#dialogAdminFalse').prop("checked", true);
+   $('#dialogManagerTrue').prop("checked", true);
+   } else {
+   $('#dialogAdminFalse').prop("checked", true);
+   $('#dialogManagerFalse').prop("checked", true);
+   }
+
+   if (manager_id == '') {
+   $('#dialogManagerId').val('-1')
+   } else {
+   $('#dialogManagerId').val(manager_id)
+   }
+   if (state == 1) {
+   $('#deactivateInput').prop("value", "0");
+   $('#deactivateInputButton').text("DEACTIVATE");
+   } else {
+   $('#deactivateInput').prop("value", "1");
+   $('#deactivateInputButton').text("ACTIVATE");
+   }
+
+   $('#deactivateForm').attr("action", '/admin/users/' + id + '/update_state');
+   $('#updateUserForm').attr("action", '/admin/users/' + id + '/update_role_manager');
+
+   policy = $('#dialogPolicyId').find(":selected").val();
+
+   $('#addPolicyToUserForm').attr("action", '/admin/users/' + id + '/add_policy');
+
+
+   var username = $('#modalProfileUserName');
+   var usernameLable = $('#modalProfileUserNameLabel');
+
+   if (user_name != null) {
+   username.text(user_name);
+   username.show();
+   usernameLable.show();
+   } else {
+   username.hide();
+   usernameLable.hide();
+   }
+   $('#modalProfilelUserEmail').text(user_mail);
+
+   $('#hiddenUserId').val(id);
+
+   onOpenEditModal(id);
+
+   $('#editProfileDialog').modal('show');
+
+   $('form#showPoliciesForUserForm').attr("action", '/admin/users/' + id + '/get_policies');
+   $('form#showPoliciesForUserForm').submit();
+   }
+
+   function getUserExpensesPath() {
+   var userId = $('#hiddenUserId').val();
+
+   var path = "";
+   <% if is_admin_view %>
+   path = '/admin/expenses/company?filter_user_id=' + userId;
+   <% elsif is_manager_view %>
+   path = '/admin/expenses?filter_user_id=' + userId;
+
+   <% end %>
+
+   return path;
+
+   }
+
+   function getUserReportsPath() {
+   var userId = $('#hiddenUserId').val();
+
+   var path = "";
+   <% if is_admin_view %>
+   path = '/admin/company/reports?filter_user_id=' + userId;
+   <% elsif is_manager_view %>
+   path = '/admin/reports?filter_user_id=' + userId;
+
+   <% end %>
+
+   return path;
+
+   }
+
+</script>

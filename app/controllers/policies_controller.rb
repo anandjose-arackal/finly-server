@@ -23,6 +23,7 @@ class PoliciesController < ApplicationController
   def show
     @policy = Policy.find(params[:id])
     @managers = @policy.company.managers
+    @finance_managers = @policy.company.finance_managers
     load_users
   end
 
@@ -102,6 +103,22 @@ class PoliciesController < ApplicationController
 
   end
 
+  def update_user_configuration
+    @policy = Policy.find(params[:policy_id])
+    pus = PolicyUserService.new(@policy)
+    if pus.update_configuration params[:policy]
+      load_users
+      flash.now[:success] = 'Configuration updated'
+      respond_to do |format|
+        format.html { redirect_to policy_path(@policy, view: params[:view]) }
+        format.js
+      end
+      return
+    end
+    flash[:failure] = pus.errors
+    render_flash_message
+  end
+
   private
   def load_users
     @users = []
@@ -109,12 +126,33 @@ class PoliciesController < ApplicationController
       user = map.user
       uts = UserTeamService.new(user)
       admin = map.admin
-      manager = uts.manager(policy: @policy)
-      finance_manager = uts.finance_manager(policy: @policy)
-      approves_to = uts.approves_to(policy: @policy)
-      approves_finance_to = uts.approves_finance_to(policy: @policy)
-      @users << {user: user, admin: admin, manager: manager, finance_manager: finance_manager, approves_to: approves_to, approves_finance_to: approves_finance_to}
+      conditional_manager= nil
+      conditional_finance =nil
+      conditional_approves_to = nil
+      conditional_approves_finance_to = nil
+
+      mappings = uts.mappings policy: @policy
+      default_mapping = mappings.default
+      default_mapping = default_mapping.first if default_mapping.present?
+      conditional_mapping = mappings.non_default
+      cm = conditional_mapping.manager
+      conditional_manager = cm.first if cm.present?
+      cf = conditional_mapping.finance_manager
+      conditional_finance = cf.first if cf.present?
+      cat = conditional_mapping.approves_to
+      conditional_approves_to = cat.first if cat.present?
+      caft = conditional_mapping.approves_finance_to
+      conditional_approves_finance_to = caft.first if caft.present?
+
+      @users << {user: user, admin: admin, default_mapping: default_mapping, conditional_manager: conditional_manager,
+                 conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
+                 conditional_approves_finance_to: conditional_approves_finance_to}
     end
+  end
+
+  def update_user_params
+    params.require(:policy).permit(:admin, :default, :conditional_manager, :conditional_finance_manager,
+                                   :conditional_approves_to, :conditional_approves_finance_to)
   end
 
 end

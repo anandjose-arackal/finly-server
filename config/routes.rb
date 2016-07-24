@@ -1,8 +1,24 @@
 # == Route Map
 #
 #                       Prefix Verb   URI Pattern                                         Controller#Action
+#                     policies GET    /policies(.:format)                                 policies#index
+#                              POST   /policies(.:format)                                 policies#create
+#                       policy GET    /policies/:id(.:format)                             policies#show
+#                              PATCH  /policies/:id(.:format)                             policies#update
+#                              PUT    /policies/:id(.:format)                             policies#update
+#                              DELETE /policies/:id(.:format)                             policies#destroy
+#       policy_invitable_users POST   /policies/:policy_id/invitable_users(.:format)      policies#invitable_users
+#             policy_add_users POST   /policies/:policy_id/add_users(.:format)            policies#add_users
+#          policy_remove_users POST   /policies/:policy_id/remove_users(.:format)         policies#remove_users
+#                              GET    /policies(.:format)                                 policies#index
+#                              POST   /policies(.:format)                                 policies#create
+#                   new_policy GET    /policies/new(.:format)                             policies#new
+#                  edit_policy GET    /policies/:id/edit(.:format)                        policies#edit
+#                              GET    /policies/:id(.:format)                             policies#show
+#                              PATCH  /policies/:id(.:format)                             policies#update
+#                              PUT    /policies/:id(.:format)                             policies#update
+#                              DELETE /policies/:id(.:format)                             policies#destroy
 #         organization_account GET    /organization_account(.:format)                     organization_account#organization_account
-#                 user_profile GET    /user_profile(.:format)                             user_profile#user_profile
 #                       people GET    /people(.:format)                                   people#people
 #                      reports GET    /reports(.:format)                                  reports#index
 #                              POST   /reports(.:format)                                  reports#create
@@ -22,6 +38,7 @@
 #          report_take_control PATCH  /reports/:report_id/take_control(.:format)          reports#take_control
 #          report_add_expenses POST   /reports/:report_id/add_expenses(.:format)          reports#add_expenses
 #       report_remove_expenses DELETE /reports/:report_id/remove_expenses(.:format)       reports#remove_expenses
+#         report_assign_policy POST   /reports/:report_id/assign_policy(.:format)         reports#assign_policy
 #                              GET    /reports(.:format)                                  reports#index
 #                              POST   /reports(.:format)                                  reports#create
 #                   new_report GET    /reports/new(.:format)                              reports#new
@@ -30,12 +47,30 @@
 #                              PATCH  /reports/:id(.:format)                              reports#update
 #                              PUT    /reports/:id(.:format)                              reports#update
 #                              DELETE /reports/:id(.:format)                              reports#destroy
-#                     policies GET    /policies(.:format)                                 policies#index
-#                              POST   /policies(.:format)                                 policies#create
-#                       policy GET    /policies/:id(.:format)                             policies#show
-#                              PATCH  /policies/:id(.:format)                             policies#update
-#                              PUT    /policies/:id(.:format)                             policies#update
-#                              DELETE /policies/:id(.:format)                             policies#destroy
+#       expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)      expenses#attach_receipt
+#       expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)      expenses#detach_receipt
+#          expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)         expenses#add_receipt
+#                     expenses GET    /expenses(.:format)                                 expenses#index
+#                              POST   /expenses(.:format)                                 expenses#create
+#                  new_expense GET    /expenses/new(.:format)                             expenses#new
+#                 edit_expense GET    /expenses/:id/edit(.:format)                        expenses#edit
+#                      expense GET    /expenses/:id(.:format)                             expenses#show
+#                              PATCH  /expenses/:id(.:format)                             expenses#update
+#                              PUT    /expenses/:id(.:format)                             expenses#update
+#                              DELETE /expenses/:id(.:format)                             expenses#destroy
+#                 user_details POST   /users/:user_id/user_details(.:format)              users#user_details
+#             user_update_team POST   /users/:user_id/update_user_team(.:format)          users#update_team
+#                        users GET    /users(.:format)                                    users#index
+#                              POST   /users(.:format)                                    users#create
+#                     new_user GET    /users/new(.:format)                                users#new
+#                    edit_user GET    /users/:id/edit(.:format)                           users#edit
+#                         user GET    /users/:id(.:format)                                users#show
+#                              PATCH  /users/:id(.:format)                                users#update
+#                              PUT    /users/:id(.:format)                                users#update
+#                              DELETE /users/:id(.:format)                                users#destroy
+#                              GET    /expenses(.:format)                                 expenses#expenses
+#                   settlement GET    /settlement(.:format)                               settlement#settlement
+#              user_settlement GET    /user_settlement(.:format)                          settlement#user_settlement
 #                    oauth_new GET    /oauth/new(.:format)                                opro/oauth/auth#new
 #              oauth_authorize POST   /oauth/authorize(.:format)                          opro/oauth/auth#create
 #                  oauth_token POST   /oauth/token(.:format)                              opro/oauth/token#create
@@ -56,6 +91,8 @@
 #                         root GET    /                                                   static_pages#home
 #                        about GET    /about(.:format)                                    static_pages#about
 #                     features GET    /features(.:format)                                 static_pages#features
+#                 user_profile GET    /users/profile(.:format)                            users#profile
+#         update_user_password POST   /users/update_password(.:format)                    users#update_password
 #             new_user_session GET    /users/sign_in(.:format)                            devise/sessions#new
 #                 user_session POST   /users/sign_in(.:format)                            devise/sessions#create
 #         destroy_user_session DELETE /users/sign_out(.:format)                           devise/sessions#destroy
@@ -87,11 +124,14 @@
 
 Rails.application.routes.draw do
   # get 'policies' => 'policies#index'
+  devise_for :users
+
   resources :policies, except: [:new, :edit]
   resources :policies do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
     post 'add_users' => 'policies#add_users', as: :add_users
     post 'remove_users' => 'policies#remove_users', as: :remove_users
+    patch 'update_users_configuration' => 'policies#update_user_configuration', as: :update_user_configuration
   end
 
   get 'organization_account' => 'organization_account#organization_account'
@@ -115,12 +155,19 @@ Rails.application.routes.draw do
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+    post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
   end
 
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
+    post 'add_receipt', to: 'expenses#add_receipt'
+  end
 
+  resources :users do
+    post 'user_details', to: 'users#user_details', as: :details
+    post 'update_user_team', to: 'users#update_team', as: :update_team
+    post 'update_role', to: 'users#update_role', as: :update_role
   end
 
   resources :settlements
@@ -140,7 +187,7 @@ Rails.application.routes.draw do
 
   post 'users/update_password', to: 'users#update_password', as: :update_user_password
 
-  devise_for :users
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -162,7 +209,7 @@ Rails.application.routes.draw do
   #     member do
   #       get 'short'
   #       post 'toggle'
-  #     ends
+  #     end
   #
   #     collection do
   #       get 'sold'

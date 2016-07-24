@@ -1,0 +1,149 @@
+<div id="employeeDetailsDiv">
+  <ul class="innerul">
+    <li style="
+    padding: 22px 0 16px 22px;
+        border-bottom: solid 1px #e6e6e6;"><%= @user.name%>
+
+    </li>
+    <li class="active" data-switch="#user_info"><a href="#" data-turbolinks="false">User's Info
+      <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
+    <li data-switch="#roles"><a href="#" data-turbolinks="false">Roles
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#policies_assigned"><a href="#" data-turbolinks="false">Policies Assigned
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#expenses"><a href="#" data-turbolinks="false">Expenses
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#reports"><a href="#" data-turbolinks="false">Reports
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+    <li data-switch="#accounting_statements"><a href="#" data-turbolinks="false">Accounting Statements
+      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+    </li>
+  </ul>
+
+
+  <div id="page-2" class="innerdiv" >
+
+    <!-- Hidden blocks that you show when requested. -->
+
+    <div class="divsections" id="user_info">
+
+      <h3 id="divsection_heading">User Info</h3>
+
+      <%= render 'profile_info' %>
+
+      <hr style="margin-top: 20px">
+
+    </div>
+
+    <div class="divsections" id="roles" style="display: none">
+
+      <h3 id="divsection_heading">Roles</h3>
+
+      <%= render 'people/user_roles' %>
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+
+    <div class="divsections " id="policies_assigned" style="display: none">
+
+      <h3 id="divsection_heading">Policies Assigned</h3>
+
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+
+    <div class="divsections " id="cards_assigned" style="display: none">
+
+      <h3 id="divsection_heading">Cards Assigned</h3>
+
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+
+    <div class="divsections" id="expenses" style="display: none">
+
+      <h3 id="divsection_heading">Expenses</h3>
+
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+
+    <div class="divsections" id="reports" style="display: none">
+
+      <h3 id="divsection_heading">Reports</h3>
+
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+    <div class="divsections" id="accounting_statements" style="display: none">
+
+      <h3 id="divsection_heading">Accounting Statements</h3>
+
+
+      <hr style="margin-top: 20px">
+
+
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+
+<script>
+
+  var selector, elems, makeActive;
+
+  selector = '.innerul li';
+  elems = document.querySelectorAll(selector);
+
+  makeActive = function () {
+    for (var i = 0; i < elems.length; i++)
+      elems[i].classList.remove('active');
+
+    this.classList.add('active');
+  };
+
+  for (var i = 0; i < elems.length; i++)
+    elems[i].addEventListener('mousedown', makeActive);
+
+
+  $('[data-switch]').on('click', function (e) {
+    var $page = $('#page-2'),
+        blockToShow = e.currentTarget.getAttribute('data-switch');
+
+    // Hide all children.
+    $page.children().hide();
+
+    // And show the requested component.
+    $page.children(blockToShow).show();
+
+  });
+
+
+</script>

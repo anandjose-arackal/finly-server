@@ -38,6 +38,7 @@ class ViolationService < BaseService
       end
     end
 
+    self.warning_messages
   end
 
   private
@@ -136,11 +137,11 @@ class ViolationService < BaseService
     report = expense.report
     total_expenses = 0
     # all user reports with the associated budget
-    user.reports.where(policy_id: rule.policy_id).where.not(id: report.id).each do |budget_report|
+    user.reports.where(report_status_id: [5, 6, 7, 8]).where(policy_id: rule.policy_id).where.not(id: report.id).each do |budget_report|
       if category
-        total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.where("status = ? OR status = ?", 1, 2).where('date >= ? && date <= ?', start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.where('date >= ? && date <= ?', start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
       end
     end
     if category

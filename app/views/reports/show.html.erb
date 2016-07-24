@@ -1,11 +1,11 @@
 <% @violations_found = false %>
 <% @block_violations = false %>
-<!-- < % if @policy %>
-    < % @violation_messages.each do |key, value| %>
-        < % @violations_found = true unless value['warning'].blank? && value['blocking'].blank? %>
-        < % @block_violations = true unless value['blocking'].blank? %>
-    < % end %>
-< % end %> -->
+<% if @policy %>
+    <% @violation_messages.each do |key, value| %>
+        <% @violations_found = true unless (value['expense_warning'].blank? && value['expense_blocking'].blank? && value['budget_warning'].blank? && value['budget_blocking'].blank?) %>
+        <% @block_violations = true unless (value['expense_blocking'].blank? && value['budget_blocking'].blank?) %>
+    <% end %>
+<% end %>
 
 <% provide(:title, "Finly Report") %>
 <body id="show_report">
@@ -290,7 +290,7 @@
     }
   }
 
-  function openEditableExpenseModal(id, merchant, amount, note, date, dateVal, category, categoryId, receipt, receiptUrl, blocks, warnings) {
+  function openEditableExpenseModal(id, merchant, amount, note, date, dateVal, category, categoryId, receipt, receiptUrl, expense_blocks, budget_blocks, expense_warnings, budget_warnings) {
 
 
     $('#editableExpenseDetail').modal('show');

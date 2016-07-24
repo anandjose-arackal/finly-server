@@ -12,14 +12,7 @@
   <% if params["filter_amount"].blank? || params["filter_amount"]["value"].blank? %>
       <li><a id="amount" href="#" data-turbolinks="false">Amount</a></li>
   <% end %>
-  <% if is_admin_view %>
-      <% if params["filter_user_id"].blank? %>
-          <li><a id="user" href="#" data-turbolinks="false">User</a></li>
-      <% end %>
-      <% if params["filter_manager_id"].blank? %>
-          <li><a id="manager" href="#" data-turbolinks="false">Manager</a></li>
-      <% end %>
-  <% end %>
+
   <% if params["filter_merchant"].blank? %>
       <li><a id="merchant" href="#" data-turbolinks="false">Merchant</a></li>
   <% end %>
@@ -78,7 +71,7 @@
 
 
   <!-- Status Filter -->
-  <% if (params["filter_status"].blank? || params["filter_status"].blank?) && !is_personal_view %>
+  <% if (params["filter_status"].blank? || params["filter_status"].blank?) %>
       <ul id="statusFilterList" class="filterList">
         <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
           <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Section</a>
@@ -86,9 +79,8 @@
 
         <select name="filter_status" class="selectors" style=" margin-top: 15px;">
           <option style="display:none" value="" selected="selected"></option>
-          <option value="1">Submitted</option>
-          <option value="2">Approved</option>
-          <option value="3">Declined</option>
+          <option value="1">Unreported</option>
+          <option value="4">Rejected</option>
         </select>
 
         <hr class="listDivider">
@@ -161,9 +153,9 @@
 
         <select name="filter_category_id" class="selectors" style="padding-top: 10px">
           <option style="display:none" value="" selected="selected"></option>
-  <!--        < % @categories.each do |cat| %>
-              <option value="< %= cat.id %>">< %= cat.name %></option>
-          < % end %>-->
+            <% @categories.each do |cat| %>
+              <option value="<%= cat.id %>"><%= cat.category_name %></option>
+            <% end %>
         </select>
 
         <hr class="listDivider">
@@ -194,7 +186,7 @@
   <% end %>
 
   <!-- Sort By -->
-
+<!--
   <% if params["filter_sort"].blank? || params["filter_sort"]["sort_by"].blank? %>
       <ul id="sortFilterList" class="filterList">
         <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
@@ -223,65 +215,7 @@
 
       </ul>
   <% end %>
-
-
-  <!-- User Filter  -->
-
-  <% if is_admin_view %>
-
-      <% if params["filter_user_id"].blank? || params["filter_user_id"].blank? %>
-          <ul id="userFilterList" class="filterList">
-            <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
-              <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">User</a>
-            </li>
-
-            <div id="ui-widgetUser" class="filterInput" style="padding-top: 12px">
-              <select id="combobox2" name="filter_user_id">
-                <option value="" selected="selected">Select user...</option>
-                <% @users.each do |user| %>
-                    <option value="<%= user.id %>"><%= user.name %></option>
-                <% end %>
-              </select>
-            </div>
-
-            <hr class="listDivider">
-
-            <input type="submit" class="green-button" id="applyFiltersBtn" value="Apply Filter">
-
-          </ul>
-      <% end %>
-  <% end %>
-
-
-
-  <!-- Manager Filter  -->
-
-  <% if is_admin_view %>
-
-      <% if params["filter_manager_id"].blank? || params["filter_manager_id"].blank? %>
-
-          <ul id="managerFilterList" class="filterList">
-            <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
-              <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Manager</a>
-            </li>
-            <div id="ui-widgetManager" style="padding-top: 12px">
-              <select id="combobox3" name="filter_manager_id">
-                <option value="" selected="selected">Select user...</option>
-                <% @managers.each do |manager| %>
-                    <option value="<%= manager.id %>"><%= manager.name %></option>
-                <% end %>
-              </select>
-            </div>
-
-            <hr class="listDivider">
-
-            <input type="submit" class="green-button" id="applyFiltersBtn" value="Apply Filter">
-
-          </ul>
-      <% end %>
-
-  <% end %>
-
+-->
 
 </div>
 
