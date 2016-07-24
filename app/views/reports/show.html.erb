@@ -1,12 +1,3 @@
-<% @violations_found = false %>
-<% @block_violations = false %>
-<% if @policy %>
-    <% @violation_messages.each do |key, value| %>
-        <% @violations_found = true unless (value['expense_warning'].blank? && value['expense_blocking'].blank? && value['budget_warning'].blank? && value['budget_blocking'].blank?) %>
-        <% @block_violations = true unless (value['expense_blocking'].blank? && value['budget_blocking'].blank?) %>
-    <% end %>
-<% end %>
-
 <% provide(:title, 'Finly Report') %>
 <body id="show_report">
 <div id="container">

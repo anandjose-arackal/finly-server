@@ -1,3 +1,11 @@
+<% @violations_found = false %>
+<% @block_violations = false %>
+<% if @policy %>
+    <% @violation_messages.each do |key, value| %>
+        <% @violations_found = true unless (value['expense_warning'].blank? && value['expense_blocking'].blank? && value['budget_warning'].blank? && value['budget_blocking'].blank?) %>
+        <% @block_violations = true unless (value['expense_blocking'].blank? && value['budget_blocking'].blank?) %>
+    <% end %>
+<% end %>
 <div id="container">
   <div id="newReport">
     <div style="height: 70px; background-color: white;">
@@ -58,7 +66,8 @@
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                 <select name="report[policy_id]" onchange="$('form#applyPolicyForm').submit();" class="selectors" style="padding-top: 10px; width: 155px">
                   <option value="nil"
-                          <% if @policy.nil? %> selected="selected" <% end %>
+                          <% if @policy.nil? %> selected="selected"
+                          <% end %>
                           >None
                   </option>
                   <% @policies.each do |policy| %>
@@ -451,10 +460,10 @@
   <div class="modal fade" id="newExpenseModal" role="dialog" style="margin-top: 5%;">
     <div class="modal-dialog modal-md" style="background-color: white">
 
-      <!--<form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="< %= user_expenses_path(current_user) %>">
+      <form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="<%= expenses_path(current_user) %>">
 
-        < %= hidden_field_tag :authenticity_token, form_authenticity_token %>
-        <input type="text" hidden="hidden" name="expense[report_id]" value="< %= @report.id %>"/>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="text" hidden="hidden" name="expense[report_id]" value="<%= @report.id %>"/>
 
 
         <div style="width: 100%;margin: 0 auto;display: block; max-width: 940px;">
@@ -472,7 +481,8 @@
               <div id="uppertone" style="border-bottom: 1px solid #465c8b;
                   margin-top: 10px ;
                   padding: 0px ;
-                  margin-bottom: 10px;"><p style="float: left;margin-left: 24px;font-size: 36px; color: white">&#8377</p>
+                  margin-bottom: 10px;">
+                <p style="float: left;margin-left: 24px;font-size: 36px; color: white">&#8377</p>
                 <input id="currency" class="clearInput" type="text" name="expense[amount]" placeholder="0.00" style="border:none; margin-left: 1px; font-size: 34px;width: 70%  ;color: white ; background-color: #465c8b;outline: none" onkeypress='validate(event)'>
                 <hr id="upperhr">
                 <div>
@@ -507,9 +517,9 @@
             <div class="splitSections">
               <p class="splitSideHeader">CATEGORY:</p>
               <select name="expense[category_id]" id="newExpenseCategory">
-                < % current_company.categories.each do |cat| %>
-                    <option value="< %= cat.id %>">< %= cat.name %></option>
-                < % end %>
+                <% current_company.categories.each do |cat| %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% end %>
               </select>
 
             </div>
@@ -531,7 +541,7 @@
 
         </div>
 
-      </form>-->
+      </form>
     </div>
   </div>
 </div>
