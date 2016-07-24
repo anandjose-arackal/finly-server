@@ -75,7 +75,7 @@ class SettlementsController < ApplicationController
           @user = user
           return true
         elsif current_user.policy_admin?
-          admin_team = UserTeamService.new(current_user).admin_team
+          admin_team = UserTeamService.new(current_user).team(UserRole.admin_id)
           if admin_team and admin_team.with_id(params[:id]).present?
             @user = user
             return true
