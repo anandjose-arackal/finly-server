@@ -29,18 +29,18 @@ class ExpensesController < ApplicationController
 
   def create
     if @expense_service.add_expense expense_params
-      flash[:success] = "Expense created!"
+      flash.now[:success] = 'Expense created!'
     else
-      flash[:danger] = "Error. Please try again"
+      flash.now[:danger] = 'Error. Please try again'
     end
     redirect_to expenses_path
   end
 
   def update
     if @expense_service.update_expense(current_user, expense_params)
-      flash[:success] = "Expense edited!"
+      flash[:success] = 'Expense edited!'
     else
-      flash[:danger] = "Error. Please try again"
+      flash[:danger] = 'Error. Please try again'
     end
     redirect_to expenses_path
   end
