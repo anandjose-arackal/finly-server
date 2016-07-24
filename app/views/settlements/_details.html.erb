@@ -16,7 +16,7 @@
         <li data-value="paymentHistory" data-switch="#settlementHistoryTable" <%= 'class="activeMembers"' if @load_type[:payments] %>>Settlement
           History
         </li>
-        <li data-value="approved" data-switch="#reportsTable" <%= 'class="activeMembers"' if @load_type[:approved] %>>Approved
+        <li data-value="approved" data-switch="#reportsTable" class="activeMembers" <%= 'class="activeMembers"' if @load_type[:approved] %>>Approved
           Reports
         </li>
         <li data-value="reimbursed" data-switch="#reportsTable" <%= 'class="activeMembers"' if @load_type[:reimbursed] %> >Reimbursed

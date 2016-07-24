@@ -154,7 +154,7 @@
       <span style="width: 45%;
           display: inline-block;">&#8377 <span><%= @user.balance_sheet.pending_reimbursement.value %></span></span>
       <span style="
-      display: inline-block;">&#8377 <span>0</span></span>
+      display: inline-block;">&#8377 <span id="selectedReportTotal">0</span></span>
               </section>
             </div>
             <button class="green-button" style="padding: 8px 12px 8px 12px;
@@ -165,6 +165,7 @@
             <div id="listOfApprovedReports" style="clear: both;margin-top: 15px; overflow-x: hidden; max-width: 100%">
               <table>
                 <%= render 'settlement_reports_header_modal' %>
+                <tbody>
                 <% if @reports.present? %>
                     <% @reports.each do |report| %>
                         <tr>
@@ -176,22 +177,14 @@
                             <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
                           </td>
                           <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
-                          <td style="width:  15%;"><span>&#8377</span><%= report[:total_amount] %></td>
+                          <td style="width:  15%;">
+                            <span>&#8377</span><span class="reimburseAmount"><%= report[:total_amount] %></span>
+                          </td>
                           </td>
                         </tr>
                     <% end %>
                 <% end %>
-                <!--<tr>-->
-                <!--<td style="width: 1%; padding-left: 20px">-->
-
-                <!--<input name="existing_users_id" class="checkboxReimburse" type="checkbox"></td>-->
-
-                <!--<td style="width:  39.5%;">admisd_12_32_2003<span style="text-transform: capitalize; font-size: 10px; display: block">report id: 1232</span>-->
-                <!--</td>-->
-                <!--<td style="width:  39.5%;"> vivek.a@hapitoe.com</td>-->
-                <!--<td style="width:  20%;"><span>&#8377</span>345</td>-->
-
-                <!--</tr>-->
+                </tbody>
 
               </table>
             </div>
@@ -297,13 +290,22 @@
             </button>
             <div id="listOfApprovedReports" style="clear: both;margin-top: 15px; overflow-x: hidden; max-width: 100%">
               <table>
-                <%= render 'settlements/settlement_reports_header_modal' %>
+                <thead>
+                <tr>
+                  <th style="width: 1%; padding-left: 20px ">
+                    <input type="checkbox" id="checkAllSettledReports" style="margin-right: 20px"></th>
+                  <th style="width: 39.5%;">Report</th>
+                  <th style="width:  39.5%;">Approvers</th>
+                  <th style="width:  20%;">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
                 <% if @reports.present? %>
                     <% @reports.each do |report| %>
                         <tr>
                           <td style="width: 1%; padding-left: 20px">
 
-                            <input name="existing_users_id" class="checkboxReimburse" type="checkbox"></td>
+                            <input name="existing_users_id" class="checkboxSettle" type="checkbox"></td>
 
                           <td style="width:  34.5%;"><%= report[:report].name %>
                             <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
@@ -314,17 +316,7 @@
                         </tr>
                     <% end %>
                 <% end %>
-                <!--<tr>-->
-                  <!--<td style="width: 1%; padding-left: 20px">-->
-
-                    <!--<input name="existing_users_id" class="checkboxSettle" type="checkbox"></td>-->
-
-                  <!--<td style="width:  39.5%;">admisd_12_32_2003<span style="text-transform: capitalize; font-size: 10px; display: block">report id: 1232</span>-->
-                  <!--</td>-->
-                  <!--<td style="width:  39.5%;"> vivek.a@hapitoe.com</td>-->
-                  <!--<td style="width:  20%;"><span>&#8377</span>345</td>-->
-
-                <!--</tr>-->
+                </tbody>
 
               </table>
             </div>
@@ -436,15 +428,36 @@
 
 
     $("#checkAllApprovedReports").change(function () {
-      $("input:checkbox[class=checkboxSettle]").prop('checked', $(this).prop("checked"));
-    });
-
-    $("#checkAllApprovedReports").change(function () {
       $("input:checkbox[class=checkboxReimburse]").prop('checked', $(this).prop("checked"));
     });
 
+    $("#checkAllSettledReports").change(function () {
+      $("input:checkbox[class=checkboxSettle]").prop('checked', $(this).prop("checked"));
+    });
+
     $("#checkAllReports").change(function () {
-      $("input:checkbox[class=checkboxAllReports]").prop('checked', $(this).prop("checked"));
+      $("input:checkbox[class=checkboxApproved]").prop('checked', $(this).prop("checked"));
+    });
+
+    $(".checkboxReimburse").change(function () {
+      var tbodyVar = $(this).closest('tbody');
+
+      var selectedReportTotal = parseInt(0);
+
+      $('> tr', tbodyVar).each(function () {
+
+
+        if ($(this).find('.checkboxReimburse').is(':checked')) {
+
+          selectedReportTotal += parseFloat($(this).find('.reimburseAmount').html());
+
+        }
+
+      });
+
+      $('#selectedReportTotal').text(selectedReportTotal);
+
+
     });
 
 
@@ -488,7 +501,7 @@
       $('#confirmReimbursement').show();
       $('.modal-header i').show();
     } else {
-      alert(' SHow toast to select approved reports to reimburse');
+      alert(' Show toast to select approved reports to reimburse');
     }
   }
 

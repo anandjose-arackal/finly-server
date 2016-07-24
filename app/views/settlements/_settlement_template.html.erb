@@ -12,9 +12,9 @@
         < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
     < % end %>
   </div>
-  < %= render 'settlement_filter' %>
 </form>
 -->
+<%= render 'settlement_filter' %>
 
 <div>
   <div id="centerBlockOfExpenses" style="margin-top: 110px">
@@ -179,7 +179,6 @@
     } else {
 
       $("#firstList").show();
-      $("#detailsOfExpense").hide();
 
       document.getElementById("centerBlockOfExpenses").style.marginLeft = "30px";
 
