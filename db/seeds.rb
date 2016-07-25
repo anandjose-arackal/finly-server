@@ -242,7 +242,8 @@ if Report.count == 0
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1}, merchant: Faker::Company.name,
+        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+                                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
                                                                          user_id: 1}]})
@@ -258,7 +259,8 @@ if Report.count == 0
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1}, merchant: Faker::Company.name,
+        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+                                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
                                                                          user_id: 1}]})
@@ -276,6 +278,7 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+                                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
                                                                          user_id: 1}]})

@@ -9,19 +9,55 @@ class ReportService < BaseService
     self.report_detail_service = ReportDetailService.new(self.report)
   end
 
-  def admin_reports
+  def reports(role_id)
     errors.clear
-    if user.company_admin?
-      return Report.not_open.with_user(self.users.pluck(:id))
-    elsif user.policy_admin?
-      user_ids = UserTeamService.new(user).admin_team.pluck(:id)
-      return Report.not_open.with_user(user_ids)
-    end
-    unless user.admin?
-      errors << 'User is not an admin'
-      return false
+    case role_id
+      when UserRole.admin_id
+        if self.user.company_admin?
+          return Report.not_open.with_user(user.company.users.pluck(:id))
+        elsif user.policy_admin?
+          user_ids = UserTeamService.new(user).team(UserRole.admin_id).pluck(:id)
+          policy_ids = user.admin_policies.pluck(:id)
+          return Report.not_open.with_user(user_ids).with_policy(policy_ids)
+        end
+        unless user.admin?
+          errors << 'User is not an admin'
+          return false
+        end
+      when UserRole.manager_id
+        controlling_report_query = current_user.controlling_reports.non_owner(current_user.id)
+        interacted_reports_query= current_user.manager_reports
+        sql = Report.connection.unprepared_statement {
+          "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
+        }
+        return Report.from(sql)
+      when UserRole.finance_manager_id
+        controlling_report_query = current_user.controlling_reports.non_owner(current_user.id)
+        interacted_reports_query = current_user.finance_reports
+        sql = Report.connection.unprepared_statement {
+          "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
+        }
+        return Report.from(sql)
+      when UserRole.employee_id
+        return user.reports
+      else
+        return nil
     end
   end
+
+  # def admin_reports
+  #   errors.clear
+  #   if user.company_admin?
+  #     return Report.not_open.with_user(self.users.pluck(:id))
+  #   elsif user.policy_admin?
+  #     user_ids = UserTeamService.new(user).team(UserRole.admin_id).pluck(:id)
+  #     return Report.not_open.with_user(user_ids)
+  #   end
+  #   unless user.admin?
+  #     errors << 'User is not an admin'
+  #     return false
+  #   end
+  # end
 
   def user_role_for_report
     return nil unless validate controlling_user: true
@@ -51,7 +87,7 @@ class ReportService < BaseService
         return manager
       end
     end
-    if user.manager? and uts.manager_for?(report)
+    if user.manager? and uts.manager_for?(report, user: user)
       manager = uts.approves_to(report: report)
       if manager.nil?
         return UserTeamService.new(report.user).finance_manager(report: report)
@@ -59,9 +95,10 @@ class ReportService < BaseService
         return manager
       end
     end
-    if user.finance_manager? and uts.finance_manager_for?(report)
-      uts.approves_finance_to report: report
+    if user.finance_manager? and uts.finance_manager_for?(report, user: user)
+      return uts.approves_finance_to report: report
     end
+    nil
   end
 
   def create(params={})
@@ -71,8 +108,8 @@ class ReportService < BaseService
       self.report = report
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
-      if params[:expenses].present?
-        add_expense params[:expenses]
+      if params[:expense_id].present?
+        add_expense params[:expense_id]
       end
       return report
     end
@@ -526,7 +563,7 @@ class ReportService < BaseService
                                              report_comment_action_id: ReportCommentAction.report_update_id,
                                              updated_field: 'policy', updated_from: report.policy_id,
                                              updated_to: new_policy_id if report.retracted?
-      report.policy_id = params[:policy_id]
+      report.policy_id = new_policy_id
       update = true
     end
     unless update

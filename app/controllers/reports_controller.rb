@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
 
   def create
     rs = ReportService.new(user: current_user)
-    if rs.create
+    if rs.create create_params
       redirect_to report_path rs.report, view_params
       return
     end
@@ -17,7 +17,6 @@ class ReportsController < ApplicationController
 
   def index
     @reports = @reports.paginate(page: params[:page], per_page: 30) if @reports.present?
-    @interacted_reports = @interacted_reports.paginate(page: params[:page], per_page: 30) if @interacted_reports.present?
   end
 
   def update
@@ -33,7 +32,7 @@ class ReportsController < ApplicationController
   end
 
   def add_expenses
-
+    handle_update :add_expense, 'Expenses added to report', params[:expense_id]
   end
 
   def remove_expenses
@@ -110,6 +109,9 @@ class ReportsController < ApplicationController
   end
 
   private
+  def create_params
+    params.require(:report).permit(:expense_id, :name)
+  end
 
   def load_service_object
     @violation_service = ViolationService.new(current_user)
@@ -123,6 +125,8 @@ class ReportsController < ApplicationController
     if @admin_view
       if @report.can_take_control? and not @report.controlling_user?(current_user)
         @views[:take_control] = true
+      elsif @report.processing? and @report.controlling_user?(current_user)
+        @views[:review] = true
       end
     elsif @finance_view or @manager_view
       if @report.processing? and @report.controlling_user?(current_user)
@@ -178,41 +182,43 @@ class ReportsController < ApplicationController
   end
 
   def fetch_reports
+    rs = ReportService.new(user: current_user)
     if @admin_view
-      rs = ReportService.new(user: current_user)
-      @reports = rs.admin_reports
-      unless @reports
-      flash.now[:danger] = rs.errors
-      render_flash_message
-      return false
-      end
+      @reports = rs.reports(UserRole.admin_id)
     elsif @manager_view
-      @reports = current_user.controlling_reports.non_owner(current_user.id)
-      @interacted_reports = current_user.manager_reports
+      @reports = rs.reports(UserRole.manager_id)
     elsif @finance_view
-      @reports = current_user.controlling_reports.non_owner(current_user.id)
-      @interacted_reports = current_user.finance_reports
+      @reports = rs.reports(UserRole.finance_manager_id)
     else
-      @reports = current_user.reports
+      @reports = rs.reports(UserRole.employee_id)
     end
-    @reports
-    if @interacted_reports.present?
-      without_id = @reports.pluck(:id)
-      @interacted_reports= @interacted_reports.without_id(without_id)
-    end
+    # if @admin_view
+    #   rs = ReportService.new(user: current_user)
+    #   @reports = rs.admin_reports
+    #   unless @reports
+    #   flash.now[:danger] = rs.errors
+    #   render_flash_message
+    #   return false
+    #   end
+    # elsif @manager_view
+    #   @reports = current_user.controlling_reports.non_owner(current_user.id)
+    #   @interacted_reports = current_user.manager_reports
+    # elsif @finance_view
+    #   @reports = current_user.controlling_reports.non_owner(current_user.id)
+    #   @interacted_reports = current_user.finance_reports
+    # else
+    #   @reports = current_user.reports
+    # end
+    # @reports
+    # if @interacted_reports.present?
+    #   without_id = @reports.pluck(:id)
+    #   @interacted_reports= @interacted_reports.without_id(without_id)
+    # end
   end
 
   def fetch_report
-    controlling_reports = nil
-    if @admin_view
-      reports = current_user.company.all_reports
-    elsif @manager_view or @finance_view
-      reports = current_user.interacted_reports
-      controlling_reports = current_user.controlling_reports
-    else
-      reports = current_user.reports
-    end
-    if reports.blank? and controlling_reports.blank?
+    fetch_reports
+    if @reports.blank?
       flash[:danger] == 'Report not found'
       redirect_to reports_path(view: params[:view])
       return false
@@ -221,10 +227,7 @@ class ReportsController < ApplicationController
     if id.blank? and params[:id].present?
       id = params[:id]
     end
-    @report = reports.with_id(id)
-    if @report.blank? and controlling_reports.present?
-      @report = controlling_reports.with_id(id)
-    end
+    @report = @reports.with_id(id)
     if @report.present?
       @report = @report.first
     else

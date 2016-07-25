@@ -42,9 +42,9 @@
             <span class="ng-binding">[<%= @counts %>]</span>
           </h3>
 
-          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= %>" method="post">
+          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= reports_path(load_params) %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-            <input id="createReportExpenseIds" name="expense_id" type="text">
+            <input id="createReportExpenseIds" name="report[expense_id]" type="text">
           </form>
           <button onclick="createReportFromSelectedExpenses();" id="createReport" onclick="">CREATE REPORT
           </button>

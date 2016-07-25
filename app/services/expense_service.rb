@@ -14,10 +14,10 @@ class ExpenseService < BaseService
     if @personal_view
       return @user.expenses.unreported.includes(:manual_expense)
     elsif @manager_view
-      user_ids = @user_team_service.team(self.params).pluck(:user_id)
+      user_ids = @user_team_service.team(UserRole.manager_id, self.params).pluck(:user_id)
       return Expense.where(user_id: user_ids)
     elsif @finance_view
-      user_ids = @user_team_service.team(self.params).pluck(:user_id)
+      user_ids = @user_team_service.team(UserRole.finance_manager_id, self.params).pluck(:user_id)
       return Expense.where(user_id: user_ids)
     else
       # do nothing

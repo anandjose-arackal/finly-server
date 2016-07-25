@@ -39,6 +39,7 @@ class Report < ActiveRecord::Base
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
+  scope :with_policy, ->(policy_id) { where policy_id: policy_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }

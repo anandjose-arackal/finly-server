@@ -6,21 +6,6 @@ class UserTeamService < BaseService
     self.user = user
   end
 
-  def admin_team
-    errors.clear
-    if user.company_admin?
-      return user.company.users
-    elsif user.policy_admin?
-      users = user.company.users
-      policies = user.admin_policies.pluck(:id)
-      if policies.present?
-         return users.with_id(PolicyUserMapping.with_policy(policies).pluck(:user_id))
-      end
-    end
-    errors << 'User is not an admin'
-    false
-  end
-
   def team(role_id, params={})
     errors.clear
     unless user.present?
@@ -78,27 +63,28 @@ class UserTeamService < BaseService
   # it checks if the user is associated as a manager with the given user which includes chains of approvals
   def manager_for?(obj, params={})
     errors.clear
+    managing_user = self.user
+    if params[:user].present?
+      managing_user = params[:user]
+    end
     if obj.is_a?(Report)
       report = obj
       emp = report.user
-      rds = ReportDetailService.new(report)
-      policy = report.policy
-      policy = rds.policy unless policy.blank?
-      m = UserTeamService.new(emp).manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      m = UserTeamService.new(emp).manager(report: report)
       while m.present?
-        return true if m.id == self.user.id
-        m = UserTeamService.new(m).approves_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+        return true if m.id == managing_user.id
+        m = UserTeamService.new(m).approves_to(report: report)
       end
     elsif obj.is_a?(User)
-      user = obj
-      emp = UserManagerMapping.has_manager(self.user.id).with_user(user.id)
+      for_user = obj
+      emp = UserManagerMapping.has_manager(managing_user.id).with_user(for_user.id)
       if emp.present?
         return true
       end
       if params[:indirect_associations]
-        approves_to_ids = UserManagerMapping.has_approves_to(self.user.id).pluck(:id)
+        approves_to_ids = UserManagerMapping.has_approves_to(managing_user.id).pluck(:id)
         while approves_to_ids.present?
-          emp = UserManagerMapping.has_manager(approves_to_ids).with_user(user.id)
+          emp = UserManagerMapping.has_manager(approves_to_ids).with_user(for_user.id)
           if emp.present?
             return true
           end
@@ -119,27 +105,28 @@ class UserTeamService < BaseService
   # it checks if the user is associated as a finance manager with the given user which includes chains of approvals
   def finance_manager_for?(obj, params={})
     errors.clear
+    managing_user = self.user
+    if params[:user].present?
+      managing_user = params[:user]
+    end
     if obj.is_a?(Report)
       report = obj
       emp = report.user
-      rds = ReportDetailService.new(report)
-      policy = report.policy
-      policy = rds.policy unless policy.blank?
-      m = UserTeamService.new(emp).finance_manager(policy: policy, currency: rds.currency, amount: rds.total_amount)
+      m = UserTeamService.new(emp).finance_manager(report)
       while m.present?
-        return true if m.id == self.user.id
-        m = UserTeamService.new(m).approves_finance_to(policy: policy, currency: rds.currency, amount: rds.total_amount)
+        return true if m.id == managing_user.id
+        m = UserTeamService.new(m).approves_finance_to(report)
       end
     elsif obj.is_a?(User)
-      user = obj
-      emp = UserManagerMapping.has_finance_manager(self.user.id).with_user(user.id)
+      for_user = obj
+      emp = UserManagerMapping.has_finance_manager(managing_user.id).with_user(for_user.id)
       if emp.present?
         return true
       end
       if params[:indirect_associations]
-        approves_to_ids = UserManagerMapping.has_approves_finance_to(self.user.id).pluck(:id)
+        approves_to_ids = UserManagerMapping.has_approves_finance_to(managing_user.id).pluck(:id)
         while approves_to_ids.present?
-          emp = UserManagerMapping.has_finance_manager(approves_to_ids).with_user(user.id)
+          emp = UserManagerMapping.has_finance_manager(approves_to_ids).with_user(for_user.id)
           if emp.present?
             return true
           end
@@ -318,9 +305,11 @@ class UserTeamService < BaseService
       @amount = params[:amount]
     elsif params[:report.present?]
       report = params[:report]
-      rds = ReportDetailService.new(report)
-      policy = rds.policy
-      @policy_id = policy.id
+      if report.policy_id.present? and user.policies.with_id(report.policy_id).present?
+        @policy_id = report.policy_id
+      else
+        @policy_id = nil
+      end
       @currency_id = rds.currency
       @amount = rds.total_amount
     end
@@ -378,6 +367,21 @@ class UserTeamService < BaseService
   def load_role_update(params={})
     @policy_id = params[:policy_id]
     @roles = self.user.roles
+  end
+
+  def admin_team
+    errors.clear
+    if user.company_admin?
+      return user.company.users
+    elsif user.policy_admin?
+      users = user.company.users
+      policies = user.admin_policies.pluck(:id)
+      if policies.present?
+        return users.with_id(PolicyUserMapping.with_policy(policies).pluck(:user_id))
+      end
+    end
+    errors << 'User is not an admin'
+    false
   end
 
 end

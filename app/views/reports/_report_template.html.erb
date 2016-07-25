@@ -52,7 +52,7 @@
 
   </div>
   <div class="col-sm-4">
-    <form data-remote data-turboboost action="<%= reports_path(view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost action="<%= reports_path(load_params) %>" method="post">
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <% if is_personal_view %>
           <button class="invite" type="submit">
