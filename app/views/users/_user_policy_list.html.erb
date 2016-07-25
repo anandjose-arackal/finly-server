@@ -1,0 +1,44 @@
+<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+<body style="background-color: #f5f6f9;">
+
+<div style="margin: 50px 170px 0px 170px;background: white;
+    padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
+  <p style="font-size: 24px;
+      font-weight: 600;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">My Policy List</p>
+
+  <hr>
+
+  <% if @policies.blank? %>
+  <div>
+
+  <p> No policy has been applied to you yet.</p>
+
+  </div>
+
+  <% end %>
+
+  <div id="policyListTable" <% if @policies.blank? %> style="display: none" <% end %>>
+    <table>
+      <thead>
+      <tr>
+        <th style="width: 30%;">Policy Name</th>
+        <th style="width:  40%;">Owner</th>
+        <th style="width:  30%;"></th>
+      </tr>
+      </thead>
+
+      <% @policies.each do |policy| %>
+          <tr>
+            <td style="width: 30%;"> <%= link_to policy.name, policy_path(policy) %></td>
+            <td style="width: 30%;">
+              <button>View Report</button>
+              <i class="fa fa-trash-o"></i></td>
+          </tr>
+      <% end %>
+
+    </table>
+  </div>
+</div>
+
+</body>

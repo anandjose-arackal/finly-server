@@ -25,17 +25,26 @@ class UsersController < ApplicationController
     @user = current_company.users.with_id(params[:user_id]).first
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
+    @policies = @user.policies
+    @reports = @user.reports
     # using current user instead of @user because we need list of users in current user's view
     @users = current_company.users.paginate(page: params[:page])
     @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
+    @company_managers = current_company.users.with_roles.only_managers
+    @company_finance_managers = current_company.users.with_roles.only_finance_managers
+
     render partial: 'users/employee_profile', replace: '#employeeDetailsDiv'
   end
 
   # for employee list
   def index
     @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
-
+    @policies = @user.policies
     @users = current_company.users.paginate(page: params[:page])
+    @reports = @user.reports
+    @company_managers = current_company.users.with_roles.only_managers
+    @company_finance_managers = current_company.users.with_roles.only_finance_managers
+    debugger
 
     @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
   end
@@ -53,8 +62,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def update_role
-    @user = @user = current_company.users.with_id(params[:user_id]).first
+  def user_policy_details
 
   end
 

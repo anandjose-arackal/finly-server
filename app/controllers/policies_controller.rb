@@ -126,18 +126,39 @@ class PoliciesController < ApplicationController
   def add_rule
     # determine the type of rule and call the respective service method
     if rule_params['greater_than_amount_attributes']
-      @rule_service.add_expense_rule(rule_params)
+      if @rule_service.add_expense_rule(rule_params)
+        flash[:success] = "Expense Rule added!"
+      else
+        flash[:danger] = "Error. Please try again."
+      end
+    elsif rule_params['amount_attributes']
+      if @rule_service.add_budget_rule(rule_params)
+        flash[:success] = "Budget Rule added"
+      else
+        flash[:danger] = "Error. Please try again."
+      end
     else
-      @rule_service.add_budget_rule(rule_params)
+      flash[:danger] = "Invalid input params."
     end
     redirect_to request.referrer
   end
 
   def remove_rule
+    # determine the type of rule being added and accordingly update
     if params['budget_rule']
-      @rule_service.remove_budget_rule(params['budget_rule']['rule_id'])
+      if @rule_service.remove_budget_rule(params['budget_rule']['rule_id'])
+        flash[:success] = "Expense Rule removed!"
+      else
+        flash[:danger] = "Error. Please try again."
+      end
+    elsif params['expense_rule']
+      if @rule_service.remove_expense_rule(params['expense_rule']['rule_id'])
+        flash[:success] = "Budget rule removed!"
+      else
+        flash[:danger] = "Error. Please try again."
+      end
     else
-      @rule_service.remove_expense_rule(params['expense_rule']['rule_id'])
+      flash[:danger] = "Invalid input params."
     end
     redirect_to request.referrer
   end
