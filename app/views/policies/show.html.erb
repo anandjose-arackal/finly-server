@@ -5,11 +5,8 @@
     <li style="padding: 20px; background: beige">
       <%= @policy.name %>
     </li>
-    <li class="active" data-switch="#expense_rules"><a href="#" data-turbolinks="false">Expenses Rules
+    <li class="active" data-switch="#rules"><a href="#" data-turbolinks="false">Rules
       <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
-    </li>
-    <li data-switch="#policies"><a href="#" data-turbolinks="false">Auto Approval
-      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
     </li>
     <li data-switch="#policy_members"><a href="#" data-turbolinks="false">Policy Members
       <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
@@ -47,17 +44,23 @@
 
     </div>
 
-    <div class="divsections" id="expense_rules">
+    <div class="divsections" id="rules" >
 
       <h3 id="divsection_heading">Expense Rules</h3>
-
 
       <%= render 'expense_rules' %>
 
       <hr style="margin-top: 20px">
 
+      <h3 id="divsection_heading">Budget Rules</h3>
+
+      <%= render 'budget_rules' %>
+
+      <hr style="margin-top: 20px">
+
 
     </div>
+
 
   </div>
 

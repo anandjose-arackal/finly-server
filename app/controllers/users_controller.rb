@@ -54,6 +54,7 @@ class UsersController < ApplicationController
   end
 
   def update_role
+    @user = @user = current_company.users.with_id(params[:user_id]).first
 
   end
 
