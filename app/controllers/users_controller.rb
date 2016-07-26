@@ -21,14 +21,15 @@ class UsersController < ApplicationController
 
   # action to retrieve a particular user's details in the employees screen - only for admin, obviously
   def user_details
-    @user = current_company.users.with_id(params[:user_id]).first
+    @user = current_company.users.with_id(params[:user_id]).first # user needs to be modified to include all user-policy related details
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
     @policies = @user.policies
     @reports = @user.reports
     # using current user instead of @user because we need list of users in current user's view
     @users = current_company.users.paginate(page: params[:page])
-    @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
+    load_all_mappings
+
     @company_managers = current_company.users.with_roles.only_managers
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
 
@@ -43,9 +44,8 @@ class UsersController < ApplicationController
     @reports = @user.reports
     @company_managers = current_company.users.with_roles.only_managers
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
-    debugger
 
-    @mappings = @user_team_service.mappings.includes(:manager, :finance_manager, :greater_than_amount)
+    load_all_mappings
   end
 
   def update_team
@@ -56,13 +56,9 @@ class UsersController < ApplicationController
       flash[:success] = "Team updated!"
       redirect_to users_path
     else
-      flash[:danger] = "Error. Try again."
+      flash[:danger] = @user_team_service.errors
       redirect_to users_path
     end
-  end
-
-  def user_policy_details
-
   end
 
   private
@@ -73,6 +69,15 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:current_password, :password, :password_confirmation, :manager_id, :team_mapping_id, :finance_manager_id)
+  end
+
+  def load_all_mappings
+    # loading all mappings for the user, with and without policy
+    @mappings = {} # each value will be an array of mappings
+    @mappings['company'] = @user_team_service.mappings
+    @policies.each do |policy|
+      @mappings[policy.id] = @user_team_service.mappings(policy: policy)
+    end
   end
 
 end
