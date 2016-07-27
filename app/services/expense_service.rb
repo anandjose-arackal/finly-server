@@ -29,7 +29,7 @@ class ExpenseService < BaseService
     expense_params = load_expense_params params
     expense = @user.expenses.build(expense_params)
     if expense.save
-      ReportService.new(user: @user, report: expense.report).expense_created_in_report(self) if expense.report_id.present? and @user.present?
+      ReportService.new(user: @user, report: expense.report).expense_created_in_report(expense) if expense.report_id.present? and @user.present?
       return expense
     else
       errors << expense.errors.full_messages
@@ -162,8 +162,10 @@ class ExpenseService < BaseService
 
     # for manual expenses only
     expense_params[:expense_type_id] = 1 if expense_params[:expense_type_id].nil?
-    # i.e. it's an unsubmitted expense
-    expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil?
+    # i.e. it's an unreported expense if no report id i present, and unsubmitted if report id is present.
+    expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil? && expense_params[:report_id].nil?
+    expense_params[:expense_status_id] = 2 if expense_params[:report_id].present?
+
     expense_params[:id] = params[:id] || params[:expense_id]
     expense_params
   end

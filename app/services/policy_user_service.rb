@@ -122,7 +122,7 @@ class PolicyUserService < BaseService
     return false unless handle_mapping_update user, mappings, params[:conditional_finance_manager]
 
     return false unless handle_mapping_update user, mappings, params[:conditional_approves_to]
-    
+
     return false unless handle_mapping_update user, mappings, params[:conditional_approves_finance_to]
     true
   end

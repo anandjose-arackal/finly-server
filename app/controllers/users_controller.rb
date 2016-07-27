@@ -46,18 +46,32 @@ class UsersController < ApplicationController
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
 
     load_all_mappings
+
   end
 
   def update_team
     @user = current_company.users.with_id(params[:user_id]).first
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
-    if @user_team_service.update(user_params)
-      flash[:success] = "Team updated!"
-      redirect_to users_path
+    # updating the default team mapping
+    if @user_team_service.update(user_team_params['default'])
+      @default_success = true
     else
       flash[:danger] = @user_team_service.errors
-      redirect_to users_path
+      redirect_to request.referrer
+    end
+    # updating the non default mapping - or creating it if it doesn't exist.
+    if user_team_params['non-default']['mapping_id']
+      if @user_team_service.update(user_team_params['non-default'])
+        @non_default_success = true
+      else
+        flash[:danger] = @user_team_service.errors
+        redirect_to request.referrer
+      end
+    else
+      if @user_team_service.create(user_team_params['non-default'])
+        @non_default_success = true
+      end
     end
   end
 
@@ -68,7 +82,11 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:current_password, :password, :password_confirmation, :manager_id, :team_mapping_id, :finance_manager_id)
+    params.require(:user).permit(:current_password, :password, :password_confirmation)
+  end
+
+  def user_team_params
+    params.require(:user_team).permit!
   end
 
   def load_all_mappings

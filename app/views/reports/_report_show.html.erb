@@ -386,6 +386,126 @@
   </div>
 
 
+  <div class="modal fade" id="newExpenseModal" role="dialog" style="margin-top: 5%;">
+    <div class="modal-dialog modal-md" style="background-color: white">
+
+      <form data-remote="true" data-turboboost="true" accept-charset="UTF-8" enctype="multipart/form-data" id="expenseForm" action="<%= expenses_path %>" method="post">
+        <input name="utf8" type="hidden" value="&#x2713;"/>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="text" hidden="hidden" name="expense[report_id]" value="<%= @report.id %>"/>
+
+        <div style="height: 70px; background-color: white;">
+
+          <p style="color: #a0a0a0; font-weight: 500; display: inline-block;vertical-align: middle; line-height: 70px;margin-left: 12.5%;letter-spacing: 1px ">
+            ADD EXPENSE </p>
+
+          <input type="submit" id="sendBtn" value="Add">
+
+          <button form="" onclick="redirectBack()" id="cancelBtn">Cancel</button>
+        </div>
+
+        <div style="width: 100%;margin: 0 auto;display: block; max-width: 940px;">
+
+          <div id="splitHeader" style="float: left;width: 640px;
+              margin: 50px 0px 0px 0px;
+              display: inline-block;
+              background-color: #465c8b;">
+
+            <div id="uppertone" style="order-bottom: 1px solid #0072b0;
+                margin-top: 30px ;
+                padding: 0px ;
+                margin-bottom: 30px;"><p style="float: left;margin-left: 24px;font-size: 36px; color: white">&#8377</p>
+              <input id="currency" type="text" name="expense[amount]" width="40%" placeholder="0.00" style="border:none; margin-left: 1px; font-size: 34px ;color: white ; background-color: #465c8b;outline: none" onkeypress='validate(event)'>
+
+              <hr id="upperhr">
+
+              <div>
+                <p style="margin-top:10px;color: #eeeeee; margin-left: 24px;font-size: 14px; font-weight: 700;float: left;opacity: 0.7">MERCHANT:</p>
+                <input type="text" name="expense[merchant]" style="width: 65%;margin-top:10px;border:none; margin-left: 23px; font-size: 14px ;color: white ; background-color: #465c8b;outline: none">
+
+                <!-- TODO - add javascript to choose city name dynamically -->
+                <!--       <input id="location" type="text" placeholder="Choose city" style="border:none; margin-right: 5px;color: #a0a0a0;font-size: 13px ;color: white ; background-color: #465c8b;outline: none;float: right;">
+           -->
+              </div>
+            </div>
+
+            <input type="file" name="expense[receipt]" id="receiptSelectFile" style="display:none" accept=".png, .jpg,.pdf, .jpeg" onchange="readFile(this)"/>
+
+          </div>
+
+          <div id="receiptUpload" style="cursor: pointer" onclick="selectFile()" onchange="readFile(this)">
+            <div style=" border-style: dashed; border-color:#a0a0a0; border-width: 1px ; text-align: center;color: #a0a0a0">
+              <i class="roundCircle fa fa-remove" style="float: right;
+                  margin-right: -6px;
+                  margin-top: -8px;
+                  color: #465c8b;
+                  font-size: 20px;display: none" onclick="removeImage()"></i>
+              <div id="noReceipt">
+                <button class="fa fa-arrow-circle-up" form="" style="background-color: transparent; border: none;outline: none;font-size: 50px; margin-top: 45px; opacity: 0.5;cursor: pointer"></button>
+                <p style="margin-bottom: 45px"> Upload a Receipt </p>
+              </div>
+              <div id="attachedReceipt" hidden="hidden">
+                <img id="receiptImage" style="margin-top: 20px;max-width: 200px; max-height: 300px">
+
+                <p style="margin-bottom: 20px;margin-top: 20px">Attached Receipt</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="split">
+
+            <!-- <div class="splitExpenseHeader">
+               <p class="splitExpenseUnit">$</p>
+               <input class="splitExpenseInput" type="text" width="100px" onkeypress='validate(event)' placeholder="0.00">
+               <hr class="expenseDivider">
+             </div>-->
+
+            <div class="splitSections">
+              <p class="splitSideHeader">CATEGORY:</p>
+              <select name="expense[category_id]" id="newExpenseCategory">
+                <% current_company.active_categories.each do |cat| %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% end %>
+              </select>
+
+              <!--<input type="text" width="60%" style="border:none; margin-left: 23px;margin-top: 14px;  font-size: 14px ;color: #2E2F30 ; background-color: white;outline: none; ">-->
+            </div>
+
+            <div class="splitSections">
+              <p class="splitSideHeader">NOTE:</p>
+              <textarea name="expense[note]" style="border: none;resize: none; border: none; outline: none;font-size: 14px ;color: #2E2F30 ; background-color: white;border-radius: 1px; line-height: normal !important; width: 60%; margin-left: 80px "></textarea>
+
+            </div>
+
+            <div class="splitSections">
+              <p class="splitSideHeader">DATE:</p>
+              <input id="date" type="date" name="expense[date]" width="40%" style="font-size: 14px;color: #2E2F30;background-color: white;border-radius: 1px;line-height: normal !important;width: 60%;margin-left: 80px;border: none;">
+
+            </div>
+
+            <!--<div class="splitSections" style="border-bottom:1px solid #d8d8d8; ">
+
+              <div style="float: right;padding-right: 12px;padding-bottom: 14px; ">
+
+                <div class="addDetailDropdownToggle" dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                  Add Detail <i class="fa fa-caret-down"></i>
+                </div>
+              </div>
+            </div>-->
+
+          </div>
+
+          <!--  <div id="addSplitBtn" class="splitExpenseBtn" tooltip="Split / Itemize this expense across categories">
+              Split / Itemize
+            </div>-->
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+
   <div class="modal fade" id="addExistingExpenseModal" role="dialog" style="margin-top: 5%; ">
     <div class="modal-dialog modal-lg" style="width: 90%">
       <div class="modal-content" style="border-radius: 1px">

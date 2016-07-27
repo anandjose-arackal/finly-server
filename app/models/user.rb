@@ -165,6 +165,14 @@ class User < ActiveRecord::Base
     self.name
   end
 
+  def manager_name
+    self.name
+  end
+
+  def finance_manager_name
+    self.name
+  end
+
   private
   # def valid_role
   #   if self.role_mapping.count == 0
