@@ -22,8 +22,6 @@
 <% if mapping.greater_than_amount_id %>
  for reports greater than <%= mapping.greater_than_amount.value %></p>
 
-<% end %>
-
       <label class="profile_subheading">Change:
       </label>
 
@@ -31,16 +29,18 @@
         <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
         <input name="user[team_mapping_id]" value="<%= mapping.id%>" type="hidden">
         <input name="user[user_id]" value="<%= @user.id%>" type="hidden">
-      <select class="profile_info" name="user[manager_id]" list="suggestionList" id="answerInput" style="float: left; width: 30%">
-        <datalist id="suggestionList">
-          <option value="-1">None</option>
-          <% @users.each do |user| %>
-              <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
-          <% end %>
-        </datalist>
-      </select>
+        <select class="profile_info" name="user[manager_id]" list="suggestionList" id="answerInput" style="float: left; width: 30%">
+          <datalist id="suggestionList">
+            <option value="-1">None</option>
+            <% @company_managers.each do |user| %>
+                <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
+            <% end %>
+          </datalist>
+        </select>
         <input type="submit" class="profile_info" value="Update">
       </form>
+
+<% end %>
 
 <% end %>
 
@@ -49,6 +49,7 @@
 <% if @manager_exists.nil? %>
 <p class="profile_info"> No Reporting Manager. [ Submitted reports will be auto-approved ] </p>
 <% end %>
+
 
 <h4 class="profile_subheading">Finance managers:</h4>
 
@@ -60,25 +61,26 @@
           <% if mapping.greater_than_amount_id %>
               for reports greater than <%= mapping.greater_than_amount.value %></p>
 
+
+              <label class="profile_subheading">Change:
+              </label>
+
+              <form data-remote data-turboboost action="<%= user_update_team_path(@user) %>" method="post">
+                <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                <input name="user[team_mapping_id]" value="<%= mapping.id%>" type="hidden">
+                <input name="user[user_id]" value="<%= @user.id%>" type="hidden">
+                <select class="profile_info" name="user[finance_manager_id]" list="suggestionList" id="answerInput" style="float: left; width: 30%">
+                  <datalist id="suggestionList">
+                    <option value="-1">None</option>
+                    <% @company_finance_managers.each do |user| %>
+                        <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
+                    <% end %>
+                  </datalist>
+                </select>
+                <input type="submit" class="profile_info" value="Update">
+              </form>
+
           <% end %>
-
-          <label class="profile_subheading">Change:
-          </label>
-
-          <form data-remote data-turboboost action="<%= user_update_team_path(@user) %>" method="post">
-            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-            <input name="user[team_mapping_id]" value="<%= mapping.id%>" type="hidden">
-            <input name="user[user_id]" value="<%= @user.id%>" type="hidden">
-            <select class="profile_info" name="user[finance_manager_id]" list="suggestionList" id="answerInput" style="float: left; width: 30%">
-              <datalist id="suggestionList">
-                <option value="-1">None</option>
-                <% @users.each do |user| %>
-                    <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
-                <% end %>
-              </datalist>
-            </select>
-            <input type="submit" class="profile_info" value="Update">
-          </form>
 
     <% end %>
 

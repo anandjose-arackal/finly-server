@@ -483,11 +483,13 @@
                   padding: 0px ;
                   margin-bottom: 10px;">
                 <p style="float: left;margin-left: 24px;font-size: 36px; color: white">&#8377</p>
-                <input id="currency" class="clearInput" type="text" name="expense[amount]" placeholder="0.00" style="border:none; margin-left: 1px; font-size: 34px;width: 70%  ;color: white ; background-color: #465c8b;outline: none" onkeypress='validate(event)'>
+                <input id="currency" class="clearInput" type="text" name="expense[amount_attributes][value]" placeholder="0.00" style="border:none; margin-left: 1px; font-size: 34px;width: 70%  ;color: white ; background-color: #465c8b;outline: none" onkeypress='validate(event)'>
+                <input type="text" name="expense[amount_attributes][currency]" value="1" hidden="hidden"/>
+                <input type="text" name="request_type" value="1" hidden="hidden"/>
                 <hr id="upperhr">
                 <div>
                   <p style="color: #eeeeee; margin-left: 24px;font-size: 14px; font-weight: 700;float: left;opacity: 0.7">MERCHANT:</p>
-                  <input type="text" class="clearInput" name="expense[merchant]" width="40%" style="border:none; margin-left: 23px; font-size: 14px ;color: white ; background-color: #465c8b;outline: none">
+                  <input type="text" class="clearInput" name="expense[manual_expense_attributes][merchant]" width="40%" style="border:none; margin-left: 23px; font-size: 14px ;color: white ; background-color: #465c8b;outline: none">
                 </div>
               </div>
             </div>

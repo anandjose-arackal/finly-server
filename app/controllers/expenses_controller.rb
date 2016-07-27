@@ -33,7 +33,13 @@ class ExpensesController < ApplicationController
     else
       flash.now[:danger] = 'Error. Please try again'
     end
-    redirect_to expenses_path
+    if params[:request_type] == '1'
+      respond_to do |format|
+        format.js {}
+      end
+    else
+      redirect_to expenses_path
+    end
   end
 
   def update

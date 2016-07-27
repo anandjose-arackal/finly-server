@@ -22,7 +22,7 @@ class ExpensePolicy < ApplicationPolicy
       return false
     elsif @user.manager?
       # load users from team
-      user_ids = @user_team_service.team.pluck(:user_id)
+      user_ids = @user_team_service.team(UserRole.manager_id).pluck(:user_id)
       expenses = Expense.where(user_id: user_ids)
       if expenses.include?(@expense)
         return true
@@ -49,6 +49,5 @@ class ExpensePolicy < ApplicationPolicy
     end
     false
   end
-
 
 end

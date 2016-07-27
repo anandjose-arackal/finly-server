@@ -16,9 +16,6 @@
     <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
       <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
     </li>
-    <li data-switch="#expenses"><a href="#" data-turbolinks="false">Expenses
-      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-    </li>
     <li data-switch="#reports"><a href="#" data-turbolinks="false">Reports
       <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
     </li>
@@ -58,6 +55,7 @@
 
       <h3 id="divsection_heading">Policies Assigned</h3>
 
+        <%= render 'user_policy_list' %>
 
       <hr style="margin-top: 20px">
 
@@ -76,21 +74,11 @@
     </div>
 
 
-    <div class="divsections" id="expenses" style="display: none">
-
-      <h3 id="divsection_heading">Expenses</h3>
-
-
-      <hr style="margin-top: 20px">
-
-
-    </div>
-
-
     <div class="divsections" id="reports" style="display: none">
 
       <h3 id="divsection_heading">Reports</h3>
 
+      <%= render 'user_reports' %>
 
       <hr style="margin-top: 20px">
 
