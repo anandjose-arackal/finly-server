@@ -37,6 +37,21 @@
       <input id="policy_<%= policy.id %>_conditional_finance_manager_id" value="<%= @mappings[policy.id].non_default.finance_manager.first.finance_manager_id %>"/>
       <input id="policy_<%= policy.id %>_conditional_finance_manager_amount" value="<%= @mappings[policy.id].non_default.finance_manager.first.greater_than_amount.value %>"/>
       <% end %>
+      <input id="policy_<%= policy.id %>_is_manager" value="<%= @user.manager? %>"/>
+      <input id="policy_<%= policy.id %>_approves_to" value="<%= @mappings[policy.id].default.first.approves_to_user_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_to.present? %>
+          <input id="policy_<%= policy.id %>_conditional_approves_to_mapping_id" value="<%= @mappings[policy.id].non_default.approves_to.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_to" value="<%= @mappings[policy.id].non_default.approves_to.first.approves_to_user_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_to_amount" value="<%= @mappings[policy.id].non_default.approves_to.first.greater_than_amount.value %>"/>
+      <% end %>
+      <input id="policy_<%= policy.id %>_is_finance_manager" value="<%= @user.finance_manager? %>"/>
+      <input id="policy_<%= policy.id %>_approves_finance_to" value="<%= @mappings[policy.id].default.first.approves_finance_to_user_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_finance_to.present? %>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to_mapping_id" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.approves_finance_to_user_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to_amount" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.greater_than_amount.value %>"/>
+      <% end %>
+
     </div>
 
 <% end %>
@@ -59,10 +74,7 @@
         <input name="_method" type="hidden" value="patch"/>
       </form>
 
-      <input type="hidden" name="user_team[default][mapping_id]" value="<%= @mappings['company'].default.first.id if @mappings['company'].default.present?%>"
-             form="updateDefaultUserConfiguration">
-
-      <input type="hidden" name="user_team[non_default][mapping_id]" value="<%= @mappings['company'].non_default.first.id if @mappings['company'].non_default.present?%>"
+      <input type="hidden" name="user_team[default][team_mapping_id]" value="<%= @mappings['company'].default.first.id if @mappings['company'].default.present?%>"
              form="updateDefaultUserConfiguration">
 
       <div class="modal-body">
@@ -88,13 +100,16 @@
 
           <label>If Report Total is Over:</label>
           <input id="userManagerConditionalAmount" form="updateDefaultUserConfiguration"
-                 name="user_team[non_default][manager_amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.manager.first.greater_than_amount_value if @mappings['company'].non_default.manager.present?%>">
-          <input name="user_team[non_default][manager_currency]" type="hidden" value="1">
+                 name="user_team[non_default][conditional_manager][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.manager.first.greater_than_amount_value if @mappings['company'].non_default.manager.present?%>">
+          <input name="user_team[non_default][conditional_manager][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
+
+          <input type="hidden" name="user_team[non_default][conditional_manager][team_mapping_id]" value="<%= @mappings['company'].non_default.manager.first.id if @mappings['company'].non_default.manager.present?%>"
+                 form="updateDefaultUserConfiguration">
 
           <div>
             <label>Then Submits To:</label>
             <select id="userManagerConditionalSelector" form="updateDefaultUserConfiguration"
-                    name="user_team[non_default][manager_id]" class="selectors" style=" margin-top: 15px;">
+                    name="user_team[non_default][conditional_manager][manager_id]" class="selectors" style=" margin-top: 15px;">
               <option value="<%=@mappings['company'].non_default.manager.first.manager_id if @mappings['company'].non_default.manager.present?%>" selected="selected">
                 <%=@mappings['company'].non_default.manager.first.manager_name if @mappings['company'].non_default.manager.present?%>
               </option>
@@ -122,13 +137,16 @@
 
           <label>If Report Total is Over:</label>
           <input id="userFinanceManagerConditionalAmount" form="updateDefaultUserConfiguration"
-                 name="user_team[non_default][finance_manager_amount]" type="number" placeholder="Amount">
-          <input name="user_team[non_default][finance_manager_currency]" type="hidden" value="1">
+                 name="user_team[non_default][conditional_finance_manager][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.finance_manager.first.greater_than_amount_value if @mappings['company'].non_default.finance_manager.present?%>">
+          <input name="user_team[non_default][conditional_finance_manager][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
+
+          <input type="hidden" name="user_team[non_default][conditional_finance_manager][team_mapping_id]" value="<%= @mappings['company'].non_default.finance_manager.first.id if @mappings['company'].non_default.finance_manager.present?%>"
+                 form="updateDefaultUserConfiguration">
 
           <div>
             <label>Then Submits To:</label>
             <select id="userFinanceManagerConditionalSelector" form="updateDefaultUserConfiguration"
-                    name="user_team[non_default][finance_manager_id]" class="selectors" style=" margin-top: 15px;">
+                    name="user_team[non_default][conditional_finance_manager][finance_manager_id]" class="selectors" style=" margin-top: 15px;">
               <option value="<%=@mappings['company'].non_default.finance_manager.first.finance_manager_id if @mappings['company'].non_default.finance_manager.present?%>" selected="selected">
                 <%=@mappings['company'].non_default.finance_manager.first.finance_manager_name if @mappings['company'].non_default.finance_manager.present?%>
               </option>
@@ -138,6 +156,88 @@
             </select>
           </div>
           <p>If the finance exceeds the amount above, who does <%=@user.name%> get the finances approved by?</p>
+        </div>
+
+        <div id="userSettingsApprovesToSection">
+          <label>Approves To:</label>
+          <select id="userApprovesToSelector" form="updateDefaultUserConfiguration" name="user_team[default][approves_to_user_id]"
+                  class="selectors" style=" margin-left: 45px; width: 150px">
+            <option value="<%=@mappings['company'].default.first.approves_to_user_id if @mappings['company'].default.present?%>" selected="selected">
+              <%=@mappings['company'].default.first.approves_to_user_name if @mappings['company'].default.present?%>
+            </option>
+            <% @company_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+
+          <p>Does <%=@user.name%> have reports to approve? If so, who do they forward these approved reports to?
+            (This
+            is usually to someone in accounting or finance)</p>
+
+          <label>If Report Total is Over:</label>
+          <input id="userApprovesToConditionalAmount" form="updateDefaultUserConfiguration"
+                 name="user_team[non_default][conditional_approves_to][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.approves_to.first.greater_than_amount_value if @mappings['company'].non_default.approves_to.present?%>">">
+          <input name="user_team[non_default][conditional_approves_to][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
+
+          <input type="hidden" name="user_team[non_default][conditional_approves_to][team_mapping_id]" value="<%= @mappings['company'].non_default.approves_to.first.id if @mappings['company'].non_default.approves_to.present?%>"
+                 form="updateDefaultUserConfiguration">
+
+          <div>
+            <label>Then Approves To:</label>
+            <select id="userApprovesToConditionalSelector" name="user_team[non_default][conditional_approves_to][approves_to_user_id]"
+                    form="updateDefaultUserConfiguration" class="selectors" style=" margin-top: 15px;">
+              <option value="<%=@mappings['company'].non_default.approves_to.first.approves_to_user_id if @mappings['company'].non_default.approves_to.present?%>" selected="selected">
+                <%=@mappings['company'].non_default.approves_to.first.approves_to_user_name if @mappings['company'].non_default.approves_to.present?%>
+              </option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does <%= @user.name%> forward those approved reports
+            to?</p>
+          <hr>
+        </div>
+
+
+        <div id="userSettingsApprovesFinanceToSection">
+          <label>Approves Finance To:</label>
+
+          <select id="userApprovesFinanceToSelector" form="updateDefaultUserConfiguration"
+                  name="user_team[default][approves_finance_to_user_id]" class="selectors" style=" margin-left: 45px; width: 150px">
+            <option value="<%=@mappings['company'].default.first.approves_finance_to_user_id if @mappings['company'].default.present?%>" selected="selected">
+              <%=@mappings['company'].default.first.approves_finance_to_user_name if @mappings['company'].default.present?%>
+            </option>
+            <% @company_finance_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+
+          <p>Does <%= @user.name%> have finances to approve? If so, who do they forward these approved finances
+            to? </p>
+
+          <label>If Report Total is Over:</label>
+          <input id="userApprovesFinanceToConditionalAmount" form="updateDefaultUserConfiguration"
+                 name="user_team[non_default][conditional_approves_finance_to][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.approves_finance_to.first.greater_than_amount_value if @mappings['company'].non_default.approves_finance_to.present?%>">>
+          <input name="user_team[non_default][conditional_approves_finance_to][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
+
+          <input type="hidden" name="user_team[non_default][conditional_approves_finance_to][team_mapping_id]" value="<%= @mappings['company'].non_default.approves_finance_to.first.id if @mappings['company'].non_default.approves_finance_to.present?%>"
+                 form="updateDefaultUserConfiguration">
+
+          <div>
+            <label>Then Approves Finance To:</label>
+            <select id="userApprovesFinanceToConditionalSelector" form="updateDefaultUserConfiguration"
+                    name="user_team[non_default][conditional_approves_finance_to][approves_finance_to_user_id]" class="selectors" style=" margin-top: 15px;">
+              <option value="<%=@mappings['company'].non_default.approves_finance_to.first.approves_finance_to_user_id if @mappings['company'].non_default.approves_finance_to.present?%>" selected="selected">
+                <%=@mappings['company'].non_default.approves_finance_to.first.approves_finance_to_user_name if @mappings['company'].non_default.approves_finance_to.present?%>
+              </option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does <%= @user.name%> get the finances approved by?</p>
+          <hr>
         </div>
 
         <hr>

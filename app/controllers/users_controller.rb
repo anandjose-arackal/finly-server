@@ -60,19 +60,13 @@ class UsersController < ApplicationController
       flash[:danger] = @user_team_service.errors
       redirect_to request.referrer
     end
-    # updating the non default mapping - or creating it if it doesn't exist.
-    if user_team_params['non-default']['mapping_id']
-      if @user_team_service.update(user_team_params['non-default'])
-        @non_default_success = true
-      else
-        flash[:danger] = @user_team_service.errors
-        redirect_to request.referrer
-      end
+    # updating all the non default mappings - or creating it if it doesn't exist.
+    if update_non_default_teams
+      flash[:success] = "Team updated!"
     else
-      if @user_team_service.create(user_team_params['non-default'])
-        @non_default_success = true
-      end
+      flash[:danger] = @user_team_service.errors
     end
+    redirect_to request.referrer
   end
 
   private
@@ -96,6 +90,79 @@ class UsersController < ApplicationController
     @policies.each do |policy|
       @mappings[policy.id] = @user_team_service.mappings(policy: policy)
     end
+  end
+
+  def update_non_default_teams
+
+    # create or update the conditional manager
+    if user_team_params['non_default']['conditional_manager']['team_mapping_id'].present?
+      # i.e. updating conditional manager mapping
+      unless @user_team_service.update(user_team_params['non_default']['conditional_manager'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    elsif user_team_params['non_default']['conditional_manager']['amount'].present?
+      # i.e. there is no conditional mapping but one needs to be created
+      unless @user_team_service.create(user_team_params['non_default']['conditional_manager'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    end
+
+    # create or update the conditional finance manager
+    if user_team_params['non_default']['conditional_finance_manager']['team_mapping_id'].present?
+      # i.e. updating conditional manager mapping
+      unless @user_team_service.update(user_team_params['non_default']['conditional_finance_manager'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    elsif user_team_params['non_default']['conditional_finance_manager']['amount'].present?
+      # i.e. there is no conditional mapping but one needs to be created
+      unless @user_team_service.create(user_team_params['non_default']['conditional_finance_manager'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    end
+
+    # create or update the conditional approves to user
+    if user_team_params['non_default']['conditional_approves_to']['team_mapping_id'].present?
+      # i.e. updating conditional manager mapping
+      unless @user_team_service.update(user_team_params['non_default']['conditional_approves_to'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    elsif user_team_params['non_default']['conditional_approves_to']['amount'].present?
+      # i.e. there is no conditional mapping but one needs to be created
+      unless @user_team_service.create(user_team_params['non_default']['conditional_approves_to'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    end
+
+    # create or update the conditional approves finance to user
+    if user_team_params['non_default']['conditional_approves_finance_to']['team_mapping_id'].present?
+      # i.e. updating conditional manager mapping
+      unless @user_team_service.update(user_team_params['non_default']['conditional_approves_finance_to'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    elsif user_team_params['non_default']['conditional_approves_finance_to']['amount'].present?
+      # i.e. there is no conditional mapping but one needs to be created
+      unless @user_team_service.create(user_team_params['non_default']['conditional_approves_finance_to'])
+        flash[:danger] = @user_team_service.errors
+        @non_default_success = false
+        return false
+      end
+    end
+    # return true of all are successful
+    true
   end
 
 end

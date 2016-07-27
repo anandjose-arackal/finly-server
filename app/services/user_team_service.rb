@@ -198,6 +198,11 @@ class UserTeamService < BaseService
   def update(params={})
     errors.clear
     load_update params
+    # updating greater than amount for non-default if it needs to be updated
+    if !@mapping.default and params['amount'] == @mapping.greater_than_amount_value and params['currency_id'] == @mapping.greater_than_amount_currency_id
+      greater_than_amount = Amount.create(value: params['amount'], currency_id: params['currency_id'])
+      @mapping.update_attributes(greater_than_amount_id: greater_than_amount.id)
+    end
     if params[:manager_id].present? || params['manager_id'].present?
       @mapping.update_attributes(manager_id: params[:manager_id] || params['manager_id'])
     end
@@ -221,11 +226,11 @@ class UserTeamService < BaseService
     load_create params
     return false unless validate_create params
     mapping = @mappings.new(policy_id: @policy_id, greater_than_amount_attributes: {value: @amount, currency_id: @currency_id})
-    if params[:manager_id].present?
-      mapping.manager_id = params[:manager_id]
+    if params[:manager_id].present? || params['manager_id'].present?
+      mapping.manager_id = params[:manager_id] || params['manager_id']
     end
-    if params[:finance_manager_id].present?
-      mapping.finance_manager_id = params[:finance_manager_id]
+    if params[:finance_manager_id].present? || params['finance_manager_id'].present?
+      mapping.finance_manager_id = params[:finance_manager_id] || params['finance_manager_id']
     end
     if params[:approves_to_user_id].present?
       mapping.approves_to_user_id = params[:approves_to_user_id]
@@ -337,7 +342,7 @@ class UserTeamService < BaseService
   def load_create(params={})
     @policy_id = params[:policy_id]
     @mappings = self.user.team_mapping
-    @amount = params[:amount] || params['amount_id']
+    @amount = params[:amount] || params['amount']
     @currency_id = params[:currency_id] || params['currency_id']
   end
 

@@ -146,19 +146,19 @@
     var finance_manager_id = $('#policy_' + id + '_finance_manager_id').val();
     var conditional_finance_manager_id = $('#policy_' + id + '_conditional_finance_manager_id').val();
     var conditional_finance_manager_amount = $('#policy_' + id + '_conditional_finance_manager_amount').val();
-    var is_manager = $('#policy_member_' + id + '_is_manager').val();
-    var approves_to = $('#policy_member_' + id + '_approves_to').val();
-    var conditional_approves_to = $('#policy_member_' + id + '_conditional_approves_to').val();
-    var conditional_approves_to_amount = $('#policy_member_' + id + '_conditional_approves_to_amount').val();
-    var is_finance_manager = $('#policy_member_' + id + '_is_finance_manager').val();
-    var approves_finance_to = $('#policy_member_' + id + '_approves_finance_to').val();
-    var conditional_approves_finance_to = $('#policy_member_' + id + '_conditional_approves_finance_to').val();
-    var conditional_approves_finance_to_amount = $('#policy_member_' + id + '_conditional_approves_finance_to_amount').val();
+    var is_manager = $('#policy_' + id + '_is_manager').val();
+    var approves_to = $('#policy_' + id + '_approves_to').val();
+    var conditional_approves_to = $('#policy_' + id + '_conditional_approves_to').val();
+    var conditional_approves_to_amount = $('#policy_' + id + '_conditional_approves_to_amount').val();
+    var is_finance_manager = $('#policy_' + id + '_is_finance_manager').val();
+    var approves_finance_to = $('#policy_' + id + '_approves_finance_to').val();
+    var conditional_approves_finance_to = $('#policy_' + id + '_conditional_approves_finance_to').val();
+    var conditional_approves_finance_to_amount = $('#policy_' + id + '_conditional_approves_finance_to_amount').val();
     var default_mapping_id = $('#policy_' + id + '_default_mapping_id').val();
     var conditional_manager_mapping_id = $('#policy_' + id + '_conditional_manager_mapping_id').val();
     var conditional_finance_manager_mapping_id = $('#policy_' + id + '_conditional_finance_manager_mapping_id').val();
-    var conditional_approves_to_mapping_id = $('#policy_member_' + id + '_conditional_approves_to_mapping_id').val();
-    var conditional_approves_finance_to_mapping_id = $('#policy_member_' + id + '_conditional_approves_finance_to_mapping_id').val();
+    var conditional_approves_to_mapping_id = $('#policy_' + id + '_conditional_approves_to_mapping_id').val();
+    var conditional_approves_finance_to_mapping_id = $('#policy_' + id + '_conditional_approves_finance_to_mapping_id').val();
 
     document.getElementById("policyMemberEmailId").textContent = email_id;
     $('#policyMemberSettingsUserId').val(<%=@user.id%>);
@@ -208,9 +208,31 @@
     $('#policyMemberSettings').modal('show');
   }
 
+
     function userSettingsModal() {
       $('#defaultUserSettings').modal('show');
 
+      var isEmployee = "<%=@user.employee?%>";
+      var isManager = "<%=@user.manager?%>";
+      var isFinanceManager = "<%=@user.finance_manager?%>";
+
+      if (isEmployee == "true") {
+        $('#userSettingsEmployeeSection').show();
+      } else {
+        $('#userSettingsEmployeeSection').hide();
+      }
+
+      if (isManager == "true") {
+        $('#userSettingsApprovesToSection').show();
+      } else {
+        $('#userSettingsApprovesToSection').hide();
+      }
+
+      if (isFinanceManager == "true") {
+        $('#userSettingsApprovesFinanceToSection').show();
+      } else {
+        $('#userSettingsApprovesFinanceToSection').hide();
+      }
     }
 
 </script>
