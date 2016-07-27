@@ -83,6 +83,15 @@ class UserManagerMapping < ActiveRecord::Base
     User.find_by(id: self.finance_manager_id).name
   end
 
+  def approves_to_user_name
+    return nil unless self.approves_to_user_id
+    User.find_by(id: self.approves_to_user_id).name
+  end
+
+  def approves_finance_to_user_name
+    return nil unless self.approves_finance_to_user_id
+    User.find_by(id: self.approves_finance_to_user_id).name
+  end
 
   private
   def valid_default

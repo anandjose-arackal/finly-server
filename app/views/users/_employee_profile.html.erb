@@ -208,9 +208,31 @@
     $('#policyMemberSettings').modal('show');
   }
 
+
     function userSettingsModal() {
       $('#defaultUserSettings').modal('show');
 
+      var isEmployee = "<%=@user.employee?%>";
+      var isManager = "<%=@user.manager?%>";
+      var isFinanceManager = "<%=@user.finance_manager?%>";
+
+      if (isEmployee == "true") {
+        $('#userSettingsEmployeeSection').show();
+      } else {
+        $('#userSettingsEmployeeSection').hide();
+      }
+
+      if (isManager == "true") {
+        $('#userSettingsApprovesToSection').show();
+      } else {
+        $('#userSettingsApprovesToSection').hide();
+      }
+
+      if (isFinanceManager == "true") {
+        $('#userSettingsApprovesFinanceToSection').show();
+      } else {
+        $('#userSettingsApprovesFinanceToSection').hide();
+      }
     }
 
 </script>
