@@ -37,6 +37,21 @@
       <input id="policy_<%= policy.id %>_conditional_finance_manager_id" value="<%= @mappings[policy.id].non_default.finance_manager.first.finance_manager_id %>"/>
       <input id="policy_<%= policy.id %>_conditional_finance_manager_amount" value="<%= @mappings[policy.id].non_default.finance_manager.first.greater_than_amount.value %>"/>
       <% end %>
+      <input id="policy_<%= policy.id %>_is_manager" value="<%= @user.manager? %>"/>
+      <input id="policy_<%= policy.id %>_approves_to" value="<%= @mappings[policy.id].default.first.approves_to_user_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_to.present? %>
+          <input id="policy_<%= policy.id %>_conditional_approves_to_mapping_id" value="<%= @mappings[policy.id].non_default.approves_to.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_to" value="<%= @mappings[policy.id].non_default.approves_to.first.approves_to_user_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_to_amount" value="<%= @mappings[policy.id].non_default.approves_to.first.greater_than_amount.value %>"/>
+      <% end %>
+      <input id="policy_<%= policy.id %>_is_finance_manager" value="<%= @user.finance_manager? %>"/>
+      <input id="policy_<%= policy.id %>_approves_finance_to" value="<%= @mappings[policy.id].default.first.approves_finance_to_user_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_finance_to.present? %>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to_mapping_id" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.approves_finance_to_user_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to_amount" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.greater_than_amount.value %>"/>
+      <% end %>
+
     </div>
 
 <% end %>
