@@ -30,6 +30,10 @@ class Amount < ActiveRecord::Base
     self.value
   end
 
+  def greater_than_amount_currency_id
+    self.currency_id
+  end
+
   # method that returns the currency code
   def currency_id
     self.currency.country_code

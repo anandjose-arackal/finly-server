@@ -59,10 +59,7 @@
         <input name="_method" type="hidden" value="patch"/>
       </form>
 
-      <input type="hidden" name="user_team[default][mapping_id]" value="<%= @mappings['company'].default.first.id if @mappings['company'].default.present?%>"
-             form="updateDefaultUserConfiguration">
-
-      <input type="hidden" name="user_team[non_default][mapping_id]" value="<%= @mappings['company'].non_default.first.id if @mappings['company'].non_default.present?%>"
+      <input type="hidden" name="user_team[default][team_mapping_id]" value="<%= @mappings['company'].default.first.id if @mappings['company'].default.present?%>"
              form="updateDefaultUserConfiguration">
 
       <div class="modal-body">
@@ -88,13 +85,16 @@
 
           <label>If Report Total is Over:</label>
           <input id="userManagerConditionalAmount" form="updateDefaultUserConfiguration"
-                 name="user_team[non_default][manager_amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.manager.first.greater_than_amount_value if @mappings['company'].non_default.manager.present?%>">
-          <input name="user_team[non_default][manager_currency]" type="hidden" value="1">
+                 name="user_team[non_default][conditional_manager][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.manager.first.greater_than_amount_value if @mappings['company'].non_default.manager.present?%>">
+          <input name="user_team[non_default][conditional_manager][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
+
+          <input type="hidden" name="user_team[non_default][conditional_manager][team_mapping_id]" value="<%= @mappings['company'].non_default.manager.first.id if @mappings['company'].non_default.manager.present?%>"
+                 form="updateDefaultUserConfiguration">
 
           <div>
             <label>Then Submits To:</label>
             <select id="userManagerConditionalSelector" form="updateDefaultUserConfiguration"
-                    name="user_team[non_default][manager_id]" class="selectors" style=" margin-top: 15px;">
+                    name="user_team[non_default][conditional_manager][manager_id]" class="selectors" style=" margin-top: 15px;">
               <option value="<%=@mappings['company'].non_default.manager.first.manager_id if @mappings['company'].non_default.manager.present?%>" selected="selected">
                 <%=@mappings['company'].non_default.manager.first.manager_name if @mappings['company'].non_default.manager.present?%>
               </option>
@@ -122,13 +122,16 @@
 
           <label>If Report Total is Over:</label>
           <input id="userFinanceManagerConditionalAmount" form="updateDefaultUserConfiguration"
-                 name="user_team[non_default][finance_manager_amount]" type="number" placeholder="Amount">
-          <input name="user_team[non_default][finance_manager_currency]" type="hidden" value="1">
+                 name="user_team[non_default][conditional_finance_manager][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.finance_manager.first.greater_than_amount_value if @mappings['company'].non_default.finance_manager.present?%>">
+          <input name="user_team[non_default][conditional_finance_manager][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
+
+          <input type="hidden" name="user_team[non_default][conditional_finance_manager][team_mapping_id]" value="<%= @mappings['company'].non_default.finance_manager.first.id if @mappings['company'].non_default.finance_manager.present?%>"
+                 form="updateDefaultUserConfiguration">
 
           <div>
             <label>Then Submits To:</label>
             <select id="userFinanceManagerConditionalSelector" form="updateDefaultUserConfiguration"
-                    name="user_team[non_default][finance_manager_id]" class="selectors" style=" margin-top: 15px;">
+                    name="user_team[non_default][conditional_finance_manager][finance_manager_id]" class="selectors" style=" margin-top: 15px;">
               <option value="<%=@mappings['company'].non_default.finance_manager.first.finance_manager_id if @mappings['company'].non_default.finance_manager.present?%>" selected="selected">
                 <%=@mappings['company'].non_default.finance_manager.first.finance_manager_name if @mappings['company'].non_default.finance_manager.present?%>
               </option>
