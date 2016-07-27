@@ -113,7 +113,7 @@ class PoliciesController < ApplicationController
       load_users
       flash.now[:success] = 'Configuration updated'
       respond_to do |format|
-        format.html { redirect_to policy_path(@policy, view: params[:view]) }
+        format.html { redirect_to request.referrer }
         format.js
       end
       return
@@ -129,13 +129,13 @@ class PoliciesController < ApplicationController
       if @rule_service.add_expense_rule(rule_params)
         flash[:success] = "Expense Rule added!"
       else
-        flash[:danger] = "Error. Please try again."
+        flash[:danger] = @rule_service.errors
       end
     elsif rule_params['amount_attributes']
       if @rule_service.add_budget_rule(rule_params)
         flash[:success] = "Budget Rule added"
       else
-        flash[:danger] = "Error. Please try again."
+        flash[:danger] = @rule_service.errors
       end
     else
       flash[:danger] = "Invalid input params."
@@ -149,13 +149,13 @@ class PoliciesController < ApplicationController
       if @rule_service.remove_budget_rule(params['budget_rule']['rule_id'])
         flash[:success] = "Expense Rule removed!"
       else
-        flash[:danger] = "Error. Please try again."
+        flash[:danger] = @rule_service.errors
       end
     elsif params['expense_rule']
       if @rule_service.remove_expense_rule(params['expense_rule']['rule_id'])
         flash[:success] = "Budget rule removed!"
       else
-        flash[:danger] = "Error. Please try again."
+        flash[:danger] = @rule_service.errors
       end
     else
       flash[:danger] = "Invalid input params."

@@ -433,7 +433,7 @@ class ReportService < BaseService
 
   def expense_created_in_report(expense)
     return false unless validate require_report: true, require_user: true
-    comment = report.comments.build report: report, user: user, report_comment_action: ReportCommentAction.expense_add_id, expense: expense
+    comment = report.comments.build report: report, user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense: expense
     if comment.save
       return true
     end

@@ -180,7 +180,7 @@ Rails.application.routes.draw do
 
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details
-    post 'update_user_team', to: 'users#update_team', as: :update_team
+    patch 'update_user_team', to: 'users#update_team', as: :update_team
     post 'update_role', to: 'users#update_role', as: :update_role
   end
 

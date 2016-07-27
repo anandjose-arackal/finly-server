@@ -31,14 +31,14 @@ class ExpensesController < ApplicationController
     if @expense_service.add_expense expense_params
       flash.now[:success] = 'Expense created!'
     else
-      flash.now[:danger] = 'Error. Please try again'
+      flash.now[:danger] = @expense_service.errors
     end
     if params[:request_type] == '1'
       respond_to do |format|
         format.js {}
       end
     else
-      redirect_to expenses_path
+      redirect_to request.referrer
     end
   end
 
@@ -46,7 +46,7 @@ class ExpensesController < ApplicationController
     if @expense_service.update_expense(current_user, expense_params)
       flash[:success] = 'Expense edited!'
     else
-      flash[:danger] = 'Error. Please try again'
+      flash[:danger] = @expense_service.errors
     end
     redirect_to expenses_path
   end
@@ -55,18 +55,18 @@ class ExpensesController < ApplicationController
     if @expense_service.remove_expense(params[:id] || params[:expense_id])
       flash[:success] = "Expense deleted!"
     else
-      flash[:danger] = "Error. Please try again"
+      flash[:danger] = @expense_service.errors
     end
-    redirect_to expenses_path
+    redirect_to request.referrer
   end
 
   def add_receipt
     if @expense_service.add_receipt_to_expense(expense_params, params[:id] || params[:expense_id])
       flash[:success] = "receipt added!"
     else
-      flash[:danger] = "Error. Please try again"
+      flash[:danger] = @expense_service.errors
     end
-    redirect_to expenses_path
+    redirect_to request.referrer
   end
 
   def attach_receipt

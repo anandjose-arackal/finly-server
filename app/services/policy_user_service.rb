@@ -97,11 +97,13 @@ class PolicyUserService < BaseService
     errors.clear
     admin = params[:admin]
     user_id = params[:user_id]
+
     if self.policy.blank?
       errors << 'Policy not found'
       return false
     end
     user = self.policy.users.with_id(user_id)
+
     if user.blank?
       errors << 'User not found in policy'
       return false
@@ -112,10 +114,15 @@ class PolicyUserService < BaseService
       return false
     end
     mappings = user.team_mapping.policy(@policy.id)
+
     return false unless handle_mapping_update user, mappings, params[:default], true
+
     return false unless handle_mapping_update user, mappings, params[:conditional_manager]
+
     return false unless handle_mapping_update user, mappings, params[:conditional_finance_manager]
+
     return false unless handle_mapping_update user, mappings, params[:conditional_approves_to]
+
     return false unless handle_mapping_update user, mappings, params[:conditional_approves_finance_to]
     true
   end

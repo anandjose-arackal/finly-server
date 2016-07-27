@@ -27,6 +27,7 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :policy
   accepts_nested_attributes_for :greater_than_amount
 
+  delegate :greater_than_amount_value, to: :greater_than_amount
 
   validate :valid_default
   validate :valid_non_default
@@ -69,6 +70,17 @@ class UserManagerMapping < ActiveRecord::Base
 
   scope :with_details, -> { includes :user, :manager, :finance_manager, :approves_to_user, :approves_finance_to_user, :greater_than_amount }
 
+  def manager_name
+    return nil unless self.manager_id
+    User.find_by(id: self.manager_id).name
+  end
+
+  def finance_manager_name
+    return nil unless self.finance_manager_id
+    User.find_by(id: self.finance_manager_id).name
+  end
+
+
   private
   def valid_default
     if default and greater_than_amount.present?
@@ -81,5 +93,6 @@ class UserManagerMapping < ActiveRecord::Base
       errors.add(:greater_than_amount, "cannot be blank")
     end
   end
+
 
 end

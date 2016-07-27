@@ -337,8 +337,8 @@ class UserTeamService < BaseService
   def load_create(params={})
     @policy_id = params[:policy_id]
     @mappings = self.user.team_mapping
-    @amount = params[:amount]
-    @currency_id = params[:currency_id]
+    @amount = params[:amount] || params['amount_id']
+    @currency_id = params[:currency_id] || params['currency_id']
   end
 
   def validate_create(params={})
