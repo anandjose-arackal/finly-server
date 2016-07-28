@@ -1,0 +1,150 @@
+<% provide(:title, "Change Password") %>
+<body>
+<div class="modal-dialog">
+  <div class="loginmodal-container">
+    <form data-remote data-turboboost name="myForm" method="post" action="/users/password/forgot" onsubmit="return validateForm()">
+      <%= devise_error_messages! %>
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+      <%= hidden_field(:user, :reset_password_token, id: :reset_password_token)%>
+      <!-- <input type="hidden" name="user[reset_password_token]" id="reset_password_token">
+      --> <input id="new_password" type="password" name="user[password]" placeholder="New Password " title="New Password">
+      <input id="confirm_new_password" type="password" name="user[password_confirmation]" placeholder="Confirm New Password (Minimum 8 characters) " title="Confirm New Password">
+      <input id="submit_login" type="submit" name="changePwd" class="login loginmodal-submit" value="Change My Password">
+    </form>
+  </div>
+</div>
+
+</body>
+<style>
+
+  body {
+
+    background-color: #46568b;
+    position: absolute;
+    margin: 160px 0px 0 0px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+  }
+
+  #forgot_password_text {
+    text-align: center;
+    font-size: 14px;
+    color: #FFF;
+    font-family: sans-serif;
+    font-weight: 100;
+    margin-top: 12px;
+    cursor: pointer;
+    cursor: hand;
+  }
+
+  #forgot_password_anchor {
+    text-decoration: none;
+
+  }
+
+  .loginmodal-container {
+    padding: 30px;
+    max-width: 500px;
+    width: 100% !important;
+    background-color: #F7F7F7;
+    margin: 0 auto;
+    border-radius: 4px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+
+  .loginmodal-container h1 {
+    text-align: center;
+    font-size: 1.8em;
+    font-family: sans-serif;
+  }
+
+  .loginmodal-container input[type=submit] {
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .loginmodal-container input[type=text], input[type=password] {
+    height: 64px;
+    font-size: 14px;
+    font-weight: 100;
+    width: 100%;
+    margin-bottom: 10px;
+    -webkit-appearance: none;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-top: 1px solid #c0c0c0;
+    /* border-radius: 2px; */
+    padding: 0 8px 0 16px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+  }
+
+  .loginmodal-container input[type=text]:hover, input[type=password]:hover {
+    border: 1px solid #b9b9b9;
+    border-top: 1px solid #a0a0a0;
+    -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .loginmodal-submit {
+    /* border: 1px solid #3079ed; */
+    border: 0px;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+    background-color: #93c178;
+    padding: 17px 0px;
+    font-family: sans-serif;
+    font-size: 14px;
+    /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#4787ed)); */
+  }
+
+  .loginmodal-submit:hover {
+    border: 1px solid #93c178;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+    background-color: #f7ef6a;
+    color: #555;
+  }
+
+  .loginmodal-container a {
+    text-decoration: none;
+    color: #666;
+    text-align: center;
+    display: inline-block;
+    opacity: 0.6;
+    transition: opacity ease 0.5s;
+  }
+
+  .topbarContainer {
+    visibility: hidden;
+  }
+
+
+</style>
+
+
+<script>
+
+  function validateForm() {
+
+    var email = document.forms["myForm"]['session[email]'].value;
+    var password = document.forms["myForm"]['session[password]'].value;
+
+    if (email == null || email == "") {
+      alert("Email must be filled out");
+      return false;
+    }
+    if (password == null || password == "") {
+      alert("Password must be filled out");
+      return false;
+    }
+  }
+
+</script>
