@@ -48,6 +48,15 @@ class Expense < ActiveRecord::Base
   validates :user_id, presence: true
   validate :no_future_date
   validate :created_by
+  validate :report_status
+
+
+  # i.e. an expense associated with a report can't be destroyed
+  before_destroy {
+    if self.report_id
+      errors.add(:expense, "associated with a report can't be destroyed.")
+    end
+  }
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
@@ -100,6 +109,7 @@ class Expense < ActiveRecord::Base
   scope :with_category, ->(category_id) { where category_id: category_id }
 
   delegate :category_name, to: :category
+
 
 
 
@@ -157,6 +167,16 @@ class Expense < ActiveRecord::Base
   def no_future_date
     if date.present? and date > Date.today
       errors.add(:date, "cannot be in the future!")
+    end
+  end
+
+  # ensuring the report is either open or retracted before allowing editing of expense
+  def report_status
+    if self.report_id
+      report = self.report
+      unless report.open? or report.retracted?
+        errors.add(:report, ' cannot be edited in this state.')
+      end
     end
   end
 
