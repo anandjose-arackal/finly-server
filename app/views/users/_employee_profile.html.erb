@@ -1,9 +1,6 @@
 <div id="employeeDetailsDiv">
   <ul class="innerul">
-    <li style="
-    padding: 22px 0 16px 22px;
-        border-bottom: solid 1px #e6e6e6;"><%= @user.name%>
-
+    <li class="modalListHeader"><%= @user.name %>
     </li>
     <li class="active" data-switch="#user_info"><a href="#" data-turbolinks="false">User's Info
       <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
@@ -13,19 +10,19 @@
     <li data-switch="#policies_assigned"><a href="#" data-turbolinks="false">Policies Assigned
       <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
     </li>
-    <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
+    <!--    <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
+          <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+        </li>-->
+    <li data-switch="#userReports"><a href="#" data-turbolinks="false">Reports
       <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
     </li>
-    <li data-switch="#reports"><a href="#" data-turbolinks="false">Reports
-      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-    </li>
-    <li data-switch="#accounting_statements"><a href="#" data-turbolinks="false">Accounting Statements
-      <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-    </li>
+    <!--   <li data-switch="#accounting_statements"><a href="#" data-turbolinks="false">Accounting Statements
+         <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+       </li>-->
   </ul>
 
 
-  <div id="page-2" class="innerdiv" >
+  <div id="page-2" class="innerdiv">
 
     <!-- Hidden blocks that you show when requested. -->
 
@@ -35,7 +32,6 @@
 
       <%= render 'profile_info' %>
 
-      <hr style="margin-top: 20px">
 
     </div>
 
@@ -45,8 +41,6 @@
 
       <%= render 'people/user_roles' %>
 
-      <hr style="margin-top: 20px">
-
 
     </div>
 
@@ -55,7 +49,7 @@
 
       <h3 id="divsection_heading">Policies Assigned</h3>
 
-        <%= render 'user_policy_list' %>
+      <%= render 'user_policy_list' %>
 
       <hr style="margin-top: 20px">
 
@@ -74,23 +68,18 @@
     </div>
 
 
-    <div class="divsections" id="reports" style="display: none">
+    <div class="divsections" id="userReports" style="display: none">
 
       <h3 id="divsection_heading">Reports</h3>
 
-      <%= render 'user_reports' %>
-
-      <hr style="margin-top: 20px">
-
+     <!-- < %= render 'user_reports' %>
+-->
 
     </div>
 
     <div class="divsections" id="accounting_statements" style="display: none">
 
       <h3 id="divsection_heading">Accounting Statements</h3>
-
-
-      <hr style="margin-top: 20px">
 
 
     </div>
@@ -111,19 +100,20 @@
   elems = document.querySelectorAll(selector);
 
   makeActive = function () {
-    for (var i = 0; i < elems.length; i++)
+    for (var i = 0; i < elems.length; i++) {
       elems[i].classList.remove('active');
-
+    }
     this.classList.add('active');
   };
 
-  for (var i = 0; i < elems.length; i++)
+  for (var i = 1; i < elems.length; i++)
     elems[i].addEventListener('mousedown', makeActive);
 
 
   $('[data-switch]').on('click', function (e) {
     var $page = $('#page-2'),
         blockToShow = e.currentTarget.getAttribute('data-switch');
+
 
     // Hide all children.
     $page.children().hide();
@@ -209,30 +199,30 @@
   }
 
 
-    function userSettingsModal() {
-      $('#defaultUserSettings').modal('show');
+  function userSettingsModal() {
+    $('#defaultUserSettings').modal('show');
 
-      var isEmployee = "<%=@user.employee?%>";
-      var isManager = "<%=@user.manager?%>";
-      var isFinanceManager = "<%=@user.finance_manager?%>";
+    var isEmployee = "<%=@user.employee?%>";
+    var isManager = "<%=@user.manager?%>";
+    var isFinanceManager = "<%=@user.finance_manager?%>";
 
-      if (isEmployee == "true") {
-        $('#userSettingsEmployeeSection').show();
-      } else {
-        $('#userSettingsEmployeeSection').hide();
-      }
-
-      if (isManager == "true") {
-        $('#userSettingsApprovesToSection').show();
-      } else {
-        $('#userSettingsApprovesToSection').hide();
-      }
-
-      if (isFinanceManager == "true") {
-        $('#userSettingsApprovesFinanceToSection').show();
-      } else {
-        $('#userSettingsApprovesFinanceToSection').hide();
-      }
+    if (isEmployee == "true") {
+      $('#userSettingsEmployeeSection').show();
+    } else {
+      $('#userSettingsEmployeeSection').hide();
     }
+
+    if (isManager == "true") {
+      $('#userSettingsApprovesToSection').show();
+    } else {
+      $('#userSettingsApprovesToSection').hide();
+    }
+
+    if (isFinanceManager == "true") {
+      $('#userSettingsApprovesFinanceToSection').show();
+    } else {
+      $('#userSettingsApprovesFinanceToSection').hide();
+    }
+  }
 
 </script>

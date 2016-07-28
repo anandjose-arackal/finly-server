@@ -69,7 +69,7 @@
     }
   }
 
-  .innerdiv{
+  .innerdiv {
     background: white;
 
     #divsection_heading {
@@ -83,24 +83,17 @@
     }
   }
 
-
   .active {
 
-    background-color: white;
+    background-color: honeydew;
     text-decoration: none;
   }
 
-
   #eachRow {
     cursor: pointer;
-    background-color: white;
-    margin-top: 1px;
-    padding-top: 10px;
-    padding-bottom: 10px;
 
-    .fa-pencil{
-      font-size: 15px; color: black;margin-top: 18px;
-      margin-left: 25px;
+    .fa-pencil {
+
       opacity: 0.6;
     }
 
@@ -108,6 +101,8 @@
       display: block;
       height: 50px;
       width: 50px;
+      margin-left: 30px;
+      margin-top: 6px;
       line-height: 50px;
       -moz-border-radius: 30px;
       border-radius: 60px;
@@ -118,7 +113,7 @@
   #user_info {
 
     .profile_subheading {
-      width: 30%;
+      width: 50%;
       clear: both;
       float: left;
       font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
@@ -129,7 +124,7 @@
       float: right;
       font-size: 12px;
       margin-top: 30px;
-      width: 70%;
+      width: 50%;
       font-family: 'Roboto', sans-serif;
       font-weight: 700;
     }
@@ -164,15 +159,24 @@
     }
   }
 
-  .editProfileDialogHeaders {
-    font-size: 14px;
-    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
-    text-transform: uppercase;
-    font-weight: 400;
-    padding: 20px 0 5px 40px;
-    color: #777;
-  }
+  #roles {
 
+    .editProfileDialogHeaders {
+      font-size: 14px;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+      text-transform: uppercase;
+      font-weight: 400;
+      padding: 20px 0 5px 40px;
+      color: #777;
+
+      width: 50%;
+
+    }
+
+    div {
+      display: inline-block;
+    }
+  }
   .spanEditProfile {
     color: #a0a0a0;
     text-transform: lowercase;
@@ -180,9 +184,50 @@
     font-weight: 300;
   }
 
-  .arrow{
+  .arrow {
 
     float: right;
+  }
+
+  .selectors {
+    width: 200px;
+    border-radius: 3px;
+    outline: none;
+    margin-top: -10px;
+    font-size: 14px;
+    background-color: #fff;
+    height: 38px;
+  }
+
+  #peoplePoliciesDetails {
+
+    label {
+      font-weight: 400;
+      font-size: 12px;
+      width: 40%;
+
+    }
+
+    .selectors {
+      height: 28px;
+    }
+
+    input {
+      width: 200px;
+      padding-left: 10px;
+    }
+
+    hr {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      width: 50%;
+      margin-left: 0px;
+    }
+
+    .conditionMargin {
+      margin-top: 5px;
+    }
+
   }
 
 }

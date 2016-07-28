@@ -168,20 +168,9 @@
                 <tbody>
                 <% if @reports.present? %>
                     <% @reports.each do |report| %>
-                        <tr>
-                          <td style="width: 1%; padding-left: 20px">
 
-                            <input name="existing_users_id" class="checkboxReimburse" type="checkbox"></td>
+                        <%= render partial: 'approved_report_list', locals: {report: report} %>
 
-                          <td style="width:  34.5%;"><%= report[:report].name %>
-                            <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
-                          </td>
-                          <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
-                          <td style="width:  15%;">
-                            <span>&#8377</span><span class="reimburseAmount"><%= report[:total_amount] %></span>
-                          </td>
-                          </td>
-                        </tr>
                     <% end %>
                 <% end %>
                 </tbody>
@@ -200,7 +189,7 @@
       </form>
       <div id="confirmReimbursement" style="display: none">
 
-        <label>Reimbursing Amount : &#8377 <span> 500</span>/- </label>
+        <label>Reimbursing Amount : &#8377 <span id="finalReimbursementAmount"> 500</span>/- </label>
 
         <section>
           <label style="margin-top: 8px">Date :</label>
@@ -279,7 +268,7 @@
       <span style="width: 45%;
           display: inline-block;">&#8377 <span>3555</span></span>
       <span style="
-      display: inline-block;">&#8377 <span>345</span></span>
+      display: inline-block;">&#8377 <span id="approvedSettlementAmount">345</span></span>
               </section>
             </div>
 
@@ -302,18 +291,7 @@
                 <tbody>
                 <% if @reports.present? %>
                     <% @reports.each do |report| %>
-                        <tr>
-                          <td style="width: 1%; padding-left: 20px">
-
-                            <input name="existing_users_id" class="checkboxSettle" type="checkbox"></td>
-
-                          <td style="width:  34.5%;"><%= report[:report].name %>
-                            <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
-                          </td>
-                          <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
-                          <td style="width:  15%;"><span>&#8377</span><%= report[:total_amount] %></td>
-                          </td>
-                        </tr>
+                        <%= render partial: 'approved_report_list', locals: {report: report} %>
                     <% end %>
                 <% end %>
                 </tbody>
@@ -332,7 +310,7 @@
       </form>
       <div id="confirmSettlement" style="display: none">
 
-        <label>Settlement Amount : &#8377 <span> 500</span>/- </label>
+        <label>Settlement Amount : &#8377 <span id="finalSettlementAmount"> 500</span>/- </label>
 
         <section>
           <label style="margin-top: 8px">Date :</label>
@@ -427,12 +405,9 @@
 //    $('#bulkReimburseSection').hide();
 
 
-    $("#checkAllApprovedReports").change(function () {
-      $("input:checkbox[class=checkboxReimburse]").prop('checked', $(this).prop("checked"));
-    });
-
-    $("#checkAllSettledReports").change(function () {
+    $("#checkAllSettledReports, #checkAllApprovedReports").change(function () {
       $("input:checkbox[class=checkboxSettle]").prop('checked', $(this).prop("checked"));
+      $("input:checkbox[class=checkboxReimburse]").prop('checked', $(this).prop("checked"));
     });
 
     $("#checkAllReports").change(function () {
@@ -456,7 +431,7 @@
       });
 
       $('#selectedReportTotal').text(selectedReportTotal);
-
+      $('#approvedSettlementAmount').text(selectedReportTotal);
 
     });
 
@@ -496,9 +471,17 @@
 
   function showConfirmReimbursement() {
 
+
     if ($("#listOfApprovedReports input:checkbox:checked").length > 0) {
+
+      var reimbursementAmount = parseFloat($('#selectedReportTotal').html());
+
+
       $('#reimbursementMainScreen').hide();
       $('#confirmReimbursement').show();
+
+      $('#finalReimbursementAmount').text(reimbursementAmount);
+
       $('.modal-header i').show();
     } else {
       alert(' Show toast to select approved reports to reimburse');
@@ -507,8 +490,13 @@
 
   function showConfirmSettlement() {
 
+    var settlementAmount = parseFloat($('#approvedSettlementAmount').html());
+
     $('#settlementMainScreen').hide();
     $('#confirmSettlement').show();
+
+    $('#finalSettlementAmount').text(settlementAmount);
+
     $('.modal-header i').show();
 
   }
