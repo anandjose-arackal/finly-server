@@ -1,44 +1,382 @@
-<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
-<body style="background-color: #f5f6f9;">
 
-<div style="margin: 50px 170px 0px 170px;background: white;
-    padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
-  <p style="font-size: 24px;
-      font-weight: 600;
-      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">My Policy List</p>
-
-  <hr>
+<div style="background: white;
+    padding: 15px;border: 1px solid #d8d8d8; ">
 
   <% if @policies.blank? %>
-  <div>
+      <div>
 
-  <p> No policy has been applied to you yet.</p>
+        <p> No policy has been applied to the user yet.</p>
 
-  </div>
+      </div>
 
   <% end %>
 
-  <div id="policyListTable" <% if @policies.blank? %> style="display: none" <% end %>>
-    <table>
-      <thead>
-      <tr>
-        <th style="width: 30%;">Policy Name</th>
-        <th style="width:  40%;">Owner</th>
-        <th style="width:  30%;"></th>
-      </tr>
-      </thead>
+  <div id="peoplePoliciesDetails"
+       <% if @policies.blank? %> style="display: none"
+       <% end %>>
 
-      <% @policies.each do |policy| %>
-          <tr>
-            <td style="width: 30%;"> <%= link_to policy.name, policy_path(policy) %></td>
-            <td style="width: 30%;">
-              <a href=""></a><button>View Report</button>
-              <i class="fa fa-trash-o"></i></td>
-          </tr>
+    <p style="width: 100%; background-color: #efefef; font-weight: 600; padding: 5px">Policy Name : Test Policy</p>
+
+    <div style="padding: 20px;
+        border: 1px solid #efefef;">
+      <div class="row">
+        <section class="col-md-6">
+
+          <div>
+            <label>Submits To:</label>
+            <select id="policyMemberManagerSelector" form="updateUserPolicyConfiguration"
+                    name="policy[default][manager_id]" class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+
+          </div>
+          <hr>
+          <div>
+            <label>If Report Total is Over:</label>
+            <input id="policyMemberManagerConditionalAmount" form="updateUserPolicyConfiguration"
+                   name="policy[conditional_manager][amount]" type="number" placeholder="Amount" min="0">
+          </div>
+          <div class="conditionMargin">
+            <label>Then Submits To:</label>
+            <select id="policyMemberManagerConditionalSelector" form="updateUserPolicyConfiguration"
+                    name="policy[conditional_manager][manager_id]" class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </section>
+
+        <section class="col-md-6">
+          <div>
+            <label>Finance Manager:</label>
+
+            <select id="policyMemberFinanceManager" form="updateUserPolicyConfiguration" name="policy[default][finance_manager_id]"
+                    class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <hr>
+          <div>
+            <label>If Report Total is Over:</label>
+            <input id="policyMemberFinanceManagerConditionalAmount" form="updateUserPolicyConfiguration"
+                   name="policy[conditional_finance_manager][amount]" type="number" placeholder="Amount" min="0">
+          </div>
+          <div class="conditionMargin">
+            <label>Then Submits To:</label>
+            <select id="policyMemberFinanceManagerConditionalManager" form="updateUserPolicyConfiguration"
+                    name="policy[conditional_finance_manager][finance_manager_id]" class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+
+
+        </section>
+      </div>
+
+      <hr style="margin-top: 20px;
+          margin-bottom: 20px; width: 100%;
+      ">
+
+      <div class="row">
+
+        <section class="col-md-6">
+          <div>
+            <label>Approves To:</label>
+            <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration" name="policy[default][approves_to_user_id]"
+                    class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <hr>
+          <div>
+            <label>If Report Total is Over:</label>
+            <input id="policyMemberApprovesToConditionalAmount" form="updateUserPolicyConfiguration"
+                   name="policy[conditional_approves_to][amount]" type="number" placeholder="Amount"  min="0">
+          </div>
+          <div class="conditionMargin">
+            <label>Then Approves To:</label>
+            <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_user_id]"
+                    form="updateUserPolicyConfiguration" class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </section>
+        <section class="col-md-6">
+          <div>
+            <label>Approves Finance To:</label>
+
+            <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration"
+                    name="policy[default][approves_finance_to_user_id]" class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <hr>
+          <div>
+            <label>If Report Total is Over:</label>
+            <input id="policyMemberApprovesFinanceToConditionalAmount" form="updateUserPolicyConfiguration"
+                   name="policy[conditional_approves_finance_to][amount]" type="number" placeholder="Amount"  min="0">
+          </div>
+          <div class="conditionMargin">
+            <label>Then Approves Finance To:</label>
+            <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration"
+                    name="policy[conditional_approves_finance_to][approves_finance_to_user_id]" class="selectors">
+              <option value="" selected="selected"></option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button class="green-button" style="width: 100px;
+    height: 35px;
+    float: left;
+    letter-spacing: 1px;
+    margin-top: 30px;background-color: #46568b">Update
+</button>
+
+</div>
+
+
+
+
+
+<% @policies.each do |policy| %>
+    <div onclick="policySettingsModal(<%= policy.id %>)"><p class="profile_info"><%= policy.name %></p></div>
+
+    <div hidden="hidden">
+      <input id="policy_<%= policy.id %>_name" value="<%= @user.name %>"/>
+      <input id="policy_<%= policy.id %>_email_id" value="<%= @user.email %>"/>
+      <input id="policy_<%= policy.id %>_is_admin" value="<%= @user.admin? %>"/>
+      <input id="policy_<%= policy.id %>_is_employee" value="<%= @user.employee? %>"/>
+      <input id="policy_<%= policy.id %>_manager_id" value="<%= @mappings[policy.id].default.first.manager_id if @mappings[policy.id].default.present? %>"/>
+      <input id="policy_<%= policy.id %>_default_mapping_id" value="<%= @mappings[policy.id].default.first.id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.manager.present? %>
+          <input id="policy_<%= policy.id %>_conditional_manager_mapping_id" value="<%= @mappings[policy.id].non_default.manager.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_manager_id" value="<%= @mappings[policy.id].non_default.manager.first.manager_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_manager_amount" value="<%= @mappings[policy.id].non_default.manager.first.greater_than_amount.value %>"/>
+      <% end %>
+      <input id="policy_<%= policy.id %>_finance_manager_id" value="<%= @mappings[policy.id].default.first.finance_manager_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.finance_manager.present? %>
+          <input id="policy_<%= policy.id %>_conditional_finance_manager_mapping_id" value="<%= @mappings[policy.id].non_default.finance_manager.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_finance_manager_id" value="<%= @mappings[policy.id].non_default.finance_manager.first.finance_manager_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_finance_manager_amount" value="<%= @mappings[policy.id].non_default.finance_manager.first.greater_than_amount.value %>"/>
+      <% end %>
+      <input id="policy_<%= policy.id %>_is_manager" value="<%= @user.manager? %>"/>
+      <input id="policy_<%= policy.id %>_approves_to" value="<%= @mappings[policy.id].default.first.approves_to_user_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_to.present? %>
+          <input id="policy_<%= policy.id %>_conditional_approves_to_mapping_id" value="<%= @mappings[policy.id].non_default.approves_to.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_to" value="<%= @mappings[policy.id].non_default.approves_to.first.approves_to_user_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_to_amount" value="<%= @mappings[policy.id].non_default.approves_to.first.greater_than_amount.value %>"/>
+      <% end %>
+      <input id="policy_<%= policy.id %>_is_finance_manager" value="<%= @user.finance_manager? %>"/>
+      <input id="policy_<%= policy.id %>_approves_finance_to" value="<%= @mappings[policy.id].default.first.approves_finance_to_user_id if @mappings[policy.id].default.present? %>"/>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_finance_to.present? %>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to_mapping_id" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.approves_finance_to_user_id %>"/>
+          <input id="policy_<%= policy.id %>_conditional_approves_finance_to_amount" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.greater_than_amount.value %>"/>
       <% end %>
 
-    </table>
+    </div>
+
+<% end %>
+
+
+
+
+
+<div class="modal fade" id="policyMemberSettings"  role="dialog" style="margin-top: 5%;display: none ">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="border-radius: 1px">
+      <div class="modal-header" style="background-color: #e9e9e9;">
+        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="font-weight: 400;border-bottom: #d8d8d8">Policy Member settings</h4>
+
+      </div>
+
+      <form hidden="hidden" data-remote data-turboboost id="updateUserPolicyConfiguration" action="" method="post">
+        <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+        <input name="_method" type="hidden" value="patch"/>
+      </form>
+
+      <div class="modal-body">
+        <label style="margin-top: 0">Employee Email: </label>
+        <span id="policyMemberEmailId" style="margin-left: 30px">MaryJain@spidey.com</span>
+
+
+        <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsUserId" name="policy[user_id]">
+        <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsDefaultMappingId" name="policy[default][mapping_id]">
+        <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsManagerMappingId"
+               name="policy[conditional_manager][mapping_id]">
+        <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsFinanceManagerMappingId"
+               name="policy[conditional_finance_manager][mapping_id]">
+        <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsApprovesToMappingId"
+               name="policy[conditional_approves_to][mapping_id]">
+        <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsApprovesFinanceToMappingId"
+               name="policy[conditional_approves_finance_to][mapping_id]">
+
+        <div id="policyMemberSettingsEmployeeSection">
+          <hr>
+          <label>Submits To:</label>
+
+          <select id="policyMemberManagerSelector" form="updateUserPolicyConfiguration"
+                  name="policy[default][manager_id]" class="selectors" style=" margin-left: 45px; width: 150px">
+            <option value="" selected="selected"></option>
+            <% @company_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+
+          <p>This is the default manager to whom mary jain will submit her reports to.</p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberManagerConditionalAmount" form="updateUserPolicyConfiguration"
+                 name="policy[conditional_manager][amount]" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Submits To:</label>
+            <select id="policyMemberManagerConditionalSelector" form="updateUserPolicyConfiguration"
+                    name="policy[conditional_manager][manager_id]" class="selectors" style=" margin-top: 15px;">
+              <option value="" selected="selected"></option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does mary.jain@spidey.com submit those reports to?</p>
+
+          <hr>
+          <label>Finance Manager:</label>
+
+          <select id="policyMemberFinanceManager" form="updateUserPolicyConfiguration" name="policy[default][finance_manager_id]"
+                  class="selectors" style=" margin-left: 45px; width: 150px">
+            <option value="" selected="selected"></option>
+            <% @company_finance_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+
+          <p>This is the default finance manager whom mary jain will have her finances approved by.</p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberFinanceManagerConditionalAmount" form="updateUserPolicyConfiguration"
+                 name="policy[conditional_finance_manager][amount]" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Submits To:</label>
+            <select id="policyMemberFinanceManagerConditionalManager" form="updateUserPolicyConfiguration"
+                    name="policy[conditional_finance_manager][finance_manager_id]" class="selectors" style=" margin-top: 15px;">
+              <option value="" selected="selected"></option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the finance exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
+        </div>
+
+        <hr>
+        <div id="policyMemberSettingsApprovesToSection">
+          <label>Approves To:</label>
+          <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration" name="policy[default][approves_to_user_id]"
+                  class="selectors" style=" margin-left: 45px; width: 150px">
+            <option value="" selected="selected"></option>
+            <% @company_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+
+          <p>Does MaryJain@spidey.com have reports to approve? If so, who do they forward these approved reports to?
+            (This
+            is usually to someone in accounting or finance)</p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberApprovesToConditionalAmount" form="updateUserPolicyConfiguration"
+                 name="policy[conditional_approves_to][amount]" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Approves To:</label>
+            <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_user_id]"
+                    form="updateUserPolicyConfiguration" class="selectors" style=" margin-top: 15px;">
+              <option value="" selected="selected"></option>
+              <% @company_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does mary.jain@spidey.com forward those approved reports
+            to?</p>
+          <hr>
+        </div>
+
+
+        <div id="policyMemberSettingsApprovesFinanceToSection">
+          <label>Approves Finance To:</label>
+
+          <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration"
+                  name="policy[default][approves_finance_to_user_id]" class="selectors" style=" margin-left: 45px; width: 150px">
+            <option value="" selected="selected"></option>
+            <% @company_finance_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+
+          <p>Does MaryJain@spidey.com have finances to approve? If so, who do they forward these approved finances
+            to? </p>
+
+          <label>If Report Total is Over:</label>
+          <input id="policyMemberApprovesFinanceToConditionalAmount" form="updateUserPolicyConfiguration"
+                 name="policy[conditional_approves_finance_to][amount]" type="number" placeholder="Amount">
+
+          <div>
+            <label>Then Approves Finance To:</label>
+            <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration"
+                    name="policy[conditional_approves_finance_to][approves_finance_to_user_id]" class="selectors" style=" margin-top: 15px;">
+              <option value="" selected="selected"></option>
+              <% @company_finance_managers.each do |manager| %>
+                  <option value="<%= manager.id %>"><%= manager.name %></option>
+              <% end %>
+            </select>
+          </div>
+          <p>If the report exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
+          <hr>
+        </div>
+
+        <button form="updateUserPolicyConfiguration" type="submit" class="green-button" style="background-color: #465c8b;letter-spacing: 1px;
+            padding: 7px 10px 7px 10px;
+            width: 110px">UPDATE
+        </button>
+
+      </div>
+
+    </div>
   </div>
 </div>
 
-</body>
+

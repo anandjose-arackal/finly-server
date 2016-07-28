@@ -28,7 +28,7 @@
                 <% if @load_type[:approved] %>
                     <td style="width: 1%; padding-left: 20px">
 
-                      <input name="existing_users_id" class="checkboxReimburse" type="checkbox" style="margin-right: 20px;"> </td>
+                      <input name="existing_users_id" class="checkboxApproved" type="checkbox" style="margin-right: 20px;"> </td>
                 <% end %>
 
                 <td style="width:  34.5%;"><%= report[:report].name %>
@@ -44,3 +44,12 @@
 
   </div>
 </div>
+
+<script>
+  
+  $("#checkAllReports").change(function () {
+    $("input:checkbox[class=checkboxApproved]").prop('checked', $(this).prop("checked"));
+  });
+
+
+</script>

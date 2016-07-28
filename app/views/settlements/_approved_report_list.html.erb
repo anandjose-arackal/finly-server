@@ -1,0 +1,14 @@
+<tr>
+  <td style="width: 1%; padding-left: 20px">
+
+    <input name="existing_users_id" class="checkboxReimburse" type="checkbox"></td>
+
+  <td style="width:  34.5%;"><%= report[:report].name %>
+    <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
+  </td>
+  <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
+  <td style="width:  15%;">
+    <span>&#8377</span><span class="reimburseAmount"><%= report[:total_amount] %></span>
+  </td>
+  </td>
+</tr>

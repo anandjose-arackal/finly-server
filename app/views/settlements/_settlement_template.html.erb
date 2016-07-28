@@ -12,9 +12,9 @@
         < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
     < % end %>
   </div>
-  < %= render 'settlement_filter' %>
 </form>
 -->
+<%= render 'settlement_filter' %>
 
 <div>
   <div id="centerBlockOfExpenses" style="margin-top: 110px">
@@ -142,9 +142,7 @@
     $("#firstList").hide();
     $("#subFilter").hide();
 
-
     $('div#centerBlockRows').on('click', 'div.row', function () {
-
 
       removeAllSelectedRowBgColors();
 
@@ -179,7 +177,6 @@
     } else {
 
       $("#firstList").show();
-      $("#detailsOfExpense").hide();
 
       document.getElementById("centerBlockOfExpenses").style.marginLeft = "30px";
 

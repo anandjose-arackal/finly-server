@@ -9,13 +9,27 @@
     z-index: 10;
   }
 
+  .selectors {
+    width: 135px;
+    border-radius: 3px;
+    border: 1px solid #d8d8d8;
+    outline: none;
+    margin-top: 2px;
+    padding: 10px 16px;
+    font-size: 14px;
+    background-color: #fff;
+    height: 38px;
+    text-indent: 10px;
+    margin-left: 10%;
+  }
+
 
   .reportDiv {
     float: left;
     background-color: white;
     width: 880px;
     margin-left: 95px;
-    margin-top: 25px;
+    margin-top: 0px;
     padding: 30px;
     border: 1px solid #ddd;
     box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .065);
@@ -213,5 +227,58 @@
     font-weight: 500;
     border-radius: 1px;
   }
+
+
+
+#newExpenseModal{
+  #receiptUpload {
+    float: right;
+    width: 280px;
+    background-color: #fff;
+    display: inline-block;
+    margin: 50px 0px 0px 0px;
+    padding: 4px;
+    border: solid;
+    border-color: #d8d8d8;
+    border-width: 1px;
+    position: relative;
+  }
+
+  .splitSections {
+    border-bottom: 1px solid #d8d8d8;
+    height: 60px;
+    line-height: 60px;
+    float: left;
+    width: 640px;
+    background-color: white;
+    border-left: 1px solid #d8d8d8;
+    border-right: 1px solid #d8d8d8;
+  }
+
+  .splitSideHeader {
+    color: #a0a0a0;
+    margin-left: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    float: left;
+    opacity: 0.7;
+  }
+
+  #newExpenseCategory {
+    width: 450px;
+    background: transparent;
+    padding: 0px 0px 0px 45px;
+    border-color: white;
+    font-size: 14px;
+    outline: none;
+    -webkit-appearance: none;
+    font-weight: 400;
+    cursor: pointer;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+}
+
 
 }
