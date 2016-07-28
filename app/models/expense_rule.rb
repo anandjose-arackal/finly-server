@@ -28,4 +28,24 @@ class ExpenseRule < ActiveRecord::Base
   delegate :type, to: :rule_type
   delegate :category_name, to: :category
 
+  validates :policy_id, presence: true
+  validates :greater_than_amount_id, presence: true
+  validates :rule_type_id, presence: true
+  validates :expense_rule_type_id, presence: true
+
+  validate :no_duplicates
+
+  private
+
+  # todo - look for a more elegant way to do this. Shitty code.
+  # make sure no rule has all attributes the same
+  def no_duplicates
+    self.policy.expense_rules.each do |rule|
+      if rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.days_after == self.days_after and rule.expense_rule_type_id == self.expense_rule_type_id and rule.rule_type_id == self.rule_type_id
+        errors.add(:rule, 'already exists. Please try again.')
+      end
+    end
+
+  end
+
 end

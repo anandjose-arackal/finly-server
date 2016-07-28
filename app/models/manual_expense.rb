@@ -12,6 +12,8 @@
 class ManualExpense < ActiveRecord::Base
   belongs_to :expense # foreign key expense_id
 
+  validates :merchant, presence: true
+
   def merchant_name
     self.merchant
   end

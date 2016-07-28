@@ -10,6 +10,8 @@
 
 class RuleType < ActiveRecord::Base
 
+  validates :name, presence: true
+
   def type
     self.name
   end

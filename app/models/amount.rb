@@ -21,6 +21,8 @@ class Amount < ActiveRecord::Base
   #   return item
   # end
 
+  validate :no_negative_amount
+
   # method that returns the amount value
   def amount_value
     self.value
@@ -41,6 +43,14 @@ class Amount < ActiveRecord::Base
 
   def precision_value
     super(self.value)
+  end
+
+  private
+
+  def no_negative_amount
+    if self.value < 0
+      errors.add(:amount, 'cannot be negative')
+    end
   end
 
 end

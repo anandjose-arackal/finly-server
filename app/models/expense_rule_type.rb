@@ -9,4 +9,7 @@
 #
 
 class ExpenseRuleType < ActiveRecord::Base
+
+  validates :name, presence: true
+
 end

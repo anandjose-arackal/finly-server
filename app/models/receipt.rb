@@ -28,13 +28,6 @@ class Receipt < ActiveRecord::Base
   has_attached_file :image
   validates_attachment_content_type :image, content_type: /\Aimage\/.*\Z/
 
-  def validate_expense_user
-    if self.user && self.parent
-      if self.user.id != self.parent.user.id
-        errors.add(:base, "Parent expense does not belong to current user.")
-      end
-    end
-  end
 
   def receipt_file_name
     self.image_file_name
@@ -43,4 +36,15 @@ class Receipt < ActiveRecord::Base
   def belongs_to?(user)
     user.receipts.find_by(id: self.id)
   end
+
+  private
+
+  def validate_expense_user
+    if self.user && self.parent
+      if self.user.id != self.parent.user.id
+        errors.add(:base, "Parent expense does not belong to current user.")
+      end
+    end
+  end
+
 end

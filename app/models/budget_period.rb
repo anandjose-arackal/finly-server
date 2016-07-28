@@ -13,4 +13,6 @@ class BudgetPeriod < ActiveRecord::Base
   def period
     self.name
   end
+
+  validates :name, presence: true
 end

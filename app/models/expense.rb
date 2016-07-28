@@ -40,6 +40,15 @@ class Expense < ActiveRecord::Base
   delegate :merchant_name, to: :manual_expense
   delegate :user_name, to: :user
 
+
+  validates :amount_id, presence: true
+  validates :date, presence: true
+  validates :category_id, presence: true
+  validates :expense_type_id, presence: true
+  validates :user_id, presence: true
+  validate :no_future_date
+  validate :created_by
+
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
     case type
@@ -93,21 +102,10 @@ class Expense < ActiveRecord::Base
   delegate :category_name, to: :category
 
 
-  # validates :amount_id, uniqueness: true
-  validate :no_future_date
-  validates :amount, presence: true
-
 
   # returns the number of receipts attached to this expense
   def receipts_count
     self.receipts.count
-  end
-
-  # cannot add an expense with future date
-  def no_future_date
-    if date.present? and date > Date.today
-      errors.add(:date, "cannot be in the future!")
-    end
   end
 
   def manual_expense?
@@ -145,5 +143,22 @@ class Expense < ActiveRecord::Base
   def rejected?
     expense_status_id == ExpenseStatus.rejected_id
   end
+
+  private
+
+  # only employees can create an expense
+  def created_by
+    unless self.user.employee?
+      errors.add(:expense, 'can only be created by employees')
+    end
+  end
+
+  # cannot add an expense with future date
+  def no_future_date
+    if date.present? and date > Date.today
+      errors.add(:date, "cannot be in the future!")
+    end
+  end
+
 
 end
