@@ -15,18 +15,3 @@
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  amount_id: 
-  date: 2016-07-15
-  payment_type_id: 
-  initiating_user_id: 1
-  receiving_user_id: 1
-  note: MyText
-
-two:
-  amount_id: 
-  date: 2016-07-15
-  payment_type_id: 
-  initiating_user_id: 1
-  receiving_user_id: 1
-  note: MyText

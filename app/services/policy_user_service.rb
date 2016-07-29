@@ -28,7 +28,8 @@ class PolicyUserService < BaseService
     # Add user configuration
     user.team_mapping.policy(nil).each do |item|
       cloned_item = item.dup
-      cloned_item.update_attribute(:policy_id, self.policy.id)
+      cloned_item.policy_id = self.policy.id
+      cloned_item.save
     end
     true
   end
@@ -51,7 +52,13 @@ class PolicyUserService < BaseService
       # Add user configuration
       user.team_mapping.policy(nil).each do |item|
         cloned_item = item.dup
-        cloned_item.update_attribute(:policy_id, self.policy.id)
+        cloned_item.policy_id = self.policy.id
+        if cloned_item.greater_than_amount.present?
+          amount = cloned_item.greater_than_amount.dup
+          amount.save
+          cloned_item.greater_than_amount = amount
+        end
+        cloned_item.save
       end
     end
     true
@@ -59,6 +66,12 @@ class PolicyUserService < BaseService
 
   def remove_user(user)
     errors.clear
+
+    unless self.policy.present?
+      errors << 'Policy not found'
+      return false
+    end
+
     if user.blank?
       errors << 'No user selected'
       return false
@@ -69,17 +82,36 @@ class PolicyUserService < BaseService
       return false
     end
 
-    # Remove user configuration
-    user.team_mapping.policy(policy.id).destroy_all
+    unless user.policy_admin?(policy) and PolicyUserMapping.with_user(user.id).admin.count <= 1
+      errors << 'Cannot remove the only admin from policy'
+      return false
+    end
 
     # Remove user
-    self.policy.users.destroy(user) if user.present?
+    self.policy.users.destroy(user)
+
+    # Remove user configuration
+    user.team_mapping.policy(policy.id).destroy_all
   end
 
   def remove_users(users)
     errors.clear
+
+    unless self.policy.present?
+      errors << 'Policy not found'
+      return false
+    end
+
     if users.blank?
       errors << 'No user selected'
+      return false
+    end
+
+    # Check if all admins are being removed from the policy
+    user_ids = users.pluck(:id)
+    policy_admin_ids = PolicyUserMapping.with_policy(policy.id).admin.pluck(:id)
+    if (policy_admin_ids - user_ids).blank?
+      errors << 'You cannot remove all the admins from the policy'
       return false
     end
 

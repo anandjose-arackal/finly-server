@@ -25,7 +25,11 @@ class ReportComment < ActiveRecord::Base
   belongs_to :rejected_to, class_name: 'User'
   belongs_to :payment
 
-  default_scope {order created_at: :desc}
+  validates :report_id, presence: true
+  validates :report_comment_action_id, presence: true
+  validate :associations
+
+  default_scope { order created_at: :desc }
 
   def generate(u = nil)
     comment = nil
@@ -101,5 +105,43 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} updated the expense at : #{expense.merchant_name}. #{updated_field} from #{updated_from} to #{updated_to}"
     end
     comment
+  end
+
+  private
+  def associations
+    case report_comment_action_id
+      when ReportCommentAction.report_comment_id
+        validate_attributes [:user_id, :content]
+      when ReportCommentAction.report_retract_id, ReportCommentAction.report_submit_id, ReportCommentAction.report_approve_id,
+          ReportCommentAction.report_reject_id, ReportCommentAction.report_unapprove_id, ReportCommentAction.report_take_control_id,
+          ReportCommentAction.report_reimbursement_confirmed_id
+        validate_attributes [:user_id]
+      when ReportCommentAction.report_update_id
+        validate_attributes [:user_id, :updated_field, :updated_from, :updated_to]
+      when ReportCommentAction.report_reimbursed_id
+        validate_attributes [:user_id, :payment]
+      when ReportCommentAction.report_attach_receipt_id
+        # todo pending
+      when ReportCommentAction.report_detach_receipt_id
+        # todo pending
+      when ReportCommentAction.expense_add_id, ReportCommentAction.expense_remove_id, ReportCommentAction.expense_reject_id
+        validate_attributes [:user_id, :expense_id]
+      when ReportCommentAction.expense_update_id
+        validate_attributes [:user_id, :expense_id, :updated_field, :updated_from, :updated_to]
+      else
+
+    end
+  end
+
+  def validate_attributes(items=[])
+    return unless items.present?
+    items.each do |item|
+      if self.send(item).blank?
+        val = item
+        s_val = val.to_s
+        val = s_val.gsub!('_id', '').to_sym if s_val.ends_with?('_id')
+        errors.add val, 'cannot be blank'
+      end
+    end
   end
 end

@@ -16,11 +16,14 @@ class PolicyUserMapping < ActiveRecord::Base
   belongs_to :user
   belongs_to :policy
 
-  scope :admin, ->{ where admin: true }
+  scope :admin, -> { where admin: true }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   # Used in PolicyUserService to get single user belonging to the policy
   scope :policy_user_map, ->(policy, user) { where policy: policy, user: user }
-  scope :with_policy_not_null, ->{ where.not policy_id: nil }
+  scope :with_policy_not_null, -> { where.not policy_id: nil }
+
+  validates :user_id, presence: true, uniqueness: {:scope => :policy_id}
+  validates :policy_id, presence: true
 
 end

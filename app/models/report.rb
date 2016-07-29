@@ -34,6 +34,8 @@ class Report < ActiveRecord::Base
 
   validates :user, presence: true
   validates :status, presence: true
+  validate :is_employee
+  validate :has_expenses
 
   default_scope { order report_status_id: :asc }
 
@@ -55,23 +57,9 @@ class Report < ActiveRecord::Base
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
   scope :include_user, -> { includes :user }
 
-  before_save do
-    if self.name.blank?
-      self.name = Report.get_default_name(self.user)
-    end
-  end
+  before_save :handle_name
 
-  before_destroy do
-    if self.expenses.present?
-      expenses.each do |expense|
-        expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
-      end
-      receipts.each do |receipt|
-        receipt.parent_id = receipt.parent_type = nil
-        receipt.save
-      end
-    end
-  end
+  before_destroy :clear_expenses
 
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
@@ -179,6 +167,41 @@ class Report < ActiveRecord::Base
     end
     name = status.name
     name[0].upcase + name[1..name.length]
+  end
+
+  private
+  def is_employee
+    unless self.user.employee?
+      errors.add(:User, 'is not allowed to create reports')
+    end
+  end
+
+  def handle_name
+    if self.name.blank?
+      self.name = Report.get_default_name(self.user)
+    end
+  end
+
+  def has_expenses
+    if report_status_id_changed? and report_status_id_was.present? and
+        (report_status_id_was == ReportStatus.open_id or report_status_id_was == ReportStatus.retracted_id) and
+        (report_status_id == ReportStatus.processing_id or report_status_id == ReportStatus.closed_id)
+      unless expenses.present?
+        errors.add :cannot, 'submit an empty report'
+      end
+    end
+  end
+
+  def clear_expenses
+    if self.expenses.present?
+      expenses.each do |expense|
+        expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
+      end
+      receipts.each do |receipt|
+        receipt.parent_id = receipt.parent_type = nil
+        receipt.save
+      end
+    end
   end
 
 end

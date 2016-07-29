@@ -106,7 +106,8 @@ end
 
 if User.count == 0
   a = User.create(company: Company.first, name: "Finly Admin", email: "admin@finlytest.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 1}])
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+                                                                                                                           {user_role_id: UserRole.employee_id}])
   User.create(company: Company.first, name: "Finly King", email: "king@finlytest.io",
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
@@ -115,17 +116,20 @@ if User.count == 0
   fm = []
   4.times do |pos|
     fm << User.create(company: Company.first, name: "Finly Finance Manager #{pos}", email: "finance#{pos}@finlytest.io",
-                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 2}])
+                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 2},
+                                                                                                                               {user_role_id: UserRole.employee_id}])
   end
   m = []
   6.times do |pos|
     m << User.create(company: Company.first, name: "Finly Manager #{pos}", email: "manager#{pos}@finlytest.io",
-                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 3}])
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 3},
+                                                                                                                              {user_role_id: UserRole.employee_id}])
   end
   u = []
   10.times do |pos|
     u << User.create(company: Company.first, name: "Finly Employee #{pos}", email: "user#{pos}@finlytest.io",
-                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 4}],
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 4},
+                                                                                                                              {user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
   end
 

@@ -118,7 +118,7 @@ class PoliciesController < ApplicationController
       end
       return
     end
-    flash[:failure] = pus.errors
+    flash.now[:failure] = pus.errors
     render_flash_message
   end
 
@@ -176,8 +176,8 @@ class PoliciesController < ApplicationController
       conditional_approves_finance_to = nil
 
       mappings = uts.mappings policy: @policy
-      default_mapping = mappings.default
-      default_mapping = default_mapping.first if default_mapping.present?
+      dm = mappings.default
+      default_mapping = dm.first if dm.present?
       conditional_mapping = mappings.non_default
       cm = conditional_mapping.manager
       conditional_manager = cm.first if cm.present?

@@ -58,7 +58,6 @@ class ApplicationController < ActionController::Base
       format.json {}
     end
   end
-=begin
 
   def render_flash_message
     respond_to do |format|
@@ -66,16 +65,15 @@ class ApplicationController < ActionController::Base
         if request.present? && request.referrer.present?
           redirect_to request.referrer
         else
-          render partial: 'shared/flash_message', replace: '#flashContainer'
+          render partial: 'shared/flash_message'
         end
       end
       format.js do
-        render partial: 'shared/flash_message', replace: '#flashContainer'
+        render partial: 'shared/flash_message'
       end
       format.json {}
     end
   end
-=end
 
   # def after_sign_in_path_for(resource)
   #   session[:previous_url] || root_path
@@ -113,7 +111,7 @@ class ApplicationController < ActionController::Base
   def load_view
     return unless params[:view].present?
     view = params[:view]
-    view.tr!('?','')
+    view.tr!('?', '')
     case view
       when 'admin'
         @admin_view = true

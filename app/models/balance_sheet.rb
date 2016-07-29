@@ -15,7 +15,9 @@ class BalanceSheet < ActiveRecord::Base
   belongs_to :cash_in_hand, class_name: 'Amount'
   belongs_to :pending_reimbursement, class_name: 'Amount'
 
-  before_create do
+  validates :user_id, uniqueness: true, presence: true
+
+  before_save do
     if self.cash_in_hand.blank?
       amount = Amount.create(value: 0, currency: Currency.first)
       self.cash_in_hand = amount

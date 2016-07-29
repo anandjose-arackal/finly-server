@@ -13,7 +13,6 @@
 <body>
 <div id="ohsnap"></div>
 <%= snap_flash %>
-
 <%= yield %>
 
 </body>
@@ -74,31 +73,31 @@
 
     $(document).on("turboboost:success", function (e, flash) {
       formDisabled = false;
-      if (flash != null && flash != undefined) {
-        var dynamicFlashContainer = document.getElementById("dynamicFlashContainer");
-        while (dynamicFlashContainer.firstChild) {
-          dynamicFlashContainer.removeChild(dynamicFlashContainer.firstChild);
-        }
-        for (var key in flash) {
-          if (flash.hasOwnProperty(key)) {
-            var value = flash[key];
-            var clone = null;
-            var itm = null;
-            if (value == 'failure') {
-              itm = document.getElementById("dynamic_flash_failure");
-              clone = itm.cloneNode(true);
-            } else {
-              itm = document.getElementById("dynamic_flash_success");
-              clone = itm.cloneNode(true);
-            }
-            clone.hidden = null;
-            clone.appendChild(document.createTextNode(value));
-            $(clone).delay(6000).fadeOut(2000);
-            dynamicFlashContainer.appendChild(clone);
-          }
-        }
-        $(dynamicFlashContainer).show();
-      }
+//      if (flash != null && flash != undefined) {
+//        var dynamicFlashContainer = document.getElementById("dynamicFlashContainer");
+//        while (dynamicFlashContainer.firstChild) {
+//          dynamicFlashContainer.removeChild(dynamicFlashContainer.firstChild);
+//        }
+//        for (var key in flash) {
+//          if (flash.hasOwnProperty(key)) {
+//            var value = flash[key];
+//            var clone = null;
+//            var itm = null;
+//            if (value == 'failure') {
+//              itm = document.getElementById("dynamic_flash_failure");
+//              clone = itm.cloneNode(true);
+//            } else {
+//              itm = document.getElementById("dynamic_flash_success");
+//              clone = itm.cloneNode(true);
+//            }
+//            clone.hidden = null;
+//            clone.appendChild(document.createTextNode(value));
+//            $(clone).delay(6000).fadeOut(2000);
+//            dynamicFlashContainer.appendChild(clone);
+//          }
+//        }
+//        $(dynamicFlashContainer).show();
+//      }
     });
 
     $(document).on("turboboost:error", function (e, flash) {

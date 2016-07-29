@@ -267,17 +267,16 @@ ActiveRecord::Schema.define(version: 20160718102230) do
   add_index "policies", ["owner_id"], name: "index_policies_on_owner_id", using: :btree
 
   create_table "policy_configurations", force: :cascade do |t|
-    t.integer  "policy_id",                limit: 4,                 null: false
-    t.boolean  "require_category",                   default: false, null: false
-    t.boolean  "default_reimbursable_set",           default: false, null: false
-    t.boolean  "default_billable_set",               default: false, null: false
-    t.integer  "report_currency_id",       limit: 4
-    t.integer  "technical_contact_id",     limit: 4
-    t.boolean  "mandate_expense_tagging",            default: false, null: false
-    t.integer  "default_tag_id",           limit: 4
-    t.boolean  "active",                             default: true,  null: false
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.integer  "policy_id",               limit: 4,                 null: false
+    t.boolean  "require_category",                  default: false, null: false
+    t.boolean  "default_billable_set",              default: false, null: false
+    t.integer  "report_currency_id",      limit: 4
+    t.integer  "technical_contact_id",    limit: 4
+    t.boolean  "mandate_expense_tagging",           default: false, null: false
+    t.integer  "default_tag_id",          limit: 4
+    t.boolean  "active",                            default: true,  null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
   end
 
   add_index "policy_configurations", ["default_tag_id"], name: "index_policy_configurations_on_default_tag_id", using: :btree
