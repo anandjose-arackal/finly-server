@@ -153,11 +153,9 @@ module ApplicationHelper
 
       type = type.to_sym
       type = :blue if type == :info
-      type = :green if type == :notice
+      type = :green if type == :notice or type == :success
       type = :orange if type == :alert
-      type = :red if type == :error
-      type = :red if type == :failure
-      type = :red if type == :success
+      type = :red if type == :error or type == :failure or type == :danger
 
       next unless ALERT_TYPES.include?(type)
       Array(message).each do |msg|

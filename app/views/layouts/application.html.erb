@@ -73,6 +73,9 @@
 
     $(document).on("turboboost:success", function (e, flash) {
       formDisabled = false;
+
+      handleFlash(flash);
+
 //      if (flash != null && flash != undefined) {
 //        var dynamicFlashContainer = document.getElementById("dynamicFlashContainer");
 //        while (dynamicFlashContainer.firstChild) {
@@ -97,14 +100,36 @@
 //          }
 //        }
 //        $(dynamicFlashContainer).show();
-//      }
+//    }
     });
 
     $(document).on("turboboost:error", function (e, flash) {
       formDisabled = false;
+      handleFlash(flash);
     });
 
   });
+
+  function handleFlash(flash){
+    if (flash != null && flash != undefined) {
+      for (var key in flash) {
+        var value = flash[key];
+        var type = null;
+        if (key == 'info') {
+          type = 'blue'
+        } else if (key == 'notice' || key == 'success') {
+          type = 'green'
+        } else if (key == 'alert') {
+          type = 'orange'
+        } else if (key == 'error' || key == 'failure' || key == 'danger') {
+          type = 'red'
+        }
+        if (type != null && value != null) {
+          ohSnap(value, {color: type, duration: '7000'});
+        }
+      }
+    }
+  }
 
   function closeConfirmModal() {
     formDisabled = false;

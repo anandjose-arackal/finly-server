@@ -110,7 +110,7 @@ class ReportsController < ApplicationController
 
   private
   def create_params
-    params.require(:report).permit(:expense_id, :name)
+    params.permit(:report).permit(:expense_id, :name)
   end
 
   def load_service_object
