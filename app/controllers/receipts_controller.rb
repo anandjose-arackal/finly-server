@@ -33,7 +33,18 @@ class ReceiptsController < ApplicationController
       flash[:danger] = @expense_service.errors
     end
     redirect_to request.referrer
+  end
 
+  def add_note
+    @receipt = current_user.receipts.find_by(id: params[:receipt_id])
+    note = receipt_params[:note]
+    if @receipt.update_attributes(note: note)
+      flash[:success] = "Note added"
+      render partial: 'shared/flash_message', replace: "#flashContainer"
+    else
+      flash[:danger] = "Error try again."
+      render partial: 'shared/flash_message', replace: "#flashContainer"
+    end
   end
 
   private

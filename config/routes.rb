@@ -188,7 +188,9 @@ Rails.application.routes.draw do
   end
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
-  resources :receipts
+  resources :receipts do
+    post 'add_note', to: 'receipts#add_note', as: :add_note
+  end
 
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
 

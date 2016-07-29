@@ -48,7 +48,7 @@ class Amount < ActiveRecord::Base
   private
 
   def no_negative_amount
-    if self.value < 0
+    if self.value and self.value < 0
       errors.add(:amount, 'cannot be negative')
     end
   end
