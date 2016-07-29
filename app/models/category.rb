@@ -15,6 +15,9 @@
 class Category < ActiveRecord::Base
   belongs_to :company
 
+  validates :company_id, presence: true
+  validates :name, presence: true
+
   # returns the name of the category if it's active
   def category_name
     return self.name if self.active

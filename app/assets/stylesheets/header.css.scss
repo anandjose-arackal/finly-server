@@ -5,7 +5,6 @@
   right: 0;
   z-index: 10;
 
-
   .canSwitch {
     background-color: rgba(0, 0, 0, 0.05);
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -34,7 +33,6 @@
     margin-top: 15px;
     float: left;
   }
-
 
   #topNav .viewToggle .viewSummary {
     height: 30px;
@@ -81,8 +79,7 @@
     border-radius: 1px;
   }
 
-
-  #viewToggleDropdown li a{
+  #viewToggleDropdown li a {
     padding-top: 12px;
     padding-bottom: 20px;
   }
@@ -93,21 +90,17 @@
     padding: 0;
     overflow: hidden;
     text-align: center;
-
-  }
-
-  #headerNavigation li {
-    float: left;
-    display: inline;
-
-  }
-
-  #headerNavigation li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 24px 24px;
-    display: inline-block;
+    li {
+      float: left;
+      display: inline;
+      a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 24px 24px;
+        display: inline-block;
+      }
+    }
   }
 
 }

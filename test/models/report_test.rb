@@ -20,9 +20,27 @@
 #
 
 require 'test_helper'
+require 'helpers/report_service_test_helper'
 
 class ReportTest < ActiveSupport::TestCase
+  include ReportServiceTestHelper
   # test "the truth" do
   #   assert true
   # end
+
+  test 'an empty report cannot be submitted' do
+    user = User.find_by(email: 'user0@finlytest.io')
+    report = dummy_report_flow user, create: true
+    assert report.valid?
+    assert report.open?
+    assert_not report.update(report_status_id: ReportStatus.processing_id)
+    assert report.reload.open?
+
+    report = dummy_report_flow user, create_and_add_expenses: true
+    assert report.valid?
+    assert report.open?
+    assert report.update(report_status_id: ReportStatus.processing_id)
+    assert report.reload.processing?
+  end
+
 end

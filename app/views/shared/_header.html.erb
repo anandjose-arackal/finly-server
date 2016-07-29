@@ -6,9 +6,7 @@
       <a class="navbar-brand" style="color: white; font-family: 'Bree Serif', serif; font-weight: 800;font-size: 32px;margin-top: 15px; float: left" href="<%= root_path %>" data-turbolinks="false">F</a>
     </div>
 
-    <!--
     <% if logged_in? %>
-   -->
         <ul class="nav navbar-nav topButton">
           <div class="dropdown canSwitch " onclick="showDropDown()" style="cursor: pointer">
             <span class="viewSummary">
@@ -41,21 +39,6 @@
           </a>
           <ul class="dropdown-menu cog" style="padding: 0;
               border-radius: 1px;">
-            <!-- < % if current_user.admin? %>
-                 <li>
-                   <a href="< %= admin_edit_company_path %>" style="height: 45px;">Organization Account</a>
-                 </li>
-             < % end %>
-             <li><a href="< %= edit_user_path(current_user) %>" style="height: 45px;">My Account</a></li>
-             < % if current_user.admin? %>
-                 <li><a href="< %= admin_company_policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
-                   Policy</a></li>
-             < % end %>
-             <li>
-               <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
-                 the App</a></li>
-             <li><a href="#" data-turbolinks="false" style="height: 45px;">Support</a></li>
-             -->
             <li>
               <a href="<%= organization_account_path %>" style="height: 45px;">Organization Account</a>
             </li>
@@ -65,56 +48,60 @@
             <li><a href="<%= policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
               Policy</a></li>
             <li>
+              <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
+                the App</a></li>
+            <li>
+            <li>
               <% if logged_in? %>
                 <li><%= link_to "Log out", destroy_user_session_path, method: "delete" %></li>
             <% end %>
           </ul>
         </ul>
-        <!--
     <% end %>
--->
-    <ul id="headerNavigation">
-      <li>
-        <a href="<%= reports_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
-      </li>
-      <li>
-        <a href="<%= users_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
-      </li>
-      <li>
-        <a href="<%= receipts_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
-      </li>
-      <li>
-        <a href="<%= expenses_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
-      </li>
-      <li>
-        <a href="<%= settlements_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
-      </li>
 
-      <!--      < % if !logged_in? %>
-                <div style="position: absolute;
-                    right: 9%;">
-                  <li>
-                    <a href="< %= root_path %>" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; padding: 24px 14px; color: #46568b">Home</a>
-                  </li>
-                  <li>
-                    <a onclick="scrollToFeatures()" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; cursor: pointer; padding: 24px 14px; color: #46568b">Features</a>
-                  </li>
-                  <li>
-                    <a href="< %= about_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">About</a>
-                  </li>
-                  <li>
-                    <a href="< %= new_user_session_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">Log
-                      In</a></li>
-                </div>
-            < % else %>
+    <ul id="headerNavigation">
+      <% if logged_in? %>
+          <li>
+            <a href="<%= reports_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+          </li>
+          <li>
+            <a href="<%= users_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
+          </li>
+          <li>
+            <a href="< %= receipts_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
+          </li>
+          <li>
+            <a href="<%= expenses_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
+          </li>
+          <li>
+            <a href="<%= settlements_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+          </li>
+      <% end %>
+      <% if !logged_in? %>
+          <div style="position: absolute;
+              right: 9%;">
+            <li>
+              <a href="<%= root_path %>" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; padding: 24px 14px; color: #46568b">Home</a>
+            </li>
+            <li>
+              <a  onclick="scrollToFeatures()"  style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; cursor: pointer; padding: 24px 14px; color: #46568b">Features</a>
+            </li>
+            <li>
+              <a href="<%= about_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">About</a>
+            </li>
+            <li>
+              <a href="<%= new_user_session_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">Log
+                In</a></li>
+          </div>
+          <!--      < % else %>
                 < % if is_admin_view %>
-                    < %= render 'shared/header_admin' %>
+                < %= render 'shared/header_admin' %>
                 < % elsif is_manager_view %>
-                    < %= render 'shared/header_manager' %>
+                < %= render 'shared/header_manager' %>
                 < % else %>
-                    < %= render 'shared/header_personal' %>
-                < % end %>
-            < % end %>-->
+                < %= render 'shared/header_personal' %>
+                < % end %>-->
+      <% end %>
     </ul>
 
   </div>

@@ -1,5 +1,8 @@
 module ApplicationHelper
 
+  ALERT_TYPES = [:blue, :green, :orange, :red] unless const_defined?(:ALERT_TYPES)
+
+
   def ej(obj)
     escape_javascript obj.to_s
   end
@@ -119,6 +122,53 @@ module ApplicationHelper
   def param
     return ''
 
+  end
+
+  def snap_flash(options = {})
+    flash_messages = []
+    flash.each do |type, message|
+      next if message.blank?
+
+      type = type.to_sym
+      type = :blue if type == :info
+      type = :green if type == :notice
+      type = :orange if type == :alert
+      type = :red if type == :error
+      type = :red if type == :failure
+      type = :red if type == :success
+
+      next unless ALERT_TYPES.include?(type)
+      Array(message).each do |msg|
+        flash_messages << "ohSnap('#{msg}', {color: '#{type.to_s}', duration: '7000'});" if msg
+      end
+    end
+    javascript_tag flash_messages.join("\n").html_safe
+    # debugger
+  end
+
+  def snap_flash_without(options = {})
+    flash_messages = []
+    flash.each do |type, message|
+      next if message.blank?
+
+      type = type.to_sym
+      type = :blue if type == :info
+      type = :green if type == :notice
+      type = :orange if type == :alert
+      type = :red if type == :error
+      type = :red if type == :failure
+      type = :red if type == :success
+
+      next unless ALERT_TYPES.include?(type)
+      Array(message).each do |msg|
+        message = msg
+        formatting = {color: "#{type.to_s}", duration: '7000'}
+        color = "#{type.to_s}"
+        flash_messages << {message: message, format: formatting, color: color}
+      end
+    end
+    flash_messages
+    # debugger
   end
 
 end

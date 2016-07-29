@@ -207,37 +207,41 @@ body {
   margin-top: 10px;
 }
 
-#flashContainer {
+/* ALERTS */
+/* inspired by Twitter Bootstrap */
 
-  .alert {
-    height: 60px;
-    margin: 10px 0 10px 0px;
-  }
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #eed3d7;
+  border-radius: 4px;
+  position: absolute;
+  bottom: 0px;
+  right: 21px;
+  /* Each alert has its own width */
+  float: right;
+  clear: right;
+}
 
-  .alert-failure, .alert-failure i, .alert-alert, .alert-danger {
-    background-color: #FF685C;
-    font-weight: 300;
-    color: white;
-
-  }
-
-  .alert-success {
-    background-color: #465c8b;
-    color: white;
-  }
-
-  .alert-notice {
-
-    color: white !important;
-    background-color: #93c178;
-  }
-
-  #flashClose {
-    float: right;
-    color: white;
-    cursor: pointer;
-    margin-top: -10px;
-  }
+.alert-red {
+  color: white;
+  background-color: #DA4453;
+}
+.alert-green {
+  color: white;
+  background-color: #37BC9B;
+}
+.alert-blue {
+  color: white;
+  background-color: #4A89DC;
+}
+.alert-yellow {
+  color: white;
+  background-color: #F6BB42;
+}
+.alert-orange {
+  color:white;
+  background-color: #E9573F;
 }
 
 .holder {

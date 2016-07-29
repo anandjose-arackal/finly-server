@@ -43,7 +43,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
 
   belongs_to :company
-  has_one :profile, class_name: 'profile', dependent: :destroy
+  has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
@@ -101,6 +101,7 @@ class User < ActiveRecord::Base
   scope :filter_search, -> (term) do
 
   end
+
   scope :only_employees, -> { where "user_role_mappings.user_role_id = ?", UserRole.employee_id }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }

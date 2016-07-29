@@ -207,7 +207,7 @@ class ReportService < BaseService
     # end
     if report.update_attributes report_status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: nil
       if auto_approve
-        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_auto_approve_id
+        comment = report.comments.build report_comment_action_id: ReportCommentAction.report_auto_approve_id
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
       else
         comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_approve_id
@@ -327,7 +327,7 @@ class ReportService < BaseService
       comment.save
       return true
     end
-    errors = errors + report.errors.full_messages
+    self.errors = errors + report.errors.full_messages
     false
   end
 
@@ -612,6 +612,7 @@ class ReportService < BaseService
     # associating the current user with the receipt
     attach.user = user
     if attach.save
+      # todo adding comments when retracted state
       return true
     end
     errors << attach.errors.full_messages
@@ -635,6 +636,7 @@ class ReportService < BaseService
     end
     receipt.parent = report
     if receipt.save
+      # todo adding comments when retracted state
       return true
     end
     errors << receipt.errors.full_messages
@@ -659,6 +661,7 @@ class ReportService < BaseService
     end
     receipt.parent_id = receipt.parent_type = nil
     if receipt.save
+      # todo adding comments when retracted state
       return true
     end
     errors << receipt.errors.full_messages

@@ -65,11 +65,11 @@ class ApplicationController < ActionController::Base
         if request.present? && request.referrer.present?
           redirect_to request.referrer
         else
-          render partial: 'shared/flash_message', replace: '#flashContainer'
+          render partial: 'shared/flash_message'
         end
       end
       format.js do
-        render partial: 'shared/flash_message', replace: '#flashContainer'
+        render partial: 'shared/flash_message'
       end
       format.json {}
     end
@@ -111,7 +111,7 @@ class ApplicationController < ActionController::Base
   def load_view
     return unless params[:view].present?
     view = params[:view]
-    view.tr!('?','')
+    view.tr!('?', '')
     case view
       when 'admin'
         @admin_view = true

@@ -23,6 +23,9 @@ class Amount < ActiveRecord::Base
 
   validate :no_negative_amount
 
+  validates :value, presence: true
+  validates :currency_id, presence: true
+
   # method that returns the amount value
   def amount_value
     self.value
@@ -37,7 +40,7 @@ class Amount < ActiveRecord::Base
   end
 
   # method that returns the currency code
-  def currency_id
+  def currency_country_code
     self.currency.country_code
   end
 
