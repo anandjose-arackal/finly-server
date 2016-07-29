@@ -122,7 +122,6 @@ class PoliciesController < ApplicationController
     render_flash_message
   end
 
-
   def add_rule
     # determine the type of rule and call the respective service method
     if rule_params['greater_than_amount_attributes']
