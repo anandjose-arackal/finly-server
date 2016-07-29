@@ -77,6 +77,9 @@ gem 'opro'
 gem 'devise'
 gem 'devise_invitable'
 
+# gem for flash messages/ notifications
+gem 'ohsnap-rails'
+
 gem 'has_scope'
 
 group :development, :test do

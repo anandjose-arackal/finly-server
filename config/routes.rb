@@ -191,6 +191,10 @@ Rails.application.routes.draw do
 
   mount_opro_oauth
 
+  resources :receipts do
+
+  end
+
   root 'static_pages#home'
 
   get 'about', to: 'static_pages#about'
