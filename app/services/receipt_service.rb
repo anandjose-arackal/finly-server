@@ -7,9 +7,8 @@ class ReceiptService < BaseService
 
 
   def create_receipt(params=nil)
-    return if params[:receipt].blank?
-    receipt_params = load_receipt_params params
-    receipt = @user.receipts.build(receipt_params)
+    return if params.blank?
+    receipt = @user.receipts.build(params)
     if receipt.save
       return receipt
     else
@@ -33,7 +32,7 @@ class ReceiptService < BaseService
   private
 
   def load_receipt_params(params)
-    receipt_params = params[:receipt].slice(:image)
+    receipt_params = params[:image]
   end
 
   def load_receipt(id)

@@ -28,6 +28,7 @@ class Receipt < ActiveRecord::Base
   has_attached_file :image
   validates_attachment_content_type :image, content_type: /\Aimage\/.*\Z/
 
+  scope :without_parent, -> {where(parent_id: nil)}
 
   def receipt_file_name
     self.image_file_name

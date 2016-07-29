@@ -28,7 +28,7 @@ class UserManagerMapping < ActiveRecord::Base
   accepts_nested_attributes_for :greater_than_amount
 
   delegate :greater_than_amount_value, to: :greater_than_amount
-  delegate :grater_than_amount_currency_id, to: :greater_than_amount
+  delegate :greater_than_amount_currency_id, to: :greater_than_amount
 
   validate :valid_default
   validate :valid_non_default

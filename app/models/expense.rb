@@ -41,7 +41,6 @@ class Expense < ActiveRecord::Base
   delegate :user_name, to: :user
 
 
-  validates :amount_id, presence: true
   validates :date, presence: true
   validates :category_id, presence: true
   validates :expense_type_id, presence: true

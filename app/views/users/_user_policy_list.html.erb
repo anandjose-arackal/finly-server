@@ -15,20 +15,71 @@
        <% if @policies.blank? %> style="display: none"
        <% end %>>
 
-    <p style="width: 100%; background-color: #efefef; font-weight: 600; padding: 5px">Policy Name : Test Policy</p>
+    <% @policies.each do |policy| %>
+
+
+        <form data-remote data-turboboost id="updateUserPolicyConfiguration<%=policy.id%>" action="<%=policy_update_user_configuration_path(policy)%>" method="post">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          <input name="_method" type="hidden" value="patch"/>
+
+        </form>
+
+    <p style="width: 100%; background-color: #efefef; font-weight: 600; padding: 5px">Policy Name : <%= policy.name %></p>
+
+        <button class="green-button" style="width: 100px;
+            height: 35px;
+            letter-spacing: 1px;
+            background-color: #46568b" form="updateUserPolicyConfiguration<%=policy.id%>">Update
+        </button>
 
     <div style="padding: 20px;
         border: 1px solid #efefef;">
+
+      <input hidden="hidden" form="updateUserPolicyConfiguration<%=policy.id%>" id="policyMemberSettingsUserId" name="policy[user_id]" value="<%=@user.id%>">
+      <input hidden="hidden" form="updateUserPolicyConfiguration<%=policy.id%>" id="policyMemberSettingsDefaultMappingId" name="policy[default][mapping_id]" value="<%= @mappings[policy.id].default.first.id if @mappings[policy.id].default.present? %>">
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.manager.present? %>
+      <input hidden="hidden" form="updateUserPolicyConfiguration<%=policy.id%>" id="policyMemberSettingsManagerMappingId"
+             name="policy[conditional_manager][mapping_id]" value="<%=@mappings[policy.id].non_default.manager.first.id %>">
+      <% end %>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.finance_manager.present? %>
+      <input hidden="hidden" form="updateUserPolicyConfiguration<%=policy.id%>" id="policyMemberSettingsFinanceManagerMappingId"
+             name="policy[conditional_finance_manager][mapping_id]" value="<%= @mappings[policy.id].non_default.finance_manager.first.id%>">
+      <% end %>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_to.present? %>
+      <input hidden="hidden" form="updateUserPolicyConfiguration<%=policy.id%>" id="policyMemberSettingsApprovesToMappingId"
+             name="policy[conditional_approves_to][mapping_id]" value="<%=@mappings[policy.id].non_default.approves_to.first.id %>">
+      <% end %>
+      <% if @mappings[policy.id].non_default.present? && @mappings[policy.id].non_default.approves_finance_to.present? %>
+      <input hidden="hidden" form="updateUserPolicyConfiguration<%=policy.id%>" id="policyMemberSettingsApprovesFinanceToMappingId"
+             name="policy[conditional_approves_finance_to][mapping_id]" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.id %>">
+      <% end %>
+
+      <% if policy.user_mapping.admin.first.id == @user.id%>
+      <div id="policyMemberAdminSection">
+        <%=@user.name%> is the admin of this policy
+      </div>
+      <% end %>
+
+      <div id="policyMemberSettingsEmployeeSection"
+           <% unless @user.employee? %>
+           style="display:none;"
+           <% end %>
+           >
+
       <div class="row">
         <section class="col-md-6">
 
           <div>
             <label>Submits To:</label>
-            <select id="policyMemberManagerSelector" form="updateUserPolicyConfiguration"
-                    name="policy[default][manager_id]" class="selectors">
+            <select id="policyMemberManagerSelector" form="updateUserPolicyConfiguration<%=policy.id%>"
+                    name="policy[default][manager_id]" class="selectors" value="<%=@mappings[policy.id].default.first.manager_id%>">
               <option value="" selected="selected"></option>
               <% @company_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].default.first.manager_id == manager.id %>
+                  selected
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
 
@@ -36,16 +87,24 @@
           <hr>
           <div>
             <label>If Report Total is Over:</label>
-            <input id="policyMemberManagerConditionalAmount" form="updateUserPolicyConfiguration"
-                   name="policy[conditional_manager][amount]" type="number" placeholder="Amount" min="0">
+            <input id="policyMemberManagerConditionalAmount" form="updateUserPolicyConfiguration<%=policy.id%>"
+                   name="policy[conditional_manager][amount]" type="number" placeholder="Amount" min="0" value="<%= @mappings[policy.id].non_default.manager.first.greater_than_amount_value if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.manager.present? %>">
+            <input type="hidden" name="policy[conditional_manager][currency_id]" value="1" form="updateUserPolicyConfiguration<%=policy.id%>">
+
           </div>
           <div class="conditionMargin">
             <label>Then Submits To:</label>
-            <select id="policyMemberManagerConditionalSelector" form="updateUserPolicyConfiguration"
+            <select id="policyMemberManagerConditionalSelector" form="updateUserPolicyConfiguration<%=policy.id%>"
                     name="policy[conditional_manager][manager_id]" class="selectors">
               <option value="" selected="selected"></option>
               <% @company_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.manager.present? %>
+                    <% if @mappings[policy.id].non_default.manager.first.manager_id == manager.id %>
+                      selected
+                    <% end %>
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
@@ -55,114 +114,165 @@
           <div>
             <label>Finance Manager:</label>
 
-            <select id="policyMemberFinanceManager" form="updateUserPolicyConfiguration" name="policy[default][finance_manager_id]"
+            <select id="policyMemberFinanceManager" form="updateUserPolicyConfiguration<%=policy.id%>" name="policy[default][finance_manager_id]"
                     class="selectors">
               <option value="" selected="selected"></option>
               <% @company_finance_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].default.first.finance_manager_id == manager.id %>
+                    selected
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
           <hr>
           <div>
             <label>If Report Total is Over:</label>
-            <input id="policyMemberFinanceManagerConditionalAmount" form="updateUserPolicyConfiguration"
-                   name="policy[conditional_finance_manager][amount]" type="number" placeholder="Amount" min="0">
+            <input id="policyMemberFinanceManagerConditionalAmount" form="updateUserPolicyConfiguration<%=policy.id%>"
+                   name="policy[conditional_finance_manager][amount]" type="number" placeholder="Amount" min="0" value="<%= @mappings[policy.id].non_default.finance_manager.first.greater_than_amount_value if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.finance_manager.present? %>">
+            <input name="policy[conditional_finance_manager][currency_id]" type="hidden" value="1" form="updateUserPolicyConfiguration<%=policy.id%>">
+
           </div>
           <div class="conditionMargin">
             <label>Then Submits To:</label>
-            <select id="policyMemberFinanceManagerConditionalManager" form="updateUserPolicyConfiguration"
+            <select id="policyMemberFinanceManagerConditionalManager" form="updateUserPolicyConfiguration<%=policy.id%>"
                     name="policy[conditional_finance_manager][finance_manager_id]" class="selectors">
               <option value="" selected="selected"></option>
               <% @company_finance_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.finance_manager.present? %>
+                     <% if @mappings[policy.id].non_default.finance_manager.first.finance_manager_id == manager.id %>
+                        selected
+                     <% end %>
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
 
 
         </section>
+      </div>
+
       </div>
 
       <hr style="margin-top: 20px;
           margin-bottom: 20px; width: 100%;
       ">
 
+
       <div class="row">
+
+        <div id="policyMemberSettingsApprovesToSection"
+        <% unless @user.manager? %>
+            style="display:none;"
+        <% end %>
+        >
 
         <section class="col-md-6">
           <div>
             <label>Approves To:</label>
-            <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration" name="policy[default][approves_to_user_id]"
+            <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration<%=policy.id%>" name="policy[default][approves_to_user_id]"
                     class="selectors">
               <option value="" selected="selected"></option>
               <% @company_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].default.first.approves_to_user_id == manager.id %>
+                     selected
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
           <hr>
           <div>
             <label>If Report Total is Over:</label>
-            <input id="policyMemberApprovesToConditionalAmount" form="updateUserPolicyConfiguration"
-                   name="policy[conditional_approves_to][amount]" type="number" placeholder="Amount"  min="0">
+            <input id="policyMemberApprovesToConditionalAmount" form="updateUserPolicyConfiguration<%=policy.id%>"
+                   name="policy[conditional_approves_to][amount]" type="number" placeholder="Amount" min="0" value="<%= @mappings[policy.id].non_default.approves_to.first.greater_than_amount_value if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.approves_to.present? %>">
+            <input name="policy[conditional_approves_to][currency_id]" type="hidden" value="1" form="updateUserPolicyConfiguration<%=policy.id%>">
           </div>
           <div class="conditionMargin">
             <label>Then Approves To:</label>
             <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_user_id]"
-                    form="updateUserPolicyConfiguration" class="selectors">
+                    form="updateUserPolicyConfiguration<%=policy.id%>" class="selectors">
               <option value="" selected="selected"></option>
               <% @company_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.approves_to.present? %>
+                     <% if @mappings[policy.id].non_default.approves_to.first.approves_to_user_id == manager.id %>
+                        selected
+                     <% end %>
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
         </section>
+
+        </div>
+
+        <div id="policyMemberSettingsApprovesFinanceToSection"
+        <% unless @user.finance_manager? %>
+            style="display:none;"
+        <% end %>
+        >
+
         <section class="col-md-6">
           <div>
             <label>Approves Finance To:</label>
 
-            <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration"
+            <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration<%=policy.id%>"
                     name="policy[default][approves_finance_to_user_id]" class="selectors">
               <option value="" selected="selected"></option>
               <% @company_finance_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].default.first.approves_to_user_id == manager.id %>
+                    selected
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
           <hr>
           <div>
             <label>If Report Total is Over:</label>
-            <input id="policyMemberApprovesFinanceToConditionalAmount" form="updateUserPolicyConfiguration"
-                   name="policy[conditional_approves_finance_to][amount]" type="number" placeholder="Amount"  min="0">
+            <input id="policyMemberApprovesFinanceToConditionalAmount" form="updateUserPolicyConfiguration<%=policy.id%>"
+                   name="policy[conditional_approves_finance_to][amount]" type="number" placeholder="Amount" min="0" value="<%= @mappings[policy.id].non_default.approves_finance_to.first.greater_than_amount_value if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.approves_finance_to.present? %>">
+            <input name="policy[conditional_approves_finance_to][currency_id]" form="updateUserPolicyConfiguration<%=policy.id%>" type="hidden" value="1">
+
           </div>
           <div class="conditionMargin">
             <label>Then Approves Finance To:</label>
-            <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration"
+            <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration<%=policy.id%>"
                     name="policy[conditional_approves_finance_to][approves_finance_to_user_id]" class="selectors">
               <option value="" selected="selected"></option>
               <% @company_finance_managers.each do |manager| %>
-                  <option value="<%= manager.id %>"><%= manager.name %></option>
+                  <option value="<%= manager.id %>"
+                  <% if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.approves_finance_to.present? %>
+                    <% if @mappings[policy.id].non_default.approves_finance_to.first.approves_finance_to_user_id == manager.id %>
+                       selected
+                    <% end %>
+                  <% end %>
+                  ><%= manager.name %></option>
               <% end %>
             </select>
           </div>
         </section>
 
+        </div>
+
       </div>
     </div>
+
+
+    <% end %>
+
   </div>
 
 </div>
 
-<button class="green-button" style="width: 100px;
-    height: 35px;
-    float: left;
-    letter-spacing: 1px;
-    margin-top: 30px;background-color: #46568b">Update
-</button>
-
 </div>
-
 
 
 

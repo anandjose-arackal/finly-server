@@ -39,6 +39,7 @@
 #              policy_remove_users POST   /policies/:policy_id/remove_users(.:format)               policies#remove_users
 # policy_update_user_configuration PATCH  /policies/:policy_id/update_users_configuration(.:format) policies#update_user_configuration
 #                  policy_add_rule POST   /policies/:policy_id/add_rule(.:format)                   policies#add_rule
+#               policy_remove_rule DELETE /policies/:policy_id/remove_rule(.:format)                policies#remove_rule
 #                                  GET    /policies(.:format)                                       policies#index
 #                                  POST   /policies(.:format)                                       policies#create
 #                       new_policy GET    /policies/new(.:format)                                   policies#new
@@ -87,8 +88,17 @@
 #                                  PATCH  /expenses/:id(.:format)                                   expenses#update
 #                                  PUT    /expenses/:id(.:format)                                   expenses#update
 #                                  DELETE /expenses/:id(.:format)                                   expenses#destroy
+#              expenses_unreported POST   /expenses/unreported(.:format)                            expenses#unreported
+#                         receipts GET    /receipts(.:format)                                       receipts#index
+#                                  POST   /receipts(.:format)                                       receipts#create
+#                      new_receipt GET    /receipts/new(.:format)                                   receipts#new
+#                     edit_receipt GET    /receipts/:id/edit(.:format)                              receipts#edit
+#                          receipt GET    /receipts/:id(.:format)                                   receipts#show
+#                                  PATCH  /receipts/:id(.:format)                                   receipts#update
+#                                  PUT    /receipts/:id(.:format)                                   receipts#update
+#                                  DELETE /receipts/:id(.:format)                                   receipts#destroy
 #                     user_details POST   /users/:user_id/user_details(.:format)                    users#user_details
-#                 user_update_team POST   /users/:user_id/update_user_team(.:format)                users#update_team
+#                 user_update_team PATCH  /users/:user_id/update_user_team(.:format)                users#update_team
 #                 user_update_role POST   /users/:user_id/update_role(.:format)                     users#update_role
 #                            users GET    /users(.:format)                                          users#index
 #                                  POST   /users(.:format)                                          users#create
@@ -177,6 +187,10 @@ Rails.application.routes.draw do
     post 'add_receipt', to: 'expenses#add_receipt'
   end
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
+
+  resources :receipts
+
+  post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
 
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details

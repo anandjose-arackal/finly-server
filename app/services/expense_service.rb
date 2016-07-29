@@ -131,7 +131,7 @@ class ExpenseService < BaseService
   end
 
   def expense_from_receipt(params = nil, receipt_id = nil)
-    return unless params || receipt_id
+    return unless params && receipt_id
     expense_params = load_expense_params params
     expense = @user.expenses.build(expense_params)
     receipt = @user.receipts.find_by(id: receipt_id)
@@ -153,7 +153,7 @@ class ExpenseService < BaseService
   private
 
   def load_expense_params(params = {})
-    expense_params = params[:expense].except(:amount, :merchant, :currency_id)
+    expense_params = params[:expense].except(:amount, :merchant, :currency_id, :receipt_id)
 
     # todo - add logic here to take into account expenses edited within reports
     # in case the method is called from the test cases

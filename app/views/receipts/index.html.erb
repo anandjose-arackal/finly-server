@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <body id="receipts">
-<form data-remote data-turboboost enctype="multipart/form-data" action="" hidden="hidden" method="post">
+<form data-remote data-turboboost enctype="multipart/form-data" action="<%= receipts_path%>" hidden="hidden" method="post">
   <input name="authenticity_token" value="<%= form_authenticity_token %>">
   <input class="form-control" id="receiptSelectFile" type="file" name="receipt[image]" accept=".png,.jpg,.pdf,.jpeg" onchange="submitFile()"/>
   <input id="receiptSubmitFile" type="submit" name="commit" value="Submit" class="btn btn-primary"/>
@@ -21,10 +21,11 @@
 <% end %>
 </body>
 <div id="receiptRows">
-  <!--  < % @receipts.each do |receipt| %>
-   -->
-  <form data-remote data-turboboost data-confirm="Are you sure?" id="deleteReceipt<%= %>" method="post" action="/users/<%= %>/receipts/<%= %>/delete"></form>
-  <form data-remote data-turboboost id="saveReceiptNote<%= %>" method="post" onsubmit="hideLayout('saveNoteParent<%=  %>')" action="/users/<%= %>/receipts/<%= %>/add_note"></form>
+
+<% @receipts.each do |receipt| %>
+
+  <form data-remote data-turboboost data-confirm="Are you sure?" id="deleteReceipt<%= %>" method="post" action="<%= receipt_path(receipt)%>"></form>
+  <form data-remote data-turboboost id="saveReceiptNote<%= %>" method="post" onsubmit="hideLayout('saveNoteParent<%= receipt.id %>')" action="/users/<%= %>/receipts/<%= %>/add_note"></form>
   <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden" form="deleteReceipt<%= %>">
   <input name="_method" type="hidden" value="delete" form="deleteReceipt<%= %>"/>
   <input name="authenticity_token" value="<%= %>" type="hidden" form="saveReceiptNote<%= %>">
@@ -32,7 +33,7 @@
 
   <div class="col-md-4" style="width:350px;margin-top:30px;">
     <div style="border: 1px solid #d8d8d8;background-color:white;">
-      <a target="_blank" style="height: 300px; width: 100%;display: flex;align-items: center;justify-content: center;" href="<%= "#{request.protocol}#{request.host_with_port}#}" %>">
+      <a target="_blank" style="height: 300px; width: 100%;display: flex;align-items: center;justify-content: center;" href="<%= "#{request.protocol}#{request.host_with_port}#{receipt.image.url}" %>">
         <img src="<%= %>" style="background-color: white;max-height:100%;max-width:96%;">
       </a>
 
@@ -40,14 +41,14 @@
         <p style="font-weight: 600;">Uploaded Receipt</p>
 
         <p style="color: #a0a0a0; line-height: 30%; font-size: 12px"><%= %></p>
-        <input id="expenseNoteText<%= %>" type="text" style="resize: none;margin-top: 10px; width: 100%;padding: 5px;" placeholder="Note" onclick="showLayout('saveNoteParent<%=  %>')" name="note" form="saveReceiptNote<%= %>" value="<%= %>">
+        <input id="expenseNoteText<%= receipt.id%>" type="text" style="resize: none;margin-top: 10px; width: 100%;padding: 5px;" placeholder="Note" onclick="showLayout('saveNoteParent<%= receipt.id %>')" name="note" form="saveReceiptNote<%= %>" value="<%= %>">
 
         <div style="margin-top: 10px" id="saveNoteParent<%= %>" hidden="hidden">
           <button class="abaButton" style="width: 35%" form="saveReceiptNote<%= %>">SAVE</button>
-          <button class="abaButton" onclick="hideLayout('saveNoteParent<%=  %>')" style="width: 35%;background-color: #f5f5f5; border: 1px solid #d8d8d8; color: #555; margin-left:10px">CANCEL</button>
+          <button class="abaButton" onclick="hideLayout('saveNoteParent<%= receipt.id %>')" style="width: 35%;background-color: #f5f5f5; border: 1px solid #d8d8d8; color: #555; margin-left:10px">CANCEL</button>
         </div>
         <hr>
-        <button class="grey-button" style="margin-left: 0;width: 55%; background-color: #f5f5f5; border: 1px solid #d8d8d8; color: #555" onclick="createExpense('<%=  %>','<%= %>','<%= %>')">EXPENSE</button>
+        <button class="grey-button" style="margin-left: 0;width: 55%; background-color: #f5f5f5; border: 1px solid #d8d8d8; color: #555" onclick="createExpense('<%= receipt.id %>','<%= receipt.image%>','<%= receipt.note%>')">EXPENSE</button>
         <button form="deleteReceipt<%= %>" class="grey-button" style="background-color: #f5f5f5;border: 1px solid #d8d8d8;width: 25%;float: right;
             border-radius: 1px; ">
           <span class="fa fa-close" style="font-size: 16px;color: #555"></span>
@@ -55,13 +56,14 @@
       </div>
     </div>
   </div>
-  <!--  < % end %>-->
+
+  <% end %>
 </div>
 
 <div class="modal fade" id="newExpense" role="dialog" style="margin-top: 5%;">
   <div class="modal-dialog modal-md" style="background-color: white">
 
-    <form id="expenseForm" method="post" style="background: white;" data-remote data-turboboost action="<%= %>">
+    <form id="expenseForm" method="post" style="background: white;" data-remote data-turboboost action="<%= expense_from_receipt_path%>">
 
       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
       <input type="text" hidden="hidden" name="expense[receipt_id]" id="receiptId"/>
@@ -106,9 +108,9 @@
           <div class="splitSections">
             <p class="splitSideHeader">CATEGORY:</p>
             <select name="expense[category_id]" id="newExpenseCategory">
-              <!-- < % current_company.get_active_categories.each do |cat| %>
-                   <option value="< %= cat.id %>">< %= cat.name %></option>
-               < % end %>-->
+              <% current_company.active_categories.each do |cat| %>
+                   <option value="<%= cat.id %>"><%= cat.name %></option>
+              <% end %>
             </select>
 
           </div>

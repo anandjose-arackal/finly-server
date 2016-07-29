@@ -199,7 +199,7 @@ class UserTeamService < BaseService
     errors.clear
     load_update params
     # updating greater than amount for non-default if it needs to be updated
-    if !@mapping.default and params['amount'] == @mapping.greater_than_amount_value and params['currency_id'] == @mapping.greater_than_amount_currency_id
+    if !@mapping.default and params['amount'] != @mapping.greater_than_amount_value and params['currency_id'] != @mapping.greater_than_amount_currency_id
       greater_than_amount = Amount.create(value: params['amount'], currency_id: params['currency_id'])
       @mapping.update_attributes(greater_than_amount_id: greater_than_amount.id)
     end
