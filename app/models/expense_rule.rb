@@ -29,7 +29,6 @@ class ExpenseRule < ActiveRecord::Base
   delegate :category_name, to: :category
 
   validates :policy_id, presence: true
-  validates :greater_than_amount_id, presence: true
   validates :rule_type_id, presence: true
   validates :expense_rule_type_id, presence: true
 

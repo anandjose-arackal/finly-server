@@ -188,7 +188,7 @@ style="display:none;"
 
   <label>If Report Total is Over:</label>
   <input id="userApprovesFinanceToConditionalAmount" form="updateDefaultUserConfiguration"
-         name="user_team[non_default][conditional_approves_finance_to][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.approves_finance_to.first.greater_than_amount_value if @mappings['company'].non_default.approves_finance_to.present?%>">>
+         name="user_team[non_default][conditional_approves_finance_to][amount]" type="number" placeholder="Amount" value="<%=@mappings['company'].non_default.approves_finance_to.first.greater_than_amount_value if @mappings['company'].non_default.approves_finance_to.present?%>">
   <input name="user_team[non_default][conditional_approves_finance_to][currency_id]" type="hidden" value="1" form="updateDefaultUserConfiguration">
 
   <input type="hidden" name="user_team[non_default][conditional_approves_finance_to][team_mapping_id]" value="<%= @mappings['company'].non_default.approves_finance_to.first.id if @mappings['company'].non_default.approves_finance_to.present?%>"

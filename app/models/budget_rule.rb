@@ -27,7 +27,6 @@ class BudgetRule < ActiveRecord::Base
   delegate :amount_value, to: :amount
   delegate :category_name, to: :category
 
-  validates :amount_id, presence: true
   validates :budget_period_id, presence: true
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true

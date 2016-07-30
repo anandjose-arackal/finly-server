@@ -247,15 +247,15 @@ if Report.count == 0
     3.times.each do
       report = ReportService.new(user: user).create
       report_service = ReportService.new(user: user, report: report)
-      expense_service = ExpenseService.new(user)
+
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+        e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                                   manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}]})
+                                                                         user_id: 1}])
         expenses << e
         expenses_ids << e.id
       end
@@ -264,15 +264,15 @@ if Report.count == 0
     3.times.each do
       report = ReportService.new(user: user).create
       report_service = ReportService.new(user: user, report: report)
-      expense_service = ExpenseService.new(user)
+
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+        e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                                   manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}]})
+                                                                         user_id: 1}])
         expenses << e
         expenses_ids << e.id
       end
@@ -282,15 +282,15 @@ if Report.count == 0
     3.times.each do
       report = ReportService.new(user: user).create
       report_service = ReportService.new(user: user, report: report)
-      expense_service = ExpenseService.new(user)
+
       expenses = []
       expenses_ids = []
       5.times.each do
-        e = expense_service.add_expense(expense: {amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
+        e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                                   manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}]})
+                                                                         user_id: 1}])
         expenses << e
         expenses_ids << e.id
       end
