@@ -153,7 +153,7 @@ class ExpenseService < BaseService
   private
 
   def load_expense_params(params = {})
-    expense_params = params[:expense].except(:amount, :merchant, :currency_id, :receipt_id)
+    expense_params = params[:expense].except(:amount, :merchant, :currency_id, :receipt_id, :receipt)
 
     # todo - add logic here to take into account expenses edited within reports
     # in case the method is called from the test cases
@@ -162,7 +162,7 @@ class ExpenseService < BaseService
 
     # for manual expenses only
     expense_params[:expense_type_id] = 1 if expense_params[:expense_type_id].nil?
-    # i.e. it's an unreported expense if no report id i present, and unsubmitted if report id is present.
+    # i.e. it's an unreported expense if no report id is present, and unsubmitted if report id is present.
     expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil? && expense_params[:report_id].nil?
     expense_params[:expense_status_id] = 2 if expense_params[:report_id].present?
 

@@ -4,6 +4,7 @@
   <form data-remote="true" data-turboboost="true" accept-charset="UTF-8" enctype="multipart/form-data" id="expenseForm" action="<%= expenses_path %>" method="post">
     <input name="utf8" type="hidden" value="&#x2713;"/>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <input name="request_type" type="hidden" value="1">
 
     <div style="height: 70px; background-color: white;">
 

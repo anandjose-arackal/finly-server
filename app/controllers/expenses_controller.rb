@@ -33,10 +33,8 @@ class ExpensesController < ApplicationController
     else
       flash.now[:danger] = @expense_service.errors
     end
-    if params[:request_type] == '1'
-      respond_to do |format|
-        format.js {}
-      end
+    if params['request_type'] == '1'
+      redirect_to expenses_path
     else
       redirect_to request.referrer
     end
@@ -94,6 +92,7 @@ class ExpensesController < ApplicationController
 
     params[:expense][:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
     params[:expense][:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
+    params[:expense][:receipts_attributes] = [{image: params[:expense][:receipt], user_id: current_user.id}] if params[:expense][:receipt]
     params.permit!
 
   end
