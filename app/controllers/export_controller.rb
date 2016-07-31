@@ -1,13 +1,15 @@
 class ExportController < ApplicationController
 
   def report
+    role = UserRole.employee_id
     if @admin_view
-      @reports = current_user.company.all_reports
-    elsif @manager_view or @finance_view
-      @reports = current_user.interacted_reports
-    else
-      @reports = current_user.reports
+      role = UserRole.employee_id
+    elsif @manager_view
+      role = UserRole.manager_id
+    elsif @finance_view
+      role = UserRole.finance_manager_id
     end
+    @reports = ReportService.new(user: current_user).reports(role)
     unless @reports.present? and params[:report_id].present?
       flash[:failure] = 'Report not found'
       render_flash_message

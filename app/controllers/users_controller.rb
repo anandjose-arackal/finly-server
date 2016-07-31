@@ -57,8 +57,8 @@ class UsersController < ApplicationController
     if @user_team_service.update(user_team_params['default'])
       @default_success = true
     else
-      flash[:danger] = @user_team_service.errors
-      redirect_to request.referrer
+      flash.now[:danger] = @user_team_service.errors
+      render_flash_message
     end
     # updating all the non default mappings - or creating it if it doesn't exist.
     if update_non_default_teams

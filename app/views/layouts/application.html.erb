@@ -76,9 +76,21 @@
       formDisabled = false;
     }
 
-    $(document).on('page:fetch',   function() {ohSnap('Loading...', {color: 'blue', duration: '20000'}); });
-    $(document).on('page:change',  function() { console.log('change') });
-    $(document).on('page:restore', function() { console.log('restore') });
+    $(document).on('page:fetch', function () {
+      ohSnap('Loading...', {color: 'blue', duration: '20000'});
+    });
+    $(document).on('page:change', function () {
+      console.log('change')
+    });
+    $(document).on('page:restore', function () {
+      console.log('restore');
+//      Clear all ohSnap elements
+      var myNode = document.getElementById("ohsnap");
+      console.log('myNode' + (myNode == null));
+      while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+      }
+    });
 
     $(document).on("turboboost:success", function (e, flash) {
       formDisabled = false;
