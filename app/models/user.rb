@@ -52,7 +52,7 @@ class User < ActiveRecord::Base
   has_many :receipts, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
-  has_many :admin_policy_user_mappings, -> { with_policy_not_null }, class_name:'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
+  has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
 
   has_many :reports, dependent: :destroy
@@ -93,15 +93,15 @@ class User < ActiveRecord::Base
   scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
-  scope :sort_by_name, -> { order(name: :asc)}
-  scope :active, -> { where active: true}
+  scope :sort_by_name, -> { order(name: :asc) }
+  scope :active, -> { where active: true }
 
   # scopes for filters
   scope :filter_search, -> (term) do
 
   end
 
-  scope :only_employees, -> { where "user_role_mappings.user_role_id = ?", UserRole.employee_id }
+  scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 

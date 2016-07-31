@@ -31,14 +31,16 @@
   <% if @load_type[:approved] %>
       <section id="bulkReimburseSection" style="display: inline-block;
           margin-left: 25px;">
-        <button class="grey-button" style="padding: 5px;margin-right: 5px;background-color: #8394AE;
-            color: white;
-            width: 100px;" onclick="reimburseReport()">Reimburse
-        </button>
-        <button class="grey-button" style="padding: 5px;background-color: #8394AE;
-            color: white;
-            width: 100px;" onclick="settleReport()">Settle
-        </button>
+        <% if not is_personal_view %>
+            <button class="grey-button" style="padding: 5px;margin-right: 5px;background-color: #8394AE;
+                color: white;
+                width: 100px;" onclick="reimburseReport()">Reimburse
+            </button>
+            <button class="grey-button" style="padding: 5px;background-color: #8394AE;
+                color: white;
+                width: 100px;" onclick="settleReport()">Settle
+            </button>
+        <% end %>
       </section>
   <% end %>
 

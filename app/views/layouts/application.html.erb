@@ -131,6 +131,23 @@
 
   });
 
+  function redirectBack() {
+    redirectBack(null);
+  }
+
+  function redirectBack(path) {
+    var redirect_path;
+    <% if request.referrer.present? and URI(request.referer).path != request.path %>
+    redirect_path = '<% request.referrer %>';
+    <% else %>
+    redirect_path = '<% root_path %>';
+    if (path != null && path.length > 0) {
+      redirect_path = path
+    }
+    <% end %>
+    Turbolinks.visit(redirect_path);
+  }
+
   function handleFlash(flash) {
     if (flash != null && flash != undefined) {
       for (var key in flash) {

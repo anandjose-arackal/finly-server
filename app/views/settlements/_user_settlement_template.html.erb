@@ -19,7 +19,10 @@
     </label>
 
     <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 17px;">Cash In
-      <span><%= @user.name %></span>'s Hand</label>
+      <% if not is_personal_view %>
+          <span><%= @user.name %>'s</span>
+      <% end %>
+      Hand</label>
 
     <section>
       <span style="width: 50%;
@@ -31,32 +34,37 @@
     <section style="margin-top: 15px">
       <span style="width: 50%;
           display: inline-block;">
+    <% if not is_personal_view %>
       <button class="green-button" data-toggle="modal" data-target="#reimburseModal" style=" background-color: #465c8b;
           color: white;
           padding: 5px 10px 5px 10px;
           letter-spacing: 1px;
           border: 1px solid; width: 150px ">REIMBURSE
       </button>
+    <% end %>
         </span>
       <span>
+    <% if not is_personal_view %>
       <button class="green-button" data-toggle="modal" data-target="#settleDebtModal" style=" background-color: #465c8b;
           color: white;
           padding: 5px 10px 5px 10px;
           letter-spacing: 1px;
           border: 1px solid;width: 150px  ">SETTLE DEBT
       </button>
+    <% end %>
       </span>
     </section>
   </section>
-
   <section style="  margin-right: 85px;
       float: right;
       font-weight: 500;
   ">
-    <button data-toggle="modal" data-target="#add_payment_modal" class="green-button" style="padding: 10px;
-        width: 135px;">ADD PAYMENT
-    </button>
-    <button style="display: none">QUICK LOAD CARD</button>
+    <% if not is_personal_view %>
+        <button data-toggle="modal" data-target="#add_payment_modal" class="green-button" style="padding: 10px;
+            width: 135px;">ADD PAYMENT
+        </button>
+        <button style="display: none">QUICK LOAD CARD</button>
+    <% end %>
   </section>
 </div>
 
@@ -72,14 +80,14 @@
 </body>
 
 
-
 <!-- Modal-->
 <div class="modal fade" id="add_payment_modal" role="dialog" style="margin-top: 5%; ">
   <div class="modal-dialog modal-md">
     <div class="modal-content" style="border-radius: 1px">
       <div class="modal-header" style="background-color: #e9e9e9 ">
         <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">New Settlement</h4>
+        <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">New
+          Settlement</h4>
       </div>
       <form id="settlementModalForm" method="post" data-remote data-turboboost action="<%= settlement_add_payment_path(load_params id: params[:id]) %>">
         <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
@@ -146,7 +154,8 @@
                 REIMBURSEMENT PENDING
               </label>
 
-              <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 17px;">SELECTED REPORT TOTAL/
+              <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 17px;">SELECTED REPORT
+                TOTAL/
                 REIMBURSING</label>
 
 
@@ -235,7 +244,6 @@
 </div>
 
 
-
 <div class="modal fade" id="settleDebtModal" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -261,7 +269,8 @@
                 CASH IN HAND
               </label>
 
-              <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 17px;">SELECTED REPORT TOTAL</label>
+              <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 17px;">SELECTED REPORT
+                TOTAL</label>
 
 
               <section>
@@ -510,9 +519,8 @@
     $('#confirmReimbursement').hide();
 
     $('.modal-header i').hide();
-
-
   }
+
 
   function reimburseReport() {
 
