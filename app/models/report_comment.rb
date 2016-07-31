@@ -117,7 +117,7 @@ class ReportComment < ActiveRecord::Base
           ReportCommentAction.report_reimbursement_confirmed_id
         validate_attributes [:user_id]
       when ReportCommentAction.report_update_id
-        validate_attributes [:user_id, :updated_field, :updated_from, :updated_to]
+        validate_attributes [:user_id, :updated_field]
       when ReportCommentAction.report_reimbursed_id
         validate_attributes [:user_id, :payment]
       when ReportCommentAction.report_attach_receipt_id
@@ -127,7 +127,7 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.expense_add_id, ReportCommentAction.expense_remove_id, ReportCommentAction.expense_reject_id
         validate_attributes [:user_id, :expense_id]
       when ReportCommentAction.expense_update_id
-        validate_attributes [:user_id, :expense_id, :updated_field, :updated_from, :updated_to]
+        validate_attributes [:user_id, :expense_id, :updated_field]
       else
 
     end

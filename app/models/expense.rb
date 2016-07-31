@@ -57,6 +57,8 @@ class Expense < ActiveRecord::Base
     end
   }
 
+  scope :with_amount, -> { joins :amount }
+  scope :with_report, ->(report_id) { where report_id: report_id }
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
     case type
@@ -80,11 +82,11 @@ class Expense < ActiveRecord::Base
       where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
     end
   end
-  scope :filter_category_id, -> (category_id) {where category_id: category_id}
+  scope :filter_category_id, -> (category_id) { where category_id: category_id }
   scope :filter_merchant, -> (merchant_name) do
     joins(:manual_expense).select('expenses.*').where('merchant like ?', "%#{merchant_name}%")
   end
-  scope :filter_status_id, -> (status_id) {where expense_status_id: status_id}
+  scope :filter_status_id, -> (status_id) { where expense_status_id: status_id }
   scope :filter_search, -> (value) do
     joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant_name like ? OR note like ?', "%#{value}%")
   end
@@ -108,8 +110,6 @@ class Expense < ActiveRecord::Base
   scope :with_category, ->(category_id) { where category_id: category_id }
 
   delegate :category_name, to: :category
-
-
 
 
   # returns the number of receipts attached to this expense

@@ -51,11 +51,33 @@ class Report < ActiveRecord::Base
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
+  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
   scope :include_user, -> { includes :user }
+  scope :without_payment, ->{ where reimbursement_id: nil }
+
+  scope :filter_status, ->(status_id) { where report_status_id: status_id }
+  scope :filter_user_id, ->(id) { where(user_id: id) }
+  scope :filter_report_id, ->(id) { where(id: id) }
+  scope :filter_search, ->(value) do
+    user_ids = self.pluck(:id)
+    user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
+    reports = arel_table
+    where(reports[:name].matches("%#{value}%").or(reports[:user_id].in(user_ids)).or(reports[:id].eq(value)))
+  end
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      # date_to = Date.today if date_to.blank?
+      reports = arel_table
+      where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
+    end
+  end
 
   before_save :handle_name
 

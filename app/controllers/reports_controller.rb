@@ -5,6 +5,12 @@ class ReportsController < ApplicationController
   before_action :fetch_reports, only: [:index]
   before_action :load_service_object
 
+  has_scope :filter_search
+  has_scope :filter_status
+  has_scope :filter_user
+  has_scope :filter_date, using: [:from, :to], type: :hash
+  has_scope :filter_policy
+
   def create
     rs = ReportService.new(user: current_user)
     if rs.create create_params
@@ -16,7 +22,18 @@ class ReportsController < ApplicationController
   end
 
   def index
-    @reports = @reports.paginate(page: params[:page], per_page: 30) if @reports.present?
+    type_counts = @reports.group(:report_status_id).count
+    @counts = {}
+    @counts[:open] = (type_counts[ReportStatus.open_id] or 0)
+    @counts[:processing] = (type_counts[ReportStatus.processing_id] or 0)
+    @counts[:retracted] = (type_counts[ReportStatus.retracted_id] or 0)
+    @counts[:rejected] = (type_counts[ReportStatus.rejected_id] or 0)
+    @counts[:approved] = (type_counts[ReportStatus.approved_id] or 0)
+    @counts[:reimbursed] = (type_counts[ReportStatus.reimbursed_id] or 0)
+    @counts[:reimbursement_confirmed] = (type_counts[ReportStatus.reimbursement_confirmed_id] or 0)
+    @counts[:closed] = (type_counts[ReportStatus.closed_id] or 0)
+    generate_filters
+    @reports = apply_scopes(@reports).paginate(page: params[:page], per_page: 30) if @reports.present?
   end
 
   def update
@@ -110,7 +127,7 @@ class ReportsController < ApplicationController
 
   private
   def create_params
-    params.permit(:report).permit(:expense_id, :name)
+    params.require(:report).permit(:expense_id, :name) if params[:report].present?
   end
 
   def load_service_object
@@ -277,6 +294,15 @@ class ReportsController < ApplicationController
 
   def update_params
     params.require(:report).permit(:name, :policy_id)
+  end
+
+  def generate_filters
+    @filter = {}
+    if params[:filter_status].present?
+      status_id = params[:filter_status]
+      status = ReportStatus.find_by(id: status_id)
+      @filter[:status] = status.name if status.present?
+    end
   end
 
 end

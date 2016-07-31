@@ -45,11 +45,81 @@ module ApplicationHelper
     p
   end
 
+  def parse_params
+    filter_values = (@filter or {})
+    param = []
+    return param if params.blank?
+    params.each do |key, value|
+      hash={}
+      filter = []
+      if !key.start_with?('filter_') || value.blank?
+        next
+      else
+        s_key = key[7..key.length]
+        name = key[7].upcase + key[8..key.length]
+        case s_key
+          when 'user_id'
+            hash = {name: 'User', value: filter_values[:user_name]}
+          when 'manager_id'
+            hash = {name: 'Manager', value: filter_values[:manager_name]}
+          when 'status'
+            hash= {name: 'Status', value: filter_values[:status]}
+          when 'category_id'
+            hash = {name: 'Category', value: filter_values[:category]}
+          when 'amount'
+            type = value[:type]
+            amount = value[:value]
+            next if type.blank? || amount.blank?
+            case type
+              when 'lteq', 'lt'
+                type = "Less Than"
+              when 'eq'
+                type = "Equal To"
+              when 'gteq', 'gt'
+                type = "Greater Than"
+            end
+            hash = {name: name, value: "#{type} \u20B9#{amount}"}
+            filter << {'filter_amount[type]': value[:type], 'filter_amount[value]': amount}
+          when 'receipt'
+            hash = {name: name, value: 'No Receipt'} if value != 'nil'
+          else
+            if value.is_a?(Hash)
+              param_val = ""
+              value.each do |k, v|
+                next if v.blank? || k.blank?
+                param_val += ", " unless param_val.blank?
+                param_val+= "#{k[0].upcase + k[1..k.length]} - #{v[0].upcase + v[1..v.length]}"
+                h = {}
+                h["#{key}[#{k}]"] = v
+                filter << h
+              end
+              next if param_val.blank?
+              if param_val.include?('Sort_by -')
+                param_val.sub!('Sort_by -', 'By')
+              end
+              hash = {name: name, value: param_val}
+            else
+              hash = {name: name, value: value}
+            end
+        end
+        unless hash.blank?
+          if filter.blank?
+            h = {}
+            h[key] = value
+            filter = [h]
+          end
+          hash[:filter] = filter
+          param << hash
+        end
+      end
+    end
+    param
+  end
+
   # type is 1 for expense, 2 for report
   def get_old_filters(old_params, type=1)
     param = []
     old_params.each do |key, value|
-      hash = {}
       filter = []
       if !key.start_with?('filter_') || value.blank?
         next
@@ -129,13 +199,7 @@ module ApplicationHelper
     flash.each do |type, message|
       next if message.blank?
 
-      type = type.to_sym
-      type = :blue if type == :info
-      type = :green if type == :notice
-      type = :orange if type == :alert
-      type = :red if type == :error
-      type = :red if type == :failure
-      type = :red if type == :success
+      type = get_type(type)
 
       next unless ALERT_TYPES.include?(type)
       Array(message).each do |msg|
@@ -151,11 +215,7 @@ module ApplicationHelper
     flash.each do |type, message|
       next if message.blank?
 
-      type = type.to_sym
-      type = :blue if type == :info
-      type = :green if type == :notice or type == :success
-      type = :orange if type == :alert
-      type = :red if type == :error or type == :failure or type == :danger
+      type = get_type(type)
 
       next unless ALERT_TYPES.include?(type)
       Array(message).each do |msg|
@@ -167,6 +227,16 @@ module ApplicationHelper
     end
     flash_messages
     # debugger
+  end
+
+  private
+  def get_type(type)
+    type = type.to_sym
+    type = :blue if type == :info
+    type = :green if type == :notice or type == :success
+    type = :orange if type == :alert
+    type = :red if type == :error or type == :failure or type == :danger
+    type
   end
 
 end

@@ -8,7 +8,6 @@ class SettlementsController < ApplicationController
     result = nil
     param = payment_params
     success_message = nil
-
     if param[:payment_type] == PaymentType.advance_id.to_s
       result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'Advance added'
@@ -39,7 +38,7 @@ class SettlementsController < ApplicationController
   end
 
   def index
-    @users = @users.with_roles.only_employees
+    @users = @users.with_roles.only_employees if @users.present?
   end
 
   def show
@@ -108,7 +107,9 @@ class SettlementsController < ApplicationController
     if r.present?
       r.each do |report|
         rds = ReportDetailService.new(report)
-        @reports << {report: report, total_amount: rds.total_amount, final_approver: rds.final_approver}
+        reimbursement_amount = 0
+        reimbursement_amount = report.reimbursement_amount.value if report.reimbursement_amount.present?
+        @reports << {report: report, reimbursement_amount: reimbursement_amount ,total_amount: rds.total_amount, final_approver: rds.final_approver}
       end
     end
     @load_type = {}

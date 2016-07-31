@@ -1,5 +1,11 @@
 <% messages =  snap_flash_without %>
 <%messages.each do |message| %>
-  ohSnap('<%= message[:message] %>', {color: '<%= message[:color] %>', duration: '7000'});
+<% if message[:message].is_a?(Array)%>
+<% Array(message[:message]).each do |m| %>
+ohSnap('<%= m %>', {color: '<%= message[:color] %>', duration: '7000'});
+<%end%>
+<%else%>
+ohSnap('<%= message[:message] %>', {color: '<%= message[:color] %>', duration: '7000'});
+<%end%>
 <%end%>
 //ohSnap('pus.errors', {color: 'red', duration: '7000'});

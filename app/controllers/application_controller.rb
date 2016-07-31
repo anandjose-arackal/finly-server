@@ -109,9 +109,8 @@ class ApplicationController < ActionController::Base
   end
 
   def load_view
-    return unless params[:view].present?
     view = params[:view]
-    view.tr!('?', '')
+    view.tr!('?', '') if view.present?
     case view
       when 'admin'
         @admin_view = true

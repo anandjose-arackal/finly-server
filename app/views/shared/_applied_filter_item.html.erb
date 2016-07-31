@@ -1,16 +1,15 @@
-<!--
-< % name = item[:name] %>
-< % value = item[:value] %>
-< % filter = item[:filter] %>
-< % id = "oldFilterParent#{name}" %>
-<random id="< %= id %>">
-  < % filter.each do |item| %>
-      < % item.each do |key, value| %>
-          < % filter_name = key %>
-          < % filter_value = value %>
-          <input hidden="hidden" name="< %= filter_name %>" value="< %= filter_value %>" type="text">
-      < % end %>
-  < % end %>
-  <p id="oldFilterAmount">< %= "#{name}: #{value}" %>
-    <span class="fa fa-remove" onclick="closeFilter('< %= ej id %>')"><span></span></span></p>
-</random>-->
+<% name = item[:name] %>
+<% value = item[:value] %>
+<% filter = item[:filter] %>
+<% id = "oldFilterParent#{name}" %>
+<random id="<%= id %>">
+  <% filter.each do |item| %>
+      <% item.each do |key, value| %>
+          <% filter_name = key %>
+          <% filter_value = value %>
+          <input hidden="hidden" name="<%= filter_name %>" value="<%= filter_value %>" type="text">
+      <% end %>
+  <% end %>
+  <p id="oldFilterAmount"><%= "#{name}: #{value}" %>
+    <span class="fa fa-remove" onclick="closeFilter('<%= ej id %>')"><span></span></span></p>
+</random>

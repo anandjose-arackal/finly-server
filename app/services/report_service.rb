@@ -102,6 +102,7 @@ class ReportService < BaseService
   end
 
   def create(params={})
+    params = {} if params.nil?
     return false unless validate require_user: true
     report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
     if report.save
@@ -194,6 +195,7 @@ class ReportService < BaseService
     if auto_approve or manager.blank?
       settlement = SettlementService.new(report.user)
       status = ReportStatus.approved_id
+      # debugger
       unless settlement.require_reimbursement?(report)
         status = ReportStatus.closed_id
       end
@@ -433,6 +435,7 @@ class ReportService < BaseService
 
   def expense_created_in_report(expense)
     return false unless validate require_report: true, require_user: true
+    return true if report.open?
     comment = report.comments.build report: report, user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense: expense
     if comment.save
       return true

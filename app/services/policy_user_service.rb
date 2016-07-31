@@ -145,8 +145,12 @@ class PolicyUserService < BaseService
       errors << 'User not found in policy'
       return false
     end
-    mappings = user.team_mapping.policy(@policy.id)
+    policy_mapping = user.policy_user_mappings.with_policy(@policy.id)
+    if policy_mapping.present? and as_boolean(admin) != policy_mapping.first.admin
+      policy_mapping.first.update_attribute(:admin, as_boolean(admin))
+    end
 
+    mappings = user.team_mapping.policy(@policy.id)
     return false unless handle_mapping_update user, mappings, params[:default], true
 
     return false unless handle_mapping_update user, mappings, params[:conditional_manager]
@@ -160,6 +164,10 @@ class PolicyUserService < BaseService
   end
 
   private
+  def as_boolean(string)
+    string.match(/(true|t|yes|y|1)$/i) != nil
+  end
+
   def handle_mapping_update(user, mappings, params={}, default= false)
     if params[:mapping_id].present?
       mapping = mappings.with_id(params[:mapping_id])

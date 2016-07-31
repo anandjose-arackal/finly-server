@@ -52,7 +52,6 @@ class User < ActiveRecord::Base
   has_many :receipts, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
-  has_many :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { with_policy_not_null }, class_name:'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
 

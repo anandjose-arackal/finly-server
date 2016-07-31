@@ -25,8 +25,11 @@ class SettlementService < BaseService
     payments_to_user = payments.transferred_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     settlement = payments.settlement.sum(:value)
-    expenses = user.reports.with_amount.submitted_after(date).sum(:value)
-    value = cash.value + expenses + debt_clearance + settlement - payments_to_user
+    reports = user.reports.processed.submitted_after(date)
+    report_ids = reports.pluck(:id)
+    expenses = user.expenses.with_amount.with_report(report_ids).sum(:value)
+    pending_reimbursement = reports.with_amount.without_payment.sum(:value)
+    value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
     Amount.new(value: value, currency: cash.currency)
   end
 

@@ -11,7 +11,8 @@
         <% end %>
         <th style="width: 34.5%;">Report Name</th>
         <th style="width:  49.5%;">Final Approver</th>
-        <th style="width:  15%;">Amount</th>
+        <th style="width:  15%;">Reimbursement Amount</th>
+        <th style="width:  15%;">Total Amount</th>
       </tr>
       </thead>
       <!--
@@ -35,6 +36,7 @@
                   <span style="text-transform: capitalize; font-size: 10px; display: block">report id: <%= report[:report].id %></span>
                 </td>
                 <td style="width:  49.5%;"> <%= report[:final_approver].name if report[:final_approver].present? %></td>
+                <td style="width:  15%;"><span>&#8377</span><%= report[:reimbursement_amount] %></td>
                 <td style="width:  15%;"><span>&#8377</span><%= report[:total_amount] %></td>
                 </td>
               </tr>

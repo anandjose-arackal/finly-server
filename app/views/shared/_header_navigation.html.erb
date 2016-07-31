@@ -1,0 +1,62 @@
+<% if logged_in? %>
+    <% if is_admin_view %>
+        <li>
+          <a href="<%= reports_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
+            Reports</a>
+        </li>
+        <li>
+          <a href="<%= users_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
+            Employees</a>
+        </li>
+        <li>
+          <a href="<%= settlements_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
+            Settlements</a>
+        </li>
+    <% elsif is_finance_view %>
+        <li>
+          <a href="<%= reports_path(view: 'finance') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+        </li>
+        <li>
+          <a href="<%= users_path(view: 'finance') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
+        </li>
+        <li>
+          <a href="<%= settlements_path(view: 'finance') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+        </li>
+    <% elsif is_manager_view %>
+        <li>
+          <a href="<%= reports_path(view: 'manager') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+        </li>
+        <li>
+          <a href="<%= users_path(view: 'manager') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
+        </li>
+    <% elsif is_personal_view %>
+        <li>
+          <a href="<%= expenses_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
+        </li>
+        <li>
+          <a href="<%= reports_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+        </li>
+        <li>
+          <a href="<%= receipts_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
+        </li>
+        <li>
+          <a href="<%= settlements_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+        </li>
+    <% end %>
+<% else %>
+    <div style="position: absolute;
+        right: 9%;">
+      <li>
+        <a href="<%= root_path %>" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; padding: 24px 14px; color: #46568b">Home</a>
+      </li>
+      <li>
+        <a onclick="scrollToFeatures()" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; cursor: pointer; padding: 24px 14px; color: #46568b">Features</a>
+      </li>
+      <li>
+        <a href="<%= about_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">About</a>
+      </li>
+      <li>
+        <a href="<%= new_user_session_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">Log
+          In</a></li>
+    </div>
+<% end %>

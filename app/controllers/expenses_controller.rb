@@ -30,23 +30,26 @@ class ExpensesController < ApplicationController
   def create
     if @expense_service.add_expense expense_params
       flash.now[:success] = 'Expense created!'
+      if params['request_type'] == '1'
+        redirect_to expenses_path
+      else
+        redirect_to request.referrer
+      end
     else
       flash.now[:danger] = @expense_service.errors
+      render_flash_message
     end
-    if params['request_type'] == '1'
-      redirect_to expenses_path
-    else
-      redirect_to request.referrer
-    end
+
   end
 
   def update
     if @expense_service.update_expense(current_user, expense_params)
       flash[:success] = 'Expense edited!'
+      redirect_to expenses_path
     else
       flash[:danger] = @expense_service.errors
+      render_flash_message
     end
-    redirect_to expenses_path
   end
 
   def destroy

@@ -7,6 +7,11 @@
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+  <!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js">
+  </script>
+  <script src="bower_components/html5shiv/dist/html5shiv.js"></script>
+  <![endif]-->
 
   <%= render 'shared/header' %>
 </head>
@@ -71,10 +76,14 @@
       formDisabled = false;
     }
 
+    $(document).on('page:fetch',   function() {ohSnap('Loading...', {color: 'blue', duration: '20000'}); });
+    $(document).on('page:change',  function() { console.log('change') });
+    $(document).on('page:restore', function() { console.log('restore') });
+
     $(document).on("turboboost:success", function (e, flash) {
       formDisabled = false;
 
-      handleFlash(flash);
+//      handleFlash(flash);
 
 //      if (flash != null && flash != undefined) {
 //        var dynamicFlashContainer = document.getElementById("dynamicFlashContainer");
@@ -105,12 +114,12 @@
 
     $(document).on("turboboost:error", function (e, flash) {
       formDisabled = false;
-      handleFlash(flash);
+//      handleFlash(flash);
     });
 
   });
 
-  function handleFlash(flash){
+  function handleFlash(flash) {
     if (flash != null && flash != undefined) {
       for (var key in flash) {
         var value = flash[key];
@@ -124,6 +133,7 @@
         } else if (key == 'error' || key == 'failure' || key == 'danger') {
           type = 'red'
         }
+        console.log('type : ' + type);
         if (type != null && value != null) {
           ohSnap(value, {color: type, duration: '7000'});
         }

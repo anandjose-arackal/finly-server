@@ -38,7 +38,7 @@ class Payment < ActiveRecord::Base
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
 
-  validates :amount_id, presence: true
+  # validates :amount_id, presence: true
   validates :date, presence: true
   validates :initiating_user_id, presence: true
   validates :receiving_user_id, presence: true

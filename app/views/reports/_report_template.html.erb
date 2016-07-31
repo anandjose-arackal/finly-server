@@ -5,9 +5,11 @@
 <form data-remote data-turboboost id="allReportsFilters" action="" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
-    <% param = get_old_filters(params, 2) # i.e get filters for expenses      %>
-    <% param.each do |item| %>
-        <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+    <% param = parse_params # i.e get filters for expenses              %>
+    <% if param.present? %>
+        <% param.each do |item| %>
+            <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+        <% end %>
     <% end %>
   </div>
 </form>
@@ -34,9 +36,9 @@
       <div id="my-posts">
         <%= yield :reports %>
       </div>
-      <div id="infinite-scrolling" style="display: none">
+      <!--<div id="infinite-scrolling" style="display: none">-->
         <%= will_paginate @reports if @reports.present? %>
-      </div>
+      <!--</div>-->
 
 
       <script>
@@ -66,12 +68,14 @@
     <div class="navblock" style="margin-top: 0">
       <p class="listHeaders">Date Submitted</p>
 
-      <form data-remote data-turboboost id="filterForm" action="" method="get" style="background-color: white">
+      <form data-remote data-turboboost id="filterForm" action="<%= reports_path %>" method="get" style="background-color: white">
+        <input type="text" hidden="hidden" name="view" value="<%= params[:view] if params[:view].present? %>" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: white;border-radius: 1px;line-height: normal !important;width: 60%;">
+
         <div style="padding: 16px 0 8px 16px;"><label style="font-weight: 400;margin-top: 3px">From</label>
-          <input id="dateFrom" type="date" name="filter_date[from]" onchange="setDate(this)" value="" style="font-size: 14px;float: right;border: 1px solid #d8d8d8;margin-right: 30px;color: #2E2F30;padding: 3px;background-color: beige;border-radius: 1px;line-height: normal !important;width: 60%;">
+          <input id="dateFrom" type="date" name="filter_date[from]" value="<%= params[:filter_date][:from] if params[:filter_date] && params[:filter_date][:from] %>" onchange="setDate(this)" value="" style="font-size: 14px;float: right;border: 1px solid #d8d8d8;margin-right: 30px;color: #2E2F30;padding: 3px;background-color: beige;border-radius: 1px;line-height: normal !important;width: 60%;">
         </div>
         <div style="padding: 8px 0 16px 16px"><label style="font-weight: 400; margin-top: 3px">To</label>
-          <input id="dateTo" type="date" name="filter_date[to]" value="" onchange="setDate(this)" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: beige;border-radius: 1px;line-height: normal !important;width: 60%;">
+          <input id="dateTo" type="date" name="filter_date[to]" value="<%= params[:filter_date][:to] if params[:filter_date] && params[:filter_date][:to] %>" onchange="setDate(this)" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: beige;border-radius: 1px;line-height: normal !important;width: 60%;">
         </div>
         <input id="filterStatus" type="text" hidden="hidden" name="filter_status" value="" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: white;border-radius: 1px;line-height: normal !important;width: 60%;">
       </form>
@@ -79,29 +83,38 @@
 
     <div class="navblock">
       <p class="listHeaders">STATUS</p>
-
-      <!--     < % if is_personal_view %>
-               <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
-                 <span class="listOptionsNumbers">< %= @unsubmitted_count %></span>
-               </div>
-           < % end %>-->
-      <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(0)"> Unsubmitted
-        <span class="listOptionsNumbers"><%= %></span>
+      <% if is_personal_view %>
+          <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.open_id %>)">
+            Open
+            <span class="listOptionsNumbers"><%= @counts[:open] %></span>
+          </div>
+      <% end %>
+      <div class="listOptions" id="submittedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.processing_id %>)">
+        Processing
+        <span class="listOptionsNumbers"><%= @counts[:processing] %></span>
       </div>
-      <div class="listOptions" id="submittedReportsSelector" onclick="reloadPageWithStatus(1)"> Submitted
-        <span class="listOptionsNumbers"><%= %></span>
+      <div class="listOptions" id="approvedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.approved_id %>)">
+        Approved
+        <span class="listOptionsNumbers"><%= @counts[:approved] %></span>
       </div>
-      <div class="listOptions" id="approvedReportsSelector" onclick="reloadPageWithStatus(2)"> Approved
-        <span class="listOptionsNumbers"><%= %></span>
+      <div class="listOptions" id="rejectedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.rejected_id %>)">
+        Rejected
+        <span class="listOptionsNumbers"><%= @counts[:rejected] %></span>
       </div>
-      <div class="listOptions" id="rejectedReportsSelector" onclick="reloadPageWithStatus(3)"> Rejected
-        <span class="listOptionsNumbers"><%= %></span>
+      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.retracted_id %>)">
+        Retracted
+        <span class="listOptionsNumbers"><%= @counts[:retracted] %></span>
       </div>
-      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(4)"> Retracted
-        <span class="listOptionsNumbers"><%= %></span>
+      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.reimbursed_id %>)">
+        Reimbursed
+        <span class="listOptionsNumbers"><%= @counts[:reimbursed] %></span>
+      </div>
+      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.reimbursement_confirmed_id %>)">
+        Reimbursement Confirmed
+        <span class="listOptionsNumbers"><%= @counts[:reimbursement_confirmed] %></span>
       </div>
       <div class="listOptions" id="allReportsSelector" onclick="reloadPageWithStatus(null)"> All
-        <span class="listOptionsNumbers"><%= %></span>
+        <span class="listOptionsNumbers"><%= @counts[:closed] %></span>
       </div>
     </div>
 
