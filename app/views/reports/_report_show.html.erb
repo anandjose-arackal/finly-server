@@ -191,8 +191,12 @@
           <form data-remote data-turboboost id="updateNameForm" action="<%= report_path(@report, view: params[:view]) %>" method="post">
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
             <input name="_method" type="hidden" value="patch"/>
-            <textarea name="report[name]" id="modalInputName" class="form-control" placeholder="Name"><%= @report.name %></textarea>
-            <input type="submit" class="sendButton" value="SAVE">
+            <textarea name="report[name]" id="modalInputName" style="border-radius: 1px" class="form-control" placeholder="Name"><%= @report.name %></textarea>
+            <input type="submit" class="green-button" value="SAVE" style="    margin-top: 10px;
+                width: 80px;
+                padding: 7px;
+                letter-spacing: 1px;
+                font-weight: 500;">
           </form>
         </div>
       </div>
@@ -529,7 +533,7 @@
                 <% end %>
               </select>
               <i class="fa  fa-caret-down" style="margin-left: -40px;
-              opacity: 0.8;"> </i>
+                  opacity: 0.8;"> </i>
             </div>
 
             <div class="splitSections">

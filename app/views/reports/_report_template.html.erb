@@ -5,7 +5,7 @@
 <form data-remote data-turboboost id="allReportsFilters" action="" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
-    <% param = parse_params # i.e get filters for expenses              %>
+    <% param = parse_params # i.e get filters for expenses               %>
     <% if param.present? %>
         <% param.each do |item| %>
             <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
@@ -37,7 +37,7 @@
         <%= yield :reports %>
       </div>
       <!--<div id="infinite-scrolling" style="display: none">-->
-        <%= will_paginate @reports if @reports.present? %>
+      <%= will_paginate @reports if @reports.present? %>
       <!--</div>-->
 
 
@@ -57,7 +57,7 @@
     <form data-remote data-turboboost action="<%= reports_path(load_params) %>" method="post">
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <% if is_personal_view %>
-          <button class="invite" type="submit">
+          <button class="invite" style="margin-bottom: 20px" type="submit">
             CREATE NEW REPORT
           </button>
       <% end %>
@@ -85,11 +85,11 @@
       <p class="listHeaders">STATUS</p>
       <% if is_personal_view %>
           <div class="listOptions" id="unsubmittedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.open_id %>)">
-            Open
+            Unsubmitted
             <span class="listOptionsNumbers"><%= @counts[:open] %></span>
           </div>
       <% end %>
-      <div class="listOptions" id="submittedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.processing_id %>)">
+      <div class="listOptions" id="processingReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.processing_id %>)">
         Processing
         <span class="listOptionsNumbers"><%= @counts[:processing] %></span>
       </div>
@@ -105,11 +105,11 @@
         Retracted
         <span class="listOptionsNumbers"><%= @counts[:retracted] %></span>
       </div>
-      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.reimbursed_id %>)">
+      <div class="listOptions" id="reimbursedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.reimbursed_id %>)">
         Reimbursed
         <span class="listOptionsNumbers"><%= @counts[:reimbursed] %></span>
       </div>
-      <div class="listOptions" id="retractedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.reimbursement_confirmed_id %>)">
+      <div class="listOptions" id="reimbursementConfirmedReportsSelector" onclick="reloadPageWithStatus(<%= ReportStatus.reimbursement_confirmed_id %>)">
         Reimbursement Confirmed
         <span class="listOptionsNumbers"><%= @counts[:reimbursement_confirmed] %></span>
       </div>
@@ -127,25 +127,33 @@
 <script>
 
   $(document).ready(function () {
-    /*
 
-     < % if  params[:filter_status] == "0"%>
-     $('#unsubmittedReportsSelector').css("background", "#FFFFBB")
-     $('#headerTitle').text('UNSUBMITTED');
-     < % elsif   params[:filter_status] == "1"%>
-     $('#submittedReportsSelector').css("background", "#FFFFBB")
-     $('#headerTitle').text('SUBMITTED');
-     < % elsif   params[:filter_status] == "2"%>
-     $('#closedReportsSelector').css("background", "#FFFFBB")
-     $('#headerTitle').text('CLOSED');
-     < % elsif   params[:filter_status] == "3"%>
-     $('#reopenedReportsSelector').css("background", "#FFFFBB")
-     $('#headerTitle').text('REOPENED');
-     < % else %>
-     $('#headerTitle').text('ALL');
-     $('#allReportsSelector').css("background", "#FFFFBB")
-     < % end %>
-     */
+
+    <% if   params[:filter_status] == "1"%>
+    $('#unsubmittedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('UNSUBMITTED');
+    <% elsif   params[:filter_status] == "2"%>
+    $('#processingReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('PROCESSING');
+    <% elsif   params[:filter_status] == "3"%>
+    $('#retractedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('RETRACTED');
+    <% elsif   params[:filter_status] == "4"%>
+    $('#rejectedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('REJECTED');
+    <% elsif   params[:filter_status] == "5"%>
+    $('#approvedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('APPROVED');
+    <% elsif   params[:filter_status] == "6"%>
+    $('#reimbursedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('REIMBURSED');
+    <% elsif   params[:filter_status] == "7"%>
+    $('#reimbursementConfirmedReportsSelector').css("background", "#FFFFBB")
+    $('#headerTitle').text('REIMBURSEMENT CONFIRMED');
+    <% else %>
+    $('#headerTitle').text('ALL');
+    $('#allReportsSelector').css("background", "#FFFFBB")
+    <% end %>
 
 
   });

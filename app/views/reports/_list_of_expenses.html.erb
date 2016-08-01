@@ -1,141 +1,140 @@
 <div id="expenseContainer">
-<% @expenses.each do |section| %>
-    <div>
-      <hr style="
-      border-top: 1px solid #d8d8d8;
-      ">
-      <h5 style="color: #374F76"><%= section[:category_name] %> -
-        <span>&#8377</span> <%= section[:category_total] %></h5>
-      <% if @report.approved? && is_personal_view %>
+  <% @expenses.each do |section| %>
+      <div>
+        <hr style="
+        border-top: 1px solid #d8d8d8;
+        ">
+        <h5 style="color: #374F76"><%= section[:category_name] %> -
+          <span>&#8377</span> <%= section[:category_total] %></h5>
+        <% if @report.approved? && is_personal_view %>
 
-          <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8">
-            <div class="col-md-2" style="text-align: right"> DATE</div>
-            <div class="col-md-3" style="text-align: center"> MERCHANT</div>
-            <div class="col-md-3" style="text-align: center"> NOTE</div>
-            <div class="col-md-3" style="text-align: center; padding-left: 35px"> TOTAL</div>
-          </div>
-          <% section[:expenses].each do |expense| %>
-              <div class="row" style="margin-top: 10px">
-                <form data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed" data-remote data-turboboost id="expense<%= expense.id %>"
-                      action="<%= report_remove_expenses_path(@report, load_params(expense_id: expense.id)) %>" method="post">
+            <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8">
+              <div class="col-md-2" style="text-align: right"> DATE</div>
+              <div class="col-md-3" style="text-align: center"> MERCHANT</div>
+              <div class="col-md-3" style="text-align: center"> NOTE</div>
+              <div class="col-md-3" style="text-align: center; padding-left: 35px"> TOTAL</div>
+            </div>
+            <% section[:expenses].each do |expense| %>
+                <div class="row" style="margin-top: 10px">
+                  <form data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed" data-remote data-turboboost id="expense<%= expense.id %>"
+                        action="<%= report_remove_expenses_path(@report, load_params(expense_id: expense.id)) %>" method="post">
 
-                  <input name="_method" type="hidden" value="delete"/>
-                  <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                </form>
-                <div class="col-md-1">
+                    <input name="_method" type="hidden" value="delete"/>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                  </form>
+                  <div class="col-md-1">
 
-                  <% if @policy %>
-                      <% unless (@violation_messages[expense.id]['expense_blocking'].blank? && @violation_messages[expense.id]['budget_blocking'].blank?) %>
-                          <i class="fa fa-exclamation-circle" style="color: red; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Blocking Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_blocking'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_blocking'] %>"></i>
-                      <% end %>
-                      <% unless (@violation_messages[expense.id]['expense_warning'].blank? && @violation_messages[expense.id]['budget_warning'].blank?) %>
-                          <i class="fa fa-shield" style="color: sandybrown; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violations: Warning Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_warning'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_warning'] %>"></i>
-                      <% end %>
-                  <% end %>
+                    <% if @policy %>
+                        <% unless (@violation_messages[expense.id]['expense_blocking'].blank? && @violation_messages[expense.id]['budget_blocking'].blank?) %>
+                            <i class="fa fa-exclamation-circle" style="color: red; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Blocking Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_blocking'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_blocking'] %>"></i>
+                        <% end %>
+                        <% unless (@violation_messages[expense.id]['expense_warning'].blank? && @violation_messages[expense.id]['budget_warning'].blank?) %>
+                            <i class="fa fa-shield" style="color: sandybrown; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violations: Warning Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_warning'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_warning'] %>"></i>
+                        <% end %>
+                    <% end %>
 
-                  <button style="border: none;
-                      font-size: 10px;
-                      width: 100%;
-                      margin-left: 20px;
-                      background: #93c178;
-                      color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
-                      '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
-                      '<%= ej expense.date %>','<%= ej section[:category_name] %>','<%= ej expense.category_id %>',
-                      '<%= ej expense.receipts.first.image if expense.receipts.present? %>',
-                      '<%= ej expense.receipts.first.image.url if expense.receipts.present? %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['expense_blocking'] if @policy %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['budget_blocking'] if @policy %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['expense_warning'] if @policy %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['budget_warning'] if @policy %>')">VIEW
-                  </button>
+                    <button style="border: none;
+                        font-size: 10px;
+                        width: 100%;
+                        margin-left: 20px;
+                        background: #93c178;
+                        color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
+                        '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
+                        '<%= ej expense.date %>','<%= ej section[:category_name] %>','<%= ej expense.category_id %>',
+                        '<%= ej expense.receipts.first.image if expense.receipts.present? %>',
+                        '<%= ej expense.receipts.first.image.url if expense.receipts.present? %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['expense_blocking'] if @policy %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['budget_blocking'] if @policy %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['expense_warning'] if @policy %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['budget_warning'] if @policy %>')">VIEW
+                    </button>
 
+                  </div>
+                  <div class="col-md-2"><%= expense.date.strftime("%d-%b-%y") %>
+                  </div>
+                  <div class="col-md-3"><%= expense.merchant_name %></div>
+                  <div class="col-md-3"><%= expense.note %></div>
+                  <div class="col-md-3"><%= "\u20B9#{expense.amount.precision_value}" %>
+                    <!--< % if expense.approved? %>-->
+                    <!--<button class="btn active" style="margin-left: 30px"> Approved</button>-->
+                    <!--< % elsif expense.rejected? %>-->
+                    <!--<button class="btn inactive" style="margin-left: 30px"> Rejected</button>-->
+                    <!--< % end %>-->
+                  </div>
                 </div>
-                <div class="col-md-2"><%= expense.date.strftime("%d-%b-%y") %>
-                </div>
-                <div class="col-md-3"><%= expense.merchant_name %></div>
-                <div class="col-md-3"><%= expense.note %></div>
-                <div class="col-md-3"><%= "\u20B9#{expense.amount.precision_value}" %>
-                  <!--< % if expense.approved? %>-->
-                      <!--<button class="btn active" style="margin-left: 30px"> Approved</button>-->
-                  <!--< % elsif expense.rejected? %>-->
-                      <!--<button class="btn inactive" style="margin-left: 30px"> Rejected</button>-->
-                  <!--< % end %>-->
-                </div>
-              </div>
 
-          <% end %>
-          <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
-          </div>
-      <% elsif is_personal_view %>
-          <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8">
-            <div class="col-md-3" style="text-align: right"> DATE</div>
-            <div class="col-md-3" style="text-align: center"> MERCHANT</div>
-            <div class="col-md-3" style="text-align: center"> NOTE</div>
-            <div class="col-md-3" style="text-align: center; padding-left: 35px"> TOTAL</div>
-          </div>
-          <% section[:expenses].each do |expense| %>
-              <div class="row" style="margin-top: 10px">
-                <form data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed" data-remote data-turboboost id="expense<%= expense.id %>"
-                      action="<%= report_remove_expenses_path(@report, load_params(expense_id: expense.id)) %>" method="post">
-                  <input name="_method" type="hidden" value="delete"/>
-                  <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                </form>
+            <% end %>
+            <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
+            </div>
+        <% elsif is_personal_view %>
+            <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8">
+              <div class="col-md-3" style="text-align: right"> DATE</div>
+              <div class="col-md-3" style="text-align: center"> MERCHANT</div>
+              <div class="col-md-3" style="text-align: center"> NOTE</div>
+              <div class="col-md-3" style="text-align: center; padding-left: 35px"> TOTAL</div>
+            </div>
+            <% section[:expenses].each do |expense| %>
+                <div class="row" style="margin-top: 10px">
+                  <form data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed" data-remote data-turboboost id="expense<%= expense.id %>"
+                        action="<%= report_remove_expenses_path(@report, load_params(expense_id: expense.id)) %>" method="post">
+                    <input name="_method" type="hidden" value="delete"/>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                  </form>
 
-                <div class="col-md-2" style="padding: 0;">
+                  <div class="col-md-2" style="padding: 0;">
 
-                  <% if @policy %>
-                      <% unless (@violation_messages[expense.id]['expense_blocking'].blank? && @violation_messages[expense.id]['budget_blocking'].blank?) %>
-                          <i class="fa fa-exclamation-circle" style="color: red; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Blocking Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_blocking'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_blocking'] %>"></i>
-                      <% end %>
-                      <% unless (@violation_messages[expense.id]['expense_warning'].blank? && @violation_messages[expense.id]['budget_warning'].blank?) %>
-                          <i class="fa fa-shield" style="color: sandybrown;margin-top: 3px; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Warning Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_warning'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_warning'] %>"></i>
-                      <% end %>
-                  <% end %>
+                    <% if @policy %>
+                        <% unless (@violation_messages[expense.id]['expense_blocking'].blank? && @violation_messages[expense.id]['budget_blocking'].blank?) %>
+                            <i class="fa fa-exclamation-circle" style="color: red; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Blocking Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_blocking'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_blocking'] %>"></i>
+                        <% end %>
+                        <% unless (@violation_messages[expense.id]['expense_warning'].blank? && @violation_messages[expense.id]['budget_warning'].blank?) %>
+                            <i class="fa fa-shield" style="color: sandybrown;margin-top: 3px; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Warning Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_warning'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_warning'] %>"></i>
+                        <% end %>
+                    <% end %>
 
-                  <% unless @report.processing? || @report.approved? %>
+                    <% unless @report.processing? || @report.approved? %>
                   <span onclick="$('#expense<%= expense.id %>').submit();" class="fa fa-trash-o" style="color: indianred;font-size: 17px;
                       vertical-align: middle;"></span>
-                  <% end %>
+                    <% end %>
 
-                  <button style="border: none;
-                      font-size: 10px;
-                      width: 80px;
-                      margin-left: 10px;
-                      background: #93c178;
-                      color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
-                      '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
-                      '<%= ej expense.date %>','<%= ej section[:category_name] %>','<%= ej expense.category_id %>','<%= ej expense.receipts.first.image if expense.receipts.present? %>',
-                      '<%= ej expense.receipts.first.image.url if expense.receipts.present? %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['expense_blocking'] if @policy %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['budget_blocking'] if @policy %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['expense_warning'] if @policy %>',
-                      '<%= formatted_violations @violation_messages[expense.id]['budget_warning'] if @policy %>')">VIEW
-                  </button>
+                    <button style="border: none;
+                        font-size: 10px;
+                        width: 80px;
+                        margin-left: 10px;
+                        background: #93c178;
+                        color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
+                        '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
+                        '<%= ej expense.date %>','<%= ej section[:category_name] %>','<%= ej expense.category_id %>','<%= ej expense.receipts.first.image if expense.receipts.present? %>',
+                        '<%= ej expense.receipts.first.image.url if expense.receipts.present? %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['expense_blocking'] if @policy %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['budget_blocking'] if @policy %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['expense_warning'] if @policy %>',
+                        '<%= formatted_violations @violation_messages[expense.id]['budget_warning'] if @policy %>')">VIEW
+                    </button>
 
+                  </div>
+                  <div class="col-md-2"><%= expense.date.strftime("%d-%b-%y") %>
+                  </div>
+                  <div class="col-md-3"><%= expense.merchant_name %></div>
+                  <div class="col-md-3"><%= expense.note %></div>
+                  <div class="col-md-2"><%= "\u20B9#{expense.amount.precision_value}" %></div>
                 </div>
-                <div class="col-md-2"><%= expense.date.strftime("%d-%b-%y") %>
-                </div>
-                <div class="col-md-3"><%= expense.merchant_name %></div>
-                <div class="col-md-3"><%= expense.note %></div>
-                <div class="col-md-2"><%= "\u20B9#{expense.amount.precision_value}" %></div>
-              </div>
-          <% end %>
-          <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
-          </div>
-      <% else %>
-          <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8">
-            <div class="col-md-3" style="text-align: center"> DATE</div>
-            <div class="col-md-2" style="padding-left: 10px"> MERCHANT</div>
-            <div class="col-md-3" style="padding-left: 15px "> NOTE</div>
-            <div class="col-md-1" style="text-align: center;padding-left: 25px"> TOTAL</div>
-            <div class="col-md-3" style="padding-left: 40px;text-align: center"> APPROVAL</div>
-          </div>
-          <% section[:expenses].each do |expense| %>
-              <%= render partial: 'reports/expense_row', locals: {expense: expense, category_name: section[:category_name]} %>
-          <% end %>
-          <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
-          </div>
-      <% end %>
-    </div>
-<% end %>
+            <% end %>
+            <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
+            </div>
+        <% else %>
+            <div class="row" style="background-color: #efefef; font-size: 10px;padding: 10px;border-bottom: 1px solid #d8d8d8">
+              <div class="col-md-2"></div>
+              <div class="col-md-2" > DATE</div>
+              <div class="col-md-5"> MERCHANT</div>
+              <div class="col-md-3" style="padding-left: 25px"> EXPENSE</div>
+            </div>
+            <% section[:expenses].each do |expense| %>
+                <%= render partial: 'reports/expense_row', locals: {expense: expense, category_name: section[:category_name]} %>
+            <% end %>
+            <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
+            </div>
+        <% end %>
+      </div>
+  <% end %>
 </div>
