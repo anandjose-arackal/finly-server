@@ -40,7 +40,7 @@ class UsersController < ApplicationController
   def index
     @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
     @policies = @user.policies
-    @users = current_company.users.paginate(page: params[:page])
+    @users = current_company.users.paginate(page: params[:page], per_page: 30)
     @reports = @user.reports
     @company_managers = current_company.users.with_roles.only_managers
     @company_finance_managers = current_company.users.with_roles.only_finance_managers

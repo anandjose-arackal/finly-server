@@ -38,9 +38,9 @@
       <div id="employees">
           <%= yield :people %>
       </div>
-      <div id="infinite-scrolling" style="display: none">
-          <%= will_paginate @users %>
-      </div>
+      <!--<div id="infinite-scrolling" style="display: none">-->
+          <%= will_paginate @users if @users.present? %>
+      <!--</div>-->
 
     </div>
 

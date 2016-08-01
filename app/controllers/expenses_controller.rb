@@ -25,6 +25,7 @@ class ExpensesController < ApplicationController
       @merchants << expense.merchant_name
     end
     @categories = current_company.active_categories
+    generate_filters
   end
 
   def create
@@ -87,6 +88,20 @@ class ExpensesController < ApplicationController
 
 
   private
+  def generate_filters
+    @filter = {}
+    if params[:filter_status].present?
+      status_id = params[:filter_status]
+      status = ExpenseStatus.find_by(id: status_id)
+      @filter[:status] = status.name if status.present?
+    end
+    if params[:filter_category_id].present?
+      category_id = params[:filter_category_id]
+      category = current_company.categories.find_by(id: category_id)
+      @filter[:category] = category.name if category.present?
+    end
+    # todo filters for manager and user for admin views expenses
+  end
 
   def expense_params
     ###### todo temporary - will be removed after currency is added in main screen###

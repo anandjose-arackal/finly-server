@@ -40,7 +40,7 @@
           <a href="<%= receipts_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
         </li>
          <li class="<%= 'active' if current_page?(settlements_path(id: current_user.id)) %>">
-          <a href="<%= settlements_path(id: current_user.id) %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+          <a href="<%= settlement_path(id: current_user.id) %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
         </li>
     <% end %>
 <% else %>

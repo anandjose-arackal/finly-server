@@ -38,7 +38,7 @@ class SettlementsController < ApplicationController
   end
 
   def index
-    @users = @users.with_roles.only_employees if @users.present?
+    @users = @users.with_roles.only_employees.paginate(page: params[:page], per_page: 30) if @users.present?
   end
 
   def show

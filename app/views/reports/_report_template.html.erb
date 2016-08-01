@@ -2,7 +2,7 @@
 
 <%= render 'shared/lower_header' %>
 
-<form data-remote data-turboboost id="allReportsFilters" action="" method="get">
+<form data-remote data-turboboost id="allReportsFilters" action="<%= reports_path(load_params) %>" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
     <% param = parse_params # i.e get filters for expenses               %>

@@ -9,11 +9,14 @@
 <form data-remote data-turboboost id="allFilters" action="<%= expenses_path %>" method="get">
   <!-- search bar -->
   <div id="showPreviousFilters">
-    <!-- todo - tweak previous filter code to show filters
-    <!-- < % param = get_old_filters(params, 1) %>
-     < % param.each do |item| %>
-         < %= render partial: 'shared/applied_filter_item', locals: {item: item} %>
-     < % end %>-->
+    <div id="showPreviousFilters" style="min-height: 20px;">
+    <% param = parse_params # i.e get filters for expenses               %>
+    <% if param.present? %>
+        <% param.each do |item| %>
+            <%= render partial: 'shared/applied_filter_item', locals: {item: item} %>
+        <% end %>
+    <% end %>
+  </div>
   </div>
   <%= render 'shared/filter' %>
 </form>
@@ -166,9 +169,9 @@
 
     </div>
 
-    <div id="infinite-scrolling" style="display: none" class="row pagination-wrapper">
+    <!--<div id="infinite-scrolling" style="display: none" class="row pagination-wrapper">-->
       <%= will_paginate(@expenses) unless @expenses.blank? %>
-    </div>
+    <!--</div>-->
 <% end %>
 
 <!--All Modals -->
