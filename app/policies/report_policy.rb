@@ -113,7 +113,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def unapprove?
-    
+
   end
 
   def take_control?

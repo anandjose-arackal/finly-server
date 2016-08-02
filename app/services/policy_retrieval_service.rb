@@ -18,9 +18,9 @@ class PolicyRetrievalService < BaseService
     end
     load_view params
     if @admin_view # Admin can view all policies
-      user.company.policies.non_default
+      user.company.policies.non_default if user.company.policies
     elsif @personal_view # User would get a list of policies he is added to
-      user.company.policies.non_default
+      user.policies.non_default if user.policies
     end
   end
 

@@ -6,22 +6,22 @@ class ReceiptPolicy < ApplicationPolicy
   end
 
   def create?
-    return unless check_personal_view
+    check_personal_view
   end
 
   def destroy?
-    return unless check_personal_view
+    check_personal_view
   end
 
   def index?
-    return unless check_personal_view
+    check_personal_view
   end
 
   def expense_from_receipt?
-    return unless check_personal_view
+    check_personal_view
   end
 
   def add_note?
-    return unless check_personal_view
+    check_personal_view
   end
 end
