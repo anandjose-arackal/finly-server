@@ -40,7 +40,6 @@ class Expense < ActiveRecord::Base
   delegate :merchant_name, to: :manual_expense
   delegate :user_name, to: :user
 
-
   validates :date, presence: true
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
@@ -48,7 +47,6 @@ class Expense < ActiveRecord::Base
   validate :no_future_date
   validate :created_by
   validate :report_status
-
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy {
@@ -83,13 +81,9 @@ class Expense < ActiveRecord::Base
     end
   end
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
-  scope :filter_merchant, -> (merchant_name) do
-    joins(:manual_expense).select('expenses.*').where('merchant like ?', "%#{merchant_name}%")
-  end
+  scope :filter_merchant, -> (merchant_name) { joins(:manual_expense).select('expenses.*').where('merchant like ?', "%#{merchant_name}%") }
   scope :filter_status_id, -> (status_id) { where expense_status_id: status_id }
-  scope :filter_search, -> (value) do
-    joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant_name like ? OR note like ?', "%#{value}%")
-  end
+  scope :filter_search, -> (value) { joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant like ? OR note like ?', "%#{value}%", "%#{value}%") }
 
   # todo - revisit this once you figure out how to filter based on presence of children
   scope :filter_receipt, -> (value) do
@@ -101,13 +95,14 @@ class Expense < ActiveRecord::Base
     end
   end
 
-
   scope :with_id, ->(ids) { where id: ids }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
+  scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
+  scope :include_manual_expense, -> { joins :manual_expense }
 
   delegate :category_name, to: :category
 

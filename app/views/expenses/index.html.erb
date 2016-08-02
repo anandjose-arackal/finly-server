@@ -42,7 +42,7 @@
           <% end %>
           <h3 id="pendingExpensesHeader" style="color: #2B4072" tooltip="These expenses are awaiting approval by an admin" tooltip-placement="top">
             Expenses
-            <span class="ng-binding">[<%= @counts %>]</span>
+            <span class="ng-binding">[<%= (@count or 0) %>]</span>
           </h3>
 
           <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= reports_path(load_params) %>" method="post">
@@ -56,8 +56,11 @@
 
           <%= render @expenses unless @expenses.blank? %>
 
-        </div>
 
+        </div>
+        <!--<div id="infinite-scrolling" style="display: none" class="row pagination-wrapper">-->
+        <%= will_paginate(@expenses) unless @expenses.blank? %>
+        <!--</div>-->
       </div>
 
       <div id="detailsOfExpense" style="background-color: transparent; border: none; border-top: 1px solid #d8d8d8; border-bottom: 1px solid #d8d8d8" class="scrollbar">
@@ -169,9 +172,6 @@
 
     </div>
 
-    <!--<div id="infinite-scrolling" style="display: none" class="row pagination-wrapper">-->
-      <%= will_paginate(@expenses) unless @expenses.blank? %>
-    <!--</div>-->
 <% end %>
 
 <!--All Modals -->

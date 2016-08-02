@@ -20,11 +20,20 @@ class ExpensesController < ApplicationController
   def index
     authorize Expense
     # currently returns only the personal expenses of the user
-    @expenses = apply_scopes(@expense_service.list_expenses).paginate(page: params[:page])
+    role = UserRole.employee_id
+    if @admin_view
+      role = UserRole.admin_id
+    elsif @finance_view
+      role = UserRole.finance_manager_id
+    elsif @manager_view
+      role = UserRole.manager_id
+    end
+    @expenses = @expense_service.expenses(role)
     # for the filters
-    @merchants = []
-    @expense_service.list_expenses.each do |expense|
-      @merchants << expense.merchant_name
+    if @expenses.present?
+      @count = @expenses.count
+      @merchants = @expenses.include_manual_expense.pluck(:merchant)
+      @expenses = apply_scopes(@expense_service.expenses(role)).paginate(page: params[:page], per_page: 30)
     end
     @categories = current_company.active_categories
     generate_filters

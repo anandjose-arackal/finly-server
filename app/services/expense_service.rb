@@ -4,23 +4,23 @@ class ExpenseService < BaseService
   def initialize(current_user, params = {})
     super()
     @user = current_user
-    @user_team_service = UserTeamService.new(@user)
     self.params = params
   end
 
-  def list_expenses
+  def expenses(role_id)
     return nil unless @user
-    load_view self.params
-    if @personal_view
-      return @user.expenses.unreported.includes(:manual_expense)
-    elsif @manager_view
-      user_ids = @user_team_service.team(UserRole.manager_id, self.params).pluck(:user_id)
-      return Expense.where(user_id: user_ids)
-    elsif @finance_view
-      user_ids = @user_team_service.team(UserRole.finance_manager_id, self.params).pluck(:user_id)
-      return Expense.where(user_id: user_ids)
-    else
-      # do nothing
+    case role_id
+      when UserRole.admin_id
+        user_ids = UserTeamService.new(@user).team(UserRole.admin_id, self.params).pluck(:id)
+        return Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
+      when UserRole.finance_manager_id
+        user_ids = UserTeamService.new(@user).team(UserRole.finance_manager_id, self.params).pluck(:id)
+        return Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
+      when UserRole.manager_id
+        user_ids = UserTeamService.new(@user).team(UserRole.manager_id, self.params).pluck(:id)
+        return Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
+      when UserRole.employee_id
+        return @user.expenses.unreported.includes(:manual_expense)
     end
   end
 
