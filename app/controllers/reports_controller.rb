@@ -49,11 +49,11 @@ class ReportsController < ApplicationController
   end
 
   def add_expenses
-    handle_update :add_expense, 'Expenses added to report', params[:expense_id]
+    handle_update :add_expense, 'Expenses added', params[:expense_id]
   end
 
   def remove_expenses
-    handle_update :remove_expense, nil, params[:expense_id]
+    handle_update :remove_expense, 'Expense removed', params[:expense_id]
   end
 
   def submit
@@ -122,7 +122,7 @@ class ReportsController < ApplicationController
   end
 
   def assign_policy
-    handle_update :update_report, nil, update_params
+    handle_update :update_report, 'Policy Updated', update_params
   end
 
   private
@@ -166,7 +166,7 @@ class ReportsController < ApplicationController
     end
     # code for report policy
     @policies = @report.user.policies
-    @policy = @report.policy
+    @policy = PolicyRetrievalService.for_report(@report)
     @violation_messages = @violation_service.violations(@policy, @report)
   end
 

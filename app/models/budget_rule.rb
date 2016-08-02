@@ -13,7 +13,6 @@
 #
 
 class BudgetRule < ActiveRecord::Base
-  include PolicyVersion
   belongs_to :category
   belongs_to :amount
   belongs_to :budget_period
@@ -33,7 +32,15 @@ class BudgetRule < ActiveRecord::Base
 
   validate :no_duplicates
 
+  before_create :update_parent_version
+  before_destroy :update_parent_version
+
+  has_paper_trail
+
   private
+  def update_parent_version
+    self.policy.update_attribute(:updated_at, DateTime.now)
+  end
 
   # todo - look for a more elegant way to do this. Shitty code.
   def no_duplicates

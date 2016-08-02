@@ -14,7 +14,6 @@
 #
 
 class ExpenseRule < ActiveRecord::Base
-  include PolicyVersion
   belongs_to :greater_than_amount, class_name: "Amount"
   belongs_to :category
 
@@ -34,7 +33,15 @@ class ExpenseRule < ActiveRecord::Base
 
   validate :no_duplicates
 
+  before_create :update_parent_version
+  before_destroy :update_parent_version
+
+  has_paper_trail
+
   private
+  def update_parent_version
+    self.policy.update_attribute(:updated_at, DateTime.now)
+  end
 
   # todo - look for a more elegant way to do this. Shitty code.
   # make sure no rule has all attributes the same

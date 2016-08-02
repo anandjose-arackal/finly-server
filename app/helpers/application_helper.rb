@@ -1,6 +1,6 @@
 module ApplicationHelper
 
-  ALERT_TYPES = [:blue, :green, :orange, :red] unless const_defined?(:ALERT_TYPES)
+  ALERT_TYPES = ['success', 'error', 'information', 'alert', 'warning'] unless const_defined?(:ALERT_TYPES)
 
 
   def ej(obj)
@@ -203,7 +203,7 @@ module ApplicationHelper
 
       next unless ALERT_TYPES.include?(type)
       Array(message).each do |msg|
-        flash_messages << "ohSnap('#{msg}', {color: '#{type.to_s}', duration: '7000'});" if msg
+        flash_messages << "noty({text: #{msg}, type: #{type}});" if msg
       end
     end
     javascript_tag flash_messages.join("\n").html_safe
@@ -220,9 +220,9 @@ module ApplicationHelper
       next unless ALERT_TYPES.include?(type)
       Array(message).each do |msg|
         message = msg
-        formatting = {color: "#{type.to_s}", duration: '7000'}
-        color = "#{type.to_s}"
-        flash_messages << {message: message, format: formatting, color: color}
+        formatting = {type: "#{type}", duration: '7000'}
+        type = "#{type.to_s}"
+        flash_messages << {text: message, format: formatting, type: type}
       end
     end
     flash_messages
@@ -231,12 +231,15 @@ module ApplicationHelper
 
   private
   def get_type(type)
-    type = type.to_sym
-    type = :blue if type == :info
-    type = :green if type == :notice or type == :success
-    type = :orange if type == :alert
-    type = :red if type == :error or type == :failure or type == :danger
+    type = 'information' if type == 'info' or type == 'notice'
+    type = 'error' if type == 'failure' or type == 'danger'
     type
+    # type = type.to_sym
+    # type = :blue if type == :info
+    # type = :green if type == :notice or type == :success
+    # type = :orange if type == :alert
+    # type = :red if type == :error or type == :failure or type == :danger
+    # type
   end
 
 end

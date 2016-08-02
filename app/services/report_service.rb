@@ -138,8 +138,7 @@ class ReportService < BaseService
       return approve(auto_approve: true)
     end
     memo = params[:memo]
-    submitted_at = report.submitted_at
-    submitted_at = DateTime.now if submitted_at.blank?
+    submitted_at = DateTime.now
     if report.update_attributes report_status_id: ReportStatus.processing_id, controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo, submitted_at: submitted_at
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.submit_id, report_status_id: ReportStatus.processing_id, memo: memo
       track.save
@@ -165,7 +164,7 @@ class ReportService < BaseService
       errors << 'Cannot retract report as the report is not in processing state'
       return false
     end
-    if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil
+    if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil, submitted_at: nil
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.retract_id, report_status_id: ReportStatus.retracted_id
       track.save
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_retract_id

@@ -18,5 +18,4 @@
 //= require turboboost
 //= require jquery.remotipart
 //= require bootbox
-//= require ohsnap
 //= require_tree .

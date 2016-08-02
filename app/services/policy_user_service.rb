@@ -109,7 +109,7 @@ class PolicyUserService < BaseService
 
     # Check if all admins are being removed from the policy
     user_ids = users.pluck(:id)
-    policy_admin_ids = PolicyUserMapping.with_policy(policy.id).admin.pluck(:id)
+    policy_admin_ids = PolicyUserMapping.with_policy(policy.id).admin.pluck(:user_id)
     if (policy_admin_ids - user_ids).blank?
       errors << 'You cannot remove all the admins from the policy'
       return false

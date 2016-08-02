@@ -16,7 +16,7 @@
             </div>
             <% section[:expenses].each do |expense| %>
                 <div class="row" style="margin-top: 10px">
-                  <form data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed" data-remote data-turboboost id="expense<%= expense.id %>"
+                  <form data-remote data-turboboost data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed"  id="expense<%= expense.id %>"
                         action="<%= report_remove_expenses_path(@report, load_params(expense_id: expense.id)) %>" method="post">
 
                     <input name="_method" type="hidden" value="delete"/>
@@ -75,7 +75,7 @@
             </div>
             <% section[:expenses].each do |expense| %>
                 <div class="row" style="margin-top: 10px">
-                  <form data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed" data-remote data-turboboost id="expense<%= expense.id %>"
+                  <form data-remote data-turboboost data-confirm="Are you sure you want to remove this expense from the report? This expense would be added to your unsubmitted expenses when removed"  id="expense<%= expense.id %>"
                         action="<%= report_remove_expenses_path(@report, load_params(expense_id: expense.id)) %>" method="post">
                     <input name="_method" type="hidden" value="delete"/>
                     <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">

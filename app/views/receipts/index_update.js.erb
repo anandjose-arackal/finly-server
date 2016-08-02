@@ -1,0 +1,5 @@
+<%= render 'shared/flash_message' %>
+$('.modal').remove();
+$('.modal-backdrop').remove();
+$('body').removeClass('modal-open');
+$('#receiptsParent').replaceWith("<%= j render partial:'receipts/index_body' %>");

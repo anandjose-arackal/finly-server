@@ -18,7 +18,7 @@
     <% @policies.each do |policy| %>
 
 
-        <form data-remote data-turboboost id="updateUserPolicyConfiguration<%=policy.id%>" action="<%=policy_update_user_configuration_path(policy)%>" method="post">
+        <form data-remote data-turboboost  id="updateUserPolicyConfiguration<%=policy.id%>" action="<%=policy_update_user_configuration_path(policy)%>" method="post">
           <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
           <input name="_method" type="hidden" value="patch"/>
 
@@ -330,7 +330,7 @@
 
       </div>
 
-      <form hidden="hidden" data-remote data-turboboost id="updateUserPolicyConfiguration" action="" method="post">
+      <form data-remote data-turboboost hidden="hidden"  id="updateUserPolicyConfiguration" action="" method="post">
         <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
         <input name="_method" type="hidden" value="patch"/>
       </form>

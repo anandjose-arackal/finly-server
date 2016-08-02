@@ -15,7 +15,7 @@
           <!--          < % path = admin_users_path if is_manager_view %>
                     < % path = admin_company_users_path if is_admin_view %>
 
-                    <form data-remote data-turboboost action="< %= path %>" method="get">
+                    <form data-remote data-turboboost  action="< %= path %>" method="get">
                       < % params.each do |key, value| %>
                           < % if key.start_with?('filter') && key != 'filter_search' %>
                               <input type="text" hidden="hidden" name="< %= key %>" value="< %= value %>">
@@ -112,7 +112,7 @@
 
 <div class="modal fade" id="inviteTeamMembers" role="dialog" style="margin-top: 5%; ">
   <div class="modal-dialog modal-md">
-    <form action="" method="post" data-remote data-turboboost>
+    <form data-remote data-turboboost action="" method="post" >
       <input name="authenticity_token" value="" type="hidden">
 
       <div class="modal-content">
@@ -188,7 +188,7 @@
 
 <div class="modal fade" id="showEmployeeProfile" role="dialog">
   <div class="modal-dialog modal-lg" style="width: 95%">
-    <form action="" method="post" data-remote data-turboboost>
+    <form data-remote data-turboboost action="" method="post" >
       <input name="authenticity_token" value="" type="hidden">
 
       <div class="modal-content">

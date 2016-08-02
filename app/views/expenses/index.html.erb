@@ -6,7 +6,7 @@
 <body id="expenses">
 
 <%= render 'shared/lower_header' %>
-<form data-remote data-turboboost id="allFilters" action="<%= expenses_path %>" method="get">
+<form data-remote data-turboboost  id="allFilters" action="<%= expenses_path %>" method="get">
   <!-- search bar -->
   <div id="showPreviousFilters">
     <div id="showPreviousFilters" style="min-height: 20px;">
@@ -45,7 +45,7 @@
             <span class="ng-binding">[<%= (@count or 0) %>]</span>
           </h3>
 
-          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= reports_path(load_params) %>" method="post">
+          <form data-remote data-turboboost hidden="hidden"  id="createReportFromExpenses" action="<%= reports_path(load_params) %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
             <input id="createReportExpenseIds" name="report[expense_id]" type="text">
           </form>
@@ -103,7 +103,7 @@
               <ul id="adjacentLinks" style=" margin: 0; padding: 0;">
 
                 <li>
-                  <form data-remote data-turboboost enctype="multipart/form-data" id="editExpenseAddReceipt" hidden="hidden" method="post">
+                  <form data-remote data-turboboost  enctype="multipart/form-data" id="editExpenseAddReceipt" hidden="hidden" method="post">
                     <input name="authenticity_token" value="<%= form_authenticity_token %>">
                     <input class="form-control" id="receiptSelectFile" type="file" name="receipt[image]" accept=".png,.jpg,.pdf,.jpeg" onchange="submitFile()"/>
                     <input id="receiptSubmitFile" type="submit" name="commit" value="Submit" class="btn btn-primary"/>
@@ -126,7 +126,7 @@
           </div>
         </div>
 
-        <form data-remote data-turboboost id="editExpenseForm" method="post">
+        <form data-remote data-turboboost  id="editExpenseForm" method="post">
 
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
           <input name="_method" type="hidden" value="patch"/>
@@ -198,7 +198,7 @@
         <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">Cancel this
           Expense</h4>
       </div>
-      <form data-remote data-turboboost id="deleteExpenseButton" method="post">
+      <form data-remote data-turboboost  id="deleteExpenseButton" method="post">
         <input name="_method" type="hidden" value="delete"/>
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
       </form>
@@ -239,7 +239,7 @@
           Expense</h4>
       </div>
 
-      <form data-remote data-turboboost id="denyExpenseButtonForm" method="post">
+      <form data-remote data-turboboost  id="denyExpenseButtonForm" method="post">
         <input name="_method" type="hidden" value="put"/>
         <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
         <input name="status" type="number" value="3" hidden="hidden">

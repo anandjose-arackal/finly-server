@@ -16,7 +16,6 @@
   <%= render 'shared/header' %>
 </head>
 <body>
-<div id="ohsnap"></div>
 <%= snap_flash %>
 <%= yield %>
 
@@ -31,7 +30,17 @@
   var clickDisabled = false;
   var clickTimer;
 
+  var noty_loading = null;
+
   $(document).ready(function () {
+
+//    $ = jQuery;
+
+    $.noty.defaults.timeout = 8000;
+    $.noty.defaults.layout = 'bottomRight';
+    $.noty.defaults.theme = 'bootstrapTheme';
+    $.noty.defaults.dismissQueue = true;
+//  $.noty.defaults.animation = {open: 'animated slideInRight', close: 'animated fadeOutRight'};
 
     formDisabled = false;
     $(".alert").delay(6000).fadeOut(2000);
@@ -77,7 +86,7 @@
     }
 
     $(document).on('page:fetch', function () {
-      ohSnap('Loading...', {color: 'blue', duration: '20000'});
+//      noty({text: 'Loading..', type: 'success'});
     });
     $(document).on('page:change', function () {
       console.log('change')
@@ -152,19 +161,16 @@
     if (flash != null && flash != undefined) {
       for (var key in flash) {
         var value = flash[key];
-        var type = null;
-        if (key == 'info') {
-          type = 'blue'
-        } else if (key == 'notice' || key == 'success') {
-          type = 'green'
-        } else if (key == 'alert') {
-          type = 'orange'
-        } else if (key == 'error' || key == 'failure' || key == 'danger') {
-          type = 'red'
+        var type = key;
+
+        if (key == 'info' || key == 'notice') {
+          type = 'information'
+        } else if (key == 'failure' || key == 'danger') {
+          type = 'error'
         }
         console.log('type : ' + type);
         if (type != null && value != null) {
-          ohSnap(value, {color: type, duration: '7000'});
+          noty({text: value, type: type});
         }
       }
     }

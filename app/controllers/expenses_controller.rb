@@ -39,7 +39,7 @@ class ExpensesController < ApplicationController
 
   def create
     if @expense_service.add_expense expense_params
-      flash.now[:success] = 'Expense created!'
+      flash[:success] = 'Expense created!'
       if params['request_type'] == '1'
         redirect_to expenses_path
       else
