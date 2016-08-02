@@ -120,14 +120,12 @@ class ReportsController < ApplicationController
     rs = ReportService.new(user: current_user, report: @report)
     if rs.comment params[:comment]
       @comments = @report.comments
-      if params[:show_flash].present? && params[:show_flash] == 'true'
-        flash.now[:success] = 'Comment posted'
-      end
+      flash.now[:success] = 'Comment posted'
       respond_to do |format|
         format.html do
           redirect_to report_path rs.report, view_params
         end
-        format.js { render partial: 'reports/comments', replace: '#commentsContainer' }
+        format.js
       end
       return
     end

@@ -97,3 +97,5 @@ gem 'deep_cloneable', '~> 2.2.1'
 gem 'animate-rails'
 
 gem 'rails-erd'
+
+gem 'nprogress-rails'
