@@ -30,7 +30,7 @@ class UsersController < ApplicationController
     @policies = retrieve_policies
     @reports = @user.reports
     # using current user instead of @user because we need list of users in current user's view
-    @users = current_company.users.paginate(page: params[:page])
+    @users = load_users.paginate(page: params[:page])
     load_all_mappings
 
     @company_managers = current_company.users.with_roles.only_managers
@@ -44,7 +44,7 @@ class UsersController < ApplicationController
     authorize User
     @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
     @policies = retrieve_policies
-    @users = current_company.users.paginate(page: params[:page], per_page: 30)
+    @users = load_users.paginate(page: params[:page], per_page: 30)
     @reports = @user.reports
     @company_managers = current_company.users.with_roles.only_managers
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
@@ -101,6 +101,18 @@ class UsersController < ApplicationController
         end
       end
       @policies = policy_admin_for
+    end
+  end
+
+  def load_users
+    if current_user.admin?
+      return current_company.users
+    elsif current_user.manager?
+      UserTeamService.new(current_user).team(3)
+    elsif current_user.finance_manager?
+      UserTeamService.new(current_user).team(2)
+    else
+      [] # return empty array
     end
   end
 

@@ -22,6 +22,8 @@
 
 <h4 class="profile_subheading">Reporting managers : </h4>
 
+<% if current_user.admin? %>
+
 <div>
   <p class="profile_info"><select id="userManagerSelector" form="updateDefaultUserConfiguration"
                                   name="user_team[default][manager_id]" class="selectors">
@@ -64,8 +66,33 @@
 
 </div>
 
+<% else %>
+
+<% if @mappings['company'].default.first.manager_id.present? %>
+
+<p class="profile_info"><%= current_company.users.find_by(id: @mappings['company'].default.first.manager_id).name %></p>
+
+<% end %>
+
+<% if @mappings['company'].non_default.manager.present? %>
+
+<div class="profile_info">
+  <label>If Report Total is Over:</label>
+  <p><%=@mappings['company'].non_default.manager.first.greater_than_amount_value%></p>
+
+  <label>Then Submits To:</label>
+  <p><%= current_company.users.find_by(id: @mappings['company'].non_default.manager.first.manager_id).name %></p>
+
+</div>
+
+<% end %>
+
+<% end %>
+
 
 <h4 class="profile_subheading">Reporting Finance managers :</h4>
+
+<% if current_user.admin? %>
 
 <div>
   <p class="profile_info">
@@ -109,6 +136,29 @@
     </div>
 
 </div>
+
+<% else %>
+
+        <% if @mappings['company'].default.first.finance_manager_id.present? %>
+
+            <p class="profile_info"><%= current_company.users.find_by(id: @mappings['company'].default.first.finance_manager_id).name%></p>
+        <% end %>
+
+        <% if @mappings['company'].non_default.manager.present? %>
+
+            <div class="profile_info">
+              <label>If Report Total is Over:</label>
+              <p><%=@mappings['company'].non_default.finance_manager.first.greater_than_amount_value%></p>
+
+              <label>Then Submits To:</label>
+              <p><%= current_company.users.find_by(id: @mappings['company'].non_default.finance_manager.first.finance_manager_id).name %></p>
+
+            </div>
+
+
+
+        <% end %>
+<% end %>
 
 <% end %>
 
@@ -213,6 +263,7 @@ style="display:none;"
 
 </div>
 
+<% if current_user.admin? %>
 
 <button form="updateDefaultUserConfiguration" class="green-button"
     style="width: 100px;
@@ -222,3 +273,4 @@ style="display:none;"
     margin-top: 30px;background-color: #46568b">Update
 </button>
 
+<% end %>
