@@ -2,6 +2,7 @@ class ExpensesController < ApplicationController
 
   before_action :authenticate_user!
   before_action :retrieve_service_objects
+  before_action :load_expense, only: [:update, :destroy, :add_receipt]
 
   # scopes for filters
   has_scope :filter_category_id
@@ -13,11 +14,11 @@ class ExpensesController < ApplicationController
   has_scope :filter_date, using: [:from, :to], type: :hash
 
   def new
-    current_user.view = params[:view] || params['view']
     authorize Expense
   end
 
   def index
+    authorize Expense
     # currently returns only the personal expenses of the user
     @expenses = apply_scopes(@expense_service.list_expenses).paginate(page: params[:page])
     # for the filters
@@ -30,7 +31,6 @@ class ExpensesController < ApplicationController
   end
 
   def create
-    current_user.view = params[:view] || params['view']
     authorize Expense
     if @expense_service.add_expense expense_params
       flash.now[:success] = 'Expense created!'
@@ -47,6 +47,7 @@ class ExpensesController < ApplicationController
   end
 
   def update
+    authorize @expense
     if @expense_service.update_expense(current_user, expense_params)
       flash[:success] = 'Expense edited!'
       redirect_to expenses_path
@@ -57,6 +58,7 @@ class ExpensesController < ApplicationController
   end
 
   def destroy
+    authorize @expense
     if @expense_service.remove_expense(params[:id] || params[:expense_id])
       flash[:success] = "Expense deleted!"
     else
@@ -66,7 +68,8 @@ class ExpensesController < ApplicationController
   end
 
   def add_receipt
-    if @expense_service.add_receipt_to_expense(expense_params, params[:id] || params[:expense_id])
+    authorize @expense
+    if @expense_service.add_receipt_to_expense(receipt_params, params[:id] || params[:expense_id])
       flash[:success] = "receipt added!"
     else
       flash[:danger] = @expense_service.errors
@@ -76,6 +79,7 @@ class ExpensesController < ApplicationController
 
 
   def unreported
+    authorize Expense
     @unreported_expenses = apply_scopes(current_user.expenses.unreported)
     respond_to do |format|
       format.js
@@ -112,8 +116,16 @@ class ExpensesController < ApplicationController
 
   end
 
+  def receipt_params
+    params.require(:receipt).permit(:image)
+  end
+
   def retrieve_service_objects
     @expense_service = ExpenseService.new(current_user)
+  end
+
+  def load_expense
+    @expense = current_user.expenses.find_by(id: params[:expense_id])
   end
 
 end

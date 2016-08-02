@@ -25,15 +25,15 @@ class ReportService < BaseService
           return false
         end
       when UserRole.manager_id
-        controlling_report_query = current_user.controlling_reports.non_owner(current_user.id)
-        interacted_reports_query= current_user.manager_reports
+        controlling_report_query = user.controlling_reports.non_owner(user.id)
+        interacted_reports_query= user.manager_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
         return Report.from(sql)
       when UserRole.finance_manager_id
-        controlling_report_query = current_user.controlling_reports.non_owner(current_user.id)
-        interacted_reports_query = current_user.finance_reports
+        controlling_report_query = user.controlling_reports.non_owner(user.id)
+        interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }

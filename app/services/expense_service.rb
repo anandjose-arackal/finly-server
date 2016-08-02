@@ -166,7 +166,7 @@ class ExpenseService < BaseService
   end
 
   def load_receipt_params(params)
-    receipt_params = params[:receipt].slice(:image)
+    receipt_params = params.slice(:image)
   end
 
   # if expense belongs to user, it returns the expense, otherwise false

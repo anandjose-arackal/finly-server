@@ -37,46 +37,57 @@ class ReportsController < ApplicationController
   end
 
   def update
+    authorize @report
     handle_update :update_report, nil, update_params
   end
 
   def show
+    authorize @report
     load_view_for_report
   end
 
   def destroy
+    authorize @report
     handle_update :delete_report, 'Report deleted'
   end
 
   def add_expenses
+    authorize @report
     handle_update :add_expense, 'Expenses added to report', params[:expense_id]
   end
 
   def remove_expenses
+    authorize @report
     handle_update :remove_expense, nil, params[:expense_id]
   end
 
   def submit
+    authorize @report
     handle_update :submit, 'Report submitted'
   end
 
   def retract
+    authorize @report
     handle_update :retract, 'Report retracted'
   end
 
   def approve
+    authorize @report
     handle_update :approve, 'Report approved'
   end
 
   def reject
+    authorize @report
     handle_update :reject, 'Report rejected'
   end
 
   def unapprove
+    authorize @report
     handle_update :unapprove, 'Report unapproved'
   end
 
   def take_control
+    authorize @report
     handle_update :take_control, 'You have taken control of the report'
   end
 
@@ -92,6 +103,7 @@ class ReportsController < ApplicationController
   end
 
   def reimbursement_confirm
+    authorize @report
     rs = ReportService.new(user: current_user, report: @report)
     if rs.reimbursement_confirm
       flash[:success] = 'You have taken control of the report'
@@ -103,6 +115,7 @@ class ReportsController < ApplicationController
   end
 
   def comment
+    authorize @report
     rs = ReportService.new(user: current_user, report: @report)
     if rs.comment params[:comment]
       @comments = @report.comments
@@ -122,6 +135,7 @@ class ReportsController < ApplicationController
   end
 
   def assign_policy
+    authorize @report
     handle_update :update_report, nil, update_params
   end
 

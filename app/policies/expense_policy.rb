@@ -10,30 +10,28 @@ class ExpensePolicy < ApplicationPolicy
     check_personal_view
   end
 
-
   # todo - will be updated once there's more clarity on admin view for expenses
   def index?
     check_personal_view
   end
 
   def update?
-    if @user.employee?
-      if @expense.user.id == @user.id
-        return true
-      end
+    return unless check_personal_view
+    # check if this user owns the particular expense being edited
+    unless @expense.user.id == @user.id
       return false
     end
+    true
   end
 
   # can only be destroyed by the owner
   def destroy?
     return unless check_personal_view
-    if @user.employee?
-      if @expense.user.id == @user.id
-        return true
-      end
+    # check if this user owns the particular expense being edited
+    unless @expense.user.id == @user.id
+      return false
     end
-    false
+    true
   end
 
   def create?
