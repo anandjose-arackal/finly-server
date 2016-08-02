@@ -136,7 +136,7 @@ class ReportsController < ApplicationController
 
   def assign_policy
     authorize @report
-    handle_update :update_report, nil, update_params
+    handle_update :update_report, 'Policy Updated', update_params
   end
 
   private
@@ -180,7 +180,7 @@ class ReportsController < ApplicationController
     end
     # code for report policy
     @policies = @report.user.policies
-    @policy = @report.policy
+    @policy = PolicyRetrievalService.for_report(@report)
     @violation_messages = @violation_service.violations(@policy, @report)
   end
 

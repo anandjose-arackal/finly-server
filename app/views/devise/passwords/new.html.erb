@@ -6,7 +6,7 @@
     <%= devise_error_messages! %>
     <div class="modal-dialog">
       <div class="loginmodal-container">
-        <form data-remote data-turboboost name="myForm" method="post" action="<%= password_path(resource_name) %>" onsubmit="return validateForm()">
+        <form data-remote data-turboboost  name="myForm" method="post" action="<%= password_path(resource_name) %>" onsubmit="return validateForm()">
           <input id="email" type="text" name="user[email]" placeholder="Your email address" autofocus title="Enter Email Address">
           <input id="submit_login" type="submit" name="login" class="login loginmodal-submit" value="RESET PASSWORD">
         </form>

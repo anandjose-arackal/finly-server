@@ -2,7 +2,7 @@
 
 <%= render 'shared/lower_header' %>
 
-<form data-remote data-turboboost id="allReportsFilters" action="<%= reports_path(load_params) %>" method="get">
+<form data-remote data-turboboost  id="allReportsFilters" action="<%= reports_path(load_params) %>" method="get">
   <!-- applied filters -->
   <div id="showPreviousFilters" style="min-height: 20px;">
     <% param = parse_params # i.e get filters for expenses               %>
@@ -23,7 +23,7 @@
       <div style="background-color: white">
 
         <div class="row" style="background-color: white;border-bottom: 2px solid #d8d8d8;">
-          <form data-remote data-turboboost action="<%= reports_path %>" method="get">
+          <form data-remote data-turboboost  action="<%= reports_path %>" method="get">
             <% params.each do |key, value| %>
                 <% if key.start_with?('filter') && key != 'filter_search' %>
                     <input type="text" hidden="hidden" name="<%= key %>" value="<%= value %>">
@@ -54,7 +54,7 @@
 
   </div>
   <div class="col-sm-4">
-    <form data-remote data-turboboost action="<%= reports_path(load_params) %>" method="post">
+    <form data-remote data-turboboost  action="<%= reports_path(load_params) %>" method="post">
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <% if is_personal_view %>
           <button class="invite" style="margin-bottom: 20px" type="submit">
@@ -68,7 +68,7 @@
     <div class="navblock" style="margin-top: 0">
       <p class="listHeaders">Date Submitted</p>
 
-      <form data-remote data-turboboost id="filterForm" action="<%= reports_path %>" method="get" style="background-color: white">
+      <form data-remote data-turboboost  id="filterForm" action="<%= reports_path %>" method="get" style="background-color: white">
         <input type="text" hidden="hidden" name="view" value="<%= params[:view] if params[:view].present? %>" style="font-size: 14px;margin-right: 30px;border: 1px solid #d8d8d8;float: right;color: #2E2F30;padding: 3px;background-color: white;border-radius: 1px;line-height: normal !important;width: 60%;">
 
         <div style="padding: 16px 0 8px 16px;"><label style="font-weight: 400;margin-top: 3px">From</label>

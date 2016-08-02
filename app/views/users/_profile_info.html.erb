@@ -10,7 +10,7 @@
 
 <p class="profile_info"><%= @user.mobile_number %></p>
 
-<form hidden="hidden" data-remote data-turboboost id="updateDefaultUserConfiguration" action="<%= user_update_team_path(@user)%>" method="post">
+<form data-remote data-turboboost hidden="hidden"  id="updateDefaultUserConfiguration" action="<%= user_update_team_path(@user)%>" method="post">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
   <input name="_method" type="hidden" value="patch"/>
 </form>

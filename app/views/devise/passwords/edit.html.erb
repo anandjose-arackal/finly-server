@@ -5,9 +5,10 @@
     <form data-remote data-turboboost name="myForm" method="post" action="/users/password/forgot" onsubmit="return validateForm()">
       <%= devise_error_messages! %>
       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-      <%= hidden_field(:user, :reset_password_token, id: :reset_password_token)%>
+      <%= hidden_field(:user, :reset_password_token, id: :reset_password_token) %>
       <!-- <input type="hidden" name="user[reset_password_token]" id="reset_password_token">
-      --> <input id="new_password" type="password" name="user[password]" placeholder="New Password " title="New Password">
+      -->
+      <input id="new_password" type="password" name="user[password]" placeholder="New Password " title="New Password">
       <input id="confirm_new_password" type="password" name="user[password_confirmation]" placeholder="Confirm New Password (Minimum 8 characters) " title="Confirm New Password">
       <input id="submit_login" type="submit" name="changePwd" class="login loginmodal-submit" value="Change My Password">
     </form>

@@ -77,9 +77,6 @@ gem 'opro'
 gem 'devise'
 gem 'devise_invitable'
 
-# gem for flash messages/ notifications
-gem 'ohsnap-rails'
-
 gem 'has_scope'
 
 group :development, :test do
@@ -96,3 +93,7 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'deep_cloneable', '~> 2.2.1'
+
+gem 'animate-rails'
+
+gem 'rails-erd'

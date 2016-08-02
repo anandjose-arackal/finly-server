@@ -5,7 +5,7 @@
 
 <%= render 'settlements/settlement_lower_header' %>
 <!--
-<form data-remote data-turboboost method="get" id="allFilters" action="<%= request.path %>">
+<form data-remote data-turboboost  method="get" id="allFilters" action="<%= request.path %>">
   <div id="showPreviousFilters">
     < % param = get_old_filters(params) %>
     < % param.each do |item| %>
@@ -96,7 +96,7 @@
         <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
         <h4 class="modal-title" style="text-align: center; font-weight: 400;border-bottom: #d8d8d8">New Settlement</h4>
       </div>
-      <form id="settlementModalForm" method="post" data-remote data-turboboost>
+      <form data-remote data-turboboost id="settlementModalForm" method="post" >
         <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
 
         <div class="modal-body" style=" padding-left: 40px;padding-right: 40px">

@@ -3,14 +3,20 @@ class ReceiptsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @receipts = current_user.receipts.without_parent
+    load_receipts
   end
 
   def create
     receipt_service = ReceiptService.new(current_user)
     if receipt_service.create_receipt(receipt_params)
-      flash[:success] = "Receipt added!"
-      redirect_to (request.referrer or receipts_path)
+      flash.now[:success] = "Receipt added!"
+      respond_to do |format|
+        format.html { redirect_to (request.referrer or receipts_path) }
+        format.js do
+          load_receipts
+          render 'receipts/index_update'
+        end
+      end
     else
       flash.now[:danger] = receipt_service.errors
       render_flash_message
@@ -18,10 +24,16 @@ class ReceiptsController < ApplicationController
   end
 
   def destroy
-    receipt_service = ReceiptService.new(current_user)
-    if receipt_service.destroy_receipt(receipt_params[:receipt_id])
-      flash[:success] = "Receipt added!"
-      redirect_to (request.referrer or receipts_path)
+    receipt_service = ReceiptService.new current_user
+    if receipt_service.destroy_receipt(params[:id])
+      flash.now[:success] = "Receipt destroyed!"
+      respond_to do |format|
+        format.html { redirect_to (request.referrer or receipts_path) }
+        format.js do
+          load_receipts
+          render 'receipts/index_update'
+        end
+      end
     else
       flash.now[:danger] = receipt_service.errors
       render_flash_message
@@ -32,8 +44,14 @@ class ReceiptsController < ApplicationController
     expense_service = ExpenseService.new(current_user)
     receipt_id = expense_params[:expense][:receipt_id]
     if expense_service.expense_from_receipt(expense_params, receipt_id)
-      flash[:success] = "Expense created!"
-      redirect_to (request.referrer or receipts_path)
+      flash.now[:success] = "Expense created!"
+      respond_to do |format|
+        format.html { redirect_to (request.referrer or receipts_path) }
+        format.js do
+          load_receipts
+          render 'receipts/index_update'
+        end
+      end
     else
       flash.now[:danger] = expense_service.errors
       render_flash_message
@@ -44,7 +62,7 @@ class ReceiptsController < ApplicationController
     @receipt = current_user.receipts.find_by(id: params[:receipt_id])
     note = receipt_params[:note]
     if @receipt.update_attributes(note: note)
-      flash[:success] = "Note added"
+      flash.now[:success] = "Note added"
       render_flash_message
     else
       flash[:danger] = "Error try again."
@@ -67,6 +85,10 @@ class ReceiptsController < ApplicationController
 
   def receipt_params
     params.require(:receipt).permit!
+  end
+
+  def load_receipts
+    @receipts = current_user.receipts.without_parent
   end
 
 end

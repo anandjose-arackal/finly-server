@@ -19,7 +19,7 @@
           type="submit" form="submitform" id="sendBtn" class="green-button">Submit
           </button>
 
-          <form data-remote data-turboboost data-confirm="Are you sure you want to submit the report?
+          <form data-remote data-turboboost  data-confirm="Are you sure you want to submit the report?
         <% if @violations_found %>
             <br /><br /> <b>This report contains policy violations. Your manager will be able to see the same before approval.<b>
         <% end %>
@@ -66,7 +66,7 @@
     <% unless @policies.blank? %>
         <label style="float: right;margin-top: 5px"> Report Policy:
           <% if is_personal_view && !@report.processing? && !@report.approved? %>
-              <form id="applyPolicyForm" data-remote data-turboboost action="<%= report_assign_policy_path(@report) %>" method="post" style="display: inline-block">
+              <form data-remote data-turboboost id="applyPolicyForm"  action="<%= report_assign_policy_path(@report) %>" method="post" style="display: inline-block">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                 <select name="report[policy_id]" onchange="$('form#applyPolicyForm').submit();" class="selectors" style="padding-top: 10px; width: 155px">
                   <option value="nil"
@@ -134,7 +134,7 @@
             Expense</h4>
         </div>
 
-        <form onsubmit="closeDenyModal();" id="denyExpenseButtonForm" method="post">
+        <form data-remote data-turboboost onsubmit="closeDenyModal();" id="denyExpenseButtonForm" method="post">
           <input name="_method" type="hidden" value="put"/>
           <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
           <input name="status" type="number" value="-1" hidden="hidden">
@@ -188,7 +188,7 @@
         </div>
         <div class="modal-body" style=" padding-left: 40px;padding-right: 40px; background-color: white">
 
-          <form data-remote data-turboboost id="updateNameForm" action="<%= report_path(@report, view: params[:view]) %>" method="post">
+          <form data-remote data-turboboost  id="updateNameForm" action="<%= report_path(@report, view: params[:view]) %>" method="post">
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
             <input name="_method" type="hidden" value="patch"/>
             <textarea name="report[name]" id="modalInputName" style="border-radius: 1px" class="form-control" placeholder="Name"><%= @report.name %></textarea>
@@ -213,7 +213,7 @@
             <% end %>">
             <% if is_admin_view || is_manager_view %>
                 <div style="width: 250px;float: right;margin-right: 20px">
-                  <form data-remote="" data-turboboost="" id="approveExpenseButtonForm" method="post">
+                  <form data-remote data-turboboost id="approveExpenseButtonForm" method="post">
                     <input name="_method" type="hidden" value="put">
                   </form>
                 </div>
@@ -242,7 +242,7 @@
         </div>
         <div class="modal-body row" style=" padding: 25px;">
 
-          <form data-remote data-turboboost accept-charset="UTF-8" enctype="multipart/form-data" id="editExpenseForm" method="post">
+          <form data-remote data-turboboost  accept-charset="UTF-8" enctype="multipart/form-data" id="editExpenseForm" method="post">
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
             <input name="_method" type="hidden" id="hiddenPatchCall" value="patch"/>
             <input type="text" class="expenseDetailInput" name="expense[receipt]" id="viewReceiptSelectFileText" style="display:none"/>
@@ -343,7 +343,7 @@
               </div>
               <div id="commenter" class="col-md-10">
 
-                <form data-remote data-turboboost id="addCommentForm" action="<%= report_comment_path(@report, view: params[:view]) %>" method="post">
+                <form data-remote data-turboboost  id="addCommentForm" action="<%= report_comment_path(@report, view: params[:view]) %>" method="post">
                   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                   <input name="report_id" id="reportIDForComment" value="<%= %>" type="hidden">
                   <textarea style="border-radius: 1px; background-color: ghostwhite" id="commentTextAreaEditModal" name="comment"></textarea>
@@ -400,7 +400,7 @@
         <div class="modal-header" style="background-color: #e9e9e9 ; height: 60px">
           <button type="button" id="closeAddExistingExpenseModal" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
 
-          <form hidden="hidden" data-remote data-turboboost id="createReportFromExpenses" action="<%= report_add_expenses_path(@report, load_params) %>" method="post">
+          <form data-remote data-turboboost hidden="hidden"  id="createReportFromExpenses" action="<%= report_add_expenses_path(@report, load_params) %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
             <input id="createReportExpenseIds" name="expense_id" type="text">
           </form>
@@ -417,7 +417,7 @@
         </div>
         <div class="modal-body" style="padding: 0">
 
-          <form data-remote data-turboboost id="existingExpensesList" action="<%= expenses_unreported_path(load_params) %>" method="post">
+          <form data-remote data-turboboost  id="existingExpensesList" action="<%= expenses_unreported_path(load_params) %>" method="post">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
 
             <section id="filterSection" style="float: left;width: 25%;">
@@ -468,7 +468,7 @@
   <div class="modal fade" id="newExpenseModal" role="dialog" style="margin-top: 5%;">
     <div class="modal-dialog modal-md" style="background-color: white">
 
-      <form id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;" data-remote data-turboboost action="<%= expenses_path %>">
+      <form data-remote data-turboboost id="expenseForm" accept-charset="UTF-8" enctype="multipart/form-data" method="post" style="background: white;"  action="<%= expenses_path %>">
 
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
         <input type="text" hidden="hidden" name="expense[report_id]" value="<%= @report.id %>"/>

@@ -1,4 +1,4 @@
-<form data-remote data-turboboost id="openReport<%= report.id %>" action="<%= report_path(report.id, view:params[:view]) %>" method="get">
+<form data-remote data-turboboost  id="openReport<%= report.id %>" action="<%= report_path(report.id, view:params[:view]) %>" method="get">
 </form>
 
 <div id="reportRow" class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px;cursor: pointer; " onclick="$('#openReport<%= report.id %>').submit(); changeBackground(this);">

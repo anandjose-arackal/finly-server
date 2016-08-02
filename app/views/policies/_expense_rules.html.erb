@@ -13,7 +13,7 @@
       <% @policy.expense_rules.each do |rule| %>
         <% if rule.rule_type_id == 1 %>
               <!-- deleting a particular rule or warning -->
-              <form data-confirm="Are you sure you want to remove this rule?" data-remote data-turboboost id="expense_rule<%= rule.id %>"
+              <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="expense_rule<%= rule.id %>"
                     action="<%= policy_remove_rule_path(@policy) %>" method="post">
 
                 <input name="_method" type="hidden" value="delete"/>
@@ -52,7 +52,7 @@
       <% @policy.expense_rules.each do |rule| %>
           <% if rule.rule_type_id == 2 %>
               <!-- deleting a particular rule or warning -->
-              <form data-confirm="Are you sure you want to remove this rule?" data-remote data-turboboost id="expense_rule<%= rule.id %>"
+              <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="expense_rule<%= rule.id %>"
                     action="<%= policy_remove_rule_path(@policy) %>" method="post">
 
                 <input name="_method" type="hidden" value="delete"/>
@@ -96,7 +96,7 @@
       </div>
       <div class="modal-body" style="padding: 0 35px 35px 35px">
 
-        <form name="submitNewRuleForm" data-remote data-turboboost action="<%= policy_add_rule_path(@policy)%>" method="post">
+        <form data-remote data-turboboost name="submitNewRuleForm"  action="<%= policy_add_rule_path(@policy)%>" method="post">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
           <h5>The rule is...</h5>
