@@ -12,7 +12,19 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def index?
+    true
+  end
 
+  def show?
+    # if it's personal view, check if user owns the report
+    if check_personal_view
+      if @user.id == @report.user.id
+        return true
+      else
+        return false
+      end
+    end
+    true
   end
 
   def destroy?
@@ -53,7 +65,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def comment?
-
+    true
   end
 
   def assign_policy?
@@ -79,7 +91,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def approve?
-    return false unless check_manager_view and @user.manager?
+    return false unless check_manager_view
     # check if report is approvable
     unless @report.processing?
       return false
@@ -92,7 +104,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def reimburse?
-    return false unless check_finance_view and @user.finance_manager?
+    return false unless check_finance_view
     # ensure report is approved before reimbursement
     unless @report.approved?
       return false
@@ -101,7 +113,16 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def reject?
-
+    return false unless check_manager_view
+    # check if report is approvable
+    unless @report.processing?
+      return false
+    end
+    # check if the current user can reject this report
+    unless @report.controlling_user_id == @user.id
+      return false
+    end
+    true
   end
 
   def reimbursement_confirm?
@@ -113,11 +134,11 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def unapprove?
-
+    true
   end
 
   def take_control?
-
+    true
   end
 
   # todo - all the flow actions in report

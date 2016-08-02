@@ -6,9 +6,7 @@ class PaymentPolicy < ApplicationPolicy
   end
 
   def index?
-    if @user.admin? and check_admin_view
-      return true
-    elsif @user.finance_manager? and check_finance_view
+    if check_admin_view || check_finance_view
       return true
     else
       return false
@@ -16,9 +14,7 @@ class PaymentPolicy < ApplicationPolicy
   end
 
   def add_payment?
-    if @user.admin? and check_admin_view
-      return true
-    elsif @user.finance_manager? and check_finance_view
+    if check_admin_view || check_finance_view
       return true
     else
       return false
