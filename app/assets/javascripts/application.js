@@ -18,4 +18,10 @@
 //= require turboboost
 //= require jquery.remotipart
 //= require bootbox
+//= require nprogress
+//= require nprogress-turbolinks
 //= require_tree .
+
+NProgress.configure({
+    showSpinner: false,
+});
