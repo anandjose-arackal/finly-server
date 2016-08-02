@@ -1,17 +1,14 @@
 class RuleService < BaseService
 
-  def initialize(current_user, policy_id)
+  def initialize(current_user, policy_id=nil)
     super()
-    # currently assumes that the user calling this cannot be anyone but admin
-    # todo - checks inside here to determine whether user is admin
     @user = current_user
-    @policy = retrieve_policy policy_id
+    @policy = retrieve_policy policy_id if policy_id
   end
 
   def add_expense_rule(params)
     # retrieving policies from the policy retrieval service
-    rule_params = retrieve_expense_rule_params params
-
+    rule_params = params
     rule = @policy.expense_rules.create!(rule_params)
     if rule.save
       return rule
@@ -33,7 +30,7 @@ class RuleService < BaseService
 
   def add_budget_rule(params)
     # retrieving policies from the policy retrieval service
-    rule_params = retrieve_budget_rule_params params
+    rule_params = params
     rule = @policy.budget_rules.create!(rule_params)
     if rule.save
       return rule
@@ -54,7 +51,7 @@ class RuleService < BaseService
   end
 
   def edit_expense_rule(params, rule_id)
-    rule_params = retrieve_expense_rule_params params
+    rule_params = params
     rule = load_expense_rule rule_id
     if rule.update(rule_params)
       return rule
@@ -65,7 +62,7 @@ class RuleService < BaseService
   end
 
   def edit_budget_rule(params, rule_id)
-    rule_params = retrieve_budget_rule_params params
+    rule_params = params
     rule = load_budget_rule rule_id
     if rule.update(rule_params)
       return rule
@@ -77,21 +74,21 @@ class RuleService < BaseService
 
   private
 
-  def retrieve_expense_rule_params(params = {})
-    return if params.blank?
-    # expense_rule_params = params[:expense_rule].except(:amount, :currency_id)
-    # expense_rule_params[:greater_than_amount_attributes] = {value: params[:expense_rule][:amount], currency_id: params[:expense_rule][:currency_id]}
-    # expense_rule_params
-    params
-  end
-
-  def retrieve_budget_rule_params(params = {})
-    return if params.blank?
-    # budget_rule_params = params[:budget_rule].except(:amount, :currency_id)
-    # budget_rule_params[:amount_attributes] = {value: params[:budget_rule][:amount], currency_id: params[:budget_rule][:currency_id]}
-    # budget_rule_params
-    params
-  end
+  # def retrieve_expense_rule_params(params = {})
+  #   return if params.blank?
+  #   # expense_rule_params = params[:expense_rule].except(:amount, :currency_id)
+  #   # expense_rule_params[:greater_than_amount_attributes] = {value: params[:expense_rule][:amount], currency_id: params[:expense_rule][:currency_id]}
+  #   # expense_rule_params
+  #   params
+  # end
+  #
+  # def retrieve_budget_rule_params(params = {})
+  #   return if params.blank?
+  #   # budget_rule_params = params[:budget_rule].except(:amount, :currency_id)
+  #   # budget_rule_params[:amount_attributes] = {value: params[:budget_rule][:amount], currency_id: params[:budget_rule][:currency_id]}
+  #   # budget_rule_params
+  #   params
+  # end
 
   def load_expense_rule(rule_id)
     return if rule_id.blank?

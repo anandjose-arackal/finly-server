@@ -6,6 +6,7 @@ class PoliciesController < ApplicationController
   has_scope :filter_email
 
   def create
+    authorize Policy
     pcs = PolicyCreateService.new(current_user)
     if pcs.create_policy(params[:name])
       flash.now[:success] = 'Policy Created'
@@ -17,12 +18,14 @@ class PoliciesController < ApplicationController
   end
 
   def index
+    authorize Policy
     prs = PolicyRetrievalService.new(current_user)
     @policies = prs.list params
   end
 
   def show
     @policy = Policy.find(params[:id])
+    authorize @policy
     @managers = @policy.company.managers
     @finance_managers = @policy.company.finance_managers
     @categories = current_company.categories.active
@@ -30,7 +33,8 @@ class PoliciesController < ApplicationController
   end
 
   def invitable_users
-    @policy = Policy.find(params[:policy_id])
+    @policy = Policy.find_by(id: params[:policy_id])
+    authorize @policy
     u = PolicyUserService.new(@policy).invitable_users.sort_by_name
     u = apply_scopes(u)
     manager_id = params[:filter_manager_id]
@@ -63,6 +67,7 @@ class PoliciesController < ApplicationController
 
   def add_users
     @policy = Policy.find(params[:policy_id])
+    authorize @policy
     ids = []
     ids = params[:user_id].split(/,/) unless params[:user_id].blank?
     users = PolicyUserService.new(@policy).invitable_users.with_id(ids)
@@ -81,6 +86,7 @@ class PoliciesController < ApplicationController
 
   def remove_users
     @policy = Policy.find(params[:policy_id])
+    authorize @policy
     ids = []
     ids = params[:user_id].split(/,/) unless params[:user_id].blank?
     users = @policy.users.with_id(ids)
@@ -100,6 +106,7 @@ class PoliciesController < ApplicationController
 
   def update_user_configuration
     @policy = Policy.find(params[:policy_id])
+    authorize @policy
     pus = PolicyUserService.new(@policy)
     if pus.update_configuration params[:policy]
       load_users
@@ -115,6 +122,8 @@ class PoliciesController < ApplicationController
   end
 
   def add_rule
+    @policy = Policy.find(params[:policy_id])
+    authorize @policy
     # determine the type of rule and call the respective service method
     if rule_params['greater_than_amount_attributes']
       if @rule_service.add_expense_rule(rule_params)
@@ -135,6 +144,8 @@ class PoliciesController < ApplicationController
   end
 
   def remove_rule
+    @policy = Policy.find(params[:policy_id])
+    authorize @policy
     # determine the type of rule being added and accordingly update
     if params['budget_rule']
       if @rule_service.remove_budget_rule(params['budget_rule']['rule_id'])

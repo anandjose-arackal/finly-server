@@ -64,7 +64,15 @@ class ReportPolicy < ApplicationPolicy
     add_expenses?
   end
 
+
   def comment?
+    if check_personal_view
+      if @report.user.id == @user.id
+        return true
+      else
+        return false
+      end
+    end
     true
   end
 
@@ -79,7 +87,6 @@ class ReportPolicy < ApplicationPolicy
     unless @report.user.id == @user.id
       return false
     end
-
   end
 
   def retract?
@@ -134,12 +141,16 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def unapprove?
+    return false unless check_manager_view
+    if @report.open? or @report.reimbursed? or @report.reimbursement_confirmed?
+      return false
+    end
     true
   end
 
+  # todo - recheck what a take control can do
   def take_control?
     true
   end
 
-  # todo - all the flow actions in report
 end

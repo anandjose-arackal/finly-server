@@ -36,6 +36,11 @@ class Policy < ActiveRecord::Base
 
   has_paper_trail
 
+  def admins
+    admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
+    User.where(id: admin_mapping_ids)
+  end
+
   after_create do
     self.build_configuration.save unless self.configuration.present?
   end

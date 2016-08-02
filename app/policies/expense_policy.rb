@@ -16,7 +16,7 @@ class ExpensePolicy < ApplicationPolicy
   end
 
   def update?
-    return unless check_personal_view
+    return false unless check_personal_view
     # check if this user owns the particular expense being edited
     unless @expense.user.id == @user.id
       return false
@@ -26,7 +26,7 @@ class ExpensePolicy < ApplicationPolicy
 
   # can only be destroyed by the owner
   def destroy?
-    return unless check_personal_view
+    return false unless check_personal_view
     # check if this user owns the particular expense being edited
     unless @expense.user.id == @user.id
       return false
@@ -40,7 +40,7 @@ class ExpensePolicy < ApplicationPolicy
 
   def add_receipt?
     # check that it's personal view
-    return unless check_personal_view
+    return false unless check_personal_view
     # check if this user owns the particular expense being edited
     unless @expense.user.id == @user.id
       return false

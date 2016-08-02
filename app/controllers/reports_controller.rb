@@ -12,6 +12,7 @@ class ReportsController < ApplicationController
   has_scope :filter_policy
 
   def create
+    authorize Report
     rs = ReportService.new(user: current_user)
     if rs.create create_params
       redirect_to report_path rs.report, view_params

@@ -12,7 +12,7 @@
   </div>
   <div class="col-sm-2">
 
-  <form data-remote data-turboboost id="userDetailsForm<%=user.id%>"  action="<%= user_details_path(user.id) %>" method="post">
+  <form data-remote data-turboboost id="userDetailsForm<%=user.id%>"  action="<%= user_details_path(user.id, view: params[:view] || params['view']) %>" method="post">
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
     <button id="editProfile<%= user.id %>" onclick="$('form#userDetailsForm<%=user.id%>').submit()" type="submit" style=" margin-top: 10px; padding: 10px; border: 1px solid #d8d8d8;width: 70%; background-color: #EFEFEF">

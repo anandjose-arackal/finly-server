@@ -4,6 +4,7 @@ class SettlementsController < ApplicationController
   before_action :load_users, only: [:index]
 
   def add_payment
+    authorize Payment
     ss = SettlementService.new(@user)
     result = nil
     param = payment_params
@@ -38,10 +39,12 @@ class SettlementsController < ApplicationController
   end
 
   def index
+    authorize Payment
     @users = @users.with_roles.only_employees.paginate(page: params[:page], per_page: 30) if @users.present?
   end
 
   def show
+    return unless PaymentPolicy.new(current_user, @user).show?
     load_reports :approved
   end
 

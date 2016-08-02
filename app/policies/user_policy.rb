@@ -1,11 +1,23 @@
 class UserPolicy < ApplicationPolicy
 
+  def initialize(user, record)
+    @user = user
+  end
+
   def index?
-    check_admin_view
+    # i.e. everyone other than employees can access the Users listing
+    if check_personal_view
+      return false
+    end
+    true
   end
 
   def user_details?
-    check_admin_view
+    # i.e. everyone other than employees can access the User details
+    if check_personal_view
+      return false
+    end
+    true
   end
 
   def update_team?

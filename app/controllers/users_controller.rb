@@ -4,11 +4,13 @@ class UsersController < ApplicationController
   before_action :load_service_objects
 
   def profile
+    authorize User
     @manager = @user_team_service.manager
   end
 
   def update_password
     @user = current_user
+    authorize @user
     if @user.update_with_password(user_params)
       # Sign in the user by passing validation in case their password changed
       sign_in @user, :bypass_sin_in => true
@@ -21,10 +23,11 @@ class UsersController < ApplicationController
 
   # action to retrieve a particular user's details in the employees screen - only for admin, obviously
   def user_details
+    authorize User
     @user = current_company.users.with_id(params[:user_id]).first # user needs to be modified to include all user-policy related details
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
-    @policies = @user.policies
+    @policies = retrieve_policies
     @reports = @user.reports
     # using current user instead of @user because we need list of users in current user's view
     @users = current_company.users.paginate(page: params[:page])
@@ -38,8 +41,9 @@ class UsersController < ApplicationController
 
   # for employee list
   def index
+    authorize User
     @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
-    @policies = @user.policies
+    @policies = retrieve_policies
     @users = current_company.users.paginate(page: params[:page], per_page: 30)
     @reports = @user.reports
     @company_managers = current_company.users.with_roles.only_managers
@@ -49,6 +53,7 @@ class UsersController < ApplicationController
   end
 
   def update_team
+    authorize User
     @user = current_company.users.with_id(params[:user_id]).first
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
@@ -82,6 +87,23 @@ class UsersController < ApplicationController
     params.require(:user_team).permit!
   end
 
+  def retrieve_policies
+    if current_user.admin? and (params['view'] == 'admin' or params[:view] == 'admin')
+      @policies = @user.policies
+    elsif current_user.manager? and (params['view'] == 'manager' or params[:view] == 'manager')
+      @policies = @user.policies
+      policy_admin_for = []
+      @policies.each do |policy|
+        policy.admins.each do |policy_admin|
+          if policy_admin.id == current_user.id
+            policy_admin_for << policy
+          end
+        end
+      end
+      @policies = policy_admin_for
+    end
+  end
+
   def load_all_mappings
     # loading all mappings for the user, with and without policy
     @mappings = {} # each value will be an array of mappings
@@ -92,7 +114,6 @@ class UsersController < ApplicationController
   end
 
   def update_non_default_teams
-
     # create or update the conditional manager
     if user_team_params['non_default']['conditional_manager'].present? and user_team_params['non_default']['conditional_manager']['team_mapping_id'].present?
       # i.e. updating conditional manager mapping
