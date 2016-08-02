@@ -153,12 +153,7 @@ class ExpenseService < BaseService
   private
 
   def load_expense_params(params = {})
-    expense_params = params[:expense].except(:amount, :merchant, :currency_id, :receipt_id, :receipt)
-
-    # todo - add logic here to take into account expenses edited within reports
-    # in case the method is called from the test cases
-    expense_params[:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]} if params[:expense][:amount_attributes].nil?
-    expense_params[:manual_expense_attributes] = {merchant: params[:expense][:merchant]} if params[:expense][:manual_expense_attributes].nil?
+    expense_params = params.except(:amount, :merchant, :currency_id, :receipt_id, :receipt)
 
     # for manual expenses only
     expense_params[:expense_type_id] = 1 if expense_params[:expense_type_id].nil?

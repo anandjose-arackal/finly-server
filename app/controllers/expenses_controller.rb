@@ -13,7 +13,8 @@ class ExpensesController < ApplicationController
   has_scope :filter_date, using: [:from, :to], type: :hash
 
   def new
-
+    current_user.view = params[:view] || params['view']
+    authorize Expense
   end
 
   def index
@@ -29,6 +30,8 @@ class ExpensesController < ApplicationController
   end
 
   def create
+    current_user.view = params[:view] || params['view']
+    authorize Expense
     if @expense_service.add_expense expense_params
       flash.now[:success] = 'Expense created!'
       if params['request_type'] == '1'
@@ -71,13 +74,6 @@ class ExpensesController < ApplicationController
     redirect_to request.referrer
   end
 
-  def attach_receipt
-
-  end
-
-  def detach_receipt
-
-  end
 
   def unreported
     @unreported_expenses = apply_scopes(current_user.expenses.unreported)
@@ -111,7 +107,8 @@ class ExpensesController < ApplicationController
     params[:expense][:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
     params[:expense][:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
     params[:expense][:receipts_attributes] = [{image: params[:expense][:receipt], user_id: current_user.id}] if params[:expense][:receipt]
-    params.permit!
+    params.require(:expense).permit(:currency_id, :expense_type_id, :expense_status_id, :receipt, :receipt_id, :report_id, :category_id, :date,
+                                    amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id])
 
   end
 

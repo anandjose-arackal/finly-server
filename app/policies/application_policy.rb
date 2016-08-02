@@ -6,32 +6,32 @@ class ApplicationPolicy
     @record = record
   end
 
-  def index?
-    false
+  def check_personal_view
+    unless @user.view == 'personal' || @user.view.nil?
+      return false
+    end
+    true
   end
 
-  def show?
-    scope.where(:id => record.id).exists?
-  end
-  #
-  # def create?
-  #   false
-  # end
-
-  def new?
-    create?
+  def check_admin_view
+    unless @user.view == 'admin'
+      return false
+    end
+    true
   end
 
-  def update?
-    false
+  def check_manager_view
+    unless @user.view == 'manager'
+      return false
+    end
+    true
   end
 
-  def edit?
-    update?
-  end
-
-  def destroy?
-    false
+  def check_finance_view
+    unless @user.view == 'finance'
+      return false
+    end
+    true
   end
 
   def scope
@@ -50,4 +50,7 @@ class ApplicationPolicy
       scope
     end
   end
+
+  private
+
 end

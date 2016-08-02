@@ -27,7 +27,6 @@ class PoliciesController < ApplicationController
     @finance_managers = @policy.company.finance_managers
     @categories = current_company.categories.active
     load_users
-
   end
 
   def invitable_users
@@ -98,13 +97,6 @@ class PoliciesController < ApplicationController
     render_flash_message
   end
 
-  def update
-
-  end
-
-  def destroy
-
-  end
 
   def update_user_configuration
     @policy = Policy.find(params[:policy_id])

@@ -685,7 +685,7 @@ class ReportService < BaseService
   def assign_policy(policy_id)
     return false unless validate owner: true
     unless report.open? or report.retracted?
-      errors << 'Cannot assign policy unless report is retracted'
+      errors << 'Cannot assign policy unless report is open or retracted'
       return false
     end
     if report.policy_id == policy_id

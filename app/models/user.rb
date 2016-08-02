@@ -42,6 +42,8 @@ class User < ActiveRecord::Base
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
 
+  attr_accessor :view
+
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy

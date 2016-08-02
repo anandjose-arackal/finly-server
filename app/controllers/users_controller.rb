@@ -46,7 +46,6 @@ class UsersController < ApplicationController
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
 
     load_all_mappings
-
   end
 
   def update_team

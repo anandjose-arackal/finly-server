@@ -1,53 +1,57 @@
 class ExpensePolicy < ApplicationPolicy
 
-  def initialize(user, expense, params)
+  def initialize(user, expense)
     @user = user
     @expense = expense
-    @params = params
     @user_team_service = UserTeamService.new(@user)
   end
 
-  # def create?
-  #   if @user.finance_manager? or @user.auditor?
-  #     return false
-  #   end
-  #   return true
-  # end
+  def new?
+    check_personal_view
+  end
+
+
+  # todo - will be updated once there's more clarity on admin view for expenses
+  def index?
+    check_personal_view
+  end
 
   def update?
     if @user.employee?
-      if @user.expenses.include?(@expense)
+      if @expense.user.id == @user.id
         return true
       end
       return false
-    elsif @user.manager?
-      # load users from team
-      user_ids = @user_team_service.team(UserRole.manager_id).pluck(:user_id)
-      expenses = Expense.where(user_id: user_ids)
-      if expenses.include?(@expense)
-        return true
-      end
-      return false
-    elsif @user.admin?
-      user_ids = @user.company.users.pluck(:id)
-      expenses = Expense.where(user_id: user_ids)
-      if expenses.include?(@expense)
-        return true
-      end
-      return false
-    else
-      # do nothing
     end
   end
 
   # can only be destroyed by the owner
   def destroy?
+    return unless check_personal_view
     if @user.employee?
-      if @user.expenses.include?(@expense)
+      if @expense.user.id == @user.id
         return true
       end
     end
     false
+  end
+
+  def create?
+    check_personal_view
+  end
+
+  def add_receipt?
+    # check that it's personal view
+    return unless check_personal_view
+    # check if this user owns the particular expense being edited
+    unless @expense.user.id == @user.id
+      return false
+    end
+    true
+  end
+
+  def unreported?
+    check_personal_view
   end
 
 end
