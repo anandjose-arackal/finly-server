@@ -10,7 +10,7 @@ class ExportService < BaseService
     errors.clear
     strong_params = {}
     params.each do |key, value|
-      if key == :export_field_id or key == :name
+      if key == :export_field_id or key == 'export_field_id' or key == :name or key == 'name'
         strong_params[key] = value
       end
     end
@@ -28,7 +28,7 @@ class ExportService < BaseService
 
   def remove_export_field(params={})
     errors.clear
-    export_preference = company.preferences.with_id(params[:id])
+    export_preference = company.export_preferences.with_id(params[:id])
     unless export_preference.present?
       errors << 'Preference not found'
       return false
@@ -41,9 +41,9 @@ class ExportService < BaseService
     false
   end
 
-  def update_export_field(params={})
+  def update_export_field(id, params={})
     errors.clear
-    export_preference = company.preferences.with_id(params[:id])
+    export_preference = company.export_preferences.with_id(id)
     unless export_preference.present?
       errors << 'Preference not found'
       return false
@@ -51,7 +51,7 @@ class ExportService < BaseService
     export_preference = export_preference.first
     strong_params = {}
     params.each do |key, value|
-      if key == :export_field_id or key == :name
+      if key == :export_field_id or key == 'export_field_id' or key == :name or key == 'name'
         strong_params[key] = value
       end
     end

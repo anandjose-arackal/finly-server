@@ -18,6 +18,8 @@ class ExportPreference < ActiveRecord::Base
 
   before_save :check_name
 
+  scope :with_id, ->(id) { where id: id }
+
   # Check if name is assigned, use default name if not name is assigned to the preference
   def check_name
     if self.name.blank?

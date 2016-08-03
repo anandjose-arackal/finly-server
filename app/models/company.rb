@@ -17,6 +17,7 @@ class Company < ActiveRecord::Base
   has_one :configuration, class_name: 'CompanyConfiguration', dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :export_preferences, dependent: :destroy
+
   accepts_nested_attributes_for :configuration
 
   after_create :init_config_present

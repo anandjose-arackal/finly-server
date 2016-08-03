@@ -73,6 +73,7 @@ class UsersController < ApplicationController
     redirect_to request.referrer
   end
 
+
   private
 
   def load_service_objects

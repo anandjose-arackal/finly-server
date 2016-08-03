@@ -157,10 +157,12 @@ Rails.application.routes.draw do
     delete 'remove_rule', to: 'policies#remove_rule', as: :remove_rule
   end
 
-  get 'organization_account' => 'organization_account#organization_account'
+  get 'organization_account' => 'organization_account#show'
+  post 'add_category', to: 'organization_account#add_category', as: :add_category
+  delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
 
-  # get 'policy' => 'organization_account#policy', as: :policy
-
+  patch 'export/:id/update', to: 'organization_account#update_export_column', as: :update_export_preference
+  post 'add_export_field', to: 'organization_account#add_export_column', as: :add_export_field
 
   get 'people' => 'people#people'
 

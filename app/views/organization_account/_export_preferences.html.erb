@@ -1,9 +1,9 @@
+
+
 <p>Please choose the format of the csv, and the respective column names you want to export.</p>
 
 <hr style="margin-top: 20px">
 
-<form data-remote data-turboboost id="exportForm" method="post">
-  <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
 
   <input type="checkbox" name="serial_no" value="1"
 
@@ -11,46 +11,65 @@
 
   <hr style="margin-top: 20px">
 
-  <p> Column 1: </p>
-  <span>Export</span> <select class="selectors" name="export[]">
-  <option style="display:none" value="" selected="selected"><%= [0] %></option>
-  <!-- < % @default_preferences.each do |field| %>
-       <option value="< %= field %>">< %= field %></option>
-   < % end %>-->
-  <option value=""></option>
-</select>
+<div id="exportPreferencesDiv">
+
+<% @export_preferences.each_with_index do |export_preference, index| %>
+
+<form data-remote data-turboboost id="exportPreferences<%=export_preference.id%>" method="post" action="<%= update_export_preference_path(export_preference)%>">
+
+ <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+ <input name="_method" type="hidden" value="patch">
+
+  <p> Column <%= index + 1 %>: </p>
+  <span>Export</span>
+  <select class="selectors" name="export[export_field_id]">
+    <% @export_fields.each do |export_field| %>
+        <option value="<%= export_field.id %>"
+        <% if export_preference.export_field_id == export_field.id %>
+        selected
+        <% end %>
+        ><%= export_field.name %></option>
+    <% end %>
+  </select>
   <span> as </span>
+
   <span style="margin-left: 15px;
       font-size: 14px;
       background-color: white;
       padding: 5px;
       font-variant: small-caps;
       font-weight: 500;
-  " class="exportColumnValue">The value from server <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%= %>" style="display: none">
-</span>
+  " class="exportColumnValue"><input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" value="<%= export_preference.name %>">
+  </span>
 
   <i class="fa fa-trash-o" style="color: indianred; margin-left: 80px"></i>
   <hr>
 
-  <!--  <button class="green-button" style="width: 80px;
-        padding: 5px;
-        margin-bottom: 40px;" id="saveExportConfig" type="submit"> SAVE
-    </button>-->
+  <button class="green-button" style="width: 80px;
+      padding: 5px;
+      margin-bottom: 40px;" id="saveExportConfig" form="exportPreferences<%=export_preference.id%>" type="submit"> SAVE
+  </button>
+
+</form>
+
+<% end %>
+
+</div>
 
   <div style="background-color: lavender;
       padding: 15px;">
-    <form data-remote data-turboboost method="post" action="<%= %>" style="margin-bottom: 30px">
+    <form data-remote data-turboboost method="post" action="<%= add_export_field_path%>" style="margin-bottom: 30px">
       <input name="authenticity_token" value="<%= %>" type="hidden">
-      <span>Export</span> <select class="selectors" name="export[]">
-      <option style="display:none" value="" selected="selected"><%= [0] %></option>
-      <!-- < % @default_preferences.each do |field| %>
-           <option value="< %= field %>">< %= field %></option>
-       < % end %>-->
-      <option value=""></option>
-    </select>
-      <span> as </span>
-      <input type="text" name="export_name[]" class="exportNameInput" placeholder="Column Name" value="<%= %>">
 
+      <span>Export</span>
+      <select class="selectors" name="export[export_field_id]">
+      <option style="display:none" value="" selected="selected"></option>
+        <% @export_fields.each do |export_field| %>
+             <option value="<%= export_field.id %>"><%= export_field.name %></option>
+        <% end %>
+      </select>
+      <span> as </span>
+      <input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" >
 
       <button class="green-button" id="addNewColumn" type="submit" style="margin-left: 70px;
           padding: 7px 10px 7px 10px;" onclick="setHeight()"> ADD NEW COLUMN
@@ -60,9 +79,3 @@
 
   </div>
 
-
-</form>
-
-
-
-</div>

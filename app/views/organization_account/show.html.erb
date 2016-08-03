@@ -39,9 +39,14 @@
 
     <!-- EDIT CATEGORIES -->
 
-    <div class="divsections" id="company_profile">
 
-      <h3 id="divsection_heading">Company Profile</h3>
+    <div class="divsections" id="categories" style="display:none">
+
+      <h3 id="divsection_heading">Categories</h3>
+
+      <%= render 'category_list' %>
+
+      <hr style="margin-top: 20px">
 
     </div>
 
@@ -63,16 +68,8 @@
     </div>
 
 
-    <div class="divsections" id="categories" style="display: none">
-
-      <h3 id="divsection_heading">Categories</h3>
-
-      <%= render 'category_list' %>
-      <hr style="margin-top: 20px">
-
-    </div>
-
   </div>
+
 </div>
 
 </body>

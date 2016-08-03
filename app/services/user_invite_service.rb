@@ -18,7 +18,6 @@ class UserInviteService < BaseService
     unless validate_invite params
       return false
     end
-
     u = User.invite!(params, self.user) do |u|
       u.skip_invitation = true
     end

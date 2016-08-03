@@ -24,6 +24,5 @@ class Category < ActiveRecord::Base
     false
   end
 
-
   scope :active, -> {where active: true}
 end
