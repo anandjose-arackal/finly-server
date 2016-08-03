@@ -91,8 +91,9 @@
 
 <div class="modal fade" id="inviteTeamMembers" role="dialog" style="margin-top: 5%; ">
   <div class="modal-dialog modal-md">
-    <form data-remote data-turboboost action="" method="post">
-      <input name="authenticity_token" value="" type="hidden">
+    <form data-remote data-turboboost action="<%=pending_invites_path%>" method="post">
+      <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+      <input name="pending_invite[company_id]" value="<%=current_company.id%>" type="hidden">
 
       <div class="modal-content">
         <div class="modal-header">
@@ -106,7 +107,7 @@
             font-weight: 400; padding: 20px 0 5px 40px;
             color: #777;">Email</p>
 
-        <input type="text" name="pending_invite[user_email]" class="dialogInputStyle" placeholder="example@company.com, two@asa.com">
+        <input type="text" name="pending_invite[email]" class="dialogInputStyle" placeholder="example@company.com, two@asa.com">
         <textarea class="dialogInputStyle" id="modalInputComment" class="form-control" name="pending_invite[note]"
                   placeholder="Add a note (optional)" style="margin-top: 20px;"></textarea>
 
@@ -133,15 +134,11 @@
 
         <div id="approvesReportsTo" style="display: none">
           <label class="editProfileDialogHeaders">Approves Reports To</label>
-          <select id="userManager" form="updateDefaultUserConfiguration" name="user_team[default][approves_to_user_id]"
+          <select id="userManager" form="updateDefaultUserConfiguration" name="pending_invite[approves_to_user_id]"
                   class="selectors">
             <option value=""></option>
             <% @company_managers.each do |manager| %>
-                <option value="<%= manager.id %>"
-                        <% if @mappings['company'].default.first.approves_to_user_id == manager.id %>
-                        selected
-                        <% end %>
-                        ><%= manager.name %></option>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
             <% end %>
           </select>
         </div>
@@ -155,35 +152,73 @@
         <label class="radio-inline" style="font-size: 12px">
           <input id="financeManagerTrue" type="radio" name="financemanager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px">No
         </label>
+
         <div id="approvesFinanceReports" style="display: none">
           <label class="editProfileDialogHeaders">Approves Finance Reports To</label>
-          <select id="userFinanceManager" form="updateDefaultUserConfiguration" name="user_team[default][approves_to_user_id]"
+          <select id="userFinanceManager" form="updateDefaultUserConfiguration" name="pending_invite[approves_finance_to_user_id]"
                   class="selectors">
             <option value=""></option>
-            <% @company_managers.each do |manager| %>
-                <option value="<%= manager.id %>"
-                        <% if @mappings['company'].default.first.approves_to_user_id == manager.id %>
-                        selected
-                        <% end %>
-                        ><%= manager.name %></option>
+            <% @company_finance_managers.each do |finance_manager| %>
+                <option value="<%= finance_manager.id %>"><%= finance_manager.name %></option>
             <% end %>
           </select>
         </div>
 
         <hr style=" margin: 15px 0 0 0">
 
-        <label class="editProfileDialogHeaders">Managed By
+        <% if current_user.manager? %>
+
+        <label class="editProfileDialogHeaders">Managed By :
           <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
         </label>
+
+        <% if current_user.admin? %>
 
         <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
           <datalist id="suggestionList">
             <option value="-1">None</option>
-            <!--   < % @users.each do |user| %>
-                   <option value="< %= "#{user.id}" %>">< %= "#{user.name}" %></option>
-               < % end %>-->
+            <% @users.each do |user| %>
+               <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
+            <% end %>
           </datalist>
         </select>
+
+        <% else %>
+
+            <%= current_user.name %>
+            <input name="pending_invite[manager_id]" value="<%=current_user.id%>" type="hidden">
+
+        <% end %>
+
+        <% end %>
+
+        <hr style=" margin: 15px 0 0 0">
+
+        <% if current_user.finance_manager? %>
+
+        <label class="editProfileDialogHeaders">Finance Managed By :
+          <span class="spanEditProfile"> (this is the person who will reimburse the user's expenses)</span>
+        </label>
+
+        <% if current_user.admin? %>
+
+        <select class="dialogInputStyle" name="pending_invite[finance_manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
+          <datalist id="suggestionList">
+            <option value="-1">None</option>
+            <% @users.each do |user| %>
+                <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
+            <% end %>
+          </datalist>
+        </select>
+
+        <% else %>
+
+            <%= current_user.name %>
+            <input name="pending_invite[finance_manager_id]" value="<%=current_user.id%>" type="hidden">
+
+        <% end %>
+
+        <% end %>
 
         <hr style=" margin: 15px 0 0 0">
         <label class="editProfileDialogHeaders">Add policy to user
@@ -192,9 +227,9 @@
 
         <select name="pending_invite[policy_id]" class="selectors" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px">
           <option value="" selected="selected">None</option>
-          <!--  < % @policies.each do |policy| %>
-                <option value="< %= policy.id %>">< %= policy.name %></option>
-            < % end %>-->
+          <% @policies.each do |policy| %>
+             <option value="<%= policy.id %>"><%= policy.name %></option>
+          <% end %>
         </select>
 
         <button style="margin-top: 20px" id="inviteUsersSubmitButton" class="green-button sendButton" type="submit">INVITE</button>

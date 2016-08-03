@@ -48,7 +48,11 @@
 #                                  PATCH  /policies/:id(.:format)                                   policies#update
 #                                  PUT    /policies/:id(.:format)                                   policies#update
 #                                  DELETE /policies/:id(.:format)                                   policies#destroy
-#             organization_account GET    /organization_account(.:format)                           organization_account#organization_account
+#             organization_account GET    /organization_account(.:format)                           organization_account#show
+#                     add_category POST   /add_category(.:format)                                   organization_account#add_category
+#                  remove_category DELETE /remove_category(.:format)                                organization_account#remove_category
+#         update_export_preference PATCH  /export/:id/update(.:format)                              organization_account#update_export_column
+#                 add_export_field POST   /add_export_field(.:format)                               organization_account#add_export_column
 #                           people GET    /people(.:format)                                         people#people
 #                          reports GET    /reports(.:format)                                        reports#index
 #                                  POST   /reports(.:format)                                        reports#create
@@ -89,6 +93,7 @@
 #                                  PUT    /expenses/:id(.:format)                                   expenses#update
 #                                  DELETE /expenses/:id(.:format)                                   expenses#destroy
 #              expenses_unreported POST   /expenses/unreported(.:format)                            expenses#unreported
+#                 receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                  receipts#add_note
 #                         receipts GET    /receipts(.:format)                                       receipts#index
 #                                  POST   /receipts(.:format)                                       receipts#create
 #                      new_receipt GET    /receipts/new(.:format)                                   receipts#new
@@ -97,6 +102,7 @@
 #                                  PATCH  /receipts/:id(.:format)                                   receipts#update
 #                                  PUT    /receipts/:id(.:format)                                   receipts#update
 #                                  DELETE /receipts/:id(.:format)                                   receipts#destroy
+#             expense_from_receipt POST   /expense_from_receipt(.:format)                           receipts#expense_from_receipt
 #                     user_details POST   /users/:user_id/user_details(.:format)                    users#user_details
 #                 user_update_team PATCH  /users/:user_id/update_user_team(.:format)                users#update_team
 #                 user_update_role POST   /users/:user_id/update_role(.:format)                     users#update_role
@@ -108,6 +114,15 @@
 #                                  PATCH  /users/:id(.:format)                                      users#update
 #                                  PUT    /users/:id(.:format)                                      users#update
 #                                  DELETE /users/:id(.:format)                                      users#destroy
+#        pending_invite_new_invite POST   /pending_invites/:pending_invite_id/invite(.:format)      pending_invites#invite
+#                  pending_invites GET    /pending_invites(.:format)                                pending_invites#index
+#                                  POST   /pending_invites(.:format)                                pending_invites#create
+#               new_pending_invite GET    /pending_invites/new(.:format)                            pending_invites#new
+#              edit_pending_invite GET    /pending_invites/:id/edit(.:format)                       pending_invites#edit
+#                   pending_invite GET    /pending_invites/:id(.:format)                            pending_invites#show
+#                                  PATCH  /pending_invites/:id(.:format)                            pending_invites#update
+#                                  PUT    /pending_invites/:id(.:format)                            pending_invites#update
+#                                  DELETE /pending_invites/:id(.:format)                            pending_invites#destroy
 #                      settlements GET    /settlements(.:format)                                    settlements#index
 #                                  POST   /settlements(.:format)                                    settlements#create
 #                   new_settlement GET    /settlements/new(.:format)                                settlements#new
@@ -118,7 +133,6 @@
 #                                  DELETE /settlements/:id(.:format)                                settlements#destroy
 #               settlement_partial POST   /settlements/:id/show_partial(.:format)                   settlements#show_partial
 #           settlement_add_payment POST   /settlements/:id/add_payment(.:format)                    settlements#add_payment
-#                                  GET    /expenses(.:format)                                       expenses#expenses
 #                        oauth_new GET    /oauth/new(.:format)                                      opro/oauth/auth#new
 #                  oauth_authorize POST   /oauth/authorize(.:format)                                opro/oauth/auth#create
 #                      oauth_token POST   /oauth/token(.:format)                                    opro/oauth/token#create
@@ -136,6 +150,14 @@
 #                                  POST   /oauth_tests(.:format)                                    opro/oauth/tests#create
 #                       oauth_test GET    /oauth_tests/:id(.:format)                                opro/oauth/tests#show
 #                                  DELETE /oauth_tests/:id(.:format)                                opro/oauth/tests#destroy
+#                                  GET    /receipts(.:format)                                       receipts#index
+#                                  POST   /receipts(.:format)                                       receipts#create
+#                                  GET    /receipts/new(.:format)                                   receipts#new
+#                                  GET    /receipts/:id/edit(.:format)                              receipts#edit
+#                                  GET    /receipts/:id(.:format)                                   receipts#show
+#                                  PATCH  /receipts/:id(.:format)                                   receipts#update
+#                                  PUT    /receipts/:id(.:format)                                   receipts#update
+#                                  DELETE /receipts/:id(.:format)                                   receipts#destroy
 #                             root GET    /                                                         static_pages#home
 #                            about GET    /about(.:format)                                          static_pages#about
 #                         features GET    /features(.:format)                                       static_pages#features
@@ -145,6 +167,9 @@
 
 Rails.application.routes.draw do
   # get 'policies' => 'policies#index'
+
+  get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
+
   devise_for :users
 
   resources :policies, except: [:new, :edit]
@@ -201,6 +226,11 @@ Rails.application.routes.draw do
     patch 'update_user_team', to: 'users#update_team', as: :update_team
     post 'update_role', to: 'users#update_role', as: :update_role
   end
+
+  resources :pending_invites do
+    post 'invite', to: 'pending_invites#invite', as: :new_invite
+  end
+
 
   resources :settlements
   post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial

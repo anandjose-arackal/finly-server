@@ -2,17 +2,17 @@
 #
 # Table name: policy_configurations
 #
-#  id                       :integer          not null, primary key
-#  policy_id                :integer          not null
-#  require_category         :boolean          default(FALSE), not null
-#  default_billable_set     :boolean          default(FALSE), not null
-#  report_currency_id       :integer
-#  technical_contact_id     :integer
-#  mandate_expense_tagging  :boolean          default(FALSE), not null
-#  default_tag_id           :integer
-#  active                   :boolean          default(TRUE), not null
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
+#  id                      :integer          not null, primary key
+#  policy_id               :integer          not null
+#  require_category        :boolean          default(FALSE), not null
+#  default_billable_set    :boolean          default(FALSE), not null
+#  report_currency_id      :integer
+#  technical_contact_id    :integer
+#  mandate_expense_tagging :boolean          default(FALSE), not null
+#  default_tag_id          :integer
+#  active                  :boolean          default(TRUE), not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
 #
 
 class PolicyConfiguration < ActiveRecord::Base

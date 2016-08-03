@@ -13,6 +13,7 @@
 #  image_updated_at   :datetime
 #  parent_id          :integer
 #  parent_type        :string(255)
+#  note               :text(65535)
 #
 
 require 'test_helper'

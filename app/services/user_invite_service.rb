@@ -19,7 +19,7 @@ class UserInviteService < BaseService
       return false
     end
     u = User.invite!(params, self.user) do |u|
-      u.skip_invitation = true
+      # u.skip_invitation = true
     end
     if u
       return true
@@ -100,12 +100,13 @@ class UserInviteService < BaseService
       errors << 'User does not have the permission to invite other users'
       return false
     end
-    if params[:company].blank? and params[:company_id].blank?
+
+    if params[:company].blank? and params[:company_id].blank? and params['company_id']
       errors << 'A user can only be invited to a company. Please enter the company the user has to be assigned to'
       return false
     end
-    company_id = params[:company_id] or params[:company]
-    if company_id != self.user.company_id
+    company_id = params[:company_id] or params[:company] or params['company_id']
+    if company_id != self.user.company_id.to_s
       errors << 'User can only be invited in the same company'
       return false
     end
@@ -147,7 +148,7 @@ class UserInviteService < BaseService
       role_mapping.each do |role|
         rid = role[:user_role_id]
         unless rid.present? and (rid == UserRole.manager_id or rid == UserRole.employee_id)
-          errors << 'User can only invite the user as an employee or manager'
+          errors << "#{self.user.name} can only invite the user as an employee or manager"
           return false
         end
       end
@@ -155,7 +156,7 @@ class UserInviteService < BaseService
       role_mapping.each do |role|
         rid = role[:user_role_id]
         unless rid.present? and (rid == UserRole.finance_manager_id or rid == UserRole.employee_id)
-          errors << 'User can only invite the user as an employee or finance manager'
+          errors << "#{self.user.name} can only invite the user as an employee or finance manager"
           return false
         end
       end
