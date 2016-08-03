@@ -1,0 +1,23 @@
+<!--<div id="categoriesList" style="width: 60%">
+< % @categories.each do |category| %>
+     <div class="row" style="padding-left: 10px; padding-right: 10px">
+       <div class="col-md-11" style="font-size: 12px; font-weight: 500">
+         < %= category.name %>
+       </div>
+       <form data-remote data-turboboost method="post" id="deleteCategory< %= category.id %>" action="< %= admin_destroy_category_path(category_id: category.id) %>">
+         <input name="_method" type="hidden" value="delete"/>
+         <input name="authenticity_token" value="< %= form_authenticity_token %>" type="hidden">
+         <div onclick="$('#deleteCategory< %= category.id %>').submit()" class="col-md-1 fa fa-close" style="cursor: pointer"></div>
+       </form>
+     </div>
+
+     <hr style="margin-top: 10px; margin-bottom: 10px;">
+ < % end %>
+
+
+<form data-remote data-turboboost method="post" action="< %= admin_create_new_category_path %>">
+ <input name="authenticity_token" value="< %= form_authenticity_token %>" type="hidden">
+ <input type="text" class="form-control" name="category[name]" id="newCategory" placeholder="Add new category name" style="width: 35%; margin-top: 30px; border-radius: 1px">
+ <button class="button" id="add_new_category" type="submit" onclick="setHeight()"> ADD NEW CATEGORY</button>
+</form>
+</div>-->

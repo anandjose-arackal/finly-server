@@ -1,4 +1,3 @@
-
 <% provide(:title, current_user.name) %>
 
 <body id="people">
@@ -36,10 +35,10 @@
         </div>
       </div>
       <div id="employees">
-          <%= yield :people %>
+        <%= yield :people %>
       </div>
       <!--<div id="infinite-scrolling" style="display: none">-->
-          <%= will_paginate @users if @users.present? %>
+      <%= will_paginate @users if @users.present? %>
       <!--</div>-->
 
     </div>
@@ -92,7 +91,7 @@
 
 <div class="modal fade" id="inviteTeamMembers" role="dialog" style="margin-top: 5%; ">
   <div class="modal-dialog modal-md">
-    <form data-remote data-turboboost action="" method="post" >
+    <form data-remote data-turboboost action="" method="post">
       <input name="authenticity_token" value="" type="hidden">
 
       <div class="modal-content">
@@ -111,28 +110,68 @@
         <textarea class="dialogInputStyle" id="modalInputComment" class="form-control" name="pending_invite[note]"
                   placeholder="Add a note (optional)" style="margin-top: 20px;"></textarea>
 
-        <!--  < % if @user.admin? %>
-              <label class="editProfileDialogHeaders">Assign Admin Role?</label>
+        <% if @user.admin? %>
+            <label class="editProfileDialogHeaders">Assign Admin Role?</label>
 
-              <label class="radio-inline" style="font-size: 12px">
-                <input id="adminTrue" type="radio" name="admin" style="font-size: 8px" value="1">Yes
-              </label>
-              <label class="radio-inline" style="font-size: 12px">
-                <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
-              </label>
-          < % end %>-->
+            <label class="radio-inline" style="font-size: 12px">
+              <input id="adminTrue" type="radio" name="admin" style="font-size: 8px" value="1">Yes
+            </label>
+            <label class="radio-inline" style="font-size: 12px">
+              <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
+            </label>
+        <% end %>
         <hr style=" margin: 15px 0 0 0">
 
         <label class="editProfileDialogHeaders">Assign Manager Role?</label>
 
         <label class="radio-inline" style="font-size: 12px">
-          <input id="managerTrue" type="radio" name="manager" style="font-size: 8px" value="1">Yes
+          <input id="managerTrue" type="radio" name="manager" onclick="displayApprovesReports(true)" style="font-size: 8px" value="1">Yes
         </label>
         <label class="radio-inline" style="font-size: 12px">
-          <input id="managerTrue" type="radio" name="manager" value="0" checked="checked" style="font-size: 8px">No
+          <input id="managerTrue" type="radio" name="manager" onclick="displayApprovesReports(false)" value="0" checked="checked" style="font-size: 8px">No
         </label>
 
+        <div id="approvesReportsTo" style="display: none">
+          <label class="editProfileDialogHeaders">Approves Reports To</label>
+          <select id="userManager" form="updateDefaultUserConfiguration" name="user_team[default][approves_to_user_id]"
+                  class="selectors">
+            <option value=""></option>
+            <% @company_managers.each do |manager| %>
+                <option value="<%= manager.id %>"
+                        <% if @mappings['company'].default.first.approves_to_user_id == manager.id %>
+                        selected
+                        <% end %>
+                        ><%= manager.name %></option>
+            <% end %>
+          </select>
+        </div>
         <hr style=" margin: 15px 0 0 0">
+
+        <label class="editProfileDialogHeaders">Assign Finance Manager Role?</label>
+
+        <label class="radio-inline" style="font-size: 12px">
+          <input id="financeManagerTrue" type="radio" name="financemanager" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px" value="1">Yes
+        </label>
+        <label class="radio-inline" style="font-size: 12px">
+          <input id="financeManagerTrue" type="radio" name="financemanager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px">No
+        </label>
+        <div id="approvesFinanceReports" style="display: none">
+          <label class="editProfileDialogHeaders">Approves Finance Reports To</label>
+          <select id="userFinanceManager" form="updateDefaultUserConfiguration" name="user_team[default][approves_to_user_id]"
+                  class="selectors">
+            <option value=""></option>
+            <% @company_managers.each do |manager| %>
+                <option value="<%= manager.id %>"
+                        <% if @mappings['company'].default.first.approves_to_user_id == manager.id %>
+                        selected
+                        <% end %>
+                        ><%= manager.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <hr style=" margin: 15px 0 0 0">
+
         <label class="editProfileDialogHeaders">Managed By
           <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
         </label>
@@ -168,7 +207,7 @@
 
 <div class="modal fade" id="showEmployeeProfile" role="dialog">
   <div class="modal-dialog modal-lg" style="width: 95%">
-    <form data-remote data-turboboost action="" method="post" >
+    <form data-remote data-turboboost action="" method="post">
       <input name="authenticity_token" value="" type="hidden">
 
       <div class="modal-content">
@@ -188,170 +227,188 @@
 
   $(document).ready(function () {
 
-   $("#submitbut").click(function () {
-   $.post("< %= invite_path %>", {
-   email: $('input[id="inputEmail3"]').val()
-   })
-   })
+    $("#submitbut").click(function () {
+      $.post("< %= invite_path %>", {
+        email: $('input[id="inputEmail3"]').val()
+      })
+    })
 
-   $("#checkAll").change(function () {
-   $("input:checkbox").prop('checked', $(this).prop("checked"));
-   });
+    $("#checkAll").change(function () {
+      $("input:checkbox").prop('checked', $(this).prop("checked"));
+    });
 
-   <% if  params[:filter_type]%>
-   <% if  params[:filter_type] == "1"%>
-   $('#adminFilter').css("background", "#FFFFBB")
-   $('#headerTitle').text('ADMIN');
-   <% elsif   params[:filter_type] == "3"%>
-   $('#managerFilter').css("background", "#FFFFBB")
-   $('#headerTitle').text('MANAGER');
-   <% end %>
-   <% elsif  params[:filter_state] %>
-   <% if  params[:filter_state] == "1"%>
-   $('#activeStatus').css("background", "#FFFFBB")
-   $('#headerTitle').text('ACTIVE');
-   <% elsif   params[:filter_state] == "0"%>
-   $('#deactivatedStatus').css("background", "#FFFFBB")
-   $('#headerTitle').text('DEACTIVATED');
-   <% end %>
-   <% elsif params[:filter_pending_invites]  %>
-   $('#pendingStatus').css("background", "#FFFFBB")
-   $('#headerTitle').text('PENDING');
-   <% else %>
-   $('#headerTitle').text('ALL');
-   $('#allFilter').css("background", "#FFFFBB")
-   <% end %>
+    <% if  params[:filter_type]%>
+    <% if  params[:filter_type] == "1"%>
+    $('#adminFilter').css("background", "#FFFFBB")
+    $('#headerTitle').text('ADMIN');
+    <% elsif   params[:filter_type] == "3"%>
+    $('#managerFilter').css("background", "#FFFFBB")
+    $('#headerTitle').text('MANAGER');
+    <% end %>
+    <% elsif  params[:filter_state] %>
+    <% if  params[:filter_state] == "1"%>
+    $('#activeStatus').css("background", "#FFFFBB")
+    $('#headerTitle').text('ACTIVE');
+    <% elsif   params[:filter_state] == "0"%>
+    $('#deactivatedStatus').css("background", "#FFFFBB")
+    $('#headerTitle').text('DEACTIVATED');
+    <% end %>
+    <% elsif params[:filter_pending_invites]  %>
+    $('#pendingStatus').css("background", "#FFFFBB")
+    $('#headerTitle').text('PENDING');
+    <% else %>
+    $('#headerTitle').text('ALL');
+    $('#allFilter').css("background", "#FFFFBB")
+    <% end %>
 
-   });
+  });
 
-   function closeEditProfile() {
-   $('#editProfileDialog').modal('hide');
-   }
+  function closeEditProfile() {
+    $('#editProfileDialog').modal('hide');
+  }
 
-   function showList() {
-   document.getElementById("myDropdown").classList.toggle("show");
-   }
+  function showList() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
 
-   function reloadPageWithPendingUsers() {
-   var url = "/admin/users";
-   if (<%= is_admin_view %>) {
-   url += "/company"
-   }
-   url += '?filter_pending_invites=true';
-   Turbolinks.visit(url)
-   }
+  function reloadPageWithPendingUsers() {
+    var url = "/admin/users";
+    if (<%= is_admin_view %>) {
+      url += "/company"
+    }
+    url += '?filter_pending_invites=true';
+    Turbolinks.visit(url)
+  }
 
-   function reloadPageWithUserState(id) {
-   var url = "/admin/users";
-   if (<%= is_admin_view %>) {
-   url += "/company"
-   }
-   if (id != null && id >= 0) {
-   url += "?filter_state=" + id;
-   }
-   Turbolinks.visit(url)
-   }
+  function reloadPageWithUserState(id) {
+    var url = "/admin/users";
+    if (<%= is_admin_view %>) {
+      url += "/company"
+    }
+    if (id != null && id >= 0) {
+      url += "?filter_state=" + id;
+    }
+    Turbolinks.visit(url)
+  }
 
-   function reloadPageWithUserType(id) {
-
-
-   var url = "/admin/users";
-   if (<%= is_admin_view %>) {
-   url += "/company"
-   }
-   if (id != null && id >= 0) {
-   url += "?filter_type=" + id;
-   }
-   Turbolinks.visit(url)
-   }
+  function reloadPageWithUserType(id) {
 
 
-   function showEditProfileModal(id, user_type_id, manager_id, user_mail, user_name, state) {
+    var url = "/admin/users";
+    if (<%= is_admin_view %>) {
+      url += "/company"
+    }
+    if (id != null && id >= 0) {
+      url += "?filter_type=" + id;
+    }
+    Turbolinks.visit(url)
+  }
+
+  function displayApprovesReports(show) {
+
+    $('#approvesReportsTo').hide();
+
+    if (show)
+      $('#approvesReportsTo').show();
 
 
-   if (user_type_id == '1') {
-   $('#dialogAdminTrue').prop("checked", true);
-   $('#dialogManagerFalse').prop("checked", true);
-   } else if (user_type_id == '3') {
-   $('#dialogAdminFalse').prop("checked", true);
-   $('#dialogManagerTrue').prop("checked", true);
-   } else {
-   $('#dialogAdminFalse').prop("checked", true);
-   $('#dialogManagerFalse').prop("checked", true);
-   }
+  }
 
-   if (manager_id == '') {
-   $('#dialogManagerId').val('-1')
-   } else {
-   $('#dialogManagerId').val(manager_id)
-   }
-   if (state == 1) {
-   $('#deactivateInput').prop("value", "0");
-   $('#deactivateInputButton').text("DEACTIVATE");
-   } else {
-   $('#deactivateInput').prop("value", "1");
-   $('#deactivateInputButton').text("ACTIVATE");
-   }
+  function displayApprovesFinanceReports(show) {
 
-   $('#deactivateForm').attr("action", '/admin/users/' + id + '/update_state');
-   $('#updateUserForm').attr("action", '/admin/users/' + id + '/update_role_manager');
+    $('#approvesFinanceReports').hide();
+    if (show)
+      $('#approvesFinanceReports').show();
 
-   policy = $('#dialogPolicyId').find(":selected").val();
-
-   $('#addPolicyToUserForm').attr("action", '/admin/users/' + id + '/add_policy');
+  }
 
 
-   var username = $('#modalProfileUserName');
-   var usernameLable = $('#modalProfileUserNameLabel');
+  function showEditProfileModal(id, user_type_id, manager_id, user_mail, user_name, state) {
 
-   if (user_name != null) {
-   username.text(user_name);
-   username.show();
-   usernameLable.show();
-   } else {
-   username.hide();
-   usernameLable.hide();
-   }
-   $('#modalProfilelUserEmail').text(user_mail);
 
-   $('#hiddenUserId').val(id);
+    if (user_type_id == '1') {
+      $('#dialogAdminTrue').prop("checked", true);
+      $('#dialogManagerFalse').prop("checked", true);
+    } else if (user_type_id == '3') {
+      $('#dialogAdminFalse').prop("checked", true);
+      $('#dialogManagerTrue').prop("checked", true);
+    } else {
+      $('#dialogAdminFalse').prop("checked", true);
+      $('#dialogManagerFalse').prop("checked", true);
+    }
 
-   onOpenEditModal(id);
+    if (manager_id == '') {
+      $('#dialogManagerId').val('-1')
+    } else {
+      $('#dialogManagerId').val(manager_id)
+    }
+    if (state == 1) {
+      $('#deactivateInput').prop("value", "0");
+      $('#deactivateInputButton').text("DEACTIVATE");
+    } else {
+      $('#deactivateInput').prop("value", "1");
+      $('#deactivateInputButton').text("ACTIVATE");
+    }
 
-   $('#editProfileDialog').modal('show');
+    $('#deactivateForm').attr("action", '/admin/users/' + id + '/update_state');
+    $('#updateUserForm').attr("action", '/admin/users/' + id + '/update_role_manager');
 
-   $('form#showPoliciesForUserForm').attr("action", '/admin/users/' + id + '/get_policies');
-   $('form#showPoliciesForUserForm').submit();
-   }
+    policy = $('#dialogPolicyId').find(":selected").val();
 
-   function getUserExpensesPath() {
-   var userId = $('#hiddenUserId').val();
+    $('#addPolicyToUserForm').attr("action", '/admin/users/' + id + '/add_policy');
 
-   var path = "";
-   <% if is_admin_view %>
-   path = '/admin/expenses/company?filter_user_id=' + userId;
-   <% elsif is_manager_view %>
-   path = '/admin/expenses?filter_user_id=' + userId;
 
-   <% end %>
+    var username = $('#modalProfileUserName');
+    var usernameLable = $('#modalProfileUserNameLabel');
 
-   return path;
+    if (user_name != null) {
+      username.text(user_name);
+      username.show();
+      usernameLable.show();
+    } else {
+      username.hide();
+      usernameLable.hide();
+    }
+    $('#modalProfilelUserEmail').text(user_mail);
 
-   }
+    $('#hiddenUserId').val(id);
 
-   function getUserReportsPath() {
-   var userId = $('#hiddenUserId').val();
+    onOpenEditModal(id);
 
-   var path = "";
-   <% if is_admin_view %>
-   path = '/admin/company/reports?filter_user_id=' + userId;
-   <% elsif is_manager_view %>
-   path = '/admin/reports?filter_user_id=' + userId;
+    $('#editProfileDialog').modal('show');
 
-   <% end %>
+    $('form#showPoliciesForUserForm').attr("action", '/admin/users/' + id + '/get_policies');
+    $('form#showPoliciesForUserForm').submit();
+  }
 
-   return path;
+  function getUserExpensesPath() {
+    var userId = $('#hiddenUserId').val();
 
-   }
+    var path = "";
+    <% if is_admin_view %>
+    path = '/admin/expenses/company?filter_user_id=' + userId;
+    <% elsif is_manager_view %>
+    path = '/admin/expenses?filter_user_id=' + userId;
+
+    <% end %>
+
+    return path;
+
+  }
+
+  function getUserReportsPath() {
+    var userId = $('#hiddenUserId').val();
+
+    var path = "";
+    <% if is_admin_view %>
+    path = '/admin/company/reports?filter_user_id=' + userId;
+    <% elsif is_manager_view %>
+    path = '/admin/reports?filter_user_id=' + userId;
+
+    <% end %>
+
+    return path;
+
+  }
 
 </script>
