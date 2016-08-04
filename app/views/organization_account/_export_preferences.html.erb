@@ -33,6 +33,7 @@
   </select>
   <span> as </span>
 
+
   <span style="margin-left: 15px;
       font-size: 14px;
       background-color: white;
@@ -42,15 +43,23 @@
   " class="exportColumnValue"><input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" value="<%= export_preference.name %>">
   </span>
 
-  <i class="fa fa-trash-o" style="color: indianred; margin-left: 80px"></i>
+</form>
+
+  <i class="fa fa-trash-o" onclick="$('#deleteExportField<%=export_preference.id%>').submit();" style="color: indianred; margin-left: 80px"></i>
   <hr>
+
+  <form data-remote data-turboboost id="deleteExportField<%=export_preference.id%>" action="<%=delete_export_field_path%>" method="post">
+    <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+    <input name="_method" type="hidden" value="delete">
+    <input name="export_field_id" value="<%=export_preference.id%>" type="hidden">
+  </form>
 
   <button class="green-button" style="width: 80px;
       padding: 5px;
       margin-bottom: 40px;" id="saveExportConfig" form="exportPreferences<%=export_preference.id%>" type="submit"> SAVE
   </button>
 
-</form>
+
 
 <% end %>
 

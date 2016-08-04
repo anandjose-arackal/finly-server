@@ -188,6 +188,7 @@ Rails.application.routes.draw do
 
   patch 'export/:id/update', to: 'organization_account#update_export_column', as: :update_export_preference
   post 'add_export_field', to: 'organization_account#add_export_column', as: :add_export_field
+  delete 'remove_export_field', to: 'organization_account#remove_export_column', as: :delete_export_field
 
   get 'people' => 'people#people'
 

@@ -53,11 +53,17 @@ class OrganizationAccountController < ApplicationController
     @export_preferences = current_company.export_preferences
     @export_fields = ExportField.all
     render partial: 'organization_account/export_preferences', replace: 'exportPreferencesDiv'
-    render_flash_message
   end
 
   def remove_export_column
-
+    if @export_service.remove_export_field(id: params[:export_field_id])
+      flash[:success] = "Field deleted."
+    else
+      flash[:error] = @export_service.errors
+    end
+    @export_preferences = current_company.export_preferences
+    @export_fields = ExportField.all
+    render partial: 'organization_account/export_preferences', replace: 'exportPreferencesDiv'
   end
 
 
