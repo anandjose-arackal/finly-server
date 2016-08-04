@@ -61,14 +61,31 @@ class UserInviteService < BaseService
 
   def update_invite(user_id, params={})
     user = User.find_by(id: user_id)
-    debugger
     uts = UserTeamService.new(user)
-    if uts.update(params)
-      return true
-    else
+    unless uts.update(params)
       errors << uts.errors
       return false
     end
+    if params[:manager] == '1'
+      uts.update_role(user_role_id: 3)
+    elsif params[:manager] == '0' and user.manager?
+      uts.remove_role(user_role_id: 3)
+      # removing his approves_to
+      user.team_mapping.default.first.update_attributes(:approves_to, nil)
+    end
+    if params[:finance_manager] == '1'
+      uts.update_role(user_role_id: 2)
+    elsif params[:finance_manager_id] == '0' and user.finance_manager?
+      uts.remove_role(user_role_id: 2)
+      # removing his approves_finance_to
+      user.team_mapping.default.first.update_attributes(:approves_finance_to, nil)
+    end
+    if params[:admin] == '1'
+      uts.update_role(user_role_id: 1)
+    elsif params[:finance_manager_id] == '0' and user.admin?
+      uts.remove_role(user_role_id: 1)
+    end
+    true
   end
 
   def accept_invitation(params={})

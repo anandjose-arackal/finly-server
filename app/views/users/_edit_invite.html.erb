@@ -33,48 +33,91 @@
                  value="1">Yes
         </label>
         <label class="radio-inline" style="font-size: 12px">
-          <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
+          <input id="adminFalse" type="radio" name="admin"
+                 <% unless @user.admin? %>
+                 checked="checked"
+                 <% end %>
+                 value="0" style="font-size: 8px">No
         </label>
     <% end %>
     <hr style=" margin: 15px 0 0 0">
 
+    <% if current_user.admin? or current_user.manager? %>
+
     <label class="editProfileDialogHeaders">Assign Manager Role?</label>
 
     <label class="radio-inline" style="font-size: 12px">
-      <input id="managerTrue" type="radio" name="manager" onclick="displayApprovesReports(true)" style="font-size: 8px" value="1">Yes
+      <input id="managerTrue" type="radio" name="pending_invite[manager]" onclick="displayApprovesReports(true)" style="font-size: 8px"
+             <% if @user.manager? %>
+              checked="checked"
+             <% end %>
+             value="1">Yes
     </label>
     <label class="radio-inline" style="font-size: 12px">
-      <input id="managerTrue" type="radio" name="manager" onclick="displayApprovesReports(false)" value="0" checked="checked" style="font-size: 8px">No
+      <input id="managerTrue" type="radio" name="pending_invite[manager]" onclick="displayApprovesReports(false)" value="0"
+             <% unless @user.manager? %>
+              checked="checked"
+             <% end %>
+             style="font-size: 8px">No
     </label>
 
-    <% if @user.manager? %>
 
-        <div id="approvesReportsTo" style="display: none">
-          <label class="editProfileDialogHeaders">Approves Reports To</label>
+    <div id="approvesReportsTo" style="display: none">
+      <label class="editProfileDialogHeaders">Approves Reports To : </label>
+
+    <% if current_user.admin? %>
+
+
           <select form="inviteMembersForm" id="userManager" name="pending_invite[approves_to_user_id]"
                   class="selectors">
             <option value=""></option>
             <% @company_managers.each do |manager| %>
-                <option value="<%= manager.id %>"><%= manager.name %></option>
+                <option value="<%= manager.id %>"
+                <% if @mappings['company'].non_default.approves_to.present? and @mappings['company'].non_default.approves_to.first.approves_to_user_id == manager.id %>
+                selected
+                <% end %>
+                ><%= manager.name %></option>
             <% end %>
           </select>
-        </div>
+
+    <% else %>
+
+          <%= current_user.name %>
+          <input name="pending_invite[approves_to_user_id]" value="<%=current_user.id%>" type="hidden">
+
+    <% end %>
+
+    </div>
 
     <% end %>
 
     <hr style=" margin: 15px 0 0 0">
 
+    <% if current_user.admin? or current_user.finance_manager? %>
+
     <label class="editProfileDialogHeaders">Assign Finance Manager Role?</label>
 
     <label class="radio-inline" style="font-size: 12px">
-      <input id="financeManagerTrue" type="radio" name="finance_manager" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px" value="1">Yes
+      <input id="financeManagerTrue" type="radio" name="pending_invite[finance_manager]" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px"
+             <% if @user.finance_manager? %>
+              checked="checked"
+             <% end %>
+             value="1">Yes
     </label>
     <label class="radio-inline" style="font-size: 12px">
-      <input id="financeManagerTrue" type="radio" name="finance_manager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px">No
+      <input id="financeManagerTrue" type="radio" name="pending_invite[finance_manager]" onclick="displayApprovesFinanceReports(false)" value="0"
+             <% unless @user.finance_manager? %>
+              checked="checked"
+             <% end %>
+             style="font-size: 8px">No
     </label>
 
+
     <div id="approvesFinanceReports" style="display: none">
-      <label class="editProfileDialogHeaders">Approves Finance Reports To</label>
+      <label class="editProfileDialogHeaders">Approves Finance Reports To : </label>
+
+      <% if current_user.admin? %>
+
       <select form="inviteMembersForm" id="userFinanceManager" name="pending_invite[approves_finance_to_user_id]"
               class="selectors">
         <option value=""></option>
@@ -82,17 +125,25 @@
             <option value="<%= finance_manager.id %>"><%= finance_manager.name %></option>
         <% end %>
       </select>
+
+      <% else %>
+
+          <%= current_user.name %>
+          <input name="pending_invite[approves_finance_to_user_id]" value="<%=current_user.id%>" type="hidden">
+
+      <% end %>
+
     </div>
 
-    <hr style=" margin: 15px 0 0 0">
+    <% end %>
 
-    <% if current_user.manager? or current_user.admin? %>
+    <hr style=" margin: 15px 0 0 0">
 
         <label class="editProfileDialogHeaders">Managed By :
           <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
         </label>
 
-        <% if current_user.admin? %>
+        <% if current_user.admin? or current_user.finance_manager? %>
 
             <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
               <datalist id="suggestionList">
@@ -114,17 +165,14 @@
 
         <% end %>
 
-    <% end %>
-
     <hr style=" margin: 15px 0 0 0">
 
-    <% if current_user.finance_manager? or current_user.admin? %>
 
         <label class="editProfileDialogHeaders">Finance Managed By :
           <span class="spanEditProfile"> (this is the person who will reimburse the user's expenses)</span>
         </label>
 
-        <% if current_user.admin? %>
+        <% if current_user.admin? or currrent_user.manager? %>
 
             <select class="dialogInputStyle" name="pending_invite[finance_manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
               <datalist id="suggestionList">
@@ -145,8 +193,6 @@
             <input name="pending_invite[finance_manager_id]" value="<%=current_user.id%>" type="hidden">
 
         <% end %>
-
-    <% end %>
 
     <% if current_user.admin? %>
 

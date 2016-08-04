@@ -54,6 +54,9 @@ class PendingInvitesController < ApplicationController
     if params[:finance_manager] == '1'
       params[:pending_invite][:role_mapping_attributes] << {user_role_id: 2}
     end
+    if params[:admin] == '1'
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 1}
+    end
     params[:pending_invite][:team_mapping_attributes] = [{default: true, manager_id: params[:pending_invite][:manager_id],
                                                           finance_manager_id: params[:pending_invite][:finance_manager_id],
                                                           approves_to_user_id: params[:pending_invite][:approves_to_user_id],
@@ -64,7 +67,7 @@ class PendingInvitesController < ApplicationController
   end
 
   def updated_user_invite_params
-    params.require(:pending_invite).permit(:email, :company_id, :manager_id, :finance_manager_id, :approves_to_user_id, :approves_finance_to_user_id, :team_mapping_id)
+    params.require(:pending_invite).permit(:email, :company_id, :finance_manager, :manager, :manager_id, :finance_manager_id, :approves_to_user_id, :approves_finance_to_user_id, :team_mapping_id)
   end
 
   def user_params

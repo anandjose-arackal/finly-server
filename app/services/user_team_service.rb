@@ -274,19 +274,31 @@ class UserTeamService < BaseService
     errors.blank?
   end
 
+  # takes as input all the roles the user needs to be added to
   def update_role(params={})
     errors.clear
     load_role_update params
-    existing_roles = user.role_mapping.policy(@policy_id).map(&:user_role_id)
+    existing_role_ids = user.role_mapping.map(&:user_role_id)
     new_role_ids = params[:user_role_id]
-    new_roles = UserRole.find_by(id: new_role_ids)
-    new_roles = [new_roles] unless new_roles.is_a? Array
-    roles_to_add = new_roles - existing_roles
-    roles_to_remove = existing_roles - new_roles
-    user.role_mapping.policy(@policy_id).role(roles_to_remove).destroy_all
+    roles_to_add = new_role_ids - existing_role_ids
     roles_to_add.each do |role_id|
-      user.role_mapping.create(policy_id: @policy_id, user_role_id: role_id)
+      unless user.role_mapping.create(user_role_id: role_id)
+        errors << user.role_mapping.errors.full_messages
+        return false
+      end
     end
+    true
+  end
+
+  def remove_role(params={})
+    errors.clear
+    load_role_update params
+    roles_to_remove = params[:user_role_id]
+    unless user.role_mapping.role(roles_to_remove).destroy_all
+      errors << user.role_mapping.errors.full_messages
+      return false
+    end
+    true
   end
 
   private
