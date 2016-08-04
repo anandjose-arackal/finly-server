@@ -127,13 +127,6 @@ class UserInviteService < BaseService
   end
 
   private
-  # def invite_params(params)
-  #   params.permit(:email, :company, :company_id, :role_mapping_attributes, :team_mapping_attributes)
-  # end
-  #
-  # def invitation_accept_params(params)
-  #   params.permit(:invitation_token, :name, :mobile_number, :password)
-  # end
 
   def validate_invite(params)
     unless user.admin? or user.manager? or user.finance_manager?

@@ -2,6 +2,8 @@ class UsersController < ApplicationController
 
   #before_action :authenticate_user!
   before_action :load_service_objects
+  before_action :load_update_role_ids, only: [:update_user_role]
+
 
   def profile
     authorize User
@@ -79,8 +81,41 @@ class UsersController < ApplicationController
     redirect_to request.referrer
   end
 
+  def update_user_role
+    @user = current_company.users.find_by(id: params[:user_id])
+    @user_team_service = UserTeamService.new(@user)
+    if @user_team_service.update_role(user_role_id: @new_role_ids) and @user_team_service.remove_role(user_role_id: @removable_user_ids)
+      flash[:success] = "Role updated. "
+      render_flash_message
+    else
+      flash[:error] = @user_team_service.errors
+      render_flash_message
+    end
+  end
+
 
   private
+
+  def load_update_role_ids
+    @user = current_company.users.find_by(id: params[:user_id])
+    @new_role_ids = []
+    @removable_user_ids = []
+    if params[:admin] == '1'
+      @new_role_ids << 1
+    elsif params[:admin] == '0' and @user.admin?
+      @removable_user_ids << 1
+    end
+    if params[:manager] == '1'
+      @new_role_ids << 3
+    elsif params[:manager] == '0' and @user.manager?
+      @removable_user_ids << 3
+    end
+    if params[:finance_manager] == '1'
+      @new_role_ids << 2
+    elsif params[:finance_manager] == '0' and @user.finance_manager?
+      @removable_user_ids << 2
+    end
+  end
 
   def load_service_objects
     @user_team_service = UserTeamService.new(current_user)

@@ -294,6 +294,12 @@ class UserTeamService < BaseService
     errors.clear
     load_role_update params
     roles_to_remove = params[:user_role_id]
+    roles_to_remove.each do |role|
+      unless user.team(role) and user.team(role).empty?
+        errors << "#{self.user.name} has other team members under him. "
+        return false
+      end
+    end
     unless user.role_mapping.role(roles_to_remove).destroy_all
       errors << user.role_mapping.errors.full_messages
       return false

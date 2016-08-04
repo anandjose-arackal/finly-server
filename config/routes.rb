@@ -225,7 +225,7 @@ Rails.application.routes.draw do
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details
     patch 'update_user_team', to: 'users#update_team', as: :update_team
-    post 'update_role', to: 'users#update_role', as: :update_role
+    patch 'update_role', to: 'users#update_user_role', as: :update_role
   end
 
   resources :pending_invites do
