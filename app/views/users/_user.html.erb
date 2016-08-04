@@ -1,6 +1,6 @@
 <div class="row" style="background-color: white;  margin-top: 1px; padding-top: 10px; padding-bottom: 10px ">
 
-  <div id="eachRow" class="row" data-toggle="modal" data-target="#showEmployeeProfile" onclick="$('form#userDetailsForm<%=user.id%>').submit()">
+  <div id="eachRow" class="row" data-toggle="modal" onclick="showEmployeeDetails(<%=user.id%>, '<%=user.invite_accepted?%>')">
 
   <div class="col-sm-2"><span class="roundCircle" style="">VR</span></div>
   <div class="col-sm-8" style="">
@@ -15,7 +15,7 @@
   <form data-remote data-turboboost id="userDetailsForm<%=user.id%>"  action="<%= user_details_path(user.id, view: params[:view] || params['view']) %>" method="post">
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-    <button id="editProfile<%= user.id %>" onclick="$('form#userDetailsForm<%=user.id%>').submit()" type="submit" style=" margin-top: 10px; padding: 10px; border: 1px solid #d8d8d8;width: 70%; background-color: #EFEFEF">
+    <button id="editProfile<%= user.id %>" onclick="showEmployeeDetails(<%=user.id%>, '<%=user.invite_accepted?%>')" type="submit" style=" margin-top: 10px; padding: 10px; border: 1px solid #d8d8d8;width: 70%; background-color: #EFEFEF">
       <i class="fa fa-pencil" style="font-size: 15px; color: black"> </i></button>
   </form>
 

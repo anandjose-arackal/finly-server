@@ -28,6 +28,7 @@ class UsersController < ApplicationController
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
     @policies = retrieve_policies
+    @company_policies = current_company.policies
     @reports = @user.reports
     # using current user instead of @user because we need list of users in current user's view
     @users = load_users.paginate(page: params[:page])
@@ -36,7 +37,11 @@ class UsersController < ApplicationController
     @company_managers = current_company.users.with_roles.only_managers
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
 
-    render partial: 'users/employee_profile', replace: '#employeeDetailsDiv'
+    if @user.invite_accepted?
+      render partial: 'users/edit_invite', replace: '#inviteDetaislDiv'
+    else
+      render partial: 'users/employee_profile', replace: '#employeeDetailsDiv'
+    end
   end
 
   # for employee list
@@ -44,6 +49,7 @@ class UsersController < ApplicationController
     authorize User
     @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
     @policies = retrieve_policies
+    @company_policies = current_company.policies
     @users = load_users.paginate(page: params[:page], per_page: 30)
     @reports = @user.reports
     @company_managers = current_company.users.with_roles.only_managers

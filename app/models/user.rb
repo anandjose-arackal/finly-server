@@ -167,6 +167,10 @@ class User < ActiveRecord::Base
     self.name
   end
 
+  def invite_accepted?
+    self.invitation_token
+  end
+
   alias_method :manager_name, :user_name
   alias_method :finance_manager_name, :user_name
   alias_method :approves_to_user_name, :user_name

@@ -1,0 +1,175 @@
+<div id="inviteDetaislDiv">
+
+<form data-remote data-turboboost id="updateInviteForm" action="<%=pending_invite_edit_invite_path(pending_invite_id: @user.id)%>" method="post">
+  <input name="_method" type="hidden" value="patch">
+  <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+  <input name="pending_invite[company_id]" value="<%=current_company.id%>" type="hidden">
+  <input name="pending_invite[team_mapping_id]" value="<%=@mappings['company'].default.first.id%>" type="hidden">
+
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title">INVITE TEAM
+        MEMBER</h4>
+    </div>
+    <p style="font-size: 14px;
+        font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+        text-transform: uppercase;
+        font-weight: 400; padding: 20px 0 5px 40px;
+        color: #777;">Email</p>
+
+    <input type="text" name="pending_invite[email]" class="dialogInputStyle" placeholder="example@company.com, two@asa.com" value="<%=@user.email%>">
+        <textarea class="dialogInputStyle" id="modalInputComment" class="form-control" name="pending_invite[note]"
+                  placeholder="Add a note (optional)" style="margin-top: 20px;"></textarea>
+
+    <% if current_user.admin? %>
+        <label class="editProfileDialogHeaders">Assign Admin Role?</label>
+
+        <label class="radio-inline" style="font-size: 12px">
+          <input id="adminTrue" type="radio" name="admin" style="font-size: 8px"
+                 <% if @user.admin? %>
+                 checked="checked"
+                 <% end %>
+                 value="1">Yes
+        </label>
+        <label class="radio-inline" style="font-size: 12px">
+          <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
+        </label>
+    <% end %>
+    <hr style=" margin: 15px 0 0 0">
+
+    <label class="editProfileDialogHeaders">Assign Manager Role?</label>
+
+    <label class="radio-inline" style="font-size: 12px">
+      <input id="managerTrue" type="radio" name="manager" onclick="displayApprovesReports(true)" style="font-size: 8px" value="1">Yes
+    </label>
+    <label class="radio-inline" style="font-size: 12px">
+      <input id="managerTrue" type="radio" name="manager" onclick="displayApprovesReports(false)" value="0" checked="checked" style="font-size: 8px">No
+    </label>
+
+    <% if @user.manager? %>
+
+        <div id="approvesReportsTo" style="display: none">
+          <label class="editProfileDialogHeaders">Approves Reports To</label>
+          <select form="inviteMembersForm" id="userManager" name="pending_invite[approves_to_user_id]"
+                  class="selectors">
+            <option value=""></option>
+            <% @company_managers.each do |manager| %>
+                <option value="<%= manager.id %>"><%= manager.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+    <% end %>
+
+    <hr style=" margin: 15px 0 0 0">
+
+    <label class="editProfileDialogHeaders">Assign Finance Manager Role?</label>
+
+    <label class="radio-inline" style="font-size: 12px">
+      <input id="financeManagerTrue" type="radio" name="finance_manager" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px" value="1">Yes
+    </label>
+    <label class="radio-inline" style="font-size: 12px">
+      <input id="financeManagerTrue" type="radio" name="finance_manager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px">No
+    </label>
+
+    <div id="approvesFinanceReports" style="display: none">
+      <label class="editProfileDialogHeaders">Approves Finance Reports To</label>
+      <select form="inviteMembersForm" id="userFinanceManager" name="pending_invite[approves_finance_to_user_id]"
+              class="selectors">
+        <option value=""></option>
+        <% @company_finance_managers.each do |finance_manager| %>
+            <option value="<%= finance_manager.id %>"><%= finance_manager.name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <hr style=" margin: 15px 0 0 0">
+
+    <% if current_user.manager? or current_user.admin? %>
+
+        <label class="editProfileDialogHeaders">Managed By :
+          <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
+        </label>
+
+        <% if current_user.admin? %>
+
+            <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
+              <datalist id="suggestionList">
+                <option value="-1">None</option>
+                <% @company_managers.each do |user| %>
+                    <option value="<%= "#{user.id}" %>"
+                            <% if @mappings['company'].default.first.manager_id == user.id %>
+                            selected
+                            <% end %>
+                            ><%= "#{user.name}" %></option>
+                <% end %>
+              </datalist>
+            </select>
+
+        <% else %>
+
+            <%= current_user.name %>
+            <input name="pending_invite[manager_id]" value="<%=current_user.id%>" type="hidden">
+
+        <% end %>
+
+    <% end %>
+
+    <hr style=" margin: 15px 0 0 0">
+
+    <% if current_user.finance_manager? or current_user.admin? %>
+
+        <label class="editProfileDialogHeaders">Finance Managed By :
+          <span class="spanEditProfile"> (this is the person who will reimburse the user's expenses)</span>
+        </label>
+
+        <% if current_user.admin? %>
+
+            <select class="dialogInputStyle" name="pending_invite[finance_manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
+              <datalist id="suggestionList">
+                <option value="-1">None</option>
+                <% @company_finance_managers.each do |user| %>
+                    <option value="<%= "#{user.id}" %>"
+                            <% if @mappings['company'].default.first.finance_manager_id == user.id %>
+                            selected
+                            <% end %>
+                            ><%= "#{user.name}" %></option>
+                <% end %>
+              </datalist>
+            </select>
+
+        <% else %>
+
+            <%= current_user.name %>
+            <input name="pending_invite[finance_manager_id]" value="<%=current_user.id%>" type="hidden">
+
+        <% end %>
+
+    <% end %>
+
+    <% if current_user.admin? %>
+
+        <hr style=" margin: 15px 0 0 0">
+        <label class="editProfileDialogHeaders">Add policy to user
+          <span class="spanEditProfile"> (this policy will hence be available to the user)</span>
+        </label>
+
+        <select name="pending_invite[policy_id]" class="selectors" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px">
+          <option value="" selected="selected">None</option>
+          <% @company_policies.each do |policy| %>
+              <option value="<%= policy.id %>"
+                      <% if @mappings[policy.id] %>
+                      selected
+                      <% end %>
+                      ><%= policy.name %></option>
+          <% end %>
+        </select>
+
+    <% end %>
+
+    <button style="margin-top: 20px" id="inviteUsersSubmitButton" class="green-button sendButton" type="submit">Update</button>
+  </div>
+</form>
+
+</div>

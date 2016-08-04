@@ -91,7 +91,7 @@
 
 <div class="modal fade" id="inviteTeamMembers" role="dialog" style="margin-top: 5%; ">
   <div class="modal-dialog modal-md">
-    <form data-remote data-turboboost action="<%=pending_invites_path%>" method="post">
+    <form data-remote data-turboboost id="inviteMembersForm" action="<%=pending_invites_path%>" method="post">
       <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
       <input name="pending_invite[company_id]" value="<%=current_company.id%>" type="hidden">
 
@@ -111,7 +111,7 @@
         <textarea class="dialogInputStyle" id="modalInputComment" class="form-control" name="pending_invite[note]"
                   placeholder="Add a note (optional)" style="margin-top: 20px;"></textarea>
 
-        <% if @user.admin? %>
+        <% if current_user.admin? %>
             <label class="editProfileDialogHeaders">Assign Admin Role?</label>
 
             <label class="radio-inline" style="font-size: 12px">
@@ -134,7 +134,7 @@
 
         <div id="approvesReportsTo" style="display: none">
           <label class="editProfileDialogHeaders">Approves Reports To</label>
-          <select id="userManager" form="updateDefaultUserConfiguration" name="pending_invite[approves_to_user_id]"
+          <select form="inviteMembersForm" id="userManager" name="pending_invite[approves_to_user_id]"
                   class="selectors">
             <option value=""></option>
             <% @company_managers.each do |manager| %>
@@ -147,15 +147,15 @@
         <label class="editProfileDialogHeaders">Assign Finance Manager Role?</label>
 
         <label class="radio-inline" style="font-size: 12px">
-          <input id="financeManagerTrue" type="radio" name="financemanager" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px" value="1">Yes
+          <input id="financeManagerTrue" type="radio" name="finance_manager" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px" value="1">Yes
         </label>
         <label class="radio-inline" style="font-size: 12px">
-          <input id="financeManagerTrue" type="radio" name="financemanager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px">No
+          <input id="financeManagerTrue" type="radio" name="finance_manager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px">No
         </label>
 
         <div id="approvesFinanceReports" style="display: none">
           <label class="editProfileDialogHeaders">Approves Finance Reports To</label>
-          <select id="userFinanceManager" form="updateDefaultUserConfiguration" name="pending_invite[approves_finance_to_user_id]"
+          <select form="inviteMembersForm" id="userFinanceManager" name="pending_invite[approves_finance_to_user_id]"
                   class="selectors">
             <option value=""></option>
             <% @company_finance_managers.each do |finance_manager| %>
@@ -166,7 +166,7 @@
 
         <hr style=" margin: 15px 0 0 0">
 
-        <% if current_user.manager? %>
+        <% if current_user.manager? or current_user.admin? %>
 
         <label class="editProfileDialogHeaders">Managed By :
           <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
@@ -177,7 +177,7 @@
         <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
           <datalist id="suggestionList">
             <option value="-1">None</option>
-            <% @users.each do |user| %>
+            <% @company_managers.each do |user| %>
                <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
             <% end %>
           </datalist>
@@ -194,7 +194,7 @@
 
         <hr style=" margin: 15px 0 0 0">
 
-        <% if current_user.finance_manager? %>
+        <% if current_user.finance_manager? or current_user.admin? %>
 
         <label class="editProfileDialogHeaders">Finance Managed By :
           <span class="spanEditProfile"> (this is the person who will reimburse the user's expenses)</span>
@@ -205,7 +205,7 @@
         <select class="dialogInputStyle" name="pending_invite[finance_manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
           <datalist id="suggestionList">
             <option value="-1">None</option>
-            <% @users.each do |user| %>
+            <% @company_finance_managers.each do |user| %>
                 <option value="<%= "#{user.id}" %>"><%= "#{user.name}" %></option>
             <% end %>
           </datalist>
@@ -220,6 +220,8 @@
 
         <% end %>
 
+        <% if current_user.admin? %>
+
         <hr style=" margin: 15px 0 0 0">
         <label class="editProfileDialogHeaders">Add policy to user
           <span class="spanEditProfile"> (this policy will hence be available to the user)</span>
@@ -227,10 +229,12 @@
 
         <select name="pending_invite[policy_id]" class="selectors" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px">
           <option value="" selected="selected">None</option>
-          <% @policies.each do |policy| %>
+          <% @company_policies.each do |policy| %>
              <option value="<%= policy.id %>"><%= policy.name %></option>
           <% end %>
         </select>
+
+        <% end %>
 
         <button style="margin-top: 20px" id="inviteUsersSubmitButton" class="green-button sendButton" type="submit">INVITE</button>
       </div>
@@ -257,6 +261,17 @@
     </form>
   </div>
 </div>
+
+
+<div class="modal fade" id="editInviteModal" role="dialog" style="margin-top: 5%; ">
+  <div class="modal-dialog modal-md">
+    <%= render 'edit_invite' %>
+  </div>
+</div>
+
+
+
+
 
 <script>
 
@@ -444,6 +459,18 @@
 
     return path;
 
+  }
+
+  function showEmployeeDetails(id, accepted_invite) {
+
+    $('form#userDetailsForm' + id).submit();
+
+    if (accepted_invite == '') {
+      $('#showEmployeeProfile').modal('show');
+    }
+    else {
+      $('#editInviteModal').modal('show');
+    }
   }
 
 </script>

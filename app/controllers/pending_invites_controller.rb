@@ -8,6 +8,7 @@ class PendingInvitesController < ApplicationController
     if @user_invite_service.invite(user_invite_params)
       flash[:success] = "User invited!"
     else
+      debugger
       flash[:error] = @user_invite_service.errors
     end
     redirect_to request.referer
@@ -22,7 +23,17 @@ class PendingInvitesController < ApplicationController
       flash[:success] = "Registration done!"
       redirect_to root_url
     else
-      debugger
+      flash[:error] = @user_invite_service.errors
+      render_flash_message
+    end
+  end
+
+  def update_invite
+    user_id = params[:pending_invite_id]
+    if @user_invite_service.update_invite(user_id, updated_user_invite_params)
+      flash[:success] = "Invite updated!"
+      redirect_to request.referrer
+    else
       flash[:error] = @user_invite_service.errors
       render_flash_message
     end
@@ -37,13 +48,23 @@ class PendingInvitesController < ApplicationController
 
   def user_invite_params
     params[:pending_invite][:role_mapping_attributes] = [{user_role_id: 4}]
-    params[:pending_invite][:team_mapping_attributes] = [{default: true, manager_id: params[:pending_invite][:manager_id].to_i,
-                                                          finance_manager_id: params[:pending_invite][:finance_manager_id].to_i,
-                                                          approves_to_user_id: params[:pending_invite][:approves_to_id].to_i,
-                                                          approves_finance_to_user_id: params[:pending_invite][:approves_finance_to_id].to_i}]
+    if params[:manager] == '1'
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 3}
+    end
+    if params[:finance_manager] == '1'
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 2}
+    end
+    params[:pending_invite][:team_mapping_attributes] = [{default: true, manager_id: params[:pending_invite][:manager_id],
+                                                          finance_manager_id: params[:pending_invite][:finance_manager_id],
+                                                          approves_to_user_id: params[:pending_invite][:approves_to_user_id],
+                                                          approves_finance_to_user_id: params[:pending_invite][:approves_finance_to_user_id]}]
     params.require(:pending_invite).permit(:email, :company_id, role_mapping_attributes: [:user_role_id],
                                            team_mapping_attributes: [:default, :manager_id, :finance_manager_id,
                                                                      :approves_to_user_id, :approves_finance_to_user_id])
+  end
+
+  def updated_user_invite_params
+    params.require(:pending_invite).permit(:email, :company_id, :manager_id, :finance_manager_id, :approves_to_user_id, :approves_finance_to_user_id, :team_mapping_id)
   end
 
   def user_params

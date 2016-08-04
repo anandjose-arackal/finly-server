@@ -230,6 +230,7 @@ Rails.application.routes.draw do
 
   resources :pending_invites do
     post 'invite', to: 'pending_invites#invite', as: :new_invite
+    patch 'update_invite', to: 'pending_invites#update_invite', as: :edit_invite
   end
 
 

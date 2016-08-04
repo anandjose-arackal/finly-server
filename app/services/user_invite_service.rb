@@ -18,9 +18,24 @@ class UserInviteService < BaseService
     unless validate_invite params
       return false
     end
+    # if the user has a policy during invite, temporarily storing that user's policy to add it separately later
+    if params[:policy_id]
+      @policy_id = params[:policy_id]
+      params.delete(:policy_id)
+    end
     u = User.invite!(params, self.user) do |u|
       # u.skip_invitation = true
     end
+
+    # retrieving the policy and ensuring that the user is added to the particular policy
+    @policy = Policy.find_by(id: @policy_id)
+    if @policy
+      unless PolicyUserService.new(@policy).add_user(u)
+        errors << "User could not be added to policy."
+        return false
+      end
+    end
+
     if u
       return true
     end
@@ -44,8 +59,16 @@ class UserInviteService < BaseService
     false
   end
 
-  def update_invite(params={})
-
+  def update_invite(user_id, params={})
+    user = User.find_by(id: user_id)
+    debugger
+    uts = UserTeamService.new(user)
+    if uts.update(params)
+      return true
+    else
+      errors << uts.errors
+      return false
+    end
   end
 
   def accept_invitation(params={})
@@ -182,7 +205,7 @@ class UserInviteService < BaseService
           if mapping[:default]
             default_present = true
           end
-          if mapping[:manager_id] == self.user.id
+          if mapping[:manager_id].to_i == self.user.id
             valid = true
             break
           end
@@ -192,7 +215,7 @@ class UserInviteService < BaseService
           if mapping[:default]
             default_present = true
           end
-          if mapping[:finance_manager_id] == self.user.id
+          if mapping[:finance_manager_id].to_i == self.user.id
             valid = true
             break
           end

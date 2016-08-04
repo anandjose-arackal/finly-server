@@ -46,7 +46,7 @@ class OrganizationAccountController < ApplicationController
 
   def add_export_column
     if @export_service.add_export_field(export_params)
-      flash[:success] = "Field updated."
+      flash[:success] = "Field added."
     else
       flash[:error] = @export_service.errors
     end
