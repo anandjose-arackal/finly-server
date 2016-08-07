@@ -1,0 +1,37 @@
+<form data-remote data-turboboost id="openReport<%= report.id %>" action="<%= report_path(report.id, view: params[:view]) %>" method="get">
+</form>
+
+<div id="reportRow" class="row" style="background-color: white;
+    border: 1px solid #dfdfdf;
+    padding: 10px;
+    margin: 20px;cursor: pointer; " onclick="$('#openReport<%= report.id %>').submit(); changeBackground(this);">
+  <div class="col-md-2" style="margin-top: 6px;"><img style="max-width: 35px;
+      margin-left: 10px;<% if is_personal_view %> margin-top: 3px; <% else %> margin-top: 10px; <% end %>
+      color: #6B7EA6;" aria-hidden="true" src="<%= asset_path 'report.png' %>"/></div>
+  <div class="col-md-6" style="margin-left: -25px">
+    <% if is_personal_view %>
+        <p userTarget="reportname" style="line-height: 80%;font-weight: 300; margin-top: 5px;font-size: 13px;font-weight: 600;"><%= report.name %></p>
+    <% else %>
+        <p usertarget="name" style="line-height: 80%;font-weight: 600; margin-top: 5px"><%= report.user.name %></p>
+        <p userTarget="reportname" style="line-height: 80%;font-weight: 300; margin-top: 5px;font-size: 12px"><%= report.name %></p>
+    <% end %>
+    <i style="font-size: 10px; text-align: center;
+        /*border-radius: 30px;*/
+        padding: 5px;text-transform: uppercase; font-style: normal;background: khaki;"><%= report.relative_status_name(current_user) %></i>
+
+  </div>
+  <div class="col-md-2" style="">
+    <p style="text-align: center;
+        margin-top: 15px;
+        font-size: 16px;"><span>&#8377</span><%= ReportDetailService.new(report).total_amount || '0' %></p>
+  </div>
+  <div class="col-md-2" style="">
+
+    <i class="fa fa-pencil" style="font-size: 15px; color: black;margin-top: 18px;
+        /*margin-left: 25px;*/
+        opacity: 0.6;"> </i>
+
+  </div>
+
+
+</div>

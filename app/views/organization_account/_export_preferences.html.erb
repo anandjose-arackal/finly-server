@@ -21,7 +21,7 @@
  <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
  <input name="_method" type="hidden" value="patch">
 
-  <p> Column <%= index + 1 %>: </p>
+  <p style="font-weight: 700; font-weight: 15px"> Column <%= index + 1 %>: </p>
   <span>Export</span>
   <select class="selectors" name="export[export_field_id]">
     <% @export_fields.each do |export_field| %>
@@ -43,11 +43,11 @@
       font-weight: 500;
   " class="exportColumnValue"><input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" value="<%= export_preference.name %>">
   </span>
+  <i class="fa fa-trash-o" onclick="$('#deleteExportField<%=export_preference.id%>').submit();" style="color: indianred; margin-left: 80px"></i>
 
 </form>
 
-  <i class="fa fa-trash-o" onclick="$('#deleteExportField<%=export_preference.id%>').submit();" style="color: indianred; margin-left: 80px"></i>
-  <hr>
+
 
   <form data-remote data-turboboost id="deleteExportField<%=export_preference.id%>" action="<%=delete_export_field_path%>" method="post">
     <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
@@ -57,9 +57,9 @@
 
   <button class="green-button" style="width: 80px;
       padding: 5px;
-      margin-bottom: 40px;" id="saveExportConfig" form="exportPreferences<%=export_preference.id%>" type="submit"> SAVE
+      margin-top: 20px;" id="saveExportConfig" form="exportPreferences<%=export_preference.id%>" type="submit"> SAVE
   </button>
-
+      <hr>
 
 
 <% end %>
@@ -67,7 +67,7 @@
 
   <div style="background-color: lavender;
       padding: 15px;">
-    <form data-remote data-turboboost method="post" action="<%= add_export_field_path%>" style="margin-bottom: 30px">
+    <form data-remote data-turboboost method="post" action="<%= add_export_field_path%>" >
       <input name="authenticity_token" value="<%= %>" type="hidden">
 
       <span>Export</span>
