@@ -180,7 +180,7 @@
           <span class="spanEditProfile"> (this is the person who will reimburse the user's expenses)</span>
         </label>
 
-        <% if current_user.admin? or currrent_user.manager? %>
+        <% if current_user.admin? or current_user.manager? %>
 
             <select class="dialogInputStyle" name="pending_invite[finance_manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
               <datalist id="suggestionList">

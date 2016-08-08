@@ -248,6 +248,7 @@ class ReportsController < ApplicationController
 
   def fetch_report
     fetch_reports
+
     if @reports.blank?
       flash[:danger] == 'Report not found'
       redirect_to reports_path(view: params[:view])
@@ -257,12 +258,9 @@ class ReportsController < ApplicationController
     if id.blank? and params[:id].present?
       id = params[:id]
     end
-    @report = @reports.with_id(id)
-    if @report.present?
-      @report = @report.first
-    else
-      @report = nil
-    end
+
+    @report = @reports.find_by_id(id)
+
     if @report.blank?
       flash[:danger] == 'Report not found'
       redirect_to reports_path(view: params[:view])

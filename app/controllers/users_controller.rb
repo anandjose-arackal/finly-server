@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  #before_action :authenticate_user!
+  before_action :authenticate_user!
   before_action :load_service_objects
   before_action :load_update_role_ids, only: [:update_user_role]
 
@@ -49,7 +49,7 @@ class UsersController < ApplicationController
   # for employee list
   def index
     authorize User
-    @user = current_user # just a placeholder, will be replaced by whichever user's details are necessary with ajax
+    @user = current_user
     @policies = retrieve_policies
     @company_policies = current_company.policies
     @users = load_users.paginate(page: params[:page], per_page: 30)

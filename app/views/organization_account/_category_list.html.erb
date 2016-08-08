@@ -4,7 +4,7 @@
        <div class="col-md-11" style="font-size: 12px; font-weight: 500">
          <%= category.name %>
        </div>
-       <form data-remote data-turboboost method="post" id="deleteCategory<%= category.id %>" action="<%= remove_category_path(category) %>">
+       <form data-remote data-turboboost method="post" id="deleteCategory<%= category.id %>" action="<%= category_path(category) %>">
          <input name="_method" type="hidden" value="delete"/>
          <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
          <input name="category_id" type="hidden" value="<%= category.id%>">
@@ -16,7 +16,7 @@
  <% end %>
 
 
-<form data-remote data-turboboost method="post" action="<%= add_category_path %>">
+<form data-remote data-turboboost method="post" action="<%= categories_path %>">
  <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
  <input type="text" class="form-control" name="category[name]" id="newCategory" placeholder="Add new category name" style="width: 35%; margin-top: 30px; border-radius: 1px">
  <button class="button" id="add_new_category" type="submit" onclick="setHeight()"> ADD NEW CATEGORY</button>
