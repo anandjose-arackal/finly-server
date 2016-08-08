@@ -44,10 +44,10 @@
   " class="exportColumnValue"><input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" value="<%= export_preference.name %>">
   </span>
 
-</form>
-
   <i class="fa fa-trash-o" onclick="$('#deleteExportField<%=export_preference.id%>').submit();" style="color: indianred; margin-left: 80px"></i>
   <hr>
+
+</form>
 
   <form data-remote data-turboboost id="deleteExportField<%=export_preference.id%>" action="<%=delete_export_field_path%>" method="post">
     <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">

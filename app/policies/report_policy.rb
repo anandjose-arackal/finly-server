@@ -98,7 +98,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def approve?
-    return false unless check_manager_view
+    return false unless check_manager_view || check_admin_view
     # check if report is approvable
     unless @report.processing?
       return false
@@ -120,7 +120,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def reject?
-    return false unless check_manager_view
+    return false unless check_manager_view || check_admin_view
     # check if report is approvable
     unless @report.processing?
       return false

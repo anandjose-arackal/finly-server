@@ -199,25 +199,27 @@ class UserTeamService < BaseService
     errors.clear
     load_update params
     # updating greater than amount for non-default if it needs to be updated
-    if !@mapping.default and params['amount'] != @mapping.greater_than_amount_value and params['currency_id'] != @mapping.greater_than_amount_currency_id
+    if !@mapping.default and !params['amount'].blank? and params['amount'] != @mapping.greater_than_amount_value and params['currency_id'] != @mapping.greater_than_amount_currency_id
       greater_than_amount = Amount.create(value: params['amount'], currency_id: params['currency_id'])
       @mapping.update_attributes(greater_than_amount_id: greater_than_amount.id)
     end
-    if params[:manager_id].present? || params['manager_id'].present?
-      @mapping.update_attributes(manager_id: params[:manager_id] || params['manager_id'])
+    manager_id = params[:manager_id] || params['manager_id']
+    finance_manager_id = params[:finance_manager_id] || params['finance_manager_id']
+    approves_to_user_id = params[:approves_to_user_id] || params['approves_to_user_id']
+    approves_finance_to_user_id = params[:approves_finance_to_user_id] || params['approves_finance_to_user_id']
+    # if amount is left empty, remove the conditional manager params
+    if params['amount'] and params['amount'].empty?
+      manager_id = finance_manager_id = approves_to_user_id = approves_finance_to_user_id = nil
     end
-    if params[:finance_manager_id].present? || params['finance_manager_id'].present?
-      @mapping.update_attributes(finance_manager_id: params[:finance_manager_id] || params['finance_manager_id'])
+    if @mapping.update_attributes(manager_id: manager_id,
+                               finance_manager_id: finance_manager_id,
+                               approves_to_user_id: approves_to_user_id,
+                               approves_finance_to_user_id: approves_finance_to_user_id)
+      return true
+    else
+      errors << @mapping.errors.full_messages
+      return false
     end
-    if params[:approves_to_user_id].present? || params['approves_to_user_id'].present?
-      @mapping.update_attributes(approves_to_user_id: params[:approves_to_user_id] || params['approves_to_user_id'])
-    end
-    if params[:approves_finance_to_user_id].present? || params['approves_finance_to_user_id'].present?
-      @mapping.update_attributes(approves_finance_to_user_id: params[:approves_finance_to_user_id] || params['approves_finance_to_user_id'])
-    end
-    errors << @mapping.errors.full_messages
-    false if errors.present?
-    true
   end
 
   # Create service
@@ -293,11 +295,15 @@ class UserTeamService < BaseService
   def remove_role(params={})
     errors.clear
     load_role_update params
+    @user_team_service = UserTeamService.new(user)
     roles_to_remove = params[:user_role_id]
     roles_to_remove.each do |role|
-      unless user.team(role) and user.team(role).empty?
-        errors << "#{self.user.name} has other team members under him. "
-        return false
+      debugger
+      if @user_team_service.team(role)
+        unless @user_team_service.team(role).empty?
+          errors << "#{self.user.name} has other team members under him. "
+          return false
+        end
       end
     end
     unless user.role_mapping.role(roles_to_remove).destroy_all

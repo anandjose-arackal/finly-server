@@ -52,7 +52,7 @@ class OrganizationAccountController < ApplicationController
     end
     @export_preferences = current_company.export_preferences
     @export_fields = ExportField.all
-    render partial: 'organization_account/export_preferences', replace: 'exportPreferencesDiv'
+    render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
   end
 
   def remove_export_column
@@ -63,7 +63,7 @@ class OrganizationAccountController < ApplicationController
     end
     @export_preferences = current_company.export_preferences
     @export_fields = ExportField.all
-    render partial: 'organization_account/export_preferences', replace: 'exportPreferencesDiv'
+    render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
   end
 
 
