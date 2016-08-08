@@ -1,7 +1,7 @@
 <body style="background-color: #f5f6f9;">
 
 
-<div style="margin: 50px 170px 0px 5px;background: white;
+<div style="margin-top: 20px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
   <p style="font-size: 24px;
       font-weight: 600;
@@ -9,18 +9,20 @@
 
   <hr>
 
-  <div>
-    <p> No Policies to Display.</p>
-  </div>
+  <% unless @policies.present? %>
+      <div>
+        <p> No Policies to Display.</p>
+      </div>
+  <% end %>
+
 
   <div id="policyListTable"
        >
     <table>
       <thead>
       <tr>
-        <th style="width: 30%;">Policy Name</th>
-        <th style="width:  40%;">Owner</th>
-        <th style="width:  30%;"></th>
+        <th style="width: 50%;">Policy Name</th>
+        <th style="width:  50%;"></th>
       </tr>
       </thead>
 
@@ -31,9 +33,8 @@
 
           <tr>
             <td style="width: 30%;"> Some Policy</td>
-            <td style="width: 40%;"></td>
             <td style="width: 40%;">
-              <button id="showReportsButton" onclick="">View Reports</button>
+              <button id="showReportsButton" class="green-button" onclick="">View Reports</button>
               <i  class="fa fa-trash-o"></i></td>
           </tr>
 
@@ -42,7 +43,7 @@
 
 
 </div>
-<div style="margin: 50px 0px 0px 710px;background: white;
+<div style="margin: 20px 0px 0px 680px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 270px; position: fixed">
   <p style="font-size: 24px;
       font-weight: 600;

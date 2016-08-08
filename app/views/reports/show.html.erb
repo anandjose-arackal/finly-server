@@ -288,39 +288,7 @@
 
     $('#editableExpenseDetail').modal('show');
 
-    switch (status) {
-      case "2":
-        $('#approvedBtn').show();
-        $('#denyBtn').show();
-        break;
-      case "3":
-        $('#deniedBtn').show();
-        $('#approveBtn').show();
-        break;
-      default:
-        $('#approveBtn').show();
-        $('#denyBtn').show();
-    }
-
-    $('div#blockingViolationHeader').hide();
-    $('div#warningViolationHeader').hide();
-
-    if (!(jQuery.isEmptyObject(blocks)) || !(jQuery.isEmptyObject(warnings))) {
-
-      $('#policyViolationsExpenseDetail').show();
-      if (!(jQuery.isEmptyObject(blocks))) {
-        $('div#blockingViolationHeader').show();
-        $('p#blockingViolationsList').html(blocks);
-      }
-      if (!(jQuery.isEmptyObject(warnings))) {
-        $('div#warningViolationHeader').show();
-        $('p#warningViolationsList').html(warnings);
-      }
-    }
-    else {
-      $('#policyViolationsExpenseDetail').hide();
-    }
-
+    $('#expenseMerchant').val(merchant);
     $('#expenseReceiptHref').height($('#commenter').height() * 4.5);
     $('#expenseMerchant').val(merchant);
     $('#date').val(date);
@@ -347,7 +315,43 @@
     $('#category').val(category);
     $('#editExpenseCategory').val(categoryId);
     $('#expenseAmount').val(amount);
-//    document.getElementById("editExpenseForm").action = getExpensePath(id);
+/*
+    switch (status) {
+      case "2":
+        $('#approvedBtn').show();
+        $('#denyBtn').show();
+        break;
+      case "3":
+        $('#deniedBtn').show();
+        $('#approveBtn').show();
+        break;
+      default:
+        $('#approveBtn').show();
+        $('#denyBtn').show();
+    }
+*/
+
+    $('div#blockingViolationHeader').hide();
+    $('div#warningViolationHeader').hide();
+
+    if (!(jQuery.isEmptyObject(budget_blocks)) || !(jQuery.isEmptyObject(expense_warnings))) {
+
+      $('#policyViolationsExpenseDetail').show();
+      if (!(jQuery.isEmptyObject(budget_blocks))) {
+        $('div#blockingViolationHeader').show();
+        $('p#blockingViolationsList').html(budget_blocks);
+      }
+      if (!(jQuery.isEmptyObject(expense_warnings))) {
+        $('div#warningViolationHeader').show();
+        $('p#warningViolationsList').html(expense_warnings);
+      }
+    }
+    else {
+      $('#policyViolationsExpenseDetail').hide();
+    }
+
+
+
   }
 
   function createReportFromSelectedExpenses() {
