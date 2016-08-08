@@ -1,6 +1,7 @@
 class CategoriesController < ApplicationController
 
   def create
+    authorize Category
     category = current_company.categories.build(category_params)
     if category.save
       category.update_attributes(active: true)
@@ -13,6 +14,7 @@ class CategoriesController < ApplicationController
   end
 
   def destroy
+    authorize Category
     category = current_company.categories.active.find_by(id: params[:category_id])
     if category and category.update_attributes(active: false)
       flash[:success] = "Category removed."

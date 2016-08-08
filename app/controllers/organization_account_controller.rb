@@ -9,6 +9,6 @@ class OrganizationAccountController < ApplicationController
   end
 
   private
-  
+
 
 end

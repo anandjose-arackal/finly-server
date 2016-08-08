@@ -4,6 +4,7 @@ class ExportPreferencesController < ApplicationController
   before_action :load_service_objects
 
   def create
+    authorize ExportPreference
     if @export_service.add_export_field(export_params)
       flash[:success] = "Field added."
     else
@@ -15,6 +16,7 @@ class ExportPreferencesController < ApplicationController
   end
 
   def destroy
+    authorize ExportPreference
     if @export_service.remove_export_field(id: params[:export_field_id])
       flash[:success] = "Field deleted."
     else
@@ -26,6 +28,7 @@ class ExportPreferencesController < ApplicationController
   end
 
   def update
+    authorize ExportPreference
     if @export_service.update_export_field(params[:id], export_params)
       flash[:success] = "Field updated."
     else

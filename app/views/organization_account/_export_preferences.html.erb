@@ -6,14 +6,6 @@
 
 <hr style="margin-top: 20px">
 
-
-  <input type="checkbox" name="serial_no" value="1"
-
-  > Include serial number in Export<br>
-
-  <hr style="margin-top: 20px">
-
-
 <% @export_preferences.each_with_index do |export_preference, index| %>
 
 <form data-remote data-turboboost id="exportPreferences<%=export_preference.id%>" method="post" action="<%= export_preference_path(export_preference)%>">

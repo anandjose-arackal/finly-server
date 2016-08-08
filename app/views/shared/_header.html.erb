@@ -49,14 +49,19 @@
           </a>
           <ul class="dropdown-menu cog" style="padding: 0;
               border-radius: 1px;">
+            <% if current_user.admin? %>
             <li>
-              <a href="<%= organization_account_path %>" style="height: 45px;">Organization Account</a>
+              <a href="<%= organization_account_path(view: 'admin') %>" style="height: 45px;">Organization Account</a>
             </li>
+            <% end %>
             <li>
               <a href="<%= user_profile_path %>" style="height: 45px;">My Account</a>
             </li>
-            <li><a href="<%= policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
-              Policy</a></li>
+            <% if current_user.policy_admin? or current_user.admin? %>
+            <li><a href="<%= policies_path(view: 'admin') %>" data-turbolinks="false" style="height: 45px;">Expense
+              Policy</a>
+            </li>
+            <% end %>
             <li>
               <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
                 the App</a></li>
