@@ -56,7 +56,7 @@
                   </td>
                   <td width="30%" style="padding: 5px"><%= expense.merchant_name %></td>
                   <td width="35%" style="padding: 5px"><%= expense.note %></td>
-                  <td width="20%" style="text-align: center"><span>&#8377</span><%= "#{expense.amount}" %></td>
+                  <td width="20%" style="text-align: center"><span>&#8377</span><%= "#{expense.amount_value}" %></td>
                 </tr>
 
             <% end %>
@@ -86,7 +86,7 @@
             <td id="commenter" style="padding-left: 25px">
               <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%= comment.user_name %></p>
 
-              <p id="theComment" style="font-size: 12px; font-weight: 300;"><%= comment.content %></p>
+              <p id="theComment" style="font-size: 12px; font-weight: 300;"><%= comment.generate(current_user) %></p>
 
               <p id="commentDate" style="font-size: 12px; color: #a3a7ab; font-weight: 300; line-height: 15%">
                 <%= comment.created_at.strftime("%d %b %y") %></p>

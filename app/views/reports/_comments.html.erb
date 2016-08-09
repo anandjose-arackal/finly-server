@@ -25,7 +25,7 @@
           <!--<span style="font-size: 14px; margin-top: 5px" class="roundCircle">< %= #comment.user_name[0..1].upcase %></span>-->
         </div>
         <div id="commenter" class="col-md-11">
-          <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%=  %></p>
+          <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%= comment.user_name %></p>
 
           <p id="theComment" style="font-size: 12px; font-weight: 300;"><%= comment.generate(current_user) %></p>
 
