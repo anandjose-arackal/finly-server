@@ -36,7 +36,7 @@ class Expense < ActiveRecord::Base
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
   delegate :expense_type, to: :expense_type
-  delegate :expense_status, to: :expense_status
+  delegate :expense_status_name, to: :expense_status
   delegate :merchant_name, to: :manual_expense
   delegate :user_name, to: :user
 

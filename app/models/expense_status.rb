@@ -14,7 +14,7 @@ class ExpenseStatus < ActiveRecord::Base
   validates :name, presence: true
 
   # delegated from expense model
-  def expense_status
+  def expense_status_name
     self.name
   end
 

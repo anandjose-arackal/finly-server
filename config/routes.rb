@@ -166,11 +166,21 @@
 #
 
 Rails.application.routes.draw do
+  mount_opro_oauth controllers: {
+      oauth_new: 'oauth/auth',
+      oauth_token: 'oauth/token'
+  }, except: :docs
   # get 'policies' => 'policies#index'
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   devise_for :users
+
+  namespace :api do
+    namespace :v1 do
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+    end
+  end
 
   resources :policies, except: [:new, :edit]
   resources :policies do
@@ -238,8 +248,6 @@ Rails.application.routes.draw do
   post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
 
-  mount_opro_oauth
-
   resources :receipts do
 
   end
@@ -254,7 +262,11 @@ Rails.application.routes.draw do
 
   post 'users/update_password', to: 'users#update_password', as: :update_user_password
 
+  namespace :api do
+    namespace :v1 do
 
+    end
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
