@@ -10,27 +10,27 @@ class SettlementsController < ApplicationController
     param = payment_params
     success_message = nil
     if param[:payment_type] == PaymentType.advance_id.to_s
-      result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], currency.first.id)
+      result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'advance added'
     elsif param[:payment_type] == PaymentType.debt_clearance_id.to_s
-      result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], currency.first.id)
+      result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'debt clearance payment added'
     elsif param[:payment_type] == PaymentType.reimbursement_id.to_s
       report_ids = nil
       report_ids = param[:report_id].split if param[:report_id].present?
-      result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], currency.first.id)
+      result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'reimbursement added'
     elsif param[:payment_type] == PaymentType.settlement_id.to_s
       report_ids = nil
       report_ids = param[:report_id].split if param[:report_id].present?
-      result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], currency.first.id)
+      result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'settlement created'
     end
 
     if result
       flash.now[:success] = 'payment successfully added'
       flash.now[:success] = success_message if success_message.present?
-      redirect_to settlement_path(@user.id)
+      redirect_to settlement_path(@user.id, view: params[:view])
       return
     end
     flash.now[:danger] = 'error adding payment'
@@ -70,7 +70,7 @@ class SettlementsController < ApplicationController
   end
 
   def load_user
-    user = current_user.company.users.find_by(id: params[:id])
+    user = current_company.users.find_by(id: params[:id])
     if @admin_view
       if user.present?
         if current_user.company_admin?

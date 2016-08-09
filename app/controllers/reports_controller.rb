@@ -108,7 +108,7 @@ class ReportsController < ApplicationController
     authorize @report
     rs = ReportService.new(user: current_user, report: @report)
     if rs.reimbursement_confirm
-      flash[:success] = 'You have taken control of the report'
+      flash[:success] = 'You have successfully confirmed reimbursement of the report'
       redirect_to report_path rs.report, view_params
       return
     end
