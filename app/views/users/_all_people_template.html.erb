@@ -11,16 +11,14 @@
 
         <div class="row" style="background-color: white;border-bottom: 2px solid #d8d8d8;">
 
-          <!--          < % path = admin_users_path if is_manager_view %>
-                    < % path = admin_company_users_path if is_admin_view %>
-
-                    <form data-remote data-turboboost  action="< %= path %>" method="get">
-                      < % params.each do |key, value| %>
-                          < % if key.start_with?('filter') && key != 'filter_search' %>
-                              <input type="text" hidden="hidden" name="< %= key %>" value="< %= value %>">
-                          < % end %>
-                      < % end %>-->
-          <input type="search" name="filter_search" placeholder="Filter by user name..." style="width: 250px;
+          <form data-remote data-turboboost action="<%= users_path(view: params[:view]) %>" method="get">
+          <input type="search" name="filter_search"
+                 <% if params[:filter_search] %>
+                  placeholder="<%=params[:filter_search]%>"
+                 <% else %>
+                  placeholder="Search user name or email..."
+                 <% end %>
+                 style="width: 250px;
               border-radius: 4px;
               border: 1px solid #d8d8d8;
               outline: none;
@@ -29,7 +27,7 @@
               font-size: 14px;
               background-position: 99% 50%;
               background-size: 32px;
-              opacity: 0.5;" value="">
+              opacity: 0.5;">
           <input type="submit" hidden="hidden"/>
           </form>
         </div>
@@ -53,31 +51,36 @@
     <div class="navblock">
       <p class="listHeaders">ROLE</p>
 
-      <!--      < % if @user.admin? %>
+            <% if current_user.admin? %>
                 <div class="listOptions" id="adminFilter" onclick="reloadPageWithUserType(1)"> Admin
-                  <span class="listOptionsNumbers">< %= @admin_count %></span>
+                  <span class="listOptionsNumbers"><%= @users_type_count[1] %></span>
                 </div>
-            < % end %>
+            <% end %>
             <div class="listOptions" id="managerFilter" onclick="reloadPageWithUserType(3)"> Manager
-              <span class="listOptionsNumbers">< %= @manager_count %></span>
+              <span class="listOptionsNumbers"><%= @users_type_count[3] %></span>
+            </div>
+            <div class="listOptions" id="financeManagerFilter" onclick="reloadPageWithUserType(2)"> Finance Manager
+              <span class="listOptionsNumbers"><%= @users_type_count[2] %></span>
             </div>
             <div class="listOptions" id="allFilter" onclick="reloadPageWithUserType(-1)"> All
-              <span class="listOptionsNumbers">< %= @users.count %></span>
-            </div>-->
+              <span class="listOptionsNumbers"><%= @users_type_count[4] %></span>
+            </div>
+
     </div>
 
     <div class="navblock">
       <p class="listHeaders">STATUS</p>
 
-      <!--<div class="listOptions" id="activeStatus" onclick="reloadPageWithUserState(1)"> Active
-        <span class="listOptionsNumbers">< %= @active_users %></span>
+      <div class="listOptions" id="activeStatus" onclick="reloadPageWithUserState(1)"> Active
+        <span class="listOptionsNumbers"><%= @users_status_count[true] %></span>
       </div>
-      <div class="listOptions" id="pendingStatus" onclick="reloadPageWithPendingUsers()"> Pending
-        <span class="listOptionsNumbers">< %= @pending_users_count %></span>
+      <div class="listOptions" id="pendingStatus" onclick="reloadPageWithUserState(3)"> Pending
+        <span class="listOptionsNumbers"><%= @pending_invites_count %></span>
       </div>
-      <div class="listOptions" id="deactivatedStatus" onclick="reloadPageWithUserState(0)"> Deactivated
-        <span class="listOptionsNumbers">< %= @inactive_users %></span>
-      </div>-->
+      <div class="listOptions" id="deactivatedStatus" onclick="reloadPageWithUserState(2)"> Deactivated
+        <span class="listOptionsNumbers"><%= @users_status_count[false] %></span>
+      </div>
+
     </div>
 
   </div>
@@ -361,25 +364,20 @@
   }
 
   function reloadPageWithUserState(id) {
-    var url = "/admin/users";
-    if (<%= is_admin_view %>) {
-      url += "/company"
-    }
+    var url = "/users";
+    url += "?view=<%=params[:view]%>&";
     if (id != null && id >= 0) {
-      url += "?filter_state=" + id;
+      url += "filter_state=" + id;
     }
     Turbolinks.visit(url)
   }
 
   function reloadPageWithUserType(id) {
 
-
-    var url = "/admin/users";
-    if (<%= is_admin_view %>) {
-      url += "/company"
-    }
+    var url = "/users";
+    url += "?view=<%=params[:view]%>&";
     if (id != null && id >= 0) {
-      url += "?filter_type=" + id;
+      url += "filter_role=" + id;
     }
     Turbolinks.visit(url)
   }
@@ -390,7 +388,6 @@
 
     if (show)
       $('#approvesReportsTo').show();
-
 
   }
 

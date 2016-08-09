@@ -51,21 +51,19 @@ class ExpenseService < BaseService
     end
   end
 
-  def update_expense(user, params=nil)
+  def update_expense(params=nil, expense_id)
     return true if params.blank?
-    if user.blank?
-      errors << 'User not provided while updating expense'
-      return false
-    end
     expense_params = load_expense_params params
-    expense = load_expense expense_params[:id] || expense_params[:expense_id]
+    expense = load_expense expense_id
     unless expense
       errors << 'Expense does not belong to user.'
       return false
     end
     if expense.update_attributes(expense_params)
       # Callback to create comments in report when an expense is edited
-      ReportService.new(user: user, report: report).expense_updated(self) if expense.report_id.present? and user.present?
+      if expense.report_id.present? and @user.present?
+        ReportService.new(user: user, report: expense.report).expense_updated_in_report(expense)
+      end
       expense.reload
       return expense
     else
@@ -161,7 +159,6 @@ class ExpenseService < BaseService
     expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil? && expense_params[:report_id].nil?
     expense_params[:expense_status_id] = 2 if expense_params[:report_id].present?
 
-    expense_params[:id] = params[:id] || params[:expense_id]
     expense_params
   end
 

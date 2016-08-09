@@ -19,7 +19,6 @@ class ExpensesController < ApplicationController
 
   def index
     authorize Expense
-    # currently returns only the personal expenses of the user
     role = UserRole.employee_id
     if @admin_view
       role = UserRole.admin_id
@@ -33,7 +32,7 @@ class ExpensesController < ApplicationController
     if @expenses.present?
       @count = @expenses.count
       @merchants = @expenses.include_manual_expense.pluck(:merchant)
-      @expenses = apply_scopes(@expense_service.expenses(role)).paginate(page: params[:page], per_page: 30)
+      @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 30)
     end
     @categories = current_company.active_categories
     generate_filters
@@ -57,7 +56,7 @@ class ExpensesController < ApplicationController
 
   def update
     authorize @expense
-    if @expense_service.update_expense(current_user, expense_params)
+    if @expense_service.update_expense(expense_params, params[:id] || params[:expense_id])
       flash[:success] = 'Expense edited!'
       redirect_to expenses_path
     else
@@ -120,9 +119,8 @@ class ExpensesController < ApplicationController
     params[:expense][:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
     params[:expense][:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
     params[:expense][:receipts_attributes] = [{image: params[:expense][:receipt], user_id: current_user.id}] if params[:expense][:receipt]
-    params.require(:expense).permit(:currency_id, :expense_type_id, :expense_status_id, :receipt, :receipt_id, :report_id, :category_id, :date,
+    params.require(:expense).permit(:currency_id, :expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date,
                                     amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id])
-
   end
 
   def receipt_params
@@ -134,7 +132,7 @@ class ExpensesController < ApplicationController
   end
 
   def load_expense
-    @expense = current_user.expenses.find_by(id: params[:expense_id])
+    @expense = current_user.expenses.find_by(id: params[:expense_id] || params[:id])
   end
 
 end

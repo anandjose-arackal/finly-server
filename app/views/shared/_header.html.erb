@@ -32,10 +32,10 @@
                   <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: true %></li>
               <% end %>
               <% if current_user.finance_manager? and not is_finance_view %>
-                  <li> <%= link_to "Finance View", reports_path(filter_status: 1, view: 'finance'), turbolink: true %></li>
+                  <li> <%= link_to "Finance View", reports_path(view: 'finance'), turbolink: true %></li>
               <% end %>
               <% if current_user.manager? and not is_manager_view %>
-                  <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: true %></li>
+                  <li> <%= link_to "Manager View", reports_path(view: 'manager'), turbolink: true %></li>
               <% end %>
               <% if current_user.employee? and not is_personal_view %>
                   <li> <%= link_to "Personal View", reports_path, turbolink: true %></li>

@@ -288,9 +288,11 @@
 
     $('#editableExpenseDetail').modal('show');
 
+    $('#editExpenseForm').attr('action', '/expenses/' + id);
     $('#expenseMerchant').val(merchant);
     $('#expenseReceiptHref').height($('#commenter').height() * 4.5);
     $('#expenseMerchant').val(merchant);
+
     $('#date').val(date);
     $('#editExpenseDate').val(dateVal);
 

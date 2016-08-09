@@ -5,6 +5,7 @@ class ReportsController < ApplicationController
   before_action :fetch_reports, only: [:index]
   before_action :load_service_object
 
+
   has_scope :filter_search
   has_scope :filter_status
   has_scope :filter_user

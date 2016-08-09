@@ -3,7 +3,11 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :load_service_objects
   before_action :load_update_role_ids, only: [:update_user_role]
+  before_action :load_user_counts, only: [:index, :user_details]
 
+  has_scope :filter_search
+  has_scope :filter_role
+  has_scope :filter_status
 
   def profile
     authorize User
@@ -29,11 +33,11 @@ class UsersController < ApplicationController
     @user = current_company.users.with_id(params[:user_id]).first # user needs to be modified to include all user-policy related details
     # reinitializing the user team service object
     @user_team_service = UserTeamService.new(@user)
-    @policies = retrieve_policies
+    retrieve_policies
     @company_policies = current_company.policies
     @reports = @user.reports
     # using current user instead of @user because we need list of users in current user's view
-    @users = load_users.paginate(page: params[:page])
+    @users = apply_scopes(load_users).paginate(page: params[:page])
     load_all_mappings
 
     @company_managers = current_company.users.with_roles.only_managers
@@ -50,9 +54,9 @@ class UsersController < ApplicationController
   def index
     authorize User
     @user = current_user
-    @policies = retrieve_policies
+    retrieve_policies
     @company_policies = current_company.policies
-    @users = load_users.paginate(page: params[:page], per_page: 30)
+    @users = apply_scopes(load_users).paginate(page: params[:page], per_page: 30)
     @reports = @user.reports
     @company_managers = current_company.users.with_roles.only_managers
     @company_finance_managers = current_company.users.with_roles.only_finance_managers
@@ -95,6 +99,12 @@ class UsersController < ApplicationController
 
 
   private
+
+  def load_user_counts
+    @users_type_count = current_company.users.joins(:role_mapping).group(:user_role_id).count
+    @users_status_count = current_company.users.group(:active).count
+    @pending_invites_count = current_company.users.pending.count
+  end
 
   def load_update_role_ids
     @user = current_company.users.find_by(id: params[:user_id])

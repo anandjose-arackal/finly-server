@@ -87,6 +87,7 @@ class ReportPolicy < ApplicationPolicy
     unless @report.user.id == @user.id
       return false
     end
+    true
   end
 
   def retract?
@@ -95,6 +96,7 @@ class ReportPolicy < ApplicationPolicy
     unless @report.user.id == @user.id
       return false
     end
+    true
   end
 
   def approve?

@@ -99,10 +99,23 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
 
   # scopes for filters
-  scope :filter_search, -> (term) do
+  scope :filter_search, -> (term) {where("name like ? OR email like ?", "%#{term}%")}
+  scope :filter_state, -> (state) {
+    case(state)
+      when 1
+        where(active: true)
+      when 2
+        where(active: false)
+      when 3
+        where.not(invitation_token: nil)
+    end
+  }
 
-  end
+  scope :filter_role, -> (role) {
+    joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
+  }
 
+  scope :pending, -> {where.not(invitation_token: nil)}
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
