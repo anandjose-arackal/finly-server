@@ -79,6 +79,8 @@ class Report < ActiveRecord::Base
     end
   end
 
+  delegate :status_name, to: :status
+
   before_save :handle_name
 
   before_destroy :clear_expenses

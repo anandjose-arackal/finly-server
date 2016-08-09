@@ -17,6 +17,10 @@ class ReportStatus < ActiveRecord::Base
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
 
+  def status_name
+    self.name
+  end
+
   def open?
     self.id == ReportStatus.open_id
   end

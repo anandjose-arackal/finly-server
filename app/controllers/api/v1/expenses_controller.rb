@@ -4,8 +4,8 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   allow_oauth!
   before_action :authenticate_user!
   before_action :retrieve_service_objects
-  before_action :load_expense, only: [:show, :update, :destroy, :add_receipt]
-  before_action :load_receipt, only: [:create, :add_receipt, :update]
+  before_action :load_expense, only: [:show, :update, :destroy]
+  before_action :load_receipt, only: [:create, :update]
 
   respond_to :json
 
@@ -61,17 +61,6 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     id = (params[:id] or params[:expense_id])
     if @expense_service.remove_expense(id)
       render 'api/v1/shared/success'
-    else
-      @errors = @expense_service.errors
-      render 'api/v1/shared/failure'
-    end
-  end
-
-  def add_receipt
-    authorize @expense
-    id = (params[:id] or params[:expense_id])
-    if @expense_service.add_receipt_to_expense(receipt_params, id)
-      render 'api/v1/expenses/show'
     else
       @errors = @expense_service.errors
       render 'api/v1/shared/failure'

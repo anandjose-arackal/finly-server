@@ -169,7 +169,7 @@ Rails.application.routes.draw do
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
       oauth_token: 'oauth/token'
-  }, except: :docs
+  }
   # get 'policies' => 'policies#index'
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
@@ -179,6 +179,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:index, :show]
     end
   end
 
@@ -261,12 +262,6 @@ Rails.application.routes.draw do
   get 'users/profile', to: 'users#profile', as: :user_profile
 
   post 'users/update_password', to: 'users#update_password', as: :update_user_password
-
-  namespace :api do
-    namespace :v1 do
-
-    end
-  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
