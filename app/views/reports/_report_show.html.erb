@@ -65,7 +65,7 @@
 
     <% unless @policies.blank? %>
         <label style="float: right;margin-top: 5px"> Report Policy:
-          <% if is_personal_view && !@report.processing? && !@report.approved? %>
+          <% if is_personal_view && @report.editable? %>
               <form data-remote data-turboboost id="applyPolicyForm"  action="<%= report_assign_policy_path(@report) %>" method="post" style="display: inline-block">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                 <select name="report[policy_id]" onchange="$('form#applyPolicyForm').submit();" class="selectors" style="padding-top: 10px; width: 155px">

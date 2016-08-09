@@ -1,5 +1,9 @@
 source 'https://rubygems.org'
 
+# gem for pdf export and its executable
+gem 'wicked_pdf'
+gem 'wkhtmltopdf-binary'
+
 # Gem pundit for permission check in actions etc.
 gem 'pundit'
 

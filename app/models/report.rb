@@ -151,6 +151,10 @@ class Report < ActiveRecord::Base
     self.status_id == ReportStatus.closed_id
   end
 
+  def editable?
+    open? or retracted?
+  end
+
   def reimbursement_pending?
     approved? and reimbursement_amount.present? and reimbursement_amount.value > 0
   end
@@ -189,6 +193,33 @@ class Report < ActiveRecord::Base
     end
     name = status.name
     name[0].upcase + name[1..name.length]
+  end
+
+  def date_start
+    e = self.expenses.unscoped.where(report_id: self.id).order(date: :asc).limit(1)
+    if e.present?
+      e[0].date
+    end
+  end
+
+  def date_end
+    e = self.expenses.unscoped.where(report_id: self.id).order(date: :desc).limit(1)
+    if e.present?
+      e[0].date
+    end
+  end
+
+  def get_date_string
+    d_start = date_start
+    d_end = date_end
+    if d_start.present? && d_end.present? && d_start != d_end
+      return "#{d_start.strftime("%d-%b-%y")} to #{d_end.strftime("%d-%b-%y")}"
+    elsif d_start.present?
+      return "#{d_start.strftime("%d-%b-%y")}"
+    elsif d_end.present?
+      return "#{d_end.strftime("%d-%b-%y")}"
+    end
+    ""
   end
 
   private

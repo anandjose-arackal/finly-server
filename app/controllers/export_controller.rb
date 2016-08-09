@@ -1,4 +1,7 @@
 class ExportController < ApplicationController
+  include MathUtil
+
+  before_action :authenticate_user!
 
   def report
     role = UserRole.employee_id
@@ -30,7 +33,43 @@ class ExportController < ApplicationController
         @header = d[:header]
         @data = d[:data]
       end
-      format.pdf
+      format.pdf do
+        @comments = reports.first.comments
+        load_info_for_views(reports.first)
+        render pdf: "report-#{reports.first.name}", layout: "pdf.html.erb" # Excluding ".pdf" extension.
+      end
+
+    end
+  end
+
+  private
+
+  def load_info_for_views(report)
+    @report = report
+    uts = UserTeamService.new(report.user)
+    manager = uts.manager(report: report)
+    if manager.blank?
+      manager = uts.finance_manager(report: report)
+    end
+    @manager_name = nil
+    @manager_name = manager.name if manager.present?
+    @status = report.relative_status_name(current_user)
+    rds = ReportDetailService.new(@report)
+    @total = precision_value rds.total_amount
+    @date_string = rds.date_as_string
+    @policy = report.policy
+
+    # loading expenses
+    @expenses= []
+    @categories = current_user.company.categories
+    all_expenses = @report.expenses
+    @categories.each do |category|
+      item_expenses = all_expenses.with_category(category.id)
+      if item_expenses.present?
+        item_name = category.name
+        item_sum = precision_value item_expenses.with_amount.sum(:value)
+        @expenses << {category_name: item_name, expenses: item_expenses, category_total: item_sum}
+      end
     end
   end
 
