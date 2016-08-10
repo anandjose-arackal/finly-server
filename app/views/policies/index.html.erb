@@ -5,7 +5,7 @@
     padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
   <p style="font-size: 24px;
       font-weight: 600;
-      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Company Policy List</p>
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policies you are Admin for: </p>
 
   <hr>
 
@@ -23,7 +23,7 @@
         <table>
           <thead>
           <tr>
-            <th style="width: 50%;"><%= policy.name%></th>
+            <th style="width: 50%;"><%= link_to policy.name, policy %></th>
             <th style="width:  50%;"></th>
           </tr>
           </thead>
@@ -37,7 +37,7 @@
           <tr>
             <td style="width: 30%;"> <% link_to policy.name, policy %></td>
             <td style="width: 40%;">
-              <a id="showReportsButton" class="btn btn-primary green-button" onclick="">View Reports</a>
+              <a id="showReportsButton" class="btn btn-primary green-button" href="<%= reports_path(view: params[:view])%>">View Reports</a>
               <i class="fa fa-trash-o"></i></td>
           </tr>
 
@@ -48,30 +48,6 @@
 
 
 </div>
-<div style="margin: 20px 0px 0px 680px;background: white;
-    padding: 15px;border: 1px solid #d8d8d8; width: 270px; position: fixed">
-  <p style="font-size: 24px;
-      font-weight: 600;
-      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Add new policy</p>
-  <hr>
-  <form data-remote data-turboboost id="policyCreate"  action="<%= policies_path %>" method="post">
-    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-
-    <input type="text" id="policyName" name="name" style="height: 40px;
-        padding: 10px;" placeholder="Enter name of policy">
-
-    <p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy
-      applied to: </p>
-    <input type="radio" name="users" value="everyone" checked> Everyone <br>
-    <input type="radio" name="users" value=""> Invite Employees Later <br>
-
-    <input type="submit" class="abaButton" onclick="return validate()" style="border-radius: 1px;margin-top: 20px;margin-left: 0px" id="createPolicy" value="Create">
-  </form>
-  <a onclick="$('form#policyCreate').submit()">Create</a>
-</div>
-
-
-
 
 </body>
 
