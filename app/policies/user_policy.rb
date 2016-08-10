@@ -4,6 +4,10 @@ class UserPolicy < ApplicationPolicy
     @user = user
   end
 
+  def profile?
+    check_personal_view
+  end
+
   def index?
     # i.e. everyone other than employees can access the Users listing
     if check_personal_view

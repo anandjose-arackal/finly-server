@@ -19,12 +19,12 @@ class UsersController < ApplicationController
     authorize @user
     if @user.update_with_password(user_params)
       # Sign in the user by passing validation in case their password changed
-      sign_in @user, :bypass_sin_in => true
+      sign_in @user, :bypass => true
       flash.now[:success] = 'Password updated'
     else
       flash.now[:danger] = 'Password updation failed'
     end
-    redirect_to request.referrer
+    render_flash_message
   end
 
   # action to retrieve a particular user's details in the employees screen - only for admin, obviously

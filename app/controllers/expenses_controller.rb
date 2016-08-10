@@ -5,9 +5,10 @@ class ExpensesController < ApplicationController
   before_action :load_expense, only: [:update, :destroy, :add_receipt]
 
   # scopes for filters
+  has_scope :filter_sort, using: [:sort_by, :order], type: :hash
   has_scope :filter_category_id
   has_scope :filter_merchant
-  # has_scope :filter_receipt
+  has_scope :filter_receipt
   has_scope :filter_search
   has_scope :filter_amount, using: [:type, :value], type: :hash
   has_scope :filter_status_id
@@ -30,9 +31,9 @@ class ExpensesController < ApplicationController
     @expenses = @expense_service.expenses(role)
     # for the filters
     if @expenses.present?
-      @count = @expenses.count
       @merchants = @expenses.include_manual_expense.pluck(:merchant)
       @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 30)
+      @count = @expenses.count
     end
     @categories = current_company.active_categories
     generate_filters
@@ -114,7 +115,7 @@ class ExpensesController < ApplicationController
   def expense_params
     ###### todo temporary - will be removed after currency is added in main screen###
     params[:expense][:currency_id] = Currency.first.id
-    ##########################################################################
+    #################################################################################
 
     params[:expense][:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
     params[:expense][:manual_expense_attributes] = {merchant: params[:expense][:merchant]}

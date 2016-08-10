@@ -22,13 +22,13 @@
 </form>
 
 
-<% if @expenses.blank? %>
+<% if param.blank? and @expenses.blank? %>
     <div id="noexpensesview" style="margin-top: 22%">
 
       <img id="emptyPlaceholderImage" src="<%= asset_path 'checkbox-multiple-blank.png' %>" alt="No Expenses">
 
       <p id="emptyPlaceholder">Welcome to Finly! <br>
-        Looks like there aren't any pending expenses.</p>
+        Looks like there aren't any expenses.</p>
 
     </div>
 

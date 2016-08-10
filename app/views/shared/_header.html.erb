@@ -55,7 +55,7 @@
             </li>
             <% end %>
             <li>
-              <a href="<%= user_profile_path %>" style="height: 45px;">My Account</a>
+              <a href="<%= user_profile_path(current_user) %>" style="height: 45px;">My Account</a>
             </li>
             <% if current_user.policy_admin? or current_user.admin? %>
             <li><a href="<%= policies_path(view: 'admin') %>" data-turbolinks="false" style="height: 45px;">Expense

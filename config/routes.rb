@@ -124,6 +124,8 @@
 #                     user_details POST   /users/:user_id/user_details(.:format)                      users#user_details
 #                 user_update_team PATCH  /users/:user_id/update_user_team(.:format)                  users#update_team
 #                 user_update_role PATCH  /users/:user_id/update_role(.:format)                       users#update_user_role
+#                     user_profile GET    /users/:user_id/profile(.:format)                           users#profile
+#             user_update_password POST   /users/:user_id/update_password(.:format)                   users#update_password
 #                            users GET    /users(.:format)                                            users#index
 #                                  POST   /users(.:format)                                            users#create
 #                         new_user GET    /users/new(.:format)                                        users#new
@@ -180,8 +182,6 @@
 #                             root GET    /                                                           static_pages#home
 #                            about GET    /about(.:format)                                            static_pages#about
 #                         features GET    /features(.:format)                                         static_pages#features
-#                     user_profile GET    /users/profile(.:format)                                    users#profile
-#             update_user_password POST   /users/update_password(.:format)                            users#update_password
 #
 
 Rails.application.routes.draw do
@@ -249,6 +249,8 @@ Rails.application.routes.draw do
     post 'user_details', to: 'users#user_details', as: :details
     patch 'update_user_team', to: 'users#update_team', as: :update_team
     patch 'update_role', to: 'users#update_user_role', as: :update_role
+    get 'profile', to: 'users#profile', as: :profile
+    post 'update_password', to: 'users#update_password', as: :update_password
   end
 
   resources :pending_invites do
@@ -273,9 +275,6 @@ Rails.application.routes.draw do
 
   get 'features', to: 'static_pages#features'
 
-  get 'users/profile', to: 'users#profile', as: :user_profile
-
-  post 'users/update_password', to: 'users#update_password', as: :update_user_password
 
 
 

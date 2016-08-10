@@ -59,6 +59,12 @@ class ExpenseService < BaseService
       errors << 'Expense does not belong to user.'
       return false
     end
+    # adding manual expense and amount ids so that they get updated and not recreated
+    manual_expense_id = expense.manual_expense.id
+    amount_id = expense.amount.id
+    expense_params[:manual_expense_attributes][:id] = manual_expense_id
+    expense_params[:amount_attributes][:id] = amount_id
+
     if expense.update_attributes(expense_params)
       # Callback to create comments in report when an expense is edited
       if expense.report_id.present? and @user.present?
