@@ -1,4 +1,4 @@
-<div id="centerBlockRows" style="background-color:white;cursor: pointer" class="container-fluid" onclick="onClickCenterBlockExpenses('<%=expense.id%>', '<%=expense.amount_value%>', '<%=j expense.user_name%>', '<%=j expense.merchant_name%>', '<%=j expense.note%>', '<%=expense.date%>', '<%=expense.receipts.first%>','<%=expense.category_name%>','<%=expense.category_id%>', '<%=expense.receipts.first.image.url if expense.receipts.first %>', this)">
+<div id="centerBlockRows" style="background-color:white;cursor: pointer" class="container-fluid" onclick="onClickCenterBlockExpenses('<%=expense.id%>', '<%=expense.amount_value%>', '<%=j expense.user_name%>', '<%=j expense.merchant_name%>', '<%=j expense.note%>', '<%=expense.date%>', '<%=expense.receipts.first.image if expense.receipts.first%>','<%=expense.category_name%>','<%=expense.category_id%>', '<%=expense.receipts.first.image.url if expense.receipts.first %>', this)">
 
   <div class="row">
     <% if is_personal_view %>

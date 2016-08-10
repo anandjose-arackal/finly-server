@@ -88,6 +88,12 @@ class ExpenseService < BaseService
     receipt_params = load_receipt_params params
     expense = load_expense expense_id
     return unless expense
+
+    # checking if the expense already has an associated receipt - if it does, detach that receipt, and add the new one
+    if expense.receipts.present?
+      detach_receipt_from_expense(expense.receipts.first.id, expense.id)
+    end
+
     # build the expense associated with the expense
     attach = expense.receipts.build(receipt_params)
     # associating the current user with the receipt
