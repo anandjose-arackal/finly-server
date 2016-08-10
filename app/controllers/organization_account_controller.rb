@@ -6,6 +6,7 @@ class OrganizationAccountController < ApplicationController
     @categories = current_company.categories.active
     @export_fields = ExportField.all
     @export_preferences = current_company.export_preferences
+    @policies = current_company.policies
   end
 
   private

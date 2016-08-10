@@ -78,6 +78,7 @@ class Report < ActiveRecord::Base
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
     end
   end
+  scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
   before_save :handle_name
 

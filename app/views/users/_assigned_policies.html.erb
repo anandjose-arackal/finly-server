@@ -1,0 +1,66 @@
+
+
+<body style="background-color: #f5f6f9;">
+
+<div id="policyListAdmin">
+
+  <div style="margin-top: 20px;background: white;
+      padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
+    <p style="font-size: 24px;
+        font-weight: 600;
+        font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Company Policy List</p>
+
+    <hr>
+
+    <% unless @assigned_policies.present? %>
+        <div>
+          <p> No Policies to Display.</p>
+        </div>
+    <% end %>
+
+
+    <div id="policyListTable">
+
+      <% @assigned_policies.each do |policy| %>
+
+          <table>
+            <thead>
+            <tr>
+              <th style="width: 50%;"><%= link_to policy.name, policy %></th>
+              <th style="width:  50%;"></th>
+            </tr>
+            </thead>
+
+            <tr>
+              <td style="width: 30%;"> <% link_to policy.name, policy %></td>
+              <td style="width: 40%;">
+                <a id="showReportsButton" class="btn btn-primary green-button" href="<%=reports_path(filter_policy: policy.id, view: params[:view])%>">View Reports</a>
+            </tr>
+
+          </table>
+
+      <% end %>
+    </div>
+
+
+  </div>
+
+</div>
+
+</body>
+
+
+
+<script>
+
+
+  function getPolicyReportsPath(policyId) {
+
+    path = '/admin/company/reports?filter_policy_id=' + policyId;
+
+    return path;
+
+  }
+
+</script>
+

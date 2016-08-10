@@ -1,6 +1,8 @@
-
+<% if current_user.admin? or current_user.policy_admin?(@policy) %>
 <button id="createNewRule" data-toggle="modal" data-target="#createNewExpenseRuleModal">Create New Rule
 </button>
+<% end %>
+
 <div>
 
   <div id="warningDiv">
@@ -13,6 +15,7 @@
       <% @policy.expense_rules.each do |rule| %>
         <% if rule.rule_type_id == 1 %>
               <!-- deleting a particular rule or warning -->
+              <% if current_user.admin or current_user.policy_admin?(@policy) %>
               <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="expense_rule<%= rule.id %>"
                     action="<%= policy_remove_rule_path(@policy) %>" method="post">
 
@@ -20,10 +23,16 @@
                 <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
                 <input name="expense_rule[rule_id]" type="hidden" value="<%=rule.id%>">
               </form>
+              <% end %>
 
               <div style="margin-bottom: 15px" class="row">
                 <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
-                <span class="col-md-10"><%= rule_in_words rule%></span><i onclick="$('form#expense_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                <span class="col-md-10"><%= rule_in_words rule%></span>
+
+                <% if current_user.admin or current_user.policy_admin?(@policy) %>
+                <i onclick="$('form#expense_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                <% end %>
+
               </div>
         <% end %>
       <% end %>
@@ -52,6 +61,8 @@
       <% @policy.expense_rules.each do |rule| %>
           <% if rule.rule_type_id == 2 %>
               <!-- deleting a particular rule or warning -->
+
+              <% if current_user.admin or current_user.policy_admin?(@policy) %>
               <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="expense_rule<%= rule.id %>"
                     action="<%= policy_remove_rule_path(@policy) %>" method="post">
 
@@ -59,10 +70,14 @@
                 <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
                 <input name="expense_rule[rule_id]" type="hidden" value="<%=rule.id%>">
               </form>
+              <% end %>
 
               <div style="margin-bottom: 15px" class="row">
                 <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
-                <span class="col-md-10"><%= rule_in_words rule%></span><i onclick="$('form#expense_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                <span class="col-md-10"><%= rule_in_words rule%></span>
+                <% if current_user.admin or current_user.policy_admin?(@policy) %>
+                <i onclick="$('form#expense_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                <% end %>
               </div>
           <% end %>
       <% end %>
@@ -84,6 +99,7 @@
 
 </div>
 
+<% if current_user.admin or current_user.policy_admin?(@policy) %>
 
 <div class="modal fade" id="createNewExpenseRuleModal" role="dialog">
   <div class="modal-dialog modal-md">
@@ -143,6 +159,8 @@
     </div>
   </div>
 </div>
+<% end %>
+
 </div>
 
 

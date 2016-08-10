@@ -10,11 +10,20 @@ class PoliciesController < ApplicationController
     pcs = PolicyCreateService.new(current_user)
     if pcs.create_policy(params[:name])
       flash.now[:success] = 'Policy Created'
-      render_flash_message
+      if current_user.admin?
+        @policies = current_company.policies
+      else
+        @policies = current_user.admin_policies
+      end
+      render partial: 'organization_account/policy_list', replace: '#policyListAdmin'
       return
     end
     flash.now[:failure] = pcs.errors
     render_flash_message
+  end
+
+  def destroy
+
   end
 
   def index

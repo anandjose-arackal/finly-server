@@ -12,6 +12,7 @@ class UsersController < ApplicationController
   def profile
     authorize User
     @manager = @user_team_service.manager
+    @assigned_policies = current_user.policies
   end
 
   def update_password

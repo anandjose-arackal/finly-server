@@ -20,8 +20,11 @@ class PolicyRetrievalService < BaseService
       return false
     end
     load_view params
-    if @admin_view # Admin can view all policies
+    if @admin_view and user.admin? # Admin can view all policies
       user.company.policies.non_default if user.company.policies
+    elsif @admin_view and user.policy_admin?
+      # i.e. all policies this user is an admin for
+      user.admin_policies if user.admin_policies
     elsif @personal_view # User would get a list of policies he is added to
       user.policies.non_default if user.policies
     end
