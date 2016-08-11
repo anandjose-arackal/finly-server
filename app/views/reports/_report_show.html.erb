@@ -244,15 +244,14 @@
           <form data-remote data-turboboost accept-charset="UTF-8" enctype="multipart/form-data" id="editExpenseForm" method="post">
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
             <input name="_method" type="hidden" id="hiddenPatchCall" value="patch"/>
-            <input type="text" class="expenseDetailInput" name="expense[receipt]" id="viewReceiptSelectFileText" style="display:none"/>
             <input type="file" class="expenseDetailInput" name="expense[receipt]" id="viewReceiptSelectFile" style="display:none" accept=".png, .jpg,.pdf, .jpeg" onclick="this.value=null;" onchange="readFileForView(this)"/>
           </form>
 
           <div class="col-md-8" id="expenseDetailsColumn" style="background-color: white; border-right: 1px solid #d8d8d8">
 
 
-            <form data-remote data-turboboost method="post" id="editExpenseWithinReportForm">-->
-              <input type="hidden" name="authenticity_token" value="<%=form_authenticity_token%>">-->
+            <form data-remote data-turboboost method="post" id="editExpenseWithinReportForm">
+              <input type="hidden" name="authenticity_token" value="<%=form_authenticity_token%>">
               <input type="hidden" name="_method" value="patch">
             <section id="expenseSectionDetail">
 

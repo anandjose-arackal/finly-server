@@ -59,11 +59,16 @@ class ExpenseService < BaseService
       errors << 'Expense does not belong to user.'
       return false
     end
-    # adding manual expense and amount ids so that they get updated and not recreated
+    # adding receipt, manual expense and amount ids so that they get updated and not recreated
     manual_expense_id = expense.manual_expense.id
     amount_id = expense.amount.id
     expense_params[:manual_expense_attributes][:id] = manual_expense_id
     expense_params[:amount_attributes][:id] = amount_id
+
+    if expense.receipts.present? and params[:receipt].present?
+      receipt_id = expense.receipts.first.id
+      expense_params[:receipts_attributes][0][:id] = receipt_id
+    end
 
     old_expense = expense # stub to keep track of what's changed
     if expense.update_attributes(expense_params)

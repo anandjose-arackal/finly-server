@@ -59,7 +59,7 @@ class ExpensesController < ApplicationController
     authorize @expense
     if @expense_service.update_expense(expense_params, params[:id] || params[:expense_id])
       flash[:success] = 'Expense edited!'
-      redirect_to expenses_path
+      redirect_to request.referrer
     else
       flash[:danger] = @expense_service.errors
       render_flash_message
@@ -119,9 +119,9 @@ class ExpensesController < ApplicationController
 
     params[:expense][:amount_attributes] = {value: params[:expense][:amount], currency_id: params[:expense][:currency_id]}
     params[:expense][:manual_expense_attributes] = {merchant: params[:expense][:merchant]}
-    params[:expense][:receipts_attributes] = [{image: params[:expense][:receipt], user_id: current_user.id}] if params[:expense][:receipt]
+    params[:expense][:receipts_attributes] = [{image: params[:expense][:receipt], user_id: current_user.id}] if params[:expense][:receipt].present?
     params.require(:expense).permit(:currency_id, :expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date,
-                                    amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id])
+                                    amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
   end
 
   def receipt_params
