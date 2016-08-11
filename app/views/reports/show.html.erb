@@ -336,17 +336,18 @@
     $('div#blockingViolationHeader').hide();
     $('div#warningViolationHeader').hide();
 
-    if (!(jQuery.isEmptyObject(budget_blocks)) || !(jQuery.isEmptyObject(expense_warnings))) {
+    if (!(jQuery.isEmptyObject(budget_blocks)) || !(jQuery.isEmptyObject(expense_warnings)) || !(jQuery.isEmptyObject(expense_blocks)) || !(jQuery.isEmptyObject(budget_warnings))) {
 
       $('#policyViolationsExpenseDetail').show();
-      if (!(jQuery.isEmptyObject(budget_blocks))) {
+      if (!(jQuery.isEmptyObject(budget_blocks)) || !(jQuery.isEmptyObject(expense_blocks))) {
         $('div#blockingViolationHeader').show();
-        $('p#blockingViolationsList').html(budget_blocks);
+        $('p#blockingViolationsList').html(budget_blocks + expense_blocks);
       }
-      if (!(jQuery.isEmptyObject(expense_warnings))) {
+      if (!(jQuery.isEmptyObject(expense_warnings)) || !(jQuery.isEmptyObject(budget_warnings))) {
         $('div#warningViolationHeader').show();
-        $('p#warningViolationsList').html(expense_warnings);
+        $('p#warningViolationsList').html(expense_warnings + budget_warnings);
       }
+
     }
     else {
       $('#policyViolationsExpenseDetail').hide();

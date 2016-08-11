@@ -444,7 +444,7 @@ class ReportService < BaseService
   end
 
   # Callback to create comments in reports when expense is updated
-  def expense_updated_in_report(expense)
+  def expense_updated_in_report(edited_expense, old_details)
 
   end
 

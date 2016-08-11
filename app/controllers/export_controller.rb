@@ -6,7 +6,7 @@ class ExportController < ApplicationController
   def report
     role = UserRole.employee_id
     if @admin_view
-      role = UserRole.employee_id
+      role = UserRole.admin_id
     elsif @manager_view
       role = UserRole.manager_id
     elsif @finance_view
@@ -18,8 +18,8 @@ class ExportController < ApplicationController
       render_flash_message
       return
     end
-    reports = @reports.with_id(params[:report_id])
-    unless reports.present?
+    report = @reports.find_by_id(params[:report_id])
+    unless report.present?
       flash[:danger] = 'Report not found'
       render_flash_message
       return
@@ -27,16 +27,16 @@ class ExportController < ApplicationController
     es = ExportService.new(current_user.company)
     respond_to do |format|
       format.html
-      format.csv { send_data es.export_as_csv(reports) }
+      format.csv { send_data es.export_as_csv(report) }
       format.xls do
-        d = es.export_as_xls(reports)
+        d = es.export_as_xls(report)
         @header = d[:header]
         @data = d[:data]
       end
       format.pdf do
-        @comments = reports.first.comments
-        load_info_for_views(reports.first)
-        render pdf: "report-#{reports.first.name}", layout: "pdf.html.erb" # Excluding ".pdf" extension.
+        @comments = report.comments
+        load_info_for_views(report)
+        render pdf: "report-#{report.name}", layout: "pdf.html.erb" # Excluding ".pdf" extension.
       end
 
     end

@@ -36,13 +36,13 @@ class UsersController < ApplicationController
     @user_team_service = UserTeamService.new(@user)
     retrieve_policies
     @company_policies = current_company.policies
-    @reports = @user.reports
+    @reports = @user.reports.not_open
     # using current user instead of @user because we need list of users in current user's view
     @users = apply_scopes(load_users).paginate(page: params[:page])
     load_all_mappings
 
-    @company_managers = current_company.users.with_roles.only_managers
-    @company_finance_managers = current_company.users.with_roles.only_finance_managers
+    @company_managers = current_company.users.with_roles.only_managers.signed_up
+    @company_finance_managers = current_company.users.with_roles.only_finance_managers.signed_up
 
     if @user.invite_accepted?
       render partial: 'users/edit_invite', replace: '#inviteDetaislDiv'
@@ -58,9 +58,9 @@ class UsersController < ApplicationController
     retrieve_policies
     @company_policies = current_company.policies
     @users = apply_scopes(load_users).paginate(page: params[:page], per_page: 30)
-    @reports = @user.reports
-    @company_managers = current_company.users.with_roles.only_managers
-    @company_finance_managers = current_company.users.with_roles.only_finance_managers
+    @reports = @user.reports.not_open
+    @company_managers = current_company.users.with_roles.only_managers.signed_up
+    @company_finance_managers = current_company.users.with_roles.only_finance_managers.signed_up
 
     load_all_mappings
   end

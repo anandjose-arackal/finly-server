@@ -196,6 +196,29 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
+  def first_date
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_asc.first.date
+  end
+
+  def last_date
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_desc.first.date
+  end
+
+  def get_date_string
+    d_start = first_date
+    d_end = last_date
+    if d_start.blank? and d_end.blank?
+      return ''
+    end
+    if d_start == d_end
+      return "#{d_start.strftime("%d-%b-%y")}"
+    else
+      return "#{d_start.strftime("%d-%b-%y")} to #{d_end.strftime("%d-%b-%y")}"
+    end
+  end
+
 
   private
   def is_employee

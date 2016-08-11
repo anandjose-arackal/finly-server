@@ -115,6 +115,7 @@ class User < ActiveRecord::Base
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
   }
 
+  scope :signed_up, -> {where invitation_token: nil}
   scope :pending, -> {where.not(invitation_token: nil)}
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(name: :asc) }

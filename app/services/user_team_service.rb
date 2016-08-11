@@ -282,6 +282,7 @@ class UserTeamService < BaseService
     load_role_update params
     existing_role_ids = user.role_mapping.map(&:user_role_id)
     new_role_ids = params[:user_role_id]
+    new_role_ids = [new_role_ids] unless new_role_ids.is_a?(Array)
     roles_to_add = new_role_ids - existing_role_ids
     roles_to_add.each do |role_id|
       unless user.role_mapping.create(user_role_id: role_id)

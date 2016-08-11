@@ -65,10 +65,11 @@ class ExpenseService < BaseService
     expense_params[:manual_expense_attributes][:id] = manual_expense_id
     expense_params[:amount_attributes][:id] = amount_id
 
+    old_expense = expense # stub to keep track of what's changed
     if expense.update_attributes(expense_params)
       # Callback to create comments in report when an expense is edited
       if expense.report_id.present? and @user.present?
-        ReportService.new(user: user, report: expense.report).expense_updated_in_report(expense)
+        ReportService.new(user: user, report: expense.report).expense_updated_in_report(expense, old_expense)
       end
       expense.reload
       return expense
