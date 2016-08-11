@@ -6,10 +6,11 @@
 
 # Ignore bundler config.
 /.bundle
-Gemfile.lock
-config/database.yml
+/Gemfile.lock
+/config/database.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
 /tmp
+/public/system/receipts
