@@ -1,231 +1,76 @@
-<body id="policies">
+<body style="background-color: #f5f6f9;">
 
-<ul class="innerul">
-  <li class="active" data-switch="#company_profile"><a href="#" data-turbolinks="false">Company Profile
-    <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
-  <li data-switch="#policies"><a href="#" data-turbolinks="false">Policies
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#bank_account"><a href="#" data-turbolinks="false">Bank Account
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#organisation_expenses"><a href="#" data-turbolinks="false">Organisation Expenses
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#admins"><a href="#" data-turbolinks="false">Admins
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#integration"><a href="#" data-turbolinks="false">Integration
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#export_preferences"><a href="#" data-turbolinks="false">Export Preferences
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#invoicing_history"><a href="#" data-turbolinks="false">Invoicing History
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#account_manager"><a href="#" data-turbolinks="false">Finly Account Manager
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-</ul>
 
-<div id="page-2" class="innerdiv">
+<div style="margin-top: 20px;background: white;
+    padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
+  <p style="font-size: 24px;
+      font-weight: 600;
+      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policies you are Admin for: </p>
 
-  <!-- Hidden blocks that you show when requested. -->
+  <hr>
 
-  <!-- EDIT CATEGORIES -->
+  <% unless @policies.present? %>
+      <div>
+        <p> No Policies to Display.</p>
+      </div>
+  <% end %>
 
-  <div class="divsections container" id="company_profile" >
 
-    <h3 id="divsection_heading">Company Profile</h3>
+  <div id="policyListTable">
 
-    <!--<button onclick="temperory()"> add</button>-->
+    <% @policies.each do |policy| %>
 
-    <p>Below are the expense categories your team will see, on the web and in the app.</p>
+        <table>
+          <thead>
+          <tr>
+            <th style="width: 50%;"><%= link_to policy.name, policy %></th>
+            <th style="width:  50%;"></th>
+          </tr>
+          </thead>
 
-    <hr style="margin-top: 20px">
 
-  </div>
+          <!-- deleting a particular policy -->
+          <form data-remote data-turboboost method="post" action="<%= %>" id="deletePolicy<%=policy.id%>"></form>
+          <input name="_method" type="hidden" value="delete"/>
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
 
-  <div class="divsections " id="export_preferences" style="display: none">
+          <tr>
+            <td style="width: 30%;"> <% link_to policy.name, policy %></td>
+            <td style="width: 40%;">
+              <a id="showReportsButton" class="btn btn-primary green-button" href="<%= reports_path(view: params[:view])%>">View Reports</a>
+              <i class="fa fa-trash-o"></i></td>
+          </tr>
 
-    <h3 id="divsection_heading">Export Preferences</h3>
+        </table>
 
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <%= render 'organization_account/export_preferences' %>
-
-  </div>
-
-
-  <div class="divsections " id="policies" style="display: none">
-
-    <h3 id="divsection_heading">Policies</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-  <%= render 'policy_list' %>
-    <hr style="margin-top: 20px">
-
-
-  </div>
-
-
-  <div class="divsections " id="bank_account" style="display: none">
-
-    <h3 id="divsection_heading">Bank Account</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-
-    <hr style="margin-top: 20px">
-
-
-  </div>
-
-
-  <div class="divsections " id="organisation_expenses" style="display: none">
-
-    <h3 id="divsection_heading">Organisation Expenses</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-
-    <hr style="margin-top: 20px">
-
-
-  </div>
-
-
-  <div class="divsections " id="admins" style="display: none">
-
-    <h3 id="divsection_heading">Admins</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-
-    <hr style="margin-top: 20px">
-
-
-  </div>
-
-  <div class="divsections " id="integration" style="display: none">
-
-    <h3 id="divsection_heading">Integration</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-
-    <hr style="margin-top: 20px">
-
-
-  </div>
-
-  <div class="divsections " id="invoicing_history" style="display: none">
-
-    <h3 id="divsection_heading">Invoicing History</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-
-    <hr style="margin-top: 20px">
-
-
-  </div>
-
-  <div class="divsections " id="account_manager" style="display: none">
-
-    <h3 id="divsection_heading">Account Manager</h3>
-
-    <!--<button onclick="temperory()"> add</button>-->
-
-    <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-
-    <hr style="margin-top: 20px">
-
-
+    <% end %>
   </div>
 
 
 </div>
 
-
 </body>
 
-<style>
 
-
-  #exportForm p {
-    font-weight: 500;
-  }
-
-  #exportForm span {
-    font-size: 13px;
-  }
-
-  #exportForm hr {
-    margin-right: 40%;
-  }
-
-  .active {
-
-    background-color: white;
-    text-decoration: none;
-  }
-
-  .arrow {
-
-    float: right;
-    vertical-align: middle;
-    font-size: 14px;
-    padding-right: 22px;
-
-  }
-
-  #chartSelector > a:active {
-    color: black;
-    font-size: larger;
-    text-decoration: none;
-  }
-
-
-</style>
 
 <script>
 
-  var selector, elems, makeActive;
+  function  validate(){
+    var x;
+    x = document.getElementById("policyName").value.trim();
+    if (x == "") {
+      alert("Enter a Policy Name");
+      return false;
+    };
+  }
 
-  selector = '.innerul li';
-  elems = document.querySelectorAll(selector);
+  function getPolicyReportsPath(policyId) {
 
-  makeActive = function () {
-    for (var i = 0; i < elems.length; i++)
-      elems[i].classList.remove('active');
+    path = '/admin/company/reports?filter_policy_id=' + policyId;
 
-    this.classList.add('active');
-  };
+    return path;
 
-  for (var i = 0; i < elems.length; i++)
-    elems[i].addEventListener('mousedown', makeActive);
-
-
-  $('[data-switch]').on('click', function (e) {
-    var $page = $('#page-2'),
-        blockToShow = e.currentTarget.getAttribute('data-switch');
-
-    // Hide all children.
-    $page.children().hide();
-
-    // And show the requested component.
-    $page.children(blockToShow).show();
-
-  });
-
-
+  }
 
 </script>
+

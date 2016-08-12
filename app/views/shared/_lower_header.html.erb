@@ -14,23 +14,22 @@
   <div class="showFilteringSidebar" onclick="showFilterList()">
     Filter
   </div>
-  <!--
-    < % if is_personal_view %>-->
-  <div class="newTransaction" onclick="loadNewExpense()">Add Expense</div>
-  <!-- < % end %>
-  -->
+
+  <% if is_personal_view %>
+    <div class="newTransaction" onclick="loadNewExpense()">Add Expense</div>
+  <% end %>
+
   <hr style="border-top: 1px solid #9EACC9; padding: 0; margin: 0; clear: both">
 
-
-  <!--  <script>
+  <script>
       function loadNewExpense() {
-        Turbolinks.visit("< %= new_user_expense_path(current_user) %>")
+        Turbolinks.visit("<%= new_expense_path %>")
       }
 
       function openExpensesList() {
-        if (< %= is_admin_view %>) {
+        if (<%= is_admin_view %>) {
           Turbolinks.visit(" < %= admin_company_expenses_path %>")
-        } else if (< %= is_manager_view %>) {
+        } else if (<%= is_manager_view %>) {
           Turbolinks.visit("< %= admin_expenses_path %>")
         } else {
           Turbolinks.visit("< %= user_expenses_path(current_user) %>")
@@ -43,7 +42,8 @@
         });
 
       }
-    </script>-->
+
+  </script>
 
 </div>
 

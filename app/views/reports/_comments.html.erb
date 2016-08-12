@@ -22,10 +22,10 @@
   <% @comments.each do |comment| %>
       <div class="row" style="padding-top: 10px;padding-bottom: 10px; background-color: rgba(239, 242, 248, 0.41)">
         <div class="col-md-1">
-          <!--<span style="font-size: 14px; margin-top: 5px" class="roundCircle">< %= #comment.user_name[0..1].upcase %></span>-->
+          <span style="font-size: 14px; margin-top: 5px" class="roundCircle"><%= comment.user_name[0..1].upcase if comment.user %></span>
         </div>
         <div id="commenter" class="col-md-11">
-          <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%=  %></p>
+          <p style="font-size: 16px; font-weight: 400;line-height: 70%"><%= comment.user_name if comment.user %></p>
 
           <p id="theComment" style="font-size: 12px; font-weight: 300;"><%= comment.generate(current_user) %></p>
 

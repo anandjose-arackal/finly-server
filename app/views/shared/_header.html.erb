@@ -23,6 +23,7 @@
                 <% end %>
               </span>
               <div class="orgName" style="color: #e0e0e0;font-size: 12px;clear: both;font-style: italic;float: left;margin-left: 16px; margin-top: 2px">
+                <%= current_company.name %>
               </div>
             </span>
             <span class="icon fa fa-chevron-down" style="margin-left: 70px ;color: white;opacity: 0.8;margin-top: 12px; font-size: 16px"></span>
@@ -32,10 +33,10 @@
                   <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: true %></li>
               <% end %>
               <% if current_user.finance_manager? and not is_finance_view %>
-                  <li> <%= link_to "Finance View", reports_path(filter_status: 1, view: 'finance'), turbolink: true %></li>
+                  <li> <%= link_to "Finance View", reports_path(view: 'finance'), turbolink: true %></li>
               <% end %>
               <% if current_user.manager? and not is_manager_view %>
-                  <li> <%= link_to "Manager View", reports_path(filter_status: 1, view: 'manager'), turbolink: true %></li>
+                  <li> <%= link_to "Manager View", reports_path(view: 'manager'), turbolink: true %></li>
               <% end %>
               <% if current_user.employee? and not is_personal_view %>
                   <li> <%= link_to "Personal View", reports_path, turbolink: true %></li>
@@ -49,14 +50,24 @@
           </a>
           <ul class="dropdown-menu cog" style="padding: 0;
               border-radius: 1px;">
+            <% if current_user.admin? %>
             <li>
-              <a href="<%= organization_account_path %>" style="height: 45px;">Organization Account</a>
+              <a href="<%= organization_account_path(view: 'admin') %>" style="height: 45px;">Organization Account</a>
             </li>
+            <% end %>
+            <% if current_user.policy_admin? %>
             <li>
-              <a href="<%= user_profile_path %>" style="height: 45px;">My Account</a>
+              <a href="<%= policies_path(view: params[:view]) %>" style="height: 45px;">Administering Policies</a>
             </li>
-            <li><a href="<%= policies_path %>" data-turbolinks="false" style="height: 45px;">Expense
-              Policy</a></li>
+            <% end %>
+            <li>
+              <a href="<%= user_profile_path(current_user) %>" style="height: 45px;">My Account</a>
+            </li>
+            <% if current_user.policy_admin? or current_user.admin? %>
+            <li><a href="<%= policies_path(view: 'admin') %>" data-turbolinks="false" style="height: 45px;">Expense
+              Policy</a>
+            </li>
+            <% end %>
             <li>
               <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
                 the App</a></li>

@@ -65,7 +65,7 @@
 
     <% unless @policies.blank? %>
         <label style="float: right;margin-top: 5px"> Report Policy:
-          <% if is_personal_view && !@report.processing? && !@report.approved? %>
+          <% if is_personal_view && @report.editable? %>
               <form data-remote data-turboboost id="applyPolicyForm"  action="<%= report_assign_policy_path(@report) %>" method="post" style="display: inline-block">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                 <select name="report[policy_id]" onchange="$('form#applyPolicyForm').submit();" class="selectors" style="padding-top: 10px; width: 155px">
@@ -241,16 +241,18 @@
         </div>
         <div class="modal-body row" style=" padding: 25px;">
 
-          <form data-remote data-turboboost  accept-charset="UTF-8" enctype="multipart/form-data" id="editExpenseForm" method="post">
+          <form data-remote data-turboboost accept-charset="UTF-8" enctype="multipart/form-data" id="editExpenseForm" method="post">
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
             <input name="_method" type="hidden" id="hiddenPatchCall" value="patch"/>
-            <input type="text" class="expenseDetailInput" name="expense[receipt]" id="viewReceiptSelectFileText" style="display:none"/>
             <input type="file" class="expenseDetailInput" name="expense[receipt]" id="viewReceiptSelectFile" style="display:none" accept=".png, .jpg,.pdf, .jpeg" onclick="this.value=null;" onchange="readFileForView(this)"/>
           </form>
 
           <div class="col-md-8" id="expenseDetailsColumn" style="background-color: white; border-right: 1px solid #d8d8d8">
 
 
+            <form data-remote data-turboboost method="post" id="editExpenseWithinReportForm">
+              <input type="hidden" name="authenticity_token" value="<%=form_authenticity_token%>">
+              <input type="hidden" name="_method" value="patch">
             <section id="expenseSectionDetail">
 
               <ol id="expenseSectionDetailList" style="list-style-type:none;">
@@ -263,7 +265,7 @@
                 </li>
                 <li>
                   <label class="expenseDetailLabel">Note</label>
-                  <input name="expense[note]" form="editExpenseForm" id="note" class="expenseDetailInput switchExpenseOneReadOnly" type=" text" class="short" tabindex="1"
+                  <input name="expense[note]" form="editExpenseForm" id="note" class="expenseDetailInput switchExpenseOneReadOnly" type="text" class="short" tabindex="1"
                          readonly>
                   <input type="text" hidden="hidden" id="hiddenNote"/>
 
@@ -331,6 +333,7 @@
               <% end %>
 
             </section>
+            </form>
 
 
             <div class="row" style="padding: 18px;<%  if @report.approved? %>  padding-top: 0; <% end %>margin-top: 5px">

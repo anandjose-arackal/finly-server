@@ -42,7 +42,6 @@
         </li>
 
 
-        <!-- TODO add ability to choose start date and end date -->
 
         <p id="datesFilterPara2" class="filterText">
           Range:</p>
@@ -51,7 +50,7 @@
           <option value="<%= Date.today %>">Today</option>
           <option value="<%= 2.days.ago.strftime("%Y/%m/%d") %>">Last two days</option>
           <option value="<%= 1.week.ago.strftime("%Y/%m/%d") %>">This week</option>
-          <!-- todo custom dates for filters -->
+
           <option value="custom">Custom</option>
         </select>
 
@@ -71,7 +70,7 @@
 
 
   <!-- Status Filter -->
-  <% if (params["filter_status"].blank? || params["filter_status"].blank?) %>
+  <% if params["filter_status"].blank? || params["filter_status"].blank? %>
       <ul id="statusFilterList" class="filterList">
         <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
           <span id="firstSpanItem" onclick="showFilterList()" class="fa fa-close"></span><a id="listHeader" href="#" data-turbolinks="false">Section</a>
@@ -186,7 +185,7 @@
   <% end %>
 
   <!-- Sort By -->
-<!--
+
   <% if params["filter_sort"].blank? || params["filter_sort"]["sort_by"].blank? %>
       <ul id="sortFilterList" class="filterList">
         <li class="firstListItem" target="columnHeader"><i onclick="backButton()" class="fa fa-chevron-left"></i>
@@ -215,7 +214,7 @@
 
       </ul>
   <% end %>
--->
+
 
 </div>
 

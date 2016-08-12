@@ -11,7 +11,7 @@
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
 
-  <% if current_user.admin? %>
+  <% if current_user.admin? or current_user.policy_admin? %>
   <li data-switch="#administering_policies"><a href="#" data-turbolinks="false">Policies Administered
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
@@ -49,6 +49,7 @@
 
     <h3 id="divsection_heading">Policies Assigned</h3>
 
+    <%= render 'assigned_policies' %>
 
     <hr style="margin-top: 20px">
 
@@ -71,7 +72,6 @@
 
     <h3 id="divsection_heading">Bank Account</h3>
 
-    <!--<button onclick="temperory()"> add</button>-->
 
 
     <hr style="margin-top: 20px">

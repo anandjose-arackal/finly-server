@@ -7,20 +7,36 @@
 <label class="editProfileDialogHeaders">Assign Admin Role?</label>
 
 <label class="radio-inline" style="font-size: 12px">
-  <input id="adminTrue" type="radio" name="admin" style="font-size: 8px" value="1">Yes
+  <input id="adminTrue" type="radio"
+         <% if @user.admin? %>
+          checked="checked"
+         <% end %>
+         name="admin" style="font-size: 8px" value="1">Yes
 </label>
 <label class="radio-inline" style="font-size: 12px">
-  <input id="adminFalse" type="radio" name="admin" value="0" checked="checked" style="font-size: 8px">No
+  <input id="adminFalse" type="radio"
+         <% unless @user.admin? %>
+         checked="checked"
+         <% end %>
+         name="admin" value="0" style="font-size: 8px">No
 </label>
 <hr style=" margin: 15px 0 0 0">
 
 <label class="editProfileDialogHeaders">Assign Manager Role?</label>
 
 <label class="radio-inline" style="font-size: 12px">
-  <input id="managerTrue" type="radio" name="manager" style="font-size: 8px" value="1">Yes
+  <input id="managerTrue" type="radio"
+         <% if @user.manager? %>
+         checked="checked"
+         <% end %>
+         name="manager" style="font-size: 8px" value="1">Yes
 </label>
 <label class="radio-inline" style="font-size: 12px">
-  <input id="managerTrue" type="radio" name="manager" value="0" checked="checked" style="font-size: 8px">No
+  <input id="managerTrue" type="radio"
+         <% unless @user.manager? %>
+         checked="checked"
+         <% end %>
+         name="manager" value="0" style="font-size: 8px">No
 </label>
 
 
@@ -28,10 +44,18 @@
 <label class="editProfileDialogHeaders">Assign Finance Role?</label>
 
 <label class="radio-inline" style="font-size: 12px">
-  <input id="managerTrue" type="radio" name="finance_manager" style="font-size: 8px" value="1">Yes
+  <input id="managerTrue" type="radio"
+         <% if @user.finance_manager? %>
+         checked="checked"
+         <% end %>
+         name="finance_manager" style="font-size: 8px" value="1">Yes
 </label>
 <label class="radio-inline" style="font-size: 12px">
-  <input id="managerTrue" type="radio" name="finance_manager" value="0" checked="checked" style="font-size: 8px">No
+  <input id="managerTrue" type="radio"
+         <% unless @user.finance_manager? %>
+         checked="checked"
+         <% end %>
+         name="finance_manager" value="0" style="font-size: 8px">No
 </label>
 
   <button type="submit" class="green-button"

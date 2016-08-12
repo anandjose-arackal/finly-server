@@ -1,5 +1,8 @@
+
+
 <body style="background-color: #f5f6f9;">
 
+<div id="policyListAdmin">
 
 <div style="margin-top: 20px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
@@ -16,29 +19,34 @@
   <% end %>
 
 
-  <div id="policyListTable"
-       >
+  <div id="policyListTable">
+
+    <% @policies.each do |policy| %>
+
     <table>
       <thead>
       <tr>
-        <th style="width: 50%;">Policy Name</th>
+        <th style="width: 50%;"><%= link_to policy.name, policy %></th>
         <th style="width:  50%;"></th>
       </tr>
       </thead>
 
 
           <!-- deleting a particular policy -->
+          <form data-remote data-turboboost method="post" action="<%= %>" id="deletePolicy<%=policy.id%>"></form>
             <input name="_method" type="hidden" value="delete"/>
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
 
           <tr>
-            <td style="width: 30%;"> Some Policy</td>
+            <td style="width: 30%;"> <% link_to policy.name, policy %></td>
             <td style="width: 40%;">
-              <button id="showReportsButton" class="green-button" onclick="">View Reports</button>
-              <i  class="fa fa-trash-o"></i></td>
+              <a id="showReportsButton" class="btn btn-primary green-button" href="<%=reports_path(filter_policy: policy.id, view: params[:view])%>">View Reports</a>
+              <i class="fa fa-trash-o"></i></td>
           </tr>
 
     </table>
+
+    <% end %>
   </div>
 
 
@@ -49,24 +57,22 @@
       font-weight: 600;
       font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Add new policy</p>
   <hr>
-  <form data-remote data-turboboost id="policyCreate"  action="<%= policies_path %>" method="post">
+  <form data-remote data-turboboost id="policyCreate"  action="<%= policies_path(view: 'admin') %>" method="post">
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
     <input type="text" id="policyName" name="name" style="height: 40px;
         padding: 10px;" placeholder="Enter name of policy">
 
-    <p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy
-      applied to: </p>
-    <input type="radio" name="users" value="everyone" checked> Everyone <br>
-    <input type="radio" name="users" value=""> Invite Employees Later <br>
+    <!--<p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy-->
+      <!--applied to: </p>-->
+    <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
+    <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
 
     <input type="submit" class="abaButton" onclick="return validate()" style="border-radius: 1px;margin-top: 20px;margin-left: 0px" id="createPolicy" value="Create">
   </form>
-<a onclick="$('form#policyCreate').submit()">Create</a>
 </div>
 
-
-
+</div>
 
 </body>
 
@@ -74,13 +80,14 @@
 
 <script>
 
-  function  validate(){
+  function validate(){
     var x;
     x = document.getElementById("policyName").value.trim();
     if (x == "") {
       alert("Enter a Policy Name");
       return false;
-    };
+    }
+    $('form#policyCreate').submit();
   }
 
   function getPolicyReportsPath(policyId) {

@@ -12,7 +12,7 @@ class PolicyPolicy < ApplicationPolicy
 
   def index?
     # i.e. it's only visible in the admin or personal view
-    check_admin_view or check_personal_view
+    check_admin_view or check_policy_admin
   end
 
   def show?
@@ -50,11 +50,7 @@ class PolicyPolicy < ApplicationPolicy
     # if it's a company admin, he can do whatever he wants
     return true if check_admin_view
     # else it has to be a policy admin
-    @policy.user_mapping.admin.each do |admin_mapping|
-      if admin_mapping.user.id == @user.id
-        return true
-      end
-    end
+    return true if @user.policy_admin?
     false
   end
 

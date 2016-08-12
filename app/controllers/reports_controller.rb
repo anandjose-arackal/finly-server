@@ -5,6 +5,7 @@ class ReportsController < ApplicationController
   before_action :fetch_reports, only: [:index]
   before_action :load_service_object
 
+
   has_scope :filter_search
   has_scope :filter_status
   has_scope :filter_user
@@ -107,7 +108,7 @@ class ReportsController < ApplicationController
     authorize @report
     rs = ReportService.new(user: current_user, report: @report)
     if rs.reimbursement_confirm
-      flash[:success] = 'You have taken control of the report'
+      flash[:success] = 'You have successfully confirmed reimbursement of the report'
       redirect_to report_path rs.report, view_params
       return
     end
@@ -248,6 +249,7 @@ class ReportsController < ApplicationController
 
   def fetch_report
     fetch_reports
+
     if @reports.blank?
       flash[:danger] == 'Report not found'
       redirect_to reports_path(view: params[:view])
@@ -257,12 +259,9 @@ class ReportsController < ApplicationController
     if id.blank? and params[:id].present?
       id = params[:id]
     end
-    @report = @reports.with_id(id)
-    if @report.present?
-      @report = @report.first
-    else
-      @report = nil
-    end
+
+    @report = @reports.find_by_id(id)
+
     if @report.blank?
       flash[:danger] == 'Report not found'
       redirect_to reports_path(view: params[:view])

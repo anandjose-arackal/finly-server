@@ -51,21 +51,31 @@ class ExpenseService < BaseService
     end
   end
 
-  def update_expense(user, params=nil)
+  def update_expense(params=nil, expense_id)
     return true if params.blank?
-    if user.blank?
-      errors << 'User not provided while updating expense'
-      return false
-    end
     expense_params = load_expense_params params
-    expense = load_expense expense_params[:id] || expense_params[:expense_id]
+    expense = load_expense expense_id
     unless expense
       errors << 'Expense does not belong to user.'
       return false
     end
+    # adding receipt, manual expense and amount ids so that they get updated and not recreated
+    manual_expense_id = expense.manual_expense.id
+    amount_id = expense.amount.id
+    expense_params[:manual_expense_attributes][:id] = manual_expense_id
+    expense_params[:amount_attributes][:id] = amount_id
+
+    if expense.receipts.present? and params[:receipt].present?
+      receipt_id = expense.receipts.first.id
+      expense_params[:receipts_attributes][0][:id] = receipt_id
+    end
+
+    old_expense = expense # stub to keep track of what's changed
     if expense.update_attributes(expense_params)
       # Callback to create comments in report when an expense is edited
-      ReportService.new(user: user, report: report).expense_updated(self) if expense.report_id.present? and user.present?
+      if expense.report_id.present? and @user.present?
+        ReportService.new(user: user, report: expense.report).expense_updated_in_report(expense, old_expense)
+      end
       expense.reload
       return expense
     else
@@ -84,6 +94,12 @@ class ExpenseService < BaseService
     receipt_params = load_receipt_params params
     expense = load_expense expense_id
     return unless expense
+
+    # checking if the expense already has an associated receipt - if it does, detach that receipt, and add the new one
+    if expense.receipts.present?
+      detach_receipt_from_expense(expense.receipts.first.id, expense.id)
+    end
+
     # build the expense associated with the expense
     attach = expense.receipts.build(receipt_params)
     # associating the current user with the receipt
@@ -161,7 +177,6 @@ class ExpenseService < BaseService
     expense_params[:expense_status_id] = 1 if expense_params[:expense_status_id].nil? && expense_params[:report_id].nil?
     expense_params[:expense_status_id] = 2 if expense_params[:report_id].present?
 
-    expense_params[:id] = params[:id] || params[:expense_id]
     expense_params
   end
 

@@ -2,11 +2,11 @@
   <div class="col-md-2">
 
     <% if @policy %>
-        <% unless @violation_messages[expense.id]['blocking'].blank? %>
-            <i class="fa fa-exclamation-circle" style="color: red; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Blocking Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['blocking'] %>"></i>
+        <% unless (@violation_messages[expense.id]['expense_blocking'].blank? && @violation_messages[expense.id]['budget_blocking'].blank?) %>
+            <i class="fa fa-exclamation-circle" style="color: red; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Blocking Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_blocking'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_blocking'] %>"></i>
         <% end %>
-        <% unless @violation_messages[expense.id]['warning'].blank? %>
-            <i class="fa fa-shield" style="color: sandybrown;margin-top: 3px; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Warning Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['warning'] %>"></i>
+        <% unless (@violation_messages[expense.id]['expense_warning'].blank? && @violation_messages[expense.id]['budget_warning'].blank?) %>
+            <i class="fa fa-shield" style="color: sandybrown;margin-top: 3px; margin-left: -22px;vertical-align: middle;margin-right: 30px; font-size: 20px" data-html="true" data-toggle="popover" title="Violation: Warning Rule" data-content="<br /><%= formatted_violations @violation_messages[expense.id]['expense_warning'] %><br /><%= formatted_violations @violation_messages[expense.id]['budget_warning'] %>"></i>
         <% end %>
     <% end %>
 

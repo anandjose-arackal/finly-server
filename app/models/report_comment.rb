@@ -29,6 +29,8 @@ class ReportComment < ActiveRecord::Base
   validates :report_comment_action_id, presence: true
   validate :associations
 
+  delegate :user_name, to: :user
+
   default_scope { order created_at: :desc }
 
   def generate(u = nil)

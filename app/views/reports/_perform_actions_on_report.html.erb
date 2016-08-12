@@ -19,7 +19,7 @@
 
 <% if @views[:review] %>
     <!--APPROVE REPORT-->
-    <form data-remote data-turboboost  data-confirm="Are you sure you want to retract this report?" action="<%= report_approve_path(@report, view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost  data-confirm="Are you sure you want to approve this report?" action="<%= report_approve_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <button type="submit" class="righButtons" style="margin-left: 10px"> APPROVE REPORT
@@ -27,7 +27,7 @@
     </form>
 
     <!--REJECT REPORT-->
-    <form data-remote data-turboboost  data-confirm="Are you sure you want to retract this report?" action="<%= report_reject_path(@report, view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost  data-confirm="Are you sure you want to reject this report?" action="<%= report_reject_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <button type="submit" class="righButtons" style="margin-left: 10px"> REJECT REPORT
@@ -37,7 +37,7 @@
 
 <% if @views[:unapprove] %>
     <!--UNAPPROVE-->
-    <form data-remote data-turboboost  data-confirm="Are you sure you want to retract this report?" action="<%= report_unapprove_path(@report, view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost  data-confirm="Are you sure you want to unapprove this report?" action="<%= report_unapprove_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <button type="submit" class="righButtons" style="margin-left: 10px"> UNAPPROVE REPORT
@@ -47,7 +47,7 @@
 
 <% if @views[:take_control] %>
     <!--TAKE CONTROL-->
-    <form data-remote data-turboboost  data-confirm="Are you sure you want to retract this report?" action="<%= report_take_control_path(@report, view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost  data-confirm="Are you sure you want to take control of this report?" action="<%= report_take_control_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
       <button type="submit" class="righButtons" style="margin-left: 10px"> TAKE CONTROL
@@ -57,20 +57,20 @@
 
 <% if @views[:reimburse] %>
     <!--REIMBURSE REPORT-->
-    <form data-remote data-turboboost  data-confirm="Are you sure you want to retract this report?" action="<%= report_reimburse_path(@report, view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost  data-confirm="Are you sure you want to reimburse this report?" action="<%= report_reimburse_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-      <button type="submit" class="righButtons" style="margin-left: 10px"> RETRACT REPORT
+      <button type="submit" class="righButtons" style="margin-left: 10px"> REIMBURSE REPORT
       </button>
     </form>
 <% end %>
 
 <% if @views[:reimbursement_confirm] %>
     <!--CONFIRM_REIMBURSEMENT-->
-    <form data-remote data-turboboost  data-confirm="Are you sure you want to retract this report?" action="<%= report_reimbursement_confirm_path(@report, view: params[:view]) %>" method="post">
+    <form data-remote data-turboboost  data-confirm="Are you sure you want to confirm reimbursement of this report?" action="<%= report_reimbursement_confirm_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>
       <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-      <button type="submit" class="righButtons" style="margin-left: 10px"> RETRACT REPORT
+      <button type="submit" class="righButtons" style="margin-left: 10px"> CONFIRM REIMBURSEMENT
       </button>
     </form>
 <% end %>

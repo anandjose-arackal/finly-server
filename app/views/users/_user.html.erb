@@ -2,7 +2,7 @@
 
   <div id="eachRow" class="row" data-toggle="modal" onclick="showEmployeeDetails(<%=user.id%>, '<%=user.invite_accepted?%>')">
 
-  <div class="col-sm-2"><span class="roundCircle" style="">VR</span></div>
+  <div class="col-sm-2"><span class="roundCircle" style=""><%=user.name[0,1].upcase if user.name%></span></div>
   <div class="col-sm-8" style="">
     <p userTarget="name" style="line-height: 80%;font-weight: 600; margin-top: 5px"><%= user.name %></p>
 

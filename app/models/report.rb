@@ -78,6 +78,7 @@ class Report < ActiveRecord::Base
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
     end
   end
+  scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
   before_save :handle_name
 
@@ -151,6 +152,10 @@ class Report < ActiveRecord::Base
     self.status_id == ReportStatus.closed_id
   end
 
+  def editable?
+    open? or retracted?
+  end
+
   def reimbursement_pending?
     approved? and reimbursement_amount.present? and reimbursement_amount.value > 0
   end
@@ -190,6 +195,30 @@ class Report < ActiveRecord::Base
     name = status.name
     name[0].upcase + name[1..name.length]
   end
+
+  def first_date
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_asc.first.date
+  end
+
+  def last_date
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_desc.first.date
+  end
+
+  def get_date_string
+    d_start = first_date
+    d_end = last_date
+    if d_start.blank? and d_end.blank?
+      return ''
+    end
+    if d_start == d_end
+      return "#{d_start.strftime("%d-%b-%y")}"
+    else
+      return "#{d_start.strftime("%d-%b-%y")} to #{d_end.strftime("%d-%b-%y")}"
+    end
+  end
+
 
   private
   def is_employee

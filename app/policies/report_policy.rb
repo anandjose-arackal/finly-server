@@ -87,6 +87,7 @@ class ReportPolicy < ApplicationPolicy
     unless @report.user.id == @user.id
       return false
     end
+    true
   end
 
   def retract?
@@ -95,10 +96,11 @@ class ReportPolicy < ApplicationPolicy
     unless @report.user.id == @user.id
       return false
     end
+    true
   end
 
   def approve?
-    return false unless check_manager_view
+    return false unless check_manager_view || check_admin_view
     # check if report is approvable
     unless @report.processing?
       return false
@@ -120,7 +122,7 @@ class ReportPolicy < ApplicationPolicy
   end
 
   def reject?
-    return false unless check_manager_view
+    return false unless check_manager_view || check_admin_view
     # check if report is approvable
     unless @report.processing?
       return false
@@ -138,6 +140,7 @@ class ReportPolicy < ApplicationPolicy
     unless @report.user.id == @user.id
       return false
     end
+    true
   end
 
   def unapprove?

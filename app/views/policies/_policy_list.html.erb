@@ -28,9 +28,9 @@
 
       <% @policies.each do |policy| %>
           <tr>
-            <td style="width: 50%;"><%= policy.name %></td>
+            <td style="width: 50%;"> <a href="<%=policies_path(policy)%>"><%=policy.name%></a> </td>
             <td style="width: 50%;">
-              <button id="showReportsButton" class="green-button" onclick="">View Reports</button>
+              <button id="showReportsButton" class="green-button" href="<%= reports_path(filter_policy_id: policy.id)%>" onclick="">View Reports</button>
               <i class="fa fa-trash-o"></i></td>
           </tr>
       <% end %>
@@ -39,6 +39,8 @@
 
 
 </div>
+
+<% if current_user.admin? %>
 <div style="margin: 0px 0px 0px 695px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 270px; position: fixed">
   <p style="font-size: 24px;
@@ -51,10 +53,10 @@
     <input type="text" id="policyName" name="name" style="height: 40px;
         padding: 10px;" placeholder="Enter name of policy">
 
-    <p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy
-      applied to: </p>
-    <input type="radio" name="users" value="everyone" checked> Everyone <br>
-    <input type="radio" name="users" value=""> Invite Employees Later <br>
+    <!--<p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy-->
+      <!--applied to: </p>-->
+    <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
+    <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
 
     <input type="submit" class="green-button" onclick="return validate()" style="    margin-top: 20px;
         padding: 5px;
@@ -63,6 +65,7 @@
   </form>
 </div>
 
+<% end %>
 
 <script>
 
@@ -73,7 +76,7 @@
       alert("Enter a Policy Name");
       return false;
     }
-    ;
+
   }
 
   function getPolicyReportsPath(policyId) {

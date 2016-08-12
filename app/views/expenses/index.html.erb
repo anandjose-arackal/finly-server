@@ -22,13 +22,13 @@
 </form>
 
 
-<% if @expenses.blank? %>
+<% if param.blank? and @expenses.blank? %>
     <div id="noexpensesview" style="margin-top: 22%">
 
       <img id="emptyPlaceholderImage" src="<%= asset_path 'checkbox-multiple-blank.png' %>" alt="No Expenses">
 
       <p id="emptyPlaceholder">Welcome to Finly! <br>
-        Looks like there aren't any pending expenses.</p>
+        Looks like there aren't any expenses.</p>
 
     </div>
 
@@ -373,7 +373,6 @@
 
   function onClickCenterBlockExpenses(expenseID, amount, name, merchant, note, date, receipt, category, categoryId, receiptUrl, entireRow) {
 
-
     removeAllSelectedRowBgColors();
 
     $(entireRow).css("background-color", '#FFFFBB');
@@ -396,21 +395,26 @@
     $('p#expenseID').text(expenseID);
     var imageElement = $('img#expenseReceipt');
     var href = $('#expenseReceiptHref');
-    if (receipt != null) {
-      if (receiptUrl != "/assets/original/missing.png")
-        href.attr("href", receiptUrl);
-      else
-        href.attr("href", null);
-      imageElement.attr("src", "");
-      imageElement.attr("src", receipt);
-      if (receiptUrl == "/assets/original/missing.png")
-        imageElement.attr("src", "<%= asset_path 'missing.png'%>");
-      imageElement.show();
+    if (receipt == '') {
+      imageElement.attr("src", '<%= asset_path 'missing.png'%>');
+      href.attr("href", '<%= asset_path 'missing.png'%>');
+//      if (receiptUrl != "/assets/original/missing.png")
+//        href.attr("href", receiptUrl);
+//      else
+//        href.attr("href", null);
+//      imageElement.attr("src", "");
+//      imageElement.attr("src", receipt);
+//      if (receiptUrl == "/assets/original/missing.png")
+//        imageElement.attr("src", "<%= asset_path 'missing.png'%>");
+//      imageElement.show();
     } else {
-      href.attr("href", "");
-      imageElement.attr("src", "<%= asset_path 'missing.png'%>");
-      imageElement.hide();
+      href.attr("href", receiptUrl);
+      imageElement.attr("src", receipt);
+//      imageElement.show();
     }
+
+    imageElement.show();
+
 
     var myNode = document.getElementById("expenseComments");
     if (myNode != null)
