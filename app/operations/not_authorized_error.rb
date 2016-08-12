@@ -1,0 +1,4 @@
+class NotAuthorizedError < StandardError
+
+
+end
