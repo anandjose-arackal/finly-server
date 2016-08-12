@@ -179,7 +179,25 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
-      resources :reports, only: [:index, :show]
+      resources :reports, only: [:create, :index, :show, :update, :destroy]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+        patch 'retract' => 'reports#retract', as: :retract
+        patch 'submit' => 'reports#submit', as: :submit
+        patch 'approve' => 'reports#approve', as: :approve
+        patch 'unapprove' => 'reports#unapprove', as: :unapprove
+        patch 'reject' => 'reports#reject', as: :reject
+        patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+        patch 'take_control' => 'reports#take_control', as: :take_control
+        post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
+        delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+        post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
+      end
+      resources :receipts, only: [:create, :index, :destroy]
+      resources :receipts do
+        post 'add_note', to: 'receipts#add_note', as: :add_note
+        post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
     end
   end
 
@@ -212,7 +230,6 @@ Rails.application.routes.draw do
     patch 'approve' => 'reports#approve', as: :approve
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
-    patch 'reimburse' => 'reports#reimburse', as: :reimburse
     patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses

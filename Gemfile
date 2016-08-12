@@ -77,8 +77,6 @@ gem 'opro', github: 'opro/opro', branch: 'master'
 gem 'devise'
 gem 'devise_invitable'
 
-gem 'has_scope'
-
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'

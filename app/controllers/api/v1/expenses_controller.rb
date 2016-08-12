@@ -4,8 +4,8 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   allow_oauth!
   before_action :authenticate_user!
   before_action :retrieve_service_objects
+  before_action :parse_receipt, only: [:create, :update]
   before_action :load_expense, only: [:show, :update, :destroy]
-  before_action :load_receipt, only: [:create, :update]
 
   respond_to :json
 
@@ -48,7 +48,8 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def update
     authorize @expense
-    if @expense_service.update_expense(current_user, expense_params)
+    debugger
+    if @expense_service.update_expense(current_user, update_params)
       render 'api/v1/expenses/show'
     else
       @errors = @expense_service.errors
@@ -79,6 +80,16 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
                                     amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id])
   end
 
+  def update_params
+    params[:currency_id] = Currency.first.id
+    ##########################################################################
+    params[:amount_attributes] = {value: params[:amount], currency_id: params[:currency_id]}
+    params[:manual_expense_attributes] = {merchant: params[:merchant]}
+    params[:receipts_attributes] = [{image: params[:image], user_id: current_user.id}] if params[:receipt]
+    params.permit(:id, :expense_id,:currency_id, :expense_type_id, :expense_status_id, :receipt, :receipt_id, :report_id, :category_id, :date,
+                  amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id])
+  end
+
   def receipt_params
     params.require(:receipt).permit(:image)
   end
@@ -92,10 +103,11 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     @expense = current_user.expenses.find_by(id: id)
   end
 
-  def load_receipt
+  def parse_receipt
     if params[:receipt] and params[:receipt] != 'nil'
-      params[:expense] = {} if params[:expense].blank?
-      params[:expense][:receipt] = extract_receipt_image
+      # params[:expense] = {} if params[:expense].blank?
+      # params[:expense][:receipt] = extract_receipt_image
+      params[:receipt] = extract_receipt_image
     end
   end
 

@@ -1,5 +1,6 @@
 class Api::V1::ReportsController < Api::V1::BaseApiController
   include MathUtil
+  protect_from_forgery with: :null_session
 
   allow_oauth!
   before_action :authenticate_user!
@@ -17,11 +18,13 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     authorize Report
     rs = ReportService.new(user: current_user)
     if rs.create create_params
-      redirect_to report_path rs.report, view_params
+      @report = rs.report
+      load_view_for_report
+      render 'api/v1/reports/show'
       return
     end
-    flash[:error] = rs.errors
-    render_flash_message
+    @errors = rs.errors
+    render 'api/v1/shared/failure'
   end
 
   def index
@@ -87,12 +90,12 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     authorize @report
     rs = ReportService.new(user: current_user, report: @report)
     if rs.reimbursement_confirm
-      flash[:success] = 'You have taken control of the report'
-      redirect_to report_path rs.report, view_params
+      load_view_for_report
+      render 'api/v1/reports/show'
       return
     end
-    flash[:danger] = rs.errors
-    render_flash_message
+    @errors = rs.errors
+    render 'api/v1/shared/failure'
   end
 
   def comment
@@ -100,17 +103,12 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     rs = ReportService.new(user: current_user, report: @report)
     if rs.comment params[:comment]
       @comments = @report.comments
-      flash.now[:success] = 'Comment posted'
-      respond_to do |format|
-        format.html do
-          redirect_to report_path rs.report, view_params
-        end
-        format.js
-      end
+      load_view_for_report
+      render 'api/v1/reports/show'
       return
     end
-    flash[:danger] = rs.errors
-    render_flash_message
+    @errors = rs.errors
+    render 'api/v1/shared/failure'
   end
 
   def assign_policy
@@ -151,6 +149,8 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
       if @report.open? or @report.retracted? or @report.rejected?
         @views[:add_expenses] = true
         @views[:delete] = true
+        @views[:editable] = true
+        @views[:submit] = true
       elsif @report.processing?
         @views[:retract] = true
       elsif @report.reimbursed?
@@ -267,22 +267,16 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if (params.present? and rs.send(update, params)) or (params.blank? and rs.send(update))
       flash.now[:success] = success_message unless success_message.blank?
       if update == :delete_report
-        redirect_to reports_path view_params
+        render 'api/v1/shared/success'
         return
       end
-      respond_to do |format|
-        format.html do
-          redirect_to report_path rs.report, view_params
-        end
-        format.js do
-          load_view_for_report
-          render 'reports/report', remote: true
-        end
-      end
+      @report = rs.report
+      load_view_for_report
+      render 'api/v1/reports/show'
       return
     end
-    flash.now[:danger] = rs.errors
-    render_flash_message
+    @errors = rs.errors
+    render 'api/v1/shared/failure'
   end
 
   def update_params

@@ -2,10 +2,11 @@ json.success true
 json.data do
   json.manager_name @manager_name
   json.total @total
+  json.date @date_string
   json.report do
     json.partial! 'report', report: @report
   end
-  json.buttons do
+  json.views do
     json.take_control @views[:take_control]
     json.review @views[:review]
     json.unapprove @views[:unapprove]
@@ -14,6 +15,8 @@ json.data do
     json.delete @views[:delete]
     json.retract @views[:retract]
     json.reimbursement_confirm @views[:reimbursement_confirm]
+    json.editable @views[:editable]
+    json.submit @views[:submit]
   end
   json.expenses_group @expenses do |expense|
     json.extract! expense, :category_name, :category_total
