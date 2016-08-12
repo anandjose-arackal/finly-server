@@ -1,0 +1,2 @@
+class UnloadCash
+end
