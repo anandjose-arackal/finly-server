@@ -72,7 +72,7 @@ gem 'bootbox-rails', '~>0.4'
 # gem for font awesome
 gem 'font-awesome-rails'
 
-gem 'opro'
+gem 'opro', github: 'opro/opro', branch: 'master'
 
 # gem for devise authentication
 gem 'devise'

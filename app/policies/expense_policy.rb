@@ -15,6 +15,15 @@ class ExpensePolicy < ApplicationPolicy
     check_personal_view
   end
 
+  def show?
+    return false unless check_personal_view
+    # check if this user owns the particular expense being edited
+    unless @expense.user.id == @user.id
+      return false
+    end
+    true
+  end
+
   def update?
     return false unless check_personal_view
     # check if this user owns the particular expense being edited
