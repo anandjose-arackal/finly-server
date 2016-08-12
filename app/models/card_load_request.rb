@@ -3,6 +3,7 @@
 # Table name: card_load_requests
 #
 #  id                          :integer          not null, primary key
+#  user_id                     :integer
 #  prepaid_card_id             :integer
 #  load_amount_id              :integer
 #  loaded_by                   :integer
@@ -15,4 +16,8 @@
 
 class CardLoadRequest < ActiveRecord::Base
   belongs_to :card_load_request_status
+  belongs_to :user
+  belongs_to :card
+  belongs_to :amount
+  belongs_to :loaded_by, class_name: 'User'
 end

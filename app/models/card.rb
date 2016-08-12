@@ -13,5 +13,8 @@
 
 class Card < ActiveRecord::Base
   belongs_to :card_type
+  belongs_to :user
 
+  scope :with_id, ->(id) { where id: id }
+  scope :with_user, ->(user_id) { where user_id: user_id }
 end

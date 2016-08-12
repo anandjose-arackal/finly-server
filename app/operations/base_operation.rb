@@ -1,17 +1,19 @@
 class BaseOperation
   attr_accessor :user, :params, :errors
 
-  def initialize(user, params)
+  def initialize(user, params={})
     self.user = user
     self.params = params
   end
 
-  def self.operate(user, params)
+  def self.operate(user, params={})
     self.new(user, params).operate
   end
 
   def operate
     errors.clear
+    authorize_user authorized_user_types
+    return if has_errors
     validate
     return if has_errors
     init
@@ -21,6 +23,10 @@ class BaseOperation
     process
     return if has_errors
     retrieve
+  end
+
+  def authorized_user_types
+    nil
   end
 
   def validate
@@ -51,8 +57,6 @@ class BaseOperation
 
   end
 
-  protected
-
   def success
     true
   end
@@ -73,8 +77,11 @@ class BaseOperation
         end
       end
     end
+    raise_unauthorized_exception
+  end
 
-    raise NotAuthorizedError
+  def raise_unauthorized_exception
+    raise NotAuthorizedException
   end
 
 end
