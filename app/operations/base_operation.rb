@@ -1,16 +1,19 @@
 class BaseOperation
   attr_accessor :user, :params, :errors, :process_complete
 
+  # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
     self.errors = []
     self.user = user
     self.params = params
   end
 
+  # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
   def self.call(user, params={})
     self.new(user, params).run
   end
 
+  # Used to run the operation
   def run
     errors.clear
     authorize_user authorized_user_types
@@ -29,30 +32,42 @@ class BaseOperation
     retrieve
   end
 
+  # Define the authorized user types for the action
   def authorized_user_types
+    # [:employee, :manager, :finance_manager, :admin]
     nil
   end
 
+  # Add all validations come here for checking if the required data is present in params
   def validate
 
   end
 
+  # All objects which would be required for processing would be loaded here
   def init
 
   end
 
+  # Verify if user has access to the given models
   def authorize
 
   end
 
+  def pre_process
+
+  end
+
+  # Actual processing is handled here
   def process
 
   end
 
+  # Any post process based events such as notifications, mailers is created here
   def post_process
 
   end
 
+  # This would be sent as a return value
   def retrieve
     success
   end
@@ -73,6 +88,7 @@ class BaseOperation
     self.process_complete and errors.present?
   end
 
+  # Used to present the data to the UI
   class BaseOperation::BasePresenter
 
   end
