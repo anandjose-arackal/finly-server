@@ -18,6 +18,9 @@ class Policy < ActiveRecord::Base
   has_many :users, through: :user_mapping
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
 
+  has_many :reports
+  has_many :card_load_requests
+
   has_many :expense_rules
   has_many :budget_rules
 

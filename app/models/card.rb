@@ -3,8 +3,9 @@
 # Table name: cards
 #
 #  id            :integer          not null, primary key
-#  ending_number :string(255)
-#  proxy         :string(255)
+#  user_id       :integer
+#  ending_number :string(255)      not null
+#  proxy         :string(255)      not null
 #  card_type_id  :integer
 #  description   :text(65535)
 #  created_at    :datetime         not null

@@ -8,7 +8,6 @@ class PendingInvitesController < ApplicationController
     if @user_invite_service.invite(user_invite_params)
       flash[:success] = "User invited!"
     else
-      debugger
       flash[:error] = @user_invite_service.errors
     end
     redirect_to request.referer

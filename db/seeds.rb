@@ -83,6 +83,24 @@ if ReportCommentAction.count == 0
   ReportCommentAction.create(id: 18, name: 'expense_update')
 end
 
+if CardLoadTrackingAction.count == 0
+  CardLoadTrackingAction.create(id: 1,name: 'Create')
+  CardLoadTrackingAction.create(id: 2,name: 'Retract')
+  CardLoadTrackingAction.create(id: 3,name: 'Submit')
+  CardLoadTrackingAction.create(id: 4,name: 'Approve')
+  CardLoadTrackingAction.create(id: 5,name: 'Reject')
+  CardLoadTrackingAction.create(id: 6,name: 'Unapprove')
+  CardLoadTrackingAction.create(id: 7,name: 'Take Control')
+  CardLoadTrackingAction.create(id: 8,name: 'Approved')
+end
+
+if CardLoadRequestStatus.count == 0
+  CardLoadRequestStatus.create id: 1,name: 'Processing'
+  CardLoadRequestStatus.create id: 2,name: 'Retracted'
+  CardLoadRequestStatus.create id: 3,name: 'Rejected'
+  CardLoadRequestStatus.create id: 4,name: 'Credited'
+end
+
 if Currency.count == 0
   Currency.create(id: 1, country: 'India', country_code: 'INR')
 end

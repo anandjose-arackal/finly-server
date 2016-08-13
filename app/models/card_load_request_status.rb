@@ -9,4 +9,21 @@
 #
 
 class CardLoadRequestStatus < ActiveRecord::Base
+
+  def self.processing_id
+    1
+  end
+
+  def self.retracted_id
+    2
+  end
+
+  def self.rejected_id
+    3
+  end
+
+  def self.credited_id
+    4
+  end
+
 end

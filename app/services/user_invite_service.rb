@@ -29,11 +29,8 @@ class UserInviteService < BaseService
 
     # retrieving the policy and ensuring that the user is added to the particular policy
     @policy = Policy.find_by(id: @policy_id)
-    debugger
     if @policy
-      debugger
       unless PolicyUserService.new(@policy).add_user(u)
-        debugger
         errors << "User could not be added to policy."
         return false
       end

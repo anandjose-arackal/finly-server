@@ -69,7 +69,11 @@ class BaseOperation
 
   # This would be sent as a return value
   def retrieve
-    success
+    if is_success?
+      success
+    else
+      failure
+    end
   end
 
   def has_errors?
