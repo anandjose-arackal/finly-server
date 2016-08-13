@@ -1,27 +1,31 @@
 class BaseOperation
-  attr_accessor :user, :params, :errors
+  attr_accessor :user, :params, :errors, :process_complete
 
   def initialize(user, params={})
+    self.errors = []
     self.user = user
     self.params = params
   end
 
-  def self.operate(user, params={})
-    self.new(user, params).operate
+  def self.call(user, params={})
+    self.new(user, params).run
   end
 
-  def operate
+  def run
     errors.clear
     authorize_user authorized_user_types
-    return if has_errors
+    return if has_errors?
     validate
-    return if has_errors
+    return if has_errors?
     init
-    return if has_errors
+    return if has_errors?
     authorize
-    return if has_errors
+    return if has_errors?
     process
-    return if has_errors
+    return if has_errors?
+    self.process_complete = true
+    post_process
+    return if has_errors?
     retrieve
   end
 
@@ -45,18 +49,35 @@ class BaseOperation
 
   end
 
+  def post_process
+
+  end
+
   def retrieve
     success
   end
 
-  def has_errors
+  def has_errors?
     self.errors.present?
+  end
+
+  def processing?
+    not self.process_complete
+  end
+
+  def is_success?
+    self.process_complete and not errors.present?
+  end
+
+  def is_failure?
+    self.process_complete and errors.present?
   end
 
   class BaseOperation::BasePresenter
 
   end
 
+  protected
   def success
     true
   end

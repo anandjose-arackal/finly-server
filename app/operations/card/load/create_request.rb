@@ -1,5 +1,4 @@
 class Card::Load::CreateRequest < Card::Base
-  attr_accessor :card
 
   def authorized_user_types
     :employee
@@ -19,13 +18,8 @@ class Card::Load::CreateRequest < Card::Base
     end
   end
 
-  def init
-    card = user.cards.with_id(params[:id])
-    self.card = card.first if card.present?
-  end
-
   def authorize
-    unless self.card.present?
+    unless self.user.cards.with_id(params[:id]).present?
       raise_unauthorized_exception
     end
   end
@@ -36,6 +30,7 @@ class Card::Load::CreateRequest < Card::Base
     request = user.card_load_requests.build(request_params)
     unless request.present?
       errors << 'Error creating request'
+      return
     end
     unless request.save
       errors << request.errors.full_messages
