@@ -154,7 +154,11 @@ class User < ActiveRecord::Base
     if policy.blank?
       return admin_policies.count > 0
     end
-    admin_policies.with_id(policy.id).present?
+    policy_id = policy
+    if policy.is_a?(Policy)
+      policy_id = policy.id
+    end
+    admin_policies.with_id(policy_id).present?
   end
 
   def admin?

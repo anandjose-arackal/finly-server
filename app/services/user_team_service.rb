@@ -215,7 +215,8 @@ class UserTeamService < BaseService
     errors.clear
     load_update params
     # updating greater than amount for non-default if it needs to be updated
-    if !@mapping.default and !params['amount'].blank? and params['amount'] != @mapping.greater_than_amount_value and params['currency_id'] != @mapping.greater_than_amount_currency_id
+    if not @mapping.default and not params['amount'].blank? and params['amount'] != @mapping.greater_than_amount_value and
+        params['currency_id'] != @mapping.greater_than_amount_currency_id
       greater_than_amount = Amount.create(value: params['amount'], currency_id: params['currency_id'])
       @mapping.update_attributes(greater_than_amount_id: greater_than_amount.id)
     end
@@ -224,7 +225,7 @@ class UserTeamService < BaseService
     approves_to_user_id = params[:approves_to_user_id] || params['approves_to_user_id']
     approves_finance_to_user_id = params[:approves_finance_to_user_id] || params['approves_finance_to_user_id']
     # if amount is left empty, remove the conditional manager params
-    if params['amount'] and params['amount'].empty?
+    if params['amount'] and params['amount'].empty? and not @mapping.default
       manager_id = finance_manager_id = approves_to_user_id = approves_finance_to_user_id = nil
     end
     if @mapping.update_attributes(manager_id: manager_id,

@@ -1,11 +1,12 @@
 class BaseOperation
-  attr_accessor :user, :params, :errors, :process_complete
+  attr_accessor :user, :params, :errors, :process_complete,
+                :admin_view, :manager_view, :finance_view, :personal_view, :auditor_view
 
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
     self.errors = []
     self.user = user
-    self.params = params
+    self.params = (params or {})
   end
 
   # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
@@ -18,11 +19,15 @@ class BaseOperation
     errors.clear
     authorize_user authorized_user_types
     return if has_errors?
-    validate
+    pre_validate
+    return if has_errors?
+    pre_authorize
     return if has_errors?
     init
     return if has_errors?
     authorize
+    return if has_errors?
+    validate
     return if has_errors?
     process
     return if has_errors?
@@ -39,12 +44,20 @@ class BaseOperation
   end
 
   # Add all validations come here for checking if the required data is present in params
-  def validate
+  def pre_validate
+
+  end
+
+  def pre_authorize
 
   end
 
   # All objects which would be required for processing would be loaded here
   def init
+
+  end
+
+  def validate
 
   end
 
@@ -123,6 +136,23 @@ class BaseOperation
 
   def raise_unauthorized_exception
     raise NotAuthorizedException
+  end
+
+  def load_views
+    return if params.blank?
+    view = params[:view] || params['view']
+    case view
+      when 'admin'
+        self.admin_view = true
+      when 'manager'
+        self.manager_view = true
+      when 'finance'
+        self.finance_view = true
+      when 'auditor'
+        self.auditor_view = true
+      else
+        self.personal_view = true
+    end
   end
 
 end

@@ -4,7 +4,7 @@ class Card::Load::Request::Update < Card::Load::Request::Base
     [:employee, :manager, :finance_manager, :admin]
   end
 
-  def validate
+  def pre_validate
     if params[:id].blank?
       errors << 'Card Request not found'
     end

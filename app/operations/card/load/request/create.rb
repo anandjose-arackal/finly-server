@@ -5,7 +5,7 @@ class Card::Load::Request::Create < Card::Load::Request::Base
     :employee
   end
 
-  def validate
+  def pre_validate
     if params[:id].blank?
       errors << 'Card not found'
     end
