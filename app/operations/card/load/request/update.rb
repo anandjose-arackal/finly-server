@@ -27,6 +27,7 @@ class Card::Load::Request::Update < Card::Load::Request::Base
   def authorize
     if self.card_load_request.blank?
       errors << 'You cannot update this request'
+      raise_unauthorized_exception
     end
   end
 

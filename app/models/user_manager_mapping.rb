@@ -46,7 +46,12 @@ class UserManagerMapping < ActiveRecord::Base
   scope :manager, -> { where 'manager_id IS NOT NULL' }
   scope :finance_manager, -> { where 'finance_manager_id IS NOT NULL' }
   scope :approves_to, -> { where 'approves_to_user_id IS NOT NULL' }
+  # todo to be renamed to approves_to once services are migrated to operations
+  scope :approves_to_user, -> { where 'approves_to_user_id IS NOT NULL' }
   scope :approves_finance_to, -> { where 'approves_finance_to_user_id IS NOT NULL' }
+  # todo to be renamed to approves_finance_to once services are migrated to operations
+  scope :approves_finance_to_user, -> { where 'approves_finance_to_user_id IS NOT NULL' }
+
   scope :amount, ->(currency_id, value) do
     if value.blank? or currency_id.blank?
       self.default

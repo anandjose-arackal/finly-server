@@ -25,7 +25,7 @@ class Card::Load::Request::Approve < Card::Load::Request::Base
 
   def authorize
     if self.card_load_request.blank?
-      errors << 'You cannot team this request'
+      raise_unauthorized_exception
     end
   end
 

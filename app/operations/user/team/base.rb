@@ -1,5 +1,5 @@
 class User::Team::Base < BaseOperation
-  attr_accessor :admin_view, :manager_view, :finance_view, :currency_id, :amount_value, :mappings, :response
+  attr_accessor :admin_view, :manager_view, :finance_view, :currency_id, :amount_value, :mappings, :response, :policy_id
 
   def init_values
     return if params.blank?

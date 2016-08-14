@@ -8,10 +8,10 @@ class Card::Load::Request::Reject < Card::Load::Approve
         self.card_load_request)
     if params[:reject_to].present?
       reject_to_users = User::Team::Review::RejectToUsersList.call(self.card_load_request, self.user)
-      if reject_to_users.blank?
+      if reject_to_users.present?
         self.to_user =reject_to_users.with_id(params[:reject_to])
       else
-        errors << 'User not found'
+        errors << 'Cannot reject as user not found'
       end
     else
       self.to_user = self.card_load_request.user

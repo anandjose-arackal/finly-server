@@ -13,6 +13,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       currency = obj[:currency]
       uts = UserTeamService.new(user)
       manager = uts.manager(amount: amount, currency_id: currency)
+      manager = User::Team::Approver.(user, type: :manager, amount: amount, currency_id: currency)
       return manager if manager.present?
       return uts.finance_manager(amount: amount, currency_id: currency)
     end

@@ -21,10 +21,12 @@ class Card::Load::Request::Approve < Card::Load::Request::Base
   def authorize
     if self.card_load_request.blank?
       errors << 'You cannot retract this request'
+      raise_unauthorized_exception
       return
     end
     unless self.card_load_request.user.id == user.id
       errors << 'Only owners can retract card load requests'
+      raise_unauthorized_exception
     end
   end
 
