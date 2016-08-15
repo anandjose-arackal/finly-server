@@ -33,7 +33,7 @@ class Card::Load::Request::Approve < Card::Load::Request::Base
       Card::Load::LoadCash.(user, params)
     else
       if card_load_request.update_attributes status_id: CardLoadRequestStatus.processing_id, controlling_user_id: to_user.id,
-                                   controlling_for_user_id: nil
+                                   controlling_for_user_id: nil, note: self.params[:note]
         card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.approve_id,
                                                 status_id: CardLoadRequestStatus.processing_id, user_request_role_id: user_role
       else

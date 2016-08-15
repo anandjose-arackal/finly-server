@@ -36,7 +36,7 @@ class Card::Load::Request::Retract < Card::Load::Request::Base
 
   def process
     if card_load_request.update_attributes status_id: CardLoadRequestStatus.retracted_id, controlling_user_id: user.id,
-                                 controlling_for_user_id: nil
+                                 controlling_for_user_id: nil, note: self.params[:note]
       card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.retract_id,
                                              status_id: CardLoadRequestStatus.retracted_id, user_request_role_id: UserRole.employee_id
     else

@@ -123,11 +123,11 @@ class BaseOperation
   def authorize_user(user_types)
     return if user_types.blank?
     user_types = [user_types] unless user_types.is_a?(Array)
-
     if user.present?
       user_types.each do |user_type|
         if (user_type == :employee and user.employee?) or (user_type == :manager and user.manager?) or
-            (user_type == :finance_manager and user.finance_manager?) or (user_type == :admin and user.admin?)
+            (user_type == :finance_manager and user.finance_manager?) or(user_type == :policy_admin and user.policy_admin?) or
+            (user_type == :company_admin and user.company_admin?) or (user_type == :admin and user.admin?)
           return
         end
       end

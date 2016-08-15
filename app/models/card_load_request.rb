@@ -38,7 +38,7 @@ class CardLoadRequest < ActiveRecord::Base
     return nil if tracks.blank?
     trackings = tracks.without_take_control_action
     if user_before.present?
-      track = trackings.find_by(action_user_id: user_before.id)
+      track = trackings.with_action_user(user_before.id).first
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
