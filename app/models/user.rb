@@ -195,8 +195,8 @@ class User < ActiveRecord::Base
 
   alias_method :manager_name, :user_name
   alias_method :finance_manager_name, :user_name
-  alias_method :approves_to_user_name, :user_name
-  alias_method :approves_finance_to_user_name, :user_name
+  alias_method :approves_to_name, :user_name
+  alias_method :approves_finance_to_name, :user_name
 
 
   private

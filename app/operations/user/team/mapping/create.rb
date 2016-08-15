@@ -15,8 +15,8 @@ class User::Team::Mapping::Create < User::Team::Mapping::Base
     currency_id = params[:currency_id] || params['currency_id']
     self.create_params = {user_id: params[:user_id], manager_id: (params[:manager_id] or params['manager_id']),
                           finance_manager_id: (params[:finance_manager_id] or params['finance_manager_id']),
-                          approves_to_id: (params[:approves_to_user_id] or params['approves_to_user_id']),
-                          approves_finance_to_id: (params[:approves_finance_to_user_id] or params['approves_finance_to_user_id']),
+                          approves_to_id: (params[:approves_to_id] or params['approves_to_id']),
+                          approves_finance_to_id: (params[:approves_finance_to_id] or params['approves_finance_to_id']),
                           policy_id: params[:policy_id], greater_than_amount_attributes: {value: amount_value, currency_id: currency_id}}
   end
 
@@ -32,12 +32,12 @@ class User::Team::Mapping::Create < User::Team::Mapping::Base
         create_params[:finance_manager_id].to_s != mapping.finance_manager_id.to_s
       errors << 'Another finance manager is already configured for the given amount'
     end
-    if create_params[:approves_to_user_id].present? and mapping.approves_to.present? and
-        create_params[:approves_to_user_id].to_s != mapping.approves_to.to_s
+    if create_params[:approves_to_id].present? and mapping.approves_to.present? and
+        create_params[:approves_to_id].to_s != mapping.approves_to.to_s
       errors << 'Another approves to manager is already configured for the given amount'
     end
-    if create_params[:approves_finance_to_user_id].present? and mapping.approves_finance_to.present? and
-        create_params[:approves_finance_to_user_id].to_s != mapping.approves_finance_to.to_s
+    if create_params[:approves_finance_to_id].present? and mapping.approves_finance_to.present? and
+        create_params[:approves_finance_to_id].to_s != mapping.approves_finance_to.to_s
       errors << 'Another approves finance to manager is already configured for the given amount'
     end
     if not destroy? and self.create_params.blank?

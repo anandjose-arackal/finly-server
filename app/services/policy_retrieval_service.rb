@@ -7,7 +7,7 @@ class PolicyRetrievalService < BaseService
   end
 
   def self.for_report(report)
-    return report.user.company.default_policy unless report.policy.present?
+    return report.user.company.default_policy.first rescue nil unless report.policy.present?
     if report.submitted_at.present?
       return report.policy.version_at report.submitted_at, has_many: true, has_one: true, belongs_to: true
     end

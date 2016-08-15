@@ -193,22 +193,22 @@ class PolicyUserService < BaseService
         end
         params[:finance_manager_id] = default_config.finance_manager_id
       end
-      if params[:approves_to_user_id].blank?
+      if params[:approves_to_id].blank?
         if default_config.blank?
           default_config = user.team_mapping.without_policy.default.first
         end
-        params[:approves_to_user_id] = default_config.approves_to_user_id
+        params[:approves_to_id] = default_config.approves_to_id
       end
-      if params[:approves_finance_to_user_id].blank?
+      if params[:approves_finance_to_id].blank?
         if default_config.blank?
           default_config = user.team_mapping.without_policy.default.first
         end
-        params[:approves_finance_to_user_id] = default_config.approves_finance_to_user_id
+        params[:approves_finance_to_id] = default_config.approves_finance_to_id
       end
     end
 
     if params[:manager_id].blank? and params[:finance_manager_id].blank? and
-        params[:approves_to_user_id].blank? and params[:approves_finance_to_user_id].blank?
+        params[:approves_to_id].blank? and params[:approves_finance_to_id].blank?
       unless default
         if mapping.destroy!
           return true
@@ -220,8 +220,8 @@ class PolicyUserService < BaseService
     end
     mapping.manager_id = params[:manager_id]
     mapping.finance_manager_id = params[:finance_manager_id]
-    mapping.approves_to_user_id = params[:approves_to_user_id]
-    mapping.approves_finance_to_user_id = params[:approves_finance_to_user_id]
+    mapping.approves_to_id = params[:approves_to_id]
+    mapping.approves_finance_to_id = params[:approves_finance_to_id]
     amount = params[:amount]
     if amount.present? and amount.to_f > 0
       mapping.greater_than_amount.value = amount.to_f

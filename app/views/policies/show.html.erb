@@ -313,7 +313,7 @@
         <hr>
         <div id="policyMemberSettingsApprovesToSection">
           <label>Approves To:</label>
-          <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration" name="policy[default][approves_to_user_id]"
+          <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration" name="policy[default][approves_to_id]"
                   class="selectors" style=" margin-left: 45px; width: 150px">
             <option value="" selected="selected"></option>
             <% @managers.each do |manager| %>
@@ -331,7 +331,7 @@
 
           <div>
             <label>Then Approves To:</label>
-            <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_user_id]"
+            <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_id]"
                     form="updateUserPolicyConfiguration" class="selectors" style=" margin-top: 15px;">
               <option value="" selected="selected"></option>
               <% @managers.each do |manager| %>
@@ -349,7 +349,7 @@
           <label>Approves Finance To:</label>
 
           <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration"
-                  name="policy[default][approves_finance_to_user_id]" class="selectors" style=" margin-left: 45px; width: 150px">
+                  name="policy[default][approves_finance_to_id]" class="selectors" style=" margin-left: 45px; width: 150px">
             <option value="" selected="selected"></option>
             <% @finance_managers.each do |manager| %>
                 <option value="<%= manager.id %>"><%= manager.name %></option>
@@ -366,7 +366,7 @@
           <div>
             <label>Then Approves Finance To:</label>
             <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration"
-                    name="policy[conditional_approves_finance_to][approves_finance_to_user_id]" class="selectors" style=" margin-top: 15px;">
+                    name="policy[conditional_approves_finance_to][approves_finance_to_id]" class="selectors" style=" margin-top: 15px;">
               <option value="" selected="selected"></option>
               <% @finance_managers.each do |manager| %>
                   <option value="<%= manager.id %>"><%= manager.name %></option>

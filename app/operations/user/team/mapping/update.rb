@@ -4,8 +4,8 @@ class User::Team::Mapping::Update < User::Team::Mapping::Base
   def pre_validate
     super
     unless params[:manager_id] or params['manager_id'] or params[:finance_manager_id] or params['finance_manager_id'] or
-        params[:approves_to_user_id] or params['approves_to_user_id'] or params[:approves_finance_to_user_id] or
-        params['approves_finance_to_user_id'] or (params['amount'] and params['currency_id'])
+        params[:approves_to_id] or params['approves_to_id'] or params[:approves_finance_to_id] or
+        params['approves_finance_to_id'] or (params['amount'] and params['currency_id'])
       errors << 'Nothing to update'
     end
     if params[:team_mapping_id].blank?
@@ -27,12 +27,12 @@ class User::Team::Mapping::Update < User::Team::Mapping::Base
 
     manager_id = params[:manager_id] or params['manager_id']
     finance_manager_id = params[:finance_manager_id] or params['finance_manager_id']
-    approves_to_user_id = params[:approves_to_user_id] or params['approves_to_user_id']
-    approves_finance_to_user_id = params[:approves_finance_to_user_id] or params['approves_finance_to_user_id']
+    approves_to_id = params[:approves_to_id] or params['approves_to_id']
+    approves_finance_to_id = params[:approves_finance_to_id] or params['approves_finance_to_id']
     self.update_params= {manager_id: manager_id,
                          finance_manager_id: finance_manager_id,
-                         approves_to_user_id: approves_to_user_id,
-                         approves_finance_to_user_id: approves_finance_to_user_id}
+                         approves_to_id: approves_to_id,
+                         approves_finance_to_id: approves_finance_to_id}
     if not self.mapping.default and not params['amount'].blank? and params['amount'] != self.mapping.greater_than_amount_value and
         params['currency_id'] != self.mapping.greater_than_amount_currency_id
       self.update_params[:greater_than_amount_attributes] = {id: self.mapping.greater_than_amount_id, value: params['amount'],

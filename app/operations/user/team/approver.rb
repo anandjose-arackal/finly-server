@@ -7,10 +7,8 @@ class User::Team::Approver < User::Team::Base
     unless params[:type].present?
       'Manager type not found'
     end
-    params[:type] = :approves_to_user if params[:type] == :approves_to
-    params[:type] = :approves_finance_to_user if params[:type] == :approves_finance_to
     unless params[:type] == :manager or params[:type] == :finance_manager or
-        params[:type] == :approves_to_user or params[:type] == :approves_finance_to_user
+        params[:type] == :approves_to or params[:type] == :approves_finance_to
       errors << 'User type not valid'
     end
   end

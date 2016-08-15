@@ -6,8 +6,8 @@
 #  user_id                     :integer
 #  manager_id                  :integer
 #  finance_manager_id          :integer
-#  approves_to_user_id         :integer
-#  approves_finance_to_user_id :integer
+#  approves_to_id         :integer
+#  approves_finance_to_id :integer
 #  greater_than_amount_id      :integer
 #  default                     :boolean          default(FALSE), not null
 #  created_at                  :datetime         not null
@@ -21,8 +21,8 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :user
   belongs_to :manager, class_name: "User"
   belongs_to :finance_manager, class_name: "User"
-  belongs_to :approves_to_user, class_name: "User"
-  belongs_to :approves_finance_to_user, class_name: "User"
+  belongs_to :approves_to, class_name: "User"
+  belongs_to :approves_finance_to, class_name: "User"
   belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
   belongs_to :policy
   accepts_nested_attributes_for :greater_than_amount
@@ -45,12 +45,12 @@ class UserManagerMapping < ActiveRecord::Base
   end
   scope :manager, -> { where 'manager_id IS NOT NULL' }
   scope :finance_manager, -> { where 'finance_manager_id IS NOT NULL' }
-  scope :approves_to, -> { where 'approves_to_user_id IS NOT NULL' }
+  scope :approves_to, -> { where 'approves_to_id IS NOT NULL' }
   # todo to be renamed to approves_to once services are migrated to operations
-  scope :approves_to_user, -> { where 'approves_to_user_id IS NOT NULL' }
-  scope :approves_finance_to, -> { where 'approves_finance_to_user_id IS NOT NULL' }
+  scope :approves_to, -> { where 'approves_to_id IS NOT NULL' }
+  scope :approves_finance_to, -> { where 'approves_finance_to_id IS NOT NULL' }
   # todo to be renamed to approves_finance_to once services are migrated to operations
-  scope :approves_finance_to_user, -> { where 'approves_finance_to_user_id IS NOT NULL' }
+  scope :approves_finance_to, -> { where 'approves_finance_to_id IS NOT NULL' }
 
   scope :amount, ->(currency_id, value) do
     if value.blank? or currency_id.blank?
@@ -72,11 +72,11 @@ class UserManagerMapping < ActiveRecord::Base
   scope :company, ->(company_id) { joins(:policy).where(company_id: company_id) }
 
   scope :has_finance_manager, ->(manager_id) { where finance_manager_id: manager_id }
-  scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_user_id: manager_id }
+  scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_id: manager_id }
   scope :has_manager, ->(manager_id) { where manager_id: manager_id }
-  scope :has_approves_to, ->(manager_id) { where approves_to_user_id: manager_id }
+  scope :has_approves_to, ->(manager_id) { where approves_to_id: manager_id }
 
-  scope :with_details, -> { includes :user, :manager, :finance_manager, :approves_to_user, :approves_finance_to_user, :greater_than_amount }
+  scope :with_details, -> { includes :user, :manager, :finance_manager, :approves_to, :approves_finance_to, :greater_than_amount }
 
   def manager_name
     return nil unless self.manager_id
@@ -88,14 +88,14 @@ class UserManagerMapping < ActiveRecord::Base
     User.find_by(id: self.finance_manager_id).name
   end
 
-  def approves_to_user_name
-    return nil unless self.approves_to_user_id
-    User.find_by(id: self.approves_to_user_id).name
+  def approves_to_name
+    return nil unless self.approves_to_id
+    User.find_by(id: self.approves_to_id).name
   end
 
-  def approves_finance_to_user_name
-    return nil unless self.approves_finance_to_user_id
-    User.find_by(id: self.approves_finance_to_user_id).name
+  def approves_finance_to_name
+    return nil unless self.approves_finance_to_id
+    User.find_by(id: self.approves_finance_to_id).name
   end
 
   private

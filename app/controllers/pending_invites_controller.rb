@@ -58,15 +58,15 @@ class PendingInvitesController < ApplicationController
     end
     params[:pending_invite][:team_mapping_attributes] = [{default: true, manager_id: params[:pending_invite][:manager_id],
                                                           finance_manager_id: params[:pending_invite][:finance_manager_id],
-                                                          approves_to_user_id: params[:pending_invite][:approves_to_user_id],
-                                                          approves_finance_to_user_id: params[:pending_invite][:approves_finance_to_user_id]}]
+                                                          approves_to_id: params[:pending_invite][:approves_to_id],
+                                                          approves_finance_to_id: params[:pending_invite][:approves_finance_to_id]}]
     params.require(:pending_invite).permit(:email, :company_id, :policy_id, role_mapping_attributes: [:user_role_id],
                                            team_mapping_attributes: [:default, :manager_id, :finance_manager_id,
-                                                                     :approves_to_user_id, :approves_finance_to_user_id])
+                                                                     :approves_to_id, :approves_finance_to_id])
   end
 
   def updated_user_invite_params
-    params.require(:pending_invite).permit(:email, :company_id, :finance_manager, :manager, :manager_id, :finance_manager_id, :approves_to_user_id, :approves_finance_to_user_id, :team_mapping_id)
+    params.require(:pending_invite).permit(:email, :company_id, :finance_manager, :manager, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :team_mapping_id)
   end
 
   def user_params

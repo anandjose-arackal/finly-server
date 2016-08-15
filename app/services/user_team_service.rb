@@ -77,7 +77,7 @@ class UserTeamService < BaseService
       end
     elsif obj.is_a?(CardLoadRequest)
       card_load_request = obj
-      emp = report.user
+      emp = card_load_request.user
       m = UserTeamService.new(emp).manager(card_load_request: card_load_request)
       while m.present?
         return true if m.id == managing_user.id
@@ -196,7 +196,7 @@ class UserTeamService < BaseService
     return nil unless user.manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_to_user rescue nil
+    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_to rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -205,7 +205,7 @@ class UserTeamService < BaseService
     return nil unless user.finance_manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_finance_to_user rescue nil
+    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_finance_to rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -222,16 +222,16 @@ class UserTeamService < BaseService
     end
     manager_id = params[:manager_id] || params['manager_id']
     finance_manager_id = params[:finance_manager_id] || params['finance_manager_id']
-    approves_to_user_id = params[:approves_to_user_id] || params['approves_to_user_id']
-    approves_finance_to_user_id = params[:approves_finance_to_user_id] || params['approves_finance_to_user_id']
+    approves_to_id = params[:approves_to_id] || params['approves_to_id']
+    approves_finance_to_id = params[:approves_finance_to_id] || params['approves_finance_to_id']
     # if amount is left empty, remove the conditional manager params
     if params['amount'] and params['amount'].empty? and not @mapping.default
-      manager_id = finance_manager_id = approves_to_user_id = approves_finance_to_user_id = nil
+      manager_id = finance_manager_id = approves_to_id = approves_finance_to_id = nil
     end
     if @mapping.update_attributes(manager_id: manager_id,
                                   finance_manager_id: finance_manager_id,
-                                  approves_to_user_id: approves_to_user_id,
-                                  approves_finance_to_user_id: approves_finance_to_user_id)
+                                  approves_to_id: approves_to_id,
+                                  approves_finance_to_id: approves_finance_to_id)
       return true
     else
       errors << @mapping.errors.full_messages
@@ -251,11 +251,11 @@ class UserTeamService < BaseService
     if params[:finance_manager_id].present? || params['finance_manager_id'].present?
       mapping.finance_manager_id = params[:finance_manager_id] || params['finance_manager_id']
     end
-    if params[:approves_to_user_id].present?
-      mapping.approves_to_user_id = params[:approves_to_user_id]
+    if params[:approves_to_id].present?
+      mapping.approves_to_id = params[:approves_to_id]
     end
-    if params[:approves_finance_to_user_id].present?
-      mapping.approves_finance_to_user_id = params[:approves_finance_to_user_id]
+    if params[:approves_finance_to_id].present?
+      mapping.approves_finance_to_id = params[:approves_finance_to_id]
     end
     return true if mapping.save
     errors << mapping.errors.full_messages
@@ -411,10 +411,10 @@ class UserTeamService < BaseService
     if params[:finance_manager_id].present?
       errors << 'Another finance manager is already configured for the given amount' if mapping.finance_manager.present?
     end
-    if params[:approves_to_user_id].present?
+    if params[:approves_to_id].present?
       errors << 'Another manager is already configured for the given amount' if mapping.approves_to.present?
     end
-    if params[:approves_finance_to_user_id].present?
+    if params[:approves_finance_to_id].present?
       errors << 'Another manager is already configured for the given amount' if mapping.approves_finance_to.present?
     end
     errors.blank?
