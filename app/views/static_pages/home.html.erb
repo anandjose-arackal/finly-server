@@ -78,8 +78,8 @@
         </p>
       </div>
 
-      <div class="col-lg-6">
-        
+      <div class="col-lg-6 text-center">
+        <%= image_tag("landing/features/mobile.png", class: "img-responsive", style: "display:inline; height: 200px; clip: rect(0, 100px, 200px, 0);") %>
       </div>
     </div>
 
@@ -113,7 +113,7 @@
 
 <div class="jumbotron" style="background-color: #F2F2F2; color: white;">
   <div class="container">
-    <h2 class="text-center">Join Us</h2>
+    <h2 class="text-center" style="color: #456B9F;">Join Us</h2>
     <div class="row">
       <div class="col-lg-6">
         <%= image_tag("landing/contact-us.png", class: 'img-responsive') %>
@@ -135,7 +135,7 @@
     </div><!-- .row -->
     <div class="row">
       <div class="row no-margin">
-        <h2 class="text-center" style="font-weight: 100px;">We are social</h2>
+        <h2 class="text-center" style="font-weight: 100px; color: #456B9F;">We are social</h2>
         <div class="text-center">
           <a href="http://facebook.com">
             <%= image_tag("landing/social/facebook.png", height: "50", class: "social-icons") %>
@@ -276,12 +276,11 @@
 
   .jumbotron{
     /*height: calc(100% - 50px);*/
-    min-height: calc(100vh);
+    /*min-height: calc(100vh);*/
     background: #423689;
     /*background: #46568b;*/
     background:#594DA8;
     /*color: #efefef;*/
-
     margin-bottom: 0;
     padding-top: 20px;
   }
