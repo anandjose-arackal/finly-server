@@ -1,0 +1,109 @@
+<div class="topbarContainer">
+  <div class="topbar">
+    <!--    STYLING FOR ADMIN -->
+    <div class="navbar-header">
+      <a class="navbar-brand" style="color: white; font-family: 'Bree Serif', serif; font-weight: 800;font-size: 32px;margin-top: 15px; float: left" href="<%= root_path %>" data-turbolinks="false">F</a>
+    </div>
+
+    <% if logged_in? %>
+        <ul class="nav navbar-nav topButton">
+          <div class="dropdown canSwitch " onclick="showDropDown()" style="cursor: pointer">
+            <span class="viewSummary">
+              <!-- ADD OTHER VIEWS -->
+              <span class="userView" style="color: white;float: left;font-size: 12px;font-weight: 500;margin-top: 8px;margin-left: 16px">
+                <% if @admin_view %>
+                Admin View
+                <% elsif @finance_view %>
+                Finance View
+                <% elsif @manager_view %>
+                Manager View
+                <% else %>
+                Personal View
+                <% end %>
+              </span>
+              <div class="orgName" style="color: #e0e0e0;font-size: 12px;clear: both;font-style: italic;float: left;margin-left: 16px; margin-top: 2px">
+              </div>
+            </span>
+            <span class="icon fa fa-chevron-down" style="margin-left: 70px ;color: white;opacity: 0.8;margin-top: 12px; font-size: 16px"></span>
+
+            <ul id="viewToggleDropdown" class="dropdown-menu">
+              <% if current_user.admin? and not is_admin_view %>
+                  <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: true %></li>
+              <% end %>
+              <% if current_user.finance_manager? and not is_finance_view %>
+                  <li> <%= link_to "Finance View", reports_path(view: 'finance'), turbolink: true %></li>
+              <% end %>
+              <% if current_user.manager? and not is_manager_view %>
+                  <li> <%= link_to "Manager View", reports_path(view: 'manager'), turbolink: true %></li>
+              <% end %>
+              <% if current_user.employee? and not is_personal_view %>
+                  <li> <%= link_to "Personal View", reports_path, turbolink: true %></li>
+              <% end %>
+            </ul>
+          </div>
+        </ul>
+
+        <ul class="nav navbar-btn navbar-right" style="margin-top: 20px;margin-right: 14px;">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#" data-turbolinks="false" style="color: white"><i class="fa fa-cog fa-lg"></i>
+          </a>
+          <ul class="dropdown-menu cog" style="padding: 0;
+              border-radius: 1px;">
+            <% if current_user.admin? %>
+            <li>
+              <a href="<%= organization_account_path(view: 'admin') %>" style="height: 45px;">Organization Account</a>
+            </li>
+            <% end %>
+            <% if current_user.policy_admin? %>
+            <li>
+              <a href="<%= policies_path(view: params[:view]) %>" style="height: 45px;">Administering Policies</a>
+            </li>
+            <% end %>
+            <li>
+              <a href="<%= user_profile_path(current_user) %>" style="height: 45px;">My Account</a>
+            </li>
+            <% if current_user.policy_admin? or current_user.admin? %>
+            <li><a href="<%= policies_path(view: 'admin') %>" data-turbolinks="false" style="height: 45px;">Expense
+              Policy</a>
+            </li>
+            <% end %>
+            <li>
+              <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" data-turbolinks="false" style="height: 45px;">Download
+                the App</a></li>
+            <li>
+            <li>
+              <% if logged_in? %>
+                <li><%= link_to "Log out", destroy_user_session_path, method: "delete" %></li>
+            <% end %>
+          </ul>
+        </ul>
+    <% end %>
+
+    <ul id="headerNavigation">
+      <%= render 'shared/header_navigation' %>
+    </ul>
+
+  </div>
+</div>
+
+<script>
+
+  $('html').click(function (event) {
+    var $trigger = $(".topButton");
+    if ($trigger !== event.target && !$trigger.has(event.target).length) {
+      $("#viewToggleDropdown").hide();
+    }
+  });
+
+  function showDropDown() {
+    $("#viewToggleDropdown").toggle();
+  }
+
+
+  function scrollToFeatures() {
+    $('html,body').animate({
+          scrollTop: ($("#featuresDiv").offset().top - 60)
+        },
+        'slow');
+  }
+
+</script>

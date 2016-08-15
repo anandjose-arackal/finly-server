@@ -1,4 +1,5 @@
 class StaticPagesController < ApplicationController
+  layout 'static'
 
   def home
     if logged_in?
