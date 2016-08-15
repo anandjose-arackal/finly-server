@@ -33,9 +33,10 @@ class Card::Load::Request::Create < Card::Load::Request::Base
   def process
     params = request_params[:card_load_request]
     params[:card_id] = self.params[:id]
+    params[:note] = self.params[:note]
     params[:status_id] = CardLoadRequestStatus.processing_id
     params[:controlling_user] =  User::Team::Review::NextReviewer.(user: user, amount: params[:amount_attributes][:value],
-        currency: params[:amount_attributes][:currency_id])
+        currency_id: params[:amount_attributes][:currency_id])
     self.card_load_request = user.card_load_requests.build(params)
     unless card_load_request.present?
       errors << 'Error creating request'

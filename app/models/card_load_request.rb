@@ -25,7 +25,7 @@ class CardLoadRequest < ActiveRecord::Base
 
   has_many :tracks, class_name: 'CardLoadRequestTrack', foreign_key: :card_load_request_id
 
-  scope :with_id, ->(id){where id: id}
+  scope :with_id, ->(id) { where id: id }
 
   accepts_nested_attributes_for :amount
 
@@ -35,7 +35,7 @@ class CardLoadRequest < ActiveRecord::Base
     return nil if tracks.blank?
     trackings = tracks.without_take_control_action
     if user_before.present?
-      track = trackings.find_by(action_user_id: user_before.id)
+      track = trackings.with_action_user(user_before.id).first
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
@@ -71,6 +71,22 @@ class CardLoadRequest < ActiveRecord::Base
 
   def credited?
     status_id == CardLoadRequestStatus.credited_id
+  end
+
+  def can_submit?
+    retracted? or rejected?
+  end
+
+  def can_retract?
+    processing?
+  end
+
+  def can_delete?
+    retracted? or rejected?
+  end
+
+  def can_unapprove?
+    credited?
   end
 
 end

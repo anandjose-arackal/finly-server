@@ -1,20 +1,43 @@
 class User::Team::Review::NextReviewer < BaseOperation
+  attr_accessor :obj
 
   def self.call(obj)
-    return nil if obj.blank?
+    self.new(obj).run
+  end
+
+  def initialize(obj)
+    super(nil, nil)
+    self.obj = obj
+  end
+
+  def validate
+    errors << 'Error retrieving next approver' if obj.blank?
+  end
+
+  def process
     if obj.is_a?(CardLoadRequest)
-      return next_reviewer(:card_load_request, obj)
+      self.response = next_reviewer(:card_load_request, obj)
     elsif obj.is_a?(Report)
-      return next_reviewer(:report, obj)
+      self.response = next_reviewer(:report, obj)
     elsif obj.is_a?(Hash)
       user = obj[:user]
-      return nil if user.blank?
+      if user.blank?
+        self.response = nil
+        return
+      end
       amount = obj[:amount]
-      currency = obj[:currency]
-      manager = User::Team::Approver.(user, type: :manager, amount: amount, currency_id: currency)
-      return manager if manager.present?
-      return User::Team::Approver.(user, type: :finance_manager, amount: amount, currency_id: currency)
+      currency_id = obj[:currency_id]
+      manager = User::Team::Approver.(user, type: :manager, amount: amount, currency_id: currency_id)
+      if manager.present?
+        self.response = manager
+      else
+        self.response = User::Team::Approver.(user, type: :finance_manager, amount: amount, currency_id: currency_id)
+      end
     end
+  end
+
+  def retrieve
+    response
   end
 
   private
