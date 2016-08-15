@@ -44,4 +44,8 @@ class UpdateTest < ActiveSupport::TestCase
     assert_not Card::Load::Request::Update.(User.last, {card_load_request: {amount_attributes: {id: @request.amount.id, value: 100}}})
   end
 
+  test 'Can be edited only when retracted' do
+
+  end
+
 end

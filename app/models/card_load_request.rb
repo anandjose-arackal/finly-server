@@ -28,7 +28,7 @@ class CardLoadRequest < ActiveRecord::Base
 
   has_many :tracks, class_name: 'CardLoadRequestTrack', foreign_key: :card_load_request_id
 
-  scope :with_id, ->(id){where id: id}
+  scope :with_id, ->(id) { where id: id }
 
   accepts_nested_attributes_for :amount
 
@@ -74,6 +74,22 @@ class CardLoadRequest < ActiveRecord::Base
 
   def credited?
     status_id == CardLoadRequestStatus.credited_id
+  end
+
+  def can_submit?
+    retracted? or rejected?
+  end
+
+  def can_retract?
+    processing?
+  end
+
+  def can_delete?
+    retracted? or rejected?
+  end
+
+  def can_unapprove?
+    credited?
   end
 
 end

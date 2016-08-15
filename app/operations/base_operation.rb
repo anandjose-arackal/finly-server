@@ -1,6 +1,5 @@
 class BaseOperation
-  attr_accessor :user, :params, :errors, :process_complete,
-                :admin_view, :manager_view, :finance_view, :personal_view, :auditor_view
+  attr_accessor :user, :params, :errors, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
@@ -82,7 +81,9 @@ class BaseOperation
 
   # This would be sent as a return value
   def retrieve
-    if is_success?
+    if self.response.present?
+      response
+    elsif is_success?
       success
     else
       failure
@@ -138,21 +139,28 @@ class BaseOperation
     raise NotAuthorizedException
   end
 
-  def load_views
-    return if params.blank?
-    view = params[:view] || params['view']
-    case view
-      when 'admin'
-        self.admin_view = true
-      when 'manager'
-        self.manager_view = true
-      when 'finance'
-        self.finance_view = true
-      when 'auditor'
-        self.auditor_view = true
-      else
-        self.personal_view = true
-    end
+  def admin_view?
+    is_view?(:admin)
+  end
+
+  def manager_view?
+    is_view?(:manager)
+  end
+
+  def finance_view?
+    is_view?(:finance)
+  end
+
+  def auditor_view?
+    is_view?(:auditor)
+  end
+
+  def personal_view?
+    is_view?(:employee) or is_view?(:personal)
+  end
+
+  def is_view?(type)
+    type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
   end
 
 end
