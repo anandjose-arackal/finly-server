@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160815145613) do
+ActiveRecord::Schema.define(version: 20160815152217) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -148,6 +148,7 @@ ActiveRecord::Schema.define(version: 20160815145613) do
     t.datetime "updated_at",                        null: false
     t.integer  "company_id",          limit: 4
     t.integer  "disabled_by_role_id", limit: 4
+    t.boolean  "active"
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree

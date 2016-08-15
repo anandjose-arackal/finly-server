@@ -35,7 +35,7 @@ class Card::Assign::AssignCard < Card::Base
 
   def validate
     unless employee
-      errors << "User does not exist!"
+      errors << "Employee does not exist!"
     end
     if params[:unassign]
       # checking that card exists and belongs to the specified employee
@@ -51,8 +51,14 @@ class Card::Assign::AssignCard < Card::Base
   end
 
   def authorize
-    unless User::Team::Show.call(user, 3, indirect_associations: true).include?(employee)
-      errors << "You are not a manager for this user."
+    if user.manager?
+      unless User::Team::Show.call(user, 3, indirect_associations: true).include?(employee)
+        errors << "You are not a manager for this user."
+      end
+    elsif user.admin?
+      unless employee.company_id == user.company_id
+        errors << "You are not an admin for this employee."
+      end
     end
   end
 
