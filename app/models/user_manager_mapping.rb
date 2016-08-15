@@ -6,8 +6,8 @@
 #  user_id                     :integer
 #  manager_id                  :integer
 #  finance_manager_id          :integer
-#  approves_to_id         :integer
-#  approves_finance_to_id :integer
+#  approves_to_user_id         :integer
+#  approves_finance_to_user_id :integer
 #  greater_than_amount_id      :integer
 #  default                     :boolean          default(FALSE), not null
 #  created_at                  :datetime         not null

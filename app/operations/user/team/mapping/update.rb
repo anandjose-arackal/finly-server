@@ -1,5 +1,5 @@
 class User::Team::Mapping::Update < User::Team::Mapping::Base
-  attr_accessor :mapping, :update_params, :destroy?
+  attr_accessor :mapping, :update_params, :destroy
 
   def pre_validate
     super
@@ -16,7 +16,7 @@ class User::Team::Mapping::Update < User::Team::Mapping::Base
   def init
     # if amount is left empty, remove the conditional manager params
     if params['amount'] and params['amount'].empty? and not self.mapping.default
-      self.destroy? = true
+      self.destroy = true
       return
     end
 

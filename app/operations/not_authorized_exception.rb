@@ -1,4 +1,3 @@
 class NotAuthorizedException < StandardError
 
-
 end

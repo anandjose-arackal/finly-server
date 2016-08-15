@@ -1,4 +1,4 @@
-class Card::Load::Request::Reject < Card::Load::Approve
+class Card::Load::Request::Reject < Card::Load::Request::Approve
 
   def init
     requests = user.controlling_card_load_requests.with_id(params[:id])
@@ -27,4 +27,5 @@ class Card::Load::Request::Reject < Card::Load::Approve
       errors << request.errors.full_messages
     end
   end
+
 end

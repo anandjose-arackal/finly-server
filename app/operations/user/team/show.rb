@@ -72,6 +72,7 @@ class User::Team::Show < User::Team::Base
   end
 
   private
+
   def admin_team
     errors.clear
     if user.company_admin?

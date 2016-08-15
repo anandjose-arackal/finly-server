@@ -1,4 +1,4 @@
-class Card::Load::Request::Approve < Card::Load::Request::Base
+class Card::Load::Request::Retract < Card::Load::Request::Base
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]

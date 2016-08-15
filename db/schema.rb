@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160812140705) do
+ActiveRecord::Schema.define(version: 20160815145613) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -140,15 +140,18 @@ ActiveRecord::Schema.define(version: 20160812140705) do
   end
 
   create_table "cards", force: :cascade do |t|
-    t.string   "ending_number", limit: 255
-    t.string   "proxy",         limit: 255
-    t.integer  "card_type_id",  limit: 4
-    t.text     "description",   limit: 65535
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.string   "ending_number",       limit: 255
+    t.string   "proxy",               limit: 255
+    t.integer  "card_type_id",        limit: 4
+    t.text     "description",         limit: 65535
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.integer  "company_id",          limit: 4
+    t.integer  "disabled_by_role_id", limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
+  add_index "cards", ["company_id"], name: "index_cards_on_company_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
     t.integer  "company_id",   limit: 4,                  null: false
@@ -647,6 +650,7 @@ ActiveRecord::Schema.define(version: 20160812140705) do
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_load_requests", "card_load_request_statuses"
   add_foreign_key "cards", "card_types"
+  add_foreign_key "cards", "companies"
   add_foreign_key "categories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
