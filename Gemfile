@@ -51,6 +51,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+gem 'backbone-on-rails'
+
 gem 'bootstrap-will_paginate'
 # gem for image manipulation
 gem 'paperclip'
