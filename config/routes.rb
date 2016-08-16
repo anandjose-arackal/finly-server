@@ -185,6 +185,8 @@
 #
 
 Rails.application.routes.draw do
+  get 'home/index'
+
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
       oauth_token: 'oauth/token'
