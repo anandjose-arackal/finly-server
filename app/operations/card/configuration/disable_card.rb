@@ -8,7 +8,7 @@
 
 class Card::Configuration::DisableCard < Card::Base
 
-  attr_accessor :employee
+  attr_accessor :employee, :response
 
   def authorized_user_types
     [:employee, :manager, :admin]
@@ -59,18 +59,18 @@ class Card::Configuration::DisableCard < Card::Base
     end
   end
 
-  def operate
+  def process
     if user.admin?
-      unless card.update_attributes(active: false, deactivated_by_role_id: UserRole.admin_id)
+      unless card.update_attributes(active: false, disabled_by_role_id: UserRole.admin_id)
         errors << card.errors.full_messages
       end
     # if manager view, user must be employee's manager
     elsif user.manager?
-      unless card.update_attributes(active: false, deactivated_by_role_id: UserRole.manager_id)
+      unless card.update_attributes(active: false, disabled_by_role_id: UserRole.manager_id)
         errors << card.errors.full_messages
       end
     elsif user.employee? and params[:self]
-      unless card.update_attributes(active: false, deactivated_by_role_id: UserRole.employee_id)
+      unless card.update_attributes(active: false, disabled_by_role_id: UserRole.employee_id)
         errors << card.errors.full_messages
       end
     end

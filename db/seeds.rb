@@ -14,6 +14,10 @@ def random_integer(low, high)
   random(low, high+1).to_i
 end
 
+def random_string_of_numbers(length)
+  (0...length).map{ (48 + rand(10)).chr }.join
+end
+
 if ExportField.count == 0
   ExportField.create(id: 1, name: 'Employee Name')
   ExportField.create(id: 2, name: 'Employee ID')
@@ -318,5 +322,33 @@ if Report.count == 0
         ReportService.new(user: report.controlling_user, report: report).approve
       end
     end
+  end
+end
+
+if CardType.count == 0
+  CardType.create(name: "Physical")
+  CardType.create(name: "Virtual")
+  CardType.create(name: "Reimbursement")
+end
+
+if Card.count == 0
+  Company.all.each do |company|
+    5.times do
+      number = random_string_of_numbers(10)
+      c = company.cards.create(proxy: number, ending_number: number[6..9], description: "Unassigned company card.",
+                            card_type_id: random_integer(1,3))
+    end
+  end
+
+  User.all.each do |user|
+    number = random_string_of_numbers(10)
+    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test physical card for user #{user.id}",
+                          card_type_id: 1, company_id: user.company.id, active: true)
+    number = random_string_of_numbers(10)
+    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test virtual card for user #{user.id}",
+                          card_type_id: 2, company_id: user.company.id, active: true)
+    number = random_string_of_numbers(10)
+    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test reimbursement card for user #{user.id}",
+                          card_type_id: 3, company_id: user.company.id, active: true)
   end
 end
