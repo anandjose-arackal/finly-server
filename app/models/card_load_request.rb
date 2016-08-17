@@ -2,15 +2,19 @@
 #
 # Table name: card_load_requests
 #
-#  id                          :integer          not null, primary key
-#  prepaid_card_id             :integer
-#  load_amount_id              :integer
-#  loaded_by                   :integer
-#  loaded_at                   :datetime
-#  note                        :string(255)
-#  card_load_request_status_id :integer
-#  created_at                  :datetime         not null
-#  updated_at                  :datetime         not null
+#  id                      :integer          not null, primary key
+#  user_id                 :integer          not null
+#  card_id                 :integer          not null
+#  amount_id               :integer          not null
+#  policy_id               :integer
+#  status_id               :integer          not null
+#  controlling_user_id     :integer
+#  controlling_for_user_id :integer
+#  loaded_by               :integer
+#  loaded_at               :datetime
+#  note                    :string(255)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
 #
 
 class CardLoadRequest < ActiveRecord::Base
@@ -24,6 +28,7 @@ class CardLoadRequest < ActiveRecord::Base
   belongs_to :controlling_for_user, class_name: 'User'
 
   has_many :tracks, class_name: 'CardLoadRequestTrack', foreign_key: :card_load_request_id
+  has_many :comments, class_name: 'CardLoadRequestComment', foreign_key: :card_load_request_id
 
   scope :with_id, ->(id) { where id: id }
 

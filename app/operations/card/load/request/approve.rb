@@ -36,6 +36,7 @@ class Card::Load::Request::Approve < Card::Load::Request::Base
                                    controlling_for_user_id: nil, note: self.params[:note]
         card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.approve_id,
                                                 status_id: CardLoadRequestStatus.processing_id, user_request_role_id: user_role
+        self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.approve_id
       else
         errors << card_load_request.errors.full_messages
       end
