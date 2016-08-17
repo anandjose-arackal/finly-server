@@ -42,9 +42,8 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 
-group :assets do
-  gem 'handlebars_assets'
-end
+gem 'handlebars_assets'
+
 
 
 # Use ActiveModel has_secure_password
@@ -90,6 +89,7 @@ gem 'devise_invitable'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+  gem 'hirb'
 end
 
 group :development do

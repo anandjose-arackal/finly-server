@@ -36,6 +36,11 @@ class ReportsController < ApplicationController
     @counts[:closed] = (type_counts[ReportStatus.closed_id] or 0)
     generate_filters
     @reports = apply_scopes(@reports).paginate(page: params[:page], per_page: 30) if @reports.present?
+
+    respond_to do |format|
+      format.html {}
+      format.json { render json: @reports.as_json }
+    end
   end
 
   def update

@@ -52,6 +52,11 @@ class ExpensesController < ApplicationController
     end
     @categories = current_company.active_categories
     generate_filters
+
+    respond_to do |format|
+      format.html {}
+      format.json { render json: @expenses.as_json }
+    end
   end
 
   def update

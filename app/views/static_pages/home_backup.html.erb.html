@@ -1,0 +1,225 @@
+<body class="homeLayout" style="background-color: #46568b; ">
+
+<div class="container text-center" style="width: 100%; height: 100vh;">
+  <img src="<%= image_url("home_screen_bg.png") %>" style="width: 75%; height: 380px; margin-top: 25px">
+
+
+  <h2 style="font-family: 'Bree Serif', serif;width: 50%;
+      color: #93c178;
+      margin: 20px auto;">Scalable & Intelligent <br>Expense Management System</h2>
+  <p style="width: 50%;
+      color: white;
+      text-align: center;
+      margin: 15px auto;
+  ">Simplify expense management and payables processing so you can focus on the important things — like growing your
+    business!.</p>
+</div>
+
+<div class="row" id="featuresDiv" style="background-color: white;padding-top: 50px;padding-bottom: 50px">
+
+  <h3 style="text-align: center;margin-bottom: 50px">Features & Benefits</h3>
+
+  <div class="row" style="padding-left: 150px;padding-right: 150px">
+    <section class="col-md-1"><img src="<%= image_url('report_feature.png') %>"></section>
+
+    <section class="col-md-5">
+      <h5>Report Faster</h5>
+      <hr>
+      <p>Employees can generate expense reports on the fly for the expenses incurred, have them reviewed by their
+        manager and claim reimbursements 10x faster than traditional process.</p>
+    </section>
+    <section class="col-md-1"><img src="<%= image_url('workflow_feature.png') %>"></section>
+
+    <section class="col-md-5">
+
+      <h5>Streamline Your Workflow</h5>
+      <hr>
+      <p>Design a multi-level approval workflow to meet your organization’s needs. Approval workflow gives our clients
+        the
+        opportunity to set defined approval paths with various routing rules including approval limits and special
+        approval rules. </p></section>
+  </div>
+  <div class="row" style="padding-left: 150px;padding-right: 150px">
+    <section class="col-md-1"><img src="<%= image_url('policy_feature.png') %>"></section>
+
+    <section class="col-md-5">
+      <h5>Policy Compliance</h5>
+      <hr>
+      <p>Gives you the flexibility to set expense reporting compliance rules and enforce your own spending policies.
+        Spending limits and expense policies are built right into the system, so your employees will know immediately
+        when
+        an expense report falls outside company policy.</p></section>
+    <section class="col-md-1"><img src="<%= image_url('sync_feature.png') %>"></section>
+
+    <section class="col-md-5">
+      <h5>Account Sync</h5>
+      <hr>
+      <p>Integrates with your accounting system, allowing you to cut time spent on data entry and easily export the
+        data
+        you need, be it in excel or in PDF format.</p></section>
+  </div>
+  <div class="row" style="padding-left: 150px;padding-right: 150px">
+    <section class="col-md-1"><img src="<%= image_url('analyze_feature.png') %>"></section>
+
+    <section class="col-md-5">
+      <h5>Analyze</h5>
+      <hr>
+      <p>Analyze overall expense spending for opportunities to reduce costs and get better insight into company's
+        spend.</p></section>
+    <section class="col-md-1"><img src="<%= image_url('mobile_feature.png') %>"></section>
+
+    <section class="col-md-5">
+      <h5>Mobile</h5>
+      <hr>
+      <p>Never lose a receipt again! Snap pictures of receipts on the go
+        Create and submit expense reports from your phone
+        Free mobile app for Android</p></section>
+  </div>
+
+</div>
+
+<!--
+    <h1 style="font-size: 55px; font-weight: 300; letter-spacing: 2px; font-family: 'Bree Serif', serif">Finly</h1>
+
+    <p style="font-size: 18px; font-weight: 300"> You Spend, We Manage.</p>-->
+
+<div style="text-align: center;">
+  <p style="color: white;
+      margin-top: 60px;
+      font-weight: 200;
+      letter-spacing: 1px;">Interested in joining us early? Please send in your contact email-id.</p>
+  <form data-remote data-turboboost  method="post" action="<%= %>">
+    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+    <input class="inputWorkEmail" name="register[email]" type="text" placeholder="Work Email">
+    <button id="addComment" class="requestDemo" type="submit">Request Early Access</button>
+  </form>
+
+
+  <footer id="footer">
+    <ul id="">
+      <div >
+        <li>
+          <a href="#" style="float: left;text-decoration: none; font-size: 11px; font-weight: 600; padding: 24px 10px; color: white; ">OUR
+            PRODUCT</a>
+        </li>
+        <li>
+          <a href="<%= about_url %>" style="float: left; text-decoration: none; font-size: 11px;font-weight: 600; padding: 24px 10px; color: white">ABOUT
+            US</a>
+        </li>
+        <li>
+          <a href="<%= %>" style="float: left;text-decoration: none; font-size: 11px;font-weight: 600; padding: 24px 10px; color: white">JOBS</a>
+        </li>
+        <li>
+          <a href="<%= %>" style="float: left;text-decoration: none; font-size: 11px;font-weight: 600; padding: 24px 10px; color: white">HELP
+          </a></li>
+        <li>
+          <a href="<%= %>" style="float: left;text-decoration: none; font-size: 11px;font-weight: 600; padding: 24px 10px; color: white">PRIVACY
+          </a></li>
+      </div>
+
+    </ul>
+    <div style="letter-spacing: 2px;float: right; color: #93c178;font-size: 28px; font-family: 'Bree Serif', serif; margin-top: 10px; margin-right: 80px">
+      Finly
+      <p style="font-size: 12px;
+          font-weight: 300;
+          color: wheat;">  &#169; 2016 Jouska, Pvt. Tech. Ltd.</p>
+    </div>
+  </footer>
+</div>
+</body>
+<style>
+
+  .topbarContainer .topbar {
+    background-color: #46568b;
+    border: none;
+  }
+
+  .inputWorkEmail {
+    border-radius: 1px;
+    border: 1px solid #d8d8d8;
+    width: 250px;
+    margin: 10px 5px 0 0;
+    height: 40px;
+    padding: 10px;
+  }
+
+  .requestDemo {
+    border: 1px solid #d8d8d8;
+    color: #555;
+    background-color: #f7ef6a;
+    border-radius: 2px;
+    margin: 10px 5px 0 0;
+    height: 40px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    -moz-transition: background-color 200ms ease;
+    -webkit-transition: background-color 200ms ease;
+    transition: background-color 200ms ease;
+  }
+
+  #footer {
+    width: 100%;
+    min-height: 110px;
+    border: none;
+  }
+
+  .navbar-brand {
+    font-weight: 800;
+    padding: 15px 15px !important;
+    font-size: 32px;
+    float: left;
+  }
+
+  #headerNavigation a {
+    color: white !important;
+  }
+
+  h5 {
+    font-weight: 200;
+    font-size: 26px;
+    color: #46568b;
+    letter-spacing: -1px;
+    margin-left: 20px;
+    font-family: 'Bree Serif', serif;
+
+  }
+
+  h3 {
+    font-size: 2.8em;
+    color: black;
+    font-family: 'Bree Serif', serif;
+
+  }
+
+  #featuresDiv p {
+    font-size: 16px;
+    font-weight: 300;
+    color: black;
+    margin-left: 20px;
+    text-align: justify;
+  }
+
+  hr {
+    border-top: 1px solid #d8d8d8;
+  }
+
+  img {
+    height: 70px;
+    width: 70px;
+    margin-top: 20px;
+  }
+
+  section {
+    margin-top: 10px;
+  }
+
+  .row {
+    margin-top: 10px;
+  }
+
+
+</style>

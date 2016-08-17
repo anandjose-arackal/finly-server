@@ -44,19 +44,16 @@
         </li>
     <% end %>
 <% else %>
-    <div style="position: absolute;
-        right: 9%;">
       <li class="<%= 'active' if current_page?(root_path) %>">
-        <a href="<%= root_path %>" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; padding: 24px 14px; color: #46568b">Home</a>
+        <a href="<%= root_path %>" style="">Home</a>
       </li>
-      <li class="<%= 'active' if current_page?(root_path) %>">
-        <a onclick="scrollToFeatures()" style="float: right;text-decoration: none; font-size: 15px; font-weight: 300; cursor: pointer; padding: 24px 14px; color: #46568b">Features</a>
+      <li class="">
+        <a onclick="scrollToFeatures()" style="">Features</a>
       </li>
       <li class="<%= 'active' if current_page?(about_path) %>">
-        <a href="<%= about_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">About</a>
+        <a href="<%= about_path %>" style="">About</a>
       </li>
       <li class="<%= 'active' if current_page?(new_user_session_path) %>">
-        <a href="<%= new_user_session_path %>" style="float: right;text-decoration: none; font-size: 15px;font-weight: 300; padding: 24px 14px; color: #46568b">Log
-          In</a></li>
-    </div>
+        <a href="<%= new_user_session_path %>" style="">Log In</a>
+      </li>
 <% end %>

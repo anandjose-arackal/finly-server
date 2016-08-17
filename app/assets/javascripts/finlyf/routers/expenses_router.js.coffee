@@ -1,21 +1,21 @@
-class FinlyF.Routers.Expenses extends Backbone.Router
+# class FinlyF.Routers.Expenses extends Backbone.Router
 
-  routes:
-    '': 'index'
-    'expenses': 'expenses'
+#   routes:
+#     '': 'index'
+#     'expenses': 'expenses'
 
-  initialize: ->
-    #create navbar
+#   initialize: ->
+#     #create navbar
 
-    #create sidebar_container
+#     #create sidebar_container
 
-    #create toolbar_container
+#     #create toolbar_container
     
-    #create main_area_container
+#     #create main_area_container
 
-  index: ->
-    console.log "Index Route"
-    #Index all reports
+#   index: ->
+#     console.log "Index Route"
+#     #Index all reports
 
-  expenses: ->
-    console.log "Expenses Route"
+#   expenses: ->
+#     console.log "Expenses Route"

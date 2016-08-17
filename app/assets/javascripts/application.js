@@ -20,6 +20,7 @@
 //= require bootbox
 //= require nprogress
 //= require nprogress-turbolinks
+//= require handlebars.runtime
 //= require_tree .
 
 NProgress.configure({

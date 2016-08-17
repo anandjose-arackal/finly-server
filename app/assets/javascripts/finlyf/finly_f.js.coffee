@@ -4,8 +4,8 @@ window.FinlyF =
   Views: {}
   Routers: {}
   initialize: ->
-    console.log "Starting FinlyF"
-    main_router = new FinlyF.Routers.Expenses()
+    console.log "Step 0. Starting FinlyF."
+    main_router = new FinlyF.Routers.Main()
     Backbone.history.start()
 
 
