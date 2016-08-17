@@ -39,7 +39,7 @@ class Card::Assign::AssignCard < Card::Base
     end
     if params[:unassign]
       # checking that card exists and belongs to the specified employee
-      unless card and card.user.id == employee.id
+      unless card and card.user_id == employee.id
         errors << "Card not found. Pliss try again."
       end
     else
@@ -64,13 +64,13 @@ class Card::Assign::AssignCard < Card::Base
 
   def process
     if params[:unassign]
-      if card.update_attributes(user_id: nil)
+      if card.update_attributes(user_id: nil, active: nil)
         self.response = success
       else
         errors << "Couldn't unassign card. Please try again."
       end
     else
-      if unassigned_card.update_attributes(user_id: employee.id)
+      if unassigned_card.update_attributes(user_id: employee.id, active: true)
         self.response = unassigned_card
       else
         errors << "Couldn't assign card. Please try again."
@@ -80,6 +80,14 @@ class Card::Assign::AssignCard < Card::Base
 
   def post_process
     # mail to user informing them of their new card allocation
+  end
+
+  def retrieve
+    if is_success?
+      return unassigned_card # though the card is now assigned, heh
+    else
+      return false
+    end
   end
 
 end

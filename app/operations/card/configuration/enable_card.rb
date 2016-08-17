@@ -60,7 +60,7 @@ class Card::Configuration::EnableCard < Card::Base
     end
   end
 
-  def operate
+  def process
     if card.update_attributes(active: true, disabled_by_role_id: nil)
       success
     else
