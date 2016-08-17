@@ -55,6 +55,7 @@ class Card::Load::Request::Reject < Card::Load::Request::Base
                                            controlling_for_user_id: nil, note: self.params[:note]
       card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.reject_id,
                                       status_id: status, user_request_role_id: self.user_role
+      self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.reject_id
     else
       errors << card_load_request.errors.full_messages
     end

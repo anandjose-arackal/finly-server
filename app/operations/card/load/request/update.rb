@@ -32,8 +32,18 @@ class Card::Load::Request::Update < Card::Load::Request::Base
   end
 
   def process
-    unless card_load_request.update_attributes(request_params[:card_load_request])
+    if card_load_request.update_attributes(request_params[:card_load_request])
+      changes = generate_changes
+      self.card_load_request.comments.create changes if changes.present?
+    else
       errors << request.errors.full_messages
+    end
+  end
+
+  private
+  def generate_changes
+    if card_load_request.previous_changes
+
     end
   end
 

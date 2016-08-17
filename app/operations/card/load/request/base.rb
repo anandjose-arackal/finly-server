@@ -3,6 +3,7 @@ class Card::Load::Request::Base < Card::Base
 
   def retrieve
     CashLoadRequestPresenter.new(card_load_request)
+    # Card::Load::Request::Show.(user, card_load_request: card_load_request)
   end
 
   class CashLoadRequestPresenter < BaseOperation::BasePresenter

@@ -40,9 +40,9 @@ class BaseOperation
   def authorized_user_types
     # [:employee, :manager, :finance_manager, :admin]
     nil
-  end
+end
 
-  # Add all validations come here for checking if the required data is present in params
+  # Add all validations here for checking if the required data is present in params
   def pre_validate
 
   end

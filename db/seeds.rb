@@ -67,24 +67,35 @@ if ReportTrackingAction.count == 0
 end
 
 if ReportCommentAction.count == 0
-  ReportCommentAction.create(id: 1, name: 'report_comment')
-  ReportCommentAction.create(id: 2, name: 'report_retract')
-  ReportCommentAction.create(id: 3, name: 'report_submit')
-  ReportCommentAction.create(id: 4, name: 'report_approve')
-  ReportCommentAction.create(id: 5, name: 'report_auto_approve')
-  ReportCommentAction.create(id: 6, name: 'report_reject')
-  ReportCommentAction.create(id: 7, name: 'report_unapprove')
-  ReportCommentAction.create(id: 8, name: 'report_take_control')
-  ReportCommentAction.create(id: 9, name: 'report_update')
-  ReportCommentAction.create(id: 10, name: 'report_reimbursed')
-  ReportCommentAction.create(id: 11, name: 'report_reimbursement_confirmed')
-  ReportCommentAction.create(id: 12, name: 'report_closed')
-  ReportCommentAction.create(id: 13, name: 'report_attach_receipt')
-  ReportCommentAction.create(id: 14, name: 'report_detach_receipt')
-  ReportCommentAction.create(id: 15, name: 'expense_add')
-  ReportCommentAction.create(id: 16, name: 'expense_remove')
-  ReportCommentAction.create(id: 17, name: 'expense_reject')
-  ReportCommentAction.create(id: 18, name: 'expense_update')
+  ReportCommentAction.create id: 1, name: 'report_comment'
+  ReportCommentAction.create id: 2, name: 'report_retract'
+  ReportCommentAction.create id: 3, name: 'report_submit'
+  ReportCommentAction.create id: 4, name: 'report_approve'
+  ReportCommentAction.create id: 5, name: 'report_auto_approve'
+  ReportCommentAction.create id: 6, name: 'report_reject'
+  ReportCommentAction.create id: 7, name: 'report_unapprove'
+  ReportCommentAction.create id: 8, name: 'report_take_control'
+  ReportCommentAction.create id: 9, name: 'report_update'
+  ReportCommentAction.create id: 10, name: 'report_reimbursed'
+  ReportCommentAction.create id: 11, name: 'report_reimbursement_confirmed'
+  ReportCommentAction.create id: 12, name: 'report_closed'
+  ReportCommentAction.create id: 13, name: 'report_attach_receipt'
+  ReportCommentAction.create id: 14, name: 'report_detach_receipt'
+  ReportCommentAction.create id: 15, name: 'expense_add'
+  ReportCommentAction.create id: 16, name: 'expense_remove'
+  ReportCommentAction.create id: 17, name: 'expense_reject'
+  ReportCommentAction.create id: 18, name: 'expense_update'
+end
+
+if CardLoadRequestCommentAction.count == 0
+  CardLoadRequestCommentAction.create id: 1, name: 'Create'
+  CardLoadRequestCommentAction.create id: 2, name: 'Retract'
+  CardLoadRequestCommentAction.create id: 3, name: 'Submit'
+  CardLoadRequestCommentAction.create id: 4, name: 'Approve'
+  CardLoadRequestCommentAction.create id: 5, name: 'Reject'
+  CardLoadRequestCommentAction.create id: 6, name: 'Unapprove'
+  CardLoadRequestCommentAction.create id: 7, name: 'Take Control'
+  CardLoadRequestCommentAction.create id: 8, name: 'Comment'
 end
 
 if CardLoadTrackingAction.count == 0
@@ -95,7 +106,6 @@ if CardLoadTrackingAction.count == 0
   CardLoadTrackingAction.create(id: 5,name: 'Reject')
   CardLoadTrackingAction.create(id: 6,name: 'Unapprove')
   CardLoadTrackingAction.create(id: 7,name: 'Take Control')
-  CardLoadTrackingAction.create(id: 8,name: 'Approved')
 end
 
 if CardLoadRequestStatus.count == 0

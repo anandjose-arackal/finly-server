@@ -28,6 +28,7 @@ class CardLoadRequest < ActiveRecord::Base
   belongs_to :controlling_for_user, class_name: 'User'
 
   has_many :tracks, class_name: 'CardLoadRequestTrack', foreign_key: :card_load_request_id
+  has_many :comments, class_name: 'CardLoadRequestComment', foreign_key: :card_load_request_id
 
   scope :with_id, ->(id) { where id: id }
 

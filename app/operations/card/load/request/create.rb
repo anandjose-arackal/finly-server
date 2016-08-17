@@ -45,6 +45,7 @@ class Card::Load::Request::Create < Card::Load::Request::Base
     if self.card_load_request.save
       self.card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.create_id,
                                            status_id: CardLoadRequestStatus.processing_id, user_request_role_id: UserRole.employee_id
+      self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.create_id
     else
       errors << self.card_load_request.errors.full_messages
     end

@@ -43,6 +43,7 @@ class Card::Load::Request::TakeControl < Card::Load::Request::Base
     if card_load_request.update_attributes controlling_for_user_id: controlling_user_id, controlling_user_id: user.id, note: params[:note]
       card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.take_control_id,
                                       status_id: card_load_request.status_id, user_request_role_id: self.user_role
+      self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.take_control_id
     else
       errors << card_load_request.errors.full_messages
     end
