@@ -1,4 +1,4 @@
-class Transaction < ActiveRecord::Base
+class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 

@@ -6,6 +6,8 @@ class Expense::Base < BaseOperation
     [:employee]
   end
 
+
+  # will be called when the user is creating a manual expense
   def manual_expense_params
     ###### todo temporary - will be removed after currency is added in main screen###
     params[:expense][:currency_id] = Currency.first.id
@@ -23,10 +25,6 @@ class Expense::Base < BaseOperation
 
     params.require(:expense).permit(:expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date,
                                     amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
-  end
-
-  def card_expense_params
-
   end
 
 end
