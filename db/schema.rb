@@ -86,6 +86,32 @@ ActiveRecord::Schema.define(version: 20160816141203) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "card_load_request_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "card_load_request_comments", force: :cascade do |t|
+    t.integer  "card_load_request_id", limit: 4,     null: false
+    t.integer  "comment_action_id",    limit: 4,     null: false
+    t.integer  "user_id",              limit: 4
+    t.integer  "expense_id",           limit: 4
+    t.string   "updated_field",        limit: 255
+    t.text     "updated_from",         limit: 65535
+    t.text     "updated_to",           limit: 65535
+    t.integer  "rejected_to_id",       limit: 4
+    t.text     "content",              limit: 65535
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "card_load_request_comments", ["card_load_request_id"], name: "index_card_load_request_comments_on_card_load_request_id", using: :btree
+  add_index "card_load_request_comments", ["comment_action_id"], name: "index_card_load_request_comments_on_comment_action_id", using: :btree
+  add_index "card_load_request_comments", ["expense_id"], name: "index_card_load_request_comments_on_expense_id", using: :btree
+  add_index "card_load_request_comments", ["rejected_to_id"], name: "index_card_load_request_comments_on_rejected_to_id", using: :btree
+  add_index "card_load_request_comments", ["user_id"], name: "index_card_load_request_comments_on_user_id", using: :btree
+
   create_table "card_load_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -698,6 +724,9 @@ ActiveRecord::Schema.define(version: 20160816141203) do
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
+  add_foreign_key "card_load_request_comments", "card_load_requests"
+  add_foreign_key "card_load_request_comments", "expenses"
+  add_foreign_key "card_load_request_comments", "users"
   add_foreign_key "card_load_request_tracks", "card_load_requests"
   add_foreign_key "card_load_request_tracks", "card_load_tracking_actions"
   add_foreign_key "card_load_requests", "amounts"

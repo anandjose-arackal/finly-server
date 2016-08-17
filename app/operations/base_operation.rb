@@ -5,7 +5,7 @@ class BaseOperation
   def initialize(user, params={})
     self.errors = []
     self.user = user
-    self.params = (params or {})
+    self.params = (ActionController::Parameters.new(params) or {})
   end
 
   # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
