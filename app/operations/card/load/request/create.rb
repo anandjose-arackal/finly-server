@@ -31,7 +31,7 @@ class Card::Load::Request::Create < Card::Load::Request::Base
   end
 
   def process
-    params = request_params[:card_load_request]
+    params = request_params
     params[:card_id] = self.params[:id]
     params[:note] = self.params[:note]
     params[:status_id] = CardLoadRequestStatus.processing_id
@@ -42,6 +42,7 @@ class Card::Load::Request::Create < Card::Load::Request::Base
       errors << 'Error creating request'
       return
     end
+    after_create self.card_load_request, &method(:after_save_callback)
     if self.card_load_request.save
       self.card_load_request.tracks.create action_user: user, card_load_tracking_action_id: CardLoadTrackingAction.create_id,
                                            status_id: CardLoadRequestStatus.processing_id, user_request_role_id: UserRole.employee_id
@@ -49,6 +50,10 @@ class Card::Load::Request::Create < Card::Load::Request::Base
     else
       errors << self.card_load_request.errors.full_messages
     end
+  end
+
+  def after_save_callback(model)
+    debugger
   end
 
 end

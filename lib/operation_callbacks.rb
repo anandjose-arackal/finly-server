@@ -1,5 +1,5 @@
 module OperationCallbacks
-  attr_accessor :callbacks_handler
+  attr_accessor :callbacks_handler, :callback_classes
 
   def self.included(base)
     # base.send :include, InstanceMethods
@@ -21,10 +21,15 @@ module OperationCallbacks
     end
   end
 
-  def add_callbacks(obj, callback_for)
-    if callbacks_handler.blank?
-      self.callbacks_handler = {}
+  def add_callbacks(obj, callback_for=nil)
+    if obj.is_a?(BaseOperation::CallbackHandler)
+      self.callback_classes = [] if callback_classes.blank?
+      self.callback_classes << obj
+      return
     end
+
+    return if callback_for.blank?
+    self.callbacks_handler = {} if callbacks_handler.blank?
     if callbacks_handler[callback_for].blank?
       self.callbacks_handler[callback_for] = [obj]
     else
@@ -36,6 +41,11 @@ module OperationCallbacks
     if callbacks_handler.present? and callbacks_handler[handle].present?
       callbacks_handler[handle].each do |callback_handler|
         callback_handler.send("#{handle}_callback", self)
+      end
+    end
+    if callback_classes.present?
+      callback_classes.each do |callback_class|
+        callback_class.send(handle, self)
       end
     end
   end
