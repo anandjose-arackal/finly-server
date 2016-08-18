@@ -76,6 +76,8 @@ gem 'devise_invitable'
 
 gem 'has_scope'
 
+gem 'hooks'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'

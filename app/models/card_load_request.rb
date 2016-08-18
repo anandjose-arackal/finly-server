@@ -18,6 +18,7 @@
 #
 
 class CardLoadRequest < ActiveRecord::Base
+  include OperationCallbacks
 
   belongs_to :status, class_name: 'CardLoadRequestStatus'
   belongs_to :user

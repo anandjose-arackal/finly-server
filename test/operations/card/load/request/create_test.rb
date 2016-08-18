@@ -8,7 +8,7 @@ class CreateTest < ActiveSupport::TestCase
   end
 
   test 'successful case' do
-    request = Card::Load::Request::Create.new @user, {id: @c.id, card_load_request: {amount_attributes: {value: 50, currency: Currency.first}}}
+    request = Card::Load::Request::Create.call @user, {id: @c.id, card_load_request: {amount_attributes: {value: 50, currency: Currency.first}}}
     assert_difference 'CardLoadRequest.count', 1 do
       assert request.run.present?
     end

@@ -1,4 +1,7 @@
+require 'hooks'
+
 class BaseOperation
+  include CallbackHandler
   attr_accessor :user, :params, :errors, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
@@ -24,9 +27,11 @@ class BaseOperation
     return if has_errors?
     init
     return if has_errors?
+    validate
+    return if has_errors?
     authorize
     return if has_errors?
-    validate
+    subscribe
     return if has_errors?
     process
     return if has_errors?
@@ -40,7 +45,7 @@ class BaseOperation
   def authorized_user_types
     # [:employee, :manager, :finance_manager, :admin]
     nil
-end
+  end
 
   # Add all validations here for checking if the required data is present in params
   def pre_validate
@@ -66,6 +71,11 @@ end
   end
 
   def pre_process
+
+  end
+
+  # For handling callbacks: Explanation with example in callback_handler.rb
+  def subscribe
 
   end
 
