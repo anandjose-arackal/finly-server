@@ -42,4 +42,8 @@ class CardLoadRequestCommentAction < ActiveRecord::Base
     8
   end
 
+  def self.update_id
+    9
+  end
+
 end

@@ -1,7 +1,6 @@
 require 'hooks'
 
 module CallbackHandler
-  include Hooks
   attr_accessor :callback_handlers, :callback_classes
 
   OPERATION_HOOKS = [:before_validation, :after_validation, :before_save, :before_create, :before_update,
@@ -10,7 +9,6 @@ module CallbackHandler
   def self.included(base)
     base.class_eval do
       include Hooks
-      attr_accessor :callback_handlers
 
       OPERATION_HOOKS.each do |op_hook|
         define_hook op_hook

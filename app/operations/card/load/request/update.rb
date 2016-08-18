@@ -1,4 +1,5 @@
 class Card::Load::Request::Update < Card::Load::Request::Base
+  attr_accessor :changes
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -32,21 +33,37 @@ class Card::Load::Request::Update < Card::Load::Request::Base
   end
 
   def subscribe
-    after_save self.card_load_request, &method(:generate_comments)
+    before_save self.card_load_request, &method(:generate_comments)
   end
 
   def process
     unless card_load_request.update_attributes(request_params)
-      errors << request.errors.full_messages
+      errors << card_load_request.errors.full_messages
     end
+  end
+
+  def post_process
+    save_comments
   end
 
   protected
   def generate_comments(model)
-    return unless self.card_load_request.changed?
-    changes = self.card_load_request.changes
-    changes.each do ||
+    # return unless self.card_load_request.changed?
+    self.changes = model.changes.merge(model.amount.changes)
+  end
 
+  def save_comments
+    return unless changes.present?
+    changes.each do |key, value|
+      next unless value.present? and key.present?
+      case key
+        when :note
+          self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
+                                                 updated_field: 'note', updated_from:  value[0], updated_to: value[1]
+        when :value
+          self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
+                                                 updated_field: 'amount', updated_from:  value[0], updated_to: value[1]
+      end
     end
   end
 
