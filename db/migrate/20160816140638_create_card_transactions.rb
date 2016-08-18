@@ -1,6 +1,6 @@
-class CreateTransactions < ActiveRecord::Migration
+class CreateCardTransactions < ActiveRecord::Migration
   def change
-    create_table :transactions do |t|
+    create_table :card_transactions do |t|
       t.references :user, index: true, foreign_key: true
       t.references :card, index: true, foreign_key: true
       t.string :channel

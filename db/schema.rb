@@ -70,21 +70,47 @@ ActiveRecord::Schema.define(version: 20160816141203) do
   add_index "card_configurations", ["prepaid_card_id"], name: "index_card_configurations_on_prepaid_card_id", using: :btree
 
   create_table "card_expenses", force: :cascade do |t|
-    t.text     "editable_merchant", limit: 65535
-    t.integer  "transaction_id",    limit: 4
-    t.integer  "expense_id",        limit: 4
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.text     "editable_merchant",   limit: 65535
+    t.integer  "card_transaction_id", limit: 4
+    t.integer  "expense_id",          limit: 4
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
+  add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
   add_index "card_expenses", ["expense_id"], name: "index_card_expenses_on_expense_id", using: :btree
-  add_index "card_expenses", ["transaction_id"], name: "index_card_expenses_on_transaction_id", using: :btree
 
   create_table "card_load_request_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "card_load_request_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "card_load_request_comments", force: :cascade do |t|
+    t.integer  "card_load_request_id", limit: 4,     null: false
+    t.integer  "comment_action_id",    limit: 4,     null: false
+    t.integer  "user_id",              limit: 4
+    t.integer  "expense_id",           limit: 4
+    t.string   "updated_field",        limit: 255
+    t.text     "updated_from",         limit: 65535
+    t.text     "updated_to",           limit: 65535
+    t.integer  "rejected_to_id",       limit: 4
+    t.text     "content",              limit: 65535
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "card_load_request_comments", ["card_load_request_id"], name: "index_card_load_request_comments_on_card_load_request_id", using: :btree
+  add_index "card_load_request_comments", ["comment_action_id"], name: "index_card_load_request_comments_on_comment_action_id", using: :btree
+  add_index "card_load_request_comments", ["expense_id"], name: "index_card_load_request_comments_on_expense_id", using: :btree
+  add_index "card_load_request_comments", ["rejected_to_id"], name: "index_card_load_request_comments_on_rejected_to_id", using: :btree
+  add_index "card_load_request_comments", ["user_id"], name: "index_card_load_request_comments_on_user_id", using: :btree
 
   create_table "card_load_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -150,6 +176,33 @@ ActiveRecord::Schema.define(version: 20160816141203) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "card_transactions", force: :cascade do |t|
+    t.integer  "user_id",                   limit: 4
+    t.integer  "card_id",                   limit: 4
+    t.string   "channel",                   limit: 255
+    t.string   "merchant_category_code",    limit: 255
+    t.integer  "merchant_id",               limit: 4
+    t.string   "merchant_name",             limit: 255
+    t.string   "network",                   limit: 255
+    t.integer  "terminal_id",               limit: 4
+    t.string   "trace_number",              limit: 255
+    t.string   "transaction_currency_code", limit: 255
+    t.string   "transaction_type",          limit: 255
+    t.string   "card_currency_code",        limit: 255
+    t.text     "post_data",                 limit: 65535
+    t.string   "bank_network",              limit: 255
+    t.integer  "transaction_amount_id",     limit: 4
+    t.integer  "card_amount_id",            limit: 4
+    t.datetime "date"
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
+
+  add_index "card_transactions", ["card_amount_id"], name: "index_card_transactions_on_card_amount_id", using: :btree
+  add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
+  add_index "card_transactions", ["transaction_amount_id"], name: "index_card_transactions_on_transaction_amount_id", using: :btree
+  add_index "card_transactions", ["user_id"], name: "index_card_transactions_on_user_id", using: :btree
 
   create_table "card_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -532,33 +585,6 @@ ActiveRecord::Schema.define(version: 20160816141203) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "transactions", force: :cascade do |t|
-    t.integer  "user_id",                   limit: 4
-    t.integer  "card_id",                   limit: 4
-    t.string   "channel",                   limit: 255
-    t.string   "merchant_category_code",    limit: 255
-    t.integer  "merchant_id",               limit: 4
-    t.string   "merchant_name",             limit: 255
-    t.string   "network",                   limit: 255
-    t.integer  "terminal_id",               limit: 4
-    t.string   "trace_number",              limit: 255
-    t.string   "transaction_currency_code", limit: 255
-    t.string   "transaction_type",          limit: 255
-    t.string   "card_currency_code",        limit: 255
-    t.text     "post_data",                 limit: 65535
-    t.string   "bank_network",              limit: 255
-    t.integer  "transaction_amount_id",     limit: 4
-    t.integer  "card_amount_id",            limit: 4
-    t.datetime "date"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-  end
-
-  add_index "transactions", ["card_amount_id"], name: "index_transactions_on_card_amount_id", using: :btree
-  add_index "transactions", ["card_id"], name: "index_transactions_on_card_id", using: :btree
-  add_index "transactions", ["transaction_amount_id"], name: "index_transactions_on_transaction_amount_id", using: :btree
-  add_index "transactions", ["user_id"], name: "index_transactions_on_user_id", using: :btree
-
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "manager_id",             limit: 4
@@ -696,14 +722,19 @@ ActiveRecord::Schema.define(version: 20160816141203) do
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
   add_foreign_key "card_configurations", "card_statuses"
+  add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
-  add_foreign_key "card_expenses", "transactions"
+  add_foreign_key "card_load_request_comments", "card_load_requests"
+  add_foreign_key "card_load_request_comments", "expenses"
+  add_foreign_key "card_load_request_comments", "users"
   add_foreign_key "card_load_request_tracks", "card_load_requests"
   add_foreign_key "card_load_request_tracks", "card_load_tracking_actions"
   add_foreign_key "card_load_requests", "amounts"
   add_foreign_key "card_load_requests", "cards"
   add_foreign_key "card_load_requests", "policies"
   add_foreign_key "card_load_requests", "users"
+  add_foreign_key "card_transactions", "cards"
+  add_foreign_key "card_transactions", "users"
   add_foreign_key "cards", "card_types"
   add_foreign_key "cards", "companies"
   add_foreign_key "cards", "users"
@@ -744,8 +775,6 @@ ActiveRecord::Schema.define(version: 20160816141203) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
-  add_foreign_key "transactions", "cards"
-  add_foreign_key "transactions", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"

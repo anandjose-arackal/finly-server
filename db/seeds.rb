@@ -362,3 +362,8 @@ if Card.count == 0
                           card_type_id: 3, company_id: user.company.id, active: true)
   end
 end
+
+# creating some junk transactions for testing
+if CardTransaction.count == 0
+
+end

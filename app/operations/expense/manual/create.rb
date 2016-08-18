@@ -9,13 +9,14 @@ class Expense::Manual::Create < Expense::Base
     if params.blank? or user.blank?
       errors << "Parameters or user not present."
     end
-    if params[:amount] < 0
+    if params[:expense][:amount] < 0
       errors << "Amount can't be negative."
     end
   end
 
   def init
     self.expense_params = manual_expense_params
+    expense_params.delete(:receipt)
   end
 
   def validate
@@ -36,6 +37,14 @@ class Expense::Manual::Create < Expense::Base
     if self.expense.report_id.present?
       # this will be changed to the respective operation when it's done
       ReportService.new(user: user, report: expense.report).expense_created_in_report(expense) if expense.report_id.present? and user.present?
+    end
+  end
+
+  def retrieve
+    if is_success?
+      return expense
+    else
+      return false
     end
   end
 end
