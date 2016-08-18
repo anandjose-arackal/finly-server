@@ -1,4 +1,7 @@
+require 'hooks'
+
 class BaseOperation
+  include CallbackHandler
   attr_accessor :user, :params, :errors, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
@@ -27,6 +30,8 @@ class BaseOperation
     authorize
     return if has_errors?
     validate
+    return if has_errors?
+    subscribe
     return if has_errors?
     process
     return if has_errors?
@@ -66,6 +71,11 @@ end
   end
 
   def pre_process
+
+  end
+
+  # For handling callbacks
+  def subscribe
 
   end
 

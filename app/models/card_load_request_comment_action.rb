@@ -10,35 +10,35 @@
 
 class CardLoadRequestCommentAction < ActiveRecord::Base
 
-  def create_id
+  def self.create_id
     1
   end
 
-  def retract_id
+  def self.retract_id
     2
   end
 
-  def submit_id
+  def self.submit_id
     3
   end
 
-  def approve_id
+  def self.approve_id
     4
   end
 
-  def reject_id
+  def self.reject_id
     5
   end
 
-  def unapprove_id
+  def self.unapprove_id
     6
   end
 
-  def take_control_id
+  def self.take_control_id
     7
   end
 
-  def comment_id
+  def self.comment_id
     8
   end
 

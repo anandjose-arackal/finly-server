@@ -31,16 +31,25 @@ class Card::Load::Request::Update < Card::Load::Request::Base
     end
   end
 
+  def subscribe
+    after_save self.card_load_request, &method(:after_save_callback)
+  end
+
   def process
     if card_load_request.update_attributes(request_params[:card_load_request])
-      changes = generate_changes
-      self.card_load_request.comments.create changes if changes.present?
+
     else
       errors << request.errors.full_messages
     end
   end
 
   private
+  def after_save_callback(model)
+    debugger
+    changes = generate_changes
+    self.card_load_request.comments.create changes if changes.present?
+  end
+
   def generate_changes
     if card_load_request.previous_changes
 
