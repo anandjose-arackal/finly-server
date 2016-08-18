@@ -1,4 +1,6 @@
 require 'test_helper'
+require_relative '../../../../app/operations/expense/card/update'
+require_relative '../../../../app/operations/expense/card/create'
 
 class UpdateTest < ActiveSupport::TestCase
 
@@ -8,7 +10,7 @@ class UpdateTest < ActiveSupport::TestCase
     @transaction = @user.card_transactions.first
     @card = @transaction.card
     # creating a card expense first
-    @expense = Expense::PrepaidCard::CreateCardExpense.new(@transaction, @card).run
+    @expense = Expense::Card::Create.new(@transaction, @card).run
     @update_expense_params = {expense: {merchant: "Olacabs",
                                        receipt: @image},
                              expense_id: @expense.id
@@ -26,7 +28,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert_equal "Randomness.", @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
     amount = @expense.amount_value
-    card_expense_op = Expense::PrepaidCard::UpdateCardExpense.new(@user, @update_expense_params)
+    card_expense_op = Expense::Card::Update.new(@user, @update_expense_params)
     @expense = card_expense_op.run
 
     # ensuring none of the original parameters have changed
@@ -41,7 +43,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert_equal "Randomness.", @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
 
-    card_expense_op = Expense::PrepaidCard::UpdateCardExpense.new(@user, @invalid_update_params)
+    card_expense_op = Expense::Card::Update.new(@user, @invalid_update_params)
     @expense = card_expense_op.run
     assert @expense
     assert_equal "Randomness.", @expense.card_expense.editable_merchant

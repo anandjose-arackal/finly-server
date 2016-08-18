@@ -59,6 +59,10 @@ class Expense::Base < BaseOperation
                                     amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
   end
 
+  def receipt_params
+    params.require(:receipt).permit(:image)
+  end
+
 
   def create_new_currency(currency_code)
     new_curr = Currency.create!(country_code: currency_code)
