@@ -41,9 +41,13 @@ class Card::Load::Request::Update < Card::Load::Request::Base
     end
   end
 
-  private
+  protected
   def generate_comments(model)
+    return unless self.card_load_request.changed?
+    changes = self.card_load_request.changes
+    changes.each do ||
 
+    end
   end
 
 end

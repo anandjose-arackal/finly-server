@@ -19,7 +19,7 @@ module CallbackHandler
       OPERATION_HOOKS.each do |method_name|
         define_method "#{method_name}_callback" do |model|
           if callback_handlers.present? and callback_handlers[model].present? and callback_handlers[model][method_name].present?
-            callback_handlers[model][method_name].call
+            callback_handlers[model][method_name].call(model)
           end
           if callback_classes.present? and callback_classes[model].present?
             callback_classes[model].send(method_name, model)
@@ -104,6 +104,7 @@ module CallbackHandler
   # class SaveCallback < CallbackHandler
   #
   #   def after_save(model)
+  #     ...
   #   end
   #
   # end
