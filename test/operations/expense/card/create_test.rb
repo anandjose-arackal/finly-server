@@ -1,2 +1,29 @@
-class CreateTest
+require 'test_helper'
+
+class CreateTest < ActiveSupport::TestCase
+
+  def setup
+    @user = User.first
+  end
+
+  test 'creating a card expense from transaction details' do
+    @transaction = @user.card_transactions.first
+    @card = @transaction.card
+    card_ex_op = Expense::PrepaidCard::CreateCardExpense.new(@transaction, @card)
+    assert_difference '@user.expenses.count', 1 do
+      @expense = card_ex_op.run
+    end
+    assert @expense
+    assert_equal @transaction.transaction_amount_value, @expense.amount_value
+    assert_equal @transaction.merchant_name, @expense.card_expense.editable_merchant
+
+    # should throw exception without the card object
+    card_ex_op = Expense::PrepaidCard::CreateCardExpense.new(@transaction, nil)
+    assert_no_difference '@user.expenses.count' do
+      @expense = card_ex_op.run rescue nil
+    end
+    assert_not @expense
+  end
+
+
 end

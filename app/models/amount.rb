@@ -31,6 +31,8 @@ class Amount < ActiveRecord::Base
     self.value
   end
 
+  alias_method :transaction_amount_value, :amount_value
+
   def greater_than_amount_value
     self.value
   end

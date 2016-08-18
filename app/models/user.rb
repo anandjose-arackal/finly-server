@@ -76,6 +76,7 @@ class User < ActiveRecord::Base
   has_many :cards
   has_many :card_load_requests
   has_many :controlling_card_load_requests, class_name: 'CardLoadRequest', foreign_key: :controlling_user_id
+  has_many :card_transactions
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping

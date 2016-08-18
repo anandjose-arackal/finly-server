@@ -365,5 +365,12 @@ end
 
 # creating some junk transactions for testing
 if CardTransaction.count == 0
-
+  User.all.each do |user|
+    card = user.cards.first
+    c = CardTransaction.create(card_id: card.id, user_id: user.id,
+                               transaction_amount_attributes: {value: 100, currency_id: 1},
+                               date: Date.today,
+                               merchant_name: "Randomness.",
+                               transaction_currency_code: "INR")
+  end
 end
