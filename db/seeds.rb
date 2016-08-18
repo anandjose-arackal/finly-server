@@ -96,6 +96,7 @@ if CardLoadRequestCommentAction.count == 0
   CardLoadRequestCommentAction.create id: 6, name: 'Unapprove'
   CardLoadRequestCommentAction.create id: 7, name: 'Take Control'
   CardLoadRequestCommentAction.create id: 8, name: 'Comment'
+  CardLoadRequestCommentAction.create id: 9, name: 'Update'
 end
 
 if CardLoadTrackingAction.count == 0
