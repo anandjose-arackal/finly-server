@@ -5,14 +5,16 @@ class RejectTest < ActiveSupport::TestCase
   def setup
     @user= User.find_by_email('user0@finlytest.io')
     @card = Card.create(ending_number: '1234', proxy: '1234', user: @user)
-    @request = Card::Load::Request::Create.(@user, {id: @card.id, card_load_request: {amount_attributes: {value: 50, currency: Currency.first}}}).card_load_request
+    @request = Card::Load::Request::Create.(@user, {id: @card.id, card_load_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).card_load_request
   end
 
   test 'successful reject' do
     assert @request.processing?
     user = @request.controlling_user
-    assert_difference 'CardLoadRequestTrack.count', 1 do
-      assert Card::Load::Request::Reject.(user, id: @request.id).present?
+    assert_difference 'CardLoadRequestComment.count', 1 do
+      assert_difference 'CardLoadRequestTrack.count', 1 do
+        assert Card::Load::Request::Reject.(user, id: @request.id).present?
+      end
     end
     assert @request.reload.rejected?
     assert_equal @request.controlling_user, @request.user
@@ -25,8 +27,10 @@ class RejectTest < ActiveSupport::TestCase
     user = @request.controlling_user
     assert_equal user.email, 'manager1@finlytest.io'
     to_user = User.find_by_email 'manager0@finlytest.io'
-    assert_difference 'CardLoadRequestTrack.count', 1 do
-      assert Card::Load::Request::Reject.(user, id: @request.id, reject_to: to_user.id).present?
+    assert_difference 'CardLoadRequestComment.count', 1 do
+      assert_difference 'CardLoadRequestTrack.count', 1 do
+        assert Card::Load::Request::Reject.(user, id: @request.id, reject_to: to_user.id).present?
+      end
     end
     assert @request.reload.processing?
     assert_equal @request.controlling_user, to_user
@@ -37,11 +41,13 @@ class RejectTest < ActiveSupport::TestCase
     user = @request.controlling_user
     to_user = User.find_by_email('manager1@finlytest.io')
     rescued = false
-    assert_no_difference 'CardLoadRequestTrack.count' do
-      begin
-        Card::Load::Request::Reject.(user, id: @request.id, reject_to: to_user.id)
-      rescue
-        rescued = true
+    assert_no_difference 'CardLoadRequestComment.count' do
+      assert_no_difference 'CardLoadRequestTrack.count' do
+        begin
+          Card::Load::Request::Reject.(user, id: @request.id, reject_to: to_user.id)
+        rescue
+          rescued = true
+        end
       end
     end
     assert rescued
@@ -55,11 +61,13 @@ class RejectTest < ActiveSupport::TestCase
     rejecting_user = User.find_by_email('manager1@finlytest.io')
     assert_not_equal user, rejecting_user
     rescued = false
-    assert_no_difference 'CardLoadRequestTrack.count' do
-      begin
-        Card::Load::Request::Reject.(rejecting_user, id: @request.id)
-      rescue
-        rescued = true
+    assert_no_difference 'CardLoadRequestComment.count' do
+      assert_no_difference 'CardLoadRequestTrack.count' do
+        begin
+          Card::Load::Request::Reject.(rejecting_user, id: @request.id)
+        rescue
+          rescued = true
+        end
       end
     end
     assert rescued

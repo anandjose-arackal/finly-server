@@ -21,8 +21,7 @@ class Card::Load::Request::Update < Card::Load::Request::Base
   end
 
   def init
-    requests = user.controlling_card_load_requests.with_id(params[:id])
-    self.card_load_request = requests.first if requests.present?
+    self.card_load_request = user.controlling_card_load_requests.with_id(params[:id]).first rescue nil
   end
 
   def authorize
@@ -63,6 +62,7 @@ class Card::Load::Request::Update < Card::Load::Request::Base
         when :value
           self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
                                                  updated_field: 'amount', updated_from:  value[0], updated_to: value[1]
+        else
       end
     end
   end

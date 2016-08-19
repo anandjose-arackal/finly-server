@@ -5,7 +5,7 @@ class RetractTest < ActiveSupport::TestCase
   def setup
     @user= User.find_by_email('user0@finlytest.io')
     @c = Card.create(ending_number: '1234', proxy: '1234', user: @user)
-    @request = Card::Load::Request::Create.(@user, {id: @c.id, card_load_request: {amount_attributes: {value: 50, currency: Currency.first}}}).card_load_request
+    @request = Card::Load::Request::Create.(@user, {id: @c.id, card_load_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).card_load_request
   end
 
   test 'successful retract' do
