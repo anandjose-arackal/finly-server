@@ -3,8 +3,7 @@
 # in the Expenses table
 # will be initialized with the transaction object and card object that will be passed
 
-
-class Expense::Card::Create < Expense::Card::Base
+class Expense::Card::Create < Expense::Base
 
   attr_accessor :expense_params
 
@@ -13,14 +12,13 @@ class Expense::Card::Create < Expense::Card::Base
     self.errors = []
     self.transaction = transaction
     self.card = card
+    self.user = card.user if card
+    self.params = ActionController::Parameters.new(params)
   end
 
   def pre_validate
     if transaction.blank? or card.blank?
       errors << "Card or Transaction not present."
-    end
-    if params[:amount] < 0
-      errors << "Amount can't be negative."
     end
   end
 

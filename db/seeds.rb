@@ -288,7 +288,7 @@ if Report.count == 0
                                                   manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}])
+                                                                         user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -305,7 +305,7 @@ if Report.count == 0
                                                   manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}])
+                                                                         user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -323,7 +323,7 @@ if Report.count == 0
                                                   manual_expense_attributes: {merchant: Faker::Company.name},
                                                   category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                                   receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}])
+                                                                         user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -366,5 +366,12 @@ end
 
 # creating some junk transactions for testing
 if CardTransaction.count == 0
-
+  User.all.each do |user|
+    card = user.cards.first
+    c = CardTransaction.create(card_id: card.id, user_id: user.id,
+                               transaction_amount_attributes: {value: 100, currency_id: 1},
+                               date: Date.today,
+                               merchant_name: "Randomness.",
+                               transaction_currency_code: "INR")
+  end
 end

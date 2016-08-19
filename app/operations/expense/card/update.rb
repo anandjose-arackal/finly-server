@@ -1,7 +1,7 @@
 # updating the expense from user's expenses view.
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
-class Expense::Card::Update < Expense::Card::Base
+class Expense::Card::Update < Expense::Base
 
   attr_accessor :old_expense, :updated_expense_params
 
@@ -19,10 +19,10 @@ class Expense::Card::Update < Expense::Card::Base
     self.expense = self.old_expense = user.expenses.find_by_id(params[:expense_id])
     # setting up the expense params for updation
     self.updated_expense_params = update_card_expense_params
-    if expense.card_expense.present?
+    if expense.card_expense.present? and params[:expense][:merchant]
       self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
     end
-    if expense.receipts.present?
+    if expense.receipts.present? and params[:expense][:receipt]
       self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
     end
   end
@@ -36,7 +36,7 @@ class Expense::Card::Update < Expense::Card::Base
 
 
   def authorize
-    unless expense.id == user.id
+    unless expense.user_id == user.id
       errors << "You do not own this expense."
     end
   end
@@ -52,5 +52,13 @@ class Expense::Card::Update < Expense::Card::Base
 
   def post_process
     # send mailer or notification indicating updation of expense
+  end
+
+  def retrieve
+    if is_success?
+      return expense
+    else
+      return false
+    end
   end
 end
