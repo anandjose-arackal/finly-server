@@ -185,6 +185,8 @@
 #
 
 Rails.application.routes.draw do
+
+  mount_griddler('/email/incoming')
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
       oauth_token: 'oauth/token'

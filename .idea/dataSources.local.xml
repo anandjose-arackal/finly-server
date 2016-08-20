@@ -15,8 +15,8 @@
     </data-source>
     <data-source name="Rails Finly: production" uuid="026a6823-e71d-4004-9d70-b242a445cfa3">
       <first-sync>true</first-sync>
-      <user-name>sreeram</user-name>
-      <user-password>dfd9dfd8dfcfdfcfdfd8dfcbdfc7</user-password>
+      <user-name>root</user-name>
+      <user-password>dfd9dfc7dfcbdfd8dfdedf98df98</user-password>
     </data-source>
   </component>
 </project>

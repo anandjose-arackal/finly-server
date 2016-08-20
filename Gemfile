@@ -76,6 +76,14 @@ gem 'opro', github: 'opro/opro', branch: 'master'
 
 gem 'has_scope'
 
+gem 'sendgrid-ruby'
+gem 'griddler'
+gem 'griddler-sendgrid'
+gem 'rmagick'
+gem 'imgkit'
+gem 'wkhtmltoimage-binary'
+gem 'proselytism', git: 'git://github.com/ramanbedi1989/proselytism.git'
+
 # gem for devise authentication
 gem 'devise'
 gem 'devise_invitable'

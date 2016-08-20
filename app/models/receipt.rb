@@ -19,6 +19,7 @@
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
+  belongs_to :receipt_email
 
   validates :user_id, presence: true
 
@@ -27,7 +28,13 @@ class Receipt < ActiveRecord::Base
   validate :validate_expense_user
 
   has_attached_file :image
-  validates_attachment_content_type :image, content_type: /\Aimage\/.*\Z/
+  validates_attachment :image, content_type: {
+      content_type: [
+          'image/jpg', 'image/jpeg', 'image/png', 'image/gif',
+          'application/pdf', 'application/rtf', 'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ]
+  }
 
   scope :without_parent, -> {where(parent_id: nil)}
 
