@@ -18,15 +18,24 @@ class ExpensesController < ApplicationController
     authorize Expense
   end
 
+  def show
+    # authorize Expense
+    @expense = Expense.find(params[:id])
+    respond_to do |format|
+      # format.html {}
+      # format.json { render json: @expenses.as_json }
+      format.json {}
+    end 
+  end
+
   def create
+    # fail
     authorize Expense
     if @expense_service.add_expense expense_params
-      flash[:success] = 'Expense created!'
-      if params['request_type'] == '1'
-        redirect_to expenses_path
-      else
-        redirect_to request.referrer
+      respond_to do |format|
+        format.json { render json: {"success": true} }
       end
+      
     else
       flash.now[:danger] = @expense_service.errors
       render_flash_message
@@ -34,6 +43,7 @@ class ExpensesController < ApplicationController
   end
 
   def index
+    # sleep 2
     authorize Expense
     role = UserRole.employee_id
     if @admin_view
@@ -47,7 +57,7 @@ class ExpensesController < ApplicationController
     # for the filters
     if @expenses.present?
       @merchants = @expenses.include_manual_expense.pluck(:merchant)
-      @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 30)
+      @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 5)
       @count = @expenses.count
     end
     @categories = current_company.active_categories
@@ -55,7 +65,8 @@ class ExpensesController < ApplicationController
 
     respond_to do |format|
       format.html {}
-      format.json { render json: @expenses.as_json }
+      # format.json { render json: @expenses.as_json }
+      format.json {}
     end
   end
 

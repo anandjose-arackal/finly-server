@@ -28,6 +28,7 @@ class ExpenseService < BaseService
     return if params.blank?
     expense_params = load_expense_params params
     expense = @user.expenses.build(expense_params)
+    # ap expense_params
     if expense.save
       ReportService.new(user: @user, report: expense.report).expense_created_in_report(expense) if expense.report_id.present? and @user.present?
       return expense

@@ -26,3 +26,4 @@
 NProgress.configure({
     showSpinner: false,
 });
+

@@ -127,7 +127,7 @@ if User.count == 0
   end
   u = []
   10.times do |pos|
-    u << User.create(company: Company.first, name: "Finly Employee #{pos}", email: "user#{pos}@finlytest.io",
+    u << User.create(company: Company.first, name: Faker::Name.name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 4},
                                                                                                                               {user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
@@ -175,14 +175,14 @@ end
 
 if Expense.count == 0
   200.times do |i|
-    Expense.create(amount_attributes: {value: random(0, 100), currency_id: 1},
+    Expense.create(amount_attributes: {value: random(100, 1000), currency_id: 1},
                    expense_status_id: 1,
                    expense_type_id: 1,
-                   note: "test note #{i}",
-                   date: Date.today,
+                   note: "#{Faker::Lorem.sentence}",
+                   date: Faker::Date.between(20.days.ago, Date.today),
                    user_id: random_integer(1, 10),
                    category_id: 1,
-                   manual_expense_attributes: {merchant: "Test merchant #{random_integer(1, 10)}"})
+                   manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
 end
 

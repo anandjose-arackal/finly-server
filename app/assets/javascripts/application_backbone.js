@@ -12,14 +12,18 @@
 //
 //= require jquery
 //= require jquery_ujs
+// require jquery-ui
+//= require customized/jquery-ui.min
 //= require bootstrap
-//= require turbolinks
-//= require turboboost
+// require turbolinks
+// require turboboost
 //= require jquery.remotipart
-//= require bootbox
-//= require nprogress
-//= require nprogress-turbolinks
+// require bootbox
+// require nprogress
+// require nprogress-turbolinks
+//= require handlebars.runtime
+//= require finlyf/application_finlyf
 
-NProgress.configure({
-    showSpinner: false,
-});
+// NProgress.configure({
+//   showSpinner: false,
+// });

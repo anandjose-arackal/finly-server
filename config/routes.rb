@@ -186,7 +186,8 @@
 #
 
 Rails.application.routes.draw do
-  get 'home/index'
+
+  # get 'home/index'
 
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
@@ -298,11 +299,16 @@ Rails.application.routes.draw do
 
   end
 
-  root 'static_pages#home'
+  root 'home#index'
+  get 'welcome' => 'home#welcome'
 
-  get 'about', to: 'static_pages#about'
+  get 'about', to: 'home#about'
 
-  get 'features', to: 'static_pages#features'
+
+  #Filters/Autocomplete
+  get 'autocomplete/merchant'
+
+  # get 'features', to: 'static_pages#features'
 
 
   # The priority is based upon order of creation: first created -> highest priority.
