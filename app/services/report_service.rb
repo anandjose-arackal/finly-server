@@ -1,3 +1,5 @@
+require "#{Rails.root}/app/models/report"
+
 class ReportService < BaseService
   attr_accessor :report, :user, :user_team_service, :report_detail_service
 

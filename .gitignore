@@ -14,3 +14,5 @@
 !/log/.keep
 /tmp
 /public/system/receipts
+
+/.idea

@@ -16,7 +16,6 @@
 #  report_id            :integer
 #  category_id          :integer
 #
-
 class Expense < ActiveRecord::Base
   belongs_to :amount
   belongs_to :expense_status

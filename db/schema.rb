@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160816141203) do
+ActiveRecord::Schema.define(version: 20160821105444) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -288,6 +288,28 @@ ActiveRecord::Schema.define(version: 20160816141203) do
     t.string   "country_code", limit: 255
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
+  end
+
+  create_table "event_configurations", force: :cascade do |t|
+    t.integer  "user_id",                 limit: 4, null: false
+    t.integer  "event_id",                limit: 4, null: false
+    t.boolean  "allow_push_notification"
+    t.boolean  "allow_mailer"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "event_configurations", ["event_id"], name: "index_event_configurations_on_event_id", using: :btree
+  add_index "event_configurations", ["user_id"], name: "index_event_configurations_on_user_id", using: :btree
+
+  create_table "events", force: :cascade do |t|
+    t.string   "name",                           limit: 255, null: false
+    t.boolean  "has_push_notification",                      null: false
+    t.boolean  "has_mailer",                                 null: false
+    t.boolean  "configurable_push_notification",             null: false
+    t.boolean  "configurable_mailer",                        null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
   end
 
   create_table "expense_rule_types", force: :cascade do |t|
@@ -742,6 +764,8 @@ ActiveRecord::Schema.define(version: 20160816141203) do
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_tags", "companies"
+  add_foreign_key "event_configurations", "events"
+  add_foreign_key "event_configurations", "users"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
