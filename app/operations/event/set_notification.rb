@@ -1,3 +1,5 @@
+# Used for setting notifications. Automatically handles user configuration as well to
+# ensure push and mailer notifications are sent only if its configured by the user
 class Event::SetNotification < Event::Base
   attr_accessor :event_obj, :has_push_notification, :has_mailer
 
