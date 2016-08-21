@@ -1,23 +1,30 @@
-class Event::Report::Submit < Event::Report::Base
+class Event::Report::Submit < Event::Base
 
-  def event_id
-    Event.report_submit_id
+  def events
+    SetNotifications
   end
 
-  def affected_users
-    [self.report.user, self.report.controlling_user]
-  end
+  class SetNotifications < Event::Report::Base
 
-  def send_push_notification(user, gcm_sender_id)
+    def event_id
+      Event.report_submit_id
+    end
 
-  end
+    def affected_users
+      [self.report.user, self.report.controlling_user]
+    end
 
-  def send_mailer(user)
-    ReportMailer.submit(self.report, user)
-  end
+    def send_push_notification(user, gcm_sender_id)
 
-  def set_notification(user)
+    end
 
+    def send_mailer(user)
+      ReportMailer.submit(self.report, user)
+    end
+
+    def set_notification(user)
+
+    end
   end
 
 end

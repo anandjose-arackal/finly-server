@@ -1,4 +1,4 @@
-class Event::Report::Base < Event::Base
+class Event::Report::Base < Event::SetNotification
   attr_accessor :report
 
   def pre_validate
