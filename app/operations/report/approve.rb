@@ -88,5 +88,5 @@ class Report::Approve < Report::Base
       end
     end
   end
-  
+
 end

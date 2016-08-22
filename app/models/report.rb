@@ -164,6 +164,11 @@ class Report < ActiveRecord::Base
     open? or retracted? or rejected?
   end
 
+  def can_destroy?
+    # same as can_submit
+    can_submit?
+  end
+
   def can_archive?
     reimbursed? or reimbursement_confirmed? or closed?
   end

@@ -3,7 +3,28 @@ class Report::Base < BaseOperation
   attr_accessor :report, :report_id
 
 
-  # added here because in most cases we will be returing the report itself
+  # todo - redefine all init methods to use report retrieval operation
+
+
+  def pre_validate
+    if user.blank? or params.blank?
+      errors << "No user or params passed."
+    end
+  end
+
+
+  def init
+    self.report = Report.find_by(id: params[:report_id])
+  end
+
+
+  def validate
+    unless report
+      errors << "Report not found."
+    end
+  end
+
+  # added here because in most cases we will be returning the report itself
   def retrieve
     if is_success?
       return report
