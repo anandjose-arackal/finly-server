@@ -16,4 +16,8 @@ class Event < ActiveRecord::Base
     1
   end
 
+  def report_approve_id
+    2
+  end
+
 end

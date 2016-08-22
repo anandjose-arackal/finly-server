@@ -1,8 +1,9 @@
 class ReportMailer < ApplicationMailer
 
-  def submit(report, user)
-    return if user.blank? or report.blank?
-
+  def send_mail(presenter)
+    return unless presenter.validate
+    @data = presenter
+    mail to: presenter.to, subject: presenter.subject, template_name: 'template'
   end
 
 end

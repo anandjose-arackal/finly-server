@@ -93,4 +93,20 @@ class Event::SetNotification < Event::Base
     true
   end
 
+  class MailerPresenter < BaseOperation::BasePresenter
+
+    def validate
+    end
+
+    def to
+    end
+
+    def subject
+    end
+
+    def body
+    end
+
+  end
+
 end
