@@ -18,10 +18,6 @@ class Event::Report::Retract < Event::Report::Base
 
   end
 
-  def mailer_method(user)
-    :approve
-  end
-
   def mailer_subject(user)
     if user.id == report.controlling_user.id
       "Report retracted : #{self.report.name}"

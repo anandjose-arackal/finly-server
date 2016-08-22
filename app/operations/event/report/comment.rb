@@ -18,10 +18,6 @@ class Event::Report::Comment < Event::Report::Base
 
   end
 
-  def mailer_method(user)
-    :comment
-  end
-
   def mailer_subject(user)
     "#{user.name} has commented on the report: #{self.report.name}"
   end

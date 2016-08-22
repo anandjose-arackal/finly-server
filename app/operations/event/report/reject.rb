@@ -16,10 +16,6 @@ class Event::Report::Reject < Event::Report::Base
 
   end
 
-  def mailer_method(user)
-    :reject
-  end
-
   def mailer_subject(user)
     if user.id == report.controlling_user.id
       "#{user.name} has rejected the report: #{self.report.name}"

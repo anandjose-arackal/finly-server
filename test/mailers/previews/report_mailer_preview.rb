@@ -9,7 +9,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.submit(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/approve
@@ -18,7 +18,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.approve(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/retract
@@ -27,7 +27,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.retract(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/comment
@@ -36,7 +36,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.reject(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/comment
@@ -45,7 +45,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.retract(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
   end
 
 
