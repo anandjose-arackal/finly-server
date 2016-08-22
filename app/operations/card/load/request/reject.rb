@@ -40,12 +40,6 @@ class Card::Load::Request::Reject < Card::Load::Request::Base
     end
   end
 
-  def validate
-    if self.to_user.blank?
-      errors << 'Cannot reject as user not found'
-    end
-  end
-
   def process
     status = CardLoadRequestStatus.rejected_id
     unless to_user.id == card_load_request.user.id

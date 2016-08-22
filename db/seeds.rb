@@ -15,7 +15,7 @@ def random_integer(low, high)
 end
 
 def random_string_of_numbers(length)
-  (0...length).map{ (48 + rand(10)).chr }.join
+  (0...length).map { (48 + rand(10)).chr }.join
 end
 
 if ExportField.count == 0
@@ -100,20 +100,25 @@ if CardLoadRequestCommentAction.count == 0
 end
 
 if CardLoadTrackingAction.count == 0
-  CardLoadTrackingAction.create(id: 1,name: 'Create')
-  CardLoadTrackingAction.create(id: 2,name: 'Retract')
-  CardLoadTrackingAction.create(id: 3,name: 'Submit')
-  CardLoadTrackingAction.create(id: 4,name: 'Approve')
-  CardLoadTrackingAction.create(id: 5,name: 'Reject')
-  CardLoadTrackingAction.create(id: 6,name: 'Unapprove')
-  CardLoadTrackingAction.create(id: 7,name: 'Take Control')
+  CardLoadTrackingAction.create(id: 1, name: 'Create')
+  CardLoadTrackingAction.create(id: 2, name: 'Retract')
+  CardLoadTrackingAction.create(id: 3, name: 'Submit')
+  CardLoadTrackingAction.create(id: 4, name: 'Approve')
+  CardLoadTrackingAction.create(id: 5, name: 'Reject')
+  CardLoadTrackingAction.create(id: 6, name: 'Unapprove')
+  CardLoadTrackingAction.create(id: 7, name: 'Take Control')
 end
 
 if CardLoadRequestStatus.count == 0
-  CardLoadRequestStatus.create id: 1,name: 'Processing'
-  CardLoadRequestStatus.create id: 2,name: 'Retracted'
-  CardLoadRequestStatus.create id: 3,name: 'Rejected'
-  CardLoadRequestStatus.create id: 4,name: 'Credited'
+  CardLoadRequestStatus.create id: 1, name: 'Processing'
+  CardLoadRequestStatus.create id: 2, name: 'Retracted'
+  CardLoadRequestStatus.create id: 3, name: 'Rejected'
+  CardLoadRequestStatus.create id: 4, name: 'Credited'
+end
+
+if Event.count == 0
+  Event.create id: 1, name: 'Submit Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: false
 end
 
 if Currency.count == 0
@@ -142,9 +147,9 @@ if User.count == 0
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                                                                                                            {user_role_id: UserRole.employee_id}])
   User.create(company: Company.first, name: "Finly King", email: "king@finlytest.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
-              role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}])
+              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
+              role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
+                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}])
 
   fm = []
   4.times do |pos|
@@ -285,10 +290,10 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-                                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: user.id}])
+                                 manual_expense_attributes: {merchant: Faker::Company.name},
+                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                        user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -302,10 +307,10 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-                                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: user.id}])
+                                 manual_expense_attributes: {merchant: Faker::Company.name},
+                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                        user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -320,10 +325,10 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-                                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: user.id}])
+                                 manual_expense_attributes: {merchant: Faker::Company.name},
+                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                        user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -347,7 +352,7 @@ if Card.count == 0
     5.times do
       number = random_string_of_numbers(10)
       c = company.cards.create(proxy: number, ending_number: number[6..9], description: "Unassigned company card.",
-                            card_type_id: random_integer(1,3))
+                               card_type_id: random_integer(1, 3))
     end
   end
 

@@ -35,7 +35,6 @@
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
 #
-
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -77,6 +76,8 @@ class User < ActiveRecord::Base
   has_many :card_load_requests
   has_many :controlling_card_load_requests, class_name: 'CardLoadRequest', foreign_key: :controlling_user_id
   has_many :card_transactions
+
+  has_many :event_configurations
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
