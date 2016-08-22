@@ -118,7 +118,9 @@ end
 
 if Event.count == 0
   Event.create id: 1, name: 'Submit Report', has_push_notification: true, has_mailer: true,
-               configurable_push_notification: true, configurable_mailer: false
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 2, name: 'Approved Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
 end
 
 if Currency.count == 0
