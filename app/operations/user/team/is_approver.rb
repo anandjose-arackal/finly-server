@@ -51,6 +51,7 @@ class User::Team::IsApprover < User::Team::Base
   end
 
   private
+
   def process_for_user
     if self.type == :manager
       type = :has_manager
