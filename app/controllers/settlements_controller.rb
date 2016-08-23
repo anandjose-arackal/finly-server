@@ -41,11 +41,41 @@ class SettlementsController < ApplicationController
   def index
     authorize Payment
     @users = @users.with_roles.only_employees.paginate(page: params[:page], per_page: 30) if @users.present?
+
+    respond_to do |format|
+      format.html {}
+      format.js {}
+      format.json {}
+    end
   end
 
   def show
+    # Previsous Code
+    # return unless PaymentPolicy.new(current_user, @user).show?
+    # load_reports :approved
+
+    # Backbone Code
     return unless PaymentPolicy.new(current_user, @user).show?
-    load_reports :approved
+    # load_reports :approved
+    case params[:view_to_load]
+      when 'approved'
+        load_reports :approved
+      when 'reimbursed'
+        load_reports :reimbursed
+      when 'closed'
+        load_reports :closed
+      when 'payments'
+        load_payments
+      else
+        load_reports :approved
+    end
+
+
+    respond_to do |format|
+      format.html {}
+      format.js {}
+      format.json {}
+    end
   end
 
   def show_partial

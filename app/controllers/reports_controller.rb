@@ -16,7 +16,10 @@ class ReportsController < ApplicationController
     authorize Report
     rs = ReportService.new(user: current_user)
     if rs.create create_params
-      redirect_to report_path rs.report, view_params
+      respond_to do |format|
+        format.json {render json: {"status": "success"}}
+      end
+      # redirect_to report_path rs.report, view_params
       return
     end
     flash[:error] = rs.errors
@@ -39,7 +42,8 @@ class ReportsController < ApplicationController
 
     respond_to do |format|
       format.html {}
-      format.json { render json: @reports.as_json }
+      # format.json { render json: @reports.as_json }
+      format.json {}
     end
   end
 

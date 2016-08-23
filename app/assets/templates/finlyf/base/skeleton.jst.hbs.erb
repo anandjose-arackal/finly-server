@@ -1,7 +1,7 @@
 <nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="margin-top: 53px; border-color: transparent;">
   <div class="container-fluid">
     <div class="row no-margin no-padding">
-      <div class="col-md-2" style="background: #fff; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+      <div class="col-md-2" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
         <div class="navbar-header navbar-sidebar">
           {{!-- navbar_sidebar.jst.hbs partial --}}
         </div>
@@ -16,10 +16,10 @@
 </nav>
 
 <div class="container-fluid" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-  <div class="col-sm-2 sidebar" style="position:fixed;">
+  <div class="col-sm-2 sidebar">
   </div>
 
-  <div class="col-sm-10 col-sm-offset-2 main" style="position: fixed;">
+  <div class="col-sm-10 col-sm-offset-2 main">
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">
@@ -61,21 +61,23 @@
   color: #535353;
   font-size: 12px;
 }
-.expense{
+.item{
   padding: 15px;
   border: 0.5px solid #eee;
   /*border-bottom: none;*/
   background: white;
   color: #666;
   cursor: pointer;
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
 }
 
-.expense.selected{
+.item.selected{
   background: #FFF1DA;
 }
 
 .sidebar{
+  height: calc(100% - 100px);
+  position:fixed;
   background: #fff;
   background: #F5F6F9;
   position: relative;
@@ -83,16 +85,22 @@
   overflow-y: scroll;
 }
 
+.secondary-navbar li{
+  margin-left: 10px;
+}
+
 .main{
+  position:fixed;
   overflow-y: scroll;
   background: rgb(252, 252, 252) none repeat scroll 0% 0%;
   background: #F5F6F9;
   max-height: calc(100% - 103px); 
   padding: 10px;
   box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  height: calc(100% - 100px);
 }
 .main.preview .col-md-8{
-  display: none;
+  /*display: none;*/
 }
 
 .sidebar-element{
@@ -101,9 +109,9 @@
 .close-item-details{
   position: absolute;
   z-index: 100;
-  padding: 4px 10px;
+  padding: 5px 15px;
   left: 0px;
-  border: 0.5px solid #efefef;
+  /*border: 0.5px solid #efefef;*/
   font-weight: 100;
   font-size: 20px;
 }
@@ -139,6 +147,16 @@
   border-radius: 2px;
 }
 
+.btn-finly-danger:hover{
+  background: rgb(234, 97, 83);
+  color: white;
+}
+
+.btn-finly-default:hover{
+  background: #594DA8;
+  color: white;
+}
+
 
 /*Forms, Fiels, Labels*/
 .input-icon {
@@ -146,7 +164,7 @@
   margin-right: 6px;
   margin-top: -20px;
   position: relative;
-  z-index: 2;
+  z-index: 1;
   color: #676767;
   pointer-events: none;
 }

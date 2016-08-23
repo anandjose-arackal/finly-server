@@ -99,7 +99,7 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
 
   # scopes for filters
-  scope :filter_search, -> (term) {where("name like ? OR email like ?", "%#{term}%")}
+  scope :filter_search, -> (term) {where("name like ? OR email like ?", "%#{term}%", "%#{term}%")}
   scope :filter_state, -> (state) {
     case(state)
       when 1

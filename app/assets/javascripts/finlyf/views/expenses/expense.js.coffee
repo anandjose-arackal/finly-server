@@ -2,19 +2,21 @@ class FinlyF.Views.Expense extends Backbone.View
   template: HandlebarsTemplates['finlyf/expenses/expense']
   templateShow: HandlebarsTemplates['finlyf/expenses/show']
   templateShowDetails: HandlebarsTemplates['finlyf/expenses/show_details']
-  className: 'expense col-md-12'
+  className: 'item col-md-12'
 
   events:
     'click .select-item': 'toggleSelect'
     'input [contenteditable=true]': 'updateModel'
-    'click .btn-update-expense': 'update'
+    'click .btn-update-item': 'update'
 
   initialize: (options) ->
     _this = @
     @preview = options.preview
+    if options.parent
+      @parent = options.parent
     if @preview
       # console.log "Preview is passed true"
-      $(@el).removeClass("expense")
+      $(@el).removeClass("item")
       @model.fetch()
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
@@ -41,11 +43,13 @@ class FinlyF.Views.Expense extends Backbone.View
     else
       $(@el).removeClass('selected')
 
+    @parent.trigger('item:selected')
+
   populateDetails: ->
-    $(@el).find("#item-show-details").html(@templateShowDetails({expense: @model.toJSON()}))
+    $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
   showSaveOption: ->
-    $(".btn-update-expense").css("display", "inline");
+    $(".btn-update-item").css("display", "inline");
 
 
 #Features

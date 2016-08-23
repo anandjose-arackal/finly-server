@@ -1,0 +1,71 @@
+<form id="new-item" enctype="multipart/form-data">
+
+  <input name="utf8" type="hidden" value="&#x2713;"/>
+  <input type="hidden" name="authenticity_token" value="" />
+  <div class="row no-margin">
+    <div class="col-sm-7 no-padding">
+      <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">Amount</label>
+        </div>
+        <div class="col-sm-7">
+          <input type="text" name="expense[amount]" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">Merchant</label>
+        </div>
+        <div class="col-sm-7">
+          <input type="text" name="expense[merchant]" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">Date</label>
+        </div>
+        <div class="col-sm-7">
+          <input type="text" name="expense[date]" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">File</label>
+        </div>
+        <div class="col-sm-7">
+          <input type="file" name="expense[receipt]" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">Category</label>
+        </div>
+        <div class="col-sm-7">
+          <select name="expense[category_id]">
+            <option value="1">Test Category 1</option>
+            <option value="2">Test Category 2</option>
+            <option value="3">Test Category 3</option>
+            <option value="4">Test Category 4</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-7 col-sm-offset-5">
+          <input type="file" name="expense[receipt]" class="form-control" />
+          <buttun class="btn-create btn btn-primary">Create</buttun>
+        </div>
+        
+      </div>      
+    </div>
+
+    <div class="col-sm-5">
+      <img class="new-item-image" />
+    </div>
+  </div>
+</form>
+

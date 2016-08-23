@@ -5,9 +5,15 @@ class ReceiptsController < ApplicationController
 
   def index
     load_receipts
+
+    respond_to do |format|
+      format.html {}
+      format.json {}
+    end
   end
 
   def create
+    ap params
     receipt_service = ReceiptService.new(current_user)
     if receipt_service.create_receipt(receipt_params)
       flash.now[:success] = "Receipt added!"
@@ -17,6 +23,7 @@ class ReceiptsController < ApplicationController
           load_receipts
           render 'receipts/index_update'
         end
+        format.json { render json: {"success": true} }
       end
     else
       flash.now[:danger] = receipt_service.errors

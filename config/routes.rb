@@ -307,6 +307,7 @@ Rails.application.routes.draw do
 
   #Filters/Autocomplete
   get 'autocomplete/merchant'
+  get 'autocomplete/user'
 
   # get 'features', to: 'static_pages#features'
 

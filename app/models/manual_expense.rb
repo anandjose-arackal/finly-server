@@ -14,6 +14,10 @@ class ManualExpense < ActiveRecord::Base
 
   validates :merchant, presence: true
 
+  scope :merchant_like, -> (merchant) do 
+    where('lower(merchant) LIKE ?', "%#{merchant.downcase}%").pluck(:merchant)
+  end
+
   def merchant_name
     self.merchant
   end
