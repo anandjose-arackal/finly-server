@@ -1,8 +1,12 @@
+# listing of the policies associated with a user.
+# params:
+# view: the view for the policy listing - admin, policy_admin, or personal.
+
 class Policy::List < Policy::Base
 
   attr_accessor :view
 
-  def self.call
+  def self.call(user)
     self.new(user).run
   end
 

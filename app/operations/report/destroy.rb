@@ -19,9 +19,6 @@ class Report::Destroy < Report::Base
   end
 
   def validate
-    unless report
-      errors << "Report not found."
-    end
 
     # check if the report can be destroyed at all
     unless report.can_destroy?
@@ -30,8 +27,12 @@ class Report::Destroy < Report::Base
   end
 
   def authorize
+
+    unless report
+      raise_unauthorized_exception
+    end
     unless report.user_id == user.id
-      errors << "You do not own this report."
+      raise_unauthorized_exception
     end
   end
 

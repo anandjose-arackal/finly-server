@@ -29,9 +29,11 @@ class Report::Approve < Report::Base
   end
 
   def authorize
+    unless report
+      raise_unauthorized_exception
+    end
     unless report.controlling_user_id == user.id
-      errors << "You cannot approve this report."
-      return false
+      raise_unauthorized_exception
     end
   end
 

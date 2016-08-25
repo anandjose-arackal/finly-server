@@ -13,15 +13,10 @@ class Policy::Rule::Create < Policy::Rule::Create
   end
 
   def validate
+    super()
     if rule_parameters.blank?
       errors << "Rule attributes not provided"
       return false
-    end
-  end
-
-  def authorize
-    unless user.policy_admin?(policy)
-      errors << "You are not a policy admin for this policy."
     end
   end
 

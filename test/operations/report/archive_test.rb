@@ -1,0 +1,2 @@
+class ArchiveTest
+end

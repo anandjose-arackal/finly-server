@@ -2,7 +2,7 @@
 
 # params:
 # report_id: id of the report that needs to be submitted
-# controlling_user_id: if a user is submitting a report for someone else
+# controlling_for_user_id: if a user is submitting a report for someone else
 
 class Report::Submit < Report::Base
 
@@ -21,10 +21,6 @@ class Report::Submit < Report::Base
   end
 
   def validate
-    unless report
-      errors << "Report not found!"
-      return false
-    end
     # checking report status
     unless report.can_submit?
       errors << "Cannot submit this report."
@@ -37,15 +33,20 @@ class Report::Submit < Report::Base
   end
 
   def authorize
+    unless report
+      raise_unauthorized_exception
+      return false
+    end
     # if submitting a report for someone else, ensure he has the right to
-    if params[:controlling_user_id]
-      unless report.controlling_user_id == user.id
-        errors << "You cannot submit this report."
+    if params[:controlling_for_user_id]
+      unless report.controlling_for_user_id == user.id
+        raise_unauthorized_exception
         return false
       end
-    end
-    unless report.user_id == user.id
-      errors << "You do not own this report."
+    else
+      unless report.user_id == user.id
+        raise_unauthorized_exception
+      end
     end
   end
 

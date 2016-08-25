@@ -2,9 +2,7 @@ class Report::Base < BaseOperation
 
   attr_accessor :report, :report_id
 
-
   # todo - redefine all init methods to use report retrieval operation
-
 
   def pre_validate
     if user.blank? or params.blank?
@@ -18,9 +16,9 @@ class Report::Base < BaseOperation
   end
 
 
-  def validate
+  def authorize
     unless report
-      errors << "Report not found."
+      raise_unauthorized_exception
     end
   end
 
@@ -43,5 +41,8 @@ class Report::Base < BaseOperation
     end
   end
 
+  def receipt_params
+    params.require(:receipt).permit(:image)
+  end
 
 end

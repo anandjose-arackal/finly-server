@@ -18,6 +18,12 @@ class Policy::Rule::Base < Policy::Base
     self.policy = Policy.find_by(id: params[:policy_id])
   end
 
+  def authorize
+    unless user.policy_admin?(policy)
+      errors << "You are not a policy admin for this policy"
+    end
+  end
+
   def rule_parameters
     # todo - recheck the actual parameters that are being passed and whitelist them individually
     params.require(:rule).permit!

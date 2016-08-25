@@ -7,7 +7,7 @@ class Report::Retract < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or oarams not passed."
+      errors << "User or params not passed."
     end
   end
 

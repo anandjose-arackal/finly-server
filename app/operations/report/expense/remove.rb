@@ -30,10 +30,6 @@ class Report::Remove < Report::Base
   end
 
   def validate
-    unless report
-      errors << "Report not found."
-      return false
-    end
 
     # checking if the expense ids correspond to actual expenses
     unless expenses
@@ -49,6 +45,10 @@ class Report::Remove < Report::Base
   end
 
   def authorize
+    unless report
+      raise_unauthorized_exception
+      return false
+    end
     unless report.user_id == user.id
       errors << "You cannot add expenses to this report."
     end

@@ -1,3 +1,5 @@
+# todo - clarify how this is done
+
 class Policy::User::UpdateConfiguration < Policy::Base
 
   def authorized_user_types

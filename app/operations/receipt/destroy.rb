@@ -11,14 +11,15 @@ class Receipt::Destroy < Receipt::Base
   end
 
   def validate
-    unless receipt
-      errors << "Receipt not found."
-    end
+
   end
 
   def authorize
+    unless receipt
+      raise_unauthorized_exception
+    end
     unless receipt.user_id == user.id
-      errors << "You do not own this expense!"
+      raise_unauthorized_exception
     end
   end
 

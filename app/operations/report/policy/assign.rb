@@ -27,7 +27,7 @@ class Report::Policy::Assign < Report::Base
 
   def authorize
     unless report.user_id == user.id
-      errors << "You do not own this report."
+      raise_unauthorized_exception
     end
 
     if report.policy_id == policy.id
