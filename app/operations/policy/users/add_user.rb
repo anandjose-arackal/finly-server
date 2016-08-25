@@ -6,7 +6,7 @@
 #
 # todo - generalize this for adding multiple users
 
-class Policy::User::AddUser < Policy::Base
+class Policy::Users::AddUser < Policy::Base
 
   attr_accessor :added_user
 

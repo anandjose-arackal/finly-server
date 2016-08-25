@@ -4,7 +4,7 @@
 # removed_user_id: the id of the user who needs to be removed.
 # todo - generalize this to remove multiple users
 
-class Policy::User::RemoveUser < Policy::Base
+class Policy::Users::RemoveUser < Policy::Base
 
   attr_accessor :removed_user
 

@@ -1,6 +1,6 @@
 # todo - clarify how this is done
 
-class Policy::User::UpdateConfiguration < Policy::Base
+class Policy::Users::UpdateConfiguration < Policy::Base
 
   def authorized_user_types
     [:policy_admin, :admin]

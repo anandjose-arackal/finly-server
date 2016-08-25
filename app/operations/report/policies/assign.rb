@@ -3,7 +3,7 @@
 # report_id: id of the report to be updated
 # policy_id: id of the policy to be assigned to the report
 
-class Report::Policy::Assign < Report::Base
+class Report::Policies::Assign < Report::Base
 
   attr_accessor :policy
 

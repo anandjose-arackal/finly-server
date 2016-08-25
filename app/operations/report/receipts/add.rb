@@ -2,7 +2,7 @@
 # params:
 # report_id: id of the report to which the receipt needs to be added.
 
-class Report::Receipt::Add < Report::Base
+class Report::Receipts::Add < Report::Base
 
   attr_accessor :new_receipt_params, :receipt
 

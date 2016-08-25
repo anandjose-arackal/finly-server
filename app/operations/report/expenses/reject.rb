@@ -2,7 +2,7 @@
 # params:
 # report_id:
 
-class Report::Reject < Report::Base
+class Report::Expenses::Reject < Report::Base
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]

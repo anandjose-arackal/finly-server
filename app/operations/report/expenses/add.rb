@@ -1,9 +1,9 @@
-# removing expenses. Almost exactly the same as adding expenses in terms of flow.
+# action to add exisitng expenses to a report.
 # params:
-# report_id: id of the report that the action will be performed on
-# expense_ids: ids of the expenses that are to be removed.
+# report_id: id of the report to which expenses need to be added
+# expense_ids : array of ids of expenses that need to be added to the report.
 
-class Report::Remove < Report::Base
+class Report::Expenses::Add < Report::Base
 
   attr_accessor :expenses, :retracted
 
@@ -23,32 +23,31 @@ class Report::Remove < Report::Base
 
   def init
     self.report = Report.find_by(id: params[:report_id])
-    # extracting the expenses from the report itself
-    self.expenses = report.expenses.where(id: params[:expense_ids])
+    self.expenses = user.expenses.where(id: params[:expense_ids])
     # if the report is in retracted stage, comments need to be added
     self.retracted = report.retracted?
   end
 
   def validate
-
-    # checking if the expense ids correspond to actual expenses
-    unless expenses
-      errors << "No expenses found to be removed from the report."
-      return false
-    end
-
     # checking state of the report
     unless report.open? or report.retracted?
-      errors << 'Cannot remove expenses from report unless report is in open or retracted state'
+      errors << 'Cannot add expenses to report unless report is in open or retracted state'
       return false
     end
   end
 
   def authorize
     unless report
-      raise_unauthorized_exception
+      errors << "Report not found."
       return false
     end
+
+    # checking if the expense ids correspond to actual expenses
+    unless expenses
+      errors << "No expenses found to add to the report."
+      return false
+    end
+
     unless report.user_id == user.id
       errors << "You cannot add expenses to this report."
     end
@@ -56,7 +55,7 @@ class Report::Remove < Report::Base
 
   def process
     expenses.each do |expense|
-      unless expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.unreported_id, manager_memo: nil, rejecting_manager: nil)
+      unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
         errors << expense.errors.full_messages
       end
     end
@@ -66,7 +65,7 @@ class Report::Remove < Report::Base
     if is_success?
       if retracted
         expenses.each do |expense|
-          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_remove_id, expense_id: expense.id
+          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense_id: expense.id
           comment.save
         end
       end
