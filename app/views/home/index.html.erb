@@ -3,3 +3,29 @@
 
 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 <input name="utf8" id="form_utf8" type="hidden" value="&#x2713;"/>
+
+<div style="display: none;">
+  <select name="" id="newExpenseCategory">
+    <% current_company.active_categories.each do |cat| %>
+        <option value="<%= cat.id %>"><%= cat.name %></option>
+    <% end %>
+  </select>
+
+  <ul id="user-views">
+    <% if current_user.admin?%>
+      <li> <%= link_to "Admin View", reports_path(view: 'admin'), turbolink: true %></li>
+    <% end %>
+
+    <% if current_user.finance_manager? %>
+      <li> <%= link_to "Finance View", reports_path(view: 'finance'), turbolink: true %></li>
+    <% end %>
+    <% if current_user.manager? %>
+      <li> <%= link_to "Manager View", reports_path(view: 'manager'), turbolink: true %></li>
+    <% end %>
+    <% if current_user.employee? %>
+      <li> <%= link_to "Personal View", reports_path, turbolink: true %></li>
+    <% end %>   
+  </ul>
+</div>
+
+

@@ -10,7 +10,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
   #main
   templateMain: HandlebarsTemplates['finlyf/expenses/crud/main']
-  templateNew: HandlebarsTemplates['finlyf/expenses/new']
+  templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -19,7 +19,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .close-details': 'closeDetails'
     'click .btn-new': 'new'
     'click .btn-create-report': 'createReport'
-    'click .btn-create': 'create'
+    'click .btn-create-expense': 'create'
     'click .load-more': 'loadMore'
 
     #Filters
@@ -47,6 +47,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     })
     @collection.on('reset', @processItems, @)
     @on('item:selected', @doSomething, @)
+    @on('item:destroyed', @filter, @)
 
   render: ->
     # console.log "Step 3. Rendering."
@@ -84,8 +85,10 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     @params.page = 1
     @collection.fetch({
@@ -162,12 +165,23 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $(main).removeClass("preview")
 
   new: ->
-    $("#modal-new .modal-body").html(@templateNew)
+    $("#modal-new .modal-body").html(@templateNewExpense)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
+
+    #Populate categories from index.html.erb  
+    category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
+    options = $("#newExpenseCategory option")
+    for option in options
+      $('<option/>', {
+        value: $(option).attr('value')
+        text: $(option).text()
+      }).appendTo(category_select) 
+    
     $("#modal-new").modal('show')
 
   create: ->
-    values = {};
+    _this = @
+    values = {}
 
     # if(event){ event.preventDefault(); }
 
@@ -175,9 +189,23 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       values[ input.name ] = input.value
     )
     console.log values
-    # model = new FinlyF.Models.Expense()
+    model = new FinlyF.Models.Expense()
     # console.log("Putting data")
-    # console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
+    response = model.save(values, {
+      iframe: true,
+      files: this.$('form :file'),
+      data: values,
+      success: (model, res) ->
+        if res.status == "success"
+          $("#modal-new").modal('hide')
+          _this.refetchCollection()
+      error: (err) ->
+        console.log "Error", err
+
+    })
+
+    # if response.responseJSON.status = "success"
+      
 
   createReport: ->
     #  "report"=>{"expense_id"=>"15,36,39"}}

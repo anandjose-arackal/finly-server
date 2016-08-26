@@ -46,6 +46,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
     @collection.on('reset', @processItems, @)
+    @on('item:destroyed', @filter, @)
 
   render: ->
     # console.log "Step 3. Rendering."
@@ -145,6 +146,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     preview_view = new FinlyF.Views.Report({
       model: model
       preview: true
+      parent: @
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)

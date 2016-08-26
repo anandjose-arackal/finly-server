@@ -54,7 +54,17 @@ class ReportsController < ApplicationController
 
   def show
     authorize @report
-    load_view_for_report
+    # load_view_for_report
+    load_expenses_for_views
+    load_info_for_views
+    @comments = @report.comments.all.order(created_at: :desc)
+
+    # ap @expenses
+
+    respond_to do |format|
+      format.json {}
+    end
+
   end
 
   def destroy
@@ -136,6 +146,7 @@ class ReportsController < ApplicationController
           redirect_to report_path rs.report, view_params
         end
         format.js
+        format.json {render json: {"status": "success"}}
       end
       return
     end
@@ -295,7 +306,10 @@ class ReportsController < ApplicationController
     if (params.present? and rs.send(update, params)) or (params.blank? and rs.send(update))
       flash.now[:success] = success_message unless success_message.blank?
       if update == :delete_report
-        redirect_to reports_path view_params
+        # redirect_to reports_path view_params
+        respond_to do |format|
+          format.json {render json: {"status": "success"}}
+        end
         return
       end
       respond_to do |format|

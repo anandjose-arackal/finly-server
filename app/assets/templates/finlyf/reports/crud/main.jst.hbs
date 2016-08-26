@@ -1,6 +1,6 @@
 <div class="row no-margin" id="item-details">
   <div class="close-item-details"><i class="fa fa-times close-details"></i></div>
-  <div id="item-details-main"></div>
+  <div id="item-details-main"></div> 
 </div>
 
 <div class="main-header row no-margin">
@@ -27,14 +27,51 @@
     <button class="navbar-btn btn btn-sm load-more" data-page="1"><i class="fa fa-cloud-download"></i>&nbsp;&nbsp;<span>Load More</span></button>
   </div>
 </div>
+<style type="text/css">
+.bg-white{
+  background: #fff;
+}
+.main.preview #item-details {
+    /*left: 16.666%;*/
+    /*left: auto;*/
+    left: auto;
+    right: auto;
+    left: 0;
+    z-index: 1000;
+    bottom: 0;
+}
+#item-details {
+    height: calc(100% - 53px);
+    /*left: 100%;*/
+    left: 0;
+    z-index: 110;
+    bottom: calc(100% - 53px);
+    /*background: white;*/
+    background: rgba(0, 0, 0, 0.5);
+    /*box-shadow: 0 0 30px 0 rgba(0,0,0,.1);*/
+    transition: all 0.5s;
+    position: fixed;
+    margin-top: -60px;
+    display: block;
+    width: 100%;
+    padding: 0 40px 40px 40px;
+}
 
-{{!-- 
-name
-status
-memo
+#item-details-main{
+  height: 100%;
+  background: #fff;
+}
+
+#item-details-main .col-sm-12{
+  height: 100%;
+}
+
+#item-details-main .item-details{
+  height: 100%;
+}
 
 
-
-
-
- --}}
+#item-details-main .item-details #item-show-details{
+  height: 100%;
+}
+</style>

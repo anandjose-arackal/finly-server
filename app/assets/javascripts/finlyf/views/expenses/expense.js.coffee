@@ -8,6 +8,7 @@ class FinlyF.Views.Expense extends Backbone.View
     'click .select-item': 'toggleSelect'
     'input [contenteditable=true]': 'updateModel'
     'click .btn-update-item': 'update'
+    'click .btn-delete-item': 'delete'
 
   initialize: (options) ->
     _this = @
@@ -50,6 +51,18 @@ class FinlyF.Views.Expense extends Backbone.View
 
   showSaveOption: ->
     $(".btn-update-item").css("display", "inline");
+
+  delete: ->
+    @model.destroy({
+      data: {
+        'authenticity_token': $("#authenticity_token").val()
+      },
+      processData: true,
+      success: (model, res) ->
+        _this.parent.trigger('item:destroyed')
+      error: (err) ->
+        console.log "Error", err
+    })
 
 
 #Features

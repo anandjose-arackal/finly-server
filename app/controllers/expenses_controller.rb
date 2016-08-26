@@ -29,11 +29,10 @@ class ExpensesController < ApplicationController
   end
 
   def create
-    # fail
     authorize Expense
     if @expense_service.add_expense expense_params
       respond_to do |format|
-        format.json { render json: {"success": true} }
+        format.json { render json: {"status": "success"} }
       end
       
     else
@@ -57,7 +56,7 @@ class ExpensesController < ApplicationController
     # for the filters
     if @expenses.present?
       @merchants = @expenses.include_manual_expense.pluck(:merchant)
-      @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 5)
+      @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 15)
       @count = @expenses.count
     end
     @categories = current_company.active_categories
@@ -88,7 +87,10 @@ class ExpensesController < ApplicationController
     else
       flash[:danger] = @expense_service.errors
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
+    respond_to do |format|
+      format.json {render json: {"status": "success"}}
+    end
   end
 
   def add_receipt
