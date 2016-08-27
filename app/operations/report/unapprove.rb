@@ -1,4 +1,6 @@
-#
+# action to unapprove a report
+# params:
+# report_id: id of the report to be unapproved
 
 class Report::Unapprove < Report::Base
 

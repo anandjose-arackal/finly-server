@@ -18,8 +18,8 @@ class Report::Create < Report::Base
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      errors << "User or params not passed."
+    if user.blank?
+      errors << "User not passed."
     end
   end
 

@@ -30,7 +30,7 @@ class Policy::Users::RemoveUser < Policy::Base
   end
 
   def authorize
-    unless user.policy_admin?(policy) and PolicyUserMapping.with_user(user.id).admin.count <= 1
+    if removed_user.policy_admin?(policy) and policy.admins.count <= 1
       errors << 'Cannot remove the only admin from policy'
       return false
     end
