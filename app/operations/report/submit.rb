@@ -60,6 +60,8 @@ class Report::Submit < Report::Base
         errors << "Couldn't auto-approve report for some reason. Please try again."
         return false
       end
+      report.reload
+      return true
     end
     memo = params[:memo]
     submitted_at = DateTime.now

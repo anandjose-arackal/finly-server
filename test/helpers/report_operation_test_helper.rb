@@ -1,8 +1,8 @@
 module ReportOperationTestHelper
 
-  # adds dummy expenses to a report and returns the report
-  def add_dummy_expenses(user, report, amount = nil)
-    expense_params = {expense: {amount: 100,
+  # adds dummy expenses to a new report and returns the report. optional amount if the report total needs to be a certain amount
+  def create_report(user, amount = nil)
+    expense_params = {expense: {amount: 90,
                                  merchant: "Olacabs",
                                  note: "Sup dawg",
                                  expense_status_id: 1,
@@ -13,9 +13,16 @@ module ReportOperationTestHelper
     }
     expense_ids = []
     # creating 5 dummy expenses for this user
-    5.times do
-      expense = Expense::Manual::Create.new(user, expense_params).run
-      expense_ids << expense.id
+    if amount
+      (amount/100).to_i.times do
+        expense = Expense::Manual::Create.new(user, expense_params).run
+        expense_ids << expense.id
+      end
+    else
+      5.times do
+        expense = Expense::Manual::Create.new(user, expense_params).run
+        expense_ids << expense.id
+      end
     end
 
     report = Report::Create.new(user, expense_ids: expense_ids).run

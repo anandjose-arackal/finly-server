@@ -21,6 +21,9 @@
 
 
 class Report < ActiveRecord::Base
+
+  include MathUtil
+
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
@@ -52,6 +55,7 @@ class Report < ActiveRecord::Base
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
+  scope :processing, -> {where report_status_id: ReportStatus.processing_id }
   scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
@@ -199,7 +203,7 @@ class Report < ActiveRecord::Base
   end
 
   def total_amount
-    return precision_value(report.expenses.with_amount.sum(:value)) if report.expenses.present?
+    return precision_value(self.expenses.with_amount.sum(:value)) if self.expenses.present?
     0
   end
 
@@ -244,6 +248,11 @@ class Report < ActiveRecord::Base
     else
       return "#{d_start.strftime("%d-%b-%y")} to #{d_end.strftime("%d-%b-%y")}"
     end
+  end
+
+  def latest_expense
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_desc.first
   end
 
   private

@@ -1,5 +1,6 @@
 # returns the next reviewer for report, card load request and anything
 # else that goes through the standard chain of approval
+# constructor takes - cardloadrequest, report, or user
 
 class User::Team::Review::NextReviewer < BaseOperation
   attr_accessor :obj

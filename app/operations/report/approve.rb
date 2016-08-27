@@ -1,7 +1,7 @@
 # action that approves a report.
 # params:
 # report_id: id of the report that needs to be approved
-# auto_approve : set to true if the report is to be auto-approved. i.e. if there is no reporting manager
+# auto_approve : optional - set to true if the report is to be auto-approved. i.e. if there is no reporting manager
 
 class Report::Approve < Report::Base
 
@@ -41,6 +41,7 @@ class Report::Approve < Report::Base
     manager = User::Team::Review::NextReviewer.(report)
     status = ReportStatus.processing_id
     if auto_approve or manager.blank?
+      # todo - change this to operation
       settlement = SettlementService.new(report.user)
       status = ReportStatus.approved_id
       unless settlement.require_reimbursement?(report)
@@ -77,11 +78,11 @@ class Report::Approve < Report::Base
       end
       comment.save
 
-      # recomputing settlement
+      # recomputing settlement and marking the report as accounted
       unless report.processing?
-        SettlementService.new.report_approved report
+        Settlement::ReportApproved.(report.user, report_id: report.id)
+        report.reload
       end
-
       # if report is closed, add the relevant comment
       if report.closed?
         # Add comments stating report has been closed as no reimbursements required

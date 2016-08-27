@@ -1,2 +1,4 @@
-class ArchiveTest
+class ArchiveTest < ActiveSupport::TestCase
+
+  
 end

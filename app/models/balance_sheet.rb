@@ -15,6 +15,8 @@ class BalanceSheet < ActiveRecord::Base
   belongs_to :cash_in_hand, class_name: 'Amount'
   belongs_to :pending_reimbursement, class_name: 'Amount'
 
+  delegate :pending_reimbursement_value, to: :pending_reimbursement
+
   validates :user_id, uniqueness: true, presence: true
 
   before_save do
