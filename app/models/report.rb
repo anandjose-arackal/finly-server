@@ -19,7 +19,11 @@
 #  archived                :boolean          default(FALSE), not null
 #
 
+
 class Report < ActiveRecord::Base
+
+  include MathUtil
+
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
@@ -51,6 +55,7 @@ class Report < ActiveRecord::Base
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
+  scope :processing, -> {where report_status_id: ReportStatus.processing_id }
   scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
@@ -189,10 +194,6 @@ class Report < ActiveRecord::Base
     self.accounted
   end
 
-  def controlling_user?(user)
-    self.controlling_user == user
-  end
-
   def relative_status_name(user)
     if processing? and controlling_user? user
       return 'Pending Review'
@@ -201,17 +202,42 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
+  def total_amount
+    return precision_value(self.expenses.with_amount.sum(:value)) if self.expenses.present?
+    0
+  end
+
+  def controlling_user?(user)
+    self.controlling_user.id == user.id
+  end
+
+  def versioned_policy
+    if report.submitted_at.present?
+      return self.policy.version_at report.submitted_at, has_many: true, has_one: true, belongs_to: true
+    end
+    self.policy
+  end
+
+  def final_approver
+    return nil unless report.approved? or report.reimbursed? or report.reimbursement_confirmed? or report.closed?
+    tracks = report.tracks.with_action(ReportTrackingAction.approve_id)
+    if tracks.present?
+      return tracks.last.action_user
+    end
+    nil
+  end
+
   def first_date
-    return nil unless self.expenses.count > 0
-    self.expenses.sort_date_asc.first.date
+    return nil unless report.expenses.count > 0
+    report.expenses.sort_date_asc.first.date
   end
 
   def last_date
-    return nil unless self.expenses.count > 0
-    self.expenses.sort_date_desc.first.date
+    return nil unless report.expenses.count > 0
+    report.expenses.sort_date_desc.first.date
   end
 
-  def get_date_string
+  def date_as_string
     d_start = first_date
     d_end = last_date
     if d_start.blank? and d_end.blank?
@@ -224,6 +250,10 @@ class Report < ActiveRecord::Base
     end
   end
 
+  def latest_expense
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_desc.first
+  end
 
   private
   def is_employee

@@ -1,2 +1,4 @@
-class Index
+class Report::Index < Report::Base
+
+
 end

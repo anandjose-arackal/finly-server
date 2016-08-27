@@ -17,7 +17,7 @@ class PolicyUserService < BaseService
       errors << 'No user selected'
       return false
     end
-    if self.policy.users.find_by(id: user.id).present?
+    if policy.users.find_by(id: user.id).present?
       errors << 'User already added'
       return false
     end

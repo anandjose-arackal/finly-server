@@ -18,9 +18,6 @@ class Report::Archive < Report::Base
   end
 
   def validate
-    unless report
-      errors << "Report not found"
-    end
 
     # check if report can be archived at all
     unless report.can_archive?
@@ -29,8 +26,11 @@ class Report::Archive < Report::Base
   end
 
   def authorize
+    unless report
+      raise_unauthorized_exception
+    end
     unless report.user_id == user.id
-      errors << "You are not the owner of this report."
+      raise_unauthorized_exception
     end
   end
 

@@ -1,8 +1,9 @@
 # action to add exisitng expenses to a report.
 # params:
+# report_id: id of the report to which expenses need to be added
 # expense_ids : array of ids of expenses that need to be added to the report.
 
-class Report::Expense::Add < Report::Base
+class Report::Expenses::Add < Report::Base
 
   attr_accessor :expenses, :retracted
 
@@ -28,6 +29,14 @@ class Report::Expense::Add < Report::Base
   end
 
   def validate
+    # checking state of the report
+    unless report.open? or report.retracted?
+      errors << 'Cannot add expenses to report unless report is in open or retracted state'
+      return false
+    end
+  end
+
+  def authorize
     unless report
       errors << "Report not found."
       return false
@@ -39,14 +48,6 @@ class Report::Expense::Add < Report::Base
       return false
     end
 
-    # checking state of the report
-    unless report.open? or report.retracted?
-      errors << 'Cannot add expenses to report unless report is in open or retracted state'
-      return false
-    end
-  end
-
-  def authorize
     unless report.user_id == user.id
       errors << "You cannot add expenses to this report."
     end

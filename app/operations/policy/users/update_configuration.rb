@@ -1,0 +1,17 @@
+# todo - clarify how this is done
+
+class Policy::Users::UpdateConfiguration < Policy::Base
+
+  def authorized_user_types
+    [:policy_admin, :admin]
+  end
+
+  def pre_validate
+
+  end
+
+  def init
+    super()
+
+  end
+end

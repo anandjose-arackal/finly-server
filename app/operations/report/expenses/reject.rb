@@ -2,7 +2,7 @@
 # params:
 # report_id:
 
-class Report::Reject < Report::Base
+class Report::Expenses::Reject < Report::Base
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -21,9 +21,6 @@ class Report::Reject < Report::Base
   end
 
   def validate
-    unless report
-      errors << "Report not found!"
-    end
 
     # checking if the report is in processing state
     unless report.processing?
@@ -33,10 +30,13 @@ class Report::Reject < Report::Base
     if expenses.blank?
       errors << "Expenses to reject not found"
     end
-
   end
 
   def authorize
+    unless report
+      raise_unauthorized_exception
+    end
+
     unless report.controlling_user_id == user.id
       errors << "You cannot reject the expenses in this report."
     end

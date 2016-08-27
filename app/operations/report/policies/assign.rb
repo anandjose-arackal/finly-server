@@ -3,7 +3,7 @@
 # report_id: id of the report to be updated
 # policy_id: id of the policy to be assigned to the report
 
-class Report::Policy::Assign < Report::Base
+class Report::Policies::Assign < Report::Base
 
   attr_accessor :policy
 
@@ -27,7 +27,7 @@ class Report::Policy::Assign < Report::Base
 
   def authorize
     unless report.user_id == user.id
-      errors << "You do not own this report."
+      raise_unauthorized_exception
     end
 
     if report.policy_id == policy.id

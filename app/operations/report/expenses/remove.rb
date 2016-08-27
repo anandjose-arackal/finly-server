@@ -3,7 +3,7 @@
 # report_id: id of the report that the action will be performed on
 # expense_ids: ids of the expenses that are to be removed.
 
-class Report::Remove < Report::Base
+class Report::Expenses::Remove < Report::Base
 
   attr_accessor :expenses, :retracted
 
@@ -30,10 +30,6 @@ class Report::Remove < Report::Base
   end
 
   def validate
-    unless report
-      errors << "Report not found."
-      return false
-    end
 
     # checking if the expense ids correspond to actual expenses
     unless expenses
@@ -49,6 +45,10 @@ class Report::Remove < Report::Base
   end
 
   def authorize
+    unless report
+      raise_unauthorized_exception
+      return false
+    end
     unless report.user_id == user.id
       errors << "You cannot add expenses to this report."
     end
