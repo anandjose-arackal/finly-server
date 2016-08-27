@@ -121,6 +121,20 @@ if Event.count == 0
                configurable_push_notification: true, configurable_mailer: true
   Event.create id: 2, name: 'Approved Report', has_push_notification: true, has_mailer: true,
                configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 3, name: 'Retract Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 4, name: 'Reject Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 5, name: 'Report Comment', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 6, name: 'Add Advance', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 7, name: 'Clear Debt', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 8, name: 'Reimburse', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 9, name: 'Settle', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
 end
 
 if Currency.count == 0
