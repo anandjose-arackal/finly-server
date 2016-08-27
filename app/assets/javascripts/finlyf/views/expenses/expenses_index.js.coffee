@@ -21,12 +21,16 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .btn-create-report': 'createReport'
     'click .btn-create-expense': 'create'
     'click .load-more': 'loadMore'
+    'click .navbar-menu-li': 'navigate'
+    'click .navbar-view-type': 'changeView'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter': 'filter'
 
   initialize: (options) ->
+    if Backbone.history.getFragment() == ""
+      FinlyF.primary_router.navigate("expenses")
     if options
       @params = options.params || {}
     else
@@ -46,7 +50,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
     @collection.on('reset', @processItems, @)
-    @on('item:selected', @doSomething, @)
+    @on('item:selected', @expenseSelectOptions, @)
     @on('item:destroyed', @filter, @)
 
   render: ->
@@ -58,13 +62,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     $(@el).find(".sidebar").html(@templateSidebar())
     $(@el).find(".main").html(@templateMain())
+    FinlyF.structureActions(@el, @params)
     @
 
   
   processItems: ->
     #Append all the expenses
     @dump = @collection.models.slice()
-    console.log "Models - ", @collection.models.length
+    # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
@@ -72,6 +77,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
+
+
 
   appendItems: (item) ->
     #Creating view for each expense and appending them
@@ -139,7 +146,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         $(item).removeClass("selected")
         $(item).find(".select-item").prop("checked", false)
 
-    @doSomething()
+    @expenseSelectOptions()
 
   showDetails: (e) ->
     #Returns if clicked on the checkbox
@@ -234,8 +241,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         console.log "Error", err
     })
 
-  doSomething: ->
-    # console.log "Doing something"
+  expenseSelectOptions: ->
     items = $(@el).find('#items .item')
     flag = false
     for item in items
@@ -245,31 +251,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(@el).find('.secondary-navbar .btn-create-report').css('display', 'inline')
     else
       $(@el).find('.secondary-navbar .btn-create-report').css('display', 'none')
-    # console.log "Flag", flag
 
-
-
-
-
-
-    # _this = @
-    # form = $(@el).find('#new-expense')
-    # data = {
-    #   amount: $(form).find('input[name="expense[amount]"]').val()
-    #   merchant: $(form).find('input[name="expense[merchant]"]').val()
-    #   date: $(form).find('input[name="expense[date]"]').val()
-    #   category_id: $(form).find('select[name="expense[category_id]"]').val()
-    # }
-
-    # model = new FinlyF.Models.Expense(data)
-    # console.log model.toJSON()
-    # model.save({
-    #   success: ->
-    #     @collection.fetch({reset: true})
-    # })
 
   filter: ->
-    console.log "Filtering"
     sidebar = $(@el).find(".sidebar")
     params = {
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
@@ -286,7 +270,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       params["filter_amount[value]"] = filter_amount_value
       params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
 
-    console.log "Will navigate now."
+    # console.log "Will navigate now."
+    if @params.view
+      params.view = @params.view
 
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
@@ -321,3 +307,11 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(options.selector).attr('data-page', options.page)
     else
       $('.main .load-more').attr('data-page', options.page)
+
+  navigate: (e) ->
+    e.preventDefault()
+    FinlyF.navigate(e, @params)
+
+  changeView: (e) ->
+    e.preventDefault()
+    FinlyF.changeView(e)

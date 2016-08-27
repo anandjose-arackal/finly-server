@@ -21,6 +21,8 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     'click .btn-create': 'create'
     'click .load-more': 'loadMore'
     'click .filter-status li a': 'filterStatus'
+    'click .navbar-menu-li': 'navigate'
+    'click .navbar-view-type': 'changeView'
 
     #Filters
     'keyup .filter-field': 'autoComplete'
@@ -57,6 +59,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     $(@el).find(".sidebar").html(@templateSidebar())
     $(@el).find(".main").html(@templateMain())
+    FinlyF.structureActions(@el, @params)
     @
 
   loadMore: (e) ->
@@ -200,17 +203,19 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     target = $(e.currentTarget)
     # $(target).closest('ul').find('a').removeClass('active')
     $(target).parent().addClass('active')
-    console.log $(target).parent().html()
+    # console.log $(target).parent().html()
     status_id = $(target).attr('data-status-id')
 
     params = {
       'filter_status': status_id
     }
+    if @params.view
+      params.view = @params.view
 
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
-    console.log "Filtering"
+    # console.log "Filtering"
     sidebar = $(@el).find(".sidebar")
     params = {
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
@@ -227,7 +232,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       params["filter_amount[value]"] = filter_amount_value
       params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
 
-    console.log "Will navigate now."
+    # console.log "Will navigate now."
+    if @params.view
+      params.view = @params.view
 
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
@@ -271,3 +278,12 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       $(options.selector).attr('data-page', options.page)
     else
       $('.main .load-more').attr('data-page', options.page)
+
+  navigate: (e) ->
+    e.preventDefault()
+    FinlyF.navigate(e, @params)
+
+
+  changeView: (e) ->
+    e.preventDefault()
+    FinlyF.changeView(e)

@@ -25,6 +25,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .load-more': 'loadMore'
     'click .filter-status li a': 'filterStatus'
 
+    'click .navbar-menu-li': 'navigate'
+    'click .navbar-view-type': 'changeView'
+
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter': 'filter'
@@ -71,6 +74,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(@el).find(".main").html(@templateMain())
     else
       $(@el).find(".main").html(@templateMain())
+    FinlyF.structureActions(@el, @params)
     @
 
   loadMore: (e) ->
@@ -275,3 +279,13 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(options.selector).attr('data-page', options.page)
     else
       $('.main .load-more').attr('data-page', options.page)
+
+
+  navigate: (e) ->
+    e.preventDefault()
+    FinlyF.navigate(e, @params)
+
+
+  changeView: (e) ->
+    e.preventDefault()
+    FinlyF.changeView(e)

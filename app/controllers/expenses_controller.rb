@@ -42,8 +42,6 @@ class ExpensesController < ApplicationController
   end
 
   def index
-    # sleep 2
-    authorize Expense
     role = UserRole.employee_id
     if @admin_view
       role = UserRole.admin_id

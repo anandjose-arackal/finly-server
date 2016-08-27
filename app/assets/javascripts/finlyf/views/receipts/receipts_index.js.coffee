@@ -21,6 +21,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     'click .btn-create': 'create'
     'click .load-more': 'loadMore'
     'click .filter-status li a': 'filterStatus'
+    'click .navbar-menu-li': 'navigate'
+    'click .navbar-view-type': 'changeView'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -56,6 +58,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     $(@el).find(".sidebar").html(@templateSidebar())
     $(@el).find(".main").html(@templateMain())
+    FinlyF.structureActions(@el, @params)
     @
 
   loadMore: (e) ->
@@ -260,3 +263,14 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       $(options.selector).attr('data-page', options.page)
     else
       $('.main .load-more').attr('data-page', options.page)
+
+
+
+  navigate: (e) ->
+    e.preventDefault()
+    FinlyF.navigate(e, @params)
+
+
+  changeView: (e) ->
+    e.preventDefault()
+    FinlyF.changeView(e)

@@ -1,0 +1,30 @@
+admin:
+  links:
+    primary_navbar:
+      - Company Reports: reports
+      - Company Expenses: expenses
+      - Employees: employees
+      - Analytics: analytics
+      - Selttlements: selttlements
+
+personal:
+  links:
+    primary_navbar:
+      - Expenses: expenses
+      - Reports: reports
+      - Receipts: receipts
+      - Analytics: analytics
+      - Selttlements: selttlements
+
+manager:
+  links:
+    primary_navbar:
+      - Team Reports: reports
+      - Team Expenses: expenses
+      - Team Analytics: analytics
+      - Team Members: users
+
+finance:
+  links:
+    primary_navbar:
+      - Something: something
