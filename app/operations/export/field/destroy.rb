@@ -8,7 +8,7 @@ class Export::Field::Destroy < Export::Base
     self.preference = company.export_preferences.find_by(id: destroy_params[:export_field_id])
   end
 
-  def validate
+  def authorize
     unless preference
       errors << "Cannot find field to delete."
     end

@@ -6,12 +6,16 @@ class Policy::List < Policy::Base
 
   attr_accessor :view
 
-  def self.call(user)
-    self.new(user).run
+  def self.call(user, params)
+    self.new(user, params).run
   end
 
   def init
     self.view = params[:view]
+  end
+
+  def authorize
+
   end
 
   def retrieve

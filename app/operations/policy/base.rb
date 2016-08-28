@@ -22,7 +22,7 @@ class Policy::Base < BaseOperation
 
   def authorize
     unless policy
-      errors << "Policy not found"
+      raise_unauthorized_exception
     end
   end
 end

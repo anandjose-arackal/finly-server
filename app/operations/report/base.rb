@@ -10,9 +10,9 @@ class Report::Base < BaseOperation
     end
   end
 
-
   def init
-    self.report = Report.find_by(id: params[:report_id])
+    self.report = Report::List.(user, role_id: params[:role_id]).find_by(id: params[:report_id])
+    # self.report = Report.find_by(id: params[:report_id])
   end
 
 

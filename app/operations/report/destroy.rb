@@ -15,11 +15,10 @@ class Report::Destroy < Report::Base
   end
 
   def init
-    self.report = Report.find_by(id: params[:report_id])
+    super()
   end
 
   def validate
-
     # check if the report can be destroyed at all
     unless report.can_destroy?
       errors << "Report can only be deleted once it's retracted or rejected."
