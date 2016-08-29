@@ -16,8 +16,11 @@ class ReportsController < ApplicationController
     authorize Report
     rs = ReportService.new(user: current_user)
     if rs.create create_params
+      @report = rs.report
+      ap @report
       respond_to do |format|
-        format.json {render json: {"status": "success"}}
+        # format.json {render json: {"status": "success"}}
+        format.json {}
       end
       # redirect_to report_path rs.report, view_params
       return
