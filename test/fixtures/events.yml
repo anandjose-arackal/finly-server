@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: events
+#
+#  id                :integer          not null, primary key
+#  name              :string(255)      not null
+#  push_notification :boolean
+#  mailer            :boolean
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  push_notification: false
+  mailer: false
+
+two:
+  name: MyString
+  push_notification: false
+  mailer: false

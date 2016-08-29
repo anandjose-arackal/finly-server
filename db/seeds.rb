@@ -14,6 +14,10 @@ def random_integer(low, high)
   random(low, high+1).to_i
 end
 
+def random_string_of_numbers(length)
+  (0...length).map { (48 + rand(10)).chr }.join
+end
+
 if ExportField.count == 0
   ExportField.create(id: 1, name: 'Employee Name')
   ExportField.create(id: 2, name: 'Employee ID')
@@ -63,24 +67,74 @@ if ReportTrackingAction.count == 0
 end
 
 if ReportCommentAction.count == 0
-  ReportCommentAction.create(id: 1, name: 'report_comment')
-  ReportCommentAction.create(id: 2, name: 'report_retract')
-  ReportCommentAction.create(id: 3, name: 'report_submit')
-  ReportCommentAction.create(id: 4, name: 'report_approve')
-  ReportCommentAction.create(id: 5, name: 'report_auto_approve')
-  ReportCommentAction.create(id: 6, name: 'report_reject')
-  ReportCommentAction.create(id: 7, name: 'report_unapprove')
-  ReportCommentAction.create(id: 8, name: 'report_take_control')
-  ReportCommentAction.create(id: 9, name: 'report_update')
-  ReportCommentAction.create(id: 10, name: 'report_reimbursed')
-  ReportCommentAction.create(id: 11, name: 'report_reimbursement_confirmed')
-  ReportCommentAction.create(id: 12, name: 'report_closed')
-  ReportCommentAction.create(id: 13, name: 'report_attach_receipt')
-  ReportCommentAction.create(id: 14, name: 'report_detach_receipt')
-  ReportCommentAction.create(id: 15, name: 'expense_add')
-  ReportCommentAction.create(id: 16, name: 'expense_remove')
-  ReportCommentAction.create(id: 17, name: 'expense_reject')
-  ReportCommentAction.create(id: 18, name: 'expense_update')
+  ReportCommentAction.create id: 1, name: 'report_comment'
+  ReportCommentAction.create id: 2, name: 'report_retract'
+  ReportCommentAction.create id: 3, name: 'report_submit'
+  ReportCommentAction.create id: 4, name: 'report_approve'
+  ReportCommentAction.create id: 5, name: 'report_auto_approve'
+  ReportCommentAction.create id: 6, name: 'report_reject'
+  ReportCommentAction.create id: 7, name: 'report_unapprove'
+  ReportCommentAction.create id: 8, name: 'report_take_control'
+  ReportCommentAction.create id: 9, name: 'report_update'
+  ReportCommentAction.create id: 10, name: 'report_reimbursed'
+  ReportCommentAction.create id: 11, name: 'report_reimbursement_confirmed'
+  ReportCommentAction.create id: 12, name: 'report_closed'
+  ReportCommentAction.create id: 13, name: 'report_attach_receipt'
+  ReportCommentAction.create id: 14, name: 'report_detach_receipt'
+  ReportCommentAction.create id: 15, name: 'expense_add'
+  ReportCommentAction.create id: 16, name: 'expense_remove'
+  ReportCommentAction.create id: 17, name: 'expense_reject'
+  ReportCommentAction.create id: 18, name: 'expense_update'
+end
+
+if CardLoadRequestCommentAction.count == 0
+  CardLoadRequestCommentAction.create id: 1, name: 'Create'
+  CardLoadRequestCommentAction.create id: 2, name: 'Retract'
+  CardLoadRequestCommentAction.create id: 3, name: 'Submit'
+  CardLoadRequestCommentAction.create id: 4, name: 'Approve'
+  CardLoadRequestCommentAction.create id: 5, name: 'Reject'
+  CardLoadRequestCommentAction.create id: 6, name: 'Unapprove'
+  CardLoadRequestCommentAction.create id: 7, name: 'Take Control'
+  CardLoadRequestCommentAction.create id: 8, name: 'Comment'
+  CardLoadRequestCommentAction.create id: 9, name: 'Update'
+end
+
+if CardLoadTrackingAction.count == 0
+  CardLoadTrackingAction.create(id: 1, name: 'Create')
+  CardLoadTrackingAction.create(id: 2, name: 'Retract')
+  CardLoadTrackingAction.create(id: 3, name: 'Submit')
+  CardLoadTrackingAction.create(id: 4, name: 'Approve')
+  CardLoadTrackingAction.create(id: 5, name: 'Reject')
+  CardLoadTrackingAction.create(id: 6, name: 'Unapprove')
+  CardLoadTrackingAction.create(id: 7, name: 'Take Control')
+end
+
+if CardLoadRequestStatus.count == 0
+  CardLoadRequestStatus.create id: 1, name: 'Processing'
+  CardLoadRequestStatus.create id: 2, name: 'Retracted'
+  CardLoadRequestStatus.create id: 3, name: 'Rejected'
+  CardLoadRequestStatus.create id: 4, name: 'Credited'
+end
+
+if Event.count == 0
+  Event.create id: 1, name: 'Submit Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 2, name: 'Approved Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 3, name: 'Retract Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 4, name: 'Reject Report', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 5, name: 'Report Comment', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 6, name: 'Add Advance', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 7, name: 'Clear Debt', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 8, name: 'Reimburse', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
+  Event.create id: 9, name: 'Settle', has_push_notification: true, has_mailer: true,
+               configurable_push_notification: true, configurable_mailer: true
 end
 
 if Currency.count == 0
@@ -109,9 +163,9 @@ if User.count == 0
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                                                                                                            {user_role_id: UserRole.employee_id}])
   User.create(company: Company.first, name: "Finly King", email: "king@finlytest.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
-              role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}])
+              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
+              role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
+                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}])
 
   fm = []
   4.times do |pos|
@@ -133,12 +187,12 @@ if User.count == 0
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
   end
 
-  m[0].team_mapping.default.first.update_attributes(approves_to_user: m[1])
-  m[0].team_mapping.build(approves_to_user: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
+  m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
+  m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
   u[0].team_mapping.build(manager: m[3], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
 
-  fm[0].team_mapping.default.first.update_attributes(approves_finance_to_user: fm[1])
-  fm[0].team_mapping.build(approves_finance_to_user: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
+  fm[0].team_mapping.default.first.update_attributes(approves_finance_to: fm[1])
+  fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
 
   User.all.each do |user|
@@ -252,10 +306,10 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-                                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}])
+                                 manual_expense_attributes: {merchant: Faker::Company.name},
+                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                        user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -269,10 +323,10 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-                                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}])
+                                 manual_expense_attributes: {merchant: Faker::Company.name},
+                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                        user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -287,10 +341,10 @@ if Report.count == 0
       expenses_ids = []
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-                                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                                  receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                                         user_id: 1}])
+                                 manual_expense_attributes: {merchant: Faker::Company.name},
+                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
+                                                        user_id: user.id}])
         expenses << e
         expenses_ids << e.id
       end
@@ -300,5 +354,45 @@ if Report.count == 0
         ReportService.new(user: report.controlling_user, report: report).approve
       end
     end
+  end
+end
+
+if CardType.count == 0
+  CardType.create(name: "Physical")
+  CardType.create(name: "Virtual")
+  CardType.create(name: "Reimbursement")
+end
+
+if Card.count == 0
+  Company.all.each do |company|
+    5.times do
+      number = random_string_of_numbers(10)
+      c = company.cards.create(proxy: number, ending_number: number[6..9], description: "Unassigned company card.",
+                               card_type_id: random_integer(1, 3))
+    end
+  end
+
+  User.all.each do |user|
+    number = random_string_of_numbers(10)
+    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test physical card for user #{user.id}",
+                          card_type_id: 1, company_id: user.company.id, active: true)
+    number = random_string_of_numbers(10)
+    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test virtual card for user #{user.id}",
+                          card_type_id: 2, company_id: user.company.id, active: true)
+    number = random_string_of_numbers(10)
+    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test reimbursement card for user #{user.id}",
+                          card_type_id: 3, company_id: user.company.id, active: true)
+  end
+end
+
+# creating some junk transactions for testing
+if CardTransaction.count == 0
+  User.all.each do |user|
+    card = user.cards.first
+    c = CardTransaction.create(card_id: card.id, user_id: user.id,
+                               transaction_amount_attributes: {value: 100, currency_id: 1},
+                               date: Date.today,
+                               merchant_name: "Randomness.",
+                               transaction_currency_code: "INR")
   end
 end

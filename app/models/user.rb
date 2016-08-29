@@ -35,7 +35,6 @@
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
 #
-
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -56,6 +55,7 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
+  has_many :cards
 
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
@@ -71,6 +71,13 @@ class User < ActiveRecord::Base
   has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
+
+  has_many :cards
+  has_many :card_load_requests
+  has_many :controlling_card_load_requests, class_name: 'CardLoadRequest', foreign_key: :controlling_user_id
+  has_many :card_transactions
+
+  has_many :event_configurations
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
@@ -150,7 +157,11 @@ class User < ActiveRecord::Base
     if policy.blank?
       return admin_policies.count > 0
     end
-    admin_policies.with_id(policy.id).present?
+    policy_id = policy
+    if policy.is_a?(Policy)
+      policy_id = policy.id
+    end
+    admin_policies.with_id(policy_id).present?
   end
 
   def admin?
@@ -187,8 +198,8 @@ class User < ActiveRecord::Base
 
   alias_method :manager_name, :user_name
   alias_method :finance_manager_name, :user_name
-  alias_method :approves_to_user_name, :user_name
-  alias_method :approves_finance_to_user_name, :user_name
+  alias_method :approves_to_name, :user_name
+  alias_method :approves_finance_to_name, :user_name
 
 
   private

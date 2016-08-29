@@ -16,7 +16,6 @@
 #  report_id            :integer
 #  category_id          :integer
 #
-
 class Expense < ActiveRecord::Base
   belongs_to :amount
   belongs_to :expense_status
@@ -29,8 +28,9 @@ class Expense < ActiveRecord::Base
   has_many :receipts, as: :parent
 
   has_one :manual_expense, dependent: :destroy
+  has_one :card_expense, dependent: :destroy
 
-  accepts_nested_attributes_for :amount, :manual_expense
+  accepts_nested_attributes_for :amount, :manual_expense, :card_expense
   accepts_nested_attributes_for :receipts
 
   # delegating to associated classes the dependent attribute calls

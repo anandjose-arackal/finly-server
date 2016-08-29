@@ -15,10 +15,8 @@ gem 'rails', '4.2.6'
 # Use mysql as the database for Active Record
 gem 'mysql2', '>= 0.3.13', '< 0.5'
 
-
 #Bundles for pagination
 gem 'will_paginate'
-
 
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails'
@@ -67,11 +65,9 @@ gem 'faker'
 
 gem 'paper_trail', '~> 5.1.1'
 
-
 gem 'turboboost'
 
 gem 'remotipart', '~> 1.0'
-
 
 gem 'bootbox-rails', '~>0.4'
 
@@ -84,7 +80,12 @@ gem 'has_scope'
 
 # gem for devise authentication
 gem 'devise'
+
 gem 'devise_invitable'
+
+gem 'has_scope'
+
+gem 'hooks'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

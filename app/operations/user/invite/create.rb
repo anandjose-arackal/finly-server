@@ -1,0 +1,145 @@
+class User::Invite::Create < User::Invite::Base
+
+  attr_accessor :new_user
+
+  def pre_validate
+    if params.blank? or user.blank?
+      errors << "NO user or param passed."
+    end
+  end
+
+  def init
+
+  end
+
+  def validate
+    if params[:company].blank? and params[:company_id].blank? and params['company_id']
+      errors << 'A user can only be invited to a company. Please enter the company the user has to be assigned to'
+      return false
+    end
+    company_id = params[:company_id] or params[:company] or params['company_id']
+    if company_id != self.user.company_id.to_s
+      errors << 'User can only be invited in the same company'
+      return false
+    end
+
+    if params[:email].blank?
+      errors << 'User email is required for inviting users'
+      return false
+    end
+
+    if User.find_by_email(params[:email]).present?
+      errors << 'Cannot invite an existing user'
+      return false
+    end
+
+    # checking validity of user role params
+    role_mapping = params[:role_mapping_attributes]
+    if role_mapping.blank?
+      errors << 'User must be assigned a role to be invited'
+      return false
+    end
+    unless role_mapping.is_a?(Array) and role_mapping.size > 0
+      errors << 'User must be assigned a role to be invited'
+      return false
+    end
+
+    # checking validity of user team params
+    team_mapping = params[:team_mapping_attributes]
+    if team_mapping.blank?
+      errors << 'User must be assigned a manager and a finance manager to be invited'
+      return false
+    end
+    unless team_mapping.is_a?(Array) and team_mapping.size > 0
+      errors << 'User must be assigned a manager and a finance manager to be invited'
+      return false
+    end
+
+  end
+
+  def authorize
+    # checking if role mapping attributes are compatible
+    role_mapping = params[:role_mapping_attributes]
+    if user.manager?
+      role_mapping.each do |role|
+        rid = role[:user_role_id]
+        unless rid.present? and (rid == UserRole.manager_id or rid == UserRole.employee_id)
+          errors << "#{self.user.name} can only invite the user as an employee or manager"
+          return false
+        end
+      end
+    elsif user.finance_manager?
+      role_mapping.each do |role|
+        rid = role[:user_role_id]
+        unless rid.present? and (rid == UserRole.finance_manager_id or rid == UserRole.employee_id)
+          errors << "#{self.user.name} can only invite the user as an employee or finance manager"
+          return false
+        end
+      end
+    end
+
+    # checking if team mapping attributes are compatible
+    team_mapping = params[:team_mapping_attributes]
+    if self.user.manager? or self.user.finance_manager?
+
+      default_present = false
+      valid = false
+      if self.user.manager?
+        team_mapping.each do |mapping|
+          if mapping[:default]
+            default_present = true
+          end
+          if mapping[:manager_id].to_i == self.user.id
+            valid = true
+            break
+          end
+        end
+      elsif self.user.finance_manager?
+        team_mapping.each do |mapping|
+          if mapping[:default]
+            default_present = true
+          end
+          if mapping[:finance_manager_id].to_i == self.user.id
+            valid = true
+            break
+          end
+        end
+      end
+      unless default_present and valid
+        errors << 'User can only be assigned to the inviting user'
+        return false
+      end
+    end
+  end
+
+  def pre_process
+    # if the user has a policy during invite, temporarily storing that user's policy to add it separately later
+    if params[:policy_id]
+      @policy_id = params[:policy_id]
+      params.delete(:policy_id)
+    end
+  end
+
+  def process
+    self.new_user = User.invite!(params, self.user) do |u|
+      # u.skip_invitation = true
+    end
+    unless new_user
+      errors << "Invite failed. Try again!"
+    end
+  end
+
+  def post_process
+    # adding the policy to the user after he has been successfully invited
+    if is_success?
+      @policy = Policy.find_by(id: @policy_id)
+      if @policy
+        unless PolicyUserService.new(@policy).add_user(new_user)
+          errors << "User could not be added to policy."
+          return false
+        end
+      end
+    end
+  end
+
+end

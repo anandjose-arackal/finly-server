@@ -177,11 +177,11 @@ class ReportsController < ApplicationController
       if @report.can_take_control? and not @report.controlling_user?(current_user)
         @views[:take_control] = true
       elsif @report.processing? and @report.controlling_user?(current_user)
-        @views[:review] = true
+        @views[:team] = true
       end
     elsif @finance_view or @manager_view
       if @report.processing? and @report.controlling_user?(current_user)
-        @views[:review] = true
+        @views[:team] = true
       elsif (@report.can_unapprove?) and @report.associated_users(@report.controlling_user).include?(current_user)
         @views[:unapprove] = true
       end

@@ -180,12 +180,12 @@
               <section class="col-md-6">
                 <div>
                   <label>Approves To:</label>
-                  <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration<%= policy.id %>" name="policy[default][approves_to_user_id]"
+                  <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration<%= policy.id %>" name="policy[default][approves_to_id]"
                           class="selectors">
                     <option value="" selected="selected"></option>
                     <% @company_managers.each do |manager| %>
                         <option value="<%= manager.id %>"
-                                <% if @mappings[policy.id].default.first.approves_to_user_id == manager.id %>
+                                <% if @mappings[policy.id].default.first.approves_to_id == manager.id %>
                                 selected
                                 <% end %>
                                 ><%= manager.name %></option>
@@ -201,13 +201,13 @@
                 </div>
                 <div class="conditionMargin">
                   <label>Then Approves To:</label>
-                  <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_user_id]"
+                  <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_id]"
                           form="updateUserPolicyConfiguration<%= policy.id %>" class="selectors">
                     <option value="" selected="selected"></option>
                     <% @company_managers.each do |manager| %>
                         <option value="<%= manager.id %>"
                                 <% if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.approves_to.present? %>
-                                <% if @mappings[policy.id].non_default.approves_to.first.approves_to_user_id == manager.id %>
+                                <% if @mappings[policy.id].non_default.approves_to.first.approves_to_id == manager.id %>
                                 selected
                                 <% end %>
                                 <% end %>
@@ -230,11 +230,11 @@
                   <label>Approves Finance To:</label>
 
                   <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration<%= policy.id %>"
-                          name="policy[default][approves_finance_to_user_id]" class="selectors">
+                          name="policy[default][approves_finance_to_id]" class="selectors">
                     <option value="" selected="selected"></option>
                     <% @company_finance_managers.each do |manager| %>
                         <option value="<%= manager.id %>"
-                                <% if @mappings[policy.id].default.first.approves_to_user_id == manager.id %>
+                                <% if @mappings[policy.id].default.first.approves_to_id == manager.id %>
                                 selected
                                 <% end %>
                                 ><%= manager.name %></option>
@@ -252,12 +252,12 @@
                 <div class="conditionMargin">
                   <label>Then Approves Finance To:</label>
                   <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration<%= policy.id %>"
-                          name="policy[conditional_approves_finance_to][approves_finance_to_user_id]" class="selectors">
+                          name="policy[conditional_approves_finance_to][approves_finance_to_id]" class="selectors">
                     <option value="" selected="selected"></option>
                     <% @company_finance_managers.each do |manager| %>
                         <option value="<%= manager.id %>"
                                 <% if @mappings[policy.id].non_default.present? and @mappings[policy.id].non_default.approves_finance_to.present? %>
-                                <% if @mappings[policy.id].non_default.approves_finance_to.first.approves_finance_to_user_id == manager.id %>
+                                <% if @mappings[policy.id].non_default.approves_finance_to.first.approves_finance_to_id == manager.id %>
                                 selected
                                 <% end %>
                                 <% end %>
