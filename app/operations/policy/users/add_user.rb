@@ -49,7 +49,7 @@ class Policy::Users::AddUser < Policy::Base
     policy.user_mapping.create(user: added_user, admin: admin)
 
     # Add user configuration - the user configuration is cloned from the default mapping, and additional rules have to be added separately.
-    user.team_mapping.policy(nil).each do |item|
+    added_user.team_mapping.policy(nil).each do |item|
       cloned_item = item.dup
       cloned_item.policy_id = self.policy.id
       unless cloned_item.save

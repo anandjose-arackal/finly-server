@@ -1,4 +1,4 @@
-class User::Team::Mapping::Destroy < User::Team::Mapping::Base
+class User::Team::Mappings::Destroy < User::Team::Mappings::Base
   attr_accessor :mapping
 
   def pre_validate

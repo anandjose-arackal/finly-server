@@ -1,4 +1,4 @@
-class User::Team::Mapping::Reset < User::Team::Mapping::Base
+class User::Team::Mappings::Reset < User::Team::Mappings::Base
 
   def pre_validate
     super

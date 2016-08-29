@@ -20,12 +20,12 @@ class Policy::List < Policy::Base
 
   def retrieve
     if view == 'admin' and user.admin? # Admin can view all policies
-      user.company.policies.non_default if user.company.policies
+      user.company.policies if user.company.policies
     elsif view == 'policy_admin' and user.policy_admin?
       # i.e. all policies this user is an admin for
       user.admin_policies if user.admin_policies
     elsif view == 'personal' or view.nil? # User would get a list of policies he is added to
-      user.policies.non_default if user.policies
+      user.policies if user.policies
     end
   end
 end
