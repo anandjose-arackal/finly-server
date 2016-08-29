@@ -1,4 +1,4 @@
-# todo - clarify how this is done
+
 
 class Policy::Users::UpdateConfiguration < Policy::Base
 

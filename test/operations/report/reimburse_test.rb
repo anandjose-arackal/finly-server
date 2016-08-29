@@ -7,5 +7,8 @@ class ReimburseTest < ActiveSupport::TestCase
     @second_manager = User.find_by(email: 'manager1@finlytest.io')
   end
 
+  test "reports can only be marked as reimbursed after they're approved" do
+
+  end
 
 end

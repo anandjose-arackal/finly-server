@@ -17,15 +17,16 @@ class User::Invite::Destroy < User::Invite::Base
   end
 
   def validate
-    unless invited_user.present?
-      errors << "Invite not found!"
-    end
+
   end
 
   def authorize
-    unless user.admin? or user.id == invited_user.invited_by
-      errors << 'Only inviting users or admins can delete invites.'
-      return false
+    unless invited_user.present?
+      raise_unauthorized_exception
+    end
+
+    unless user.admin? or user.id == invited_user.invited_by_id
+      raise_unauthorized_exception
     end
   end
 
@@ -38,5 +39,13 @@ class User::Invite::Destroy < User::Invite::Base
 
   def post_process
     # probably nothing right now.
+  end
+
+  def retrieve
+    if is_success?
+      return true
+    else
+      return false
+    end
   end
 end
