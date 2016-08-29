@@ -153,21 +153,42 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
+
+  createReport: ->
+
+
     
   closeDetails: ->
     main = $(@el).find(".main")
     $(main).removeClass("preview")
 
   new: ->
-    $("#modal-new .modal-body").html(@templateNew)
-    $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
-    $("#modal-new").modal('show')
+    _this = @
+    main = $(@el).find(".main")
+    unless $(main).hasClass("preview")
+      $(main).addClass("preview")
+    $(@el).find("#item-details-main").html("")
+
+    model = new FinlyF.Models.Report()
+    data = {
+      authenticity_token: $("#authenticity_token").val()
+    }
+    model.save(data, {
+      success: (model, res) ->
+        preview_view = new FinlyF.Views.Report({
+          model: model
+          preview: true
+          parent: _this
+        })
+        $(_this.el).find("#item-details-main").html(preview_view.render().el)
+      error: (err) ->
+        console.log "Error", err
+    })
+
 
   create: ->
     values = {};
-
     # if(event){ event.preventDefault(); }
-
     _.each($(@el).find('form#new-item').serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
@@ -175,9 +196,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     model = new FinlyF.Models.Report()
     console.log("Putting data")
     console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
-
-
-
 
 
 
