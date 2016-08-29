@@ -1,7 +1,7 @@
 class Event::Report::Retract < Event::Report::Base
 
   def event_id
-    Event.report_approve_id
+    Event.report_retract_id
   end
 
   def affected_users

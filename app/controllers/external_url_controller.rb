@@ -4,4 +4,8 @@ class ExternalUrlController < ApplicationController
 
   end
 
+  def payment
+
+  end
+
 end

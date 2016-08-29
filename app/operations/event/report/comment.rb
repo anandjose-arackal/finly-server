@@ -1,7 +1,7 @@
 class Event::Report::Comment < Event::Report::Base
 
   def event_id
-    Event.report_approve_id
+    Event.report_comment_id
   end
 
   def affected_users
