@@ -1,5 +1,19 @@
+# action to accept a particular user's invitation
+# params
+# invitation_token: the unique string created when this user was invited
+# name:
+# mobile_number:
+# password:
+
 class User::Invite::Accept < User::Invite::Base
 
+  attr_accessor :invited_user, :accept_params
+
+  def initialize(params)
+    self.params = params
+    # self.params = (ActionController::Parameters.new(params) or {})
+    self.errors = []
+  end
 
   def authorized_user_types
 
@@ -44,9 +58,9 @@ class User::Invite::Accept < User::Invite::Base
   end
 
   def process
-    u = User.accept_invitation!(params)
-    unless u.present? and u.id.present?
-      errors << u.errors.full_messages
+    self.invited_user = User.accept_invitation!(params)
+    unless invited_user.present? and invited_user.id.present?
+      errors << invited_user.errors.full_messages
       true
     end
   end
@@ -54,4 +68,5 @@ class User::Invite::Accept < User::Invite::Base
   def post_process
     # send welcome mail
   end
+
 end

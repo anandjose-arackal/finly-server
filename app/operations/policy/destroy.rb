@@ -4,9 +4,15 @@
 
 class Policy::Destroy < Policy::Base
 
+  attr_accessor :view
+
+  def authorized_user_types
+    [:admin, :policy_admin]
+  end
 
   def init
-    self.policy = Policy::List.(user).find_by(id: params[:policy_id])
+    self.view = params[:view]
+    self.policy = Policy::List.(user, view: view).find_by(id: params[:policy_id])
   end
 
   def authorize

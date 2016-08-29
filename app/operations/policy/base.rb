@@ -11,12 +11,18 @@ class Policy::Base < BaseOperation
   def retrieve
     if is_success?
       return policy
+    else
+      return false
     end
   end
 
   def validate
+
+  end
+
+  def authorize
     unless policy
-      errors << "Policy not found"
+      raise_unauthorized_exception
     end
   end
 end

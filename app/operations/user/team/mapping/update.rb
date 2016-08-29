@@ -1,11 +1,26 @@
+# updates one particular mapping for a user
+# params:
+# team_mapping_id: id of the particular mapping that needs to be updated. Refers to an id of UserManagerMapping object
+# manager_id: id of the manager for this mapping
+# finance_manager_id: id of the finance manager for this mapping
+# approves_to_id: id of the approves_to for this mapping
+# approves_finance_to: id of the approves_finance_to for this mapping
+# policy_id: optional if the mapping is associated with a policy
+# user_id: user whose mapping params are being updated
+
 class User::Team::Mapping::Update < User::Team::Mapping::Base
   attr_accessor :mapping, :update_params, :destroy
 
   def pre_validate
-    super
+    if user.blank? or params.blank?
+      errors << "No user or params passed."
+    end
+    if params[:currency_id].blank?
+      params[:currency_id] = 1
+    end
     unless params[:manager_id] or params['manager_id'] or params[:finance_manager_id] or params['finance_manager_id'] or
         params[:approves_to_id] or params['approves_to_id'] or params[:approves_finance_to_id] or
-        params['approves_finance_to_id'] or (params['amount'] and params['currency_id'])
+        params['approves_finance_to_id'] or (params[:amount] and params[:currency_id])
       errors << 'Nothing to update'
     end
     if params[:team_mapping_id].blank?

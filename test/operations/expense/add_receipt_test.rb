@@ -1,5 +1,6 @@
 require 'test_helper'
 
+
 class AddReceiptTest < ActiveSupport::TestCase
 
   def setup

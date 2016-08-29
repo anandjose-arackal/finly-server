@@ -1,0 +1,40 @@
+# action to export a report as xml
+# params:
+# report_ids: ids of the report to be exported
+
+class Export::AsXml < Export::Base
+
+  def authorized_user_types
+    [:employee, :manager, :finance_manager, :admin]
+  end
+
+  def init
+    self.reports = Report.where(id: params[:report_ids])
+  end
+
+  def authorize
+    unless reports
+      errors << "Reports to export not found."
+    end
+  end
+
+  def process
+    @column_names = preferences.pluck(:name)
+    @data = []
+    reports.each do |r|
+      r.expenses.each do |e|
+        @data << retrieve_data(preferences, r, e)
+      end
+    end
+  end
+
+  def retrieve
+    if is_success?
+      {header: @column_names, data: @data}
+    else
+      false
+    end
+  end
+
+
+end

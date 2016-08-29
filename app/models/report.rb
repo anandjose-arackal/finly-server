@@ -94,7 +94,7 @@ class Report < ActiveRecord::Base
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
   def associated_users(user_before = nil, ordered = false)
-    return nil if tracks.blank?
+    return nil if self.tracks.blank?
     trackings = tracks.without_take_control_action
     if user_before.present?
       track = trackings.find_by(action_user_id: user_before.id)
