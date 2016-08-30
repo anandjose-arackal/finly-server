@@ -19,7 +19,6 @@
 #  archived                :boolean          default(FALSE), not null
 #
 
-
 class Report < ActiveRecord::Base
 
   include MathUtil
