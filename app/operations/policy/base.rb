@@ -2,6 +2,10 @@ class Policy::Base < BaseOperation
 
   attr_accessor :policy
 
+  class Policy::Base::PolicyPresenter < BaseOperation::BasePresenter
+
+  end
+
   def pre_validate
     if user.blank?
       errors << "No user passed."

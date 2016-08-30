@@ -3,6 +3,20 @@ class Export::Base < BaseOperation
   attr_accessor :company, :preference
 
 
+  class Export::Base::ExportPresenter < BaseOperation::BasePresenter
+
+
+  end
+
+  class Export::Field::FieldPresenter < BaseOperation::BasePresenter
+
+    attr_accessor :field
+
+    def initialize(field)
+      self.field = field
+    end
+  end
+
   def authorized_user_types
     [:admin]
   end

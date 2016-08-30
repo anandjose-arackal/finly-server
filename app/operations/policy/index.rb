@@ -2,9 +2,13 @@
 # params:
 # view: the view for the policy listing - admin, policy_admin, or personal.
 
-class Policy::List < Policy::Base
+class Policy::Index < Policy::Base
 
   attr_accessor :view
+
+  class Policy::Index::IndexPresenter < Policy::Base::PolicyPresenter
+
+  end
 
   def self.call(user, params)
     self.new(user, params).run
