@@ -2,6 +2,15 @@ class Expense::List < Expense::Base
 
   attr_accessor :role_id, :expenses
 
+  class Expense::List::ExpenseListPresenter < Expense::Base::ExpensePresenter
+
+    attr_accessor :expenses
+
+    def initialize(expenses)
+      self.expenses = expenses
+    end
+  end
+
   def initialize(user, role_id, params={})
     super(user, params)
     self.role_id = role_id
@@ -46,7 +55,8 @@ class Expense::List < Expense::Base
 
   def retrieve
     if is_success?
-      expenses
+      list_presenter = Expense::Base::ExpensePresenter.new(expenses)
+      return list_presenter
     else
       false
     end
