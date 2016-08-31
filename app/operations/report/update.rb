@@ -1,5 +1,5 @@
 class Report::Update < Report::Base
-  attr_accessor :changes
+  attr_accessor :changes, :update_param
 
   def pre_validate
     super
@@ -16,7 +16,12 @@ class Report::Update < Report::Base
   end
 
   def init
-
+    self.update_param = {}
+    self.update_param[:name] = self.params[:name] if self.params[:name].present? and self.params[:name] != report.name
+    self.update_param[:policy_id] = self.params[:policy_id] if self.params[:policy_id].present?
+    if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
+      self.update_param[:policy_id] = nil
+    end
   end
 
   def authorize
@@ -37,14 +42,8 @@ class Report::Update < Report::Base
   end
 
   def process
-    param = {}
-    param[:name] = params[:name] if params[:name].present? and params[:name] != report.name
-    param[:policy_id] = params[:policy_id] if params[:policy_id].present?
-    if param[:policy_id].present? and param[:policy_id] == 'nil'
-      param[:policy_id] = nil
-    end
-    return unless param.present?
-    unless report.update(param)
+    return unless update_param.present?
+    unless report.update(update_param)
       errors << report.errors.full_messages
       false
     end
@@ -61,18 +60,23 @@ class Report::Update < Report::Base
 
   def save_comments
     return unless changes.present?
+    query = []
     changes.each do |key, value|
       next unless value.present? and key.present?
       case key
         when :name
-          self.report.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
-                                                 updated_field: 'note', updated_from:  value[0], updated_to: value[1]
+          query << {user: user, report_comment_action_id: ReportCommentAction.report_update_id,
+                    updated_field: 'name', updated_from: value[0], updated_to: value[1]}
         when :policy_id
-          self.report.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
-                                                 updated_field: 'amount', updated_from:  value[0], updated_to: value[1]
+          from = to = nil
+          from = Policy.with_id(value[0]).first.name rescue nil if value[0].present?
+          to = Policy.with_id(value[1]).first.name rescue nil if value[1].present?
+          query << {user: user, report_comment_action_id: ReportCommentAction.report_update_id,
+                    updated_field: 'policy', updated_from: from, updated_to: to}
         else
       end
     end
+    report.comments.create query if query.present?
   end
 
 end
