@@ -15,15 +15,12 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   has_scope :filter_policy
 
   def create
-    authorize Report
-    rs = ReportService.new(user: current_user)
-    if rs.create create_params
-      @report = rs.report
-      load_view_for_report
+    create_operation = Report::Create.new(user,params)
+    @result = create_operation.run
+    if create_operation.is_success?
       render 'api/v1/reports/show'
       return
     end
-    @errors = rs.errors
     render 'api/v1/shared/failure'
   end
 
