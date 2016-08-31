@@ -1,10 +1,14 @@
+# action to destroy a particular expense.
+# params:
+# expense_id, or id : id of the expense that is to be deleted.
+
 class Expense::Manual::Destroy < Expense::Base
 
   def pre_validate
     if params.blank? or user.blank?
       errors << "Parameters or user not present."
     end
-    if params[:expense_id].nil?
+    if params[:expense_id].nil? and params[:id].nil?
       errors << "Expense ID missing!"
     end
   end
@@ -14,15 +18,19 @@ class Expense::Manual::Destroy < Expense::Base
   end
 
   def authorize
+    unless expense
+      errors << "Cannot find expense to destroy"
+      raise_unauthorized_exception
+    end
+
     unless expense.id == user.id
       errors << "You do not own this expense."
+      raise_unauthorized_exception
     end
   end
 
   def validate
-    unless expense
-      errors << "Cannot find expense to destroy"
-    end
+
   end
 
   def process
@@ -30,7 +38,7 @@ class Expense::Manual::Destroy < Expense::Base
       errors << expense.errors.full_messages
       return false
     end
-    success
+    return true
   end
 
   def post_process

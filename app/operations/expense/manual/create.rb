@@ -17,7 +17,7 @@ class Expense::Manual::Create < Expense::Base
     if params.blank? or user.blank?
       errors << "Parameters or user not present."
     end
-    if params[:expense][:amount] < 0
+    if params[:expense][:amount].to_i < 0
       errors << "Amount can't be negative."
     end
   end

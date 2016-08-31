@@ -1,8 +1,13 @@
+# action to update an expense.
+# params:
+# expense_id, or id : the id of the expense that us going to be edited.
+#
+
 class Expense::Manual::Update < Expense::Base
 
   attr_accessor :old_expense, :updated_expense_params
 
-  class Expense::Manual::Create::UpdatePresenter < Expense::Base::ExpensePresenter
+  class Expense::Manual::Update::UpdatePresenter < Expense::Base::ExpensePresenter
     attr_accessor :expense
 
     def initialize(expense)
@@ -13,18 +18,21 @@ class Expense::Manual::Update < Expense::Base
   def pre_validate
     if params.blank? or user.blank?
       errors << "Parameters or user not present."
+      return false
     end
-    if params[:expense_id].nil?
+    if params[:expense_id].nil? and params[:id].blank?
       errors << "Expense ID missing!"
+      return false
     end
-    if params[:expense][:amount] < 0
+    if params[:expense][:amount].to_i < 0
       errors << "Amount can't be negative."
+      return false
     end
   end
 
 
   def init
-    self.expense = self.old_expense = user.expenses.find_by_id(params[:expense_id])
+    self.expense = self.old_expense = user.expenses.find_by_id(params[:expense_id] || params[:id])
     # setting up the expense params for updation
     self.updated_expense_params = manual_expense_params
     self.updated_expense_params[:amount_attributes][:id] = expense.amount.id if expense
@@ -36,15 +44,16 @@ class Expense::Manual::Update < Expense::Base
 
 
   def validate
-    unless expense
-      errors << "Cannot find expense to edit. "
-    end
+
   end
 
 
   def authorize
+    unless expense
+      raise_unauthorized_exception
+    end
     unless expense and expense.user_id == user.id
-      errors << "You do not own this expense."
+      raise_unauthorized_exception
     end
   end
 
@@ -54,7 +63,7 @@ class Expense::Manual::Update < Expense::Base
       errors << self.expense.errors.full_messages
       return false
     end
-    success
+    return true
   end
 
   def post_process
@@ -69,7 +78,7 @@ class Expense::Manual::Update < Expense::Base
 
   def retrieve
     if is_success?
-      update_presenter = Expense::Manual::Create::UpdatePresenter.new(receipt)
+      update_presenter = Expense::Manual::Update::UpdatePresenter.new(expense)
       return update_presenter
     else
       return false

@@ -15,12 +15,11 @@ class ExpensesController < ApplicationController
   has_scope :filter_date, using: [:from, :to], type: :hash
 
   def new
-    authorize Expense
+
   end
 
   def show
-    # authorize Expense
-    @expense = Expense.find(params[:id])
+    @expense = current_user.expenses.find_by(id: params[:id] || params[:expense_id])
     respond_to do |format|
       # format.html {}
       # format.json { render json: @expenses.as_json }
@@ -29,14 +28,13 @@ class ExpensesController < ApplicationController
   end
 
   def create
-    authorize Expense
-    if @expense_service.add_expense expense_params
+    create_op = Expense::Manual::Create.new(current_user, params)
+    if create_op.run
       respond_to do |format|
         format.json { render json: {"status": "success"} }
       end
-      
     else
-      flash.now[:danger] = @expense_service.errors
+      flash.now[:danger] = create_op.errors
       render_flash_message
     end
   end
@@ -56,7 +54,7 @@ class ExpensesController < ApplicationController
     if @expenses.present?
       @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 15)
     end
-    generate_filters
+    # generate_filters
 
     respond_to do |format|
       format.html {}
@@ -66,19 +64,22 @@ class ExpensesController < ApplicationController
   end
 
   def update
-    authorize @expense
-    if @expense_service.update_expense(expense_params, params[:id] || params[:expense_id])
-      flash[:success] = 'Expense edited!'
-      redirect_to request.referrer
+    update_op = Expense::Manual::Update.new(current_user, params)
+    if update_op.run
+      # flash[:success] = 'Expense edited!'
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.json { render json: {"status": "success"} }
+      end
     else
-      flash[:danger] = @expense_service.errors
+      flash[:danger] = update_op.errors
       render_flash_message
     end
   end
 
   def destroy
-    authorize @expense
-    if @expense_service.remove_expense(params[:id] || params[:expense_id])
+    destroy_op = Expense::Manual::Destroy.new(current_user, params)
+    if destroy_op.run
       flash[:success] = "Expense deleted!"
     else
       flash[:danger] = @expense_service.errors
@@ -90,11 +91,11 @@ class ExpensesController < ApplicationController
   end
 
   def add_receipt
-    authorize @expense
-    if @expense_service.add_receipt_to_expense(receipt_params, params[:id] || params[:expense_id])
+    add_receipt_op = Expense::Manual::AddExpense.new(current_user, params).run
+    if add_receipt_op.run
       flash[:success] = "receipt added!"
     else
-      flash[:danger] = @expense_service.errors
+      flash[:danger] = add_receipt_op.errors
     end
     redirect_to request.referrer
   end
@@ -110,6 +111,7 @@ class ExpensesController < ApplicationController
 
 
   private
+
   def generate_filters
     @filter = {}
     if params[:filter_status].present?
