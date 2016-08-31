@@ -1,4 +1,4 @@
-json.extract! @expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name
+json.extract! @expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id
 
 # json.receipts @expense.receipts, :id, :image_file_name
 

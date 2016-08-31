@@ -26,12 +26,13 @@ class FinlyF.Views.Report extends Backbone.View
     @parent = options.parent
     _this = @
     @preview = options.preview
+    data = {}
     if @preview
-
       @current_view = options.current_view ##NEED TO ADD THIS IN REPORTS
-      # console.log "Preview is passed true"
+      if @current_view
+        data.view = @current_view
       $(@el).removeClass("item").addClass("bg-white")
-      @model.fetch()
+      @model.fetch({data: data})
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
     
@@ -115,7 +116,11 @@ class FinlyF.Views.Report extends Backbone.View
 
   existingExpense: (e) ->
     report_id = $(e.currentTarget).attr('data-item-id')
-    $(@el).find("#modal-mp .modal-body").append(@templateExistingExpense())
+    expense_view = new FinlyF.Views.ExpensesIndex({
+      indexOnly: true
+    })
+    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
     $(@el).find("#modal-mp").modal('show')
 
   edit: (e) ->

@@ -53,6 +53,7 @@ class FinlyF.Views.Expense extends Backbone.View
     $(".btn-update-item").css("display", "inline");
 
   delete: ->
+    _this = @
     @model.destroy({
       data: {
         'authenticity_token': $("#authenticity_token").val()
@@ -68,6 +69,17 @@ class FinlyF.Views.Expense extends Backbone.View
     $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-item').addClass('btn-update-item')
     $(@el).find(".item-attr-preview").css("display", "none")
     $(@el).find(".item-attr-edit").css("display", "block")
+
+    category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
+    category_select = $(@el).find(".editExpenseCategory")
+    options = $("#newExpenseCategory option")
+    for option in options
+      $('<option/>', {
+        value: $(option).attr('value')
+        text: $(option).text()
+      }).appendTo(category_select)
+
+      $(category_select).val(@model.get('category_id'))
 
   update: (e) ->
     $(e.currentTarget).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-item').addClass('btn-edit-item')
@@ -92,8 +104,9 @@ class FinlyF.Views.Expense extends Backbone.View
       data: values,
       processData: true
       success: (model, res) ->
-        console.log "Success"
-        console.log model, res
+        $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+        # console.log "Success"
+        # console.log model, res
         # if res.status == "success"
         #   $("#modal-new").modal('hide')
         #   _this.refetchCollection()

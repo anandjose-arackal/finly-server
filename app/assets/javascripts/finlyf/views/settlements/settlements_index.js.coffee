@@ -3,10 +3,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   #navbar
   templateNavbarSidebar: HandlebarsTemplates['finlyf/settlements/navbar/navbar_sidebar']
-  templateNavbarMain: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main']
+  templateNavbarMainAdmin: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main_admin']
 
   #sidebar
-  templateSidebar: HandlebarsTemplates['finlyf/settlements/sidebar/sidebar']
+  templateSidebarAdmin: HandlebarsTemplates['finlyf/settlements/sidebar/sidebar_admin']
 
   #main
 

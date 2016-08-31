@@ -9,8 +9,10 @@ class FinlyF.Routers.Main extends Backbone.Router
     'reports/params=:query': 'reports'
     'reports/action=:action': 'reportsAction'
     'receipts': 'receipts'
-    'settlements/:user': 'settlements'
-    'settlements/:user/params=:query': 'settlements'
+    'settlements': 'settlements'
+    'settlements/params=:query': 'settlements'
+    'settlements/:user': 'settlements_show'
+    'settlements/:user/params=:query': 'settlements_show'
 
   initialize: ->
     # console.log "Step 1. Main router initialized."
@@ -47,8 +49,20 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
-  settlements: (user, query) ->
-    console.log user, query
+  settlements: (query) ->
+    # Admin & Finance view
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+    view = new FinlyF.Views.SettlementsIndex({
+      user: user,
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+
+  settlements_show: (user, query) ->
+    # console.log user, query
     if typeof query != 'undefined'
       params = JSON.parse(query)
     else

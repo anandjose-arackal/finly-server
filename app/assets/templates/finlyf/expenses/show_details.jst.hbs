@@ -1,6 +1,6 @@
 <div class="row no-margin text-right" style="height: 60px;">
   <button class="btn btn-edit-item btn-sm navbar-btn">Edit</button>
-  <button class="btn btn-edit-item btn-sm navbar-btn"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+  <button class="btn btn-delete-item btn-sm navbar-btn"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
 </div>
 
 
@@ -30,7 +30,7 @@
       <div class="col-sm-4 no-padding"><label class="control-label">Category:</label></div>
       <div class="col-sm-8 item-attr-preview">{{item.category_name}}</div>
       <div class="col-sm-8 item-attr-edit">
-        <select name="expense[category_id]" class="newExpenseCategory">
+        <select name="expense[category_id]" class="editExpenseCategory">
 
         </select>
       </div>
@@ -46,14 +46,29 @@
   </div>
 
   <div class="col-sm-5 no-padding">
-    {{#each item.receipts}}
-      <img src="{{this.image_url}}" class="receipt-image img-responsive" style="max-width: 100%; max-height: 100%;" />
-    {{else}}
-      <div class="receipt-placeholder text-center" style="">
-        <i class="fa fa-arrow-circle-up" style="display: block; font-size: 40px;"></i>
-        Upload a Receipt
-      </div>
-    {{/each}}
+    <div class="item-receipt item-attr-preview">
+      {{#each item.receipts}}
+        <img src="{{this.image_url}}" class="receipt-image img-responsive" style="max-width: 100%; max-height: 100%;" />
+      {{else}}
+        <div class="receipt-placeholder text-center" style="">
+          <i class="fa fa-arrow-circle-up" style="display: block; font-size: 40px;"></i>
+          Upload a Receipt
+        </div>
+      {{/each}}
+    </div>
+
+    <div class="item-receipt item-attr-edit">
+      {{#each item.receipts}}
+        <img src="{{this.image_url}}" class="receipt-image img-responsive" style="max-width: 100%; max-height: 100%;" />
+        Upload!
+      {{else}}
+        <div class="receipt-placeholder text-center" style="">
+          <i class="fa fa-arrow-circle-up" style="display: block; font-size: 40px;"></i>
+          Upload a Receipt By Clicking
+        </div>
+      {{/each}}
+    </div>
+    
   </div>
 </div>
 </form>

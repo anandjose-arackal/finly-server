@@ -43,7 +43,11 @@
     <% if current_user.employee? %>
       <% views["personal"]["links"]["primary_navbar"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>"  href="<%= value %>"><%= key %></a></li>
+          <% unless value == 'settlements' %>
+            <li><a class="navbar-menu-li" data-path="<%= value %>"  href="<%= value %>"><%= key %></a></li>
+          <% else %>
+            <li><a class="navbar-menu-li" data-path="<%= value + '/' + current_user.id.to_s %>"  href="<%= value %>"><%= key %></a></li>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>   
