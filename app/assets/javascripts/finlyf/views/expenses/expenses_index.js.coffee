@@ -26,6 +26,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .load-more': 'loadMore'
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
+    'submit .navbar-form': 'globalSearch'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -283,6 +284,19 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
 
     # console.log "Will navigate now."
+    if @params.view
+      params.view = @params.view
+
+    FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
+
+  globalSearch: (e) ->
+    e.preventDefault()
+    target = $(e.currentTarget)
+    query = $(target).find(".input-global-search").val()
+    params = {
+      filter_search: query
+    }
+
     if @params.view
       params.view = @params.view
 
