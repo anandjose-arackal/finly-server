@@ -19,4 +19,12 @@ class Export::Field::Destroy < Export::Base
       errors << preference.errors.full_messages
     end
   end
+
+  def retrieve
+    if is_success?
+      return true
+    else
+      return false
+    end
+  end
 end

@@ -33,7 +33,7 @@ class Policy::Users::AddUser < Policy::Base
 
   def authorize
     unless policy
-      # check if it's an empty policy.
+      # check if it's an empty policy, for adding a user for the first time
       self.policy = Policy.find_by(id: params[:policy_id])
       unless policy.users.blank?
         errors << "Policy not found."

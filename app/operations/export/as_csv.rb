@@ -40,7 +40,8 @@ class Export::AsCsv < Export::Base
 
   def retrieve
     if is_success?
-      return result
+      csv_presenter = Export::Base::ExportPresenter.new(user, {data: result})
+      return csv_presenter
     else
       return false
     end

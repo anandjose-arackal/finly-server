@@ -1,13 +1,17 @@
-class Expense::List < Expense::Base
+class Expense::Index < Expense::Base
 
   attr_accessor :role_id, :expenses
 
-  class Expense::List::ExpenseListPresenter < Expense::Base::ExpensePresenter
+  class Expense::Index::ExpenseListPresenter < Expense::Base::ExpensePresenter
 
-    attr_accessor :expenses
+    attr_accessor :expenses, :merchants, :count, :categories
 
-    def initialize(expenses)
-      self.expenses = expenses
+    def initialize(user, params)
+      self.expenses = params[:expenses]
+      self.merchants = expenses.manual.pluck(:merchant)
+      self.merchants += expenses.card.pluck(:editable_merchant)
+      self.count = expenses.count
+      self.categories = user.company.active_categories
     end
   end
 
@@ -55,7 +59,7 @@ class Expense::List < Expense::Base
 
   def retrieve
     if is_success?
-      list_presenter = Expense::Base::ExpensePresenter.new(expenses)
+      list_presenter = Expense::Index::ExpenseListPresenter.new(user, {expenses: expenses})
       return list_presenter
     else
       false

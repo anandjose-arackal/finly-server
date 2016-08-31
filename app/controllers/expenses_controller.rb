@@ -50,14 +50,12 @@ class ExpensesController < ApplicationController
     elsif @manager_view
       role = UserRole.manager_id
     end
-    @expenses = @expense_service.expenses(role)
+    @expense_presenter = Expense::Index.new(current_user, role).run
+    @expenses = @expense_presenter.expenses
     # for the filters
     if @expenses.present?
-      @merchants = @expenses.include_manual_expense.pluck(:merchant)
       @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 15)
-      @count = @expenses.count
     end
-    @categories = current_company.active_categories
     generate_filters
 
     respond_to do |format|

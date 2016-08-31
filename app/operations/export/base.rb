@@ -3,6 +3,26 @@ class Export::Base < BaseOperation
   attr_accessor :company, :preference
 
 
+  class Export::Base::ExportPresenter < BaseOperation::BasePresenter
+    attr_accessor :data, :header
+
+    def initialize(user, params)
+      self.data = params[:data]
+      self.header = params[:header]
+    end
+
+  end
+
+  class Export::Field::FieldPresenter < BaseOperation::BasePresenter
+
+    attr_accessor :field
+
+    def initialize(user, params)
+      self.field = params[:preference]
+      self.result = params[:result]
+    end
+  end
+
   def authorized_user_types
     [:admin]
   end
