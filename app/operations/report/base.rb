@@ -24,7 +24,7 @@ class Report::Base < BaseOperation
   # added here because in most cases we will be returning the report itself
   def retrieve
     if is_success?
-      report
+      present_report
     else
       return false
     end
@@ -44,7 +44,7 @@ class Report::Base < BaseOperation
     params.require(:receipt).permit(:image)
   end
 
-  def report_presenter
+  def present_report
     Report::Base::Presenter.new(self.user, report: self.report)
   end
 

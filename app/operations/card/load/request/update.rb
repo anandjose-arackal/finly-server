@@ -2,7 +2,7 @@ class Card::Load::Request::Update < Card::Load::Request::Base
   attr_accessor :changes
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee]
   end
 
   def pre_validate
@@ -47,7 +47,6 @@ class Card::Load::Request::Update < Card::Load::Request::Base
 
   protected
   def generate_comments(model)
-    # return unless self.card_load_request.changed?
     self.changes = model.changes.merge(model.amount.changes)
   end
 
@@ -56,12 +55,14 @@ class Card::Load::Request::Update < Card::Load::Request::Base
     changes.each do |key, value|
       next unless value.present? and key.present?
       case key
-        when :note
-          self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
-                                                 updated_field: 'note', updated_from:  value[0], updated_to: value[1]
-        when :value
-          self.card_load_request.comments.create user: user, comment_action_id: CardLoadRequestCommentAction.update_id,
-                                                 updated_field: 'amount', updated_from:  value[0], updated_to: value[1]
+        when :name
+          self.report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id,
+                                     updated_field: 'name', updated_from: report.name_was,
+                                     updated_to: report.name
+        when :policy_id
+          self.report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id,
+                                     updated_field: 'policy', updated_from: report.policy_id_was,
+                                     updated_to: report.policy_id
         else
       end
     end
