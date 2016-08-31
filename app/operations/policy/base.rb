@@ -4,6 +4,8 @@ class Policy::Base < BaseOperation
 
   class Policy::Base::PolicyPresenter < BaseOperation::BasePresenter
 
+    attr_accessor :policy
+
   end
 
   def pre_validate

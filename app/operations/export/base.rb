@@ -4,7 +4,12 @@ class Export::Base < BaseOperation
 
 
   class Export::Base::ExportPresenter < BaseOperation::BasePresenter
+    attr_accessor :data, :header
 
+    def initialize(user, params)
+      self.data = params[:data]
+      self.header = params[:header]
+    end
 
   end
 
@@ -12,8 +17,9 @@ class Export::Base < BaseOperation
 
     attr_accessor :field
 
-    def initialize(field)
-      self.field = field
+    def initialize(user, params)
+      self.field = params[:preference]
+      self.result = params[:result]
     end
   end
 

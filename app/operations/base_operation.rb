@@ -152,6 +152,7 @@ class BaseOperation
   end
 
   protected
+
   def success
     true
   end

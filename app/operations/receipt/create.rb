@@ -20,9 +20,11 @@ class Receipt::Create < Receipt::Base
 
   def retrieve
     if is_success?
-      return receipt
+      receipt_presenter = Receipt::Base::ReceiptPresenter.new(user, receipt: receipt)
+      return receipt_presenter
     else
       return false
     end
   end
+
 end

@@ -1,6 +1,16 @@
 class User::Team::Show < User::Team::Base
   attr_accessor :role_id
 
+  class User::Team::Show::ShowPresenter < User::Team::Base::TeamPresenter
+
+    attr_accessor :team
+
+    def initialize(user, params)
+      self.team = params[:team]
+
+    end
+  end
+
   def initialize(user, role_id, params={})
     super(user, params)
     self.role_id = role_id
@@ -68,6 +78,15 @@ class User::Team::Show < User::Team::Base
     user_ids.uniq! if user_ids.present?
     if user_ids.present?
       self.response = user.company.users.with_id(user_ids)
+    end
+  end
+
+  def retrieve
+    if is_success?
+      team_presenter = User::Team::Show::ShowPresenter.new(user, {team: response})
+      return team_presenter
+    else
+      return false
     end
   end
 

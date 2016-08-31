@@ -213,7 +213,7 @@ class PoliciesController < ApplicationController
   end
 
   def rule_params
-    params.require(:rule).permit!
+    params.require(:rules).permit!
   end
 
   def load_service_objects

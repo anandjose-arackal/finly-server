@@ -17,7 +17,7 @@
 #     budget_period_id: the id based on the period of the budget - day, week, month, year
 #
 
-class Policy::Rule::Create < Policy::Rule::Create
+class Policy::Rules::Create < Policy::Rules::Base
 
   def init
     super()
@@ -47,6 +47,5 @@ class Policy::Rule::Create < Policy::Rule::Create
       end
     end
   end
-
 
 end

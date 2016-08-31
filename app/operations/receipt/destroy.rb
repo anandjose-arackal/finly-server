@@ -29,6 +29,7 @@ class Receipt::Destroy < Receipt::Base
     end
   end
 
+  # return true or false because it's a destroy operation
   def retrieve
     if is_success?
       return true

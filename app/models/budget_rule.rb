@@ -46,8 +46,8 @@ class BudgetRule < ActiveRecord::Base
   def no_duplicates
     # checking against all budget rules in the respective policy
     self.policy.budget_rules.each do |rule|
-      if rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.budget_period_id == self.budget_period_id and rule.rule_type_id == self.rule_type_id
-        errors.add(:rule, 'already exists. Please try again.')
+      if not rule.id == self.id and rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.budget_period_id == self.budget_period_id and rule.rule_type_id == self.rule_type_id
+        errors.add(:rules, 'already exists. Please try again.')
       end
     end
   end

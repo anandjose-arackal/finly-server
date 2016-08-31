@@ -30,7 +30,8 @@ class Export::AsXml < Export::Base
 
   def retrieve
     if is_success?
-      {header: @column_names, data: @data}
+      xml_presenter = Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data})
+      return xml_presenter
     else
       false
     end

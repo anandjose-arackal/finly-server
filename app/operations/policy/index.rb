@@ -4,10 +4,16 @@
 
 class Policy::Index < Policy::Base
 
-  attr_accessor :view
+  attr_accessor :view, :policies
 
   class Policy::Index::IndexPresenter < Policy::Base::PolicyPresenter
 
+    attr_accessor :policies
+
+    def initialize(user, params)
+      self.policies = params[:policies]
+
+    end
   end
 
   def self.call(user, params)
@@ -22,14 +28,21 @@ class Policy::Index < Policy::Base
 
   end
 
-  def retrieve
+  def process
     if view == 'admin' and user.admin? # Admin can view all policies
-      user.company.policies if user.company.policies
+      self.policies = user.company.policies if user.company.policies
     elsif view == 'policy_admin' and user.policy_admin?
       # i.e. all policies this user is an admin for
-      user.admin_policies if user.admin_policies
+      self.policies = user.admin_policies if user.admin_policies
     elsif view == 'personal' or view.nil? # User would get a list of policies he is added to
-      user.policies if user.policies
+      self.policies = user.policies if user.policies
+    end
+  end
+
+  def retrieve
+    if is_success?
+      index_presenter = Policy::Index::IndexPresenter.new(user, {policies: policies })
+      return index_presenter
     end
   end
 end

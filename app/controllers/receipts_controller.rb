@@ -13,7 +13,6 @@ class ReceiptsController < ApplicationController
   end
 
   def create
-    ap params
     receipt_service = ReceiptService.new(current_user)
     if receipt_service.create_receipt(receipt_params)
       flash.now[:success] = "Receipt added!"
