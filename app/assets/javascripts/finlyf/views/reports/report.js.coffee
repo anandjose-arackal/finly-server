@@ -17,6 +17,7 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-post-comment': 'postComment'
 
     'click .btn-delete-item': 'delete'
+    'click .btn-delete-sub-item': 'deleteSub'
     'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
     'click .btn-submit-item': 'submit'
@@ -203,6 +204,23 @@ class FinlyF.Views.Report extends Backbone.View
       error: (err) ->
         console.log "Error", err
 
+    })
+
+  deleteSub: (e) ->
+    console.log "deleteing sub"
+    _this = @
+    expense_id = $(e.currentTarget).attr('data-item-id')
+    $.ajax({
+      url: _this.model.urlRoot + "/" + _this.model.get('id') + "/remove_expenses?expense_id=" + expense_id,
+      type: 'DELETE',
+      dataType: 'json',
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+      },
+      success: (res)->
+        _this.model.fetch()
+      error: (err) ->
+        console.log "Error", err
     })
 
   submit: (e) ->

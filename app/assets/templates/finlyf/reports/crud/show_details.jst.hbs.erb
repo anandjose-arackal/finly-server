@@ -111,7 +111,7 @@
           <div class="col-sm-2 no-padding text-right">
           {{#switch ../../item.current_view}}
             {{#case 'personal'}}
-            <button class="btn btn-xs btn-warning">View</button> <button class="btn btn-xs btn-danger">Delete</button>
+            <button class="btn btn-xs btn-warning">View</button> <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
             {{/case}}
 
             {{#case 'admin'}}
