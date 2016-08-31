@@ -30,4 +30,13 @@ class Export::Field::Create < Export::Base
 
   end
 
+  def retrieve
+    if is_success?
+      field_presenter = Export::Base::FieldPresenter.new(user, {preference: preference})
+      return field_presenter
+    else
+      return false
+    end
+  end
+
 end

@@ -1,4 +1,4 @@
-class User::Team::Mapping::Base < User::Team::Base
+class User::Team::Mappings::Base < User::Team::Base
   attr_accessor :updating_user, :policy
 
   def pre_validate

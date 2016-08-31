@@ -1,5 +1,7 @@
 class AutocompleteController < ApplicationController
   def merchant
+    expense_presenter = Expense::Index.new(current_user, UserRole.employee_id).run
+    # todo - find out how to search from within the array of merchants
     merchants = ManualExpense.merchant_like(params[:query])
 
     respond_to do |format|

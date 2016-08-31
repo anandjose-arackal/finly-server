@@ -5,6 +5,14 @@ class Expense::Manual::Create < Expense::Base
 
   attr_accessor :expense_params
 
+  class Expense::Manual::Create::CreatePresenter < Expense::Base::ExpensePresenter
+    attr_accessor :expense
+
+    def initialize(expense)
+      self.expense = expense
+    end
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       errors << "Parameters or user not present."
@@ -29,7 +37,6 @@ class Expense::Manual::Create < Expense::Base
       errors << self.expense.errors.full_messages
       return false
     end
-    success
   end
 
   def post_process
@@ -40,9 +47,11 @@ class Expense::Manual::Create < Expense::Base
     end
   end
 
+  # the presenter here returns the created expense
   def retrieve
     if is_success?
-      return expense
+      created_expense = Expense::Manual::Create::CreatePresenter.new(expense)
+      return created_expense
     else
       return false
     end

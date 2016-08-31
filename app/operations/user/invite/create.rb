@@ -1,40 +1,49 @@
+# action to invite a new user to the company
+# params:
+# invite:
+#       company_id:
+#       role_mapping_attributes:
+#       team_mapping_attributes:
+#
+
+
 class User::Invite::Create < User::Invite::Base
 
   attr_accessor :new_user
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "NO user or param passed."
+      errors << "No user or param passed."
     end
   end
 
   def init
-
+    self.invite_params = create_invite_params
   end
 
   def validate
-    if params[:company].blank? and params[:company_id].blank? and params['company_id']
+    if invite_params[:company].blank? and invite_params[:company_id].blank? and invite_params['company_id'].blank?
       errors << 'A user can only be invited to a company. Please enter the company the user has to be assigned to'
       return false
     end
-    company_id = params[:company_id] or params[:company] or params['company_id']
-    if company_id != self.user.company_id.to_s
+    company_id = invite_params[:company_id] or invite_params[:company] or invite_params['company_id']
+    if company_id != self.user.company_id
       errors << 'User can only be invited in the same company'
       return false
     end
 
-    if params[:email].blank?
+    if invite_params[:email].blank?
       errors << 'User email is required for inviting users'
       return false
     end
 
-    if User.find_by_email(params[:email]).present?
+    if User.find_by_email(invite_params[:email]).present?
       errors << 'Cannot invite an existing user'
       return false
     end
 
     # checking validity of user role params
-    role_mapping = params[:role_mapping_attributes]
+    role_mapping = invite_params[:role_mapping_attributes]
     if role_mapping.blank?
       errors << 'User must be assigned a role to be invited'
       return false
@@ -45,7 +54,7 @@ class User::Invite::Create < User::Invite::Base
     end
 
     # checking validity of user team params
-    team_mapping = params[:team_mapping_attributes]
+    team_mapping = invite_params[:team_mapping_attributes]
     if team_mapping.blank?
       errors << 'User must be assigned a manager and a finance manager to be invited'
       return false
@@ -59,7 +68,7 @@ class User::Invite::Create < User::Invite::Base
 
   def authorize
     # checking if role mapping attributes are compatible
-    role_mapping = params[:role_mapping_attributes]
+    role_mapping = invite_params[:role_mapping_attributes]
     if user.manager?
       role_mapping.each do |role|
         rid = role[:user_role_id]
@@ -79,7 +88,7 @@ class User::Invite::Create < User::Invite::Base
     end
 
     # checking if team mapping attributes are compatible
-    team_mapping = params[:team_mapping_attributes]
+    team_mapping = invite_params[:team_mapping_attributes]
     if self.user.manager? or self.user.finance_manager?
 
       default_present = false
@@ -114,14 +123,14 @@ class User::Invite::Create < User::Invite::Base
 
   def pre_process
     # if the user has a policy during invite, temporarily storing that user's policy to add it separately later
-    if params[:policy_id]
-      @policy_id = params[:policy_id]
-      params.delete(:policy_id)
+    if invite_params[:policy_id]
+      @policy_id = invite_params[:policy_id]
+      invite_params.delete(:policy_id)
     end
   end
 
   def process
-    self.new_user = User.invite!(params, self.user) do |u|
+    self.new_user = User.invite!(invite_params, self.user) do |u|
       # u.skip_invitation = true
     end
     unless new_user
@@ -134,11 +143,19 @@ class User::Invite::Create < User::Invite::Base
     if is_success?
       @policy = Policy.find_by(id: @policy_id)
       if @policy
-        unless PolicyUserService.new(@policy).add_user(new_user)
+        unless Policy::Users::AddUser.new(user, {policy_id: @policy.id, added_user_id: new_user.id})
           errors << "User could not be added to policy."
           return false
         end
       end
+    end
+  end
+
+  def retrieve
+    if is_success?
+      return new_user
+    else
+      return false
     end
   end
 

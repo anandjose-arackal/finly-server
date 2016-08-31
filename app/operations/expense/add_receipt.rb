@@ -2,6 +2,15 @@ class Expense::AddReceipt < Expense::Base
 
   attr_accessor :receipt
 
+  class Expense::AddReceipt::ReceiptPresenter < Expense::Base::ExpensePresenter
+
+    attr_accessor :receipt
+
+    def initialize(receipt)
+      self.receipt = receipt
+    end
+  end
+
   def authorized_user_types
     [:employee]
   end
@@ -51,7 +60,8 @@ class Expense::AddReceipt < Expense::Base
 
   def retrieve
     if is_success?
-      return receipt
+      receipt_presenter = Expense::AddReceipt::ReceiptPresenter.new(receipt)
+      return receipt_presenter
     else
       return false
     end

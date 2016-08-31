@@ -1,4 +1,6 @@
 # updating an export field
+# params:
+#
 
 class Export::Field::Update < Export::Base
 
@@ -10,11 +12,13 @@ class Export::Field::Update < Export::Base
     self.preference = company.export_preferences.find_by(id: update_params[:export_field_id])
   end
 
-  def validate
+  def authorize
     unless preference
-      errors << "Cannot find preference to update."
-      return false
+      raise_unauthorized_exception
     end
+  end
+
+  def validate
     if update_params.blank?
       errors << "Nothing to update."
     end
@@ -26,4 +30,12 @@ class Export::Field::Update < Export::Base
     end
   end
 
+  def retrieve
+    if is_success?
+      field_presenter = Export::Base::FieldPresenter.new(user, {preference: preference})
+      return field_presenter
+    else
+      return false
+    end
+  end
 end

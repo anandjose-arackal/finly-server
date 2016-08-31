@@ -27,6 +27,7 @@ class Report::Receipts::Add < Report::Base
 
   def process
     self.receipt = report.receipts.build(new_receipt_params)
+    receipt.user = user
     unless receipt.save
       errors << receipt.errors.full_messages
     end

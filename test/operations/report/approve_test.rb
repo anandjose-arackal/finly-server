@@ -49,7 +49,7 @@ class ApproveTest < ActiveSupport::TestCase
 
     # correct manager approving the report - the flow this time would be manager0 and then manager1,
     # because manager0's approves to is manager1
-    approve_op = Report::Approve.new(@manager, report_id: @report.id)
+    approve_op = Report::Approve.new(@manager, {report_id: @report.id, role_id: UserRole.manager_id})
     assert_difference 'ReportTrack.count', 1 do
       @report = approve_op.run
     end
@@ -58,7 +58,7 @@ class ApproveTest < ActiveSupport::TestCase
     assert_equal @second_manager.id, @report.controlling_user_id
 
     # report is now being approved by manager1. after manager1, the report should go to finance manager 0
-    approve_op = Report::Approve.new(@second_manager, report_id: @report.id)
+    approve_op = Report::Approve.new(@second_manager, {report_id: @report.id, role_id: UserRole.manager_id})
     assert_difference 'ReportTrack.count', 1 do
       @report = approve_op.run
     end
@@ -68,7 +68,7 @@ class ApproveTest < ActiveSupport::TestCase
 
     # report is now being approved by finance0. the report should now go to finance1,
     # who is the default approves_to for finance0
-    approve_op = Report::Approve.new(@finance_manager, report_id: @report.id)
+    approve_op = Report::Approve.new(@finance_manager, {report_id: @report.id, role_id: UserRole.finance_manager_id})
     assert_difference 'ReportTrack.count', 1 do
       @report = approve_op.run
     end
@@ -77,7 +77,7 @@ class ApproveTest < ActiveSupport::TestCase
 
     # now finance1 also approves it, who's the final approver, after which it should be
     # accounted for
-    approve_op = Report::Approve.new(@second_finance_manager, report_id: @report.id)
+    approve_op = Report::Approve.new(@second_finance_manager, {report_id: @report.id, role_id: UserRole.finance_manager_id})
     assert_difference 'ReportTrack.count', 1 do
       @report = approve_op.run
     end

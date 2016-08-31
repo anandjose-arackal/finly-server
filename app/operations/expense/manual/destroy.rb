@@ -37,4 +37,14 @@ class Expense::Manual::Destroy < Expense::Base
     # mail?
   end
 
+
+  # since it's a destroy method, it return true or false based on success of the operation.
+  def retrieve
+    if is_success?
+      return true
+    else
+      return false
+    end
+  end
+
 end

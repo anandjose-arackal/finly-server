@@ -1,6 +1,4 @@
-
-# todo - come back to this in the end
-
+# action to register a company in the
 
 class Company::Register < Company::Base
 

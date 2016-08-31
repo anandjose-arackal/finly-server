@@ -24,8 +24,10 @@ class ExpenseRule < ActiveRecord::Base
   accepts_nested_attributes_for :greater_than_amount
 
   delegate :amount_value, to: :greater_than_amount
+  delegate :greater_than_amount_value, to: :greater_than_amount
   delegate :type, to: :rule_type
   delegate :category_name, to: :category
+
 
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true
@@ -47,7 +49,8 @@ class ExpenseRule < ActiveRecord::Base
   # make sure no rule has all attributes the same
   def no_duplicates
     self.policy.expense_rules.each do |rule|
-      if rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.days_after == self.days_after and rule.expense_rule_type_id == self.expense_rule_type_id and rule.rule_type_id == self.rule_type_id
+      if not rule.id == self.id and rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.days_after == self.days_after and rule.expense_rule_type_id == self.expense_rule_type_id and rule.rule_type_id == self.rule_type_id
+        debugger
         errors.add(:rule, 'already exists. Please try again.')
       end
     end

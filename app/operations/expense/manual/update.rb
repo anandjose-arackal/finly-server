@@ -2,6 +2,14 @@ class Expense::Manual::Update < Expense::Base
 
   attr_accessor :old_expense, :updated_expense_params
 
+  class Expense::Manual::Create::UpdatePresenter < Expense::Base::ExpensePresenter
+    attr_accessor :expense
+
+    def initialize(expense)
+      self.expense = expense
+    end
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       errors << "Parameters or user not present."
@@ -61,7 +69,8 @@ class Expense::Manual::Update < Expense::Base
 
   def retrieve
     if is_success?
-      return expense
+      update_presenter = Expense::Manual::Create::UpdatePresenter.new(receipt)
+      return update_presenter
     else
       return false
     end

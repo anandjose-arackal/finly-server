@@ -12,7 +12,7 @@ class Report::TakeControl < Report::Base
 
   def authorize
     if user.policy_admin?
-      unless report.policy and user.policy_admin?(report.policy)
+      if report.policy and not user.policy_admin?(report.policy) # that is the report has a policy and the user is not policy admin
         raise_unauthorized_exception
         return false
       end
@@ -27,9 +27,9 @@ class Report::TakeControl < Report::Base
   end
 
   def process
-    if report.update_attributes controlling_user: user, controlling_for_user: report.controlling_user, memo: memo
+    if report.update_attributes controlling_user: user, controlling_for_user: report.controlling_user, memo: params[:memo]
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.take_control_id,
-                                  report_status_id: report.status_id, memo: memo
+                                  report_status_id: report.status_id, memo: params[:memo]
       track.save
       return true
     end
@@ -38,7 +38,7 @@ class Report::TakeControl < Report::Base
 
   def post_process
     if is_success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_take_control_id, content: memo
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_take_control_id, content: params[:memo]
       comment.save
     end
   end

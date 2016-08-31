@@ -3,6 +3,11 @@ class Expense::Base < BaseOperation
   attr_accessor :expense
   attr_accessor :transaction, :card
 
+  class Expense::Base::ExpensePresenter < BaseOperation::BasePresenter
+
+  end
+
+
   def authorized_user_types
     [:employee]
   end

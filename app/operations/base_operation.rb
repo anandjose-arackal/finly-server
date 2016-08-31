@@ -1,7 +1,7 @@
 require 'hooks'
 
 class BaseOperation
-  include CallbackHandler
+  include CallbackHandler, MathUtil
   attr_accessor :user, :params, :errors, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
@@ -118,10 +118,42 @@ class BaseOperation
 
   # Used to present the data to the UI
   class BaseOperation::BasePresenter
+    include MathUtil
+    attr_accessor :user, :params
+
+    def initialize(user, params={})
+      self.user = user
+      self.params = params
+    end
+
+    def admin_view?
+      is_view?(:admin)
+    end
+
+    def manager_view?
+      is_view?(:manager)
+    end
+
+    def finance_view?
+      is_view?(:finance)
+    end
+
+    def auditor_view?
+      is_view?(:auditor)
+    end
+
+    def personal_view?
+      is_view?(:employee) or is_view?(:personal)
+    end
+
+    def is_view?(type)
+      type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
+    end
 
   end
 
   protected
+
   def success
     true
   end

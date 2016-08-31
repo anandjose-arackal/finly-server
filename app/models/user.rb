@@ -41,6 +41,8 @@ class User < ActiveRecord::Base
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
 
+  devise :database_authenticatable, :validatable, password_length: 8..128
+
   attr_accessor :view
 
   belongs_to :company
@@ -92,6 +94,7 @@ class User < ActiveRecord::Base
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
+
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
