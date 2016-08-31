@@ -13,7 +13,6 @@ class Report::ReimburseConfirm < Report::Base
   def validate
     unless report.reimbursed?
       errors << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
-      return false
     end
   end
 
@@ -24,7 +23,6 @@ class Report::ReimburseConfirm < Report::Base
       return true
     end
     errors << "Report could not be marked as reimbursed. Please try again."
-    return false
   end
 
   def post_process
