@@ -16,13 +16,18 @@ class ReportsController < ApplicationController
     authorize Report
     rs = ReportService.new(user: current_user)
     if rs.create create_params
-      @report = rs.report
-      ap @report
+
+      @report = rs.report #creating @report for use in show.json.jbuilder
+
+      #Calling methods neccessary to render show
+      load_expenses_for_views
+      load_info_for_views
+      @comments = @report.comments.all.order(created_at: :desc)
+
       respond_to do |format|
-        # format.json {render json: {"status": "success"}}
-        format.json {}
+        #rendeing show method
+        format.json {render :show}
       end
-      # redirect_to report_path rs.report, view_params
       return
     end
     flash[:error] = rs.errors
@@ -57,10 +62,11 @@ class ReportsController < ApplicationController
 
   def show
     authorize @report
-    # load_view_for_report
-    load_expenses_for_views
-    load_info_for_views
+    load_view_for_report
+    # load_expenses_for_views
+    # load_info_for_views
     @comments = @report.comments.all.order(created_at: :desc)
+    ap @views
 
     # ap @expenses
 
@@ -315,10 +321,20 @@ class ReportsController < ApplicationController
         end
         return
       end
+
+      @report = rs.report
+      #creating @report for use in show.json.jbuilder
+
+      #Calling methods neccessary to render show
+      load_expenses_for_views
+      load_info_for_views
+      @comments = @report.comments.all.order(created_at: :desc)
+      
       respond_to do |format|
         format.html do
           redirect_to report_path rs.report, view_params
         end
+        format.json {render :show}
         format.js do
           load_view_for_report
           render 'reports/report', remote: true
