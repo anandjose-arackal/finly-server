@@ -6,7 +6,8 @@ class FinlyF.Views.Expense extends Backbone.View
 
   events:
     'click .select-item': 'toggleSelect'
-    'input [contenteditable=true]': 'updateModel'
+    # 'input [contenteditable=true]': 'updateModel'
+    'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
     'click .btn-delete-item': 'delete'
 
@@ -35,8 +36,7 @@ class FinlyF.Views.Expense extends Backbone.View
     value = e.target.innerText
     @model.set(field, value);
 
-  update: ->
-    @model.save({patch: true})
+  
 
   toggleSelect: (e) ->
     if $(e.currentTarget).prop('checked')
@@ -63,6 +63,45 @@ class FinlyF.Views.Expense extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
+
+  edit: (e) ->
+    $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-item').addClass('btn-update-item')
+    $(@el).find(".item-attr-preview").css("display", "none")
+    $(@el).find(".item-attr-edit").css("display", "block")
+
+  update: (e) ->
+    $(e.currentTarget).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-item').addClass('btn-edit-item')
+
+    _this = @
+    values = {}
+
+    # if(event){ event.preventDefault(); }
+
+    _.each($(@el).find('form#form-update-item').serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    values.authenticity_token = $("#authenticity_token").val()
+    model = new FinlyF.Models.Expense({
+      id: @model.get('id')
+    })
+    # # console.log("Putting data")
+    response = model.save(values, {
+      patch: true,
+      iframe: true,
+      files: this.$('form :file'),
+      data: values,
+      processData: true
+      success: (model, res) ->
+        console.log "Success"
+        console.log model, res
+        # if res.status == "success"
+        #   $("#modal-new").modal('hide')
+        #   _this.refetchCollection()
+      error: (err) ->
+        console.log "Error", err
+
+    })
+    
 
 
 #Features

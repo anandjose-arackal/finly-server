@@ -17,17 +17,24 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-post-comment': 'postComment'
 
     'click .btn-delete-item': 'delete'
+    'click .btn-edit-item': 'edit'
+    'click .btn-update-item': 'update'
+    'click .btn-submit-item': 'submit'
+    'click .btn-retract-item': 'retract'
 
   initialize: (options) ->
     @parent = options.parent
     _this = @
     @preview = options.preview
     if @preview
+
+      @current_view = options.current_view ##NEED TO ADD THIS IN REPORTS
       # console.log "Preview is passed true"
       $(@el).removeClass("item").addClass("bg-white")
       @model.fetch()
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
+    
 
   render: ->
     unless @preview
@@ -52,6 +59,7 @@ class FinlyF.Views.Report extends Backbone.View
       $(@el).removeClass('selected')
 
   populateDetails: ->
+    @model.set('current_view', @current_view)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
   showSaveOption: ->
@@ -110,6 +118,51 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp .modal-body").append(@templateExistingExpense())
     $(@el).find("#modal-mp").modal('show')
 
+  edit: (e) ->
+    #Warning!!! Dirty codes ahead!
+    $(e.currentTarget).addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
+
+    _this = @
+    $(@el).find(".item-name").html("<input type='text' class='item-name-edit' />")
+    $(@el).find(".item-name .item-name-edit").val(_this.model.get('name'))
+
+    target_select = $(@el).find(".item-policy")
+    select = $('<select />', {
+      name: 'item-policy',
+      class: 'item-policy-edit',
+
+    })
+
+    policies = $(@model.get('policies'))
+    for policy in policies
+      console.log policy
+      $('<option />', {
+        text: policy.name,
+        value: policy.id
+      }).appendTo(select)
+
+    $(target_select).html(select)
+
+  update: (e) ->
+    $(e.currentTarget).html("<i class='fa fa-circle-o-notch fa-spin'></i>")
+    _this = @
+
+    policy_id = $(@el).find('select.item-policy-edit').val()
+    name = $(@el).find('input.item-name-edit').val()
+    
+    @model.save({report: {name: name}}, {
+      success: (model, res) ->
+        console.log model, res
+      error: (err) ->
+        console.log "Error", err
+    })
+
+    ##Below code is not needed, as the model sync will reload the view!
+    # $(@el).find(".item-name").html(@model.get('name'))
+    # $(@el).find(".item-policy").html(@model.get('policy') || "None")
+    # $(@el).find(".item-name .item-name-edit").val(_this.model.get('name'))
+    # $(e.currentTarget).addClass('btn-edit-item btn-warning').removeClass('btn-update-item btn-success').html("Edit  <i class='fa fa-edit'></i>")
+
   postComment: (e) ->
     _this = @
     target = $(e.currentTarget)
@@ -147,5 +200,45 @@ class FinlyF.Views.Report extends Backbone.View
 
     })
 
-#Features
-# 1. Compare models if anything has changed. Or else hide the show button.
+  submit: (e) ->
+    _this = @
+    report_id = @model.get('id')
+
+    $.ajax({
+      url: "/reports/" + report_id + "/submit",
+      dataType: 'json',
+      data: {
+        report_id: report_id,
+        authenticity_token: $("#authenticity_token").val()
+      },
+      type: 'PATCH',
+      success: (res) ->
+        console.log res
+        _this.model.fetch()
+      error: (err) ->
+        console.log err
+    })
+
+  retract: (e) ->
+    e.preventDefault()
+    _this = @
+    report_id = @model.get('id')
+
+    $.ajax({
+      url: "/reports/" + report_id + "/retract",
+      dataType: 'json',
+      data: {
+        report_id: report_id,
+        authenticity_token: $("#authenticity_token").val()
+      },
+      type: 'PATCH',
+      success: (res) ->
+        # console.log res
+        _this.model.fetch()
+      error: (err) ->
+        console.log err
+    })
+
+
+
+

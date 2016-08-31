@@ -23,6 +23,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     'click .filter-status li a': 'filterStatus'
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
+    
 
     #Filters
     'keyup .filter-field': 'autoComplete'
@@ -34,7 +35,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     else
       @params = {}
     @params.page = 1
-    # console.log "Params from view", @params
+    console.log "Params from view", @params
     # console.log "Step x. Init View"
     _this = @
     @dump = []
@@ -150,6 +151,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       model: model
       preview: true
       parent: @
+      current_view: @params.view || 'personal'
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
@@ -214,6 +216,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     #   success: ->
     #     @collection.fetch({reset: true})
     # })
+
+  
+
 
   filterStatus: (e) ->
     e.preventDefault()

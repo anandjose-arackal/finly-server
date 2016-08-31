@@ -1,11 +1,18 @@
-json.extract! @report, :id, :name, :memo, :status_name, :memo
+json.extract! @report, :id, :name, :memo, :status_name, :memo, :report_status_id
 json.user_name @report.user.name
 json.user_initial @report.user.name.split(' ').first[0] + (@report.user.name.split(' ')[1][0] || @report.user.name.split(' ').first[1])
 json.status @status
 json.manager_name @manager_name
+json.export_csv export_report_path(report_id: @report.id, view: params[:view],:format => :csv)
+json.export_xls export_report_path(report_id: @report.id, view: params[:view],:format => :xls)
+json.export_pdf export_report_path(report_id: @report.id, view: params[:view],:format => :pdf)
 
 if @report.policy
   json.policy @report.policy.name
+end
+
+json.policies @report.user.policies do |policy|
+  json.extract! policy, :id, :name
 end
 
 json.status @report.status.name
@@ -44,3 +51,4 @@ end
 
   end
 end
+
