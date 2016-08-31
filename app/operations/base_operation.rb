@@ -20,24 +20,24 @@ class BaseOperation
   def run
     errors.clear
     authorize_user authorized_user_types
-    return if has_errors?
+    return false if has_errors?
     pre_validate
-    return if has_errors?
+    return false if has_errors?
     pre_authorize
-    return if has_errors?
+    return false if has_errors?
     init
-    return if has_errors?
+    return false if has_errors?
     authorize
-    return if has_errors?
+    return false if has_errors?
     validate
-    return if has_errors?
+    return false if has_errors?
     subscribe
-    return if has_errors?
+    return false if has_errors?
     process
-    return if has_errors?
+    return false if has_errors?
     self.process_complete = true
     post_process
-    return if has_errors?
+    return false if has_errors?
     retrieve
   end
 

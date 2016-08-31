@@ -4,7 +4,6 @@
 # report_id: id of the report that is being reimbursed
 
 class Report::MarkAsReimbursed < Report::Base
-
   attr_accessor :payment
 
   def authorized_user_types
