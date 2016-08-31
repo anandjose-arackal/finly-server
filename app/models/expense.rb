@@ -99,6 +99,7 @@ class Expense < ActiveRecord::Base
   end
 
   scope :with_id, ->(ids) { where id: ids }
+  scope :with_date, ->(dates) { where date: dates }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }

@@ -24,7 +24,7 @@ class Report::Base < BaseOperation
   # added here because in most cases we will be returning the report itself
   def retrieve
     if is_success?
-      return report
+      report
     else
       return false
     end
@@ -44,9 +44,13 @@ class Report::Base < BaseOperation
     params.require(:receipt).permit(:image)
   end
 
+  def report_presenter
+    Report::Base::Presenter.new(self.user, report: self.report)
+  end
+
   class Report::Base::Presenter < BaseOperation::BasePresenter
     attr_accessor :report, :categories, :expenses, :manager, :status, :total, #:report_currency,
-                  :dates, :comments, :buttons, :policies, :selected_policy, :violations
+                  :dates, :comments, :actions, :policies, :selected_policy, :violations
 
     def initialize(user, params={})
       super(user, params)
@@ -57,76 +61,70 @@ class Report::Base < BaseOperation
       self.total = report.total_amount
       self.dates = report.date_as_string
       self.comments = report.comments
-      self.buttons = {}
-
+      self.actions = load_actions
+      self.policies = report.user.policies
+      self.selected_policy = report.policy
+      self.manager = User::Team::Approver.(report.user, type: :manager)
+      self.finance_manager =User::Team::Approver.(report.user, type: :finance_manager)
+      self.violations = Report::Violation.(user, report: self.report)
     end
 
     def expenses_category_sorted
-
+      categorized_expenses = []
+      self.categories.each do |category|
+        item_expenses = self.expenses.with_category(category.id)
+        if item_expenses.present?
+          item_name = category.name
+          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      categorized_expenses
     end
 
     def expenses_date_sorted
-
+      date_expenses = []
+      dates = self.expenses.map(&:date).uniq
+      dates.each do |date|
+        item_expenses = self.expenses.with_date(date)
+        if item_expenses.present?
+          item_name = date
+          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      date_expenses
     end
 
-  end
-
-
-  @expenses= []
-  @categories = current_user.company.categories
-  all_expenses = @report.expenses
-  @categories.each do |category|
-    item_expenses = all_expenses.with_category(category.id)
-    if item_expenses.present?
-      item_name = category.name
-      item_sum = precision_value item_expenses.with_amount.sum(:value)
-      @expenses << {category_name: item_name, expenses: item_expenses, category_total: item_sum}
-    end
-  end
-  uts = UserTeamService.new(@report.user)
-  manager = uts.manager(report: @report)
-  if manager.blank?
-    manager = uts.finance_manager(report: @report)
-  end
-  @manager_name = nil
-  @manager_name = manager.name if manager.present?
-  @status = @report.relative_status_name(current_user)
-  rds = ReportDetailService.new(@report)
-  @total = precision_value rds.total_amount
-  @date_string = rds.date_as_string
-  @comments = @report.comments.all.order(created_at: :desc)
-  @views = {}
-  if @admin_view
-    if @report.can_take_control? and not @report.controlling_user?(current_user)
-      @views[:take_control] = true
-    elsif @report.processing? and @report.controlling_user?(current_user)
-      @views[:review] = true
-    end
-  elsif @finance_view or @manager_view
-    if @report.processing? and @report.controlling_user?(current_user)
-      @views[:review] = true
-    elsif (@report.can_unapprove?) and @report.associated_users(@report.controlling_user).include?(current_user)
-      @views[:unapprove] = true
-    end
-    if @finance_view and @report.reimbursement_pending?
-      @views[:reimburse] = true
-    end
-  else
-    if @report.open? or @report.retracted? or @report.rejected?
-      @views[:add_expenses] = true
-      @views[:delete] = true
-      @views[:editable] = true
-      @views[:submit] = true
-    elsif @report.processing?
-      @views[:retract] = true
-    elsif @report.reimbursed?
-      @views[:reimbursement_confirm] = true
+    def load_actions
+      actions = {}
+      if admin_view?
+        if self.report.can_take_control? and not self.report.controlling_user?(user)
+          actions[:take_control] = {url: report_take_control_path(report_id: report.id, view: params[:view])}
+        elsif self.report.processing? and self.report.controlling_user?(user)
+          actions[:approve] = {url: report_approve_path(report_id: report.id, view: params[:view])}
+          actions[:reject] = {url: report_reject_path(report_id: report.id, view: params[:view])}
+        end
+      elsif finance_view? or manager_view?
+        if self.report.processing? and self.report.controlling_user?(user)
+          actions[:approve] = {url: report_approve_path(report_id: report.id, view: params[:view])}
+          actions[:reject] = {url: report_reject_path(report_id: report.id, view: params[:view])}
+        elsif (self.report.can_unapprove?) and self.report.associated_users(self.report.controlling_user).include?(user)
+          actions[:unapprove] = {url: report_path(report_id: report.id, view: params[:view])}
+        end
+      else
+        if self.report.open? or self.report.retracted? or self.report.rejected?
+          actions[:add_expenses] = {url: report_add_expenses_path(report_id: report.id, view: params[:view])}
+          actions[:delete] = {url: report_path(id: report.id, view: params[:view])}
+          actions[:editable] = {value: true}
+          actions[:submit] = {url: report_submit_path(report_id: report.id, view: params[:view])}
+        elsif self.report.processing?
+          actions[:retract] = {url: report_retract_path(report_id: report.id, view: params[:view])}
+        elsif self.report.reimbursed?
+          actions[:reimbursement_confirm] = {url: report_reimbursement_confirm(report_id: report.id, view: params[:view])}
+        end
+      end
+      actions
     end
   end
-  # code for report policy
-  @policies = @report.user.policies
-  @policy = PolicyRetrievalService.for_report(@report)
-  @violation_messages = @violation_service.violations(@policy, @report)
-
-
 end
