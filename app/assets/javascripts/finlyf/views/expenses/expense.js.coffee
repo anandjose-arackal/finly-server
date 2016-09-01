@@ -79,7 +79,11 @@ class FinlyF.Views.Expense extends Backbone.View
         text: $(option).text()
       }).appendTo(category_select)
 
-      $(category_select).val(@model.get('category_id'))
+    $(category_select).val(@model.get('category_id'))
+    $(@el).find(".datepicker").datepicker({
+      dateFormat: "yy-mm-dd"
+    })
+
 
   update: (e) ->
     $(e.currentTarget).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-item').addClass('btn-edit-item')
