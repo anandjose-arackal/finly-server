@@ -48,7 +48,8 @@ class ExpensesController < ApplicationController
     elsif @manager_view
       role = UserRole.manager_id
     end
-    @expense_presenter = Expense::Index.new(current_user, role, params).run
+    params[:role_id] = role
+    @expense_presenter = Expense::Index.new(current_user, params).run
     @expenses = @expense_presenter.expenses
     # for the filters
     if @expenses.present?

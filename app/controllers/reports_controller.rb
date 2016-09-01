@@ -249,7 +249,7 @@ class ReportsController < ApplicationController
     # code for report policy
     @policies = @report.user.policies
     @policy = @report.versioned_policy
-    @violation_messages = Report::Violations.new(current_user, {report_id: @report.id, role_id: params[:role_id]})
+    @violation_messages = Report::Violation.new(current_user, {report_id: @report.id, role_id: params[:role_id]})
   end
 
   def load_expenses_for_views
@@ -260,7 +260,7 @@ class ReportsController < ApplicationController
   end
 
   def load_info_for_views
-    @manager_name = @show_presenter.manager.name
+    @manager_name = @show_presenter.manager.name if @show_presenter.manager
     @status = @report.relative_status_name(current_user)
     @total = precision_value @report.total_amount
     @date_string = @report.date_as_string

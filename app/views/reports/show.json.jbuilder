@@ -31,7 +31,7 @@ json.comments @comments do |comment|
 end
 
 json.expense_categories @expenses do |category|
-  json.extract! category, :category_name, :category_total
+  json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :note, :merchant_name, :amount_value
