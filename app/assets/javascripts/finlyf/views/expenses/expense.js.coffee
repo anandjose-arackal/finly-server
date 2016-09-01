@@ -105,6 +105,7 @@ class FinlyF.Views.Expense extends Backbone.View
       processData: true
       success: (model, res) ->
         $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+        _this.model.fetch()
         # console.log "Success"
         # console.log model, res
         # if res.status == "success"
