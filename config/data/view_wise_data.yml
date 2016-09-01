@@ -5,7 +5,7 @@ admin:
       - Company Expenses: expenses
       - Employees: employees
       - Analytics: analytics
-      - Selttlements: selttlements
+      - Settlements: settlements
 
 personal:
   links:
@@ -14,7 +14,7 @@ personal:
       - Reports: reports
       - Receipts: receipts
       - Analytics: analytics
-      - Selttlements: selttlements
+      - Settlements: settlements
 
 manager:
   links:

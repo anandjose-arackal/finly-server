@@ -12,6 +12,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   templateMain: HandlebarsTemplates['finlyf/expenses/crud/main']
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
 
+  #IO (IndexOnly)
+  templateIOSkeleton: HandlebarsTemplates['finlyf/base/skeletonIO']
+
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
     'click .main-select-all:checkbox': 'toggleSelectAll'
@@ -23,6 +26,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .load-more': 'loadMore'
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
+    'submit .navbar-form': 'globalSearch'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -33,6 +37,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       FinlyF.primary_router.navigate("expenses")
     if options
       @params = options.params || {}
+      if options.indexOnly
+        @indexOnly = true
     else
       @params = {}
     @params.page = 1
@@ -56,13 +62,15 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   render: ->
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
-
-    $(@el).html(@templateSkeleton())
-    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
-    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-    $(@el).find(".sidebar").html(@templateSidebar())
-    $(@el).find(".main").html(@templateMain())
-    FinlyF.structureActions(@el, @params)
+    unless @indexOnly
+      $(@el).html(@templateSkeleton())
+      $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+      $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+      $(@el).find(".sidebar").html(@templateSidebar())
+      $(@el).find(".main").html(@templateMain())
+      FinlyF.structureActions(@el, @params)
+    else
+      $(@el).html(@templateMain())
     @
 
   
@@ -91,6 +99,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   refetchCollection: (e) ->
     #REFRESH
     #Spin refresh-spinner
+    console.log "Hi"
     _this = @
 
     if e
@@ -163,11 +172,15 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     preview_view = new FinlyF.Views.Expense({
       model: model
       preview: true
+      parent: @
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
     
-  closeDetails: ->
+  closeDetails: (e)->
+    e.preventDefault()
+    if $(e.currentTarget).attr('data-refresh-true')
+      @filter()
     main = $(@el).find(".main")
     $(main).removeClass("preview")
 
@@ -271,6 +284,19 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
 
     # console.log "Will navigate now."
+    if @params.view
+      params.view = @params.view
+
+    FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
+
+  globalSearch: (e) ->
+    e.preventDefault()
+    target = $(e.currentTarget)
+    query = $(target).find(".input-global-search").val()
+    params = {
+      filter_search: query
+    }
+
     if @params.view
       params.view = @params.view
 

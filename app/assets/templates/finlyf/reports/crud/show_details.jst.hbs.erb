@@ -1,6 +1,6 @@
 <div class="row" style="height: 100%;">
   <div class="col-sm-8 show-details-panel">
-    <div class="row">
+    <div class="row item-title">
       <div class="col-sm-6"><h4 class="item-name">{{item.name}}</h4></div>
       <div class="col-sm-6 text-right">
         
@@ -18,14 +18,13 @@
         {{/if_eq}}
         {{#if_eq item.current_view "admin"}}
         {{!-- Actions will come from server and will be displayed irrespective of current_view; according to current_user --}}
-          <button class="btn btn-warning btn-navbar btn-sm btn-edit-item">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
-          <button class="btn btn-navbar btn-sm btn-danger btn-delete-item"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+          <button class="btn btn-warning navbar-btn btn-sm btn-edit-item">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
         {{/if_eq}}
 
       </div>
     </div>
 
-    <div class="row">
+    <div class="row item-body">
       <div class="col-sm-7">
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">Policy</label></div>
@@ -81,7 +80,6 @@
       </div>
       <div class="col-sm-6 no-padding text-right">
         {{#if_eq item.current_view 'personal'}}
-          hithere
           <button class="add-new-expense btn btn-navbar" data-item-id="{{item.id}}">Add New Expense</button>
           <button class="add-existing-expense btn btn-navbar" data-item-id="{{item.id}}">Add Existing Expense</button>
         {{/if_eq}}
@@ -89,12 +87,12 @@
     </div>
     <div class="row no-margin">
       {{#each item.expense_categories}}
-      <div class="col-sm-12">
-        <div class="row" style="padding: 0 10px; background: antiquewhite;">
+      <div class="col-sm-12 expense-category">
+        <div class="row" style="padding: 0 10px; background: #B4AFD0;">
           <div class="col-sm-6 no-padding"><h5>{{this.category_name}}</h5></div>
           <div class="col-sm-6 no-padding"><h5 class="text-right">{{this.category_total}}</h5></div>
         </div>
-        <div class="row" style="padding: 5px 10px; background: antiquewhite;">
+        <div class="row" style="padding: 5px 10px; background: #DDDAEA;">
           <div class="col-sm-1 no-padding">Sl. No.</div>
           <div class="col-sm-2 no-padding">Date</div>
           <div class="col-sm-2 no-padding">Merchant</div>
@@ -111,12 +109,16 @@
           <div class="col-sm-3 no-padding">{{this.note}}</div>
           <div class="col-sm-2 no-padding text-right">$<span>{{amount_value}}</span></div>
           <div class="col-sm-2 no-padding text-right">
-          {{#if_eq item.current_view 'personal'}}
-            <button class="btn btn-xs btn-warning">View</button> <button class="btn btn-xs btn-danger">Delete</button>
-          {{/if_eq}}
-          {{#if_eq item.current_view 'admin'}}
+          {{#switch ../../item.current_view}}
+            {{#case 'personal'}}
+            <button class="btn btn-xs btn-warning">View</button> <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
+            {{/case}}
+
+            {{#case 'admin'}}
             <button class="btn btn-xs btn-danger">Reject</button>
-          {{/if_eq}}
+            {{/case}}
+
+          {{/switch}}
           </div>
         </div>
         {{/each}}
@@ -191,6 +193,16 @@
 </div><!-- .row -->
 
 <style type="text/css">
+
+  .item-title{
+    background: aliceblue;
+  }
+
+  .item-body{
+    margin-top: 50px;
+  }
+
+
   .roundCircle{
     border-radius: 50%;
     line-height: 40px;
@@ -218,5 +230,15 @@
   .comment-meta{
     color: #aaa;
     font-size: 12px;
+  }
+
+  .item-details .expense-category {
+    border: 1px solid #cdcdcd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+
+  .item-details .expense-category:last-child{
+    margin-bottom: 350px;
   }
 </style>
