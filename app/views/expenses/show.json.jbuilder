@@ -1,5 +1,7 @@
 json.extract! @expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id
 
+json.date @expense.date.strftime("%d %b")
+json.formatted_date @expense.date.strftime("%Y-%m-%d")
 # json.receipts @expense.receipts, :id, :image_file_name
 
 

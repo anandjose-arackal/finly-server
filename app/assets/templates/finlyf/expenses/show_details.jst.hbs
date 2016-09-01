@@ -17,13 +17,13 @@
       <div class="col-sm-4 no-padding"><label class="control-label">Merchant:</label></div>
 
       <div class="col-sm-8 item-merchant-name item-attr-preview" style="font-size: 16px;line-height: 14px;">{{item.merchant_name}}</div>
-      <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" name="expense[merchant]" value="{{item.merchant_name}}" /></div>
+      <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" class="filter-merchant" name="expense[merchant]" value="{{item.merchant_name}}" /></div>
     </div>
 
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Date:</label></div>
       <div class="col-sm-8 item-date item-attr-preview">{{item.date}}</div>
-      <div class="col-sm-8 item-date item-attr-edit"><input type="text" class="datepicker" name="expense[date]" value="{{item.date}}"/></div>
+      <div class="col-sm-8 item-date item-attr-edit"><input type="text" class="datepicker" name="expense[date]" value="{{item.formatted_date}}"/></div>
     </div>
 
     <div class="row no-margin item-attribute">
