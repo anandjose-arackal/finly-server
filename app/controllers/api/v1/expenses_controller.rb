@@ -25,54 +25,43 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     if create_operation.is_success?
       render 'api/v1/shared/success'
     else
+      @errors = @result.errors
       render 'api/v1/shared/failure'
     end
   end
 
   def index
-
     @result = Expense::Index.(current_user, params)
     if not @result == false
       render 'api/v1/reports/index'
     else
-      @errors = updater.errors
+      @errors = @result.errors
       render 'api/v1/shared/failure'
     end
-
-    # currently returns only the personal expenses of the user
-    role = UserRole.employee_id
-    if @admin_view
-      role = UserRole.admin_id
-    elsif @finance_view
-      role = UserRole.finance_manager_id
-    elsif @manager_view
-      role = UserRole.manager_id
-    end
-    @expenses = apply_scopes(@expense_service.expenses(role)).paginate(page: params[:page], per_page: 30)
   end
 
   def show
-    authorize @expense
+    @result = Expense::Show.(current_user,params)
   end
 
   def update
-    authorize @expense
-    debugger
-    if @expense_service.update_expense(current_user, update_params)
+    operation = Expense::Manual::Update.new(current_user,params)
+    @result = operation.run
+    if operation.is_success?
       render 'api/v1/expenses/show'
     else
-      @errors = @expense_service.errors
+      @errors = @result.errors
       render 'api/v1/shared/failure'
     end
   end
 
   def destroy
-    authorize @expense
-    id = (params[:id] or params[:expense_id])
-    if @expense_service.remove_expense(id)
+    operation = Expense::Manual::Update.new(current_user,params)
+    @result = operation.run
+    if operation.is_success?
       render 'api/v1/shared/success'
     else
-      @errors = @expense_service.errors
+      @errors = @result.errors
       render 'api/v1/shared/failure'
     end
   end

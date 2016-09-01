@@ -4,7 +4,6 @@
 # will be initialized with the transaction object and card object that will be passed
 
 class Expense::Card::Create < Expense::Base
-
   attr_accessor :expense_params
 
   # overriding initialize because the only info available will be the transaction and card
@@ -45,14 +44,6 @@ class Expense::Card::Create < Expense::Base
 
   def post_process
     # mailer to user notifying usage of the card - probably can be merged with transaction mailer
-  end
-
-  def retrieve
-    if is_success?
-      return expense
-    else
-      return false
-    end
   end
 
 end

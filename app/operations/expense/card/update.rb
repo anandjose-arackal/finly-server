@@ -3,20 +3,21 @@
 
 class Expense::Card::Update < Expense::Base
 
-  attr_accessor :old_expense, :updated_expense_params
+  attr_accessor :updated_expense_params
 
   def pre_validate
-    if params.blank? or user.blank?
-      errors << "Parameters or user not present."
+    super
+    if params.blank?
+      errors << "Parameters not present."
     end
-    if params[:expense_id].nil?
+    if params[:expense_id].blank? or params[:id].blank?
       errors << "Expense ID missing!"
     end
   end
 
 
   def init
-    self.expense = self.old_expense = user.expenses.find_by_id(params[:expense_id])
+    super
     # setting up the expense params for updation
     self.updated_expense_params = update_card_expense_params
     if expense.card_expense.present? and params[:expense][:merchant]
@@ -52,13 +53,5 @@ class Expense::Card::Update < Expense::Base
 
   def post_process
     # send mailer or notification indicating updation of expense
-  end
-
-  def retrieve
-    if is_success?
-      return expense
-    else
-      return false
-    end
   end
 end

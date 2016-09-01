@@ -2,20 +2,12 @@
 # format of parameters,
 
 class Expense::Manual::Create < Expense::Base
-
   attr_accessor :expense_params
 
-  class Expense::Manual::Create::CreatePresenter < Expense::Base::ExpensePresenter
-    attr_accessor :expense
-
-    def initialize(expense)
-      self.expense = expense
-    end
-  end
-
   def pre_validate
-    if params.blank? or user.blank?
-      errors << "Parameters or user not present."
+    super
+    if params.blank?
+      errors << 'Parameters not present.'
     end
     if params[:expense][:amount].to_i < 0
       errors << "Amount can't be negative."

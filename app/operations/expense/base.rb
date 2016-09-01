@@ -1,15 +1,28 @@
 class Expense::Base < BaseOperation
-
   attr_accessor :expense
   attr_accessor :transaction, :card
 
-  class Expense::Base::ExpensePresenter < BaseOperation::BasePresenter
-
-  end
-
-
   def authorized_user_types
     [:employee]
+  end
+
+  def pre_validate
+    if user.blank?
+      errors << 'User not found'
+    end
+  end
+
+  def init
+    id = params[:expense_id] or params[:id]
+    self.expense = Expense::Index.(user, params).expenses.with_id(id).first rescue nil
+  end
+
+  def retrieve
+    if is_success?
+      Expense::Base::Presenter.new(user, expense: self.expense)
+    else
+      false
+    end
   end
 
   # this will be called when the expense is being created - i.e. the moment the card is used, parameters will be created from the transaction object
@@ -72,5 +85,14 @@ class Expense::Base < BaseOperation
   def create_new_currency(currency_code)
     new_curr = Currency.create!(country_code: currency_code)
     new_curr.id
+  end
+
+  class Expense::Base::ExpensePresenter < BaseOperation::BasePresenter
+    attr_accessor :expense
+
+    def initialize(user, params)
+      super(user, params)
+      self.expense = params[:expense]
+    end
   end
 end
