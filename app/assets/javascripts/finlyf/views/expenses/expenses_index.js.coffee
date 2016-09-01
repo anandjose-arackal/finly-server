@@ -27,6 +27,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
     'submit .navbar-form': 'globalSearch'
+    'click .btn-reset-filters': 'resetFilters'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -66,7 +67,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(@el).html(@templateSkeleton())
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
       $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-      $(@el).find(".sidebar").html(@templateSidebar())
+
+      @params.filter_date_from = @params['filter_date[from]']
+      @params.filter_date_to = @params['filter_date[to]']
+      @params.filter_amount_value = @params['filter_amount[value]']
+      @params.filter_amount_type = @params['filter_amount[type]']
+
+
+      $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
       category_select = $(@el).find(".filter-category-id")
       options = $("#newExpenseCategory option")
       for option in options
@@ -272,6 +280,10 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     else
       $(@el).find('.secondary-navbar .btn-create-report').css('display', 'none')
 
+  resetFilters: ->
+    params = {}
+    params.view = @params.view
+    FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
     sidebar = $(@el).find(".sidebar")
