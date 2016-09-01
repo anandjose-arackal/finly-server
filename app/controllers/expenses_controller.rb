@@ -4,15 +4,15 @@ class ExpensesController < ApplicationController
   before_action :retrieve_service_objects
   before_action :load_expense, only: [:update, :destroy, :add_receipt]
 
-  # scopes for filters
-  has_scope :filter_sort, using: [:sort_by, :order], type: :hash
-  has_scope :filter_category_id
-  has_scope :filter_merchant
-  has_scope :filter_receipt
-  has_scope :filter_search
-  has_scope :filter_amount, using: [:type, :value], type: :hash
-  has_scope :filter_status_id
-  has_scope :filter_date, using: [:from, :to], type: :hash
+  # # scopes for filters
+  # has_scope :filter_sort, using: [:sort_by, :order], type: :hash
+  # has_scope :filter_category_id
+  # has_scope :filter_merchant
+  # has_scope :filter_receipt
+  # has_scope :filter_search
+  # has_scope :filter_amount, using: [:type, :value], type: :hash
+  # has_scope :filter_status_id
+  # has_scope :filter_date, using: [:from, :to], type: :hash
 
   def new
 
@@ -48,11 +48,11 @@ class ExpensesController < ApplicationController
     elsif @manager_view
       role = UserRole.manager_id
     end
-    @expense_presenter = Expense::Index.new(current_user, role).run
+    @expense_presenter = Expense::Index.new(current_user, role, params).run
     @expenses = @expense_presenter.expenses
     # for the filters
     if @expenses.present?
-      @expenses = apply_scopes(@expenses).paginate(page: params[:page], per_page: 15)
+      @expenses = @expenses.paginate(page: params[:page], per_page: 15)
     end
     # generate_filters
 

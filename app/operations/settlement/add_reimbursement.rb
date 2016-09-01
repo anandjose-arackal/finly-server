@@ -4,13 +4,14 @@
 # report_ids: ids of the reports that are to be reimbursed.
 # value : value of the amount to be reimbursed - should match total of reports referenced via report_ids
 # currency_id: currency of the reimbursement
-
+# date: date on which the reimbursement is being added
+# note: optional note while adding reimbursement
 
 class Settlement::AddReimbursement < Settlement::Base
 
   include MathUtil
 
-  attr_accessor :reports
+  attr_accessor :reports, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -20,6 +21,7 @@ class Settlement::AddReimbursement < Settlement::Base
     super()
     if params[:value] and params[:value] < 0
       errors << "Reimbursement amount cannot be negative."
+      return false
     end
     if params[:report_ids].blank?
       errors << "No reports to reimburse."
@@ -36,21 +38,26 @@ class Settlement::AddReimbursement < Settlement::Base
     unless to_user
       raise_unauthorized_exception
     end
-    team = User::Team::Show.(user, UserRole.finance_manager_id, indirect_associations: true)
+    if reports.blank?
+      raise_unauthorized_exception
+    end
+    if user.admin?
+      self.role = UserRole.admin_id
+    else
+      self.role = UserRole.finance_manager_id
+    end
+    team = User::Team::Show.(user, role, indirect_associations: true).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
   end
 
   def validate
-    if reports.blank?
-      errors << "Reports to reimburse not found."
-    end
     validate_date params[:date]
 
     # is this really necessary
-    total_amount = precision_value(reports.sum(:value))
-    unless total_amount == params[:value]
+    total_amount = precision_value(reports.with_amount.sum(:value))
+    unless total_amount == precision_value(params[:value])
       errors << "Reimbursement amount does not match report totals."
     end
   end
@@ -59,9 +66,9 @@ class Settlement::AddReimbursement < Settlement::Base
     payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.reimbursement_id, date: params[:date], note: params[:note],
                                   amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.subtract_pending_reimbursement value, currency
+    if payment.save and balance_sheet.subtract_pending_reimbursement precision_value(params[:value]), params[:currency_id]
       reports.each do |report|
-        Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id}).run
+        Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id, role_id: role}).run
       end
       return true
     end
@@ -74,4 +81,11 @@ class Settlement::AddReimbursement < Settlement::Base
     # mailers
   end
 
+  def retrieve
+    if is_success?
+      return reports
+    else
+      return false
+    end
+  end
 end

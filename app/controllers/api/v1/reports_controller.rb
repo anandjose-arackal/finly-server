@@ -8,14 +8,8 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   before_action :fetch_reports, only: [:index]
   before_action :load_service_object
 
-  has_scope :filter_search
-  has_scope :filter_status
-  has_scope :filter_user
-  has_scope :filter_date, using: [:from, :to], type: :hash
-  has_scope :filter_policy
-
   def create
-    create_operation = Report::Create.new(user,params)
+    create_operation = Report::Create.new(current_user,params)
     @result = create_operation.run
     if create_operation.is_success?
       render 'api/v1/reports/show'
@@ -25,7 +19,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   end
 
   def index
-    @reports = apply_scopes(@reports).paginate(page: params[:page], per_page: 30) if @reports.present?
+    @result = Report::Index.(current_user, params)
   end
 
   def update
@@ -34,8 +28,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   end
 
   def show
-    authorize @report
-    load_view_for_report
+    @result = Report::Show.(current_user,params)
   end
 
   def destroy

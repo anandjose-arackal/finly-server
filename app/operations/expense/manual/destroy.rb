@@ -14,7 +14,7 @@ class Expense::Manual::Destroy < Expense::Base
   end
 
   def init
-    self.expense = user.expenses.find_by_id(params[:expense_id])
+    self.expense = user.expenses.find_by_id(params[:expense_id] || params[:id])
   end
 
   def authorize
@@ -23,7 +23,7 @@ class Expense::Manual::Destroy < Expense::Base
       raise_unauthorized_exception
     end
 
-    unless expense.id == user.id
+    unless expense.user_id == user.id
       errors << "You do not own this expense."
       raise_unauthorized_exception
     end

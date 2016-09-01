@@ -4,9 +4,12 @@
 # note: Optional note to include along with the cash advance
 # value: Value of the amount being added to the card
 # currency_id: if money is being added in a difference currency, currently defaults to 1
-#
+# date: Date on which the payment is being made
 
 class Settlement::AddCashAdvance < Settlement::Base
+
+
+  attr_accessor :payment
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -27,7 +30,12 @@ class Settlement::AddCashAdvance < Settlement::Base
     unless to_user
       raise_unauthorized_exception
     end
-    team = User::Team::Show.(user, UserRole.finance_manager_id, indirect_associations: true)
+    if user.admin?
+      role = UserRole.admin_id
+    else
+      role = UserRole.finance_manager_id
+    end
+    team = User::Team::Show.(user, role, indirect_associations: true).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
@@ -40,7 +48,7 @@ class Settlement::AddCashAdvance < Settlement::Base
   end
 
   def process
-    payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.advance_id, date: params[:date], note: params[:note],
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.advance_id, date: params[:date], note: params[:note],
                                   amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(params[:value], params[:currency_id])
@@ -53,6 +61,14 @@ class Settlement::AddCashAdvance < Settlement::Base
 
   def post_process
     # mailer
+  end
+
+  def retrieve
+    if is_success?
+      return payment
+    else
+      return false
+    end
   end
 
 end

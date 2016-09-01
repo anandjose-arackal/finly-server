@@ -1,35 +1,38 @@
 json.success true
 json.data do
-  json.manager_name @manager_name
-  json.total @total
-  json.date @date_string
+  manager_name = @result.manager.name rescue nil
+  finance_manager_name = @result.finance_manager.name rescue nil
+  json.manager_name manager_name
+  json.finance_manager_name finance_manager_name
+  json.total @result.total
+  json.date @result.dates
   json.report do
-    json.partial! 'report', report: @report
+    json.partial! 'report', report: @result.report
   end
-  json.views do
-    json.take_control @views[:take_control]
-    json.review @views[:review]
-    json.unapprove @views[:unapprove]
-    json.reimburse @views[:reimburse]
-    json.add_expenses @views[:add_expenses]
-    json.delete @views[:delete]
-    json.retract @views[:retract]
-    json.reimbursement_confirm @views[:reimbursement_confirm]
-    json.editable @views[:editable]
-    json.submit @views[:submit]
+  json.actions do
+    json.take_control @result.actions[:take_control].present?
+    json.review @result.actions[:approve].present?
+    json.unapprove @result.actions[:unapprove].present?
+    json.reimburse @result.actions[:reimburse].present?
+    json.add_expenses @result.actions[:add_expenses].present?
+    json.delete @result.actions[:delete].present?
+    json.retract @result.actions[:retract].present?
+    json.reimbursement_confirm @result.actions[:reimbursement_confirm].present?
+    json.editable @result.actions[:editable].present?
+    json.submit @result.actions[:submit].present?
   end
-  json.expenses_group @expenses do |expense|
-    json.extract! expense, :category_name, :category_total
-    json.expenses expense[:expenses] do |expense_item|
+  json.expenses_group @result.expenses_category_sorted do |item|
+    json.extract! item, :section_name, :section_total
+    json.expenses item[:expenses] do |expense_item|
       json.partial! '/api/v1/expenses/expense', expense: expense_item
     end
   end
-  json.comments @comments do |comment|
+  json.comments @result.comments do |comment|
     json.extract! comment, :id, :user_id, :report_id, :report_comment_action_id
     json.content comment.generate
     json.user_name comment.user.name
   end
-  json.policies @policies, :id, :name
+  json.policies @result.policies, :id, :name
   json.violations do
 
   end
