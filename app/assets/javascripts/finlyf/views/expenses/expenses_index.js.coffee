@@ -67,6 +67,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
       $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
       $(@el).find(".sidebar").html(@templateSidebar())
+      category_select = $(@el).find(".filter-category-id")
+      options = $("#newExpenseCategory option")
+      for option in options
+        $('<option/>', {
+          value: $(option).attr('value')
+          text: $(option).text()
+        }).appendTo(category_select)
       $(@el).find(".main").html(@templateMain())
       FinlyF.structureActions(@el, @params)
     else
