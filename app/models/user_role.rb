@@ -17,6 +17,8 @@ class UserRole < ActiveRecord::Base
   scope :employee, -> { where(id: UserRole.employee_id) }
   scope :auditor, -> { where(id: UserRole.auditor_id) }
 
+  VALUES = {admin: 1, finance_manager: 2, manager: 3, employee: 4, auditor: 5}
+
   def self.admin_id
     1
   end

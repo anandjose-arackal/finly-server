@@ -19,6 +19,11 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
 
   def index
     @result = Report::Index.(current_user, params)
+    if not @result == false
+      render 'api/v1/reports/index'
+    else
+      render 'api/v1/shared/failure'
+    end
   end
 
   def update

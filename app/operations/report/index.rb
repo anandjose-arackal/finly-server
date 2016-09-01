@@ -1,7 +1,7 @@
 # action that retrieves the reports list of a user
 
 class Report::Index < Report::Base
-  attr_accessor :reports
+  attr_accessor :reports, :role_id
 
 
   def authorized_user_types
@@ -13,7 +13,10 @@ class Report::Index < Report::Base
   end
 
   def init
-
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+    end
   end
 
   def validate
@@ -21,11 +24,15 @@ class Report::Index < Report::Base
   end
 
   def authorize
-
+    if self.role_id.present?
+      raise_unauthorized_exception unless user.has_role?(self.role_id)
+    elsif not user.employee?
+      raise_unauthorized_exception
+    end
   end
 
   def process
-    case params[:role_id]
+    case self.role_id
       when UserRole.admin_id
         if self.user.company_admin?
           self.reports = Report.not_open.with_user(user.company.users.pluck(:id))
