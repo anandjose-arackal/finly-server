@@ -1,7 +1,7 @@
 require 'hooks'
 
 class BaseOperation
-  include CallbackHandler, MathUtil
+  include CallbackHandler, MathUtil, HasScope
   attr_accessor :user, :params, :errors, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
@@ -118,7 +118,7 @@ class BaseOperation
 
   # Used to present the data to the UI
   class BaseOperation::BasePresenter
-    include MathUtil
+    include MathUtil, HasScope
     attr_accessor :user, :params
 
     def initialize(user, params={})

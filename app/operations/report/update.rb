@@ -16,16 +16,20 @@ class Report::Update < Report::Base
   end
 
   def init
+    super
     self.update_param = {}
-    self.update_param[:name] = self.params[:name] if self.params[:name].present? and self.params[:name] != report.name
-    self.update_param[:policy_id] = self.params[:policy_id] if self.params[:policy_id].present?
+    self.update_param = self.params.permit(:name, :policy_id)
     if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
       self.update_param[:policy_id] = nil
     end
   end
 
   def authorize
-    unless report.controlling_user == user == report.user
+    unless user == report.user
+      errors << 'Only report owners can update report'
+      raise_unauthorized_exception
+    end
+    unless user == report.controlling_user
       errors << 'Only report owners can update report'
       raise_unauthorized_exception
     end

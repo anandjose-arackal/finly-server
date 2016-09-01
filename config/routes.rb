@@ -261,7 +261,6 @@ Rails.application.routes.draw do
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
-    post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
   end
 
   resources :expenses do

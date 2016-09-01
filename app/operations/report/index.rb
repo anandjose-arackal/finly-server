@@ -68,8 +68,6 @@ class Report::Index < Report::Base
   end
 
   class Report::Index::Presenter < BaseOperation::BasePresenter
-    include HasScope
-
     attr_accessor :reports
 
     has_scope :filter_search
