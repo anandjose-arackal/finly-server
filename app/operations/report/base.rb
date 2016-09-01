@@ -12,7 +12,8 @@ class Report::Base < BaseOperation
   end
 
   def init
-    self.report = Report::Index.(user, role_id: params[:role_id]).reports.find_by(id: params[:report_id] || params[:id])
+    id = (params[:id] or params[:report_id])
+    self.report = Report::Index.(user, role_id: params[:role_id]).reports.with_id(id).first rescue nil
     # self.report = Report.find_by(id: params[:report_id])
   end
 

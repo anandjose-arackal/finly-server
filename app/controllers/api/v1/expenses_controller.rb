@@ -1,35 +1,44 @@
+require "#{Rails.root}/app/operations/expense/manual/create"
 class Api::V1::ExpensesController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
   allow_oauth!
   before_action :authenticate_user!
-  before_action :retrieve_service_objects
-  before_action :parse_receipt, only: [:create, :update]
-  before_action :load_expense, only: [:show, :update, :destroy]
+  # before_action :retrieve_service_objects
+  # before_action :parse_receipt, only: [:create, :update]
+  # before_action :load_expense, only: [:show, :update, :destroy]
 
   respond_to :json
 
-  # scopes for filters
-  has_scope :filter_category_id
-  has_scope :filter_merchant
-  # has_scope :filter_receipt
-  has_scope :filter_search
-  has_scope :filter_amount, using: [:type, :value], type: :hash
-  has_scope :filter_status_id
-  has_scope :filter_date, using: [:from, :to], type: :hash
+  # # scopes for filters
+  # has_scope :filter_category_id
+  # has_scope :filter_merchant
+  # # has_scope :filter_receipt
+  # has_scope :filter_search
+  # has_scope :filter_amount, using: [:type, :value], type: :hash
+  # has_scope :filter_status_id
+  # has_scope :filter_date, using: [:from, :to], type: :hash
 
   def create
-    authorize Expense
-    if @expense_service.add_expense expense_params
+    create_operation = Expense::Manual::Create.new(current_user,params)
+    @result = create_operation.run
+    if create_operation.is_success?
       render 'api/v1/shared/success'
     else
-      @errors = @expense_service.errors
       render 'api/v1/shared/failure'
     end
   end
 
   def index
-    authorize Expense
+
+    @result = Expense::Index.(current_user, params)
+    if not @result == false
+      render 'api/v1/reports/index'
+    else
+      @errors = updater.errors
+      render 'api/v1/shared/failure'
+    end
+
     # currently returns only the personal expenses of the user
     role = UserRole.employee_id
     if @admin_view

@@ -35,6 +35,7 @@
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
 #
+
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -189,6 +190,12 @@ class User < ActiveRecord::Base
   def auditor?
     mapping = role_mapping
     mapping.auditor.present?
+  end
+
+  def has_role?(role_id)
+    return false unless role_id.present?
+    mapping = role_mapping
+    mapping.role(role_id).present?
   end
 
   def user_name

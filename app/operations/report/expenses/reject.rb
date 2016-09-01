@@ -10,14 +10,15 @@ class Report::Expenses::Reject < Report::Base
 
   def pre_validate
     super()
-    if params[:expense_ids].blank?
+    if params[:expense_ids].blank? and params[:expense_id].blank?
       errors << "No expense ids passed."
     end
   end
 
   def init
     super()
-    self.expenses = report.expenses.where(id: params[:expense_ids])
+    ids = (params[:expense_ids] or params[:expense_id])
+    self.expenses = report.expenses.where(id: ids)
   end
 
   def validate

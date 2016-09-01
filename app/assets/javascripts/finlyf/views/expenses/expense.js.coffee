@@ -79,7 +79,11 @@ class FinlyF.Views.Expense extends Backbone.View
         text: $(option).text()
       }).appendTo(category_select)
 
-      $(category_select).val(@model.get('category_id'))
+    $(category_select).val(@model.get('category_id'))
+    $(@el).find(".datepicker").datepicker({
+      dateFormat: "yy-mm-dd"
+    })
+
 
   update: (e) ->
     $(e.currentTarget).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-item').addClass('btn-edit-item')
@@ -105,6 +109,7 @@ class FinlyF.Views.Expense extends Backbone.View
       processData: true
       success: (model, res) ->
         $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+        _this.model.fetch()
         # console.log "Success"
         # console.log model, res
         # if res.status == "success"
