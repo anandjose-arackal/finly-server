@@ -230,12 +230,12 @@ class Report < ActiveRecord::Base
 
   def first_date
     return nil unless self.expenses.count > 0
-    self.expenses.sort_date_asc.first.date
+    expenses.sort_date_asc.first.date
   end
 
   def last_date
-    return nil unless self.expenses.count > 0
-    self.expenses.sort_date_desc.first.date
+    return nil unless expenses.count > 0
+    expenses.sort_date_desc.first.date
   end
 
   def date_as_string

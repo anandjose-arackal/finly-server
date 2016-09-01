@@ -52,10 +52,10 @@ class Report::Index < Report::Base
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
         self.reports = Report.from(sql)
-      when UserRole.employee_id
-        self.reports = user.reports
+      when UserRole.auditor_id
+        # todo auditor
       else
-        return nil
+        self.reports = user.reports
     end
   end
 
@@ -68,11 +68,20 @@ class Report::Index < Report::Base
   end
 
   class Report::Index::Presenter < BaseOperation::BasePresenter
+    include HasScope
+
     attr_accessor :reports
+
+    has_scope :filter_search
+    has_scope :filter_status
+    has_scope :filter_user
+    has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_policy
 
     def initialize(user, params)
       self.user = user
       self.reports = params[:reports]
+      self.reports = apply_scopes(self.reports, params).paginate(page: params[:page], per_page: 30) if self.reports.present?
     end
 
   end

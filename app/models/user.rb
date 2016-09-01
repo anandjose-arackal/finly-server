@@ -35,6 +35,7 @@
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
 #
+
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
