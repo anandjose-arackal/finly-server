@@ -5,6 +5,7 @@ class PendingInvitesController < ApplicationController
   before_action :valid_token, only: [:edit, :update]
 
   def create
+    invite_op = User::Invite
     if @user_invite_service.invite(user_invite_params)
       flash[:success] = "User invited!"
     else

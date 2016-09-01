@@ -36,7 +36,7 @@ class Report::Violation < Report::Base
 
   def init
     self.report = params[:report]
-    self.policy = report.policy
+    self.policy = report.versioned_policy
     report.expenses.each do |expense|
       self.warning_messages[expense.id] = {}
       self.warning_messages[expense.id]['expense_warning'] = {}

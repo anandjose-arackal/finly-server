@@ -8,30 +8,35 @@ class PoliciesController < ApplicationController
   has_scope :filter_email
 
   def create
-    authorize Policy
-    pcs = PolicyCreateService.new(current_user)
-    if pcs.create_policy(params[:name])
+    create_policy_op = Policy::Create.new(current_user, params)
+    @policy = create_policy_op.run
+    if @policy
       flash.now[:success] = 'Policy Created'
-      if current_user.admin?
-        @policies = current_company.policies
-      else
-        @policies = current_user.admin_policies
-      end
+      @policies = Policy::Index.new(current_user, view: 'admin')
       render partial: 'organization_account/policy_list', replace: '#policyListAdmin'
       return
     end
-    flash.now[:failure] = pcs.errors
+    flash.now[:failure] = create_policy_op.errors
     render_flash_message
   end
 
   def destroy
-
+    destroy_op = Policy::Destroy.new(current_user, params)
+    @result = destroy_op.run
+    if @result
+      flash.now[:success] = "Policy destroyed."
+      respond_to do |format|
+        format.json { render json: {"status": "success"} }
+      end
+    else
+      flash[:danger] = update_op.errors
+      render_flash_message
+    end
   end
 
   def index
-    authorize Policy
-    prs = PolicyRetrievalService.new(current_user)
-    @policies = prs.list params
+    index_op = Policy::Index.new(current_user, view: params[:view])
+    @policies = index_op.run
   end
 
   def show

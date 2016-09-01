@@ -4,7 +4,6 @@ json.array!(@reports) do |report|
     json.policy report.policy.name
   end
   json.status report.status.name
-  rds = ReportDetailService.new(report)
-  json.total rds.total_amount
+  json.total report.total_amount
   json.date report.created_at.strftime("%d %b")
 end

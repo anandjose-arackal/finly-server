@@ -71,7 +71,7 @@ class Report::Index < Report::Base
   end
 
   class Report::Index::Presenter < BaseOperation::BasePresenter
-    attr_accessor :reports
+    attr_accessor :reports, :counts
 
     has_scope :filter_search
     has_scope :filter_status
@@ -82,8 +82,23 @@ class Report::Index < Report::Base
     def initialize(user, params)
       self.user = user
       self.reports = params[:reports]
+      get_counts
       self.reports = apply_scopes(self.reports, params).paginate(page: params[:page], per_page: 30) if self.reports.present?
     end
+
+    def get_counts
+      type_counts = reports.group(:report_status_id)
+      self.counts = {}
+      counts[:open] = (type_counts[ReportStatus.open_id] or 0)
+      counts[:processing] = (type_counts[ReportStatus.processing_id] or 0)
+      counts[:retracted] = (type_counts[ReportStatus.retracted_id] or 0)
+      counts[:rejected] = (type_counts[ReportStatus.rejected_id] or 0)
+      counts[:approved] = (type_counts[ReportStatus.approved_id] or 0)
+      counts[:reimbursed] = (type_counts[ReportStatus.reimbursed_id] or 0)
+      counts[:reimbursement_confirmed] = (type_counts[ReportStatus.reimbursement_confirmed_id] or 0)
+      counts[:closed] = (type_counts[ReportStatus.closed_id] or 0)
+    end
+
 
   end
 
