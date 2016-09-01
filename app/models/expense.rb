@@ -92,9 +92,9 @@ class Expense < ActiveRecord::Base
   scope :filter_receipt, -> (value) do
     case value
       when 'present'
-        joins(:receipts).select('expenses.*').where('')
+        where("id IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
       when 'nil'
-        joins(:receipts).select('expenses.*')
+        where("id NOT IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
     end
   end
 

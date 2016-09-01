@@ -2,6 +2,16 @@ class User::Invite::Base < BaseOperation
 
   attr_accessor :invite_params
 
+  class User::Invite::Base::InvitePresenter < BaseOperation::BasePresenter
+
+    attr_accessor :invite, :accepted_user
+
+    def initialize(user, params)
+      self.invite = params[:invite]
+      self.accepted_user = params[:accepted_user]
+    end
+  end
+
   def authorized_user_types
     [:manager, :finance_manager, :admin]
   end

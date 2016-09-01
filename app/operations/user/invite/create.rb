@@ -153,7 +153,8 @@ class User::Invite::Create < User::Invite::Base
 
   def retrieve
     if is_success?
-      return new_user
+      invite_presenter = User::Invite::Base::InvitePresenter.new(user, invite: new_user)
+      return invite_presenter
     else
       return false
     end

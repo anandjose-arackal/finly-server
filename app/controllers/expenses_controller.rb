@@ -24,7 +24,7 @@ class ExpensesController < ApplicationController
       # format.html {}
       # format.json { render json: @expenses.as_json }
       format.json {}
-    end 
+    end
   end
 
   def create
