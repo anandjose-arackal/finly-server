@@ -41,6 +41,7 @@ class BalanceSheet < ActiveRecord::Base
     if cih.save
       return true
     end
+
     false
   end
 

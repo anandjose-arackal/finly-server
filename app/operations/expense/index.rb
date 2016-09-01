@@ -4,13 +4,27 @@ class Expense::Index < Expense::Base
 
   class Expense::Index::ExpenseListPresenter < Expense::Base::ExpensePresenter
 
+    include HasScope
+
     attr_accessor :expenses, :merchants, :count, :categories
+
+    # scopes for filters
+    has_scope :filter_sort, using: [:sort_by, :order], type: :hash
+    has_scope :filter_category_id
+    has_scope :filter_merchant
+    has_scope :filter_receipt
+    has_scope :filter_search
+    has_scope :filter_amount, using: [:type, :value], type: :hash
+    has_scope :filter_status_id
+    has_scope :filter_date, using: [:from, :to], type: :hash
 
     def initialize(user, params)
       self.expenses = params[:expenses]
+      self.expenses = apply_scopes(expenses, params[:filter_params]) if expenses.present?
       self.merchants = expenses.manual.pluck(:merchant)
       self.merchants += expenses.card.pluck(:editable_merchant)
-      self.count = expenses.count
+      # self.count = expenses.count - for some reason this doesn't work, so getting the count by the size of the association array
+      self.count = expenses.size
       self.categories = user.company.active_categories
     end
   end
@@ -59,7 +73,7 @@ class Expense::Index < Expense::Base
 
   def retrieve
     if is_success?
-      list_presenter = Expense::Index::ExpenseListPresenter.new(user, {expenses: expenses})
+      list_presenter = Expense::Index::ExpenseListPresenter.new(user, {expenses: expenses, filter_params: params})
       return list_presenter
     else
       false

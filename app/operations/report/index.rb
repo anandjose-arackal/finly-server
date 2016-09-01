@@ -1,5 +1,8 @@
+# action that retrieves the reports list of a user
+
 class Report::Index < Report::Base
   attr_accessor :reports
+
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -58,7 +61,7 @@ class Report::Index < Report::Base
 
   def retrieve
     if is_success?
-      return Report::Index::Presenter.(user, reports: reports)
+      return Report::Index::Presenter.new(user, reports: reports)
     else
       return false
     end
@@ -67,9 +70,9 @@ class Report::Index < Report::Base
   class Report::Index::Presenter < BaseOperation::BasePresenter
     attr_accessor :reports
 
-    def initialize
+    def initialize(user, params)
       self.user = user
-      self.reports = reports
+      self.reports = params[:reports]
     end
 
   end

@@ -1,6 +1,12 @@
 class User::Team::Base < BaseOperation
   attr_accessor :currency_id, :amount_value, :mappings, :policy_id
 
+
+  class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter
+
+  end
+
+
   def init_values
     return if params.blank?
     load_attrs

@@ -213,15 +213,15 @@ class Report < ActiveRecord::Base
   end
 
   def versioned_policy
-    if report.submitted_at.present?
-      return self.policy.version_at report.submitted_at, has_many: true, has_one: true, belongs_to: true
+    if self.submitted_at.present?
+      return self.policy.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
     end
     self.policy
   end
 
   def final_approver
-    return nil unless report.approved? or report.reimbursed? or report.reimbursement_confirmed? or report.closed?
-    tracks = report.tracks.with_action(ReportTrackingAction.approve_id)
+    return nil unless self.approved? or self.reimbursed? or self.reimbursement_confirmed? or self.closed?
+    tracks = self.tracks.with_action(ReportTrackingAction.approve_id)
     if tracks.present?
       return tracks.last.action_user
     end
@@ -229,13 +229,13 @@ class Report < ActiveRecord::Base
   end
 
   def first_date
-    return nil unless report.expenses.count > 0
-    report.expenses.sort_date_asc.first.date
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_asc.first.date
   end
 
   def last_date
-    return nil unless report.expenses.count > 0
-    report.expenses.sort_date_desc.first.date
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_desc.first.date
   end
 
   def date_as_string

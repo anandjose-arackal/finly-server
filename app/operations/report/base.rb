@@ -10,7 +10,7 @@ class Report::Base < BaseOperation
   end
 
   def init
-    self.report = Report::List.(user, role_id: params[:role_id]).find_by(id: params[:report_id])
+    self.report = Report::Index.(user, role_id: params[:role_id]).reports.find_by(id: params[:report_id])
     # self.report = Report.find_by(id: params[:report_id])
   end
 
@@ -49,7 +49,7 @@ class Report::Base < BaseOperation
   end
 
   class Report::Base::Presenter < BaseOperation::BasePresenter
-    attr_accessor :report, :categories, :expenses, :manager, :status, :total, #:report_currency,
+    attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations
 
     def initialize(user, params={})
@@ -65,7 +65,7 @@ class Report::Base < BaseOperation
       self.policies = report.user.policies
       self.selected_policy = report.policy
       self.manager = User::Team::Approver.(report.user, type: :manager)
-      self.finance_manager =User::Team::Approver.(report.user, type: :finance_manager)
+      self.finance_manager = User::Team::Approver.(report.user, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
     end
 
@@ -100,28 +100,28 @@ class Report::Base < BaseOperation
       actions = {}
       if admin_view?
         if self.report.can_take_control? and not self.report.controlling_user?(user)
-          actions[:take_control] = {url: report_take_control_path(report_id: report.id, view: params[:view])}
+          actions[:take_control] = {url: Rails.application.routes.url_helpers.report_take_control_path(report_id: report.id, view: params[:view])}
         elsif self.report.processing? and self.report.controlling_user?(user)
-          actions[:approve] = {url: report_approve_path(report_id: report.id, view: params[:view])}
-          actions[:reject] = {url: report_reject_path(report_id: report.id, view: params[:view])}
+          actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
+          actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
         end
       elsif finance_view? or manager_view?
         if self.report.processing? and self.report.controlling_user?(user)
-          actions[:approve] = {url: report_approve_path(report_id: report.id, view: params[:view])}
-          actions[:reject] = {url: report_reject_path(report_id: report.id, view: params[:view])}
+          actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
+          actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
         elsif (self.report.can_unapprove?) and self.report.associated_users(self.report.controlling_user).include?(user)
-          actions[:unapprove] = {url: report_path(report_id: report.id, view: params[:view])}
+          actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_path(report_id: report.id, view: params[:view])}
         end
       else
         if self.report.open? or self.report.retracted? or self.report.rejected?
-          actions[:add_expenses] = {url: report_add_expenses_path(report_id: report.id, view: params[:view])}
-          actions[:delete] = {url: report_path(id: report.id, view: params[:view])}
+          actions[:add_expenses] = {url: Rails.application.routes.url_helpers.report_add_expenses_path(report_id: report.id, view: params[:view])}
+          actions[:delete] = {url: Rails.application.routes.url_helpers.report_path(id: report.id, view: params[:view])}
           actions[:editable] = {value: true}
-          actions[:submit] = {url: report_submit_path(report_id: report.id, view: params[:view])}
+          actions[:submit] = {url: Rails.application.routes.url_helpers.report_submit_path(report_id: report.id, view: params[:view])}
         elsif self.report.processing?
-          actions[:retract] = {url: report_retract_path(report_id: report.id, view: params[:view])}
+          actions[:retract] = {url: Rails.application.routes.url_helpers.report_retract_path(report_id: report.id, view: params[:view])}
         elsif self.report.reimbursed?
-          actions[:reimbursement_confirm] = {url: report_reimbursement_confirm(report_id: report.id, view: params[:view])}
+          actions[:reimbursement_confirm] = {url: Rails.application.routes.url_helpers.report_reimbursement_confirm_path(report_id: report.id, view: params[:view])}
         end
       end
       actions

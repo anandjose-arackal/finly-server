@@ -19,7 +19,10 @@ class Settlement::Base < BaseOperation
       errors << 'Date cannot be blank'
       return false
     end
-    date = Date.parse(date)
+    unless date.is_a?(Date)
+      date = Date.parse(date)
+    end
+
     if date.present? and date > Date.today
       errors << 'Date cannot be later than the currency date'
       return false
