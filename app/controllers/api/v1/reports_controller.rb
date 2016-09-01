@@ -7,6 +7,8 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   allow_oauth!
   before_action :authenticate_user!
 
+  respond_to :json
+
   def create
     create_operation = Report::Create.new(current_user,params)
     @result = create_operation.run
@@ -14,6 +16,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
       render 'api/v1/reports/show'
       return
     end
+    @errors = updater.errors
     render 'api/v1/shared/failure'
   end
 
@@ -22,6 +25,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if not @result == false
       render 'api/v1/reports/index'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -32,6 +36,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -47,6 +52,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
       flash.now[:success] = 'Report Deleted'
       render 'api/v1/shared/success'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -57,6 +63,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -67,6 +74,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -77,6 +85,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -87,6 +96,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -97,6 +107,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -107,6 +118,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -117,6 +129,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -128,6 +141,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
       flash.now[:success] = 'You have successfully taken control of the report'
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -138,6 +152,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -148,6 +163,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if updater.is_success?
       render 'api/v1/reports/show'
     else
+      @errors = updater.errors
       render 'api/v1/shared/failure'
     end
   end

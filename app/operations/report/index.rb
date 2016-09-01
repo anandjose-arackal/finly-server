@@ -1,8 +1,7 @@
 # action that retrieves the reports list of a user
-
+# Returns a list of reports as a presenter. Can pass role_id or view in params to retrieve the respective reports
 class Report::Index < Report::Base
   attr_accessor :reports, :role_id
-
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -17,10 +16,6 @@ class Report::Index < Report::Base
     if self.role_id.blank? and params[:view].present?
       self.role_id = UserRole::VALUES[params[:view].to_sym]
     end
-  end
-
-  def validate
-
   end
 
   def authorize
@@ -68,9 +63,10 @@ class Report::Index < Report::Base
 
   def retrieve
     if is_success?
-      return Report::Index::Presenter.new(user, reports: reports)
+      params[:reports] = reports
+      Report::Index::Presenter.new(user, params)
     else
-      return false
+      false
     end
   end
 
