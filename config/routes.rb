@@ -187,6 +187,20 @@
 
 Rails.application.routes.draw do
 
+  namespace :api do
+    namespace :v1 do
+      namespace :configuration do
+        get 'category/index'
+      end
+    end
+  end
+
+  namespace :api do
+    namespace :v1 do
+      get 'configuration/category'
+    end
+  end
+
   # get 'home/index'
 
   mount_opro_oauth controllers: {
@@ -219,6 +233,9 @@ Rails.application.routes.draw do
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+      namespace :configuration do
+        get 'categories' => 'category#index', as: :categories
       end
     end
   end
