@@ -11,3 +11,7 @@ expense:
     - value: <%= params[:amount] %>
     - currency: <%= Currency.first.id %>
   <% end %>
+  <% if params[:receipt].present? %>
+  receipts_attributes:
+    - '#load_receipt'
+  <% end%>
