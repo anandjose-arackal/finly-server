@@ -62,11 +62,4 @@ class Expense::Manual::Update < Expense::Manual::Base
     # send mailer indicating updation of expense
   end
 
-  private
-  # will be called when the user is creating a manual expense
-  def manual_expense_params
-    params.require(:expense).permit(:expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date,
-                                    amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
-  end
-
 end

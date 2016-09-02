@@ -1,0 +1,20 @@
+from:
+  note: '#note'
+  amount: '#amount'
+  merchant: '#merchant'
+  date: '#date'
+  category_id: '#category_id'
+  report_id: '#report_id'
+  receipt: '#receipt'
+to:
+  expense:
+    note: '#note'
+    report_id: '#report_id'
+    date: '#date'
+    category_id: '#category_id'
+    manual_expense_attributes:
+      merchant: '#merchant'
+    amount_attributes:
+      value: '#amount'
+    receipts_attributes:
+      - '#receipt'

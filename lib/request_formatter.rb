@@ -1,15 +1,21 @@
 class RequestFormatter
 
-  def self.api_expense(params)
+  def self.api_expense(user, params)
     parse_receipt params
     param = format('./app/formatter/api/expense.yaml', params)
-    if param.present? and param[:expense].present? and param[:expense][:amount_attributes].present? and param[:expense][:amount_attributes][:value].present?
-      param[:expense][:amount_attributes][:currency_id] = Currency.first.id
+    if param.present? and param[:expense].present?
+      if param[:expense][:amount_attributes].present? and param[:expense][:amount_attributes][:value].present?
+        param[:expense][:amount_attributes][:currency_id] = Currency.first.id
+      end
+      if param[:expense][:receipts_attributes].present?
+        param[:expense][:receipts_attributes].each do |p|
+          p[:user_id] = user.id
+        end
+      end
     end
     param
   end
 
-  private
   def self.format(path_to_file, params)
     map = YAML.load_file(path_to_file) rescue nil
     return nil unless map.present?
@@ -27,6 +33,8 @@ class RequestFormatter
       if value.is_a?(String)
         next unless value[0] == '#'
         values[value] = map[key.to_sym]
+      elsif value.is_a?(Array)
+        # todo handle array in 'to'
       elsif value.is_a?(Hash)
         res = extract config[key], (map[key.to_sym] or map[key.to_s])
         values.merge!(res) unless res.blank?
@@ -48,14 +56,19 @@ class RequestFormatter
         if value.is_a?(String) and value[0] == '#'
           next if values[value].blank?
           map[key.to_sym] = values[value]
+        elsif value.is_a?(Array)
+          next if value.blank?
+          v = values[value[0]]
+          v = [v] unless v.is_a?(Array)
+          map[key.to_sym] = v
         else
           map[key.to_sym] = value
         end
       end
     end
+    map = map.deep_symbolize_keys if map.present?
     map
   end
-
 
   def self.parse_receipt(params)
     if params[:receipt].present?

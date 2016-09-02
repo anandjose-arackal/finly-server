@@ -1,7 +1,7 @@
 # Class to create an expense
 # format of parameters,
 
-class Expense::Manual::Create < Expense::Base
+class Expense::Manual::Create < Expense::Manual::Base
   attr_accessor :expense_params
 
   def pre_validate
@@ -20,7 +20,7 @@ class Expense::Manual::Create < Expense::Base
 
   def init
     self.expense_params = manual_expense_params
-    # expense_params.delete(:receipt)
+    self.expense_params[:expense_type_id] = ExpenseType.manual_expense_id
   end
 
   def validate
@@ -45,4 +45,5 @@ class Expense::Manual::Create < Expense::Base
   def success
     Expense::Manual::Create::CreatePresenter.new(expense)
   end
+
 end
