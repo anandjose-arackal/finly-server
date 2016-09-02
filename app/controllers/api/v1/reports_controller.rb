@@ -10,22 +10,23 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   respond_to :json
 
   def create
-    create_operation = Report::Create.new(current_user,params)
-    @result = create_operation.run
-    if create_operation.is_success?
+    operation = Report::Create.new(current_user, params)
+    @result = operation.run
+    if operation.is_success?
       render 'api/v1/reports/show'
       return
     end
-    @errors = updater.errors
+    @errors = operation.errors
     render 'api/v1/shared/failure'
   end
 
   def index
-    @result = Report::Index.(current_user, params)
-    if not @result == false
+    operation = Report::Index.new(current_user, params)
+    @result =operation.run
+    if operation.is_success?
       render 'api/v1/reports/index'
     else
-      @errors = updater.errors
+      @errors = operation.errors
       render 'api/v1/shared/failure'
     end
   end
@@ -42,7 +43,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   end
 
   def show
-    @result = Report::Show.(current_user,params)
+    @result = Report::Show.(current_user, params)
   end
 
   def destroy

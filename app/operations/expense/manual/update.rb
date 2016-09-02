@@ -21,7 +21,6 @@ class Expense::Manual::Update < Expense::Base
     end
   end
 
-
   def init
     super
     # setting up the expense params for updation

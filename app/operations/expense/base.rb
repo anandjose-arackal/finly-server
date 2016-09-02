@@ -13,7 +13,7 @@ class Expense::Base < BaseOperation
   end
 
   def init
-    id = params[:expense_id] or params[:id]
+    id = (params[:expense_id] or params[:id])
     self.expense = Expense::Index.(user, params).expenses.with_id(id).first rescue nil
   end
 
@@ -87,7 +87,7 @@ class Expense::Base < BaseOperation
     new_curr.id
   end
 
-  class Expense::Base::ExpensePresenter < BaseOperation::BasePresenter
+  class Expense::Base::Presenter < BaseOperation::BasePresenter
     attr_accessor :expense
 
     def initialize(user, params)

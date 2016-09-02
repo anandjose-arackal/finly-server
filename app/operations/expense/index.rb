@@ -52,10 +52,10 @@ class Expense::Index < Expense::Base
     end
   end
 
-  class Expense::Index::ExpenseListPresenter < Expense::Base::ExpensePresenter
+  class Expense::Index::ExpenseListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :categories
+    attr_accessor :expenses, :paginated_expenses, :categories
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
@@ -69,7 +69,10 @@ class Expense::Index < Expense::Base
 
     def initialize(user, params)
       self.expenses = params[:expenses]
-      self.expenses = apply_scopes(expenses, params) if expenses.present?
+      if expenses.present?
+        self.expenses = apply_scopes(expenses, params)
+        self.paginated_expenses = self.expenses.paginate(page: params[:page], per_page: 30)
+      end
       self.categories = user.company.active_categories
     end
   end
