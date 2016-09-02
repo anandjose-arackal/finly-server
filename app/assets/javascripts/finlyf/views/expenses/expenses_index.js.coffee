@@ -188,7 +188,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $("#modal-new .modal-body").html(@templateNewExpense)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
 
-    #Populate categories from index.html.erb  
+    #Populate categories from index.json.jbuilder  
     category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
     options = $("#newExpenseCategory option")
     for option in options

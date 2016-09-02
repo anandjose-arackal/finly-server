@@ -71,7 +71,7 @@ class Report::Index < Report::Base
   end
 
   class Report::Index::Presenter < BaseOperation::BasePresenter
-    attr_accessor :reports, :counts
+    attr_accessor :reports, :counts, :paginated_reports
 
     has_scope :filter_search
     has_scope :filter_status
@@ -83,7 +83,10 @@ class Report::Index < Report::Base
       self.user = user
       self.reports = params[:reports]
       get_counts
-      self.reports = apply_scopes(self.reports, params).paginate(page: params[:page], per_page: 30) if self.reports.present?
+      if self.reports.present?
+        self.reports = apply_scopes(self.reports, params)
+        self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
+      end
     end
 
     def get_counts

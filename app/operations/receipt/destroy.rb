@@ -1,4 +1,5 @@
 class Receipt::Destroy < Receipt::Base
+  attr_accessor :receipt
 
   def pre_validate
     if params.blank? or user.blank?
@@ -8,10 +9,6 @@ class Receipt::Destroy < Receipt::Base
 
   def init
     self.receipt = user.receipts.find_by_id(params[:receipt_id])
-  end
-
-  def validate
-
   end
 
   def authorize
@@ -26,15 +23,6 @@ class Receipt::Destroy < Receipt::Base
   def process
     unless receipt.destroy
       errors << "DB Error. Try again."
-    end
-  end
-
-  # return true or false because it's a destroy operation
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
     end
   end
 end
