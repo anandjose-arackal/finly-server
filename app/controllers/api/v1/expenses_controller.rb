@@ -8,7 +8,8 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   respond_to :json
 
   def create
-    operation = Expense::Manual::Create.new(current_user, params)
+    param = RequestFormatter.api_expense(params)
+    operation = Expense::Manual::Create.new(current_user, param)
     operation.run
     if operation.is_success?
       render 'api/v1/shared/success'
