@@ -36,7 +36,8 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   end
 
   def update
-    operation = Expense::Manual::Update.new(current_user, params)
+    param = RequestFormatter.api_expense(current_user, params)
+    operation = Expense::Manual::Update.new(current_user, param)
     @result = operation.run
     if operation.is_success?
       render 'api/v1/expenses/show'

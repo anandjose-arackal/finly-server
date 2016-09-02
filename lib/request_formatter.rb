@@ -1,17 +1,11 @@
 class RequestFormatter
 
   def self.api_expense(user, params)
-    parse_receipt params
+    parse_receipt user, params
     param = format('./app/formatter/api/expense.yaml', params)
-    if param.present? and param[:expense].present?
-      if param[:expense][:amount_attributes].present? and param[:expense][:amount_attributes][:value].present?
-        param[:expense][:amount_attributes][:currency_id] = Currency.first.id
-      end
-      if param[:expense][:receipts_attributes].present?
-        param[:expense][:receipts_attributes].each do |p|
-          p[:user_id] = user.id
-        end
-      end
+    # todo temp code till multi-currency is handled
+    if param.present? and param[:expense].present? and param[:expense][:amount_attributes].present? and param[:expense][:amount_attributes][:value].present?
+      param[:expense][:amount_attributes][:currency_id] = Currency.first.id
     end
     param
   end
@@ -59,8 +53,9 @@ class RequestFormatter
         elsif value.is_a?(Array)
           next if value.blank?
           v = values[value[0]]
+          next if v.blank?
           v = [v] unless v.is_a?(Array)
-          map[key.to_sym] = v
+          map[key.to_sym] = v if v.present?
         else
           map[key.to_sym] = value
         end
@@ -70,11 +65,12 @@ class RequestFormatter
     map
   end
 
-  def self.parse_receipt(params)
+  def self.parse_receipt(user, params)
     if params[:receipt].present?
       image = extract_receipt_image(params)
       params[:receipt] = {}
       params[:receipt][:image] = image
+      params[:receipt][:user_id] = user.id
     end
   end
 
