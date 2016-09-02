@@ -5,11 +5,11 @@ class PendingInvitesController < ApplicationController
   before_action :valid_token, only: [:edit, :update]
 
   def create
-    invite_op = User::Invite
-    if @user_invite_service.invite(user_invite_params)
+    invite_op = User::Invite::Create.new(current_user, params)
+    if invite_op.run
       flash[:success] = "User invited!"
     else
-      flash[:error] = @user_invite_service.errors
+      flash[:error] = invite_op.errors
     end
     redirect_to request.referer
   end
@@ -28,20 +28,37 @@ class PendingInvitesController < ApplicationController
     end
   end
 
+  def accept
+    accept_op = User::Invite::Accept.new(params)
+    if accept_op.run
+      redirect_to root_url
+    else
+      flash[:error] = accept_op.errors
+      # render the flash message
+    end
+  end
+
   def update_invite
-    user_id = params[:pending_invite_id]
-    if @user_invite_service.update_invite(user_id, updated_user_invite_params)
+    update_invite_op = User::Invite::Update.new(current_user, params)
+    if update_invite_op.run
       flash[:success] = "Invite updated!"
       redirect_to request.referrer
     else
-      flash[:error] = @user_invite_service.errors
-      render_flash_message
+      flash[:error] = update_invite_op.errors
+      # render the flash message
     end
   end
 
 
   def destroy
-
+    destroy_op = User::Invite::Destroy.new(current_user, params)
+    if destroy_op.run
+      flash[:success] = "Invite deleted!"
+      redirect_to request.referrer
+    else
+      flash[:error] = destroy_op.errors
+      # render flash
+    end
   end
 
   private

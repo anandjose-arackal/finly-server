@@ -1,3 +1,8 @@
+# action that gives the list of users in a particular user's team
+# params:
+# role_id: the role of the user viewing the team
+# if role_id is not passed, the view of the particular user is used
+
 class User::Team::Show < User::Team::Base
   attr_accessor :role_id
 
@@ -10,14 +15,23 @@ class User::Team::Show < User::Team::Base
 
     end
   end
+  #
+  # def initialize(user, role_id, params={})
+  #   super(user, params)
+  #   self.role_id = role_id
+  # end
+  #
+  # def self.call(user, role_id, params={})
+  #   self.new(user, role_id, params).run
+  # end
 
-  def initialize(user, role_id, params={})
-    super(user, params)
-    self.role_id = role_id
+  def initialize(user, params)
+    super()
+    self.role_id = params[:role_id]
   end
 
-  def self.call(user, role_id, params={})
-    self.new(user, role_id, params).run
+  def self.call(user, params)
+    self.new(user, params).run
   end
 
   def pre_validate

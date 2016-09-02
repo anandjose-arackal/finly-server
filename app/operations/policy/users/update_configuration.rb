@@ -75,7 +75,6 @@ class Policy::Users::UpdateConfiguration < Policy::Base
       self.default = User::Team::Mappings::Update.new(user, params[:default]).run
     else
       self.default = User::Team::Mappings::Create.new(user, params[:default]).run
-      debugger
     end
     if conditional_manager_mapping
       self.conditional_manager_mapping = User::Team::Mappings::Update.new(user, params[:conditional_manager]).run

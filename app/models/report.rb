@@ -214,7 +214,9 @@ class Report < ActiveRecord::Base
 
   def versioned_policy
     if self.submitted_at.present?
-      return self.policy.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
+      if self.policy
+        return self.policy.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
+      end
     end
     self.policy
   end

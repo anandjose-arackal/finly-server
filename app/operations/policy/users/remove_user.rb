@@ -14,24 +14,21 @@ class Policy::Users::RemoveUser < Policy::Base
 
   def init
     self.policy = user.policies.find_by(id: params[:policy_id])
-    self.removed_user = User.find_by(id: params[:removed_user_id])
+    self.removed_user = user.company.users.find_by(id: params[:removed_user_id])
   end
 
   def validate
     super()
-    unless removed_user
-      errors << "User to be removed not found in policy."
-    end
 
-    if self.policy.users.find_by(id: removed_user.id).blank?
-      errors << "User not found in policy."
-      return false
-    end
   end
 
   def authorize
+    unless removed_user
+      raise_unauthorized_exception
+      return false
+    end
     if removed_user.policy_admin?(policy) and policy.admins.count <= 1
-      errors << 'Cannot remove the only admin from policy'
+      raise_unauthorized_exception
       return false
     end
   end

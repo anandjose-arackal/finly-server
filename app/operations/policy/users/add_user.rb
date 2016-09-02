@@ -16,7 +16,7 @@ class Policy::Users::AddUser < Policy::Base
 
   def init
     self.policy = user.policies.find_by(id: params[:policy_id])
-    self.added_user = User.find_by(id: params[:added_user_id])
+    self.added_user = user.company.users.find_by(id: params[:added_user_id])
     self.admin = params[:admin]
   end
 
