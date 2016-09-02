@@ -3,7 +3,7 @@
 # expense_id, or id : the id of the expense that us going to be edited.
 #
 
-class Expense::Manual::Update < Expense::Base
+class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
 
   def pre_validate
@@ -25,13 +25,19 @@ class Expense::Manual::Update < Expense::Base
     super
     # setting up the expense params for updation
     self.updated_expense_params = manual_expense_params
-    self.updated_expense_params[:amount_attributes][:id] = expense.amount.id if expense
-    self.updated_expense_params[:manual_expense_attributes][:id] = expense.manual_expense.id if expense
-    if expense and expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
-      self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
+    if expense
+      if self.updated_expense_params[:amount_attributes].present? and self.updated_expense_params[:amount_attributes][:value].present? and
+          expense.amount_id.present?
+        self.updated_expense_params[:amount_attributes][:id] = expense.amount.id
+      end
+      if self.updated_expense_params[:manual_expense_attributes].present? and self.expense.manual_expense_id.present?
+        self.updated_expense_params[:manual_expense_attributes][:id] = expense.manual_expense.id if expense
+      end
+      if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
+        self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
+      end
     end
   end
-
 
   def authorize
     unless expense
@@ -41,7 +47,6 @@ class Expense::Manual::Update < Expense::Base
       raise_unauthorized_exception
     end
   end
-
 
   def process
     unless expense.update(updated_expense_params)
@@ -55,6 +60,13 @@ class Expense::Manual::Update < Expense::Base
     # add comment in report if expense is added within report
 
     # send mailer indicating updation of expense
+  end
+
+  private
+  # will be called when the user is creating a manual expense
+  def manual_expense_params
+    params.require(:expense).permit(:expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date,
+                                    amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
   end
 
 end

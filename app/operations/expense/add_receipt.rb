@@ -38,4 +38,9 @@ class Expense::AddReceipt < Expense::Base
     end
   end
 
+  private
+  def receipt_params
+    params.require(:receipt).permit(:image)
+  end
+
 end
