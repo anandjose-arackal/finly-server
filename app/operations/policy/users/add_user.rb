@@ -4,7 +4,6 @@
 # added_user_id: id of the user that us being added to this policy
 # admin: true or false depending on if the user being added is being added as an admin or not.
 #
-# todo - generalize this for adding multiple users
 
 class Policy::Users::AddUser < Policy::Base
 
