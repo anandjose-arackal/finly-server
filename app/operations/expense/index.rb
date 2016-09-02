@@ -46,13 +46,13 @@ class Expense::Index < Expense::Base
   def retrieve
     if is_success?
       params[:expenses] = self.expenses
-      Expense::Index::ExpenseListPresenter.new(user, params)
+      Expense::Index::ListPresenter.new(user, params)
     else
       false
     end
   end
 
-  class Expense::Index::ExpenseListPresenter < Expense::Base::Presenter
+  class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
     attr_accessor :expenses, :paginated_expenses, :categories

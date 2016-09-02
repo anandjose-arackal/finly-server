@@ -216,9 +216,8 @@ Rails.application.routes.draw do
         delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
         post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
       end
-      resources :receipts, only: [:create, :index, :destroy]
+      resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
-        post 'add_note', to: 'receipts#add_note', as: :add_note
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
       end
     end

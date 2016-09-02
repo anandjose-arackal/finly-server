@@ -1,7 +1,7 @@
 # Class to create an expense
 # format of parameters,
 
-class Expense::Manual::Create < Expense::Manual::Base
+class Expense::Manual::Create < Expense::Base
   attr_accessor :expense_params
 
   def pre_validate

@@ -9,7 +9,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def create
     operation = Expense::Manual::Create.new(current_user, params)
-    @result = operation.run
+    operation.run
     if operation.is_success?
       render 'api/v1/shared/success'
     else
@@ -46,7 +46,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def destroy
     operation = Expense::Manual::Update.new(current_user, params)
-    @result = operation.run
+    operation.run
     if operation.is_success?
       render 'api/v1/shared/success'
     else
