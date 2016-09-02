@@ -1,3 +1,5 @@
+
+
 class User::Index < BaseOperation
 
 
@@ -5,6 +7,9 @@ class User::Index < BaseOperation
 
     attr_accessor :team
 
+    def initialize(user, params)
+
+    end
 
   end
 

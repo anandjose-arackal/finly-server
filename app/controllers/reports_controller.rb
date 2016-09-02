@@ -91,7 +91,7 @@ class ReportsController < ApplicationController
   end
 
   def submit
-    submit_op = Report::Submit(current_user, params)
+    submit_op = Report::Submit.new(current_user, params)
     if submit_op.run
       flash.now[:success] = "Report Submitted!"
     else
@@ -178,7 +178,7 @@ class ReportsController < ApplicationController
     if comment_op.run
       flash.now[:success] = "You've taken control of this report"
     else
-      flash.now[:failure] = take_control_op.errors
+      flash.now[:failure] = comment_op.errors
     end
     load_response
   end

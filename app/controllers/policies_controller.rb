@@ -36,7 +36,7 @@ class PoliciesController < ApplicationController
 
   def index
     index_op = Policy::Index.new(current_user, view: params[:view])
-    @policies = index_op.run
+    @policies = index_op.run.policies
   end
 
   def show
@@ -81,119 +81,142 @@ class PoliciesController < ApplicationController
     end
   end
 
-  def add_users
-    @policy = Policy.find(params[:policy_id])
-    authorize @policy
-    ids = []
-    ids = params[:user_id].split(/,/) unless params[:user_id].blank?
-    users = PolicyUserService.new(@policy).invitable_users.with_id(ids)
-    pus = PolicyUserService.new(@policy)
-    if pus.add_users(users)
-      load_users
-      respond_to do |format|
-        format.html {}
-        format.js
-      end
-      return
+  def add_user
+    add_user_op = Policy::Users::Add.new(current_user, params)
+    if add_user_op.run
+      flash[:success] = "User successfully addded"
+      redirect_to request.referrer
+    else
+      flash[:danger] = add_user_op.errors
+      # render error message
     end
-    flash.now[:danger] = pus.errors
-    render_flash_message
+    # @policy = Policy.find(params[:policy_id])
+    # authorize @policy
+    # ids = []
+    # ids = params[:user_id].split(/,/) unless params[:user_id].blank?
+    # users = PolicyUserService.new(@policy).invitable_users.with_id(ids)
+    # pus = PolicyUserService.new(@policy)
+    # if pus.add_users(users)
+    #   load_users
+    #   respond_to do |format|
+    #     format.html {}
+    #     format.js
+    #   end
+    #   return
+    # end
+    # flash.now[:danger] = pus.errors
+    # render_flash_message
   end
 
   def remove_users
-    @policy = Policy.find(params[:policy_id])
-    authorize @policy
-    ids = []
-    ids = params[:user_id].split(/,/) unless params[:user_id].blank?
-    users = @policy.users.with_id(ids)
-    pus = PolicyUserService.new(@policy)
-    if pus.remove_users(users)
-      load_users
-      respond_to do |format|
-        format.html {}
-        format.js { render 'add_users' }
-      end
-      return
+    add_user_op = Policy::Users::Add.new(current_user, params)
+    if add_user_op.run
+      flash[:success] = "User successfully addded"
+      redirect_to request.referrer
+    else
+      flash[:danger] = add_user_op.errors
+      # render error message
     end
-    flash.now[:danger] = pus.errors
-    render_flash_message
+    # @policy = Policy.find(params[:policy_id])
+    # authorize @policy
+    # ids = []
+    # ids = params[:user_id].split(/,/) unless params[:user_id].blank?
+    # users = @policy.users.with_id(ids)
+    # pus = PolicyUserService.new(@policy)
+    # if pus.remove_users(users)
+    #   load_users
+    #   respond_to do |format|
+    #     format.html {}
+    #     format.js { render 'add_users' }
+    #   end
+    #   return
+    # end
+    # flash.now[:danger] = pus.errors
+    # render_flash_message
   end
 
 
   def update_user_configuration
-    @policy = Policy.find(params[:policy_id])
-    authorize @policy
-    pus = PolicyUserService.new(@policy)
-    if pus.update_configuration params[:policy]
-      load_users
-      flash.now[:success] = 'Configuration updated'
-      respond_to do |format|
-        format.html { redirect_to request.referrer }
-        format.js
-      end
-      return
-    end
-    flash.now[:failure] = pus.errors
-    render_flash_message
-  end
-
-  def add_rule
-    @policy = Policy.find(params[:policy_id])
-    authorize @policy
-    # determine the type of rule and call the respective service method
-    if rule_params['greater_than_amount_attributes']
-      if @rule_service.add_expense_rule(rule_params)
-        flash[:success] = "Expense Rule added!"
-      else
-        flash[:danger] = @rule_service.errors
-      end
-    elsif rule_params['amount_attributes']
-      if @rule_service.add_budget_rule(rule_params)
-        flash[:success] = "Budget Rule added"
-      else
-        flash[:danger] = @rule_service.errors
-      end
+    update_configuration_op = Policy::Users::UpdateConfiguration.new(current_user, params)
+    if update_configuration_op.run
+      flash[:success] = "Configuration updated"
+      redirect_to request.referrer
     else
-      flash[:danger] = "Invalid input params."
+      flash[:danger] = "Update failed."
+      # render flash message
     end
-    redirect_to request.referrer
+    # @policy = Policy.find(params[:policy_id])
+    # authorize @policy
+    # pus = PolicyUserService.new(@policy)
+    # if pus.update_configuration params[:policy]
+    #   load_users
+    #   flash.now[:success] = 'Configuration updated'
+    #   respond_to do |format|
+    #     format.html { redirect_to request.referrer }
+    #     format.js
+    #   end
+    #   return
+    # end
+    # flash.now[:failure] = pus.errors
+    # render_flash_message
   end
-
-  def remove_rule
-    @policy = Policy.find(params[:policy_id])
-    authorize @policy
-    # determine the type of rule being added and accordingly update
-    if params['budget_rule']
-      if @rule_service.remove_budget_rule(params['budget_rule']['rule_id'])
-        flash[:success] = "Expense Rule removed!"
-      else
-        flash[:danger] = @rule_service.errors
-      end
-    elsif params['expense_rule']
-      if @rule_service.remove_expense_rule(params['expense_rule']['rule_id'])
-        flash[:success] = "Budget rule removed!"
-      else
-        flash[:danger] = @rule_service.errors
-      end
-    else
-      flash[:danger] = "Invalid input params."
-    end
-    redirect_to request.referrer
-  end
+  #
+  # def add_rule
+  #   @policy = Policy.find(params[:policy_id])
+  #   authorize @policy
+  #   # determine the type of rule and call the respective service method
+  #   if rule_params['greater_than_amount_attributes']
+  #     if @rule_service.add_expense_rule(rule_params)
+  #       flash[:success] = "Expense Rule added!"
+  #     else
+  #       flash[:danger] = @rule_service.errors
+  #     end
+  #   elsif rule_params['amount_attributes']
+  #     if @rule_service.add_budget_rule(rule_params)
+  #       flash[:success] = "Budget Rule added"
+  #     else
+  #       flash[:danger] = @rule_service.errors
+  #     end
+  #   else
+  #     flash[:danger] = "Invalid input params."
+  #   end
+  #   redirect_to request.referrer
+  # end
+  #
+  # def remove_rule
+  #   @policy = Policy.find(params[:policy_id])
+  #   authorize @policy
+  #   # determine the type of rule being added and accordingly update
+  #   if params['budget_rule']
+  #     if @rule_service.remove_budget_rule(params['budget_rule']['rule_id'])
+  #       flash[:success] = "Expense Rule removed!"
+  #     else
+  #       flash[:danger] = @rule_service.errors
+  #     end
+  #   elsif params['expense_rule']
+  #     if @rule_service.remove_expense_rule(params['expense_rule']['rule_id'])
+  #       flash[:success] = "Budget rule removed!"
+  #     else
+  #       flash[:danger] = @rule_service.errors
+  #     end
+  #   else
+  #     flash[:danger] = "Invalid input params."
+  #   end
+  #   redirect_to request.referrer
+  # end
 
   private
   def load_users
     @users = []
     @policy.user_mapping.each do |map|
       user = map.user
-      uts = UserTeamService.new(user)
       admin = map.admin
       conditional_manager= nil
       conditional_finance =nil
       conditional_approves_to = nil
       conditional_approves_finance_to = nil
 
-      mappings = uts.mappings policy: @policy
+      mappings = user.team_mapping.with_details.policy(@policy.id)
       dm = mappings.default
       default_mapping = dm.first if dm.present?
       conditional_mapping = mappings.non_default
@@ -212,17 +235,17 @@ class PoliciesController < ApplicationController
     end
   end
 
-  def update_user_params
-    params.require(:policy).permit(:admin, :default, :conditional_manager, :conditional_finance_manager,
-                                   :conditional_approves_to, :conditional_approves_finance_to)
-  end
+  # def update_user_params
+  #   params.require(:policy).permit(:admin, :default, :conditional_manager, :conditional_finance_manager,
+  #                                  :conditional_approves_to, :conditional_approves_finance_to)
+  # end
+  #
+  # def rule_params
+  #   params.require(:rules).permit!
+  # end
 
-  def rule_params
-    params.require(:rules).permit!
-  end
-
-  def load_service_objects
-    @rule_service = RuleService.new(current_user, params[:policy_id])
-  end
+  # def load_service_objects
+  #   @rule_service = RuleService.new(current_user, params[:policy_id])
+  # end
 
 end

@@ -1,3 +1,6 @@
+# base class for user inviting operations
+#
+
 class User::Invite::Base < BaseOperation
 
   attr_accessor :invite_params

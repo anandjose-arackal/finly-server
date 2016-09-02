@@ -1,7 +1,8 @@
-# the class that updates an invite after the face.
+# the class that updates an invite after the fact.
 # params:
 # manager_id, finance_manager_id, conditional manager ids - all team mapping attributes
 # manager, finance_manager, admin - all individually 0 or 1 depending on the role this employee is assigned.
+# user_id: id of the user whose update is being updated
 
 class User::Invite::Update < User::Invite::Base
 
@@ -14,7 +15,7 @@ class User::Invite::Update < User::Invite::Base
   end
 
   def init
-    self.invited_user = User.pending.find_by(id: user_id)
+    self.invited_user = User.pending.find_by(id: params[:user_id])
     # creating a uts object to manipulate the invited user's attributes
     self.user_team_service = UserTeamService.new(self.invited_user)
   end
