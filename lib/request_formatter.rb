@@ -1,68 +1,55 @@
 class RequestFormatter
 
   def self.api_expense(user, params)
-    parse_receipt user, params
-    param = format('./app/formatter/api/expense.yaml', params)
-    # todo temp code till multi-currency is handled
-    if param.present? and param[:expense].present? and param[:expense][:amount_attributes].present? and param[:expense][:amount_attributes][:value].present?
-      param[:expense][:amount_attributes][:currency_id] = Currency.first.id
-    end
-    param
+    return nil if params.blank? or user.blank?
+    format('api/expense.yaml.erb', user, params)
   end
 
-  def self.format(path_to_file, params)
-    map = YAML.load_file(path_to_file) rescue nil
-    return nil unless map.present?
-    values = extract map['from'], params
-    return nil if values.blank?
-    construct map['to'], values
-  end
-
-  def self.extract(config, map)
-    return nil unless config.present? and map.present?
-    values = {}
-    config.each do |key, value|
-      next if key.blank? or value.blank?
-      next unless map.has_key?(key.to_s) or map.has_key?(key.to_sym)
-      if value.is_a?(String)
-        next unless value[0] == '#'
-        values[value] = map[key.to_sym]
-      elsif value.is_a?(Array)
-        # todo handle array in 'to'
-      elsif value.is_a?(Hash)
-        res = extract config[key], (map[key.to_sym] or map[key.to_s])
-        values.merge!(res) unless res.blank?
-      end
+  def self.format(path_to_file, user, params)
+    return nil if params.blank?
+    b = binding
+    b.local_variable_set(:user, user)
+    b.local_variable_set(:params, params)
+    map = YAML.load(ERB.new(File.read("./app/formatter/#{path_to_file}")).result(b))
+    # Load receipt seperately has yaml cannot handle images
+    if params[:receipt].present?
+      parse_receipt user, params
+      map['expense']['receipts_attributes']= []
+      map['expense']['receipts_attributes'][0] = params[:receipt]
     end
-    values
-  end
-
-  def self.construct(config, values)
-    return nil unless config.present? and values.present?
-    map = {}
-    config.each do |key, value|
-      next if key.blank? or value.blank?
-      if value.is_a?(Hash)
-        res = construct config[key], values
-        next if res.blank?
-        map[key.to_sym] = res
-      else
-        if value.is_a?(String) and value[0] == '#'
-          next if values[value].blank?
-          map[key.to_sym] = values[value]
-        elsif value.is_a?(Array)
-          next if value.blank?
-          v = values[value[0]]
-          next if v.blank?
-          v = [v] unless v.is_a?(Array)
-          map[key.to_sym] = v if v.present?
-        else
-          map[key.to_sym] = value
-        end
-      end
-    end
-    map = map.deep_symbolize_keys if map.present?
+    clean_hash_new map
+    symbolize_hash_keys map
     map
+  end
+
+  # Delete all null values in a hash
+  def self.clean_hash_new(hash)
+    hash.each do |key, value|
+      if value.kind_of?(Hash)
+        clean_hash_new value
+      elsif value.kind_of?(Array)
+        value.each do |k, v|
+          clean_hash_new v if v.kind_of?(Hash)
+        end
+        value.compact!
+      end
+    end
+    hash.delete_if { |k, v| v.blank? }
+  end
+
+  # Symbolize all keys in the hash
+  def self.symbolize_hash_keys(hash)
+    hash.each do |key, value|
+      if value.kind_of?(Hash)
+        symbolize_hash_keys value
+      elsif value.kind_of?(Array)
+        value.each do |k, v|
+          symbolize_hash_keys v if v.kind_of?(Hash)
+        end
+      else
+      end
+    end
+    hash.symbolize_keys!
   end
 
   def self.parse_receipt(user, params)
