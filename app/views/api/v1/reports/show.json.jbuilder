@@ -28,9 +28,11 @@ json.data do
     end
   end
   json.comments @result.comments do |comment|
-    json.extract! comment, :id, :user_id, :report_id, :report_comment_action_id
+    json.extract! comment, :id, :user_id, :report_id, :report_comment_action_id, :created_at
     json.content comment.generate
-    json.user_name comment.user.name
+    name = nil
+    name = comment.user.name if comment.user_id.present?
+    json.user_name name
   end
   json.policies @result.policies, :id, :name
   json.violations do

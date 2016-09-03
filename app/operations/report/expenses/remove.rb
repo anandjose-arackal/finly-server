@@ -25,6 +25,8 @@ class Report::Expenses::Remove < Report::Base
     self.report = Report.find_by(id: params[:report_id])
     # extracting the expenses from the report itself
     ids = (params[:expense_ids] or params[:expense_id])
+    # Split if IDS are sent as one comma delimited string
+    ids= ids.split(',')
     self.expenses = report.expenses.where(id: ids)
     # if the report is in retracted stage, comments need to be added
     self.retracted = report.retracted?
