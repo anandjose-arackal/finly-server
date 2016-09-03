@@ -52,7 +52,7 @@ class Card::Load::Request::Create < Card::Load::Request::Base
   end
 
   def after_save_callback(model)
-    debugger
+
   end
 
 end

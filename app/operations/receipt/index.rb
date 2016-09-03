@@ -5,19 +5,16 @@ class Receipt::Index < Receipt::Base
     self.receipts = user.receipts.without_parent
   end
 
-  def retrieve
-    if is_success?
-      Receipt::Index::ReceiptsPresenter.new(user, {receipts: receipts})
-    else
-      false
-    end
+  def success
+    params[:receipts] = receipts
+    Receipt::Index::ReceiptsPresenter.new(user, params)
   end
 
   class Receipt::Index::ReceiptsPresenter < BaseOperation::BasePresenter
     attr_accessor :receipts
 
     def initialize(user, params)
-      self.receipts = params[:receipts]
+      self.receipts = params[:receipts].paginate(page: params[:page], per_page: 30) rescue nil
     end
   end
 

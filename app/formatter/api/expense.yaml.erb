@@ -1,4 +1,5 @@
 id: <%= params[:id] %>
+receipt_id: <%= params[:receipt_id] %>
 expense:
   note: <%= params[:note] %>
   report_id: <%= params[:report_id] %>
@@ -8,8 +9,8 @@ expense:
     merchant: <%= params[:merchant] %>
   <% if params[:amount].present? %>
   amount_attributes:
-    - value: <%= params[:amount] %>
-    - currency: <%= Currency.first.id %>
+    value: <%= params[:amount] %>
+    currency_id: <%= Currency.first.id %>
   <% end %>
   <% if params[:receipt].present? %>
   receipts_attributes:

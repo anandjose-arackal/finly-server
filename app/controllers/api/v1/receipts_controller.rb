@@ -4,9 +4,9 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
 
   allow_oauth!
   before_action :authenticate_user!
-  before_action :parse_receipt, only: [:create, :update]
 
   def create
+    RequestFormatter.parse_receipt(current_user, params)
     operation = Receipt::Create.new(current_user, params)
     operation.run
     if operation.is_success?
@@ -32,7 +32,8 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
   end
 
   def expense_from_receipt
-    operation = Expense::Manual::Create.new(user, params)
+    param = RequestFormatter.api_expense(current_user, params)
+    operation = Expense::Manual::Create.new(user, param)
     operation.run
     if operation.is_success?
       render 'api/v1/shared/success'
@@ -51,21 +52,6 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
       @errors = operation.errors
       render 'api/v1/shared/failure'
     end
-  end
-
-  private
-  def parse_receipt
-    params[:receipt] = {}
-    params[:receipt][:image] = extract_receipt_image
-  end
-
-  def extract_receipt_image
-    data = params[:receipt]
-    file = data.tempfile
-    file.class.class_eval { attr_accessor :original_filename, :content_type }
-    file.original_filename = params[:filename]
-    file.content_type = params[:content_type]
-    file
   end
 
 end

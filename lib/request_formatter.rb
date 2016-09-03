@@ -14,6 +14,11 @@ class RequestFormatter
     map
   end
 
+  def self.api_receipt(user, params)
+    return nil if params.blank? or user.blank?
+    parse_receipt user, params if params[:receipt].present?
+  end
+
   def self.format(path_to_file, user, params)
     return nil if params.blank?
     b = binding

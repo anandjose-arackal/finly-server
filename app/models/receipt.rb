@@ -29,7 +29,8 @@ class Receipt < ActiveRecord::Base
   has_attached_file :image, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}, default_url: "/assets/:style/missing.png"
   validates_attachment_content_type :image, content_type: /\Aimage\/.*\Z/
 
-  scope :without_parent, -> {where(parent_id: nil)}
+  scope :with_id, ->(id) { where id: id }
+  scope :without_parent, -> { where(parent_id: nil) }
 
   def receipt_file_name
     self.image_file_name

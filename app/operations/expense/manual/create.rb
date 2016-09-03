@@ -2,7 +2,7 @@
 # format of parameters,
 
 class Expense::Manual::Create < Expense::Manual::Base
-  attr_accessor :expense_params
+  attr_accessor :expense_params, :receipt
 
   def pre_validate
     super
@@ -21,24 +21,38 @@ class Expense::Manual::Create < Expense::Manual::Base
   def init
     self.expense_params = manual_expense_params
     self.expense_params[:expense_type_id] = ExpenseType.manual_expense_id
+    if params[:receipt_id].present?
+      self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
+    end
   end
 
   def validate
     # can't think of anything for now
+    if params[:receipt_id].present? and receipt.blank?
+      errors << 'Receipt not found'
+    end
   end
 
   def process
     self.expense = user.expenses.build(expense_params)
-    unless self.expense.save
+    if self.expense.save
+      # Attach an existing receipt to the expense
+      if self.receipt.present?
+        self.receipt.parent = expense
+        self.receipt.save
+      end
+    else
       errors << self.expense.errors.full_messages
     end
   end
 
   def post_process
+    # if an existing receipt id is passed in params, attach the receipt to the expense
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present?
       # this will be changed to the respective operation when it's done
-      ReportService.new(user: user, report: expense.report).expense_created_in_report(expense) if expense.report_id.present? and user.present?
+      # todo create report comments
     end
   end
 
