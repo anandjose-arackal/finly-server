@@ -258,6 +258,15 @@ class Report < ActiveRecord::Base
     self.expenses.sort_date_desc.first
   end
 
+  def require_reimbursement?
+    report_total = report.total_amount
+    latest_expense = report.latest_expense
+    date = nil
+    date = latest_expense.date if latest_expense.present?
+    cash = self.user.cash_in_hand date
+    cash.value - report_total < 0
+  end
+
   private
   def is_employee
     unless self.user.employee?

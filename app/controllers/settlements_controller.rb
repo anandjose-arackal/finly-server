@@ -3,28 +3,49 @@ class SettlementsController < ApplicationController
   before_action :load_user, only: [:show, :show_partial, :add_payment]
   before_action :load_users, only: [:index]
 
-  def add_payment
-    authorize Payment
-    ss = SettlementService.new(@user)
+  def create
+
+    params[:to_user_id] = @user
     result = nil
-    param = payment_params
+    # param = payment_params
     success_message = nil
+    error_message = nil
     if param[:payment_type] == PaymentType.advance_id.to_s
-      result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'advance added'
+      cash_advance_op = Settlement::AddCashAdvance.new(current_user, params)
+      result = cash_advance_op.run
+      # result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
+      if result
+        success_message = 'Cash advance added'
+      else
+        error_message = cash_advance_op.errors
+      end
     elsif param[:payment_type] == PaymentType.debt_clearance_id.to_s
-      result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'debt clearance payment added'
+      debt_to_company_clearance_op = Settlement::AddDebtToCompanyClearance.new(current_user, params)
+      result = debt_to_company_clearance_op.run
+      # result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
+      if result
+        success_message = 'debt clearance payment added'
+      else
+        error_message = debt_to_company_clearance_op.errors
+      end
     elsif param[:payment_type] == PaymentType.reimbursement_id.to_s
-      report_ids = nil
-      report_ids = param[:report_id].split if param[:report_id].present?
-      result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'reimbursement added'
+      reimbursement_op = Settlement::AddReimbursement.new(current_user, params)
+      result = reimbursement_op.run
+      # result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
+      if result
+        success_message = 'Reimbursement added'
+      else
+        error_message = reimbursement_op.error
+      end
     elsif param[:payment_type] == PaymentType.settlement_id.to_s
-      report_ids = nil
-      report_ids = param[:report_id].split if param[:report_id].present?
-      result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'settlement created'
+      settle_op = Settlement::Settle.new(current_user, params)
+      result = settle_op.run
+      if result
+        success_message = 'Payment settled'
+      else
+        error_message = settle_op.errors
+      end
+      # result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
     end
 
     if result
@@ -33,8 +54,7 @@ class SettlementsController < ApplicationController
       redirect_to settlement_path(@user.id, view: params[:view])
       return
     end
-    flash.now[:danger] = 'error adding payment'
-    flash.now[:danger] = ss.errors if ss.errors.present?
+    flash.now[:danger] = error_message
     render_flash_message
   end
 
@@ -55,7 +75,6 @@ class SettlementsController < ApplicationController
     # load_reports :approved
 
     # Backbone Code
-    return unless PaymentPolicy.new(current_user, @user).show?
     # load_reports :approved
     case params[:view_to_load]
       when 'approved'
@@ -70,6 +89,7 @@ class SettlementsController < ApplicationController
         load_reports :approved
     end
 
+    @actions = Settlement::ShowActions.(current_user, params)
 
     respond_to do |format|
       format.html {}
@@ -80,7 +100,7 @@ class SettlementsController < ApplicationController
 
   def summary
     puts "Hello"
-    @user = User.find(params[:id])
+    @user = current_company.users.find_by(id: params[:id])
     respond_to do |format|
       format.json {}
     end
@@ -115,7 +135,8 @@ class SettlementsController < ApplicationController
           @user = user
           return true
         elsif current_user.policy_admin?
-          admin_team = UserTeamService.new(current_user).team(UserRole.admin_id)
+          admin_team = User::Team::Show.(current_user, role_id: UserRole.admin_id).run.team
+          # admin_team = UserTeamService.new(current_user).team(UserRole.admin_id)
           if admin_team and admin_team.with_id(params[:id]).present?
             @user = user
             return true
@@ -123,6 +144,7 @@ class SettlementsController < ApplicationController
         end
       end
     elsif @finance_view
+      # todo - change this to operation
       if user.present? and UserTeamService.new(current_user).finance_manager_for?(user, indirect_associations: true)
         @user = user
         return true
@@ -138,9 +160,11 @@ class SettlementsController < ApplicationController
 
   def load_users
     if @admin_view
-      @users = UserTeamService.new(current_user).team(UserRole.admin_id, indirect_associations: true)
+      @users = User::Team::Show.(current_user, role_id: UserRole.admin_id, indirect_associations: true).team
+      # @users = UserTeamService.new(current_user).team(UserRole.admin_id, indirect_associations: true)
     elsif @finance_view
-      @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
+      @users = User::Team::Show.(current_user, role_id: UserRole.finance_manager_id, indirect_associations: true).team
+      # @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
     end
     @users = @users.with_balance_sheet if @users.present?
   end
@@ -150,10 +174,9 @@ class SettlementsController < ApplicationController
     @reports= []
     if r.present?
       r.each do |report|
-        rds = ReportDetailService.new(report)
         reimbursement_amount = 0
         reimbursement_amount = report.reimbursement_amount.value if report.reimbursement_amount.present?
-        @reports << {report: report, reimbursement_amount: reimbursement_amount, total_amount: rds.total_amount, final_approver: rds.final_approver}
+        @reports << {report: report, reimbursement_amount: reimbursement_amount, total_amount: report.total_amount, final_approver: report.final_approver}
       end
     end
     @load_type = {}

@@ -3,22 +3,23 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   # before_action :load_service_objects
   # before_action :load_update_role_ids, only: [:update_user_role]
-  before_action :load_user_counts, only: [:index, :user_details]
+  before_action :load_user_counts, only: [:index, :show]
 
   has_scope :filter_search
   has_scope :filter_role
   has_scope :filter_status
 
 
-  # show action to show user profile
-  def show
-    @mappings = current_user.team_mapping.policy(nil)
-    @assigned_policies = current_user.policies
-  end
+  # # show action to show user profile
+  # def show
+  #   @mappings = current_user.team_mapping.policy(nil)
+  #   @assigned_policies = current_user.policies
+  # end
 
-  # action to retrieve a particular user's details in the employees screen - only for admin, obviously
-  def user_details
-    @user = current_company.users.with_id(params[:user_id]).first # user needs to be modified to include all user-policy related details
+  # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
+  def show
+    # this will be the user whose details are to be shown
+    @user = current_company.users.find_by(id: params[:user_id] || params[:id])
     # reinitializing the user team service object
     retrieve_policies
     @company_policies = current_company.policies
@@ -44,15 +45,16 @@ class UsersController < ApplicationController
 
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
-    @user = current_user
-    retrieve_policies
-    @company_policies = current_company.policies
-    @users = apply_scopes(load_team).paginate(page: params[:page], per_page: 30)
-    @reports = @user.reports.not_open
-    @company_managers = current_company.users.with_roles.only_managers.signed_up
-    @company_finance_managers = current_company.users.with_roles.only_finance_managers.signed_up
-
-    load_all_mappings
+    @users = load_team
+    # @user = current_user
+    # retrieve_policies
+    # @company_policies = current_company.policies
+    # @users = apply_scopes(load_team).paginate(page: params[:page], per_page: 30)
+    # @reports = @user.reports.not_open
+    # @company_managers = current_company.users.with_roles.only_managers.signed_up
+    # @company_finance_managers = current_company.users.with_roles.only_finance_managers.signed_up
+    #
+    # load_all_mappings
   end
 
   # def profile
@@ -178,7 +180,7 @@ class UsersController < ApplicationController
     @mappings = {} # each value will be an array of mappings
     @mappings['company'] = @user.team_mapping.policy(nil)
     @policies.each do |policy|
-      @mappings[policy.id] = @user.team_mapping(policy_id: policy.id)
+      @mappings[policy.id] = @user.team_mapping.policy(policy_id: policy.id)
     end
   end
   #

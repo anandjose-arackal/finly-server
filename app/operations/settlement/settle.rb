@@ -1,7 +1,7 @@
 # settling pending reimbursements of reports with cash in hand
 # params:
 # to_user_id: user whose reports are being settled
-# report_ids: ids of the reports that are to be reimbursed.
+# report_id: ids of the reports that are to be reimbursed.
 # value : value of the amount to be reimbursed - should match total of reports referenced via report_ids
 # currency_id: currency of the reimbursement
 
@@ -17,7 +17,7 @@ class Settlement::Settle < Settlement::Base
     if params[:value] and params[:value] < 0
       errors << "Reimbursement amount cannot be negative."
     end
-    if params[:report_ids].blank?
+    if params[:report_id].blank?
       errors << "No reports to reimburse."
       return false
     end
@@ -25,14 +25,19 @@ class Settlement::Settle < Settlement::Base
 
   def init
     self.to_user = user.company.users.find_by(id: params[:to_user_id])
-    self.reports = to_user.reports.where(id: params[:report_ids]) if to_user
+    self.reports = to_user.reports.where(id: params[:report_id]) if to_user
   end
 
   def authorize
     unless to_user
       raise_unauthorized_exception
     end
-    team = User::Team::Show.(user, UserRole.finance_manager_id, indirect_associations: true)
+    if user.admin?
+      self.role = UserRole.admin_id
+    else
+      self.role = UserRole.finance_manager_id
+    end
+    team = User::Team::Show.(user, {role_id: role, indirect_associations: true}).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end

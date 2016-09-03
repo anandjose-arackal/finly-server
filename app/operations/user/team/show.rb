@@ -26,7 +26,7 @@ class User::Team::Show < User::Team::Base
   # end
 
   def initialize(user, params)
-    super()
+    super(user, params)
     self.role_id = params[:role_id]
   end
 

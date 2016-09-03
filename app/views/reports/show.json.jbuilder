@@ -21,7 +21,7 @@ json.total rds.total_amount
 json.date @report.created_at.strftime("%d %b")
 
 json.comments @comments do |comment|
-  json.content comment.content
+  json.content comment.generate
   json.created_at comment.created_at.strftime("%d %b %y")
   if comment.user.respond_to?(:id, :name)
     json.comment_user_id comment.user.id
