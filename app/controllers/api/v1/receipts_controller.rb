@@ -31,18 +31,6 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
     end
   end
 
-  def expense_from_receipt
-    param = RequestFormatter.api_expense(current_user, params)
-    operation = Expense::Manual::Create.new(user, param)
-    operation.run
-    if operation.is_success?
-      render 'api/v1/shared/success'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
-  end
-
   def update
     operation = Receipt::Update.new(current_user, params)
     operation.run
