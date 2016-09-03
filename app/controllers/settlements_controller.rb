@@ -6,13 +6,16 @@ class SettlementsController < ApplicationController
   def add_payment
     authorize Payment
     ss = SettlementService.new(@user)
+    params[:to_user_id] = @user
     result = nil
     param = payment_params
     success_message = nil
     if param[:payment_type] == PaymentType.advance_id.to_s
+      result = Settlement::AddCashAdvance.new(current_user, params).run
       result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'advance added'
     elsif param[:payment_type] == PaymentType.debt_clearance_id.to_s
+      result = Settlement::AddDebtToCompanyClearance.new(current_user, params)
       result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
       success_message = 'debt clearance payment added'
     elsif param[:payment_type] == PaymentType.reimbursement_id.to_s
@@ -55,7 +58,6 @@ class SettlementsController < ApplicationController
     # load_reports :approved
 
     # Backbone Code
-    return unless PaymentPolicy.new(current_user, @user).show?
     # load_reports :approved
     case params[:view_to_load]
       when 'approved'
@@ -70,7 +72,6 @@ class SettlementsController < ApplicationController
         load_reports :approved
     end
 
-
     respond_to do |format|
       format.html {}
       format.js {}
@@ -80,7 +81,7 @@ class SettlementsController < ApplicationController
 
   def summary
     puts "Hello"
-    @user = User.find(params[:id])
+    @user = current_company.users.find_by(id: params[:id])
     respond_to do |format|
       format.json {}
     end
@@ -115,7 +116,8 @@ class SettlementsController < ApplicationController
           @user = user
           return true
         elsif current_user.policy_admin?
-          admin_team = UserTeamService.new(current_user).team(UserRole.admin_id)
+          admin_team = User::Team::Show.(current_user, role_id: UserRole.admin_id).run.team
+          # admin_team = UserTeamService.new(current_user).team(UserRole.admin_id)
           if admin_team and admin_team.with_id(params[:id]).present?
             @user = user
             return true
@@ -123,6 +125,7 @@ class SettlementsController < ApplicationController
         end
       end
     elsif @finance_view
+      # todo - change this to operation
       if user.present? and UserTeamService.new(current_user).finance_manager_for?(user, indirect_associations: true)
         @user = user
         return true
@@ -138,9 +141,11 @@ class SettlementsController < ApplicationController
 
   def load_users
     if @admin_view
-      @users = UserTeamService.new(current_user).team(UserRole.admin_id, indirect_associations: true)
+      @users = User::Team::Show.(current_user, role_id: UserRole.admin_id, indirect_associations: true).team
+      # @users = UserTeamService.new(current_user).team(UserRole.admin_id, indirect_associations: true)
     elsif @finance_view
-      @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
+      @users = User::Team::Show.(current_user, role_id: UserRole.finance_manager_id, indirect_associations: true).team
+      # @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
     end
     @users = @users.with_balance_sheet if @users.present?
   end
@@ -150,10 +155,9 @@ class SettlementsController < ApplicationController
     @reports= []
     if r.present?
       r.each do |report|
-        rds = ReportDetailService.new(report)
         reimbursement_amount = 0
         reimbursement_amount = report.reimbursement_amount.value if report.reimbursement_amount.present?
-        @reports << {report: report, reimbursement_amount: reimbursement_amount, total_amount: rds.total_amount, final_approver: rds.final_approver}
+        @reports << {report: report, reimbursement_amount: reimbursement_amount, total_amount: report.total_amount, final_approver: report.final_approver}
       end
     end
     @load_type = {}
