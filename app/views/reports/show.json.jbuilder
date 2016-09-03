@@ -34,8 +34,8 @@ json.expense_sections @expenses do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
-    # json.extract! expense, :id, :note, :merchant_name, :amount_value
-    json.extract! expense, :id, :note
+    json.extract! expense, :id, :note, :merchant_name, :amount_value
+    # json.extract! expense, :id, :note
     json.date expense.date.strftime("%d %b %y")
   end
 end

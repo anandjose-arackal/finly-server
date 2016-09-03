@@ -39,6 +39,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     _this = @
     @collectoinUsers = new FinlyF.Collections.Users()
+    @collectoinUsers.url = "/settlements"
     @collection = new FinlyF.Collections.Settlements()
     if options.params
       if options.params.view == 'personal' || typeof options.params.view == 'undefined'

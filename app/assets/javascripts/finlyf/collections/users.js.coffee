@@ -1,3 +1,3 @@
 class FinlyF.Collections.Users extends Backbone.Collection
-  url: '/settlements'
+  url: '/users'
   model: FinlyF.Models.User
