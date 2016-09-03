@@ -56,17 +56,18 @@ class FinlyF.Routers.Main extends Backbone.Router
     else
       params = {}
     view = new FinlyF.Views.SettlementsIndex({
-      user: user,
+      # user: user,
       params: params
     })
     $("#backbone-container").html(view.render().el)
 
   settlements_show: (user, query) ->
     # console.log user, query
-    if typeof query != 'undefined'
+    unless typeof query != 'undefined'
       params = JSON.parse(query)
     else
       params = {}
+    params.view = 'personal'
     view = new FinlyF.Views.SettlementsIndex({
       user: user,
       params: params

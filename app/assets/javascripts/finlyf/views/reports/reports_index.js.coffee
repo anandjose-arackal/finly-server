@@ -141,6 +141,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
         $(item).find(".select-item").prop("checked", false)
 
   showDetails: (e) ->
+    # bd = $("<div />", {
+    #   class: "finly-backdrop"
+    # }).appendTo('.main')
     #Returns if clicked on the checkbox
     if $(e.target).hasClass("select-item")
       return

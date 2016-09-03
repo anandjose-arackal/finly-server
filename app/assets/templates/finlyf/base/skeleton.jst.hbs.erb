@@ -111,7 +111,7 @@
 }
 
 .main{
-  z-index: 1;
+  z-index: 4;
   position:fixed;
   overflow-y: scroll;
   background: rgb(252, 252, 252) none repeat scroll 0% 0%;
@@ -197,6 +197,15 @@
   color: #676767;
   pointer-events: none;
 }
+
+.finly-backdrop{
+  background: rgba(0,0,0, 0.5);
+  position: fixed;
+  height: calc(100% - 53px);
+  width: 100%;
+  top: 53px;
+  z-index: 3;
+}
 </style>
 
 
@@ -262,7 +271,7 @@
   </div><!--/.container-fluid -->
 </nav>
 
-<div class="container-fluid" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
+<div class="container-fluid container-main" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
   <div class="col-sm-2 sidebar">
   </div>
 

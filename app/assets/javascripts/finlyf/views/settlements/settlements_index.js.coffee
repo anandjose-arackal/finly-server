@@ -1,16 +1,18 @@
 class FinlyF.Views.SettlementsIndex extends Backbone.View
-  templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
+  # templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
+  templateSkeleton: HandlebarsTemplates['finlyf/settlements/skeleton']
+  templateSkeletonAdmin: HandlebarsTemplates['finlyf/settlements/skeletonAdmin']
 
   #navbar
-  templateNavbarSidebar: HandlebarsTemplates['finlyf/settlements/navbar/navbar_sidebar']
-  templateNavbarMainAdmin: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main_admin']
+  # templateNavbarSidebar: HandlebarsTemplates['finlyf/settlements/navbar/navbar_sidebar']
+  # templateNavbarMainAdmin: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main_admin']
 
   #sidebar
   templateSidebarAdmin: HandlebarsTemplates['finlyf/settlements/sidebar/sidebar_admin']
 
   #main
 
-  templateMainSummary: HandlebarsTemplates['finlyf/settlements/crud/indexSummary']
+  templateSummary: HandlebarsTemplates['finlyf/settlements/summary']
   templateMain: HandlebarsTemplates['finlyf/settlements/crud/index']
   templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/indexPayments']
   # templateNew: HandlebarsTemplates['finlyf/receipts/crud/new']
@@ -31,50 +33,77 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter': 'filter'
+    'click .user': 'userSettlements'
 
   initialize: (options) ->
-    @user = options.user
-    if options.params
-      @params = options.params
-      @params.id = @user
-    else
-      @params = {
-        id: @user
-      }
 
-    console.log @params
     _this = @
-    @dump = []
+    @collectoinUsers = new FinlyF.Collections.Users()
     @collection = new FinlyF.Collections.Settlements()
-    @collection.url = @collection.url + "/" + @user.toString()
+    if options.params
+      if options.params.view == 'personal' || typeof options.params.view == 'undefined'
+        console.log 'we'
+        @view = 'personal'
+        @user = options.user
+        @params = options.params
+        @params.id = @user
+        # else
+        #   @params = {
+        #     id: @user
+        #   }
 
+    
+        # @collection = new FinlyF.Collections.Settlements()
+        @collection.url = @collection.url + "/" + @user.toString()
+        @collection.fetch({
+          reset: true,
+          data: _this.params
+          success: ->
+            _this.populateSummary()
 
-    @collection.fetch({
-      reset: true,
-      data: _this.params
-      success: ->
+          error: ->
+            console.log "Couldn't fetch Successfully."
+        })
+      else
+        @params = options.params
+        
+        @collectoinUsers.fetch({
+          reset: true,
+          data: @params,
+          success: (res)->
+            console.log res
+        })
+        @params = options.params
+        
+    @dump = []
 
-      error: ->
-        console.log "Couldn't fetch Successfully."
-    })
+    
     @collection.on('reset', @processItems, @)
+    @collectoinUsers.on('reset', @processUsers, @)
 
   render: ->
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
-
-    $(@el).html(@templateSkeleton())
-    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
-    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-    $(@el).find(".sidebar").html(@templateSidebar())
+    if @view == 'personal'
+      # if @params.view == 'personal'
+      $(@el).html(@templateSkeleton({item: @params}))
+    else
+      $(@el).html(@templateSkeletonAdmin({item: @params}))
+    # $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+    # $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+    # $(@el).find(".sidebar").html(@templateSidebar())
     if @params
       if @params.view_to_load == "payments"
-        $(@el).find(".main").html(@templateMainPayments())
+        $(@el).find(".settlements-index").html(@templateMainPayments())
       else
-        $(@el).find(".main").html(@templateMain())
+        $(@el).find(".settlements-index").html(@templateMain())
     else
-      $(@el).find(".main").html(@templateMain())
+      $(@el).find(".settlements-index").html(@templateMain())
     FinlyF.structureActions(@el, @params)
+
+    # Populate summary
+    # @populateSummary()
+    # console.log "Rendering"
     @
 
   loadMore: (e) ->
@@ -98,6 +127,36 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch Successfully."
     })
+
+  populateSummary: (id)->
+    user_id = id || @user
+    # console.log "populating"
+    _this = @
+    $.ajax({
+      url: '/settlements/summary?id=' + id.toString(),
+      dataType: 'json',
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+      },
+      success: (res) ->
+        # console.log "res", res
+        $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
+      error: (err) ->
+        console.log err
+
+    })
+
+  processUsers: ->
+    console.log "processing users"
+    @dump = @collectoinUsers.models.slice()
+    $(@el).find("#users").html("")
+
+    @collectoinUsers.each(@appendUsers, @)
+
+  appendUsers: (user) ->
+    console.log "appending users"
+    view_user = new FinlyF.Views.User({model: user, settlements: true})
+    $(@el).find("#users").append(view_user.render().el)
 
   processItems: ->
     #Append all the reports
@@ -136,86 +195,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch successfully."
     })
 
-  toggleSelectAll: (e) ->
-    target = e.currentTarget
-    items = $(@el).find('#items').find(".item")
-    if $(target).prop("checked")
-      for item in items
-        $(item).addClass("selected")
-        $(item).find(".select-item").prop("checked", true)
-    else
-      for item in items
-        $(item).removeClass("selected")
-        $(item).find(".select-item").prop("checked", false)
-
-  showDetails: (e) ->
-    #Returns if clicked on the checkbox
-    if $(e.target).hasClass("select-item")
-      return
-      
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
-
-    model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
-    model = @collection.get(model_id)
-
-    preview_view = new FinlyF.Views.Report({
-      model: model
-      preview: true
-    })
-
-    $(@el).find("#item-details-main").html(preview_view.render().el)
-    
-  closeDetails: ->
-    main = $(@el).find(".main")
-    $(main).removeClass("preview")
-
-  new: ->
-    $("#modal-new .modal-body").html(@templateNew)
-    $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
-    $("#modal-new").modal('show')
-
-  create: ->
-    values = {};
-
-    # if(event){ event.preventDefault(); }
-
-    _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    console.log values
-    model = new FinlyF.Models.Receipt()
-    # console.log("Putting data")
-    console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
-
-
-
-
-
-
-    # _this = @
-    # form = $(@el).find('#new-report')
-    # data = {
-    #   amount: $(form).find('input[name="report[amount]"]').val()
-    #   merchant: $(form).find('input[name="report[merchant]"]').val()
-    #   date: $(form).find('input[name="report[date]"]').val()
-    #   category_id: $(form).find('select[name="report[category_id]"]').val()
-    # }
-
-    # model = new FinlyF.Models.report(data)
-    # console.log model.toJSON()
-    # model.save({
-    #   success: ->
-    #     @collection.fetch({reset: true})
-    # })
-
   filterStatus: (e) ->
+    _this = @
     e.preventDefault()
-
     target = $(e.currentTarget)
     # $(target).closest('ul').find('a').removeClass('active')
-    $(target).parent().addClass('active')
+    # $(target).parent().addClass('active')
     # console.log $(target).parent().html()
     view_to_load = $(target).attr('data-view')
 
@@ -223,54 +208,23 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       # 'filter_status': status_id
       'view_to_load': view_to_load
     }
+    if @view == 'personal'
+      FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
+    else
+      console.log @collection.url
+      @collection.fetch({
+        data: {
+          view_to_load: view_to_load
+        },
+        reset: true,
+        # data: _this.params
+        success: ->
+          _this.populateSummary(user_id)
 
-    FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
+        error: ->
+          console.log "Couldn't fetch Successfully."
+      })
 
-  filter: ->
-    console.log "Filtering"
-    sidebar = $(@el).find(".sidebar")
-    params = {
-      'filter_merchant': $(".sidebar .filter-merchant").val() || ""
-      'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
-      'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      'filter_category_id': $(".sidebar .filter-category-id").val() || ""
-      'filter_receipt': $(".sidebar .filter-receipt").val() || ""
-    }
-
-    filter_amount_value = $(".sidebar .filter-amount-value").val()
-    filter_receipt = $(".sidebar .filter-receipt").val()
-
-    if filter_amount_value
-      params["filter_amount[value]"] = filter_amount_value
-      params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
-
-    console.log "Will navigate now."
-
-    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
-
-  autoComplete: (e) ->
-    target = $(e.currentTarget)
-    query = $(target).val()
-
-    $(target).autocomplete({
-      minLength: 2,
-      source: (request, response) ->
-        $.ajax({
-          dataType: "json"
-          type : 'get'
-          url: '/autocomplete/merchant'
-          data: 
-            remote: "true"
-            query: query
-            # area: 'central'
-          success: (data) ->
-            response(data)
-          error: (err) ->
-            console.log err
-        })
-      select: (event, ui) ->
-        console.log "Selected."
-    })
 
   resetPageCount: (options) ->
     if options.target
@@ -289,3 +243,26 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  userSettlements: (e) ->
+    target = e.currentTarget
+    $(target).siblings().removeClass("active")
+    $(target).addClass("active")
+    _this = @
+    user_id = $(target).find(".user-name").attr("data-item-id")
+    console.log "User id is", user_id
+    console.log @collection.url
+    @collection.url = "/settlements/" + user_id.toString()
+    @collection.fetch({
+      reset: true,
+      data: _this.params
+      success: ->
+        _this.populateSummary(user_id)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
+    })
+
+
+
+

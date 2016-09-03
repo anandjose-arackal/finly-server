@@ -39,13 +39,13 @@ class SettlementsController < ApplicationController
   end
 
   def index
-    authorize Payment
+    # authorize Payment
     @users = @users.with_roles.only_employees.paginate(page: params[:page], per_page: 30) if @users.present?
 
     respond_to do |format|
       format.html {}
       format.js {}
-      format.json {}
+      format.json {render json: @users.as_json}
     end
   end
 
@@ -74,6 +74,14 @@ class SettlementsController < ApplicationController
     respond_to do |format|
       format.html {}
       format.js {}
+      format.json {}
+    end
+  end
+
+  def summary
+    puts "Hello"
+    @user = User.find(params[:id])
+    respond_to do |format|
       format.json {}
     end
   end
