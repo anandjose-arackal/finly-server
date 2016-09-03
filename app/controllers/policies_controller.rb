@@ -2,7 +2,7 @@ class PoliciesController < ApplicationController
   protect_from_forgery with: :null_session
 
   before_action :authenticate_user!
-  before_action :load_service_objects
+  # before_action :load_service_objects
 
   has_scope :filter_name
   has_scope :filter_email
@@ -29,7 +29,7 @@ class PoliciesController < ApplicationController
         format.json { render json: {"status": "success"} }
       end
     else
-      flash[:danger] = update_op.errors
+      flash[:danger] = destroy_op.errors
       render_flash_message
     end
   end
@@ -82,7 +82,7 @@ class PoliciesController < ApplicationController
   end
 
   def add_user
-    add_user_op = Policy::Users::Add.new(current_user, params)
+    add_user_op = Policy::Users::AddUser.new(current_user, params)
     if add_user_op.run
       flash[:success] = "User successfully addded"
       redirect_to request.referrer
@@ -109,12 +109,12 @@ class PoliciesController < ApplicationController
   end
 
   def remove_users
-    add_user_op = Policy::Users::Add.new(current_user, params)
-    if add_user_op.run
-      flash[:success] = "User successfully addded"
+    remove_user_op = Policy::Users::RemoveUser.new(current_user, params)
+    if remove_user_op.run
+      flash[:success] = "User successfully removed"
       redirect_to request.referrer
     else
-      flash[:danger] = add_user_op.errors
+      flash[:danger] = remove_user_op.errors
       # render error message
     end
     # @policy = Policy.find(params[:policy_id])
