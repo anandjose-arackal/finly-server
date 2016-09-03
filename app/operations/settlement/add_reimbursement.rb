@@ -1,7 +1,7 @@
 # action to reimburse a bunch of reports in one shot
 # params:
 # to_user_id: user whose reports are being reimbursed
-# report_ids: ids of the reports that are to be reimbursed.
+# report_id: ids of the reports that are to be reimbursed.
 # value : value of the amount to be reimbursed - should match total of reports referenced via report_ids
 # currency_id: currency of the reimbursement
 # date: date on which the reimbursement is being added
@@ -23,7 +23,7 @@ class Settlement::AddReimbursement < Settlement::Base
       errors << "Reimbursement amount cannot be negative."
       return false
     end
-    if params[:report_ids].blank?
+    if params[:report_id].blank?
       errors << "No reports to reimburse."
       return false
     end
@@ -31,7 +31,7 @@ class Settlement::AddReimbursement < Settlement::Base
 
   def init
     self.to_user = user.company.users.find_by(id: params[:to_user_id])
-    self.reports = to_user.reports.where(id: params[:report_ids]) if to_user
+    self.reports = to_user.reports.where(id: params[:report_id]) if to_user
   end
 
   def authorize

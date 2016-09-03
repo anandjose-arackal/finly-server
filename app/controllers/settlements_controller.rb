@@ -3,31 +3,49 @@ class SettlementsController < ApplicationController
   before_action :load_user, only: [:show, :show_partial, :add_payment]
   before_action :load_users, only: [:index]
 
-  def add_payment
-    authorize Payment
-    ss = SettlementService.new(@user)
+  def create
+
     params[:to_user_id] = @user
     result = nil
-    param = payment_params
+    # param = payment_params
     success_message = nil
+    error_message = nil
     if param[:payment_type] == PaymentType.advance_id.to_s
-      result = Settlement::AddCashAdvance.new(current_user, params).run
-      result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'advance added'
+      cash_advance_op = Settlement::AddCashAdvance.new(current_user, params)
+      result = cash_advance_op.run
+      # result = ss.add_cash_advance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
+      if result
+        success_message = 'Cash advance added'
+      else
+        error_message = cash_advance_op.errors
+      end
     elsif param[:payment_type] == PaymentType.debt_clearance_id.to_s
-      result = Settlement::AddDebtToCompanyClearance.new(current_user, params)
-      result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'debt clearance payment added'
+      debt_to_company_clearance_op = Settlement::AddDebtToCompanyClearance.new(current_user, params)
+      result = debt_to_company_clearance_op.run
+      # result = ss.add_debt_to_company_clearance(current_user, param[:date], param[:note], param[:amount], Currency.first.id)
+      if result
+        success_message = 'debt clearance payment added'
+      else
+        error_message = debt_to_company_clearance_op.errors
+      end
     elsif param[:payment_type] == PaymentType.reimbursement_id.to_s
-      report_ids = nil
-      report_ids = param[:report_id].split if param[:report_id].present?
-      result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'reimbursement added'
+      reimbursement_op = Settlement::AddReimbursement.new(current_user, params)
+      result = reimbursement_op.run
+      # result = ss.add_reimbursement(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
+      if result
+        success_message = 'Reimbursement added'
+      else
+        error_message = reimbursement_op.error
+      end
     elsif param[:payment_type] == PaymentType.settlement_id.to_s
-      report_ids = nil
-      report_ids = param[:report_id].split if param[:report_id].present?
-      result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
-      success_message = 'settlement created'
+      settle_op = Settlement::Settle.new(current_user, params)
+      result = settle_op.run
+      if result
+        success_message = 'Payment settled'
+      else
+        error_message = settle_op.errors
+      end
+      # result = ss.settle(current_user, report_ids, param[:date], param[:note], param[:amount], Currency.first.id)
     end
 
     if result
@@ -36,8 +54,7 @@ class SettlementsController < ApplicationController
       redirect_to settlement_path(@user.id, view: params[:view])
       return
     end
-    flash.now[:danger] = 'error adding payment'
-    flash.now[:danger] = ss.errors if ss.errors.present?
+    flash.now[:danger] = error_message
     render_flash_message
   end
 
@@ -71,6 +88,8 @@ class SettlementsController < ApplicationController
       else
         load_reports :approved
     end
+
+    @actions = Settlement::ShowActions.(current_user, params)
 
     respond_to do |format|
       format.html {}

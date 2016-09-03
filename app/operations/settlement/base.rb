@@ -2,6 +2,11 @@ class Settlement::Base < BaseOperation
 
   attr_accessor :to_user
 
+  class Settlement::Base::BasePresenter < BaseOperation::BasePresenter
+
+
+  end
+
   def pre_validate
     if user.blank? or params.blank?
       errors << "No user or params passed."
@@ -45,12 +50,16 @@ class Settlement::Base < BaseOperation
     Amount.new(value: value, currency: cash.currency)
   end
 
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
+  # def retrieve
+  #   if is_success?
+  #     return true
+  #   else
+  #     return false
+  #   end
+  # end
+
+  def success
+    true
   end
 
 
