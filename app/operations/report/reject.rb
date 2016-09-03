@@ -21,6 +21,7 @@ class Report::Reject < Report::Base
         self.status = ReportStatus.processing_id
       end
     else
+      self.reject_to_user = self.report.user
       self.status = ReportStatus.rejected_id
     end
   end
@@ -49,8 +50,8 @@ class Report::Reject < Report::Base
 
   def process
     user_role = user_role_for_report
-    if report.update_attributes report_status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, memo: memo
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: memo,
+    if report.update_attributes report_status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, memo: params[:memo]
+      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reject_id, report_status_id: status, memo: params[:memo],
                                   user_report_role_id: user_role
       track.save
       # Reset expenses status to unsubmitted if report is rejected
@@ -65,7 +66,7 @@ class Report::Reject < Report::Base
 
   def post_process
     if is_success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: to_user.id, content: memo
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: reject_to_user.id, content: params[:memo]
       comment.save
     end
   end
