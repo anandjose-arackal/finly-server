@@ -52,7 +52,7 @@ class ReportsController < ApplicationController
   def show
     load_view_for_report
     @comments = @report.comments.all.order(created_at: :desc)
-    ap @actions
+    # ap @actions
 
     respond_to do |format|
       format.json {}
