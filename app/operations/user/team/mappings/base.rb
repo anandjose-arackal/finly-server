@@ -12,7 +12,7 @@ class User::Team::Mappings::Base < User::Team::Base
       if params[:policy_id].present?
         self.policy = user.company.policies.with_id(params[:policy_id]).first rescue nil
       else
-        self.updating_user = user.company.users.with_id(params[:user_id])
+        self.updating_user = user.company.users.with_id(params[:user_id]).first rescue nil
         return
       end
     elsif user.policy_admin?

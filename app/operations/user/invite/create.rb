@@ -139,7 +139,7 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def post_process
-    # adding the policy to the user after he has been successfully invited
+    # adding the user to the policy after he has been successfully invited
     if is_success?
       @policy = Policy.find_by(id: @policy_id)
       if @policy
@@ -153,7 +153,8 @@ class User::Invite::Create < User::Invite::Base
 
   def retrieve
     if is_success?
-      return new_user
+      invite_presenter = User::Invite::Base::InvitePresenter.new(user, invite: new_user)
+      return invite_presenter
     else
       return false
     end

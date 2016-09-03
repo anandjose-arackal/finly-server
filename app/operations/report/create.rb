@@ -46,4 +46,14 @@ class Report::Create < Report::Base
 
   end
 
+
+  # returns the created report.
+  def retrieve
+    if is_success?
+      return report
+    else
+      return false
+    end
+  end
+
 end

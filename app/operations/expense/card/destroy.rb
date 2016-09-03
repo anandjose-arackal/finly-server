@@ -1,5 +1,5 @@
 # this class probably won't exist lol
 
-class Expense::Card::Destroy < Expense::Base
+class Expense::Card::Destroy < Expense::Card::Base
 
 end

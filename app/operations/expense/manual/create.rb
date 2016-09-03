@@ -1,21 +1,17 @@
 # Class to create an expense
 # format of parameters,
 
-class Expense::Manual::Create < Expense::Base
-
+class Expense::Manual::Create < Expense::Manual::Base
   attr_accessor :expense_params
 
-  class Expense::Manual::Create::CreatePresenter < Expense::Base::ExpensePresenter
-    attr_accessor :expense
-
-    def initialize(expense)
-      self.expense = expense
-    end
-  end
-
   def pre_validate
-    if params.blank? or user.blank?
-      errors << "Parameters or user not present."
+    super
+    if params.blank?
+      errors << 'Parameters not present.'
+    end
+    if params[:expense].blank?
+      errors << 'You have not provided any details to create an expense'
+      return
     end
     if params[:expense][:amount].to_i < 0
       errors << "Amount can't be negative."
@@ -24,7 +20,7 @@ class Expense::Manual::Create < Expense::Base
 
   def init
     self.expense_params = manual_expense_params
-    expense_params.delete(:receipt)
+    self.expense_params[:expense_type_id] = ExpenseType.manual_expense_id
   end
 
   def validate
@@ -35,7 +31,6 @@ class Expense::Manual::Create < Expense::Base
     self.expense = user.expenses.build(expense_params)
     unless self.expense.save
       errors << self.expense.errors.full_messages
-      return false
     end
   end
 
@@ -47,13 +42,8 @@ class Expense::Manual::Create < Expense::Base
     end
   end
 
-  # the presenter here returns the created expense
-  def retrieve
-    if is_success?
-      created_expense = Expense::Manual::Create::CreatePresenter.new(expense)
-      return created_expense
-    else
-      return false
-    end
+  def success
+    Expense::Manual::Create::CreatePresenter.new(expense)
   end
+
 end

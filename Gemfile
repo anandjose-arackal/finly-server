@@ -76,8 +76,6 @@ gem 'font-awesome-rails'
 
 gem 'opro', github: 'opro/opro', branch: 'master'
 
-gem 'has_scope'
-
 # gem for devise authentication
 gem 'devise'
 

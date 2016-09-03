@@ -1,22 +1,22 @@
 # updating the expense from user's expenses view.
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
-class Expense::Card::Update < Expense::Base
-
-  attr_accessor :old_expense, :updated_expense_params
+class Expense::Card::Update < Expense::Card::Base
+  attr_accessor :updated_expense_params
 
   def pre_validate
-    if params.blank? or user.blank?
-      errors << "Parameters or user not present."
+    super
+    if params.blank?
+      errors << "Parameters not present."
     end
-    if params[:expense_id].nil?
+    if params[:expense_id].blank? or params[:id].blank?
       errors << "Expense ID missing!"
     end
   end
 
 
   def init
-    self.expense = self.old_expense = user.expenses.find_by_id(params[:expense_id])
+    super
     # setting up the expense params for updation
     self.updated_expense_params = update_card_expense_params
     if expense.card_expense.present? and params[:expense][:merchant]
@@ -54,11 +54,12 @@ class Expense::Card::Update < Expense::Base
     # send mailer or notification indicating updation of expense
   end
 
-  def retrieve
-    if is_success?
-      return expense
-    else
-      return false
-    end
+  private
+  # this will be called when the merchant, or receipt of the expense needs to be updated, from the user's view of expenses
+  def update_card_expense_params
+    params.require(:expense).permit(:note, :category_id,
+                                    card_expense_attributes: [:editable_merchant, :id],
+                                    receipts_attributes: [:image, :user_id, :id])
   end
+
 end

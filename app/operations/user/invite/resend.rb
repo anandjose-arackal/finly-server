@@ -43,4 +43,14 @@ class User::Invite::Resend < User::Invite::Base
   def post_process
     # send mails for resending invite
   end
+
+  # return true or false because it's a resend operation
+  def retrieve
+    if is_success?
+      return true
+    else
+      return false
+    end
+  end
+
 end

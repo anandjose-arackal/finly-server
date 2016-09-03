@@ -16,14 +16,15 @@ class Report::Expenses::Add < Report::Base
       errors << "No user or params passed."
     end
 
-    if params[:expense_ids].blank?
+    if params[:expense_ids].blank? and params[:expense_id].blank?
       errors << "No expenses to add."
     end
   end
 
   def init
     self.report = Report.find_by(id: params[:report_id])
-    self.expenses = user.expenses.where(id: params[:expense_ids])
+    ids = (params[:expense_ids] or params[:expense_id])
+    self.expenses = user.expenses.where(id: ids)
     # if the report is in retracted stage, comments need to be added
     self.retracted = report.retracted?
   end

@@ -1,7 +1,9 @@
+# report retrieval requires the role id in which capacity the user is viewing the report:
+# i.e. personal, manager, finance manager, or admin
+
 class Report::Base < BaseOperation
   attr_accessor :report, :report_id
 
-  # todo - redefine all init methods to use report retrieval operation
 
   def pre_validate
     if user.blank? or params.blank?
@@ -51,7 +53,7 @@ class Report::Base < BaseOperation
 
   class Report::Base::Presenter < BaseOperation::BasePresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
-                  :dates, :comments, :actions, :policies, :selected_policy, :violations
+                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result
 
     def initialize(user, params={})
       super(user, params)

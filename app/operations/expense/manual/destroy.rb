@@ -2,7 +2,7 @@
 # params:
 # expense_id, or id : id of the expense that is to be deleted.
 
-class Expense::Manual::Destroy < Expense::Base
+class Expense::Manual::Destroy < Expense::Manual::Base
 
   def pre_validate
     if params.blank? or user.blank?

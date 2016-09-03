@@ -81,12 +81,8 @@ class Card::Configuration::DisableCard < Card::Base
     # send mail to user indicating deactivation of card
   end
 
-  def retrieve
-    if is_success?
-      return card
-    else
-      return false
-    end
+  def success
+    card
   end
 
 end

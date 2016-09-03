@@ -47,12 +47,12 @@ class Card::Configuration::EnableCard < Card::Base
       unless employee.company_id == user.company_id
         errors << "You are not an admin for this employee."
       end
-    # if manager view, user must be employee's manager
+      # if manager view, user must be employee's manager
     elsif user.manager? and !params[:self]
       unless User::Team::Show.call(user, 3, indirect_associations: true).include?(employee) and card.disabled_by_role_id >= 3
         errors << "You are not authorized to enable this card."
       end
-    # if employee, he must own the card and should have been disabled by him
+      # if employee, he must own the card and should have been disabled by him
     elsif user.employee? and params[:self]
       unless card.user_id == user.id and card.disabled_by_role_id >= 4
         errors << "You are not authorized to enable this card."
@@ -72,11 +72,7 @@ class Card::Configuration::EnableCard < Card::Base
     # send mail to user informing about reactivation
   end
 
-  def retrieve
-    if is_success?
-      return card
-    else
-      return false
-    end
+  def success
+    card
   end
 end

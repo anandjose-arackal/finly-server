@@ -192,6 +192,12 @@ class User < ActiveRecord::Base
     mapping.auditor.present?
   end
 
+  def has_role?(role_id)
+    return false unless role_id.present?
+    mapping = role_mapping
+    mapping.role(role_id).present?
+  end
+
   def user_name
     self.name
   end

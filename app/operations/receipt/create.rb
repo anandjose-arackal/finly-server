@@ -1,4 +1,5 @@
 class Receipt::Create < Receipt::Base
+  attr_accessor :receipt, :receipt_params
 
   def pre_validate
     if params.blank? or user.blank?
@@ -20,11 +21,23 @@ class Receipt::Create < Receipt::Base
 
   def retrieve
     if is_success?
-      receipt_presenter = Receipt::Base::ReceiptPresenter.new(user, receipt: receipt)
-      return receipt_presenter
+      Receipt::Create::ReceiptPresenter.new(user, receipt: receipt)
     else
-      return false
+      false
     end
+  end
+
+  class Receipt::Create::ReceiptPresenter < BaseOperation::BasePresenter
+    attr_accessor :receipt
+
+    def initialize(user, params)
+      self.receipt = params[:receipt]
+    end
+  end
+
+  private
+  def create_params
+    params.require(:receipt).permit(:image, :note)
   end
 
 end

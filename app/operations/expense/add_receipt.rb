@@ -1,20 +1,9 @@
 class Expense::AddReceipt < Expense::Base
-
   attr_accessor :receipt
-
-  class Expense::AddReceipt::ReceiptPresenter < Expense::Base::ExpensePresenter
-
-    attr_accessor :receipt
-
-    def initialize(receipt)
-      self.receipt = receipt
-    end
-  end
 
   def authorized_user_types
     [:employee]
   end
-
 
   def pre_validate
     if params.blank? or user.blank?
@@ -22,17 +11,17 @@ class Expense::AddReceipt < Expense::Base
     end
   end
 
-
-  def init
-    self.expense = user.expenses.find_by_id(params[:expense_id])
-  end
-
-
-  def validate
+  def authorize
     unless expense
       errors << "Expense not found."
       return
     end
+    unless expense.user_id == user.id
+      errors << "You do not own this expense."
+    end
+  end
+
+  def pre_process
     # if the expense already has an associated receipt, that will be unassociated and
     # moved to the receipts screen.
     if expense.receipts.present?
@@ -40,14 +29,6 @@ class Expense::AddReceipt < Expense::Base
       receipt.update_attributes(parent_id: nil, parent_type: nil)
     end
   end
-
-
-  def authorize
-    unless expense.user_id == user.id
-      errors << "You do not own this expense."
-    end
-  end
-
 
   def process
     self.receipt = user.receipts.build(receipt_params)
@@ -57,13 +38,9 @@ class Expense::AddReceipt < Expense::Base
     end
   end
 
-
-  def retrieve
-    if is_success?
-      receipt_presenter = Expense::AddReceipt::ReceiptPresenter.new(receipt)
-      return receipt_presenter
-    else
-      return false
-    end
+  private
+  def receipt_params
+    params.require(:receipt).permit(:image)
   end
+
 end

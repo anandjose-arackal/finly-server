@@ -1,0 +1,17 @@
+id: <%= params[:id] %>
+expense:
+  note: <%= params[:note] %>
+  report_id: <%= params[:report_id] %>
+  date: <%= params[:date] %>
+  category_id: <%= params[:category_id] %>
+  manual_expense_attributes:
+    merchant: <%= params[:merchant] %>
+  <% if params[:amount].present? %>
+  amount_attributes:
+    - value: <%= params[:amount] %>
+    - currency: <%= Currency.first.id %>
+  <% end %>
+  <% if params[:receipt].present? %>
+  receipts_attributes:
+    - '#load_receipt'
+  <% end%>

@@ -49,11 +49,23 @@ class Expense < ActiveRecord::Base
   validate :report_status
 
   # i.e. an expense associated with a report can't be destroyed
-  before_destroy {
+  before_destroy do
     if self.report_id
       errors.add(:expense, "associated with a report can't be destroyed.")
     end
-  }
+  end
+
+  before_save do
+    if self.expense_status_id.blank?
+      if self.report_id.blank?
+        self.expense_status_id = ExpenseStatus.unreported_id
+      else
+        self.expense_status_id = ExpenseStatus.unsubmitted_id
+      end
+    end
+  end
+
+  default_scope {order('created_at DESC')}
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -92,9 +104,9 @@ class Expense < ActiveRecord::Base
   scope :filter_receipt, -> (value) do
     case value
       when 'present'
-        joins(:receipts).select('expenses.*').where('')
+        where("id IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
       when 'nil'
-        joins(:receipts).select('expenses.*')
+        where("id NOT IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
     end
   end
 
