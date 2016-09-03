@@ -41,19 +41,4 @@ class Report::Create < Report::Base
     errors << report.errors.full_messages
   end
 
-
-  def post_process
-
-  end
-
-
-  # returns the created report.
-  def retrieve
-    if is_success?
-      return report
-    else
-      return false
-    end
-  end
-
 end
