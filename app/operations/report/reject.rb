@@ -42,9 +42,16 @@ class Report::Reject < Report::Base
   end
 
   def validate
+    unless report.present?
+      errors << 'Report not found'
+      return
+    end
     unless report.processing?
       errors << 'Cannot reject this report after the report is approved'
-      return false
+      return
+    end
+    unless reject_to_user.present?
+      errors << 'Reject to user not found'
     end
   end
 

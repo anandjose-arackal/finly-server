@@ -3,6 +3,7 @@
 # report_id:
 
 class Report::Expenses::Reject < Report::Base
+  attr_accessor :expenses
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -16,9 +17,9 @@ class Report::Expenses::Reject < Report::Base
   end
 
   def init
-    super()
+    super
     ids = (params[:expense_ids] or params[:expense_id])
-    self.expenses = report.expenses.where(id: ids)
+    self.expenses = report.expenses.with_id(ids)
   end
 
   def validate
