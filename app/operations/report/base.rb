@@ -13,7 +13,7 @@ class Report::Base < BaseOperation
 
   def init
     id = (params[:id] or params[:report_id])
-    self.report = Report::Index.(user, role_id: params[:role_id]).reports.with_id(id).first rescue nil
+    self.report = Report::Index.(user, params).reports.with_id(id).first rescue nil
     # self.report = Report.find_by(id: params[:report_id])
   end
 
@@ -48,7 +48,7 @@ class Report::Base < BaseOperation
   end
 
   def present_report
-    Report::Base::Presenter.new(self.user, report: self.report)
+    Report::Base::Presenter.new(self.user, report: self.report, view: params[:view])
   end
 
   class Report::Base::Presenter < BaseOperation::BasePresenter
@@ -113,7 +113,7 @@ class Report::Base < BaseOperation
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
         elsif (self.report.can_unapprove?) and self.report.associated_users(self.report.controlling_user).include?(user)
-          actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_path(report_id: report.id, view: params[:view])}
+          actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_path(id: report.id, view: params[:view])}
         end
       else
         if self.report.open? or self.report.retracted? or self.report.rejected?

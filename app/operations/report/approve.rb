@@ -41,10 +41,8 @@ class Report::Approve < Report::Base
     manager = User::Team::Review::NextReviewer.(report)
     status = ReportStatus.processing_id
     if auto_approve or manager.blank?
-      # todo - change this to operation
-      settlement = SettlementService.new(report.user)
       status = ReportStatus.approved_id
-      unless settlement.require_reimbursement?(report)
+      unless report.require_reimbursement?
         status = ReportStatus.closed_id
       end
     end

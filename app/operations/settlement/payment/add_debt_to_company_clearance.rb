@@ -6,7 +6,7 @@
 # date: date of clearance
 # note: optional note for transaction
 
-class Settlement::AddDebtToCompanyClearance < Settlement::Base
+class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -27,7 +27,12 @@ class Settlement::AddDebtToCompanyClearance < Settlement::Base
     unless to_user
       raise_unauthorized_exception
     end
-    team = User::Team::Show.(user, UserRole.finance_manager_id, indirect_associations: true)
+    if user.admin?
+      self.role = UserRole.admin_id
+    else
+      self.role = UserRole.finance_manager_id
+    end
+    team = User::Team::Index.(user, {role_id: role, indirect_associations: true}).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end

@@ -17,11 +17,14 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-post-comment': 'postComment'
 
     'click .btn-delete-item': 'delete'
-    'click .btn-delete-sub-item': 'deleteSub'
     'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
     'click .btn-submit-item': 'submit'
     'click .btn-retract-item': 'retract'
+
+    'click .btn-delete-sub-item': 'deleteSub'
+    'click .btn-view-sub-item': 'viewSub'
+    'hidden.bs.modal #modal-mp': 'refreshData'
 
   initialize: (options) ->
     @parent = options.parent
@@ -206,6 +209,12 @@ class FinlyF.Views.Report extends Backbone.View
 
     })
 
+  refreshData: (e)->
+    target = e.currentTarget
+    if $(target).find(".modal-content").attr("data-refresh")
+      @model.fetch()
+    # console.log "Closed Bootstrap modal"
+
   deleteSub: (e) ->
     console.log "deleteing sub"
     _this = @
@@ -222,6 +231,20 @@ class FinlyF.Views.Report extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
+
+  viewSub: (e)->
+    target = e.currentTarget
+    expense_id = $(target).attr('data-item-id')
+
+    model = new FinlyF.Models.Expense({id: expense_id})
+
+    preview_view = new FinlyF.Views.Expense({
+      model: model
+      preview: true
+    })
+    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    $(@el).find("#modal-mp").modal('show')
 
   submit: (e) ->
     _this = @

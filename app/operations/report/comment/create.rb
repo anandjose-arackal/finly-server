@@ -1,7 +1,7 @@
 # action to add comment to a report
 # params:
 # report_id: the report on which comment is to be made
-# content: content of the comment that is to be posted
+# comment: content of the comment that is to be posted
 #
 
 class Report::Comment::Create < Report::Base
@@ -16,13 +16,13 @@ class Report::Comment::Create < Report::Base
 
   def validate
     super()
-    if params[:content].blank?
+    if params[:comment].blank?
       errors << "No content to post."
     end
   end
 
   def process
-    comment = report.comments.build(report_comment_action_id: ReportCommentAction.report_comment_id, user_id: user.id, content: params[:content])
+    comment = report.comments.build(report_comment_action_id: ReportCommentAction.report_comment_id, user_id: user.id, content: params[:comment])
     if comment.save
       return true
     end

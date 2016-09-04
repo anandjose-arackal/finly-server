@@ -229,6 +229,10 @@ module ApplicationHelper
     # debugger
   end
 
+  def load_yaml
+
+  end
+
   private
   def get_type(type)
     type = 'information' if type == 'info' or type == 'notice'

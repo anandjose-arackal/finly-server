@@ -65,17 +65,11 @@ class Report::Violation < Report::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      return warning_messages
-    else
-      return false
-    end
+  def success
+    warning_messages
   end
 
-
   private
-
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ""
     if rule.amount_value
@@ -107,7 +101,6 @@ class Report::Violation < Report::Base
 
     message
   end
-
 
   # checks the passed expense against the passed rule
   def check_expense_rule(rule, expense, manager = nil)

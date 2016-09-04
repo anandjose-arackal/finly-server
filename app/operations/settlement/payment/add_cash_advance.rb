@@ -6,9 +6,7 @@
 # currency_id: if money is being added in a difference currency, currently defaults to 1
 # date: Date on which the payment is being made
 
-class Settlement::AddCashAdvance < Settlement::Base
-
-
+class Settlement::Payment::AddCashAdvance < Settlement::Base
   attr_accessor :payment
 
   def authorized_user_types
@@ -35,7 +33,7 @@ class Settlement::AddCashAdvance < Settlement::Base
     else
       role = UserRole.finance_manager_id
     end
-    team = User::Team::Show.(user, role, indirect_associations: true).team
+    team = User::Team::Index.(user, {role_id: role, indirect_associations: true}).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end

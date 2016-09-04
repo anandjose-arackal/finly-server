@@ -21,7 +21,7 @@ json.total rds.total_amount
 json.date @report.created_at.strftime("%d %b")
 
 json.comments @comments do |comment|
-  json.content comment.content
+  json.content comment.generate
   json.created_at comment.created_at.strftime("%d %b %y")
   if comment.user.respond_to?(:id, :name)
     json.comment_user_id comment.user.id
@@ -30,11 +30,12 @@ json.comments @comments do |comment|
   end
 end
 
-json.expense_categories @expenses do |category|
+json.expense_sections @expenses do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :note, :merchant_name, :amount_value
+    # json.extract! expense, :id, :note
     json.date expense.date.strftime("%d %b %y")
   end
 end

@@ -13,6 +13,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
     'settlements/:user/params=:query': 'settlements_show'
+    'users': 'users'
 
   initialize: ->
     # console.log "Step 1. Main router initialized."
@@ -56,22 +57,37 @@ class FinlyF.Routers.Main extends Backbone.Router
     else
       params = {}
     view = new FinlyF.Views.SettlementsIndex({
-      user: user,
+      # user: user,
       params: params
     })
     $("#backbone-container").html(view.render().el)
 
   settlements_show: (user, query) ->
+    console.log "settlements show"
     # console.log user, query
-    if typeof query != 'undefined'
+    unless typeof query != 'undefined'
+      console.log "undefined params"
       params = JSON.parse(query)
     else
       params = {}
+    params.view = 'personal'
     view = new FinlyF.Views.SettlementsIndex({
       user: user,
       params: params
     })
     $("#backbone-container").html(view.render().el)
+
+  users: ->
+    # Admin & Finance view
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+    view = new FinlyF.Views.UsersIndex({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
 
   features: ->
     $(".datepicker").datepicker({

@@ -52,7 +52,7 @@ class ReportsController < ApplicationController
   def show
     load_view_for_report
     @comments = @report.comments.all.order(created_at: :desc)
-    ap @actions
+    # ap @actions
 
     respond_to do |format|
       format.json {}
@@ -126,6 +126,17 @@ class ReportsController < ApplicationController
       flash.now[:success] = "Report rejected."
     else
       flash.now[:failure] = reject_op.errors
+    end
+    load_response
+  end
+
+  def reject_expense
+    updater = Report::Expenses::Reject.new(current_user, params)
+    @result = updater.run
+    if updater.is_success?
+      flash.now[:success] = 'Expense rejected'
+    else
+      flash.now[:failure] = updater.errors
     end
     load_response
   end

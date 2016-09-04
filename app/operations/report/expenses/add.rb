@@ -5,7 +5,7 @@
 
 class Report::Expenses::Add < Report::Base
 
-  attr_accessor :expenses, :retracted
+  attr_accessor :expenses
 
   def authorized_user_types
     [:employee]
@@ -24,9 +24,9 @@ class Report::Expenses::Add < Report::Base
   def init
     self.report = Report.find_by(id: params[:report_id])
     ids = (params[:expense_ids] or params[:expense_id])
+    # Split if IDS are sent as one comma delimited string
+    ids= ids.split(',')
     self.expenses = user.expenses.where(id: ids)
-    # if the report is in retracted stage, comments need to be added
-    self.retracted = report.retracted?
   end
 
   def validate
@@ -64,7 +64,7 @@ class Report::Expenses::Add < Report::Base
 
   def post_process
     if is_success?
-      if retracted
+      if report.retracted?
         expenses.each do |expense|
           comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense_id: expense.id
           comment.save

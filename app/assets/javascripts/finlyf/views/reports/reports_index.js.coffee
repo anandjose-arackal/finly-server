@@ -23,6 +23,8 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     'click .filter-status li a': 'filterStatus'
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
+
+    'click .btn-reset-filters': 'resetFilters'
     
 
     #Filters
@@ -58,7 +60,10 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-    $(@el).find(".sidebar").html(@templateSidebar())
+
+    @params.filter_date_from = @params['filter_date[from]']
+    @params.filter_date_to = @params['filter_date[to]']
+    $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
     $(@el).find(".main").html(@templateMain())
     FinlyF.structureActions(@el, @params)
     @
@@ -136,6 +141,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
         $(item).find(".select-item").prop("checked", false)
 
   showDetails: (e) ->
+    # bd = $("<div />", {
+    #   class: "finly-backdrop"
+    # }).appendTo('.main')
     #Returns if clicked on the checkbox
     if $(e.target).hasClass("select-item")
       return
@@ -237,11 +245,16 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
+  resetFilters: ->
+    params = {}
+    params.view = @params.view
+    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+
   filter: ->
     # console.log "Filtering"
     sidebar = $(@el).find(".sidebar")
     params = {
-      'filter_merchant': $(".sidebar .filter-merchant").val() || ""
+      # 'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_category_id': $(".sidebar .filter-category-id").val() || ""

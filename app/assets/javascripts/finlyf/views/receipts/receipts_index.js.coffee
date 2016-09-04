@@ -23,6 +23,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     'click .filter-status li a': 'filterStatus'
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
+    'click .btn-reset-filters': 'resetFilters'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -195,20 +196,11 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #     @collection.fetch({reset: true})
     # })
 
-  filterStatus: (e) ->
-    e.preventDefault()
 
-    target = $(e.currentTarget)
-    # $(target).closest('ul').find('a').removeClass('active')
-    $(target).parent().addClass('active')
-    console.log $(target).parent().html()
-    status_id = $(target).attr('data-status-id')
-
-    params = {
-      'filter_status': status_id
-    }
-
-    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+  resetFilters: ->
+    params = {}
+    params.view = @params.view
+    FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
     console.log "Filtering"

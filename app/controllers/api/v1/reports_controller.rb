@@ -80,6 +80,17 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     end
   end
 
+  def reject_expense
+    updater = Report::Expenses::Reject.new(current_user, params)
+    @result = updater.run
+    if updater.is_success?
+      render 'api/v1/reports/show'
+    else
+      @errors = updater.errors
+      render 'api/v1/shared/failure'
+    end
+  end
+
   def submit
     updater = Report::Submit.new(current_user, params)
     @result = updater.run

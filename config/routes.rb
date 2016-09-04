@@ -228,6 +228,7 @@ Rails.application.routes.draw do
         patch 'take_control' => 'reports#take_control', as: :take_control
         post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
         delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+        patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
         post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
       end
       resources :receipts, only: [:create, :index, :destroy, :update]
@@ -273,6 +274,7 @@ Rails.application.routes.draw do
     patch 'approve' => 'reports#approve', as: :approve
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
+    patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
     patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
@@ -306,13 +308,15 @@ Rails.application.routes.draw do
   end
 
 
+  get 'settlements/summary' => 'settlements#summary'
   resources :settlements
-  post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
 
   resources :receipts do
 
   end
+
+  # get 'settlements/summary' => 'settlements#summary'
 
   root 'home#index'
   get 'welcome' => 'home#welcome'

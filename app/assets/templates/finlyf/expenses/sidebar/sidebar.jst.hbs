@@ -3,7 +3,7 @@
     From
   </div>
   <div class="col-sm-9">
-    <input type="text" class="datepicker filter-date-from" style="width: 100%;"/>
+    <input type="text" class="datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}" />
     <span class="fa fa-calendar input-icon "></span> 
 
   </div>
@@ -13,7 +13,7 @@
     To
   </div>
   <div class="col-sm-9">
-    <input type="text" class="datepicker filter-date-to" style="width: 100%;"/>
+    <input type="text" class="datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
     <span class="fa fa-calendar input-icon "></span> 
   </div>
 </div>
@@ -21,7 +21,7 @@
 <div class="row sidebar-element">
 
   <div class="col-sm-12">
-    <input type="text" class="filter-merchant" style="width: 100%;" placeholder="Merchant" />
+    <input type="text" class="filter-merchant" style="width: 100%;" placeholder="Merchant" value="{{item.filter_merchant}}" />
     <span class="fa fa-search input-icon"></span> 
   </div>
 </div>
@@ -30,12 +30,12 @@
   <div class="col-sm-12">Amount</div>
   <div class="col-sm-12">
     <select style="width: 100%;" class="filter-amount-type">
-      <option value="lteq">Less Than</option>
-      <option value="eq">Equal To</option>
-      <option value="gteq">Greater Than</option>
+      <option value="lteq" selected="{{#if_eq item.filter_amount_type 'lteq'}}selected{{/if_eq}}">Less Than</option>
+      <option value="eq" selected="{{#if_eq item.filter_amount_type 'eq'}}selected{{/if_eq}}">Equal To</option>
+      <option value="gteq" selected="{{#if_eq item.filter_amount_type 'gteq'}}selected{{/if_eq}}">Greater Than</option>
     </select>
   </div>
-  <div class="col-sm-12"><input type="text" style="width: 100%;" class="filter-amount-value" placeholder="Amount" /></div>
+  <div class="col-sm-12"><input type="text" style="width: 100%;" class="filter-amount-value" placeholder="Amount" value="{{item.filter_amount_value}}" /></div>
 </div>
 
 <div class="row sidebar-element">
@@ -43,20 +43,18 @@
   <div class="col-sm-12">
     <select style="width: 100%;" class="filter-category-id">
       <option value="">Select</option>
-      <option value="1">Category 1</option>
-      <option value="2">Category 2</option>
-      <option value="3">Category 3</option>
     </select>
   </div>
 </div>
 
 <div class="row sidebar-element">
   <div class="col-sm-4">Receipt</div>
+  {{item.filter_receipt}}
   <div class="col-sm-8">
     <select style="width: 100%;" class="filter-receipt">
-      <option value="">Select</option>
+      <option value="select">Select</option>
       <option value="present">Has Receipt</option>
-      <option>No Receipt</option>
+      <option value="absent">No Receipt</option>
     </select>
   </div>
 </div>
@@ -66,3 +64,5 @@
     <button class="navbar-btn btn btn-sm btn-filter">Apply Filter</button>
   </div>
 </div>
+
+<script type="text/javascript"></script>

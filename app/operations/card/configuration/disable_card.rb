@@ -49,7 +49,7 @@ class Card::Configuration::DisableCard < Card::Base
       end
     # if manager view, user must be employee's manager
     elsif user.manager? and !params[:self]
-      unless User::Team::Show.call(user, 3, indirect_associations: true).include?(employee)
+      unless User::Team::Index.call(user, 3, indirect_associations: true).include?(employee)
         errors << "You are not a manager for this employee."
       end
     elsif user.employee? and params[:self]
