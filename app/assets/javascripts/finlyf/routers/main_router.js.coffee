@@ -78,8 +78,16 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
 
   users: ->
-    view = new FinlyF.Views.UsersIndex()
+    # Admin & Finance view
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+    view = new FinlyF.Views.UsersIndex({
+      params: params
+    })
     $("#backbone-container").html(view.render().el)
+    @features()
 
   features: ->
     $(".datepicker").datepicker({

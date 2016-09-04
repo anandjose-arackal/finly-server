@@ -1,4 +1,5 @@
 class FinlyF.Views.User extends Backbone.View
+  templateList: HandlebarsTemplates['finlyf/users/crud/userList']
   template: HandlebarsTemplates['finlyf/users/crud/userSettlements']
   templateShow: HandlebarsTemplates['finlyf/users/crud/show']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
@@ -11,13 +12,16 @@ class FinlyF.Views.User extends Backbone.View
   initialize: (options) ->
     @page = options.page
 
-    if @page == 'users'
+    if @page == 'user'
       @model.fetch()
       @model.on('sync', @populateDetails, @)
 
   render: ->
     switch @page
       when 'users'
+        $(@el).attr('data-item-id', @model.get('id'))
+        $(@el).html(@templateList({ item: @model.toJSON() }))
+      when 'user'
         $(@el).removeClass('user').addClass('user-details')
         $(@el).html(@templateShow({ item: @model.toJSON() }))
       when 'settlements'

@@ -9,6 +9,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .user': 'showDetails'
 
   initialize: (options) ->
+    @params = options.params
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
       reset: true
@@ -20,7 +21,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-    
+    FinlyF.structureActions(@el, @params) 
     @
 
   loadMore: (e) ->
@@ -55,7 +56,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   appendUsers: (user) ->
     console.log "appending users"
-    view_user = new FinlyF.Views.User({model: user, page: 'settlements'})
+    view_user = new FinlyF.Views.User({model: user, page: 'users'})
     $(@el).find("#users").append(view_user.render().el)
 
   processItems: ->
@@ -70,10 +71,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
 
-  appendItems: (item) ->
-    #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Settlement({ model: item })
-    $(@el).find("#items").append(view_item.render().el)
 
   showDetails: (e) ->
     console.log "shwoing details"
@@ -82,7 +79,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     preview_view = new FinlyF.Views.User({
       model: model,
-      page: 'users'
+      page: 'user'
       # preview: true
       # parent: @
     })
