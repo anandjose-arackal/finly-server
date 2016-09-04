@@ -35,6 +35,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-filter': 'filter'
     'click .user': 'userSettlements'
 
+    'click .btn-process-reimburse': 'processReimburse'
+    'click .btn-process-debt': 'processDebt'
+    'click .btn-process-cash': 'processCash'
+
   initialize: (options) ->
     console.log options
     _this = @
@@ -265,6 +269,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
+  processReimburse: (e)->
+    console.log "Processing btn-process-reimburse"
+
+  processDebt: (e)->
+    console.log "Processing btn-process-debt"
+
+  processCash: (e) ->
+    console.log "Process Cash"
 
 
 
