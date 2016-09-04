@@ -63,8 +63,10 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
 
   settlements_show: (user, query) ->
+    console.log "settlements show"
     # console.log user, query
     unless typeof query != 'undefined'
+      console.log "undefined params"
       params = JSON.parse(query)
     else
       params = {}

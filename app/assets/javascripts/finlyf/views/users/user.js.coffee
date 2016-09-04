@@ -1,5 +1,6 @@
 class FinlyF.Views.User extends Backbone.View
   template: HandlebarsTemplates['finlyf/users/crud/userSettlements']
+  templateShow: HandlebarsTemplates['finlyf/users/crud/show']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
   className: 'user col-md-12'
@@ -8,18 +9,24 @@ class FinlyF.Views.User extends Backbone.View
     # 'click .select-item': 'toggleSelect'
 
   initialize: (options) ->
-    # console.log "Will render settlement"
-    # console.log @model.toJSON()
+    @page = options.page
+
+    if @page == 'users'
+      @model.fetch()
+      @model.on('sync', @populateDetails, @)
 
   render: ->
-    $(@el).html(@template({ item: @model.toJSON() }))
+    switch @page
+      when 'users'
+        $(@el).removeClass('user').addClass('user-details')
+        $(@el).html(@templateShow({ item: @model.toJSON() }))
+      when 'settlements'
+        $(@el).attr('data-item-id', @model.get('id'))
+        $(@el).html(@template({ item: @model.toJSON() }))
     @
 
-  # toggleSelect: (e) ->
-  #   if $(e.currentTarget).prop('checked')
-  #     $(@el).addClass('selected')
-  #   else
-  #     $(@el).removeClass('selected')
+  populateDetails: ->
+    console.log @model.toJSON()
 
 
 #Features

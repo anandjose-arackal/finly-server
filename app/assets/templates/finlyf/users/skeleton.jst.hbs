@@ -257,12 +257,12 @@
 <nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="margin-top: 53px; border-color: transparent; z-index: 2;">
   <div class="container-fluid">
     <div class="row no-margin no-padding">
-      <div class="col-md-2" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+      <div class="col-md-4" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
         <div class="navbar-header navbar-sidebar">
           {{!-- navbar_sidebar.jst.hbs partial --}}
         </div>
       </div>
-      <div class="col-md-10" style="background: #FFF;">
+      <div class="col-md-8" style="background: #FFF;">
         <div class="navbar-collapse collapse navbar-main">
           {{!-- navbar_main.jst.hbs partial --}}
         </div><!--/.nav-collapse -->    
@@ -272,16 +272,11 @@
 </nav>
 
 <div class="container-fluid container-main" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-  <div class="col-sm-4 sidebar">
-  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-  cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-  proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  <div class="col-sm-4 sidebar" id="users">
+  
   </div>
 
-  <div class="col-sm-8 col-sm-offset-2 main">
+  <div class="col-sm-8 col-sm-offset-4" id="user-details">
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">

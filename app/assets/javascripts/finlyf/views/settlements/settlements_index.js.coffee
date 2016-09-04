@@ -36,14 +36,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .user': 'userSettlements'
 
   initialize: (options) ->
-
+    console.log options
     _this = @
     @collectoinUsers = new FinlyF.Collections.Users()
     @collectoinUsers.url = "/settlements"
     @collection = new FinlyF.Collections.Settlements()
     if options.params
       if options.params.view == 'personal' || typeof options.params.view == 'undefined'
-        console.log 'we'
+        # console.log 'we'
         @view = 'personal'
         @user = options.user
         @params = options.params
@@ -56,6 +56,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     
         # @collection = new FinlyF.Collections.Settlements()
         @collection.url = @collection.url + "/" + @user.toString()
+        console.log @params
         @collection.fetch({
           reset: true,
           data: _this.params
@@ -134,7 +135,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     # console.log "populating"
     _this = @
     $.ajax({
-      url: '/settlements/summary?id=' + id.toString(),
+      url: '/settlements/summary?id=' + user_id.toString(),
       dataType: 'json',
       data: {
         authenticity_token: $("#authenticity_token").val()
@@ -156,7 +157,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   appendUsers: (user) ->
     console.log "appending users"
-    view_user = new FinlyF.Views.User({model: user, settlements: true})
+    view_user = new FinlyF.Views.User({model: user, page: 'settlements'})
     $(@el).find("#users").append(view_user.render().el)
 
   processItems: ->

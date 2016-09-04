@@ -36,6 +36,10 @@ class UsersController < ApplicationController
     else
       render partial: 'users/employee_profile', replace: '#employeeDetailsDiv'
     end
+
+    respond_to do |format|
+      format.json {render json: @user.as_json}
+    end
   end
 
   # this would call the respective private method to update the respective attributes
@@ -55,6 +59,10 @@ class UsersController < ApplicationController
     # @company_finance_managers = current_company.users.with_roles.only_finance_managers.signed_up
     #
     # load_all_mappings
+
+    respond_to do |format|
+      format.json {render json: @users.as_json}
+    end
   end
 
   # def profile

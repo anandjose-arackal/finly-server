@@ -1,6 +1,13 @@
 class FinlyF.Views.UsersIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/users/skeleton']
 
+  #navbar
+  templateNavbarSidebar: HandlebarsTemplates['finlyf/users/navbar/navbar_sidebar']
+  templateNavbarMain: HandlebarsTemplates['finlyf/users/navbar/navbar_main']
+
+  events:
+    'click .user': 'showDetails'
+
   initialize: (options) ->
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
@@ -10,6 +17,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     
 
   render: ->
+    $(@el).html(@templateSkeleton())
+    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     
     @
 
@@ -35,34 +45,17 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-  populateSummary: (id)->
-    user_id = id || @user
-    # console.log "populating"
-    _this = @
-    $.ajax({
-      url: '/settlements/summary?id=' + id.toString(),
-      dataType: 'json',
-      data: {
-        authenticity_token: $("#authenticity_token").val()
-      },
-      success: (res) ->
-        # console.log "res", res
-        $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
-      error: (err) ->
-        console.log err
-
-    })
 
   processUsers: ->
     console.log "processing users"
-    @dump = @collectoinUsers.models.slice()
+    @dump = @collection.models.slice()
     $(@el).find("#users").html("")
 
-    @collectoinUsers.each(@appendUsers, @)
+    @collection.each(@appendUsers, @)
 
   appendUsers: (user) ->
     console.log "appending users"
-    view_user = new FinlyF.Views.User({model: user, settlements: true})
+    view_user = new FinlyF.Views.User({model: user, page: 'settlements'})
     $(@el).find("#users").append(view_user.render().el)
 
   processItems: ->
@@ -81,6 +74,20 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     #Creating view for each report and appending them
     view_item = new FinlyF.Views.Settlement({ model: item })
     $(@el).find("#items").append(view_item.render().el)
+
+  showDetails: (e) ->
+    console.log "shwoing details"
+    model_id = $(e.currentTarget).attr('data-item-id')
+    model = @collection.get(model_id)
+
+    preview_view = new FinlyF.Views.User({
+      model: model,
+      page: 'users'
+      # preview: true
+      # parent: @
+    })
+
+    $(@el).find("#user-details").html(preview_view.render().el)
 
   refetchCollection: (e) ->
     #REFRESH
