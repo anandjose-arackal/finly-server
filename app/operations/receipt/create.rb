@@ -15,7 +15,7 @@ class Receipt::Create < Receipt::Base
   def process
     self.receipt = user.receipts.build(create_params)
     unless receipt.save
-      errors << "DB Error. Try again."
+      errors << receipt.errors.full_messages
     end
   end
 
@@ -37,7 +37,7 @@ class Receipt::Create < Receipt::Base
 
   private
   def create_params
-    params.require(:receipt).permit(:image, :note)
+    params.require(:receipt).permit!
   end
 
 end

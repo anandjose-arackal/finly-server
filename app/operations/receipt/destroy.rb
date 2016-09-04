@@ -8,7 +8,8 @@ class Receipt::Destroy < Receipt::Base
   end
 
   def init
-    self.receipt = user.receipts.find_by_id(params[:receipt_id])
+    id = (params[:receipt_id] or params[:id])
+    self.receipt = user.receipts.with_id(id).first rescue nil
   end
 
   def authorize

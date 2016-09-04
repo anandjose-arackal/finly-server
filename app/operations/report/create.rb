@@ -23,7 +23,6 @@ class Report::Create < Report::Base
     end
   end
 
-
   def process
     self.report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
     if report.save
@@ -39,21 +38,6 @@ class Report::Create < Report::Base
       return report
     end
     errors << report.errors.full_messages
-  end
-
-
-  def post_process
-
-  end
-
-
-  # returns the created report.
-  def retrieve
-    if is_success?
-      return report
-    else
-      return false
-    end
   end
 
 end
