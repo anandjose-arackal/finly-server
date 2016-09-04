@@ -21,6 +21,10 @@ class Settlement::ShowActions < Settlement::Base
     end
   end
 
+  def success
+    Settlement::ShowActions::ShowPresenter.new(user, params).actions
+  end
+
   class Settlement::ShowActions::ShowPresenter < Settlement::Base::BasePresenter
     attr_accessor :actions
 
@@ -37,10 +41,5 @@ class Settlement::ShowActions < Settlement::Base
 
       actions
     end
-  end
-
-  def success
-    actions_presenter = Settlement::ShowActions::ShowPresenter.new(user, params).actions
-    actions_presenter
   end
 end

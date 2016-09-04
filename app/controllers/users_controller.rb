@@ -5,9 +5,6 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    # respond_to do |format|
-    #   format.json {@result.user.as_json}
-    # end
   end
 
   # this would call the respective private method to update the respective attributes

@@ -1,10 +1,9 @@
 class SettlementsController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_user, only: [:show, :show_partial, :add_payment]
+  before_action :load_user, only: [:show, :show_partial]
   before_action :load_users, only: [:index]
 
   def create
-
     params[:to_user_id] = @user
     result = nil
     # param = payment_params
@@ -99,7 +98,6 @@ class SettlementsController < ApplicationController
   end
 
   def summary
-    puts "Hello"
     @user = current_company.users.find_by(id: params[:id])
     respond_to do |format|
       format.json {}
