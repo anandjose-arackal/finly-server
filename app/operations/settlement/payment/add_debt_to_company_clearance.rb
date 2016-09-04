@@ -6,7 +6,7 @@
 # date: date of clearance
 # note: optional note for transaction
 
-class Settlement::AddDebtToCompanyClearance < Settlement::Base
+class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
 
   def authorized_user_types
     [:finance_manager, :admin]
