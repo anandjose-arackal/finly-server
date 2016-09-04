@@ -23,7 +23,7 @@ json.mapping @result.mapping.each do |mapping|
       json.mapping_id map.id
       if map.greater_than_amount_id.present?
         json.greater_than_amount do
-          json.id map.greater_than_amount_id
+          # json.id map.greater_than_amount_id
           json.value map.greater_than_amount.value
           json.currency_id map.greater_than_amount.currency_id
         end
