@@ -2,7 +2,6 @@ class PoliciesController < ApplicationController
   protect_from_forgery with: :null_session
 
   before_action :authenticate_user!
-  before_action :load_service_objects
 
   has_scope :filter_name
   has_scope :filter_email
