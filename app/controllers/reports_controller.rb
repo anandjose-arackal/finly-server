@@ -130,6 +130,17 @@ class ReportsController < ApplicationController
     load_response
   end
 
+  def reject_expense
+    updater = Report::Expenses::Reject.new(current_user, params)
+    @result = updater.run
+    if updater.is_success?
+      flash.now[:success] = 'Expense rejected'
+    else
+      flash.now[:failure] = updater.errors
+    end
+    load_response
+  end
+
   def unapprove
     unapprove_op = Report::Unapprove.new(current_user, params)
     if unapprove_op.run

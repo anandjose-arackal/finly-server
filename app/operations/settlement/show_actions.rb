@@ -15,10 +15,14 @@ class Settlement::ShowActions < Settlement::Base
     else
       self.role = UserRole.finance_manager_id
     end
-    team = User::Team::Show.(user, {role_id: role, indirect_associations: true}).team
+    team = User::Team::Index.(user, {role_id: role, indirect_associations: true}).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
+  end
+
+  def success
+    Settlement::ShowActions::ShowPresenter.new(user, params).actions
   end
 
   class Settlement::ShowActions::ShowPresenter < Settlement::Base::BasePresenter
@@ -37,10 +41,5 @@ class Settlement::ShowActions < Settlement::Base
 
       actions
     end
-  end
-
-  def success
-    actions_presenter = Settlement::ShowActions::ShowPresenter.new(user, params).actions
-    actions_presenter
   end
 end

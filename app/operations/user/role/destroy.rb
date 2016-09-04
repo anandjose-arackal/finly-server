@@ -24,7 +24,7 @@ class User::Role::Destroy < BaseOperation
 
   def validate
     roles_to_remove.each do |role|
-      team = User::Team::Show.new(being_updated_user, role_id: role).run.team
+      team = User::Team::Index.new(being_updated_user, role_id: role).run.team
       unless team.blank?
         errors << "#{being_updated_user.name} has other team members under him. "
         return false

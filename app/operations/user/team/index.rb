@@ -3,44 +3,19 @@
 # role_id: the role of the user viewing the team
 # if role_id is not passed, the view of the particular user is used
 
-class User::Team::Show < User::Team::Base
+class User::Team::Index < User::Team::Base
   attr_accessor :role_id
 
-  class User::Team::Show::ShowPresenter < User::Team::Base::TeamPresenter
-
-    attr_accessor :team
-
-    def initialize(user, params)
-      self.team = params[:team]
-
-    end
-  end
-  #
-  # def initialize(user, role_id, params={})
-  #   super(user, params)
-  #   self.role_id = role_id
-  # end
-  #
-  # def self.call(user, role_id, params={})
-  #   self.new(user, role_id, params).run
-  # end
-
-  def initialize(user, params)
-    super(user, params)
-    self.role_id = params[:role_id]
-  end
-
-  def self.call(user, params)
-    self.new(user, params).run
-  end
-
   def pre_validate
-    errors.clear
     unless user.present?
       errors << 'User not found'
     end
-    unless role_id.present?
-      errors << 'User role not defined'
+  end
+
+  def init
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
     end
   end
 
@@ -63,6 +38,12 @@ class User::Team::Show < User::Team::Base
         end
       else
         #Nothing
+    end
+  end
+
+  def validate
+    unless role_id.present?
+      errors << 'User role not defined'
     end
   end
 
@@ -95,17 +76,7 @@ class User::Team::Show < User::Team::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      team_presenter = User::Team::Show::ShowPresenter.new(user, {team: response})
-      return team_presenter
-    else
-      return false
-    end
-  end
-
   private
-
   def admin_team
     errors.clear
     if user.company_admin?

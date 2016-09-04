@@ -46,7 +46,7 @@ class Settlement::AddReimbursement < Settlement::Base
     else
       self.role = UserRole.finance_manager_id
     end
-    team = User::Team::Show.(user, role, indirect_associations: true).team
+    team = User::Team::Index.(user, role, indirect_associations: true).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
