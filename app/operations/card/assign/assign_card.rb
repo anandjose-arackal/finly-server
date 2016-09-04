@@ -52,7 +52,7 @@ class Card::Assign::AssignCard < Card::Base
 
   def authorize
     if user.manager?
-      unless User::Team::Show.call(user, 3, indirect_associations: true).include?(employee)
+      unless User::Team::Index.call(user, 3, indirect_associations: true).include?(employee)
         errors << "You are not a manager for this user."
       end
     elsif user.admin?

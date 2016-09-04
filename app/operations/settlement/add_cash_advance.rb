@@ -35,7 +35,7 @@ class Settlement::AddCashAdvance < Settlement::Base
     else
       role = UserRole.finance_manager_id
     end
-    team = User::Team::Show.(user, {role_id: role, indirect_associations: true}).team
+    team = User::Team::Index.(user, {role_id: role, indirect_associations: true}).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end

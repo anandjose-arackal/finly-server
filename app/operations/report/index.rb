@@ -32,7 +32,7 @@ class Report::Index < Report::Base
         if self.user.company_admin?
           self.reports = Report.not_open.with_user(user.company.users.pluck(:id))
         elsif user.policy_admin?
-          user_ids = User::Team::Show.(user, UserRole.admin_id).pluck(:id)
+          user_ids = User::Team::Index.(user, UserRole.admin_id).pluck(:id)
           policy_ids = user.admin_policies.pluck(:id)
           self.reports = Report.not_open.with_user(user_ids).with_policy(policy_ids)
         end

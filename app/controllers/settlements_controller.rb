@@ -135,7 +135,7 @@ class SettlementsController < ApplicationController
           @user = user
           return true
         elsif current_user.policy_admin?
-          admin_team = User::Team::Show.(current_user, role_id: UserRole.admin_id).run.team
+          admin_team = User::Team::Index.(current_user, role_id: UserRole.admin_id).team
           # admin_team = UserTeamService.new(current_user).team(UserRole.admin_id)
           if admin_team and admin_team.with_id(params[:id]).present?
             @user = user
@@ -160,10 +160,10 @@ class SettlementsController < ApplicationController
 
   def load_users
     if @admin_view
-      @users = User::Team::Show.(current_user, role_id: UserRole.admin_id, indirect_associations: true).team
+      @users = User::Team::Index.(current_user, role_id: UserRole.admin_id, indirect_associations: true).team
       # @users = UserTeamService.new(current_user).team(UserRole.admin_id, indirect_associations: true)
     elsif @finance_view
-      @users = User::Team::Show.(current_user, role_id: UserRole.finance_manager_id, indirect_associations: true).team
+      @users = User::Team::Index.(current_user, role_id: UserRole.finance_manager_id, indirect_associations: true).team
       # @users = UserTeamService.new(current_user).team(UserRole.finance_manager_id, indirect_associations: true)
     end
     @users = @users.with_balance_sheet if @users.present?

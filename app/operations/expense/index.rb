@@ -29,13 +29,13 @@ class Expense::Index < Expense::Base
   def process
     case role_id
       when UserRole.admin_id
-        user_ids = User::Team::Show.(user, role_id).team.pluck(:id)
+        user_ids = User::Team::Index.(user, role_id).team.pluck(:id)
         self.expenses = Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
       when UserRole.finance_manager_id
-        user_ids = User::Team::Show.(user, role_id).team.pluck(:id)
+        user_ids = User::Team::Index.(user, role_id).team.pluck(:id)
         self.expenses = Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
       when UserRole.manager_id
-        user_ids = User::Team::Show.(user, role_id).team.pluck(:id)
+        user_ids = User::Team::Index.(user, role_id).team.pluck(:id)
         self.expenses = Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
       when UserRole.auditor_id
       else
