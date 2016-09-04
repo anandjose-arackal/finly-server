@@ -38,7 +38,9 @@ class SettlementsController < ApplicationController
   def index
     operation = Settlement::Index.new(user, params)
     @result = operation.run
-
+    # authorize Payment
+    # @users = @users.with_roles.only_employees.paginate(page: params[:page], per_page: 30) if @users.present?
+    # ap @users
     respond_to do |format|
       format.html {}
       format.js {}

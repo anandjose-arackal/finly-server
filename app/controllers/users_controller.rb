@@ -5,6 +5,10 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
+    ap @result.user
+    respond_to do |format|
+      format.json {render json: @result.user.as_json}
+    end
   end
 
   # this would call the respective private method to update the respective attributes
@@ -15,6 +19,10 @@ class UsersController < ApplicationController
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
     @result = User::Index.(current_user, params)
+
+    respond_to do |format|
+      format.json {render json: @result.team.as_json}
+    end
   end
 
   private

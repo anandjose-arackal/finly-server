@@ -13,7 +13,8 @@ class FinlyF.Routers.Main extends Backbone.Router
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
     'settlements/:user/params=:query': 'settlements_show'
-    'users': 'users'
+    'employees/params=:query': 'users'
+    'employees': 'users'
 
   initialize: ->
     # console.log "Step 1. Main router initialized."
@@ -77,7 +78,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
 
-  users: ->
+  users: (query)->
     # Admin & Finance view
     if typeof query != 'undefined'
       params = JSON.parse(query)

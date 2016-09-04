@@ -6,13 +6,15 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   templateNavbarMain: HandlebarsTemplates['finlyf/users/navbar/navbar_main']
 
   events:
+    'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
 
   initialize: (options) ->
     @params = options.params
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
-      reset: true
+      reset: true,
+      data: @params
     })
     @collection.on('reset', @processUsers, @)
     
@@ -80,6 +82,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     preview_view = new FinlyF.Views.User({
       model: model,
       page: 'user'
+      params: @params
       # preview: true
       # parent: @
     })
