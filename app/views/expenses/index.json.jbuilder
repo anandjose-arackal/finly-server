@@ -1,4 +1,4 @@
-json.array!(@expenses) do |expense|
+json.array!(@result.paginated_expenses) do |expense|
   json.extract! expense, :id, :note, :merchant_name, :user_name, :amount_value, :category_name
   if expense.note
     if expense.note[21]
