@@ -1,4 +1,4 @@
-json.array!(@reports) do |report|
+json.array!(@index_presenter.reports) do |report|
   json.extract! report, :id, :name, :memo, :status, :status_name, :memo
   if report.policy
     json.policy report.policy.name

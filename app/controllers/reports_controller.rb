@@ -3,8 +3,6 @@ class ReportsController < ApplicationController
   before_action :authenticate_user!
   before_action :fetch_report, except: [:create, :index]
   before_action :fetch_reports, only: [:index]
-  before_action :load_service_object
-
 
   has_scope :filter_search
   has_scope :filter_status
@@ -16,11 +14,11 @@ class ReportsController < ApplicationController
     create_report_op = Report::Create.new(current_user)
     @report = create_report_op.run
     if @report
-
-      #Calling methods neccessary to render show
-      load_expenses_for_views
-      load_info_for_views
-      @comments = @report.comments.all.order(created_at: :desc)
+      # #Calling methods neccessary to render show
+      # load_expenses_for_views
+      # load_info_for_views
+      # @comments = @report.comments.all.order(created_at: :desc)
+      @show_presenter = Report::Show.new(current_user, params)
 
       respond_to do |format|
         #rendeing show method
@@ -28,14 +26,14 @@ class ReportsController < ApplicationController
       end
       return
     end
-    flash[:error] = rs.errors
-    render_flash_message
+    # todo - render error message
   end
 
   def index
-    @counts = @index_presenter.counts
+    @index_presenter = Report::Index.new(current_user, params).run
+    # @counts = @index_presenter.counts
 
-    @reports = apply_scopes(@reports).paginate(page: params[:page], per_page: 30) if @reports.present?
+    # @reports = apply_scopes(@reports).paginate(page: params[:page], per_page: 30) if @reports.present?
 
     respond_to do |format|
       format.html {}
@@ -45,14 +43,21 @@ class ReportsController < ApplicationController
   end
 
   def update
-    authorize @report
-    handle_update :update_report, nil, update_params
+    update_op = Report::Update.new(current_user, params)
+    if update_op.run
+      flash[:success] = "Report updated successfully."
+    else
+      flash[:failure] = update_op.errors
+    end
+    load_response
   end
 
   def show
-    load_view_for_report
-    @comments = @report.comments.all.order(created_at: :desc)
-    # ap @actions
+    @show_presenter = Report::Show.new(current_user, params).run
+
+    # load_view_for_report
+    # @comments = @report.comments.all.order(created_at: :desc)
+    # # ap @actions
 
     respond_to do |format|
       format.json {}
@@ -68,6 +73,7 @@ class ReportsController < ApplicationController
     else
       flash.now[:failure] = destroy_op.errors
     end
+    load_response
   end
 
   def add_expenses
@@ -173,15 +179,13 @@ class ReportsController < ApplicationController
   end
 
   def reimbursement_confirm
-    authorize @report
-    rs = ReportService.new(user: current_user, report: @report)
-    if rs.reimbursement_confirm
-      flash[:success] = 'You have successfully confirmed reimbursement of the report'
-      redirect_to report_path rs.report, view_params
-      return
+    reimburse_confirm_op = Report::ReimburseConfirm.new(current_user, params)
+    if reimburse_confirm_op.run
+      flash.now[:success] = "Reimbursement confirmed."
+    else
+      flash.now[:failure] = reimburse_confirm_op.errors
     end
-    flash[:danger] = rs.errors
-    render_flash_message
+    load_response
   end
 
   def comment
@@ -194,121 +198,110 @@ class ReportsController < ApplicationController
     load_response
   end
 
-  def assign_policy
-    authorize @report
-    handle_update :update_report, 'Policy Updated', update_params
-  end
 
   private
 
   def load_response
     respond_to do |format|
-      format.html do
-        redirect_to report_path rs.report, view_params
-      end
+      # format.html do
+      #   redirect_to report_path rs.report, view_params
+      # end
       format.json do
-        load_view_for_report
+        @show_presenter = Report::Show.new(current_user, params).run
         render :show
       end
-      format.js do
-        load_view_for_report
-        render 'reports/report', remote: true
-      end
+      # format.js do
+      #   load_view_for_report
+      #   render 'reports/report', remote: true
+      # end
     end
   end
 
-  def create_params
-    params.require(:report).permit(:expense_id, :name) if params[:report].present?
-  end
 
-  def load_service_object
-    @violation_service = ViolationService.new(current_user)
-  end
-
-  def load_view_for_report
-    load_expenses_for_views
-    load_info_for_views
-    @comments = @report.comments.all.order(created_at: :desc)
-    # the below will be replaced by the actions that are possible in the report
-    # @views = {}
-    # if @admin_view
-    #   if @report.can_take_control? and not @report.controlling_user?(current_user)
-    #     @views[:take_control] = true
-    #   elsif @report.processing? and @report.controlling_user?(current_user)
-    #     @views[:team] = true
-    #   end
-    # elsif @finance_view or @manager_view
-    #   if @report.processing? and @report.controlling_user?(current_user)
-    #     @views[:team] = true
-    #   elsif (@report.can_unapprove?) and @report.associated_users(@report.controlling_user).include?(current_user)
-    #     @views[:unapprove] = true
-    #   end
-    #   if @finance_view and @report.reimbursement_pending?
-    #     @views[:reimburse] = true
-    #   end
-    # else
-    #   if @report.open? or @report.retracted? or @report.rejected?
-    #     @views[:add_expenses] = true
-    #     @views[:delete] = true
-    #   elsif @report.processing?
-    #     @views[:retract] = true
-    #   elsif @report.reimbursed?
-    #     @views[:reimbursement_confirm] = true
-    #   end
-    # end
-    @actions = @show_presenter.load_actions
-    # code for report policy
-    @policies = @report.user.policies
-    @policy = @report.versioned_policy
-    @violation_messages = Report::Violation.new(current_user, {report_id: @report.id, role_id: params[:role_id]})
-  end
-
-  def load_expenses_for_views
-    # won't change much even with operations
-    @expenses= []
-    @categories = current_user.company.categories
-    @expenses = @show_presenter.expenses_category_sorted
-  end
-
-  def load_info_for_views
-    @manager_name = @show_presenter.manager.name if @show_presenter.manager
-    @status = @report.relative_status_name(current_user)
-    @total = precision_value @report.total_amount
-    @date_string = @report.date_as_string
-  end
-
-  def fetch_reports
-
-    if @admin_view
-      role_id = UserRole.admin_id
-    elsif @manager_view
-      role_id = UserRole.manager_id
-    elsif @finance_view
-      role_id = UserRole.finance_manager_id
-    else
-      role_id = UserRole.employee_id
-    end
-    @index_presenter = Report::Index.new(current_user, role_id: role_id).run
-    @reports = @index_presenter.reports
-
-  end
-
-  def fetch_report
-    show_op = Report::Show.new(current_user, params)
-    @show_presenter = show_op.run
-    @report = @show_presenter.report
-  end
-
-  def view_params
-    if @admin_view
-      return {view: 'admin'}
-    elsif @manager_view
-      return {view: 'manager'}
-    elsif @finance_view
-      return {view: 'finance'}
-    end
-    nil
-  end
+  # def load_view_for_report
+  #   load_expenses_for_views
+  #   load_info_for_views
+  #   @comments = @report.comments.all.order(created_at: :desc)
+  #   # the below will be replaced by the actions that are possible in the report
+  #   # @views = {}
+  #   # if @admin_view
+  #   #   if @report.can_take_control? and not @report.controlling_user?(current_user)
+  #   #     @views[:take_control] = true
+  #   #   elsif @report.processing? and @report.controlling_user?(current_user)
+  #   #     @views[:team] = true
+  #   #   end
+  #   # elsif @finance_view or @manager_view
+  #   #   if @report.processing? and @report.controlling_user?(current_user)
+  #   #     @views[:team] = true
+  #   #   elsif (@report.can_unapprove?) and @report.associated_users(@report.controlling_user).include?(current_user)
+  #   #     @views[:unapprove] = true
+  #   #   end
+  #   #   if @finance_view and @report.reimbursement_pending?
+  #   #     @views[:reimburse] = true
+  #   #   end
+  #   # else
+  #   #   if @report.open? or @report.retracted? or @report.rejected?
+  #   #     @views[:add_expenses] = true
+  #   #     @views[:delete] = true
+  #   #   elsif @report.processing?
+  #   #     @views[:retract] = true
+  #   #   elsif @report.reimbursed?
+  #   #     @views[:reimbursement_confirm] = true
+  #   #   end
+  #   # end
+  #   @actions = @show_presenter.load_actions
+  #   # code for report policy
+  #   @policies = @report.user.policies
+  #   @policy = @report.versioned_policy
+  #   @violation_messages = Report::Violation.new(current_user, {report_id: @report.id, role_id: params[:role_id]})
+  # end
+  #
+  # def load_expenses_for_views
+  #   # won't change much even with operations
+  #   @expenses= []
+  #   @categories = current_user.company.categories
+  #   @expenses = @show_presenter.expenses_category_sorted
+  # end
+  #
+  # def load_info_for_views
+  #   @manager_name = @show_presenter.manager.name if @show_presenter.manager
+  #   @status = @report.relative_status_name(current_user)
+  #   @total = precision_value @report.total_amount
+  #   @date_string = @report.date_as_string
+  # end
+  #
+  # def fetch_reports
+  #
+  #   if @admin_view
+  #     role_id = UserRole.admin_id
+  #   elsif @manager_view
+  #     role_id = UserRole.manager_id
+  #   elsif @finance_view
+  #     role_id = UserRole.finance_manager_id
+  #   else
+  #     role_id = UserRole.employee_id
+  #   end
+  #   @index_presenter = Report::Index.new(current_user, role_id: role_id).run
+  #   @reports = @index_presenter.reports
+  #
+  # end
+  #
+  # def fetch_report
+  #   show_op = Report::Show.new(current_user, params)
+  #   @show_presenter = show_op.run
+  #   @report = @show_presenter.report
+  # end
+  #
+  # def view_params
+  #   if @admin_view
+  #     return {view: 'admin'}
+  #   elsif @manager_view
+  #     return {view: 'manager'}
+  #   elsif @finance_view
+  #     return {view: 'finance'}
+  #   end
+  #   nil
+  # end
 
   def handle_update(update, success_message, params=nil)
     rs = ReportService.new user: current_user, report: @report

@@ -41,7 +41,6 @@ class PoliciesController < ApplicationController
 
   def show
     @policy = Policy.find(params[:id])
-    authorize @policy
     @managers = @policy.company.managers
     @finance_managers = @policy.company.finance_managers
     @categories = current_company.categories.active

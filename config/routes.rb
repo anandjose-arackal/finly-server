@@ -247,8 +247,8 @@ Rails.application.routes.draw do
     post 'add_users' => 'policies#add_users', as: :add_users
     post 'remove_users' => 'policies#remove_users', as: :remove_users
     patch 'update_users_configuration' => 'policies#update_user_configuration', as: :update_user_configuration
-    post 'add_rule', to: 'policies#add_rule', as: :add_rule
-    delete 'remove_rule', to: 'policies#remove_rule', as: :remove_rule
+    post 'add_rule', to: 'rules#create', as: :add_rule
+    delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
   end
 
   resources :categories

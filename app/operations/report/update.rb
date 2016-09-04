@@ -1,3 +1,5 @@
+# action that updates the report - name or policy update.
+
 class Report::Update < Report::Base
   attr_accessor :changes, :update_param
 
