@@ -76,7 +76,7 @@ class Settlement::Show < Settlement::Base
   end
 
   def load_reports
-    self.reports = self.selected_user.reports.send(type)
+    self.reports = self.selected_user.reports.send(self.view_to_load)
   end
 
   def load_payments
