@@ -1,9 +1,7 @@
 class SettlementsController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_user, only: [:show]
 
   def create
-    params[:to_user_id] = @user
     success_message = nil
     operation = nil
     if param[:payment_type] == PaymentType.advance_id.to_s
@@ -36,7 +34,7 @@ class SettlementsController < ApplicationController
   end
 
   def index
-    operation = Settlement::Index.new(user, params)
+    operation = Settlement::Index.new(current_user, params)
     @result = operation.run
     # authorize Payment
     # @users = @users.with_roles.only_employees.paginate(page: params[:page], per_page: 30) if @users.present?
@@ -49,13 +47,13 @@ class SettlementsController < ApplicationController
   end
 
   def show
-    operation = Settlement::Show.new(user, params)
+    operation = Settlement::Show.new(current_user, params)
     @result = operation.run
     # todo render
   end
 
   def summary
-    operation = User::Show.new(user, params)
+    operation = User::Show.new(current_user, params)
     @result = operation.run
     respond_to do |format|
       format.json {}
