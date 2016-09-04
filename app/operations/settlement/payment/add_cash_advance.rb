@@ -6,9 +6,7 @@
 # currency_id: if money is being added in a difference currency, currently defaults to 1
 # date: Date on which the payment is being made
 
-class Settlement::AddCashAdvance < Settlement::Base
-
-
+class Settlement::Payment::AddCashAdvance < Settlement::Base
   attr_accessor :payment
 
   def authorized_user_types

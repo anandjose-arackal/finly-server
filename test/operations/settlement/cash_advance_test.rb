@@ -16,7 +16,7 @@ class CashAdvanceTest < ActiveSupport::TestCase
   end
 
   test "adding cash advance by finance or admin" do
-    add_payment_op = Settlement::AddCashAdvance.new(@admin, @payment_params)
+    add_payment_op = Settlement::Payment::AddCashAdvance.new(@admin, @payment_params)
     assert_difference '@employee.payments.count', 1 do
       @payment = add_payment_op.run
     end
@@ -25,7 +25,7 @@ class CashAdvanceTest < ActiveSupport::TestCase
 
 
     # finance manager adding cash advance
-    add_payment_op = Settlement::AddCashAdvance.new(@finance, @payment_params)
+    add_payment_op = Settlement::Payment::AddCashAdvance.new(@finance, @payment_params)
     assert_difference '@employee.payments.count', 1 do
       @payment = add_payment_op.run
     end
@@ -34,7 +34,7 @@ class CashAdvanceTest < ActiveSupport::TestCase
   end
 
   test "non admins and finance managers who aren't part of the user's mappings can't add money" do
-    add_payment_op = Settlement::AddCashAdvance.new(@manager, @payment_params)
+    add_payment_op = Settlement::Payment::AddCashAdvance.new(@manager, @payment_params)
     assert_no_difference '@employee.payments.count' do
       begin
         @payment = add_payment_op.run
@@ -46,7 +46,7 @@ class CashAdvanceTest < ActiveSupport::TestCase
     assert_equal 0, @employee.balance_sheet.reload.cash_in_hand.value
 
     # random finance manager trying to add to user's payments
-    add_payment_op = Settlement::AddCashAdvance.new(@finance3, @payment_params)
+    add_payment_op = Settlement::Payment::AddCashAdvance.new(@finance3, @payment_params)
     assert_no_difference '@employee.payments.count' do
       begin
         @payment = add_payment_op.run
@@ -61,7 +61,7 @@ class CashAdvanceTest < ActiveSupport::TestCase
 
   test "adding invalid parameters to cash advance action" do
     @payment_params[:value] = -10
-    add_payment_op = Settlement::AddCashAdvance.new(@admin, @payment_params)
+    add_payment_op = Settlement::Payment::AddCashAdvance.new(@admin, @payment_params)
     assert_no_difference '@employee.payments.count' do
       @payment = add_payment_op.run
     end
@@ -72,7 +72,7 @@ class CashAdvanceTest < ActiveSupport::TestCase
     @payment_params[:value] = 100
     @payment_params[:date] = Date.parse('2016-10-03')
 
-    add_payment_op = Settlement::AddCashAdvance.new(@admin, @payment_params)
+    add_payment_op = Settlement::Payment::AddCashAdvance.new(@admin, @payment_params)
     assert_no_difference '@employee.payments.count' do
       @payment = add_payment_op.run
     end

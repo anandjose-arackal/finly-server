@@ -7,8 +7,7 @@
 # date: date on which the reimbursement is being added
 # note: optional note while adding reimbursement
 
-class Settlement::AddReimbursement < Settlement::Base
-
+class Settlement::Payment::AddReimbursement < Settlement::Base
   include MathUtil
 
   attr_accessor :reports, :role

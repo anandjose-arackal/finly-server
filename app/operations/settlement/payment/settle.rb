@@ -5,7 +5,7 @@
 # value : value of the amount to be reimbursed - should match total of reports referenced via report_ids
 # currency_id: currency of the reimbursement
 
-class Settlement::Settle < Settlement::Base
+class Settlement::Payment::Settle < Settlement::Base
 
 
   def authorized_user_types

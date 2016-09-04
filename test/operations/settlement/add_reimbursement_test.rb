@@ -26,7 +26,7 @@ class AddReimbursementTest < ActiveSupport::TestCase
 
     assert @employee.balance_sheet.pending_reimbursement_value > 0
     # old_pending_value = @user.balance_sheet.pending_reimbursement_value
-    add_reimbursement_op = Settlement::AddReimbursement.new(@admin, @reimbursement_params)
+    add_reimbursement_op = Settlement::Payment::AddReimbursement.new(@admin, @reimbursement_params)
     assert_difference '@employee.reports.approved.count', -3 do
       assert_difference '@employee.balance_sheet.pending_reimbursement_value', -precision_value(@approved_reports_total) do
         @reports = add_reimbursement_op.run
