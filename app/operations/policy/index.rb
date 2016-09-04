@@ -43,6 +43,8 @@ class Policy::Index < Policy::Base
     if is_success?
       index_presenter = Policy::Index::IndexPresenter.new(user, {policies: policies })
       return index_presenter
+    else
+      return false
     end
   end
 end

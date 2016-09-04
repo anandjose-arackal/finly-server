@@ -25,7 +25,7 @@ class Policy::Rules::Base < Policy::Base
   end
 
   def init
-    self.policy = user.policies.find_by(id: params[:policy_id])
+    self.policy = user.policies.find_by(id: params[:policy_id] || params[:id])
   end
 
   def authorize
@@ -35,12 +35,11 @@ class Policy::Rules::Base < Policy::Base
   end
 
   def rule_parameters
-    # todo - recheck the actual parameters that are being passed and whitelist them individually
     if params[:expense_rule]
-      params[:expense_rule][:greater_than_amount_attributes] = {value: params[:expense_rule][:amount], currency_id: Currency.first.id}
+      # params[:expense_rule][:greater_than_amount_attributes] = {value: params[:expense_rule][:amount], currency_id: Currency.first.id}
       params.require(:expense_rule).permit(:expense_rule_id, :category_id, :days_after, :expense_rule_type_id, :rule_type_id, :policy_id, greater_than_amount_attributes: [:value, :currency_id])
     elsif params[:budget_rule]
-      params[:budget_rule][:amount_attributes] = {value: params[:budget_rule][:amount], currency_id: Currency.first.id}
+      # params[:budget_rule][:amount_attributes] = {value: params[:budget_rule][:amount], currency_id: Currency.first.id}
       params.require(:budget_rule).permit(:budget_rule_id, :category_id, :budget_period_id, :rule_type_id, :policy_id, amount_attributes: [:value, :currency_id])
     end
   end

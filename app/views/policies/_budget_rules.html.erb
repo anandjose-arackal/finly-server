@@ -23,7 +23,7 @@
 
                 <input name="_method" type="hidden" value="delete"/>
                 <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                <input name="budget_rule[rule_id]" type="hidden" value="<%=rule.id%>">
+                <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
               </form>
 
               <% end %>
@@ -70,7 +70,7 @@
 
                 <input name="_method" type="hidden" value="delete"/>
                 <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                <input name="budget_rule[rule_id]" type="hidden" value="<%=rule.id%>">
+                <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
               </form>
               <% end %>
 
@@ -122,30 +122,30 @@
           <h5>For the Category... <span>[OPTIONAL]</span></h5>
 
           <div id="categoriesBudget">
-            <input type="radio" name="rule[category_id]" value="">All <br>
+            <input type="radio" name="budget_rule[category_id]" value="">All <br>
               <% @categories.each do |cat| %>
-                 <input type="radio" name="rule[category_id]" value="<%= cat.id %>"><%= cat.category_name %> <br>
+                 <input type="radio" name="budget_rule[category_id]" value="<%= cat.id %>"><%= cat.category_name %> <br>
               <% end %>
           </div>
 
           <h5>Budget Amount is... <span>[OPTIONAL]</span></h5>
 
-          <input name="rule[amount_attributes[value]]" type="text" placeholder="0.00">
+          <input name="budget_rule[amount_attributes[value]]" type="text" placeholder="0.00">
 
-          <input name="rule[amount_attributes[currency_id]]" value="1" type="hidden" placeholder="0.00">
+          <input name="budget_rule[amount_attributes[currency_id]]" value="1" type="hidden" placeholder="0.00">
 
           <div id="newRulePeriod">
             <h5>Per... <span>[OPTIONAL]</span></h5>
-            <input type="radio" name="rule[budget_period_id]" value="1">Day <br>
-            <input type="radio" name="rule[budget_period_id]" value="2">Week<br>
-            <input type="radio" name="rule[budget_period_id]" value="3">Month<br>
-            <input type="radio" name="rule[budget_period_id]" value="4">Year<br>
+            <input type="radio" name="budget_rule[budget_period_id]" value="1">Day <br>
+            <input type="radio" name="budget_rule[budget_period_id]" value="2">Week<br>
+            <input type="radio" name="budget_rule[budget_period_id]" value="3">Month<br>
+            <input type="radio" name="budget_rule[budget_period_id]" value="4">Year<br>
           </div>
 
           <div id="newRuleTypeChooser" style="display:block">
             <h5>Block or Warning? </h5>
-            <input type="radio" name="rule[rule_type_id]" value="2" checked>Blocking <br>
-            <input type="radio" name="rule[rule_type_id]" value="1">Warning<br>
+            <input type="radio" name="budget_rule[rule_type_id]" value="2" checked>Blocking <br>
+            <input type="radio" name="budget_rule[rule_type_id]" value="1">Warning<br>
           </div>
 
           <button type="submit" id="createPolicy"> Create</button>

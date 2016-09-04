@@ -18,15 +18,15 @@ class PendingInvitesController < ApplicationController
     @pending_user = User.find_by(email: params[:email])
   end
 
-  def update
-    if @user_invite_service.accept_invitation(user_params)
-      flash[:success] = "Registration done!"
-      redirect_to root_url
-    else
-      flash[:error] = @user_invite_service.errors
-      render_flash_message
-    end
-  end
+  # def update
+  #   if @user_invite_service.accept_invitation(user_params)
+  #     flash[:success] = "Registration done!"
+  #     redirect_to root_url
+  #   else
+  #     flash[:error] = @user_invite_service.errors
+  #     render_flash_message
+  #   end
+  # end
 
   def accept
     accept_op = User::Invite::Accept.new(params)
