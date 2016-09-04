@@ -28,12 +28,12 @@ class User::Show < User::Base
   end
 
   class User::Show::Presenter < BaseOperation::BasePresenter
-    # attr_accessor :mapping, :policies
+    attr_accessor :mapping, :managers, :finance_managers, :policies
 
     def initialize(user, params)
       super(user, params)
-      # self.mapping = user.team_mapping
-      # self.policies = user.policies
+      self.mapping = user.team_mapping
+      self.policies = user.policies
     end
 
   end
