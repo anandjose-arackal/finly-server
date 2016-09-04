@@ -32,8 +32,8 @@ class User::Show < User::Base
 
     def initialize(user, params)
       super(user, params)
-      self.roles = { admin: self.user.company_admin?, manager: self.user.manager?,
-                     finance_manager: self.user.finance_manager? }
+      self.roles = {admin: self.user.company_admin?, manager: self.user.manager?,
+                    finance_manager: self.user.finance_manager?}
       self.team_mapping = self.user.team_mapping
       self.mapping = [retrieve_mapping(nil)]
       self.policies = user.policies

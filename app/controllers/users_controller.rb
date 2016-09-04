@@ -31,7 +31,7 @@ class UsersController < ApplicationController
         operation = User::Configuration::UpdatePassword.new(user, params)
         success_message = 'Password updated'
       when :team
-        operation = User::Team::UpdateConfiguration.new(current_user, params)
+        operation = User::Team::Mapping::Set.new(current_user, params)
         success_message = 'User team updated.'
       when :role
         operation = User::Role::Set.new(current_user, params)
