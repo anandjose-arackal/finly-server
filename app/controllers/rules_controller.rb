@@ -9,15 +9,17 @@ class RulesController < ApplicationController
     else
       flash.now[:error] = create_op.errors
     end
+    redirect_to request.referrer
   end
 
   def destroy
-    destroy_op = Policy::Rules.Destroy,new(current_user, params)
+    destroy_op = Policy::Rules::Destroy.new(current_user, params)
     if destroy_op.run
       flash[:success] = "Rule destroyed."
     else
-      flash.now[:error] = create_op.errors
+      flash.now[:error] = destroy_op.errors
     end
+    redirect_to request.referrer
   end
 
 

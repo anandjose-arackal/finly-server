@@ -1,26 +1,25 @@
-json.extract! @report, :id, :name, :memo, :status_name, :memo, :report_status_id
-json.user_name @report.user.name
-json.user_initial @report.user.name.split(' ').first[0] + (@report.user.name.split(' ')[1][0] || @report.user.name.split(' ').first[1])
-json.status @status
-json.manager_name @manager_name
-json.export_csv export_report_path(report_id: @report.id, view: params[:view],:format => :csv)
-json.export_xls export_report_path(report_id: @report.id, view: params[:view],:format => :xls)
-json.export_pdf export_report_path(report_id: @report.id, view: params[:view],:format => :pdf)
+json.extract! @show_presenter.report, :id, :name, :memo, :status_name, :memo, :report_status_id
+json.user_name @show_presenter.report.user.name
+json.user_initial @show_presenter.report.user.name.split(' ').first[0] + (@show_presenter.report.user.name.split(' ')[1][0] || @show_presenter.report.user.name.split(' ').first[1])
+json.status @show_presenter.status
+json.manager_name @show_presenter.manager.name
+json.export_csv export_report_path(report_id: @show_presenter.report.id, view: params[:view],:format => :csv)
+json.export_xls export_report_path(report_id: @show_presenter.report.id, view: params[:view],:format => :xls)
+json.export_pdf export_report_path(report_id: @show_presenter.report.id, view: params[:view],:format => :pdf)
 
-if @report.policy
-  json.policy @report.policy.name
+if @show_presenter.report.policy
+  json.policy @show_presenter.report.policy.name
 end
 
-json.policies @report.user.policies do |policy|
+json.policies @show_presenter.report.user.policies do |policy|
   json.extract! policy, :id, :name
 end
 
-json.status @report.status.name
-rds = ReportDetailService.new(@report)
-json.total rds.total_amount
-json.date @report.created_at.strftime("%d %b")
+json.status @show_presenter.report.status.name
+json.total @show_presenter.report.total_amount
+json.date @show_presenter.report.created_at.strftime("%d %b")
 
-json.comments @comments do |comment|
+json.comments @show_presenter.comments do |comment|
   json.content comment.generate
   json.created_at comment.created_at.strftime("%d %b %y")
   if comment.user.respond_to?(:id, :name)
@@ -30,7 +29,7 @@ json.comments @comments do |comment|
   end
 end
 
-json.expense_sections @expenses do |category|
+json.expense_sections @show_presenter.expenses_category_sorted do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
@@ -41,7 +40,7 @@ json.expense_sections @expenses do |category|
 end
 
 
-@expenses.each do |category|
+@show_presenter.expenses_category_sorted.each do |category|
   json.receipts category[:expenses] do |expense|
     unless(expense.receipts.blank? or expense.receipts.first.image.url == "/assets/original/missing.png")
       json.url expense.receipts.first.image.url

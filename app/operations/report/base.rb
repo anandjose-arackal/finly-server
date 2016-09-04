@@ -66,7 +66,7 @@ class Report::Base < BaseOperation
       self.comments = report.comments
       self.actions = load_actions
       self.policies = report.user.policies
-      self.selected_policy = report.policy
+      self.selected_policy = report.versioned_policy
       self.manager = User::Team::Approver.(report.user, type: :manager)
       self.finance_manager = User::Team::Approver.(report.user, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
