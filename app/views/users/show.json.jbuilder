@@ -30,7 +30,6 @@ json.mapping @result.mapping.each do |mapping|
         end
       end
       [:manager, :finance_manager, :approves_to, :approves_finance_to].each do |k|
-        debugger
         if map.send("#{k}_id").present?
           json.set! k do
             json.id map.send("#{k}_id")

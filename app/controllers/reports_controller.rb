@@ -45,7 +45,7 @@ class ReportsController < ApplicationController
   end
 
   def show
-    @result = Report::Show.new(current_user, params).run
+    @result = Report::Show.(current_user, params)
     # load_view_for_report
     # @comments = @report.comments.all.order(created_at: :desc)
     # # ap @actions

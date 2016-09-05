@@ -53,3 +53,7 @@ end
   end
 end
 
+json.actions @result.actions.each do |key, value|
+  json.name key
+  json.url value[:url]
+end
