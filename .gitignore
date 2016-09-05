@@ -8,6 +8,7 @@
 /.bundle
 /Gemfile.lock
 /config/database.yml
+/.byebug_history
 
 # Ignore all logfiles and tempfiles.
 /log/*
