@@ -4,16 +4,16 @@ class SettlementsController < ApplicationController
   def create
     success_message = nil
     operation = nil
-    if param[:payment_type] == PaymentType.advance_id.to_s
+    if params[:payment_type] == PaymentType.advance_id.to_s
       operation = Settlement::Payment::AddCashAdvance.new(current_user, params)
       success_message = 'Cash advance added'
-    elsif param[:payment_type] == PaymentType.debt_clearance_id.to_s
+    elsif params[:payment_type] == PaymentType.debt_clearance_id.to_s
       operation = Settlement::Payment::AddDebtToCompanyClearance.new(current_user, params)
       success_message = 'debt clearance payment added'
-    elsif param[:payment_type] == PaymentType.reimbursement_id.to_s
+    elsif params[:payment_type] == PaymentType.reimbursement_id.to_s
       operation = Settlement::Payment::AddReimbursement.new(current_user, params)
       success_message = 'Reimbursement added'
-    elsif param[:payment_type] == PaymentType.settlement_id.to_s
+    elsif params[:payment_type] == PaymentType.settlement_id.to_s
       operation = Settlement::Payment::Settle.new(current_user, params)
       success_message = 'Payment settled'
     end
