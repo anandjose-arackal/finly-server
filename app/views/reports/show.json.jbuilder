@@ -54,6 +54,5 @@ end
 end
 
 json.actions @result.actions.each do |key, value|
-  json.name key
-  json.url value[:url]
+  json.set! key, (value[:url] or value[:value])
 end
