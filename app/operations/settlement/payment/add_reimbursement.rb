@@ -18,8 +18,9 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
-      errors << "Reimbursement cannot be negative."
+    if params[:value] and params[:value] < 0
+      errors << "Reimbursement amount cannot be negative."
+      return false
     end
     if params[:report_id].blank?
       errors << "No reports to reimburse."
@@ -28,7 +29,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
   end
 
   def init
-    self.to_user = user.company.users.find_by(id: params[:to_user_id] || params[:id])
+    id = (params[:id] or params[:to_user_id])
+    self.to_user = user.company.users.find_by(id: id)
     self.reports = to_user.reports.where(id: params[:report_id]) if to_user
   end
 

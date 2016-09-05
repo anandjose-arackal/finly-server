@@ -30,7 +30,7 @@ class Expense::Manual::Update < Expense::Manual::Base
           expense.amount_id.present?
         self.updated_expense_params[:amount_attributes][:id] = expense.amount.id
       end
-      if self.updated_expense_params[:manual_expense_attributes].present? and self.expense.manual_expense_id.present?
+      if self.updated_expense_params[:manual_expense_attributes].present? and self.expense.manual_expense.id.present?
         self.updated_expense_params[:manual_expense_attributes][:id] = expense.manual_expense.id if expense
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
