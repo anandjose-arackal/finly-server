@@ -18,9 +18,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
 
   def pre_validate
     super()
-    if params[:value] and params[:value] < 0
-      errors << "Reimbursement amount cannot be negative."
-      return false
+    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
+      errors << "Reimbursement cannot be negative."
     end
     if params[:report_id].blank?
       errors << "No reports to reimburse."
@@ -29,7 +28,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
   end
 
   def init
-    self.to_user = user.company.users.find_by(id: params[:to_user_id])
+    self.to_user = user.company.users.find_by(id: params[:to_user_id] || params[:id])
     self.reports = to_user.reports.where(id: params[:report_id]) if to_user
   end
 
@@ -52,20 +51,20 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
   end
 
   def validate
-    validate_date params[:date]
+    validate_date payment_params[:date]
 
     # is this really necessary
     total_amount = precision_value(reports.with_amount.sum(:value))
-    unless total_amount == precision_value(params[:value])
+    unless total_amount == precision_value(payment_params[:amount])
       errors << "Reimbursement amount does not match report totals."
     end
   end
 
   def process
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.reimbursement_id, date: params[:date], note: params[:note],
-                                  amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.reimbursement_id, date: payment_params[:date], note: payment_params[:note],
+                                  amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.subtract_pending_reimbursement precision_value(params[:value]), params[:currency_id]
+    if payment.save and balance_sheet.subtract_pending_reimbursement precision_value(payment_params[:amount]), payment_params[:currency_id]
       reports.each do |report|
         Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id, role_id: role}).run
       end
