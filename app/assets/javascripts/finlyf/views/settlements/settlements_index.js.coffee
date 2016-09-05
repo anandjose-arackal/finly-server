@@ -209,10 +209,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     _this = @
     e.preventDefault()
     target = $(e.currentTarget)
-    # $(target).closest('ul').find('a').removeClass('active')
-    # $(target).parent().addClass('active')
-    # console.log $(target).parent().html()
     view_to_load = $(target).attr('data-view')
+    user_id = $(target).attr('data-item-id')
 
     params = {
       # 'filter_status': status_id
@@ -221,15 +219,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     if @view == 'personal'
       FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
     else
-      console.log @collection.url
+      # console.log @collection.url
+      @params.view_to_load = view_to_load
       @collection.fetch({
-        data: {
-          view_to_load: view_to_load
-        },
+        data: @params
         reset: true,
         # data: _this.params
         success: ->
-          _this.populateSummary(user_id)
+          _this.populateSummary(_this.user_id)
 
         error: ->
           console.log "Couldn't fetch Successfully."
@@ -259,6 +256,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     _this = @
     user_id = $(target).find(".user-name").attr("data-item-id")
+    @user_id = user_id
     # console.log "User id is", user_id
     # console.log @collection.url
     if typeof @params.view == 'undefined'
@@ -284,6 +282,4 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   processCash: (e) ->
     console.log "Process Cash"
-
-
 

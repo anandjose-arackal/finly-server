@@ -57,14 +57,18 @@ class ReportsController < ApplicationController
   end
 
   def destroy
-    destroy_op = Report::Destroy
-    @result = destroy_op.run
+    destroy_op = Report::Destroy.new(current_user, params)
+    destroy_op.run
+    # debugger
     if destroy_op.is_success?
-      flash.now[:success] = "Report deleted."
-      format.json {render :index}
+      respond_to do |format|
+        # flash.now[:success] = "Report deleted."
+        format.json {render json: {"success": true}}
+      end
     else
       flash.now[:failure] = destroy_op.errors
     end
+    # load_response
   end
 
   def add_expenses

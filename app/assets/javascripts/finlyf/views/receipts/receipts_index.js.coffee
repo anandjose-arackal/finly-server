@@ -25,6 +25,9 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     'click .navbar-view-type': 'changeView'
     'click .btn-reset-filters': 'resetFilters'
 
+    #receipt
+    'click .btn-create-expense': 'createExpense'
+
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter': 'filter'
@@ -49,6 +52,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
     @collection.on('reset', @processItems, @)
+    @on('item:selected', @receiptSelectOptions, @)
 
   render: ->
     # console.log "Step 3. Rendering."
@@ -99,7 +103,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
   appendItems: (item) ->
     #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Receipt({ model: item })
+    view_item = new FinlyF.Views.Receipt({
+      model: item
+      parent: @
+    })
     $(@el).find("#items").append(view_item.render().el)
 
   refetchCollection: (e) ->
@@ -266,3 +273,41 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  receiptSelectOptions: ->
+    items = $(@el).find('#items .item')
+    flag = false
+    for item in items
+      if $(item).find('.select-item').prop('checked')
+        flag = true
+    if flag == true
+      $(@el).find('.secondary-navbar .btn-create-expense').css('display', 'inline')
+    else
+      $(@el).find('.secondary-navbar .btn-create-expense').css('display', 'none')
+
+  createExpense: ->
+    #  "report"=>{"expense_id"=>"15,36,39"}}
+    items = $(@el).find('#items .item')
+    expenses = []
+    flag = false
+    for item in items
+      selected_item = $(item).find('.select-item')
+      if $(selected_item).prop('checked')
+        expenses.push($(selected_item).attr('data-item-id'))
+
+    # console.log expenses
+    model_report = new FinlyF.Models.Report({
+      "report": {
+        "expense_id": expenses.join(","),
+      },
+      "authenticity_token": $("#authenticity_token").val()
+      "utf8": $("#form_utf8").val()
+    })
+    # console.log "Model", model_report.toJSON()
+    model_report.save(null, {
+      success: (model, res) ->
+        if res.status == "success"
+          FinlyF.primary_router.navigate('reports', {trigger: true})
+      error: (err) ->
+        console.log "Error", err
+    })

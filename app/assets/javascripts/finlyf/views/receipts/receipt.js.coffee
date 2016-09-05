@@ -10,6 +10,7 @@ class FinlyF.Views.Receipt extends Backbone.View
     'click .btn-update-item': 'update'
 
   initialize: (options) ->
+    @parent = options.parent
     _this = @
     @preview = options.preview
     if @preview
@@ -40,6 +41,8 @@ class FinlyF.Views.Receipt extends Backbone.View
       $(@el).addClass('selected')
     else
       $(@el).removeClass('selected')
+
+    @parent.trigger('item:selected')
 
   populateDetails: ->
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))

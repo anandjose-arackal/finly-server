@@ -56,7 +56,7 @@ class FinlyF.Views.Report extends Backbone.View
     @model.set(field, value);
 
   update: ->
-    @model.save({patch: true})
+    @model.save({hi: "hello"}, {patch: true})
 
   toggleSelect: (e) ->
     if $(e.currentTarget).prop('checked')
