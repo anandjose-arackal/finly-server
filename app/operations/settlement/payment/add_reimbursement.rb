@@ -29,7 +29,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
   end
 
   def init
-    self.to_user = user.company.users.find_by(id: params[:to_user_id])
+    id = (params[:id] or params[:to_user_id])
+    self.to_user = user.company.users.find_by(id: id)
     self.reports = to_user.reports.where(id: params[:report_id]) if to_user
   end
 
