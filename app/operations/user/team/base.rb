@@ -4,6 +4,11 @@ class User::Team::Base < BaseOperation
 
   class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter
 
+    attr_accessor :team
+
+    def initialize(user, params)
+      self.team = params[:team]
+    end
   end
 
 
@@ -27,9 +32,7 @@ class User::Team::Base < BaseOperation
     end
   end
 
-  def retrieve
-    response
-  end
+
 
   private
   def load_policy

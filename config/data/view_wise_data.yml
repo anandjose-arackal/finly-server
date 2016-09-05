@@ -2,9 +2,9 @@ admin:
   links:
     primary_navbar:
       - Company Reports: reports
-      - Company Expenses: expenses
+      # - Company Expenses: expenses
       - Employees: employees
-      - Analytics: analytics
+      # - Analytics: analytics
       - Settlements: settlements
 
 personal:

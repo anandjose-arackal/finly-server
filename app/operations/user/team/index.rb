@@ -6,6 +6,10 @@
 class User::Team::Index < User::Team::Base
   attr_accessor :role_id
 
+  def self.call(user, params)
+    self.new(user, params).run
+  end
+
   def pre_validate
     unless user.present?
       errors << 'User not found'
@@ -74,6 +78,10 @@ class User::Team::Index < User::Team::Base
     if user_ids.present?
       self.response = user.company.users.with_id(user_ids)
     end
+  end
+
+  def success
+    User::Team::Base::TeamPresenter.new(user, team: response)
   end
 
   private
