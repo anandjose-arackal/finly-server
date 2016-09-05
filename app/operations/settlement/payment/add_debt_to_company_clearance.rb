@@ -7,6 +7,7 @@
 # note: optional note for transaction
 
 class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
+  attr_accessor :payment
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -49,9 +50,9 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
 
   def process
     balance_sheet = to_user.balance_sheet
-    payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.debt_clearance_id, date: params[:date], note: params[:note],
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.debt_clearance_id, date: params[:date], note: params[:note],
                                   amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
-    if payment.save and balance_sheet.subtract_cash_in_hand(params[:value], params[:currency_id])
+    if self.payment.save and balance_sheet.subtract_cash_in_hand(params[:value], params[:currency_id])
       return true
     end
     self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
@@ -59,7 +60,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
     false
   end
 
-  def post_process
-    # mailers
+  def success
+    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 end

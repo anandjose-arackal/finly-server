@@ -15,25 +15,22 @@ class Settlement::Payment::AddCashAdvance < Settlement::Base
 
   def pre_validate
     super()
-    if params[:value].blank? or params[:value] < 0
+    if params[:payment][:amount].blank? or params[:payment][:amount] < 0
       errors << "Amount being added blank or negative."
     end
   end
 
   def init
-    self.to_user = user.company.users.find_by(id: params[:to_user_id])
+    id = (params[:id] or params[:to_user_id])
+    self.to_user = user.company.users.find_by(id: id)
   end
 
   def authorize
     unless to_user
       raise_unauthorized_exception
     end
-    if user.admin?
-      role = UserRole.admin_id
-    else
-      role = UserRole.finance_manager_id
-    end
-    team = User::Team::Index.(user, {role_id: role, indirect_associations: true}).team
+    params[:indirect_associations] = true
+    team = User::Team::Index.(user, params).team
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
@@ -47,9 +44,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Base
 
   def process
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.advance_id, date: params[:date], note: params[:note],
-                                  amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
+                                          amount_attributes: {value: params[:amount], currency_id: params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.add_cash_in_hand(params[:value], params[:currency_id])
+    if payment.save and balance_sheet.add_cash_in_hand(params[:amount], params[:currency_id])
       return true
     end
     self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
@@ -57,16 +54,8 @@ class Settlement::Payment::AddCashAdvance < Settlement::Base
     return false
   end
 
-  def post_process
-    # mailer
-  end
-
-  def retrieve
-    if is_success?
-      return payment
-    else
-      return false
-    end
+  def success
+    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 
 end

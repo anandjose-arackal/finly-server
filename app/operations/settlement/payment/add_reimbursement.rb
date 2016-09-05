@@ -10,7 +10,7 @@
 class Settlement::Payment::AddReimbursement < Settlement::Base
   include MathUtil
 
-  attr_accessor :reports, :role
+  attr_accessor :payment,:reports, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -62,7 +62,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
   end
 
   def process
-    payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.reimbursement_id, date: params[:date], note: params[:note],
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.reimbursement_id, date: params[:date], note: params[:note],
                                   amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement precision_value(params[:value]), params[:currency_id]
@@ -76,15 +76,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
     return false
   end
 
-  def post_process
-    # mailers
+  def success
+    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 
-  def retrieve
-    if is_success?
-      return reports
-    else
-      return false
-    end
-  end
 end

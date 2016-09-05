@@ -6,7 +6,7 @@
 # currency_id: currency of the reimbursement
 
 class Settlement::Payment::Settle < Settlement::Base
-
+  attr_accessor :payment
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -64,7 +64,7 @@ class Settlement::Payment::Settle < Settlement::Base
   end
 
   def process
-    payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.settlement_id,
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.settlement_id,
                                   date: params[:date], note: params[:note],
                                   amount_attributes: {value: params[:value], currency_id: params[:currency_id]})
     balance_sheet = to_user.balance_sheet
@@ -79,8 +79,8 @@ class Settlement::Payment::Settle < Settlement::Base
     false
   end
 
-  def post_process
-    # mailer
+  def success
+    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 
 
