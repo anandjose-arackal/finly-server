@@ -38,7 +38,8 @@ class ExpensesController < ApplicationController
 
   def update
     update_op = Expense::Manual::Update.new(current_user, params)
-    if update_op.run
+    @result = update_op.run
+    if update_op.is_success?
       respond_to do |format|
         format.json { render json: {"status": "success"} }
       end
