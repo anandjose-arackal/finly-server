@@ -23,6 +23,12 @@ class User::Role::Set < BaseOperation
     return unless being_updated_user.present?
     existing_role_ids = being_updated_user.role_mapping.map(&:user_role_id)
     new_role_ids = params[:user_role_id]
+    if new_role_ids.blank? and params[:user_roles].present?
+      new_role_ids = []
+      new_role_ids << UserRole.admin_id if params[:user_roles][:admin]
+      new_role_ids << UserRole.manager_id if params[:user_roles][:manager]
+      new_role_ids << UserRole.finance_manager_id if params[:user_roles][:finance_manager]
+    end
     new_role_ids = [new_role_ids] unless new_role_ids.is_a?(Array)
     self.roles_to_add = new_role_ids - existing_role_ids
     self.roles_to_remove = existing_role_ids - new_role_ids
