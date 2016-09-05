@@ -7,7 +7,7 @@
   # note: optional note to accompany payment
   # date: date of the payment
 
-class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
+class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   attr_accessor :payment
 
   def authorized_user_types

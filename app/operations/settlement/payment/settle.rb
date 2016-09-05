@@ -8,7 +8,7 @@
   # note: optional note to accompany payment
   # date: date of the payment
 
-class Settlement::Payment::Settle < Settlement::Base
+class Settlement::Payment::Settle < Settlement::Payment::Base
   attr_accessor :payment
 
   def authorized_user_types
