@@ -9,6 +9,16 @@
 #   # json.cash_in_hand current_user.balance_sheet.cash_in_hand.value
 # end
 
-json.array!(@result.send(@view_to_load)) do |report|
-  json.merge! report.attributes 
+json.array! @result.items do |report|
+  json.merge! report.attributes
+
+  json.total_amount report.total_amount
+
+#   # debugger
+#   json.merge! report.attributes
+#   json.reimbursement_amount report[:reimbursement_amount]
+#   # json.total_amount 10
+#   json.total_amount report.total_amount
+#   json.final_approver report[:final_approver]
+#   # ap report
 end

@@ -20,6 +20,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   #settlements
   templateAddPayment: HandlebarsTemplates['finlyf/settlements/admin/addPayment']
   templateSettleDebts: HandlebarsTemplates['finlyf/settlements/admin/settleDebts']
+  templateReimburse: HandlebarsTemplates['finlyf/settlements/admin/reimburse']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -35,12 +36,16 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-filter': 'filter'
     'click .user': 'userSettlements'
 
-    'click .btn-process-reimburse': 'processReimburse'
-    'click .btn-process-debt': 'processDebt'
-    'click .btn-process-payment': 'processPayment'
+    'click .btn-process-reimburse': 'initReimburse'
+    'click .btn-process-debt': 'initDebt'
+    'click .btn-process-payment': 'initPayment'
 
     #settlements
     'click .btn-add-payment': 'addPayment'
+    # 'click .settlement-report': 'processSettlementReport'
+    'click .settlement-report-select:checkbox': 'processSettlementReport'
+    'click .btn-settlement-action': 'processSettlementAction'
+    'click .confirm-report-action': 'confirmReportAction'
 
 
 
@@ -50,6 +55,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     @collectoinUsers = new FinlyF.Collections.Users()
     @collectoinUsers.url = "/settlements"
     @collection = new FinlyF.Collections.Settlements()
+    @collectionSettlementReports = new FinlyF.Collections.Settlements()
     if options.params
       @params = options.params
       if options.params.view == 'personal' || typeof options.params.view == 'undefined'
@@ -68,6 +74,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
             console.log "Couldn't fetch Successfully."
         })
       else
+        @selected = []
+        @selectedReports = []
         console.log "params for admin is", @params
         # @params = options.params || {}
         
@@ -270,13 +278,13 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-  processReimburse: (e)->
+  initReimburse: (e)->
     console.log "Processing btn-process-reimburse"
 
-  processDebt: (e)->
+  initDebt: (e)->
     console.log "Processing btn-process-debt"
 
-  processPayment: (e) ->
+  initPayment: (e) ->
     # console.log "Process Cash"
     $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment())
     $(@el).find('#modal-settlements').modal('show')
@@ -304,38 +312,35 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log res
     })
 
-  processDebt: (e) ->
-    cash_in_hand = parseInt($(@el).find('.summary input[name=cash_in_hand]').val())
+  initDebt: (e) ->
+    cash_in_hand = parseFloat($(@el).find('.summary input[name=cash_in_hand]').val())
+    console.log "cash in hand", cash_in_hand
     $(@el).find('#modal-settlements .modal-content').html(@templateSettleDebts())
     $(@el).find('#modal-settlements').modal('show')
     $(@el).find('#modal-settlements .modal-content .cash_in_hand').text(cash_in_hand)
     e.preventDefault()
     _this = @
-    target = $(e.currentTarget)
-    # view_to_load = $(target).attr('data-view')
-    # user_id = $(target).attr('data-item-id')
+    target = $(@el).find('#modal-settlements .modal-content .settlement-modal-reports')
 
-    # params = {
-    #   # 'filter_status': status_id
-    #   'view_to_load': 'approved'
-    # }
-    
-    # console.log @collection.url
     @params.view_to_load = 'approved'
     @params.id = @user_id
-    @collection.fetch({
+    # collection = new FinlyF.Collections.Settlements()
+    @collectionSettlementReports.url = "/settlements/" + @user_id
+    @collectionSettlementReports.fetch({
       data: @params
       reset: true,
-      # data: _this.params
+      data: _this.params
       success: ->
-        console.log "hi successfully getting"
-        # _this.populateSummary(_this.user_id)
+        _this.collectionSettlementReports.each((item) ->
+          view_item = new FinlyF.Views.Settlement({ model: item, page: 'settle_debt' })
+          $(target).append(view_item.render().el)
+        , @)
 
       error: ->
         console.log "Couldn't fetch Successfully."
     })
 
-  settle: (e) ->
+  settleDebts: (e) ->
     e.preventDefault()
     target = $(e.currentTarget).closest('.modal-body')
     data = {
@@ -357,5 +362,99 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       success: (res) ->
         console.log res
     })
+
+  initReimburse: (e) ->
+    pending_reimbursement = parseFloat($(@el).find('.summary input[name=pending_reimbursement]').val())
+    $(@el).find('#modal-settlements .modal-content').html(@templateReimburse())
+    $(@el).find('#modal-settlements').modal('show')
+    $(@el).find('#modal-settlements .modal-content .pending_reimbursement').text(pending_reimbursement)
+    e.preventDefault()
+    _this = @
+    target = $(@el).find('#modal-settlements .modal-content .settlement-modal-reports')
+
+    @params.view_to_load = 'approved'
+    @params.id = @user_id
+    # collection = new FinlyF.Collections.Settlements()
+    @collectionSettlementReports.url = "/settlements/" + @user_id
+    @collectionSettlementReports.fetch({
+      data: @params
+      reset: true,
+      data: _this.params
+      success: ->
+        _this.collectionSettlementReports.each((item) ->
+          view_item = new FinlyF.Views.Settlement({ model: item, page: 'reimburse' })
+          $(target).append(view_item.render().el)
+        , @)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
+    })
+
+  processSettlementReport: (e) ->
+    _this = @
+    container = $(e.currentTarget).closest('.settlement-modal-reports')
+    reports =  $(container).find('.settlement-report')
+    flag = false
+    @selected = []
+    for report in reports
+      if $(report).find('.settlement-report-select:checkbox').prop('checked')
+        flag = true
+        @selected.push parseInt($(report).find('.settlement-report-select:checkbox').attr('data-item-id'))
+        # return
+    if flag == true
+      $(container).closest('.modal-body').find('.btn-settlement-action').prop('disabled', false)
+      # console.log selected
+    else
+      $(container).closest('.modal-body').find('.btn-settlement-action').prop('disabled', true)
+
+    @selectedReports = _.select(@collectionSettlementReports.models, (model) ->
+      (_.indexOf(_this.selected, model.get('id')) > -1)
+    )
+    $(container).closest('.modal-body').find('.selected_reports_total').text(@selectedReportsTotal())
+
+
+  processSettlementAction: (e) ->
+    _this = @
+    container = $(e.currentTarget).closest('.modal-body')
+    $(container).find('.confirmation-screen').css("display", "block")
+    $(container).find('.process-screen').css('display', 'none')
+
+    # @selectedReports = _.select(@collectionSettlementReports.models, (model) ->
+    #   (_.indexOf(_this.selected, model.get('id')) > -1)
+    # )
+    # console.log models.length
+
+  confirmReportAction: (e)->
+    _this = @
+    e.preventDefault()
+    container = $(e.currentTarget).closest('.confirmation-screen')
+
+    data = {
+      report_ids: @selected.slice()
+      payment: {
+        note: $(container).find('textarea[name=payment\\[note\\]]').val()
+        date: $(container).find('input[name=payment\\[date\\]]').val()
+        total: _this.selectedReportsTotal()
+      }
+    }
+
+    # console.log data
+    url = $(@el).find('.summary .btn-process-debt').attr('data-url')
+    $.ajax({
+      url: url,
+      data: data,
+      type: "POST",
+      dataType: 'json',
+      success: (res) ->
+        console.log "success"
+      error: (err) ->
+        console.log "err", err
+    })
+
+  selectedReportsTotal: ->
+    total = _.reduce(@selectedReports, ((memo, value) ->
+      memo + value.get('total_amount')
+    ), 0)
+    return total
 
 

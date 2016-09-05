@@ -50,14 +50,7 @@ class SettlementsController < ApplicationController
   end
 
   def show
-    # Settlement::Show.new(Userviewing, {view_to_load: 'payments', view: 'admin', id: Usertoshow.id})
-    if params[:view_to_load] == 'payments'
-      @view_to_load = params[:view_to_load]
-    else
-      @view_to_load = 'reports'
-    end
-
-    # @view_to_load = params[:view_to_load] unless params[:view_to_load] == 'payments' else 
+    # @view_to_load = params[:view_to_load] unless params[:view_to_load] == 'payments' else
     operation = Settlement::Show.new(current_user, params)
     @result = operation.run
     # ap @result
@@ -68,9 +61,10 @@ class SettlementsController < ApplicationController
   end
 
   def summary
-    operation = User::Show.new(current_user, params)
+    ap params
+    operation = Settlement::Show.new(current_user, params)
     @result = operation.run
-    ap @result
+    # ap @result
     respond_to do |format|
       format.json {}
     end

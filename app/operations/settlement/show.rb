@@ -39,14 +39,13 @@ class Settlement::Show < Settlement::Base
   end
 
   class Settlement::Show::Presenter < BaseOperation::BasePresenter
-    attr_accessor :selected_user, :reports, :payments, :actions, :type
+    attr_accessor :selected_user, :items, :actions, :type
 
     def initialize(user, params)
       super(user, params)
       self.selected_user = params[:selected_user]
-      self.reports = params[:reports]
+      self.items = (params[:reports] or params[:payments])
       self.actions = params[:actions]
-      self.payments = params[:payments]
       self.type = params[:type]
     end
 
@@ -91,10 +90,10 @@ class Settlement::Show < Settlement::Base
     return unless admin_view? or finance_view?
     return if self.selected_user.id == user.id and not admin_view?
     self.actions = {}
-    self.actions[:add_reimbursement] = {url: Rails.application.routes.url_helpers.settlement_path(id: selected_user.id, payment_type: PaymentType.reimbursement_id.to_s)}
-    self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlement_path(id: selected_user.id, payment_type: PaymentType.settlement_id)}
-    self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlement_path(id: selected_user.id, payment_type: PaymentType.debt_clearance_id)}
-    self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlement_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
+    self.actions[:add_reimbursement] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.reimbursement_id.to_s)}
+    self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.settlement_id)}
+    self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.debt_clearance_id)}
+    self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
   end
 
 end

@@ -52,7 +52,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     end
     self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
-    return false
+    false
   end
 
   def success

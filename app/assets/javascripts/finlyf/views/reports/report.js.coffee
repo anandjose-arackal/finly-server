@@ -116,7 +116,9 @@ class FinlyF.Views.Report extends Backbone.View
       processData: true
       success: (model, res) ->
         $("#modal-new").modal('hide')
-        _this.model.fetch()
+        _this.model.fetch({
+          data: _this.current_view
+        })
       error: (err) ->
         console.log "Error", err
     })
@@ -188,10 +190,15 @@ class FinlyF.Views.Report extends Backbone.View
     # @model.set('comment', comment)
     model = new FinlyF.Models.Report(data)
     model.urlRoot = '/reports/' + report_id + '/comment'
-    model.save(null, {
+    # console.log _this.parent.params.view
+    model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
         console.log model, res
-        _this.model.fetch()
+        _this.model.fetch({
+          data: {
+            view: _this.current_view
+          }
+        })
       error: (err) ->
         console.log "Error", err
     })
@@ -223,14 +230,16 @@ class FinlyF.Views.Report extends Backbone.View
       type: 'PATCH',
       dataType: 'json',
       success: (res) ->
-        _this.model.fetch()
+        _this.model.fetch({
+          data: {view: _this.current_view}
+        })
     })
 
 
   refreshData: (e)->
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh")
-      @model.fetch()
+      @model.fetch({ data: {view: _this.current_view }})
     # console.log "Closed Bootstrap modal"
 
   deleteSub: (e) ->
@@ -245,7 +254,7 @@ class FinlyF.Views.Report extends Backbone.View
         authenticity_token: $("#authenticity_token").val()
       },
       success: (res)->
-        _this.model.fetch()
+        _this.model.fetch({ data: {view: _this.current_view}})
       error: (err) ->
         console.log "Error", err
     })
@@ -292,7 +301,11 @@ class FinlyF.Views.Report extends Backbone.View
       type: 'PATCH',
       success: (res) ->
         console.log res
-        _this.model.fetch()
+        _this.model.fetch({
+          data: {
+            view: _this.current_view
+          }
+        })
       error: (err) ->
         console.log err
     })
@@ -312,7 +325,11 @@ class FinlyF.Views.Report extends Backbone.View
       type: 'PATCH',
       success: (res) ->
         # console.log res
-        _this.model.fetch()
+        _this.model.fetch({
+          data: {
+            view: _this.current_view
+          }
+        })
       error: (err) ->
         console.log err
     })
