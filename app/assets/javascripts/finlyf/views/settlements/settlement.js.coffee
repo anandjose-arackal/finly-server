@@ -1,5 +1,6 @@
 class FinlyF.Views.Settlement extends Backbone.View
   template: HandlebarsTemplates['finlyf/settlements/crud/settlement']
+  templateReport: HandlebarsTemplates['finlyf/settlements/crud/settlementReport']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
   className: 'item col-md-12'
@@ -8,11 +9,20 @@ class FinlyF.Views.Settlement extends Backbone.View
     'click .select-item': 'toggleSelect'
 
   initialize: (options) ->
+    if options
+      @page = options.page
     # console.log "Will render settlement"
     # console.log @model.toJSON()
 
   render: ->
-    $(@el).html(@template({ item: @model.toJSON() }))
+    if @page
+      if @page == 'reimburse' || @page == 'settle_debt'
+        $(@el).removeClass('item').addClass('settlement-report')
+        $(@el).html(@templateReport({ item: @model.toJSON() }))
+      else
+        $(@el).html(@template({item: @model.toJSON()}))
+    else
+      $(@el).html(@template({item: @model.toJSON()}))
     @
 
   toggleSelect: (e) ->

@@ -68,9 +68,10 @@ class SettlementsController < ApplicationController
   end
 
   def summary
-    operation = User::Show.new(current_user, params)
+    ap params
+    operation = Settlement::Show.new(current_user, params)
     @result = operation.run
-    ap @result
+    # ap @result
     respond_to do |format|
       format.json {}
     end

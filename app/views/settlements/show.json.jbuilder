@@ -10,5 +10,11 @@
 # end
 
 json.array!(@result.send(@view_to_load)) do |report|
-  json.merge! report.attributes 
+  # debugger
+  json.merge! report.attributes
+  json.reimbursement_amount report[:reimbursement_amount]
+  # json.total_amount 10
+  json.total_amount report.total_amount
+  json.final_approver report[:final_approver]
+  # ap report
 end
