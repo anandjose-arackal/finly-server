@@ -47,7 +47,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
     else
       self.role = UserRole.finance_manager_id
     end
-    team = User::Team::Index.(user, role, indirect_associations: true)
+    params[:indirect_associations] = true
+    team = User::Team::Index.(user, params)
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
