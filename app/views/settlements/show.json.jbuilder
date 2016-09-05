@@ -10,7 +10,8 @@
 # end
 
 json.array! @result.items do |report|
-  json.merge! report.attributes 
+  json.merge! report.attributes
+
   json.total_amount report.total_amount
 
 #   # debugger

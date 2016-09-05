@@ -58,4 +58,8 @@ class Payment < ActiveRecord::Base
   def settlement?
     self.payment_type_id == PaymentType.settlement_id
   end
+
+  def total_amount
+    self.amount.value
+  end
 end
