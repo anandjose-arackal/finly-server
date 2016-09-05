@@ -60,6 +60,6 @@ class Payment < ActiveRecord::Base
   end
 
   def total_amount
-    self.amount.value
+    self.amount.value rescue nil
   end
 end
