@@ -1,10 +1,11 @@
 # action to add a cash advance to a particular user
 # params:
-# to_user_id: id of the user to whom the cash advance is to be added
-# note: Optional note to include along with the cash advance
-# value: Value of the amount being added to the card
-# currency_id: if money is being added in a difference currency, currently defaults to 1
-# date: Date on which the payment is being made
+# to_user_id or id: user whose reports are being settled
+# payment:
+  # amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
+  # currency_id: currency of the reimbursement
+  # note: optional note to accompany payment
+  # date: date of the payment
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   attr_accessor :payment

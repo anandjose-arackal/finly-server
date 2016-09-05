@@ -1,10 +1,11 @@
 # action to add debt to company clearance - essentially clears company debt with cash in hand.
 # params:
-# to_user_id: id of the user to
-# value: the value of the clearance
-# currency_id:
-# date: date of clearance
-# note: optional note for transaction
+# to_user_id or id: user whose reports are being settled
+# payment:
+  # amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
+  # currency_id: currency of the reimbursement
+  # note: optional note to accompany payment
+  # date: date of the payment
 
 class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
   attr_accessor :payment
@@ -33,7 +34,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Base
     else
       self.role = UserRole.finance_manager_id
     end
-    team = User::Team::Index.(user, {role_id: role, indirect_associations: true}).team
+    team = User::Team::Index.(user, {role_id: role, indirect_associations: true})
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
