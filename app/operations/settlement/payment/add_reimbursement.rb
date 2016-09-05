@@ -1,6 +1,6 @@
 # action to reimburse a bunch of reports in one shot
 # params:
-# report_id: ids of the reports that are to be reimbursed.
+# report_ids: ids of the reports that are to be reimbursed.
 # to_user_id or id: user whose reports are being settled
 # payment:
   # amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
