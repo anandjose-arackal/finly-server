@@ -19,6 +19,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   #settlements
   templateAddPayment: HandlebarsTemplates['finlyf/settlements/admin/addPayment']
+  templateSettleDebts: HandlebarsTemplates['finlyf/settlements/admin/settleDebts']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -293,8 +294,61 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       }
     }
 
-    # console.log @collection.url
     console.log data
+
+    $.ajax({
+      url: "settlements?payment_type=1&view=admin&id=" + @user_id
+      type: "POST",
+      data: data,
+      success: (res) ->
+        console.log res
+    })
+
+  processDebt: (e) ->
+    cash_in_hand = parseInt($(@el).find('.summary input[name=cash_in_hand]').val())
+    $(@el).find('#modal-settlements .modal-content').html(@templateSettleDebts())
+    $(@el).find('#modal-settlements').modal('show')
+    $(@el).find('#modal-settlements .modal-content .cash_in_hand').text(cash_in_hand)
+    e.preventDefault()
+    _this = @
+    target = $(e.currentTarget)
+    # view_to_load = $(target).attr('data-view')
+    # user_id = $(target).attr('data-item-id')
+
+    # params = {
+    #   # 'filter_status': status_id
+    #   'view_to_load': 'approved'
+    # }
+    
+    # console.log @collection.url
+    @params.view_to_load = 'approved'
+    @params.id = @user_id
+    @collection.fetch({
+      data: @params
+      reset: true,
+      # data: _this.params
+      success: ->
+        console.log "hi successfully getting"
+        # _this.populateSummary(_this.user_id)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
+    })
+
+  settle: (e) ->
+    e.preventDefault()
+    target = $(e.currentTarget).closest('.modal-body')
+    data = {
+      authenticity_token: $("#authenticity_token").val()
+      payment: {
+        amount: $(target).find('input[name=payment\\[amount\\]]').val()
+        date: $(target).find('input[name=payment\\[date\\]]').val()
+        note: $(target).find('textarea[name=payment\\[note\\]]').val()
+        payment_type: $("input[name=payment\\[payment_type\\]]:checked").val()
+      }
+    }
+
+    # console.log data
 
     $.ajax({
       url: "settlements?payment_type=add_payment&view=admin&id=" + @user_id
@@ -304,7 +358,4 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log res
     })
 
-    # /settlements/1/add_payment?view=admin
-
-    # console.log data
 
