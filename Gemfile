@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
+gem 'puma'
+
 # Gem pundit for permission check in actions etc.
 gem 'pundit'
 

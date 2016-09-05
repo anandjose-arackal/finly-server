@@ -1,6 +1,6 @@
 # action to reimburse a bunch of reports in one shot
 # params:
-# report_id: ids of the reports that are to be reimbursed.
+# report_ids: ids of the reports that are to be reimbursed.
 # to_user_id or id: user whose reports are being settled
 # payment:
   # amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
@@ -47,7 +47,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Base
     else
       self.role = UserRole.finance_manager_id
     end
-    team = User::Team::Index.(user, role, indirect_associations: true)
+    params[:indirect_associations] = true
+    team = User::Team::Index.(user, params)
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
