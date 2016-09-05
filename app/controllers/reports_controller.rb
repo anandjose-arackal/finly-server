@@ -22,7 +22,7 @@ class ReportsController < ApplicationController
   end
 
   def index
-    @index_presenter = Report::Index.new(current_user, params).run
+    @result = Report::Index.new(current_user, params).run
     # @counts = @index_presenter.counts
 
     # @reports = apply_scopes(@reports).paginate(page: params[:page], per_page: 30) if @reports.present?
