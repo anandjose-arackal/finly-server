@@ -8,7 +8,7 @@
   # note: optional note to accompany payment
   # date: date of the payment
 
-class Settlement::Payment::AddReimbursement < Settlement::Base
+class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   include MathUtil
 
   attr_accessor :payment,:reports, :role
