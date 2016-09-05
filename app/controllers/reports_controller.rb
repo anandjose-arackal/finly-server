@@ -2,12 +2,6 @@ class ReportsController < ApplicationController
   include MathUtil
   before_action :authenticate_user!
 
-  has_scope :filter_search
-  has_scope :filter_status
-  has_scope :filter_user
-  has_scope :filter_date, using: [:from, :to], type: :hash
-  has_scope :filter_policy
-
   def create
     create_report_op = Report::Create.new(current_user)
     @report = create_report_op.run
@@ -51,8 +45,7 @@ class ReportsController < ApplicationController
   end
 
   def show
-    @show_presenter = Report::Show.new(current_user, params).run
-
+    @result = Report::Show.new(current_user, params).run
     # load_view_for_report
     # @comments = @report.comments.all.order(created_at: :desc)
     # # ap @actions

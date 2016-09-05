@@ -198,7 +198,7 @@ class BaseOperation
   end
 
   def personal_view?
-    is_view?(:employee) or is_view?(:personal)
+    is_view?(:employee) or is_view?(:personal) or params[:view].blank?
   end
 
   def is_view?(type)
