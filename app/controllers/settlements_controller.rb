@@ -4,7 +4,6 @@ class SettlementsController < ApplicationController
   def create
     success_message = nil
     operation = nil
-    debugger
     if params[:payment_type] == PaymentType.advance_id.to_s
       operation = Settlement::Payment::AddCashAdvance.new(current_user, params)
       success_message = 'Cash advance added'
