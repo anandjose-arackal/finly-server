@@ -27,6 +27,9 @@ class SettlementsController < ApplicationController
       flash.now[:success] = 'payment successfully added'
       flash.now[:success] = success_message if success_message.present?
       # todo render
+      respond_to do |format|
+        format.json {render json: {'success': true}}
+      end
     else
       flash.now[:danger] = operation.errors
       # todo render
