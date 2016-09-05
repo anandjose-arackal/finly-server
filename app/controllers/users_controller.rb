@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     @result = User::Show.(current_user, params)
     ap @result.user
     respond_to do |format|
-      format.json {render json: @result.user.as_json}
+      format.json {}
     end
   end
 

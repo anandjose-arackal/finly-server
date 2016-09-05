@@ -24,6 +24,7 @@ class FinlyF.Views.Report extends Backbone.View
 
     'click .btn-delete-sub-item': 'deleteSub'
     'click .btn-view-sub-item': 'viewSub'
+    'click .btn-reject-sub-item': 'rejectSub'
     'hidden.bs.modal #modal-mp': 'refreshData'
 
   initialize: (options) ->
@@ -233,6 +234,20 @@ class FinlyF.Views.Report extends Backbone.View
     })
 
   viewSub: (e)->
+    target = e.currentTarget
+    expense_id = $(target).attr('data-item-id')
+
+    model = new FinlyF.Models.Expense({id: expense_id})
+
+    preview_view = new FinlyF.Views.Expense({
+      model: model
+      preview: true
+    })
+    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    $(@el).find("#modal-mp").modal('show')
+
+  rejectSub: (e) ->
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
 

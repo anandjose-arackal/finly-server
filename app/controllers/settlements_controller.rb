@@ -47,14 +47,21 @@ class SettlementsController < ApplicationController
   end
 
   def show
+    # Settlement::Show.new(Userviewing, {view_to_load: 'payments', view: 'admin', id: Usertoshow.id})
+    @view_to_load = params[:view_to_load]
     operation = Settlement::Show.new(current_user, params)
     @result = operation.run
+    # ap @result
     # todo render
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def summary
     operation = User::Show.new(current_user, params)
     @result = operation.run
+    ap @result
     respond_to do |format|
       format.json {}
     end

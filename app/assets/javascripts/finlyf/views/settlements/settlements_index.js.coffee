@@ -40,17 +40,18 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-process-cash': 'processCash'
 
   initialize: (options) ->
-    console.log options
+    # console.log options
     _this = @
     @collectoinUsers = new FinlyF.Collections.Users()
     @collectoinUsers.url = "/settlements"
     @collection = new FinlyF.Collections.Settlements()
     if options.params
+      @params = options.params
       if options.params.view == 'personal' || typeof options.params.view == 'undefined'
         # console.log 'we'
         @view = 'personal'
         @user = options.user
-        @params = options.params
+        # @params = options.params
         @params.id = @user
         # else
         #   @params = {
@@ -60,7 +61,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     
         # @collection = new FinlyF.Collections.Settlements()
         @collection.url = @collection.url + "/" + @user.toString()
-        console.log @params
+        # console.log @params
         @collection.fetch({
           reset: true,
           data: _this.params
@@ -71,7 +72,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
             console.log "Couldn't fetch Successfully."
         })
       else
-        @params = options.params
+        console.log "params for admin is", @params
+        # @params = options.params || {}
         
         @collectoinUsers.fetch({
           reset: true,
@@ -142,6 +144,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       url: '/settlements/summary?id=' + user_id.toString(),
       dataType: 'json',
       data: {
+        view_to_load: @params.view_to_load
+        view: @params.view
         authenticity_token: $("#authenticity_token").val()
       },
       success: (res) ->
@@ -231,7 +235,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           console.log "Couldn't fetch Successfully."
       })
 
-
   resetPageCount: (options) ->
     if options.target
       $(options.target).attr('data-page', options.page)
@@ -240,24 +243,28 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     else
       $('.main .load-more').attr('data-page', options.page)
 
-
   navigate: (e) ->
     e.preventDefault()
     FinlyF.navigate(e, @params)
-
 
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
 
   userSettlements: (e) ->
+    #Load settlement for the user
     target = e.currentTarget
     $(target).siblings().removeClass("active")
     $(target).addClass("active")
+
     _this = @
     user_id = $(target).find(".user-name").attr("data-item-id")
-    console.log "User id is", user_id
-    console.log @collection.url
+    # console.log "User id is", user_id
+    # console.log @collection.url
+    if typeof @params.view == 'undefined'
+      @params.view = 'personal'
+    if typeof @params.view_to_load == 'undefined'
+      @params.view_to_load = 'payments'
     @collection.url = "/settlements/" + user_id.toString()
     @collection.fetch({
       reset: true,

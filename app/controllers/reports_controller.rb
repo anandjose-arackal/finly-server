@@ -1,8 +1,6 @@
 class ReportsController < ApplicationController
   include MathUtil
   before_action :authenticate_user!
-  before_action :fetch_report, except: [:create, :index]
-  before_action :fetch_reports, only: [:index]
 
   has_scope :filter_search
   has_scope :filter_status

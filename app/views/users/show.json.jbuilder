@@ -1,6 +1,7 @@
 json.user do
   json.name @result.user.name
   json.email @result.user.email
+  json.mobile_number @result.user.mobile_number
 end
 json.role do
   json.admin @result.roles[:admin]
@@ -29,6 +30,7 @@ json.mapping @result.mapping.each do |mapping|
         end
       end
       [:manager, :finance_manager, :approves_to, :approves_finance_to].each do |k|
+        debugger
         if map.send("#{k}_id").present?
           json.set! k do
             json.id map.send("#{k}_id")
@@ -38,5 +40,4 @@ json.mapping @result.mapping.each do |mapping|
       end
     end
   end
-
 end
