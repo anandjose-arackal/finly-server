@@ -422,7 +422,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     # @selectedReports = _.select(@collectionSettlementReports.models, (model) ->
     #   (_.indexOf(_this.selected, model.get('id')) > -1)
     # )
-    # console.log models.length
+    console.log @params.view
 
   confirmReportAction: (e)->
     _this = @
@@ -430,6 +430,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     container = $(e.currentTarget).closest('.confirmation-screen')
 
     data = {
+      view: _this.params.view
       report_ids: @selected.slice()
       payment: {
         note: $(container).find('textarea[name=payment\\[note\\]]').val()
@@ -437,6 +438,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         total: _this.selectedReportsTotal()
       }
     }
+
+    # console.log data
 
     # console.log data
     url = $(@el).find('.summary .btn-process-debt').attr('data-url')
