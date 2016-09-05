@@ -19,13 +19,17 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-delete-item': 'delete'
     'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
-    'click .btn-submit-item': 'submit'
-    'click .btn-retract-item': 'retract'
+    # 'click .btn-submit-item': 'submit'
+    # 'click .btn-retract-item': 'retract'
 
     'click .btn-delete-sub-item': 'deleteSub'
     'click .btn-view-sub-item': 'viewSub'
     'click .btn-reject-sub-item': 'rejectSub'
     'hidden.bs.modal #modal-mp': 'refreshData'
+
+
+    #reports
+    'click .btn-report-action': 'reportAction'
 
   initialize: (options) ->
     @parent = options.parent
@@ -209,6 +213,19 @@ class FinlyF.Views.Report extends Backbone.View
         console.log "Error", err
 
     })
+
+
+  reportAction: (e) ->
+    _this = @
+    url = $(e.currentTarget).attr('data-url')
+    $.ajax({
+      url: url,
+      type: 'PATCH',
+      dataType: 'json',
+      success: (res) ->
+        _this.model.fetch()
+    })
+
 
   refreshData: (e)->
     target = e.currentTarget

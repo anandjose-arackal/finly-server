@@ -65,13 +65,21 @@ class FinlyF.Routers.Main extends Backbone.Router
 
   settlements_show: (user, query) ->
     console.log "settlements show"
-    # console.log user, query
-    unless typeof query != 'undefined'
-      console.log "undefined params"
-      params = JSON.parse(query)
+    console.log user, query
+    if typeof query != 'undefined'
+      # console.log "we're here"
+      if query != null
+        params = JSON.parse(query)
+      else
+        params = {
+          view_to_load: 'approved'
+        }
     else
-      params = {}
+      params = {
+        view_to_load: 'approved'
+      }
     params.view = 'personal'
+    console.log params
     view = new FinlyF.Views.SettlementsIndex({
       user: user,
       params: params

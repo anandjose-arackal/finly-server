@@ -14,6 +14,7 @@ class ExpensesController < ApplicationController
   end
 
   def create
+    # debugger
     create_op = Expense::Manual::Create.new(current_user, params)
     if create_op.run
       respond_to do |format|

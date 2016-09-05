@@ -104,6 +104,7 @@ class ReportsController < ApplicationController
   def submit
     submit_op = Report::Submit.new(current_user, params)
     @result = submit_op.run
+    # debugger
     if submit_op.is_success?
       flash.now[:success] = "Report Submitted!"
     else

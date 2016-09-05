@@ -3,23 +3,35 @@
     <div class="row item-title">
       <div class="col-sm-6"><h4 class="item-name">{{item.name}}</h4></div>
       <div class="col-sm-6 text-right">
-        
-        
-        {{#if_eq item.current_view "personal"}}
-          <button class="btn navbar-btn btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
 
-          {{#switch item.report_status_id}}
-            {{#case 1}}<button class="btn btn-sm btn-submit-item navbar-btn">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>{{/case}}
-            {{#case 2}}<button class="btn btn-sm btn-retract-item navbar-btn">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>{{/case}}
-            {{#case 3}}<button class="btn btn-sm btn-submit-item navbar-btn">Re-submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>{{/case}}
-            {{#case 4}}<button class="btn btn-sm btn-submit-item navbar-btn">Re-submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>{{/case}}
-            {{#case 5}}<button class="btn btn-sm navbar-btn" disabled="disabled">Approved</button>{{/case}}
-          {{/switch}}
-        {{/if_eq}}
-        {{#if_eq item.current_view "admin"}}
-        {{!-- Actions will come from server and will be displayed irrespective of current_view; according to current_user --}}
-          <button class="btn btn-warning navbar-btn btn-sm btn-edit-item">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
-        {{/if_eq}}
+        {{#if item.actions.take_control}}
+          <button class="btn btn-warning navbar-btn btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+        {{/if}}
+
+        {{#if item.actions.submit}}
+          {{#if ../item.actions.editable}}
+            <button class="btn navbar-btn btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+          {{/if}}
+          <button class="btn btn-sm btn-report-action navbar-btn" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+        {{/if}}
+
+        {{#if item.actions.retract}}
+          <button class="btn btn-sm btn-report-action navbar-btn" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+        {{/if}}
+
+        {{#if item.actions.approve}}
+          <button class="btn btn-sm navbar-btn btn-report-action" data-url="{{item.actions.approve}}">Approve</button>
+        {{/if}}
+
+        {{#if item.actions.unapprove}}
+          <button class="btn btn-sm navbar-btn btn-report-action" data-url="{{item.actions.unapprove}}">Unapprove</button>
+        {{/if}}
+
+        {{#if item.actions.reject}}
+          <button class="btn btn-sm navbar-btn btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
+        {{/if}}
+        
+        
 
       </div>
     </div>
@@ -67,9 +79,11 @@
             </ul>
           </div>
 
-          {{#if_eq item.current_view "personal"}}          
+          {{#if item.actions.editable}}
             <button class="btn btn-navbar btn-sm btn-danger btn-delete-item"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
-          {{/if_eq}}
+          {{/if}}
+
+
         </div><!-- .row-->
       </div>
     </div>
@@ -79,10 +93,10 @@
         <h4>Expenses</h4>
       </div>
       <div class="col-sm-6 no-padding text-right">
-        {{#if_eq item.current_view 'personal'}}
+        {{#if item.actions.editable}}
           <button class="add-new-expense btn btn-navbar" data-item-id="{{item.id}}">Add New Expense</button>
           <button class="add-existing-expense btn btn-navbar" data-item-id="{{item.id}}">Add Existing Expense</button>
-        {{/if_eq}}
+        {{/if}}
       </div>
     </div>
     <div class="row no-margin">
@@ -109,16 +123,13 @@
           <div class="col-sm-3 no-padding">{{this.note}}</div>
           <div class="col-sm-2 no-padding text-right">$<span>{{amount_value}}</span></div>
           <div class="col-sm-2 no-padding text-right">
-          {{#switch ../../item.current_view}}
-            {{#case 'personal'}}
-            <button data-item-id="{{this.id}}" class="btn btn-view-sub-item btn-xs btn-warning">View</button> <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
-            {{/case}}
-
-            {{#case 'admin'}}
-            <button class="btn btn-xs btn-danger btn-reject-sub-item">Reject</button>
-            {{/case}}
-
-          {{/switch}}
+            <button data-item-id="{{this.id}}" class="btn btn-view-sub-item btn-xs btn-warning">View</button>
+          {{#if ../../item.actions.editable}}
+            <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
+          {{/if}}
+          {{#if ../../item.actions.reject}}
+            <button data-item-id="{{this.id}}" class="btn-reject-sub-item btn btn-xs btn-danger">Reject</button>
+          {{/if}}
           </div>
         </div>
         {{/each}}

@@ -53,6 +53,14 @@ end
   end
 end
 
-json.actions @result.actions.each do |key, value|
-  json.set! key, (value[:url] or value[:value])
+
+json.actions do
+  @result.actions.each do |key, value|
+    json.set! key, (value[:url] or value[:value])
+  end
 end
+
+
+
+
+

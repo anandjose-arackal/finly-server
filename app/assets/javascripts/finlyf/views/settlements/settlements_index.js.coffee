@@ -17,13 +17,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/indexPayments']
   # templateNew: HandlebarsTemplates['finlyf/receipts/crud/new']
 
+  #settlements
+  templateAddPayment: HandlebarsTemplates['finlyf/settlements/admin/addPayment']
+
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
-    'click .main-select-all:checkbox': 'toggleSelectAll'
     'click .item': 'showDetails'
-    'click .close-details': 'closeDetails'
-    'click .btn-new': 'new'
-    'click .btn-create': 'create'
     'click .load-more': 'loadMore'
     'click .filter-status li a': 'filterStatus'
 
@@ -37,7 +36,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     'click .btn-process-reimburse': 'processReimburse'
     'click .btn-process-debt': 'processDebt'
-    'click .btn-process-cash': 'processCash'
+    'click .btn-process-payment': 'processPayment'
+
+    #settlements
+    'click .btn-add-payment': 'addPayment'
+
+
 
   initialize: (options) ->
     # console.log options
@@ -48,20 +52,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     if options.params
       @params = options.params
       if options.params.view == 'personal' || typeof options.params.view == 'undefined'
-        # console.log 'we'
         @view = 'personal'
         @user = options.user
-        # @params = options.params
         @params.id = @user
-        # else
-        #   @params = {
-        #     id: @user
-        #   }
-
-    
-        # @collection = new FinlyF.Collections.Settlements()
+        
         @collection.url = @collection.url + "/" + @user.toString()
-        # console.log @params
         @collection.fetch({
           reset: true,
           data: _this.params
@@ -280,6 +275,36 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   processDebt: (e)->
     console.log "Processing btn-process-debt"
 
-  processCash: (e) ->
-    console.log "Process Cash"
+  processPayment: (e) ->
+    # console.log "Process Cash"
+    $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment())
+    $(@el).find('#modal-settlements').modal('show')
+
+  addPayment: (e) ->
+    e.preventDefault()
+    target = $(e.currentTarget).closest('.modal-body')
+    data = {
+      authenticity_token: $("#authenticity_token").val()
+      payment: {
+        amount: $(target).find('input[name=payment\\[amount\\]]').val()
+        date: $(target).find('input[name=payment\\[date\\]]').val()
+        note: $(target).find('textarea[name=payment\\[note\\]]').val()
+        payment_type: $("input[name=payment\\[payment_type\\]]:checked").val()
+      }
+    }
+
+    # console.log @collection.url
+    console.log data
+
+    $.ajax({
+      url: "settlements?payment_type=add_payment&view=admin&id=" + @user_id
+      type: "POST",
+      data: data,
+      success: (res) ->
+        console.log res
+    })
+
+    # /settlements/1/add_payment?view=admin
+
+    # console.log data
 
