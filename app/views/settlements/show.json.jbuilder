@@ -9,6 +9,6 @@
 #   # json.cash_in_hand current_user.balance_sheet.cash_in_hand.value
 # end
 
-json.array!(@result.send(@view_to_load)) do |report|
+json.array! @result.items do |report|
   json.merge! report.attributes 
 end

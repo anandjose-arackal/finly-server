@@ -39,14 +39,13 @@ class Settlement::Show < Settlement::Base
   end
 
   class Settlement::Show::Presenter < BaseOperation::BasePresenter
-    attr_accessor :selected_user, :reports, :payments, :actions, :type
+    attr_accessor :selected_user, :items, :actions, :type
 
     def initialize(user, params)
       super(user, params)
       self.selected_user = params[:selected_user]
-      self.reports = params[:reports]
+      self.items = (params[:reports] or params[:payments])
       self.actions = params[:actions]
-      self.payments = params[:payments]
       self.type = params[:type]
     end
 
