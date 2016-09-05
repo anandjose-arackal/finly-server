@@ -62,6 +62,10 @@ class Settlement::Show < Settlement::Base
 
   private
   def load_selected_user
+    if personal_view?
+      self.selected_user = self.user
+      return
+    end
     user_op = Settlement::Index.new(user, params)
     user_result = user_op.run
     unless user_op.is_success?
