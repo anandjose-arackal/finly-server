@@ -13,7 +13,7 @@ personal:
       - Expenses: expenses
       - Reports: reports
       - Receipts: receipts
-      - Analytics: analytics
+      # - Analytics: analytics
       - Settlements: settlements
 
 manager:

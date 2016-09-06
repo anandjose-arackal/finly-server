@@ -28,7 +28,7 @@ class User::Show < User::Base
   end
 
   class User::Show::Presenter < BaseOperation::BasePresenter
-    attr_accessor :team_mapping, :mapping, :policies, :roles
+    attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers, :company_finance_managers
 
     def initialize(user, params)
       super(user, params)
@@ -40,6 +40,9 @@ class User::Show < User::Base
       self.policies.each do |policy|
         self.mapping << retrieve_mapping(policy)
       end
+      company = user.company
+      self.company_managers = company.managers
+      self.company_finance_managers = company.finance_managers
     end
 
     private
@@ -52,10 +55,10 @@ class User::Show < User::Base
       conditional_finance_manager = company_default_mapping.non_default.finance_manager.first rescue nil
       conditional_approves_to = company_default_mapping.non_default.approves_to.first rescue nil
       conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to.first rescue nil
-      {company_default: policy.nil?, policy: policy, default: default_mapping, conditional_manager: conditional_manager,
+      { company_default: policy.nil?, policy: policy, default: default_mapping, conditional_manager: conditional_manager,
        conditional_finance_manager: conditional_finance_manager,
        conditional_approves_to: conditional_approves_to,
-       conditional_approves_finance_to: conditional_approves_finance_to}
+       conditional_approves_finance_to: conditional_approves_finance_to }
     end
 
   end

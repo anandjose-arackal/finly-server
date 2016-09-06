@@ -7,8 +7,9 @@ class FinlyF.Routers.Main extends Backbone.Router
     'expenses/params=:query': 'expenses'
     'reports': 'reports'
     'reports/params=:query': 'reports'
-    'reports/action=:action': 'reportsAction'
+    # 'reports/action=:action': 'reportsAction'
     'receipts': 'receipts'
+    'receipts/params=:query': 'receipts'
     'settlements': 'settlements'
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
@@ -45,9 +46,13 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
-  receipts: ->
+  receipts:(query) ->
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
     # console.log 'Step 2.D. Route at /receipts'
-    view = new FinlyF.Views.ReceiptsIndex()
+    view = new FinlyF.Views.ReceiptsIndex({ params: params })
     $("#backbone-container").html(view.render().el)
     @features()
 

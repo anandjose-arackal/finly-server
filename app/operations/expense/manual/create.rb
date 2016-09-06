@@ -49,7 +49,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   def post_process
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.open?
-      comment = self.expense.report.comments.build report: report, user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense: expense
+      comment = self.expense.report.comments.build report: self.expense.report, user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense: expense
       unless comment.save
         errors << comment.errors.full_messages
       end
