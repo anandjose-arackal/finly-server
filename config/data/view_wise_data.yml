@@ -6,6 +6,12 @@ admin:
       - Employees: employees
       # - Analytics: analytics
       - Settlements: settlements
+    cog:
+      - Ogranization Account: '/orgranization_account?view=admin'
+      - Policies: '/policies'
+      - My Account: '/users/'
+      - Expense Policies: '/policies?view=admin'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
 personal:
   links:
@@ -15,6 +21,10 @@ personal:
       - Receipts: receipts
       # - Analytics: analytics
       - Settlements: settlements
+    cog:
+      - My Account: '/users/'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      - Logout: '/users/sign_out'
 
 manager:
   links:
@@ -23,8 +33,17 @@ manager:
       - Team Expenses: expenses
       - Team Analytics: analytics
       - Team Members: users
+    cog:
+      - My Account: '/users/'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      - Logout: '/users/sign_out'
 
 finance:
   links:
     primary_navbar:
       - Something: something
+
+    cog:
+      - My Account: '/users/'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      - Logout: '/users/sign_out'  
