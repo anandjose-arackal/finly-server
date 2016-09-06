@@ -14,7 +14,6 @@ json.array! @result.items do |report|
 
   json.total_amount report.total_amount
 
-#   # debugger
 #   json.merge! report.attributes
 #   json.reimbursement_amount report[:reimbursement_amount]
 #   # json.total_amount 10

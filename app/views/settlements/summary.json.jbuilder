@@ -1,5 +1,5 @@
-json.pending_reimbursement @result.user.balance_sheet.pending_reimbursement.value
-json.cash_in_hand @result.user.balance_sheet.cash_in_hand.value
+json.pending_reimbursement @result.selected_user.balance_sheet.pending_reimbursement.value
+json.cash_in_hand @result.selected_user.balance_sheet.cash_in_hand.value
 
 # json.actions do
 #   @result.actions.each do |key, value|

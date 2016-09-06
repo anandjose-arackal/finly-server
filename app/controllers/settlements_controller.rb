@@ -23,7 +23,6 @@ class SettlementsController < ApplicationController
       return
     end
     @result = operation.run
-    debugger
     if operation.is_success?
       flash.now[:success] = 'payment successfully added'
       flash.now[:success] = success_message if success_message.present?
