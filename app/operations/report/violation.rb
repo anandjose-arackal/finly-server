@@ -22,19 +22,23 @@
 #                   }
 
 class Report::Violation < Report::Base
-  attr_accessor :no_policy, :warning_messages
+
+  include ActionView::Helpers::NumberHelper
+
+  attr_accessor :no_policy, :warning_messages, :policy
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
   end
 
   def pre_validate
-    if self.params.blank? or self.report.blank? or not self.report.is_a?(Report)
-      errors << 'Report not found'
+    if user.blank? or params.blank?
+      errors << "User or params not found."
     end
   end
 
   def init
+    self.warning_messages = {}
     self.report = params[:report]
     self.policy = report.versioned_policy
     report.expenses.each do |expense|
@@ -47,6 +51,9 @@ class Report::Violation < Report::Base
   end
 
   def validate
+    if self.report.blank? or not self.report.is_a?(Report)
+      errors << 'Report not found'
+    end
     unless policy
       self.no_policy = true
     end
@@ -54,7 +61,7 @@ class Report::Violation < Report::Base
 
   def process
     unless no_policy
-      report.expenses.watch do |expense|
+      report.expenses.each do |expense|
         policy.expense_rules.each do |rule|
           check_expense_rule rule, expense
         end
@@ -63,13 +70,15 @@ class Report::Violation < Report::Base
         end
       end
     end
+    self.response = warning_messages
   end
 
-  def success
-    warning_messages
+  def retrieve
+    self.response = warning_messages
   end
 
   private
+
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ""
     if rule.amount_value
@@ -101,6 +110,7 @@ class Report::Violation < Report::Base
 
     message
   end
+
 
   # checks the passed expense against the passed rule
   def check_expense_rule(rule, expense, manager = nil)

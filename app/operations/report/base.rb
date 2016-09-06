@@ -70,6 +70,7 @@ class Report::Base < BaseOperation
       self.manager = User::Team::Approver.(report.user, type: :manager)
       self.finance_manager = User::Team::Approver.(report.user, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
+      debugger
     end
 
     def expenses_category_sorted
