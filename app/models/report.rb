@@ -49,6 +49,7 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
+  scope :open, -> {where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
