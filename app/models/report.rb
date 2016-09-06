@@ -41,7 +41,7 @@ class Report < ActiveRecord::Base
   validate :has_expenses
 
   default_scope { order(created_at: :desc,report_status_id: :asc ) }
-  
+
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
