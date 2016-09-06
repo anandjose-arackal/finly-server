@@ -29,6 +29,34 @@
   </ul>
 
   <% views = YAML.load_file("#{Rails.root}/config/data/view_wise_data.yml") %>
+  <ul id="navbar-cog-navigation-admin">
+    <% if current_user.admin? %>
+      <% views["admin"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% elsif current_user.finance_manager? %>
+      <% views["finance"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% elsif current_user.manager? %>
+      <% views["manager"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% elsif current_user.employee? %>
+      <% views["personal"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
+
   <ul id="navbar-menu-navigation-admin">
     <% if current_user.admin?%>
       <% views["admin"]["links"]["primary_navbar"].each do |item| %>

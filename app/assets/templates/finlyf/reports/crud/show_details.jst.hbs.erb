@@ -9,7 +9,7 @@
         {{/if}}
 
         {{#if item.actions.submit}}
-          {{#if ../item.actions.editable}}
+          {{#if item.actions.editable}}
             <button class="btn navbar-btn btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
           {{/if}}
           <button class="btn btn-sm btn-report-action navbar-btn" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
