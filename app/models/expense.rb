@@ -92,6 +92,8 @@ class Expense < ActiveRecord::Base
       type_val = :date
       date_from = "1990-01-01" if date_from.blank?
       date_to = Date.today if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
       expenses = arel_table
       where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
     end

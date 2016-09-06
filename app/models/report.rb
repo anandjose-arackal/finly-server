@@ -77,6 +77,8 @@ class Report < ActiveRecord::Base
     unless date_from.blank? && date_to.blank?
       date_from = "1990-01-01" if date_from.blank?
       date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
       # date_to = Date.today if date_to.blank?
       reports = arel_table
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
@@ -259,8 +261,8 @@ class Report < ActiveRecord::Base
   end
 
   def require_reimbursement?
-    report_total = report.total_amount
-    latest_expense = report.latest_expense
+    report_total = total_amount
+    latest_expense = latest_expense
     date = nil
     date = latest_expense.date if latest_expense.present?
     cash = self.user.cash_in_hand date

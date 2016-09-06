@@ -66,7 +66,8 @@ class User::Team::Review::NextReviewer < BaseOperation
       arg_hash[:type] = :approves_to
       manager = User::Team::Approver.(user, arg_hash)
       if manager.nil?
-        return UserTeamService.new(obj.user).finance_manager(arg_hash)
+        arg_hash[:type] = :approves_finance_to
+        return User::Team::Approver.(user, arg_hash)
       else
         return manager
       end
