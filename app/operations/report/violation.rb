@@ -22,14 +22,14 @@
 #                   }
 
 class Report::Violation < Report::Base
-  attr_accessor :no_policy, :warning_messages
+  attr_accessor :no_policy, :warning_messages, :policy
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
   end
 
   def pre_validate
-    if self.params.blank? or self.report.blank? or not self.report.is_a?(Report)
+    if self.params.blank? or params[:report].blank? or not params[:report].is_a?(Report)
       errors << 'Report not found'
     end
   end
@@ -37,6 +37,7 @@ class Report::Violation < Report::Base
   def init
     self.report = params[:report]
     self.policy = report.versioned_policy
+    self.warning_messages = {}
     report.expenses.each do |expense|
       self.warning_messages[expense.id] = {}
       self.warning_messages[expense.id]['expense_warning'] = {}
