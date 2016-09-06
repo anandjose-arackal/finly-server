@@ -40,7 +40,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
 
-  default_scope { order report_status_id: :asc }
+  default_scope { order(created_at: :desc,report_status_id: :asc ) }
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
