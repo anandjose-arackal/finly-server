@@ -19,7 +19,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:total] and params[:payment][:total] < 0
+    if params[:payment][:total] and params[:payment][:total].to_i < 0
       errors << "Reimbursement amount cannot be negative."
       return false
     end
@@ -59,7 +59,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
     # is this really necessary
     total_amount = precision_value(reports.with_amount.sum(:value))
-    unless total_amount == precision_value(payment_params[:tota])
+    unless total_amount == precision_value(payment_params[:total])
       errors << "Reimbursement amount does not match report totals."
     end
   end

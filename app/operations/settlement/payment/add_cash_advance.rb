@@ -16,7 +16,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
+    if params[:payment][:total].blank? or params[:payment][:total].to_i < 0
       errors << "Amount being added blank or negative."
     end
   end
@@ -45,9 +45,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def process
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.advance_id, date: payment_params[:date], note: params[:note],
-                                          amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
+                                          amount_attributes: {value: payment_params[:total], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.add_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
+    if payment.save and balance_sheet.add_cash_in_hand(payment_params[:total], payment_params[:currency_id])
       return true
     end
     self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
