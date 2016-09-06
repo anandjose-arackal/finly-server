@@ -268,6 +268,7 @@ class FinlyF.Views.Report extends Backbone.View
     preview_view = new FinlyF.Views.Expense({
       model: model
       preview: true
+      view: @current_view
     })
     $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)

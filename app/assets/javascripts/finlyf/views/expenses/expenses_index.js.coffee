@@ -27,6 +27,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .navbar-menu-li': 'navigate'
     'click .navbar-view-type': 'changeView'
     'submit .navbar-form': 'globalSearch'
+    'click .input-search-icon': 'clearGlobalSearch'
     'click .btn-reset-filters': 'resetFilters'
 
     #Filters
@@ -66,7 +67,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     unless @indexOnly
       $(@el).html(@templateSkeleton())
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
-      $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+
+      $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
 
       @params.filter_date_from = @params['filter_date[from]']
       @params.filter_date_to = @params['filter_date[to]']
@@ -194,8 +196,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     
   closeDetails: (e)->
     e.preventDefault()
-    if $(e.currentTarget).attr('data-refresh-true')
-      @filter()
+    target = $(e.currentTarget)
+    if $(target).attr('data-refresh-true')
+      # alert("Data refresh is true")
+      # @filter()
+      @refetchCollection()
+      $(target).removeAttr('data-refresh-true') 
+    
     main = $(@el).find(".main")
     $(main).removeClass("preview")
 
@@ -315,6 +322,17 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     params = {
       filter_search: query
     }
+
+    if @params.view
+      params.view = @params.view
+
+    FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
+
+  clearGlobalSearch: (e) ->
+    e.preventDefault()
+    # target = $(e.currentTarget)
+    # query = $(target).find(".input-global-search").val()
+    params = {}
 
     if @params.view
       params.view = @params.view

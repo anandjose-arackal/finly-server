@@ -13,7 +13,11 @@
     <ul class="nav navbar-nav navbar-right">
       <form class="navbar-form" role="search">
         <div class="input-group">
-          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="width: 300px">
+          {{#if item.filter_search}}
+            <span class="fa fa-close input-search-icon"></span>
+          {{/if}}
+          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="{{#if item.filter_search}}padding-left: 30px;{{/if}}width: 300px" value="{{item.filter_search}}">
+          
           <div class="input-group-btn">
             <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
           </div>
@@ -25,3 +29,14 @@
 
 
 </div>
+<style type="text/css">
+.input-search-icon{
+  top: 8px;
+  font-size: 18px;
+  left: 9px;
+  z-index: 3;
+  position: absolute;
+  cursor: pointer;
+}
+
+</style>

@@ -24,7 +24,7 @@ personal:
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
-      - Logout: '/users/sign_out'
+      # - Logout: '/users/sign_out'
 
 manager:
   links:
@@ -36,14 +36,18 @@ manager:
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
-      - Logout: '/users/sign_out'
+      # - Logout: '/users/sign_out'
 
 finance:
   links:
     primary_navbar:
-      - Something: something
+      - Company Reports: reports
+      # - Company Expenses: expenses
+      - Employees: employees
+      # - Analytics: analytics
+      - Settlements: settlements
 
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
-      - Logout: '/users/sign_out'  
+      # - Logout: '/users/sign_out'  

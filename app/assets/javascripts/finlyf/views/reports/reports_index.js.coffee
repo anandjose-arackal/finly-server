@@ -164,11 +164,18 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
 
-  createReport: ->
+  # createReport: ->
 
 
     
-  closeDetails: ->
+  closeDetails: (e) ->
+    e.preventDefault()
+    target = $(e.currentTarget)
+    if $(target).attr('data-refresh-true')
+      # alert("Data refresh is true")
+      # @filter()
+      @refetchCollection()
+      $(target).removeAttr('data-refresh-true')
     main = $(@el).find(".main")
     $(main).removeClass("preview")
 
@@ -191,21 +198,22 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
           parent: _this
         })
         $(_this.el).find("#item-details-main").html(preview_view.render().el)
+        $(_this.el).find('.close-details').attr('data-refresh-true', true)
       error: (err) ->
         console.log "Error", err
     })
 
 
-  create: ->
-    values = {};
-    # if(event){ event.preventDefault(); }
-    _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    console.log values
-    model = new FinlyF.Models.Report()
-    console.log("Putting data")
-    console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
+  # create: ->
+  #   values = {};
+  #   # if(event){ event.preventDefault(); }
+  #   _.each($(@el).find('form#new-item').serializeArray(), (input) ->
+  #     values[ input.name ] = input.value
+  #   )
+  #   console.log values
+  #   model = new FinlyF.Models.Report()
+  #   console.log("Putting data")
+  #   console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
 
 
 
