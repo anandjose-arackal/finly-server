@@ -14,14 +14,19 @@ class FinlyF.Views.Expense extends Backbone.View
   initialize: (options) ->
     _this = @
     @preview = options.preview
-    if options.report
-      @preview_in_report = true
+    # if options.report
+    #   @preview_in_report = true
     if options.parent
       @parent = options.parent
     if @preview
+      view = options.view
       # console.log "Preview is passed true"
       $(@el).removeClass("item")
-      @model.fetch()
+      @model.fetch({
+        data: {
+          authenticity_token: $("#authenticity_token").val()
+        }
+      })
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
 

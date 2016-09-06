@@ -9,6 +9,7 @@ class FinlyF.Views.User extends Backbone.View
 
   events:
     'click .btn-edit-user': 'edit'
+    'click .btn-update-user': 'update'
 
   initialize: (options) ->
     @params = options.params
@@ -37,13 +38,33 @@ class FinlyF.Views.User extends Backbone.View
     $(@el).html(@templateShow({item: @model.toJSON()}))
 
   edit: (e) ->
-    container = $(e.currentTarget).closest('section')
+    target = $(e.currentTarget)
+    container = $(target).closest('section')
     $(container).find('.item-attr-preview').addClass('hide')
     $(container).find('.item-attr-edit').addClass('show')
     #edit
 
+    #change edit button to update
+    $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').text('Update')
+
   update: (e) ->
-    #send data to server
+    target = $(e.currentTarget)
+    container = $(target).closest('section')
+    values = {}
+
+    _.each($(container).find('form').serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    values.authenticity_token = $("#authenticity_token").val()
+
+    console.log values
+    model = new FinlyF.Models.User({id: @model.get('id')})
+    model.save(values, {
+      success: (model, res) ->
+        console.log model, res
+      error: (err) ->
+        console.log "Err", err
+    })
 
 
 #Features

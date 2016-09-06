@@ -7,38 +7,31 @@
       <button class="btn btn-sm navbar-btn btn-warning btn-edit-user">Edit</button>
     </div>
   </div>
-
-  <div class="row">
-    <div class="col-sm-3">Name</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{item.name}}</label>
-      <input class="item-attr-edit" type="text" name="user[name]" value="{{item.name}}" />
+  <form class="form-user-info">
+    <div class="row">
+      <div class="col-sm-3">Name</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">{{item.name}}</label>
+        <input class="item-attr-edit" type="text" name="user[name]" value="{{item.name}}" />
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-sm-3">Email</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{item.email}}</label>
-      <input class="item-attr-edit" type="text" name="user[email]" value="{{item.email}}" />
+    <div class="row">
+      <div class="col-sm-3">Email</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">{{item.email}}</label>
+        <input class="item-attr-edit" type="text" name="user[email]" value="{{item.email}}" />
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-sm-3">Mobile</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{item.mobile_number}}</label>
-      <input class="item-attr-edit" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
+    <div class="row">
+      <div class="col-sm-3">Mobile</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">{{item.mobile_number}}</label>
+        <input class="item-attr-edit" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
+      </div>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-3">Reporting Manager</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{item.mobile_number}}</label>
-      <input class="item-attr-edit" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
-    </div>
-  </div>
+  </form>
 </section>
 
 
@@ -51,145 +44,153 @@
       <button class="btn btn-sm navbar-btn btn-warning btn-edit-user">Edit</button>
     </div>
   </div> 
+  <form class="fomr-user-roles">
+    
+  
+    <div class="row">
+      <div class="col-sm-3">Admin?</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
 
-  <div class="row">
-    <div class="col-sm-3">Admin?</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
+        <label class="item-attr-edit">
+          <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+        </label>
 
-      <label class="item-attr-edit">
-         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />  
-      </label>
-
-      <label class="item-attr-edit">
-         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No  
-      </label>
-      
-      
+        <label class="item-attr-edit">
+          <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+        </label>
+        
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-sm-3">Manager?</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
+    <div class="row">
+      <div class="col-sm-3">Manager?</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
 
-      <label class="item-attr-edit">
-         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />  
-      </label>
+        <label class="item-attr-edit">
+           <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+        </label>
 
-      <label class="item-attr-edit">
-         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No  
-      </label>
+        <label class="item-attr-edit">
+           <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+        </label>
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-sm-3">Finance Manager?</div>
-    <div class="col-sm-9">
-      <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
+    <div class="row">
+      <div class="col-sm-3">Finance Manager?</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
 
-      <label class="item-attr-edit">
-         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />  
-      </label>
+        <label class="item-attr-edit">
+           <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+        </label>
 
-      <label class="item-attr-edit">
-         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No  
-      </label>
+        <label class="item-attr-edit">
+           <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+        </label>
+      </div>
     </div>
-  </div>
+  </form>
 
 </section>
 
-<section class="user-policies">
+<div class="user-policies">
   <div class="row">
     <div class="col-sm-6">
       <h4>Policies</h4>
     </div>
-    <div class="col-sm-6 text-right">
-      <button class="btn btn-sm navbar-btn btn-warning btn-edit-user">Edit</button>
-    </div>
   </div>
 
   
-
   {{#each item.mapping}}
-    <div class="policy" style="padding: 10px; margin-bottom: 10px; background: white;">
-      <h5>{{#if this.company_default}}Default{{else}}{{this.policy.name}}{{/if}}</h5>
-      <hr />
+    <section class="policy" style="padding: 10px; margin-bottom: 10px; background: white;">
       <div class="row">
-        <div class="col-sm-6 no-padding">
-          <div class="row no-margin">
-            <div class="col-sm-6">Reporting Manager</div>
-            <div class="col-sm-6">
-              <label class="item-attr-preview">{{this.default.manager.name}}</label>
-              <select class="item-attr-edit">
-              {{#each ../item.company_managers}}
-                <option value="{{this.id}}">{{this.name}}</option>
-              {{/each}}
-
-              </select>
-            </div>
-          </div>
-          <hr />
-          <div class="row no-margin">
-            <div class="col-sm-6">If Report Total is Above:</div>
-            <div class="col-sm-6">
-              <label class="item-attr-preview">{{this.conditional_manager.greater_than_amount.value}}</label>
-              <input type="number" name="" class="item-attr-edit" value="{{this.conditional_manager.greater_than_amount.value}}"> 
-            </div>
-          </div>
-
-          <div class="row no-margin">
-            <div class="col-sm-6">Then Submits to:</div>
-            <div class="col-sm-6">
-              <label class="item-attr-preview">{{this.conditional_manager.greater_than_amount.value}}</label>
-              <select class="item-attr-edit">
+        <div class="col-sm-6">
+          <h5>{{#if this.company_default}}Default{{else}}{{this.policy.name}}{{/if}}</h5>
+        </div>
+        <div class="col-sm-6">
+          <button class="btn btn-sm btn-warning btn-edit-user">Edit</button>
+        </div>
+        
+      </div>
+      <hr />
+      <form>
+        <input type="text" name="user_manager_mapping[mapping_id]" value="{{this.default.mapping_id}}">
+        <div class="row">
+          <div class="col-sm-6 no-padding">
+            <div class="row no-margin">
+              <div class="col-sm-6">Reporting Manager</div>
+              <div class="col-sm-6">
+                <label class="item-attr-preview">{{this.default.manager.name}}</label>
+                <select class="item-attr-edit" name="user_manager_mapping[mapping][manager_id]">
                 {{#each ../item.company_managers}}
                   <option value="{{this.id}}">{{this.name}}</option>
                 {{/each}}
-              </select>
+                </select>
+              </div>
+            </div>
+            <hr />
+            <div class="row no-margin">
+              <div class="col-sm-6">If Report Total is Above:</div>
+              <div class="col-sm-6">
+                <label class="item-attr-preview">{{this.conditional_manager.greater_than_amount.value}}</label>
+                <input type="number" name="user_manager_mapping[mapping][greater_than_amount_attributes][value]" class="item-attr-edit" value="{{this.conditional_manager.greater_than_amount.value}}"> 
+              </div>
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-6">Then Submits to:</div>
+              <div class="col-sm-6">
+                <label class="item-attr-preview">{{this.conditional_manager.greater_than_amount.value}}</label>
+                <select class="item-attr-edit" name="user_manager_mapping[mapping][approves_to_id]" >
+                  {{#each ../item.company_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 no-padding">
+            <div class="row no-margin">
+              <div class="col-sm-6">Reporting Finance Manager</div>
+              <div class="col-sm-6">
+                <label class="item-attr-preview">{{this.default.finance_manager.name}}</label>
+                <select class="item-attr-edit">
+                  {{#each ../item.company_finance_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-6">If Report Total is Above:</div>
+              <div class="col-sm-6">
+                <label class="item-attr-preview">{{this.conditional_finance_manager.greater_than_amount.value}}</label>
+                <input type="number" name="" class="item-attr-edit" value="{{this.conditional_finance_manager.greater_than_amount.value}}">
+              </div>
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-6">Then Submits to:</div>
+              <div class="col-sm-6">
+                <label class="item-attr-preview">{{this.conditional_finance_manager.finance_manager.name}}</label>
+                <select class="item-attr-edit">
+                  {{#each ../item.company_finance_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
+                </select>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="col-sm-6 no-padding">
-          <div class="row no-margin">
-            <div class="col-sm-6">Reporting Finance Manager</div>
-            <div class="col-sm-6">
-              <label class="item-attr-preview">{{this.default.finance_manager.name}}</label>
-              <select class="item-attr-edit">
-                {{#each ../item.company_finance_managers}}
-                  <option value="{{this.id}}">{{this.name}}</option>
-                {{/each}}
-              </select>
-            </div>
-          </div>
-
-          <div class="row no-margin">
-            <div class="col-sm-6">If Report Total is Above:</div>
-            <div class="col-sm-6">
-              <label class="item-attr-preview">{{this.conditional_finance_manager.greater_than_amount.value}}</label>
-              <input type="number" name="" class="item-attr-edit" value="{{this.conditional_finance_manager.greater_than_amount.value}}">
-            </div>
-          </div>
-
-          <div class="row no-margin">
-            <div class="col-sm-6">Then Submits to:</div>
-            <div class="col-sm-6">
-              <label class="item-attr-preview">{{this.conditional_finance_manager.finance_manager.name}}</label>
-              <select class="item-attr-edit">
-                {{#each ../item.company_finance_managers}}
-                  <option value="{{this.id}}">{{this.name}}</option>
-                {{/each}}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </form>
+    </section>
   {{/each}}
-</section>
+</div>
 
 
 

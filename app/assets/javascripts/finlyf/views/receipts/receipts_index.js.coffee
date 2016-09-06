@@ -61,7 +61,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-    $(@el).find(".sidebar").html(@templateSidebar())
+
+    @params.filter_date_from = @params['filter_date[from]']
+    @params.filter_date_to = @params['filter_date[to]']
+    $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
     $(@el).find(".main").html(@templateMain())
     FinlyF.structureActions(@el, @params)
     @
@@ -210,26 +213,17 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
-    console.log "Filtering"
     sidebar = $(@el).find(".sidebar")
     params = {
-      'filter_merchant': $(".sidebar .filter-merchant").val() || ""
+      # 'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      'filter_category_id': $(".sidebar .filter-category-id").val() || ""
-      'filter_receipt': $(".sidebar .filter-receipt").val() || ""
+      # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
+      # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
 
-    filter_amount_value = $(".sidebar .filter-amount-value").val()
-    filter_receipt = $(".sidebar .filter-receipt").val()
 
-    if filter_amount_value
-      params["filter_amount[value]"] = filter_amount_value
-      params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
-
-    console.log "Will navigate now."
-
-    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+    FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
     target = $(e.currentTarget)
