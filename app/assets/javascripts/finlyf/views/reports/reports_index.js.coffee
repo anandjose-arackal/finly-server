@@ -112,8 +112,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     @params.page = 1
     @collection.fetch({
@@ -168,14 +169,16 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
 
     
-  closeDetails: (e) ->
+  closeDetails: (e)->
+    # console.log "Closing", e, e.currentTarget
     e.preventDefault()
     target = $(e.currentTarget)
     if $(target).attr('data-refresh-true')
       # alert("Data refresh is true")
       # @filter()
       @refetchCollection()
-      $(target).removeAttr('data-refresh-true')
+      $(target).removeAttr('data-refresh-true') 
+    
     main = $(@el).find(".main")
     $(main).removeClass("preview")
 

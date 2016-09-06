@@ -59,8 +59,10 @@ class FinlyF.Views.Report extends Backbone.View
     value = e.target.innerText
     @model.set(field, value);
 
-  update: ->
-    @model.save({hi: "hello"}, {patch: true})
+  # update: ->
+  #   console.log "Hi"
+  #   return
+  #   @model.save({hi: "hello"}, {patch: true})
 
   toggleSelect: (e) ->
     if $(e.currentTarget).prop('checked')
@@ -166,12 +168,24 @@ class FinlyF.Views.Report extends Backbone.View
     policy_id = $(@el).find('select.item-policy-edit').val()
     name = $(@el).find('input.item-name-edit').val()
     
-    @model.save({report: {name: name}}, {
+    data = {
+      name: name,
+      policy_id: policy_id
+    }
+    model = new FinlyF.Models.Report({id: @model.get('id')})
+    model.save(data, {
       success: (model, res) ->
-        console.log model, res
+        $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        _this.model.fetch()
       error: (err) ->
-        console.log "Error", err
+        console.log "Err", err
     })
+    # @model.save({report: {name: name}}, {
+    #   success: (model, res) ->
+    #     console.log model, res
+    #   error: (err) ->
+    #     console.log "Error", err
+    # })
 
     ##Below code is not needed, as the model sync will reload the view!
     # $(@el).find(".item-name").html(@model.get('name'))

@@ -70,7 +70,7 @@
       <label for="expense-receipt-upload">
         <img class="preview-image img-responsive" id="preview-image" src="#" alt="Click to upload image"/>
       </label>
-      <input type="file" id="expense-receipt-upload" name="expense[receipt_attributes][[image]]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
+      <input type="file" id="expense-receipt-upload" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
     </div>
   </div>
 </form>
