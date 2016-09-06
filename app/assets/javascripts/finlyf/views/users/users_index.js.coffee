@@ -50,14 +50,14 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
 
   processUsers: ->
-    console.log "processing users"
+    # console.log "processing users"
     @dump = @collection.models.slice()
     $(@el).find("#users").html("")
 
     @collection.each(@appendUsers, @)
 
   appendUsers: (user) ->
-    console.log "appending users"
+    # console.log "appending users"
     view_user = new FinlyF.Views.User({model: user, page: 'users'})
     $(@el).find("#users").append(view_user.render().el)
 
@@ -75,7 +75,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
 
   showDetails: (e) ->
-    console.log "shwoing details"
+    # console.log "shwoing details"
     model_id = $(e.currentTarget).attr('data-item-id')
     model = @collection.get(model_id)
 
@@ -158,24 +158,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     e.preventDefault()
     FinlyF.changeView(e)
 
-  userSettlements: (e) ->
-    target = e.currentTarget
-    $(target).siblings().removeClass("active")
-    $(target).addClass("active")
-    _this = @
-    user_id = $(target).find(".user-name").attr("data-item-id")
-    console.log "User id is", user_id
-    console.log @collection.url
-    @collection.url = "/settlements/" + user_id.toString()
-    @collection.fetch({
-      reset: true,
-      data: _this.params
-      success: ->
-        _this.populateSummary(user_id)
-
-      error: ->
-        console.log "Couldn't fetch Successfully."
-    })
 
 
 

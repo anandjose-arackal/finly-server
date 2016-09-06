@@ -97,7 +97,6 @@
 }
 
 .sidebar{
-  height: calc(100% - 100px);
   position:fixed;
   background: #fff;
   background: #F5F6F9;
@@ -265,12 +264,12 @@
 <nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="margin-top: 53px; border-color: transparent; z-index: 2;">
   <div class="container-fluid">
     <div class="row no-margin no-padding">
-      <div class="col-md-4" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+      <div class="col-md-3" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
         <div class="navbar-header navbar-sidebar">
           {{!-- navbar_sidebar.jst.hbs partial --}}
         </div>
       </div>
-      <div class="col-md-8" style="background: #FFF;">
+      <div class="col-md-9" style="background: #FFF;">
         <div class="navbar-collapse collapse navbar-main">
           {{!-- navbar_main.jst.hbs partial --}}
         </div><!--/.nav-collapse -->    
@@ -280,11 +279,11 @@
 </nav>
 
 <div class="container-fluid container-main" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-  <div class="col-sm-4 sidebar" id="users">
+  <div class="col-sm-3 sidebar" id="users">
   
   </div>
 
-  <div class="col-sm-8 col-sm-offset-4 main" id="user-details">
+  <div class="col-sm-9 col-sm-offset-3 main" id="user-details">
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">
@@ -306,5 +305,3 @@
 
   
 </div>
-
-

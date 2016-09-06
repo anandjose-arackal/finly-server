@@ -23,6 +23,7 @@ class SettlementsController < ApplicationController
       return
     end
     @result = operation.run
+    debugger
     if operation.is_success?
       flash.now[:success] = 'payment successfully added'
       flash.now[:success] = success_message if success_message.present?
@@ -31,6 +32,7 @@ class SettlementsController < ApplicationController
         format.json {render json: {'success': true}}
       end
     else
+      puts "we're here"
       flash.now[:danger] = operation.errors
       # todo render
     end

@@ -340,28 +340,28 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-  settleDebts: (e) ->
-    e.preventDefault()
-    target = $(e.currentTarget).closest('.modal-body')
-    data = {
-      authenticity_token: $("#authenticity_token").val()
-      payment: {
-        amount: $(target).find('input[name=payment\\[amount\\]]').val()
-        date: $(target).find('input[name=payment\\[date\\]]').val()
-        note: $(target).find('textarea[name=payment\\[note\\]]').val()
-        payment_type: $("input[name=payment\\[payment_type\\]]:checked").val()
-      }
-    }
+  # settleDebts: (e) ->
+  #   e.preventDefault()
+  #   target = $(e.currentTarget).closest('.modal-body')
+  #   data = {
+  #     authenticity_token: $("#authenticity_token").val()
+  #     payment: {
+  #       amount: $(target).find('input[name=payment\\[amount\\]]').val()
+  #       date: $(target).find('input[name=payment\\[date\\]]').val()
+  #       note: $(target).find('textarea[name=payment\\[note\\]]').val()
+  #       payment_type: $("input[name=payment\\[payment_type\\]]:checked").val()
+  #     }
+  #   }
 
-    # console.log data
+  #   # console.log data
 
-    $.ajax({
-      url: "settlements?payment_type=add_payment&view=admin&id=" + @user_id
-      type: "POST",
-      data: data,
-      success: (res) ->
-        console.log res
-    })
+  #   $.ajax({
+  #     url: "settlements?payment_type=add_payment&view=admin&id=" + @user_id
+  #     type: "POST",
+  #     data: data,
+  #     success: (res) ->
+  #       console.log res
+  #   })
 
   initReimburse: (e) ->
     pending_reimbursement = parseFloat($(@el).find('.summary input[name=pending_reimbursement]').val())
@@ -435,7 +435,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       payment: {
         note: $(container).find('textarea[name=payment\\[note\\]]').val()
         date: $(container).find('input[name=payment\\[date\\]]').val()
-        total: _this.selectedReportsTotal()
+        amount: parseFloat(_this.selectedReportsTotal())
       }
     }
 
