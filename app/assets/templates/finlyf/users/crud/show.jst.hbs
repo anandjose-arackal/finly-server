@@ -57,8 +57,15 @@
     <div class="col-sm-9">
       <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
 
-      <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />
-      <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No
+      <label class="item-attr-edit">
+         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />  
+      </label>
+
+      <label class="item-attr-edit">
+         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No  
+      </label>
+      
+      
     </div>
   </div>
 
@@ -67,18 +74,28 @@
     <div class="col-sm-9">
       <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
 
-      <input class="item-attr-edit" type="radio" name="user[role][manager]" value="1" /> Yes <br />
-      <input class="item-attr-edit" type="radio" name="user[role][manager]" value="0" /> No
+      <label class="item-attr-edit">
+         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />  
+      </label>
+
+      <label class="item-attr-edit">
+         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No  
+      </label>
     </div>
   </div>
 
   <div class="row">
     <div class="col-sm-3">Finance Manager?</div>
     <div class="col-sm-9">
-      <label class="item-attr-preview">{{#if item.role.finance}}Yes{{else}}No{{/if}}</label>
+      <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
 
-      <input class="item-attr-edit" type="radio" name="user[role][finance]" value="1" /> Yes <br />
-      <input class="item-attr-edit" type="radio" name="user[role][finance]" value="0" /> No
+      <label class="item-attr-edit">
+         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="1" /> Yes <br />  
+      </label>
+
+      <label class="item-attr-edit">
+         <input class="item-attr-edit" type="radio" name="user[role][admin]" value="0" /> No  
+      </label>
     </div>
   </div>
 
@@ -106,7 +123,12 @@
             <div class="col-sm-6">Reporting Manager</div>
             <div class="col-sm-6">
               <label class="item-attr-preview">{{this.default.manager.name}}</label>
-              <select class="item-attr-edit"></select>
+              <select class="item-attr-edit">
+              {{#each ../item.company_managers}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+
+              </select>
             </div>
           </div>
           <hr />
@@ -114,7 +136,7 @@
             <div class="col-sm-6">If Report Total is Above:</div>
             <div class="col-sm-6">
               <label class="item-attr-preview">{{this.conditional_manager.greater_than_amount.value}}</label>
-              <select class="item-attr-edit"></select>
+              <input type="number" name="" class="item-attr-edit" value="{{this.conditional_manager.greater_than_amount.value}}"> 
             </div>
           </div>
 
@@ -122,7 +144,11 @@
             <div class="col-sm-6">Then Submits to:</div>
             <div class="col-sm-6">
               <label class="item-attr-preview">{{this.conditional_manager.greater_than_amount.value}}</label>
-              <select class="item-attr-edit"></select>
+              <select class="item-attr-edit">
+                {{#each ../item.company_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
             </div>
           </div>
         </div>
@@ -132,7 +158,11 @@
             <div class="col-sm-6">Reporting Finance Manager</div>
             <div class="col-sm-6">
               <label class="item-attr-preview">{{this.default.finance_manager.name}}</label>
-              <select class="item-attr-edit"></select>
+              <select class="item-attr-edit">
+                {{#each ../item.company_finance_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
             </div>
           </div>
 
@@ -140,7 +170,7 @@
             <div class="col-sm-6">If Report Total is Above:</div>
             <div class="col-sm-6">
               <label class="item-attr-preview">{{this.conditional_finance_manager.greater_than_amount.value}}</label>
-              <select class="item-attr-edit"></select>
+              <input type="number" name="" class="item-attr-edit" value="{{this.conditional_finance_manager.greater_than_amount.value}}">
             </div>
           </div>
 
@@ -148,7 +178,11 @@
             <div class="col-sm-6">Then Submits to:</div>
             <div class="col-sm-6">
               <label class="item-attr-preview">{{this.conditional_finance_manager.finance_manager.name}}</label>
-              <select class="item-attr-edit"></select>
+              <select class="item-attr-edit">
+                {{#each ../item.company_finance_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
             </div>
           </div>
         </div>

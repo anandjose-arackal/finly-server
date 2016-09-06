@@ -214,12 +214,18 @@
 }
 
 .user:hover{
-  background: #B2EDAC;
+  background: #FEE252;
 
 }
 
 .user.active{
-  background: #B2EDAC;
+  background: #FEE252;
+}
+
+
+.settlement-report{
+  padding: 5px 0;
+  border: 1px solid #dfdfdf;
 }
 </style>
 
@@ -270,13 +276,13 @@
 </nav>
 
 
-<div class="container-fluid container-main" style="background: #fff;position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
+<div class="container-fluid container-main" style="background: #fff;position: relative;margin-top: -17px; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
 
-  <div class="col-sm-3 users sidebar">
+  <div class="col-sm-3 no-padding users sidebar">
     <div class="row no-margin">
       <form class="navbar-form" role="search">
-        <div class="input-group">
-          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="width: 300px">
+        <div class="input-group" style="width: 100%;">
+          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
           <div class="input-group-btn">
             <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
           </div>
@@ -291,13 +297,13 @@
 
   <div class="col-sm-9 col-sm-offset-3 main">
 
-    <div class="summary row no-margin" style="background: #B2EDAC;color: #555;margin-bottom: 0px; height: 150px;padding-top: 20px;">
+    <div class="summary row no-margin" style="background: #DDDAEA;color: #555;margin-bottom: 0px; height: 150px;padding-top: 20px;">
       <div class="col-sm-10 col-sm-offset-1">
         <h1>Select user to see settlement details.</h1>
       </div>
     </div>  
     
-    <div class="row no-margin settlements-content" style="height: calc(100% - 150px);">
+    <div class="row no-margin settlements-content" style="height: calc(100% - 150px); display:none;">
       <div class="container-fluid"> 
         <ul class="nav nav-pills filter-status">
           <li class="{{#if_eq item.view_to_load 'payments'}}active{{/if_eq}}"><a href="#" data-view="payments">Settlements History</a></li>

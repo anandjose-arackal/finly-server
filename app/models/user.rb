@@ -102,6 +102,7 @@ class User < ActiveRecord::Base
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) { where("name like ?", "%#{name}%") }
   scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
+  scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
   scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
@@ -110,9 +111,9 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
 
   # scopes for filters
-  scope :filter_search, -> (term) {where("name like ? OR email like ?", "%#{term}%", "%#{term}%")}
+  scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
   scope :filter_state, -> (state) {
-    case(state)
+    case (state)
       when 1
         where(active: true)
       when 2
@@ -126,8 +127,8 @@ class User < ActiveRecord::Base
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
   }
 
-  scope :signed_up, -> {where invitation_token: nil}
-  scope :pending, -> {where.not(invitation_token: nil)}
+  scope :signed_up, -> { where invitation_token: nil }
+  scope :pending, -> { where.not(invitation_token: nil) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }

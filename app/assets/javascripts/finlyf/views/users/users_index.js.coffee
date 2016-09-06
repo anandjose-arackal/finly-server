@@ -75,6 +75,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
 
   showDetails: (e) ->
+    $(e.currentTarget).siblings().removeClass('active')
+    $(e.currentTarget).addClass('active')
     # console.log "shwoing details"
     model_id = $(e.currentTarget).attr('data-item-id')
     model = @collection.get(model_id)

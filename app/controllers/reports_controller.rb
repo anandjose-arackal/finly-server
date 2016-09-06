@@ -57,7 +57,6 @@ class ReportsController < ApplicationController
   def destroy
     destroy_op = Report::Destroy.new(current_user, params)
     destroy_op.run
-    # debugger
     if destroy_op.is_success?
       respond_to do |format|
         # flash.now[:success] = "Report deleted."

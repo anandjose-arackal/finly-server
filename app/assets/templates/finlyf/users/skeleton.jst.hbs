@@ -207,11 +207,27 @@
 }
 
 .user:hover {
-  background: #efefef;
+  background: #FEE252;
   cursor: pointer;
+
 }
 .user {
   padding: 10px;
+}
+
+.user.active{
+  background: #FEE252;
+}
+
+.item-attr-preview.hide{
+  display: none;
+}
+
+.item-attr-edit{
+  display: none;
+}
+.item-attr-edit.show{
+  display: inline;
 }
 </style>
 
@@ -264,8 +280,8 @@
 <nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="margin-top: 53px; border-color: transparent; z-index: 2;">
   <div class="container-fluid">
     <div class="row no-margin no-padding">
-      <div class="col-md-3" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
-        <div class="navbar-header navbar-sidebar">
+      <div class="col-md-3 no-padding" style="background: #F5F6F9; box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+        <div class="navbar-header navbar-sidebar" style="width: 100%;">
           {{!-- navbar_sidebar.jst.hbs partial --}}
         </div>
       </div>
@@ -279,7 +295,7 @@
 </nav>
 
 <div class="container-fluid container-main" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-  <div class="col-sm-3 sidebar" id="users">
+  <div class="col-sm-3 sidebar no-padding" id="users">
   
   </div>
 
