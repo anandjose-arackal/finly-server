@@ -76,13 +76,21 @@ gem 'bootbox-rails', '~>0.4'
 # gem for font awesome
 gem 'font-awesome-rails'
 
-gem 'opro'
+gem 'opro', github: 'opro/opro', branch: 'master'
+
+gem 'has_scope'
+
+gem 'sendgrid-ruby'
+gem 'griddler'
+gem 'griddler-sendgrid'
+gem 'rmagick'
+gem 'imgkit'
+gem 'wkhtmltoimage-binary'
+gem 'proselytism', git: 'git://github.com/ramanbedi1989/proselytism.git'
 
 # gem for devise authentication
 gem 'devise'
 gem 'devise_invitable'
-
-gem 'has_scope'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

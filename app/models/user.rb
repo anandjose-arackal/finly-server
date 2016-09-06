@@ -52,6 +52,7 @@ class User < ActiveRecord::Base
   has_many :tags, class_name: 'UserTag', dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :receipts, dependent: :destroy
+  has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy

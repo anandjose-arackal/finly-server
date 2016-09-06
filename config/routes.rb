@@ -185,11 +185,42 @@
 #
 
 Rails.application.routes.draw do
+
+  mount_griddler('/email/incoming')
+  mount_opro_oauth controllers: {
+      oauth_new: 'oauth/auth',
+      oauth_token: 'oauth/token'
+  }
   # get 'policies' => 'policies#index'
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   devise_for :users
+
+  namespace :api do
+    namespace :v1 do
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:create, :index, :show, :update, :destroy]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+        patch 'retract' => 'reports#retract', as: :retract
+        patch 'submit' => 'reports#submit', as: :submit
+        patch 'approve' => 'reports#approve', as: :approve
+        patch 'unapprove' => 'reports#unapprove', as: :unapprove
+        patch 'reject' => 'reports#reject', as: :reject
+        patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+        patch 'take_control' => 'reports#take_control', as: :take_control
+        post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
+        delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+        post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
+      end
+      resources :receipts, only: [:create, :index, :destroy]
+      resources :receipts do
+        post 'add_note', to: 'receipts#add_note', as: :add_note
+        post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+    end
+  end
 
   resources :policies, except: [:new, :edit]
   resources :policies do
@@ -224,7 +255,6 @@ Rails.application.routes.draw do
     patch 'approve' => 'reports#approve', as: :approve
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
-    patch 'reimburse' => 'reports#reimburse', as: :reimburse
     patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
@@ -263,8 +293,6 @@ Rails.application.routes.draw do
   post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
 
-  mount_opro_oauth
-
   resources :receipts do
 
   end
@@ -274,8 +302,6 @@ Rails.application.routes.draw do
   get 'about', to: 'static_pages#about'
 
   get 'features', to: 'static_pages#features'
-
-
 
 
   # The priority is based upon order of creation: first created -> highest priority.

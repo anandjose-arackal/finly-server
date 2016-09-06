@@ -14,7 +14,7 @@ Opro.setup do |config|
   # uncomment `config.require_refresh_within` to require refresh tokens
   # this will expire tokens within the given time duration, having it enabled
   # is more secure, but harder to use.
-  # config.require_refresh_within = 1.month
+  config.require_refresh_within = 1.month
 
   ## Allow Password Exchange
   # You can allow client applications to exchange a user's credentials

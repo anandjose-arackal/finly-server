@@ -18,6 +18,21 @@ class ExpensesController < ApplicationController
     authorize Expense
   end
 
+  def create
+    authorize Expense
+    if @expense_service.add_expense expense_params
+      flash[:success] = 'Expense created!'
+      if params['request_type'] == '1'
+        redirect_to expenses_path
+      else
+        redirect_to request.referrer
+      end
+    else
+      flash.now[:danger] = @expense_service.errors
+      render_flash_message
+    end
+  end
+
   def index
     authorize Expense
     role = UserRole.employee_id
@@ -37,22 +52,6 @@ class ExpensesController < ApplicationController
     end
     @categories = current_company.active_categories
     generate_filters
-  end
-
-  def create
-    authorize Expense
-    if @expense_service.add_expense expense_params
-      flash[:success] = 'Expense created!'
-      if params['request_type'] == '1'
-        redirect_to expenses_path
-      else
-        redirect_to request.referrer
-      end
-    else
-      flash.now[:danger] = @expense_service.errors
-      render_flash_message
-    end
-
   end
 
   def update

@@ -80,6 +80,8 @@ class Report < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
+  delegate :status_name, to: :status
+
   before_save :handle_name
 
   before_destroy :clear_expenses
