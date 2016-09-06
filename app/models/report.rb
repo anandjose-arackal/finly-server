@@ -259,8 +259,8 @@ class Report < ActiveRecord::Base
   end
 
   def require_reimbursement?
-    report_total = report.total_amount
-    latest_expense = report.latest_expense
+    report_total = total_amount
+    latest_expense = latest_expense
     date = nil
     date = latest_expense.date if latest_expense.present?
     cash = self.user.cash_in_hand date
