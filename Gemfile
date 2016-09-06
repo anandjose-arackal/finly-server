@@ -4,6 +4,10 @@ source 'https://rubygems.org'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
+# puma web server
+gem 'figaro'
+gem 'puma'
+
 # Gem pundit for permission check in actions etc.
 gem 'pundit'
 
@@ -83,6 +87,11 @@ gem 'has_scope'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+  gem 'capistrano'
+  gem 'capistrano3-puma'
+  gem 'capistrano-rails', require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-rvm'
 end
 
 group :development do
