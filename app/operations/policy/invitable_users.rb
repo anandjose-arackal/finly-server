@@ -4,18 +4,21 @@ class Policy::InvitableUsers < Policy::Base
 
   class Policy::InvitableUsers::InvitableUsersPresenter < Policy::Base::BasePresenter
 
-    attr_accessor :invitable_users
+    attr_accessor :invitable_users, :policy
 
     has_scope :filter_email
     has_scope :filter_name
 
     def initialize(user, params)
-      self.invitable_users = apply_scopes(params[:invitable_users])
+      self.invitable_users = apply_scopes(params[:invitable_users], params)
+      self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
     end
 
     def users_with_manager_email
+      users = []
       invitable_users.each do |user|
-        manager = User::Team::Approver.new(user, type: :manager).run
+        approver_op = User::Team::Approver.new(user, {type: :manager, policy_id: policy.id})
+        manager = approver_op.run
         manager_email = nil
         manager_email = manager.email if manager.present?
         users << {user: user, manager: manager_email}
@@ -32,7 +35,7 @@ class Policy::InvitableUsers < Policy::Base
 
   def init
     id = params[:policy_id] || params[:id]
-    self.policy = Policy::List.(user, view: params[:view]).find_by(id: id)
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: id)
   end
 
 
@@ -51,7 +54,8 @@ class Policy::InvitableUsers < Policy::Base
 
   def retrieve
     if is_success?
-      Policy::InvitableUsers::InvitableUsersPresenter.new(user, {invitable_users: invitable_users})
+      params[:invitable_users] = invitable_users
+      Policy::InvitableUsers::InvitableUsersPresenter.new(user, params)
     else
       return false
     end

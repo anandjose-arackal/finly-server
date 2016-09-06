@@ -14,7 +14,7 @@ class Policy::Users::RemoveUser < Policy::Base
 
   def init
     self.policy = user.policies.find_by(id: params[:policy_id])
-    self.removed_user = user.company.users.find_by(id: params[:removed_user_id])
+    self.removed_user = user.company.users.find_by(id: params[:removed_user_id] || params[:user_id])
   end
 
   def validate

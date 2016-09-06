@@ -2,7 +2,6 @@ class PoliciesController < ApplicationController
   protect_from_forgery with: :null_session
 
   before_action :authenticate_user!
-  # before_action :load_service_objects
 
   has_scope :filter_name
   has_scope :filter_email
@@ -80,9 +79,10 @@ class PoliciesController < ApplicationController
       format.html {}
       format.js
     end
+
   end
 
-  def add_user
+  def add_users
     add_user_op = Policy::Users::AddUser.new(current_user, params)
     if add_user_op.run
       flash[:success] = "User successfully addded"
@@ -212,8 +212,8 @@ class PoliciesController < ApplicationController
     @policy.user_mapping.each do |map|
       user = map.user
       admin = map.admin
-      conditional_manager= nil
-      conditional_finance =nil
+      conditional_manager = nil
+      conditional_finance = nil
       conditional_approves_to = nil
       conditional_approves_finance_to = nil
 
