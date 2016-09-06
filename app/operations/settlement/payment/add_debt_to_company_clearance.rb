@@ -16,7 +16,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:total].blank? or params[:payment][:total].to_i < 0
+    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
       errors << "Reimbursement cannot be negative."
     end
   end
@@ -42,7 +42,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   end
 
   def validate
-    value = payment_params[:total].to_f if payment_params[:total].present?
+    value = payment_params[:amount].to_f if payment_params[:amount].present?
     cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date]
     unless value <= cash_in_hand_on_date.value
       errors << 'Settlement amount cannot be greater than the cash in hand amount'
@@ -53,8 +53,8 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   def process
     balance_sheet = to_user.balance_sheet
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.debt_clearance_id, date: payment_params[:date], note: payment_params[:note],
-                                  amount_attributes: {value: payment_params[:total], currency_id: payment_params[:currency_id]})
-    if self.payment.save and balance_sheet.subtract_cash_in_hand(payment_params[:total], payment_params[:currency_id])
+                                  amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
+    if self.payment.save and balance_sheet.subtract_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
       return true
     end
     self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages

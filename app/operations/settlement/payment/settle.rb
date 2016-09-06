@@ -17,7 +17,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:total] and params[:payment][:total].to_i < 0
+    if params[:payment][:amount] and params[:payment][:amount].to_i < 0
       errors << "Reimbursement amount cannot be negative."
     end
     if params[:report_ids].blank?
@@ -53,7 +53,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     end
     validate_date payment_params[:date]
 
-    value = payment_params[:total].to_f if payment_params[:total].present?
+    value = payment_params[:amount].to_f if payment_params[:amount].present?
     cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date]
     unless value <= cash_in_hand_on_date.value
       errors << 'Settlement amount cannot be greater than the cash in hand amount'
@@ -62,7 +62,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
 
     # is this really necessary?
     total_amount = precision_value(reports.sum(:value))
-    unless total_amount == payment_params[:total]
+    unless total_amount == payment_params[:amount]
       errors << "Reimbursement amount does not match report totals."
     end
   end
@@ -70,9 +70,9 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
   def process
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.settlement_id,
                                   date: payment_params[:date], note: payment_params[:note],
-                                  amount_attributes: {value: payment_params[:total], currency_id: payment_params[:currency_id]})
+                                  amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:total], currency and balance_sheet.subtract_cash_in_hand payment_params[:total], currency
+    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], currency and balance_sheet.subtract_cash_in_hand payment_params[:total], currency
       reports.each do |report|
         Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id}).run
       end
