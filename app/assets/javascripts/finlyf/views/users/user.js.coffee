@@ -37,7 +37,13 @@ class FinlyF.Views.User extends Backbone.View
     $(@el).html(@templateShow({item: @model.toJSON()}))
 
   edit: (e) ->
+    container = $(e.currentTarget).closest('section')
+    $(container).find('.item-attr-preview').addClass('hide')
+    $(container).find('.item-attr-edit').addClass('show')
     #edit
+
+  update: (e) ->
+    #send data to server
 
 
 #Features

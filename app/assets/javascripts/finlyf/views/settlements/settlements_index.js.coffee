@@ -253,6 +253,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     FinlyF.changeView(e)
 
   userSettlements: (e) ->
+    $(@el).find('.settlements-content').css('display', 'block')
     #Load settlement for the user
     target = e.currentTarget
     $(target).siblings().removeClass("active")
@@ -340,29 +341,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-  # settleDebts: (e) ->
-  #   e.preventDefault()
-  #   target = $(e.currentTarget).closest('.modal-body')
-  #   data = {
-  #     authenticity_token: $("#authenticity_token").val()
-  #     payment: {
-  #       amount: $(target).find('input[name=payment\\[amount\\]]').val()
-  #       date: $(target).find('input[name=payment\\[date\\]]').val()
-  #       note: $(target).find('textarea[name=payment\\[note\\]]').val()
-  #       payment_type: $("input[name=payment\\[payment_type\\]]:checked").val()
-  #     }
-  #   }
-
-  #   # console.log data
-
-  #   $.ajax({
-  #     url: "settlements?payment_type=add_payment&view=admin&id=" + @user_id
-  #     type: "POST",
-  #     data: data,
-  #     success: (res) ->
-  #       console.log res
-  #   })
-
   initReimburse: (e) ->
     pending_reimbursement = parseFloat($(@el).find('.summary input[name=pending_reimbursement]').val())
     $(@el).find('#modal-settlements .modal-content').html(@templateReimburse())
@@ -419,11 +397,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     $(container).find('.confirmation-screen').css("display", "block")
     $(container).find('.process-screen').css('display', 'none')
 
-    # @selectedReports = _.select(@collectionSettlementReports.models, (model) ->
-    #   (_.indexOf(_this.selected, model.get('id')) > -1)
-    # )
-    console.log @params.view
-
   confirmReportAction: (e)->
     _this = @
     e.preventDefault()
@@ -439,9 +412,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       }
     }
 
-    # console.log data
-
-    # console.log data
     url = $(@el).find('.summary .btn-process-debt').attr('data-url')
     $.ajax({
       url: url,
