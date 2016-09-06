@@ -49,7 +49,6 @@ class ReportsController < ApplicationController
     # load_view_for_report
     # @comments = @report.comments.all.order(created_at: :desc)
     # # ap @actions
-    debugger
     respond_to do |format|
       format.json {}
     end
@@ -58,7 +57,6 @@ class ReportsController < ApplicationController
   def destroy
     destroy_op = Report::Destroy.new(current_user, params)
     destroy_op.run
-    # debugger
     if destroy_op.is_success?
       respond_to do |format|
         # flash.now[:success] = "Report deleted."

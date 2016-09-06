@@ -75,7 +75,7 @@ class Report::Index < Report::Base
 
     has_scope :filter_search
     has_scope :filter_status
-    has_scope :filter_user
+    has_scope :filter_user_id
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
 
