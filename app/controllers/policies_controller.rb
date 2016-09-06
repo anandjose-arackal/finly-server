@@ -48,32 +48,34 @@ class PoliciesController < ApplicationController
   end
 
   def invitable_users
-    @policy = Policy.find_by(id: params[:policy_id])
-    authorize @policy
-    u = PolicyUserService.new(@policy).invitable_users.sort_by_name
-    u = apply_scopes(u)
-    manager_id = params[:filter_manager_id]
-    if manager_id.present?
-      managers = @policy.company.users.with_id(manager_id)
-      if managers.present?
-        manager = managers.first
-        manager_team = UserTeamService.new(manager).team(UserRole.manager_id)
-        new_u = nil
-        if manager_team.present?
-          new_u = u.with_id(manager_team.pluck(:id))
-        end
-        u = new_u
-      end
-    end
-    @users = []
-    if u.present?
-      u.each do |user|
-        manager = UserTeamService.new(user).manager
-        manager_email = nil
-        manager_email = manager.email if manager.present?
-        @users << {user: user, manager: manager_email}
-      end
-    end
+    # @policy = Policy.find_by(id: params[:policy_id])
+    # authorize @policy
+    # u = PolicyUserService.new(@policy).invitable_users.sort_by_name
+    # u = apply_scopes(u)
+    # manager_id = params[:filter_manager_id]
+    # if manager_id.present?
+    #   managers = @policy.company.users.with_id(manager_id)
+    #   if managers.present?
+    #     manager = managers.first
+    #     manager_team = UserTeamService.new(manager).team(UserRole.manager_id)
+    #     new_u = nil
+    #     if manager_team.present?
+    #       new_u = u.with_id(manager_team.pluck(:id))
+    #     end
+    #     u = new_u
+    #   end
+    # end
+    # @users = []
+    # if u.present?
+    #   u.each do |user|
+    #     manager = UserTeamService.new(user).manager
+    #     manager_email = nil
+    #     manager_email = manager.email if manager.present?
+    #     @users << {user: user, manager: manager_email}
+    #   end
+    # end
+    invitable_users_op = Policy::InvitableUsers.new(current_user, params)
+    @result = invitable_users_op.run
     respond_to do |format|
       format.html {}
       format.js
