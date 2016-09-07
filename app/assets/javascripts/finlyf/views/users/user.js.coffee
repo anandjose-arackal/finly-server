@@ -10,6 +10,8 @@ class FinlyF.Views.User extends Backbone.View
   events:
     'click .btn-edit-user': 'edit'
     'click .btn-update-user': 'update'
+    'click .btn-edit-policy': 'editPolicy'
+    'click .btn-update-policy': 'updatePolicy'
 
   initialize: (options) ->
     @params = options.params

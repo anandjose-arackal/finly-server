@@ -230,7 +230,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     _.each($(@el).find('form#new-item').serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
-    console.log values
+    # console.log values
     model = new FinlyF.Models.Expense()
     # console.log("Putting data")
     response = model.save(values, {

@@ -62,7 +62,7 @@ class SettlementsController < ApplicationController
   end
 
   def summary
-    ap params
+    # ap params
     operation = Settlement::Show.new(current_user, params)
     @result = operation.run
     # ap @result
