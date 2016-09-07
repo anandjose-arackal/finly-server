@@ -59,7 +59,6 @@ class UsersController < ApplicationController
     else
       flash.now[:errors] = operation.errors
     end
-    debugger
   end
 
 end
