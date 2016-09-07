@@ -15,7 +15,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
     elsif user.policy_admin?
       if params[:user_manager_mapping].present?
         admin_policy_id = user.admin_policies.pluck(:id)
-        params[:user_manager_mapping].each do |mapping|
+        params[:user_manager_mapping].each do |key, mapping|
           unless admin_policy_id.include?(mapping[:mapping_id])
             errors << 'You do not have the permission to make the following update'
             raise_unauthorized_exception
@@ -33,7 +33,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   end
 
   def process
-    self.updating_mapping.each do |map|
+    self.updating_mapping.each do |key, map|
       id = map[:mapping_id]
       updated_params = map[:mapping]
       if id.present?
