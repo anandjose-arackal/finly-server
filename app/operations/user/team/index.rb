@@ -80,9 +80,9 @@ class User::Team::Index < User::Team::Base
     end
   end
 
-  def success
-    User::Team::Base::TeamPresenter.new(user, team: response)
-  end
+  # def success
+  #   User::Team::Base::TeamPresenter.new(user, team: response)
+  # end
 
   private
   def admin_team

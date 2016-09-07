@@ -50,7 +50,7 @@ class Policy::Users::UpdateConfiguration < Policy::Base
   end
 
   def init
-    self.policy = Policy::List.(user, view: params[:view]).find_by(id: params[:policy_id])
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id])
     self.being_updated_user = policy.users.find_by(id: params[:user_id])
     add_user_and_policy_to_params
   end

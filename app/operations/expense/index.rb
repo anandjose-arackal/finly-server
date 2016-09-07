@@ -39,7 +39,7 @@ class Expense::Index < Expense::Base
         self.expenses = Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
       when UserRole.auditor_id
       else
-        self.expenses = user.expenses.unreported.includes(:manual_expense)
+        self.expenses = user.expenses.includes(:manual_expense)
     end
   end
 
@@ -55,7 +55,7 @@ class Expense::Index < Expense::Base
   class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :paginated_expenses, :categories
+    attr_accessor :expenses, :paginated_unreported_expenses, :categories, :unreported_expenses
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
@@ -71,7 +71,8 @@ class Expense::Index < Expense::Base
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
-        self.paginated_expenses = self.expenses.paginate(page: params[:page], per_page: 30)
+        self.unreported_expenses = expenses.unreported
+        self.paginated_unreported_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
       end
       self.categories = user.company.active_categories
     end

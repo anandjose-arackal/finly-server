@@ -72,7 +72,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
                                   date: payment_params[:date], note: payment_params[:note],
                                   amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], currency and balance_sheet.subtract_cash_in_hand payment_params[:total], currency
+    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], currency and balance_sheet.subtract_cash_in_hand payment_params[:amount], currency
       reports.each do |report|
         Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id}).run
       end

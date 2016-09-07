@@ -1,7 +1,7 @@
 <div id="invitableUsersContainer">
   <table style="width:100%">
-    <% if @users.present? %>
-        <% @users.each do |item| %>
+    <% if @result.users_with_manager_email.present? %>
+        <% @result.users_with_manager_email.each do |item| %>
             <% user = item[:user] %>
             <tr style="margin: 0;font-size: 13px; text-align: left; padding-top: 10px; height: 30px">
               <td style="width: 15% ">
