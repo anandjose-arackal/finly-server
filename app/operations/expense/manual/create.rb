@@ -21,14 +21,17 @@ class Expense::Manual::Create < Expense::Manual::Base
   def init
     self.expense_params = manual_expense_params
     self.expense_params[:expense_type_id] = ExpenseType.manual_expense_id
-    if params[:receipt_id].present?
+    if expense_params[:receipt_id].present?
       self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
+    end
+    if expense_params[:receipts_attributes] == [nil]
+      expense_params.delete(:receipts_attributes)
     end
   end
 
   def validate
     # can't think of anything for now
-    if params[:receipt_id].present? and receipt.blank?
+    if expense_params[:receipt_id].present? and receipt.blank?
       errors << 'Receipt not found'
     end
   end
@@ -41,6 +44,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         self.receipt.parent = expense
         self.receipt.save
       end
+      self.response = expense
     else
       errors << self.expense.errors.full_messages
     end

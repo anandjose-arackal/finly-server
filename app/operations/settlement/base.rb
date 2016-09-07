@@ -29,7 +29,7 @@ class Settlement::Base < BaseOperation
     end
 
     if date.present? and date > Date.today
-      errors << 'Date cannot be later than the currency date'
+      errors << 'Date cannot be later than the current date'
       return false
     end
     return true
