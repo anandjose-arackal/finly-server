@@ -48,18 +48,23 @@ class FinlyF.Views.User extends Backbone.View
     $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').text('Update')
 
   update: (e) ->
+    e.preventDefault()
     target = $(e.currentTarget)
-    container = $(target).closest('section')
+    container = $(target).closest('form')
     values = {}
 
-    _.each($(container).find('form').serializeArray(), (input) ->
+    # _.each($(container).find('form').serializeArray(), (input) ->
+    _.each($(container).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
-    values.authenticity_token = $("#authenticity_token").val()
+    # console.log values
+    # values.authenticity_token = $("#authenticity_token").val()
 
-    console.log values
+    # # console.log values
     model = new FinlyF.Models.User({id: @model.get('id')})
     model.save(values, {
+      data: values,
+      processData: true
       success: (model, res) ->
         console.log model, res
       error: (err) ->

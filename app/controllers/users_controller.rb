@@ -13,6 +13,8 @@ class UsersController < ApplicationController
 
   # this would call the respective private method to update the respective attributes
   def update
+    ap params
+    # fail
     update_handler(params[:type])
   end
 
@@ -35,28 +37,29 @@ class UsersController < ApplicationController
     operation = nil
     success_message = nil
     case type
-      when :password
+      when 'password'
         operation = User::Configuration::UpdatePassword.new(user, params)
         success_message = 'Password updated'
-      when :team
-        operation = User::Team::Mapping::Set.new(current_user, params)
+      when 'team'
+        operation = User::Team::Mappings::Set.new(current_user, params)
         success_message = 'User team updated.'
-      when :role
+      when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = "Role updated"
       else
         # do nothing, ha!
     end
     unless operation.present?
-      errors << 'Unknown error'
+      flash.now[:error] = 'Unknown error'
       return
     end
     @result = operation.run
     if operation.is_success?
       flash.now[:success] = success_message if success_message.present?
     else
-      flash.now[:errors] - operation.errors
+      flash.now[:errors] = operation.errors
     end
+    debugger
   end
 
 end
