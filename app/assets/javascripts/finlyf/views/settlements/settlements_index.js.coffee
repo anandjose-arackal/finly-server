@@ -368,6 +368,43 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
+  
+
+  confirmReportAction: (e)->
+    #coming from confirmation screen
+    _this = @
+    e.preventDefault()
+    target = e.currentTarget
+    container = $(target).closest('.confirmation-screen')
+
+    data = {
+      view: _this.params.view
+      report_ids: @selected.slice()
+      payment: {
+        note: $(container).find('textarea[name=payment\\[note\\]]').val()
+        date: $(container).find('input[name=payment\\[date\\]]').val()
+        amount: parseFloat(_this.selectedReportsTotal())
+      }
+    }
+
+    if $(target).attr('data-action-type') == 'reimburse'
+      url = $(@el).find('.summary .btn-process-reimburse').attr('data-url')
+    else if $(target).attr('data-action-type') == 'settle'
+      url = $(@el).find('.summary .btn-process-debt').attr('data-url')
+
+    $.ajax({
+      url: url,
+      data: data,
+      type: "POST",
+      dataType: 'json',
+      success: (res) ->
+        console.log "success"
+      error: (err) ->
+        console.log "err", err
+    })
+
+
+  ##Helpers
   processSettlementReport: (e) ->
     _this = @
     container = $(e.currentTarget).closest('.settlement-modal-reports')
@@ -390,40 +427,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     )
     $(container).closest('.modal-body').find('.selected_reports_total').text(@selectedReportsTotal())
 
-
   processSettlementAction: (e) ->
     _this = @
     container = $(e.currentTarget).closest('.modal-body')
     $(container).find('.confirmation-screen').css("display", "block")
     $(container).find('.process-screen').css('display', 'none')
 
-  confirmReportAction: (e)->
-    _this = @
-    e.preventDefault()
-    container = $(e.currentTarget).closest('.confirmation-screen')
 
-    data = {
-      view: _this.params.view
-      report_ids: @selected.slice()
-      payment: {
-        note: $(container).find('textarea[name=payment\\[note\\]]').val()
-        date: $(container).find('input[name=payment\\[date\\]]').val()
-        amount: parseFloat(_this.selectedReportsTotal())
-      }
-    }
-
-    url = $(@el).find('.summary .btn-process-debt').attr('data-url')
-    $.ajax({
-      url: url,
-      data: data,
-      type: "POST",
-      dataType: 'json',
-      success: (res) ->
-        console.log "success"
-      error: (err) ->
-        console.log "err", err
-    })
-
+  
   selectedReportsTotal: ->
     total = _.reduce(@selectedReports, ((memo, value) ->
       memo + value.get('total_amount')

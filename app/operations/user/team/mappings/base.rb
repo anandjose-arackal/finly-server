@@ -2,7 +2,7 @@ class User::Team::Mappings::Base < User::Team::Base
   attr_accessor :updating_user, :policy
 
   def pre_validate
-    if user.blank? or params[:user_id].blank?
+    if user.blank? or (params[:user_id].blank? and params[:id].blank?)
       errors << 'User not found'
     end
   end

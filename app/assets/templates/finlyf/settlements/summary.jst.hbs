@@ -13,7 +13,7 @@
     <h4 class="summary_cash_id_hand">{{item.cash_in_hand}}</h4>
     <input type="hidden" name="cash_in_hand" value="{{item.cash_in_hand}}">
     {{#if item.actions.settle}}
-      <button class="btn btn-sm btn-process-debt" data-url="{{item.actions.add_reimbursement}}">Settle Debt</button>
+      <button class="btn btn-sm btn-process-debt" data-url="{{item.actions.settle}}">Settle Debt</button>
     {{/if}}
   </div>
 
