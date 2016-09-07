@@ -9,7 +9,7 @@
   # date: date of the payment
 
 class Settlement::Payment::Settle < Settlement::Payment::Base
-  attr_accessor :payment
+  attr_accessor :payment, :reports, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -27,7 +27,8 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
   end
 
   def init
-    self.to_user = user.company.users.find_by(id: params[:to_user_id])
+    id = params[:to_user_id] || params[:id]
+    self.to_user = user.company.users.find_by(id: id)
     self.reports = to_user.reports.where(id: params[:report_ids]) if to_user
   end
 
@@ -61,8 +62,8 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     end
 
     # is this really necessary?
-    total_amount = precision_value(reports.sum(:value))
-    unless total_amount == payment_params[:amount]
+    total_amount = precision_value(reports.with_amount.sum(:value))
+    unless total_amount == precision_value(payment_params[:amount])
       errors << "Reimbursement amount does not match report totals."
     end
   end
@@ -72,9 +73,9 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
                                   date: payment_params[:date], note: payment_params[:note],
                                   amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], currency and balance_sheet.subtract_cash_in_hand payment_params[:amount], currency
+    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], payment_params[:currency_id] and balance_sheet.subtract_cash_in_hand payment_params[:amount], payment_params[:currency_id]
       reports.each do |report|
-        Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id}).run
+        Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id, role_id: role}).run
       end
       return true
     end
