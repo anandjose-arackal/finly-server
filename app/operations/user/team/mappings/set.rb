@@ -72,7 +72,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
 
   private
   def update_params(params)
-    params.permit(:manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, greater_than_amount_attributes: [:id, :value, :currency_id])
+    params.permit(:manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :user_id, greater_than_amount_attributes: [:id, :value, :currency_id])
   end
 
 end

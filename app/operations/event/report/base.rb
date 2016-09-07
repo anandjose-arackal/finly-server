@@ -20,7 +20,6 @@ class Event::Report::Base < Event::SetNotification
   def send_mailer(user)
     subject = self.mailer_subject(user)
     body = self.mailer_body(user)
-    # method = self.mailer_method(user)
     button_name = self.mailer_button_name(user)
     return unless subject.present? and method.present?
     ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(user, report, subject, body, button_name))

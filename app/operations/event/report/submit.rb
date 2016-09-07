@@ -16,10 +16,6 @@ class Event::Report::Submit < Event::Report::Base
 
   end
 
-  def mailer_method(user)
-    :submit
-  end
-
   def mailer_subject(user)
     if user.id == report.user.id
       "Report submitted : #{self.report.name}"

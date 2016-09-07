@@ -48,5 +48,14 @@ class ReportMailerPreview < ActionMailer::Preview
     ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
   end
 
+  # http://localhost:3000/rails/mailers/report_mailer/take_control
+  def take_control
+    event = Event::Report::TakeControl.new(User.first, {report: Report.first})
+    event.init
+    subject = event.mailer_subject(event.user)
+    body = event.mailer_body(event.user)
+    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+  end
+
 
 end
