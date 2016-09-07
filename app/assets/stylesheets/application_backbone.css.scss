@@ -17,6 +17,18 @@
  *= require customized/jquery-ui.min
 */
 
+
+
+// Will be moved to home.css.scss
+.dropdown{
+  position: relative;
+  display: inline-block;
+}
+
+
+
+// Home css scss content ends
+
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
