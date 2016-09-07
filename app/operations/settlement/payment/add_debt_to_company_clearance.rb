@@ -8,7 +8,7 @@
   # date: date of the payment
 
 class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
-  attr_accessor :payment
+  attr_accessor :payment, :role
 
   def authorized_user_types
     [:finance_manager, :admin]

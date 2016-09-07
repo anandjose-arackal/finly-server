@@ -25,6 +25,9 @@ class Expense::Manual::Update < Expense::Manual::Base
     super
     # setting up the expense params for updation
     self.updated_expense_params = manual_expense_params
+    if updated_expense_params[:receipts_attributes] == [nil]
+      updated_expense_params.delete(:receipts_attributes)
+    end
     if expense
       if self.updated_expense_params[:amount_attributes].present? and self.updated_expense_params[:amount_attributes][:value].present? and
           expense.amount_id.present?
