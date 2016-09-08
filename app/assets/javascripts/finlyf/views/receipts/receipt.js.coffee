@@ -5,7 +5,7 @@ class FinlyF.Views.Receipt extends Backbone.View
   className: 'item col-sm-3'
 
   events:
-    'click .select-item': 'toggleSelect'
+    # 'click .select-item': 'toggleSelect'
     'input [contenteditable=true]': 'updateModel'
     'click .btn-update-item': 'update'
 
@@ -36,13 +36,13 @@ class FinlyF.Views.Receipt extends Backbone.View
   update: ->
     @model.save({patch: true})
 
-  toggleSelect: (e) ->
-    if $(e.currentTarget).prop('checked')
-      $(@el).addClass('selected')
-    else
-      $(@el).removeClass('selected')
+  # toggleSelect: (e) ->
+  #   if $(e.currentTarget).prop('checked')
+  #     $(@el).addClass('selected')
+  #   else
+  #     $(@el).removeClass('selected')
 
-    @parent.trigger('item:selected')
+  #   @parent.trigger('item:selected')
 
   populateDetails: ->
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
