@@ -27,14 +27,14 @@ class User::Invite::Accept < User::Invite::Base
   end
 
   def init
-
+    self.accept_params = user_params
   end
 
   def validate
-    invitation_token = params[:invitation_token]
-    name = params[:name]
-    mobile_number = params[:mobile_number]
-    password = params[:password]
+    invitation_token = accept_params[:invitation_token]
+    name = accept_params[:name]
+    mobile_number = accept_params[:mobile_number]
+    password = accept_params[:password]
     if invitation_token.blank?
       errors << 'Invite not found'
       return false
@@ -58,7 +58,7 @@ class User::Invite::Accept < User::Invite::Base
   end
 
   def process
-    self.invited_user = User.accept_invitation!(params)
+    self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present?
       errors << invited_user.errors.full_messages
       true

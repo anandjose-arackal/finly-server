@@ -39,11 +39,14 @@ class PoliciesController < ApplicationController
   end
 
   def show
-    @policy = Policy.find(params[:id])
-    @managers = @policy.company.managers
-    @finance_managers = @policy.company.finance_managers
-    @categories = current_company.categories.active
-    load_users
+    show_op = Policy::Show.new(current_user, params)
+    @result = show_op.run
+
+    # @policy = Policy.find(params[:id])
+    # @managers = @policy.company.managers
+    # @finance_managers = @policy.company.finance_managers
+    # @categories = current_company.categories.active
+    # load_users
   end
 
   def invitable_users
@@ -207,46 +210,34 @@ class PoliciesController < ApplicationController
   # end
 
   private
-  def load_users
-    @users = []
-    @policy.user_mapping.each do |map|
-      user = map.user
-      admin = map.admin
-      conditional_manager = nil
-      conditional_finance = nil
-      conditional_approves_to = nil
-      conditional_approves_finance_to = nil
 
-      mappings = user.team_mapping.with_details.policy(@policy.id)
-      dm = mappings.default
-      default_mapping = dm.first if dm.present?
-      conditional_mapping = mappings.non_default
-      cm = conditional_mapping.manager
-      conditional_manager = cm.first if cm.present?
-      cf = conditional_mapping.finance_manager
-      conditional_finance = cf.first if cf.present?
-      cat = conditional_mapping.approves_to
-      conditional_approves_to = cat.first if cat.present?
-      caft = conditional_mapping.approves_finance_to
-      conditional_approves_finance_to = caft.first if caft.present?
-
-      @users << {user: user, admin: admin, default_mapping: default_mapping, conditional_manager: conditional_manager,
-                 conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
-                 conditional_approves_finance_to: conditional_approves_finance_to}
-    end
-  end
-
-  # def update_user_params
-  #   params.require(:policy).permit(:admin, :default, :conditional_manager, :conditional_finance_manager,
-  #                                  :conditional_approves_to, :conditional_approves_finance_to)
-  # end
+  # def load_users
+  #   @users = []
+  #   @policy.user_mapping.each do |map|
+  #     user = map.user
+  #     admin = map.admin
+  #     conditional_manager = nil
+  #     conditional_finance = nil
+  #     conditional_approves_to = nil
+  #     conditional_approves_finance_to = nil
   #
-  # def rule_params
-  #   params.require(:rules).permit!
-  # end
-
-  # def load_service_objects
-  #   @rule_service = RuleService.new(current_user, params[:policy_id])
+  #     mappings = user.team_mapping.with_details.policy(@policy.id)
+  #     dm = mappings.default
+  #     default_mapping = dm.first if dm.present?
+  #     conditional_mapping = mappings.non_default
+  #     cm = conditional_mapping.manager
+  #     conditional_manager = cm.first if cm.present?
+  #     cf = conditional_mapping.finance_manager
+  #     conditional_finance = cf.first if cf.present?
+  #     cat = conditional_mapping.approves_to
+  #     conditional_approves_to = cat.first if cat.present?
+  #     caft = conditional_mapping.approves_finance_to
+  #     conditional_approves_finance_to = caft.first if caft.present?
+  #
+  #     @users << {user: user, admin: admin, default_mapping: default_mapping, conditional_manager: conditional_manager,
+  #                conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
+  #                conditional_approves_finance_to: conditional_approves_finance_to}
+  #   end
   # end
 
 end
