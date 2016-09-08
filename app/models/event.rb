@@ -12,40 +12,63 @@
 
 class Event < ActiveRecord::Base
 
-  def report_submit_id
-    1
-  end
+  ACTIONS = [{key: :report_submit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_approve, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_retract, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_reject, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_comment, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_edit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_add_expense, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_remove_expense, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_reject_expense, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_take_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_reimbursed, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :report_approved, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :user_invite, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_password_reset, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_password_change, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_account_unlock_instructions, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_welcome, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_role_updated, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_manager_updated, has_push_notification: false, has_masiler: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_policy_added, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :user_policy_removed, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :settlement_add_cash_advance, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :settlement_add_reimbursement, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :settlement_debt_clearance, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :settlement_settled, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true}]
 
-  def report_approve_id
-    2
-  end
-
-  def report_retract_id
-    3
-  end
-
-  def report_reject_id
-    4
-  end
-
-  def report_comment_id
-    5
-  end
-
-  def settlement_add_advance_id
-    6
-  end
-
-  def settlement_clear_debt_id
-    7
-  end
-
-  def settlement_reimburse_id
-    8
-  end
-
-  def settlement_settle_id
-    9
+  self.class.instance_eval do
+    ACTIONS.each do |item|
+      define_method "#{item[:key]}_id" do
+        ACTIONS.find_index(item)
+      end
+    end
   end
 
 end

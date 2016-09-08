@@ -15,7 +15,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
     elsif user.policy_admin?
       if params[:user_manager_mapping].present?
         admin_policy_id = user.admin_policies.pluck(:id)
-        params[:user_manager_mapping].each do |mapping|
+        params[:user_manager_mapping].each do |key, mapping|
           unless admin_policy_id.include?(mapping[:mapping_id])
             errors << 'You do not have the permission to make the following update'
             raise_unauthorized_exception
@@ -33,7 +33,10 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   end
 
   def process
-    self.updating_mapping.each do |map|
+    self.updating_mapping.each do |key, map|
+      # to remove all empty values
+      RequestFormatter.clean_hash map
+      next if map.blank?
       id = map[:mapping_id]
       updated_params = map[:mapping]
       if id.present?
@@ -60,6 +63,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
         # If ID is not present, create new user mapping
         if updated_params.present?
           updated_params[:user_id] = updating_user.id
+          updated_params["greater_than_amount_attributes"]["currency_id"] = 1
           self.mappings.create(update_params(updated_params))
         end
       end
@@ -72,7 +76,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
 
   private
   def update_params(params)
-    params.permit(:manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, greater_than_amount_attributes: [:id, :value, :currency_id])
+    params.permit(:manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :user_id, greater_than_amount_attributes: [:id, :value, :currency_id])
   end
 
 end

@@ -47,8 +47,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-settlement-action': 'processSettlementAction'
     'click .confirm-report-action': 'confirmReportAction'
 
-
-
   initialize: (options) ->
     # console.log options
     _this = @
@@ -291,6 +289,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     $(@el).find('#modal-settlements').modal('show')
 
   addPayment: (e) ->
+    _this = @
     e.preventDefault()
     target = $(e.currentTarget).closest('.modal-body')
     data = {
@@ -310,7 +309,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       type: "POST",
       data: data,
       success: (res) ->
-        console.log res
+        $(_this.el).find("#modal-settlements").modal('hide')
+        #refresh data
+        _this.populateSummary(_this.user_id)
     })
 
   initDebt: (e) ->
@@ -368,8 +369,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-  
-
   confirmReportAction: (e)->
     #coming from confirmation screen
     _this = @
@@ -398,7 +397,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       type: "POST",
       dataType: 'json',
       success: (res) ->
-        console.log "success"
+        $(_this.el).find("#modal-settlements").modal('hide')
+        #refresh sreen
+        # console.log "success"
+        _this.populateSummary(_this.user_id)
       error: (err) ->
         console.log "err", err
     })
@@ -433,8 +435,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     $(container).find('.confirmation-screen').css("display", "block")
     $(container).find('.process-screen').css('display', 'none')
 
-
-  
   selectedReportsTotal: ->
     total = _.reduce(@selectedReports, ((memo, value) ->
       memo + value.get('total_amount')

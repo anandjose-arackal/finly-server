@@ -4,6 +4,7 @@ class FinlyF.Views.Report extends Backbone.View
   templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
 
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
+  templateShowExpense: HandlebarsTemplates['finlyf/reports/expenses/show']
   templateExistingExpense: HandlebarsTemplates['finlyf/reports/expenses/existingExpenses']
   className: 'item col-sm-12'
 
@@ -30,6 +31,7 @@ class FinlyF.Views.Report extends Backbone.View
 
     #reports
     'click .btn-report-action': 'reportAction'
+    'click .confirm-add-existing-expense': 'addExistingExpenses'
 
   initialize: (options) ->
     @parent = options.parent
@@ -44,6 +46,7 @@ class FinlyF.Views.Report extends Backbone.View
       @model.fetch({data: data})
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
+    @on('expense:selected', @showExpenseSelectOption, @)#REF==3I
     
 
   render: ->
@@ -82,6 +85,7 @@ class FinlyF.Views.Report extends Backbone.View
     data = {
       report_id: $(e.currentTarget).attr('data-item-id')
     }
+    $("#modal-new").attr("data-backdrop", false)
     $("#modal-new .modal-body").html(@templateNewExpense({data: data}))
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
 
@@ -131,10 +135,61 @@ class FinlyF.Views.Report extends Backbone.View
     report_id = $(e.currentTarget).attr('data-item-id')
     expense_view = new FinlyF.Views.ExpensesIndex({
       indexOnly: true
+      parent: @
     })
-    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    $(@el).find("#modal-mp").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
     $(@el).find("#modal-mp").modal('show')
+
+  showExpenseSelectOption: ->
+    console.log "Here we are"
+
+    modal_header = $(@el).find("#modal-mp .modal-content .modal-header")
+    container = $(@el).find("#modal-mp .modal-content .modal-body")
+    items = $(container).find("#items .item")
+
+    flag = false
+    for item in items
+      if $(item).find('.select-item').prop('checked')
+        flag = true
+    if flag == true
+      $(modal_header).find('.confirm-add-existing-expense').css("display", 'inline')
+    else
+      $(modal_header).find('.confirm-add-existing-expense').css("display", 'none')
+
+  addExistingExpenses: (e) ->
+    _this = @
+    modal = $(@el).find("#modal-mp")
+    modal_header = $(modal).find(".modal-content .modal-header")
+    container = $(modal).find(".modal-content .modal-body")
+    items = $(container).find("#items .item")
+
+    expense_ids = []
+    flag = false
+    for item in items
+      selected_item = $(item).find('.select-item')
+      if $(selected_item).prop('checked')
+        expense_ids.push($(selected_item).attr('data-item-id'))
+
+    # console.log expenses
+
+    $.ajax({
+      url: _this.model.urlRoot + "/" + _this.model.get('id') + "/add_expenses",
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        expense_ids: expense_ids
+      },
+      success: (res)->
+        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        # $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        $(modal).modal('hide')
+        _this.model.fetch({ data: {view: _this.current_view}})
+      error: (err) ->
+        console.log "Error", err
+    })
+
 
   edit: (e) ->
     #Warning!!! Dirty codes ahead!
@@ -284,7 +339,7 @@ class FinlyF.Views.Report extends Backbone.View
       preview: true
       view: @current_view
     })
-    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    $(@el).find("#modal-mp").html(@templateShowExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
     $(@el).find("#modal-mp").modal('show')
 
