@@ -11,5 +11,4 @@ class OrganizationAccountController < ApplicationController
 
   private
 
-
 end
