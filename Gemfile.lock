@@ -63,6 +63,12 @@ GEM
     arel (6.0.3)
     autoprefixer-rails (6.4.0.1)
       execjs
+    awesome_print (1.7.0)
+    backbone-on-rails (1.2.0.0)
+      eco
+      ejs
+      jquery-rails
+      railties
     bcrypt (3.1.11)
     bcrypt (3.1.11-x86-mingw32)
     binding_of_caller (0.7.2)
@@ -119,6 +125,12 @@ GEM
     devise_invitable (1.7.0)
       actionmailer (>= 4.0.0)
       devise (>= 4.0.0)
+    eco (1.0.0)
+      coffee-script
+      eco-source
+      execjs
+    eco-source (1.1.0.rc.1)
+    ejs (1.1.1)
     erubis (2.7.0)
     execjs (2.7.0)
     faker (1.6.6)
@@ -134,9 +146,17 @@ GEM
       rails (>= 3.2.0)
     griddler-sendgrid (0.0.1)
       griddler
+    handlebars_assets (0.23.1)
+      execjs (~> 2.0)
+      multi_json (~> 1.0)
+      sprockets (>= 2.0.0)
+      tilt (>= 1.2)
     has_scope (0.7.0)
       actionpack (>= 4.1, < 5.1)
       activesupport (>= 4.1, < 5.1)
+    hirb (0.7.3)
+    hooks (0.4.1)
+      uber (~> 0.0.14)
     htmlentities (4.3.4)
     i18n (0.7.0)
     imgkit (1.6.1)
@@ -268,6 +288,7 @@ GEM
       thread_safe (~> 0.1)
     tzinfo-data (1.2016.6)
       tzinfo (>= 1.0.0)
+    uber (0.0.15)
     uglifier (3.0.1)
       execjs (>= 0.3.0, < 3)
     warden (1.2.6)
@@ -289,6 +310,8 @@ PLATFORMS
 DEPENDENCIES
   animate-rails
   annotate
+  awesome_print
+  backbone-on-rails
   bootbox-rails (~> 0.4)
   bootstrap-sass
   bootstrap-will_paginate
@@ -307,7 +330,10 @@ DEPENDENCIES
   font-awesome-rails
   griddler
   griddler-sendgrid
+  handlebars_assets
   has_scope
+  hirb
+  hooks
   imgkit
   jbuilder (~> 2.0)
   jquery-rails
