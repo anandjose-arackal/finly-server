@@ -207,38 +207,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
 
 
-  # create: ->
-  #   values = {};
-  #   # if(event){ event.preventDefault(); }
-  #   _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-  #     values[ input.name ] = input.value
-  #   )
-  #   console.log values
-  #   model = new FinlyF.Models.Report()
-  #   console.log("Putting data")
-  #   console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
-
-
-
-    # _this = @
-    # form = $(@el).find('#new-report')
-    # data = {
-    #   amount: $(form).find('input[name="report[amount]"]').val()
-    #   merchant: $(form).find('input[name="report[merchant]"]').val()
-    #   date: $(form).find('input[name="report[date]"]').val()
-    #   category_id: $(form).find('select[name="report[category_id]"]').val()
-    # }
-
-    # model = new FinlyF.Models.report(data)
-    # console.log model.toJSON()
-    # model.save({
-    #   success: ->
-    #     @collection.fetch({reset: true})
-    # })
-
-  
-
-
   filterStatus: (e) ->
     e.preventDefault()
 
