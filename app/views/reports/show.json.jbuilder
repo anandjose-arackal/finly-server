@@ -16,6 +16,8 @@ json.policies @result.report.user.policies do |policy|
   json.extract! policy, :id, :name
 end
 
+json.violations @result.violations
+
 json.status @result.report.status.name
 json.total @result.report.total_amount
 json.date @result.report.created_at.strftime("%d %b")
@@ -40,10 +42,9 @@ json.expense_sections @result.expenses_category_sorted do |category|
   end
 end
 
-
 @result.expenses_category_sorted.each do |category|
   json.receipts category[:expenses] do |expense|
-    unless(expense.receipts.blank? or expense.receipts.first.image.url == "/assets/original/missing.png")
+    unless expense.receipts.blank? or expense.receipts.first.image.url == "/assets/original/missing.png"
       json.url expense.receipts.first.image.url
       json.date expense.date.strftime("%d %b %y")
       json.merchant_name expense.merchant_name

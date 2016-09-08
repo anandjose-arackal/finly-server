@@ -35,7 +35,5 @@ json.data do
     json.user_name name
   end
   json.policies @result.policies, :id, :name
-  json.violations do
-
-  end
+  json.violations @result.violations
 end

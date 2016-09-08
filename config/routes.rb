@@ -237,6 +237,8 @@ Rails.application.routes.draw do
       end
       namespace :configuration do
         get 'categories' => 'category#index', as: :categories
+        post 'gcm/register', to: 'gcm#create'
+        post 'gcm/unregister', to: 'gcm#delete'
       end
     end
   end
