@@ -45,7 +45,7 @@
       </tr>
       </thead>
 
-      <% @users.each do |user| %>
+      <% @result.users.each do |user| %>
           <% default_mapping = user[:default_mapping] %>
           <tr onclick="userSettingsModal('<%= user[:user].id %>')">
             <td style="width: 1%; padding-left: 20px">
