@@ -1,5 +1,6 @@
 class FinlyF.Views.ExpensesIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
+  templateSkeletonIndexOnly: HandlebarsTemplates['finlyf/base/skeletonIndexOnly']
 
   #navbar
   templateNavbarSidebar: HandlebarsTemplates['finlyf/expenses/navbar/navbar_sidebar']
@@ -7,6 +8,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
   #sidebar
   templateSidebar: HandlebarsTemplates['finlyf/expenses/sidebar/sidebar']
+  templateSidebarIndexOnly: HandlebarsTemplates['finlyf/expenses/sidebar/sidebarIndexOnly']
+
 
   #main
   templateMain: HandlebarsTemplates['finlyf/expenses/crud/main']
@@ -32,15 +35,18 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
-    'click .btn-filter': 'filter'
+    'click .btn-filter-expenses': 'filter'
 
   initialize: (options) ->
     if Backbone.history.getFragment() == ""
       FinlyF.primary_router.navigate("expenses")
     if options
+
       @params = options.params || {}
       if options.indexOnly
         @indexOnly = true
+      if options.parent
+        @parent = options.parent
     else
       @params = {}
     @params.page = 1
@@ -74,6 +80,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       @params.filter_date_to = @params['filter_date[to]']
       @params.filter_amount_value = @params['filter_amount[value]']
       @params.filter_amount_type = @params['filter_amount[type]']
+      @params.indexOnly = false#REF==2I
 
 
       $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
@@ -84,10 +91,19 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           value: $(option).attr('value')
           text: $(option).text()
         }).appendTo(category_select)
-      $(@el).find(".main").html(@templateMain())
+      $(@el).find(".main").html(@templateMain({ item: {indexOnly: false }}))#REF==1I
       FinlyF.structureActions(@el, @params)
     else
-      $(@el).html(@templateMain())
+      $(@el).html(@templateSkeletonIndexOnly())
+      $(@el).find('.sidebar').html(@templateSidebar({item: {indexOnly: true}}))#REF==2I
+      category_select = $(@el).find(".filter-category-id")
+      options = $("#newExpenseCategory option")
+      for option in options
+        $('<option/>', {
+          value: $(option).attr('value')
+          text: $(option).text()
+        }).appendTo(category_select)
+      $(@el).find('.main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
   
@@ -261,9 +277,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     # console.log expenses
     model_report = new FinlyF.Models.Report({
-      "report": {
-        "expense_id": expenses.join(","),
-      },
+      "expense_ids": expenses.join(","),
+      # "expense_ids": expenses,
       "authenticity_token": $("#authenticity_token").val()
       "utf8": $("#form_utf8").val()
     })
@@ -277,22 +292,28 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     })
 
   expenseSelectOptions: ->
-    items = $(@el).find('#items .item')
-    flag = false
-    for item in items
-      if $(item).find('.select-item').prop('checked')
-        flag = true
-    if flag == true
-      $(@el).find('.secondary-navbar .btn-create-report').css('display', 'inline')
-    else
-      $(@el).find('.secondary-navbar .btn-create-report').css('display', 'none')
+    unless @parent
+      items = $(@el).find('#items .item')
+      flag = false
+      for item in items
+        if $(item).find('.select-item').prop('checked')
+          flag = true
+      if flag == true
+        $(@el).find('.secondary-navbar .btn-create-report').css('display', 'inline')
+      else
+        $(@el).find('.secondary-navbar .btn-create-report').css('display', 'none')
+    else#unless
+      @parent.trigger('expense:selected')#REF==3I
 
   resetFilters: ->
     params = {}
     params.view = @params.view
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
-  filter: ->
+  filter: (e) ->
+    e.preventDefault()
+    target = $(e.currentTarget)
+
     sidebar = $(@el).find(".sidebar")
     params = {
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
@@ -313,7 +334,21 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     if @params.view
       params.view = @params.view
 
-    FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
+    if $(target).attr('data-navigate')
+      if $(target).attr('data-navigate') == true
+        #Filters by navigating to a Backbone route
+        FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})  
+      else
+        #Navigates by refetching & resetting collection with params
+        @collection.fetch({
+          reset: true,
+          data: params,
+          success: ->
+            console.log "Fetched all the data"
+          error: ->
+            console.log "Couldn't fetch Successfully."
+        })
+    
 
   globalSearch: (e) ->
     e.preventDefault()

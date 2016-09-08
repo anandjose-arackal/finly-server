@@ -33,6 +33,8 @@ class BaseOperation
     return false if has_errors?
     subscribe
     return false if has_errors?
+    pre_process
+    return false if has_errors?
     process
     return false if has_errors?
     self.process_complete = true

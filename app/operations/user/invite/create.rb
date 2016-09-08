@@ -27,7 +27,7 @@ class User::Invite::Create < User::Invite::Base
       return false
     end
     company_id = invite_params[:company_id] or invite_params[:company] or invite_params['company_id']
-    if company_id != self.user.company_id
+    if company_id.to_i != self.user.company_id
       errors << 'User can only be invited in the same company'
       return false
     end
@@ -52,7 +52,6 @@ class User::Invite::Create < User::Invite::Base
       errors << 'User must be assigned a role to be invited'
       return false
     end
-
     # checking validity of user team params
     team_mapping = invite_params[:team_mapping_attributes]
     if team_mapping.blank?
