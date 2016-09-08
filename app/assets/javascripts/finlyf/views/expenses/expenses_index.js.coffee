@@ -277,9 +277,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     # console.log expenses
     model_report = new FinlyF.Models.Report({
-      "report": {
-        "expense_id": expenses.join(","),
-      },
+      "expense_ids": expenses.join(","),
+      # "expense_ids": expenses,
       "authenticity_token": $("#authenticity_token").val()
       "utf8": $("#form_utf8").val()
     })
