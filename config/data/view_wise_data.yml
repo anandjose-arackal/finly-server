@@ -1,0 +1,53 @@
+admin:
+  links:
+    primary_navbar:
+      - Company Reports: reports
+      # - Company Expenses: expenses
+      - Employees: employees
+      # - Analytics: analytics
+      - Settlements: settlements
+    cog:
+      - Ogranization Account: '/orgranization_account?view=admin'
+      - Policies: '/policies'
+      - My Account: '/users/'
+      - Expense Policies: '/policies?view=admin'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+
+personal:
+  links:
+    primary_navbar:
+      - Expenses: expenses
+      - Reports: reports
+      - Receipts: receipts
+      # - Analytics: analytics
+      - Settlements: settlements
+    cog:
+      - My Account: '/users/'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - Logout: '/users/sign_out'
+
+manager:
+  links:
+    primary_navbar:
+      - Team Reports: reports
+      - Team Expenses: expenses
+      - Team Analytics: analytics
+      - Team Members: users
+    cog:
+      - My Account: '/users/'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - Logout: '/users/sign_out'
+
+finance:
+  links:
+    primary_navbar:
+      - Company Reports: reports
+      # - Company Expenses: expenses
+      - Employees: employees
+      # - Analytics: analytics
+      - Settlements: settlements
+
+    cog:
+      - My Account: '/users/'
+      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - Logout: '/users/sign_out'  

@@ -21,7 +21,7 @@ class PolicyCreateService < BaseService
       return false
     end
     company = user.company
-    cloned_policy = company.policies.default.deep_clone except: [:users, :user_mapping]
+    cloned_policy = company.policies.default.first.deep_clone except: [:users, :user_mapping]
     cloned_policy.name = name
     cloned_policy.default = false
     errors << cloned_policy.errors.full_messages unless cloned_policy.save

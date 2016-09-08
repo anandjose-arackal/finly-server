@@ -2,17 +2,17 @@
 #
 # Table name: user_manager_mappings
 #
-#  id                          :integer          not null, primary key
-#  user_id                     :integer
-#  manager_id                  :integer
-#  finance_manager_id          :integer
-#  approves_to_user_id         :integer
-#  approves_finance_to_user_id :integer
-#  greater_than_amount_id      :integer
-#  default                     :boolean          default(FALSE), not null
-#  created_at                  :datetime         not null
-#  updated_at                  :datetime         not null
-#  policy_id                   :integer
+#  id                     :integer          not null, primary key
+#  user_id                :integer
+#  manager_id             :integer
+#  finance_manager_id     :integer
+#  approves_to_id         :integer
+#  approves_finance_to_id :integer
+#  greater_than_amount_id :integer
+#  default                :boolean          default(FALSE), not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  policy_id              :integer
 #
 
 require 'test_helper'

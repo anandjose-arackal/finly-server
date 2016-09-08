@@ -1,0 +1,105 @@
+<div id="backbone-container">
+</div>
+
+<%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+<input name="utf8" id="form_utf8" type="hidden" value="&#x2713;"/>
+
+<div style="display: none;">
+  <select name="" id="newExpenseCategory">
+    <% current_company.active_categories.each do |cat| %>
+        <option value="<%= cat.id %>"><%= cat.name %></option>
+    <% end %>
+  </select>
+
+  <input type="hidden" id="data-nav-company" value="<%= current_company.name %>">
+
+  <ul id="menu-nav-views-dropdown">
+    <% if current_user.admin? %>
+      <li><a href="#" class="navbar-view-type" data-view-type="admin">Admin View</a></li>
+    <% end %>
+    <% if current_user.finance_manager? %>
+      <li><a href="#" class="navbar-view-type" data-view-type="finance">Finance View</a></li>
+    <% end %>
+    <% if current_user.manager? %>
+      <li><a href="#" class="navbar-view-type" data-view-type="manager">Manager View</a></li>
+    <% end %>
+    <% if current_user.employee? %>
+      <li><a href="#" class="navbar-view-type" data-view-type="personal">Personal View</a></li>
+    <% end %>
+  </ul>
+
+  <% views = YAML.load_file("#{Rails.root}/config/data/view_wise_data.yml") %>
+  <ul id="navbar-cog-navigation-admin">
+    <% if current_user.admin? %>
+      <% views["admin"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% elsif current_user.finance_manager? %>
+      <% views["finance"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% elsif current_user.manager? %>
+      <% views["manager"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% elsif current_user.employee? %>
+      <% views["personal"]["links"]["cog"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
+
+  <ul id="navbar-menu-navigation-admin">
+    <% if current_user.admin?%>
+      <% views["admin"]["links"]["primary_navbar"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
+
+  <ul id="navbar-menu-navigation-personal">
+    <% if current_user.employee? %>
+      <% views["personal"]["links"]["primary_navbar"].each do |item| %>
+        <% item.select do |key, value| %>
+          <% unless value == 'settlements' %>
+            <li><a class="navbar-menu-li" data-path="<%= value %>"  href="<%= value %>"><%= key %></a></li>
+          <% else %>
+            <li><a class="navbar-menu-li" data-path="<%= value + '/' + current_user.id.to_s %>"  href="<%= value %>"><%= key %></a></li>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>   
+  </ul>
+
+  <ul id="navbar-menu-navigation-manager">
+    <% if current_user.manager? %>
+      <% views["manager"]["links"]["primary_navbar"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% end %>   
+  </ul>
+
+  <ul id="navbar-menu-navigation-finance">
+    <% if current_user.finance_manager? %>
+      <% views["finance"]["links"]["primary_navbar"].each do |item| %>
+        <% item.select do |key, value| %>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+        <% end %>
+      <% end %>
+    <% end %>   
+  </ul>
+</div>
+
+

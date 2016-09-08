@@ -5,6 +5,11 @@ class ReceiptsController < ApplicationController
 
   def index
     load_receipts
+
+    respond_to do |format|
+      format.html {}
+      format.json {}
+    end
   end
 
   def create
@@ -17,6 +22,7 @@ class ReceiptsController < ApplicationController
           load_receipts
           render 'receipts/index_update'
         end
+        format.json { render json: {"success": true} }
       end
     else
       flash.now[:danger] = receipt_service.errors
@@ -52,6 +58,18 @@ class ReceiptsController < ApplicationController
           load_receipts
           render 'receipts/index_update'
         end
+
+  def receipt_params
+    params.require(:receipt).permit(:image)
+  end
+
+  def load_receipts
+    @receipts = current_user.receipts.without_parent
+  end
+
+  def pundit_permission
+    authorize Receipt
+  end
       end
     else
       flash.now[:danger] = expense_service.errors

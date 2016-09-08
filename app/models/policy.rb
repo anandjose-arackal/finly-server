@@ -18,10 +18,13 @@ class Policy < ActiveRecord::Base
   has_many :users, through: :user_mapping
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
 
+  has_many :reports
+  has_many :card_load_requests
+
   has_many :expense_rules
   has_many :budget_rules
 
-  scope :default, -> { find_by default: true }
+  scope :default, -> { where default: true }
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }

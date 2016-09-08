@@ -1,6 +1,7 @@
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                 Controller#Action
+#                       home_index GET    /home/index(.:format)                                       home#index
 #                    accept_invite GET    /users/invitation/accept(.:format)                          pending_invites#edit
 #                 new_user_session GET    /users/sign_in(.:format)                                    devise/sessions#new
 #                     user_session POST   /users/sign_in(.:format)                                    devise/sessions#create
@@ -186,6 +187,23 @@
 
 Rails.application.routes.draw do
 
+  namespace :api do
+    namespace :v1 do
+      namespace :configuration do
+        get 'category/index'
+      end
+    end
+  end
+
+  namespace :api do
+    namespace :v1 do
+      get 'configuration/category'
+    end
+  end
+
+  # get 'home/index'
+
+
   mount_griddler('/email/incoming')
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
@@ -212,12 +230,16 @@ Rails.application.routes.draw do
         patch 'take_control' => 'reports#take_control', as: :take_control
         post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
         delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+        patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
         post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
       end
-      resources :receipts, only: [:create, :index, :destroy]
+      resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
         post 'add_note', to: 'receipts#add_note', as: :add_note
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+      namespace :configuration do
+        get 'categories' => 'category#index', as: :categories
       end
     end
   end
@@ -228,8 +250,8 @@ Rails.application.routes.draw do
     post 'add_users' => 'policies#add_users', as: :add_users
     post 'remove_users' => 'policies#remove_users', as: :remove_users
     patch 'update_users_configuration' => 'policies#update_user_configuration', as: :update_user_configuration
-    post 'add_rule', to: 'policies#add_rule', as: :add_rule
-    delete 'remove_rule', to: 'policies#remove_rule', as: :remove_rule
+    post 'add_rule', to: 'rules#create', as: :add_rule
+    delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
   end
 
   resources :categories
@@ -255,11 +277,11 @@ Rails.application.routes.draw do
     patch 'approve' => 'reports#approve', as: :approve
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
+    patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
     patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
-    post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
   end
 
   resources :expenses do
@@ -286,23 +308,33 @@ Rails.application.routes.draw do
   resources :pending_invites do
     post 'invite', to: 'pending_invites#invite', as: :new_invite
     patch 'update_invite', to: 'pending_invites#update_invite', as: :edit_invite
+    patch 'accept', to: 'pending_invites#accept', as: :accept
   end
 
 
+  get 'settlements/summary' => 'settlements#summary'
   resources :settlements
-  post 'settlements/:id/show_partial' => 'settlements#show_partial', as: :settlement_partial
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
 
   resources :receipts do
 
   end
 
-  root 'static_pages#home'
+  # get 'settlements/summary' => 'settlements#summary'
 
-  get 'about', to: 'static_pages#about'
+  root 'home#index'
+  get 'welcome' => 'home#welcome'
 
-  get 'features', to: 'static_pages#features'
+  get 'about', to: 'home#about'
 
+
+  #Filters/Autocomplete
+  get 'autocomplete/merchant'
+  get 'autocomplete/user'
+
+  # get 'features', to: 'static_pages#features'
+
+  get 'external/reports/:id' => 'external_url#report', as: :external_url_report
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

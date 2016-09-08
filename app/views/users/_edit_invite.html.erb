@@ -72,12 +72,12 @@
     <% if current_user.admin? %>
 
 
-          <select form="inviteMembersForm" id="userManager" name="pending_invite[approves_to_user_id]"
+          <select form="inviteMembersForm" id="userManager" name="pending_invite[approves_to_id]"
                   class="selectors">
             <option value=""></option>
             <% @company_managers.each do |manager| %>
                 <option value="<%= manager.id %>"
-                <% if @mappings['company'].non_default.approves_to.present? and @mappings['company'].non_default.approves_to.first.approves_to_user_id == manager.id %>
+                <% if @mappings['company'].non_default.approves_to.present? and @mappings['company'].non_default.approves_to.first.approves_to_id == manager.id %>
                 selected
                 <% end %>
                 ><%= manager.name %></option>
@@ -87,7 +87,7 @@
     <% else %>
 
           <%= current_user.name %>
-          <input name="pending_invite[approves_to_user_id]" value="<%=current_user.id%>" type="hidden">
+          <input name="pending_invite[approves_to_id]" value="<%=current_user.id%>" type="hidden">
 
     <% end %>
 
@@ -126,7 +126,7 @@
 
       <% if current_user.admin? %>
 
-      <select form="inviteMembersForm" id="userFinanceManager" name="pending_invite[approves_finance_to_user_id]"
+      <select form="inviteMembersForm" id="userFinanceManager" name="pending_invite[approves_finance_to_id]"
               class="selectors">
         <option value=""></option>
         <% @company_finance_managers.each do |finance_manager| %>
@@ -137,7 +137,7 @@
       <% else %>
 
           <%= current_user.name %>
-          <input name="pending_invite[approves_finance_to_user_id]" value="<%=current_user.id%>" type="hidden">
+          <input name="pending_invite[approves_finance_to_id]" value="<%=current_user.id%>" type="hidden">
 
       <% end %>
 

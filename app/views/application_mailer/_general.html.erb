@@ -1,0 +1,14 @@
+<% content_for :body do %>
+    <% if @title %>
+        <h1 style="color:#333;font-size:26px;font-weight:200;margin:0 0 30px 0;padding:0;text-align:center">
+          <%= @title %>
+        </h1>
+    <% end %>
+    <% if @body %>
+        <p style="line-height:160%;margin:0 0 20px 0">
+          <%= @body %>
+        </p>
+    <% end %>
+<% end %>
+
+<%= render 'application_mailer/template' %>

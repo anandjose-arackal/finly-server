@@ -1,3 +1,5 @@
+require "#{Rails.root}/app/models/report"
+
 class ReportService < BaseService
   attr_accessor :report, :user, :user_team_service, :report_detail_service
 
@@ -186,7 +188,7 @@ class ReportService < BaseService
       return false
     end
     unless report.status.processing? or auto_approve
-      errors << 'Cannot review report'
+      errors << 'Cannot team report'
       return false
     end
     manager = next_reviewer_for_report
@@ -288,7 +290,7 @@ class ReportService < BaseService
       errors << 'Cannot unapprove this report'
       return false
     end
-    associated_users = report.associated_users(report.controlling_user)
+    associated_users = report.associated_users report.controlling_user
     unless associated_users.present? and associated_users.with_id(user.id).present?
       errors << 'User has not yet reviewed the report to unapprove it'
       return false

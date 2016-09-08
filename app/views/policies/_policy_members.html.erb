@@ -45,7 +45,7 @@
       </tr>
       </thead>
 
-      <% @users.each do |user| %>
+      <% @result.users.each do |user| %>
           <% default_mapping = user[:default_mapping] %>
           <tr onclick="userSettingsModal('<%= user[:user].id %>')">
             <td style="width: 1%; padding-left: 20px">
@@ -70,11 +70,11 @@
               <% if user[:admin] %>
                   <p>Policy Admin</p>
               <% end %>
-              <% if default_mapping.approves_to_user_id.present? %>
-                  <p>Approves To <%= default_mapping.approves_to_user.email %></p>
+              <% if default_mapping.approves_to_id.present? %>
+                  <p>Approves To <%= default_mapping.approves_to.email %></p>
               <% end %>
-              <% if default_mapping.approves_finance_to_user_id.present? %>
-                  <p>Approves Finance To <%= default_mapping.approves_finance_to_user.email %></p>
+              <% if default_mapping.approves_finance_to_id.present? %>
+                  <p>Approves Finance To <%= default_mapping.approves_finance_to.email %></p>
               <% end %>
             </td>
 
@@ -102,17 +102,17 @@
                 <input id="policy_member_<%= user[:user].id %>_conditional_finance_manager_amount" value="<%= user[:conditional_finance].greater_than_amount.value %>"/>
             <% end %>
             <input id="policy_member_<%= user[:user].id %>_is_manager" value="<%= user[:user].manager? %>"/>
-            <input id="policy_member_<%= user[:user].id %>_approves_to" value="<%= user[:default_mapping].approves_to_user_id %>"/>
+            <input id="policy_member_<%= user[:user].id %>_approves_to" value="<%= user[:default_mapping].approves_to_id %>"/>
             <% if user[:conditional_approves_to].present? %>
                 <input id="policy_member_<%= user[:user].id %>_conditional_approves_to_mapping_id" value="<%= user[:conditional_approves_to].id %>"/>
-                <input id="policy_member_<%= user[:user].id %>_conditional_approves_to" value="<%= user[:conditional_approves_to].approves_to_user_id %>"/>
+                <input id="policy_member_<%= user[:user].id %>_conditional_approves_to" value="<%= user[:conditional_approves_to].approves_to_id %>"/>
                 <input id="policy_member_<%= user[:user].id %>_conditional_approves_to_amount" value="<%= user[:conditional_approves_to].greater_than_amount.value %>"/>
             <% end %>
             <input id="policy_member_<%= user[:user].id %>_is_finance_manager" value="<%= user[:user].finance_manager? %>"/>
-            <input id="policy_member_<%= user[:user].id %>_approves_finance_to" value="<%= user[:default_mapping].approves_finance_to_user_id %>"/>
+            <input id="policy_member_<%= user[:user].id %>_approves_finance_to" value="<%= user[:default_mapping].approves_finance_to_id %>"/>
             <% if user[:conditional_approves_finance_to].present? %>
                 <input id="policy_member_<%= user[:user].id %>_conditional_approves_finance_to_mapping_id" value="<%= user[:conditional_approves_finance_to].id %>"/>
-                <input id="policy_member_<%= user[:user].id %>_conditional_approves_finance_to" value="<%= user[:conditional_approves_finance_to].approves_finance_to_user_id %>"/>
+                <input id="policy_member_<%= user[:user].id %>_conditional_approves_finance_to" value="<%= user[:conditional_approves_finance_to].approves_finance_to_id %>"/>
                 <input id="policy_member_<%= user[:user].id %>_conditional_approves_finance_to_amount" value="<%= user[:conditional_approves_finance_to].greater_than_amount.value %>"/>
             <% end %>
           </div>

@@ -42,6 +42,8 @@ class User < ActiveRecord::Base
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
 
+  devise :database_authenticatable, :validatable, password_length: 8..128
+
   attr_accessor :view
 
   belongs_to :company
@@ -57,6 +59,7 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
+  has_many :cards
 
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
@@ -73,6 +76,13 @@ class User < ActiveRecord::Base
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
 
+  has_many :cards
+  has_many :card_load_requests
+  has_many :controlling_card_load_requests, class_name: 'CardLoadRequest', foreign_key: :controlling_user_id
+  has_many :card_transactions
+
+  has_many :event_configurations
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
@@ -86,12 +96,14 @@ class User < ActiveRecord::Base
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
+
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) { where("name like ?", "%#{name}%") }
   scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
+  scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
   scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
@@ -100,9 +112,9 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
 
   # scopes for filters
-  scope :filter_search, -> (term) {where("name like ? OR email like ?", "%#{term}%")}
+  scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
   scope :filter_state, -> (state) {
-    case(state)
+    case (state)
       when 1
         where(active: true)
       when 2
@@ -116,8 +128,8 @@ class User < ActiveRecord::Base
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
   }
 
-  scope :signed_up, -> {where invitation_token: nil}
-  scope :pending, -> {where.not(invitation_token: nil)}
+  scope :signed_up, -> { where invitation_token: nil }
+  scope :pending, -> { where.not(invitation_token: nil) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
@@ -151,7 +163,11 @@ class User < ActiveRecord::Base
     if policy.blank?
       return admin_policies.count > 0
     end
-    admin_policies.with_id(policy.id).present?
+    policy_id = policy
+    if policy.is_a?(Policy)
+      policy_id = policy.id
+    end
+    admin_policies.with_id(policy_id).present?
   end
 
   def admin?
@@ -178,6 +194,12 @@ class User < ActiveRecord::Base
     mapping.auditor.present?
   end
 
+  def has_role?(role_id)
+    return false unless role_id.present?
+    mapping = role_mapping
+    mapping.role(role_id).present?
+  end
+
   def user_name
     self.name
   end
@@ -186,10 +208,25 @@ class User < ActiveRecord::Base
     self.invitation_token
   end
 
+  def cash_in_hand(date = nil)
+    cash = self.balance_sheet.cash_in_hand
+    return cash if date.blank? or date == Date.today
+    payments = self.payments.made_after(date).with_amount
+    payments_to_user = payments.transferred_to_user.sum(:value)
+    debt_clearance = payments.debt_clearance.sum(:value)
+    settlement = payments.settlement.sum(:value)
+    reports = self.reports.processed.submitted_after(date)
+    report_ids = reports.pluck(:id)
+    expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
+    pending_reimbursement = reports.with_amount.without_payment.sum(:value)
+    value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
+    Amount.new(value: value, currency: cash.currency)
+  end
+
   alias_method :manager_name, :user_name
   alias_method :finance_manager_name, :user_name
-  alias_method :approves_to_user_name, :user_name
-  alias_method :approves_finance_to_user_name, :user_name
+  alias_method :approves_to_name, :user_name
+  alias_method :approves_finance_to_name, :user_name
 
 
   private

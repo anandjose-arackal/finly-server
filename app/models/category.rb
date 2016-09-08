@@ -25,4 +25,5 @@ class Category < ActiveRecord::Base
   end
 
   scope :active, -> {where active: true}
+  scope :with_id, ->(id){where id: id}
 end

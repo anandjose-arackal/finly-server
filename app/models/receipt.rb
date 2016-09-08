@@ -36,7 +36,8 @@ class Receipt < ActiveRecord::Base
       ]
   }
 
-  scope :without_parent, -> {where(parent_id: nil)}
+  scope :with_id, ->(id) { where id: id }
+  scope :without_parent, -> { where(parent_id: nil) }
 
   def receipt_file_name
     self.image_file_name

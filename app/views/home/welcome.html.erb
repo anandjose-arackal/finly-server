@@ -1,0 +1,356 @@
+<div class="jumbotron" style="min-height: 500px;">
+  <div class="container">
+    <div style="">
+      <img class="feature_image" src="<%= image_url('home_screen_bg.png') %>" style="">
+    </div>
+
+
+    <div class="text-center">
+      <h1 style="font-size: 40px; color: #F2EC5C; font-weight: 200;">Scalable &amp; Intelligent<br />Expense Management System</h1>
+      <p style="color: rgb(204, 204, 204); font-size: 16px; width: 500px; margin-left: auto; margin-right: auto;">Simplify expense management and payables processing so you can focus on the important things — like growing your business!</p>  
+    </div>
+    
+  </div>
+</div>
+<div class="jumbotron" id="" style="background: #EEF5F9;">
+  <div class="container">
+    <div class="row text-center no-margin">
+      <h2>Features &amp; Benefits</h1>
+    </div>
+
+    <div class="row no-margin landing-feature">
+      <div class="col-lg-5 col-lg-offset-1">
+        <h3 style="">Super Fast Reporting</h3>
+        <p>
+          Employees can generate expense reports on the fly for the expenses incurred, have them reviewed by their manager and claim reimbursements 10x faster than traditional process.  
+        </p>
+      </div>
+
+      <div class="col-lg-6 text-center">
+        <%= image_tag("landing/features/stopwatch.png", class: "img-responsive", style: "height: 250px; margin-top: -40px; display: inline;") %>
+      </div>
+    </div>
+    <div class="row no-margin landing-feature">
+      <div class="col-lg-6 text-center">
+        <!-- Image/Animation -->
+        <%= image_tag("landing/features/policy.png", class: "img-responsive", style: "height: 230px; display: inline;") %>
+      </div>
+
+      <div class="col-lg-5">
+        <h3 style="">Policy Compliance</h3>
+        <p>
+          Flexibility to set expense reporting compliance rules and enforce your own spending policies. Spending limits and expense policies are built right into the system, so your employees will know immediately when an expense report falls outside company policy.
+        </p>
+      </div>
+    </div>
+
+    <div class="row no-margin landing-feature">
+      <div class="col-lg-5 col-lg-offset-1">
+        <h3 style="">Streamlined Workflow</h3>
+        <p>
+          Design a multi-level approval workflow to meet your organization’s needs. Approval workflow gives our clients the opportunity to set defined approval paths with various routing rules including approval limits and special approval rules.
+        </p>
+      </div>
+
+      <div class="col-lg-6 text-center">
+        <%= image_tag("landing/features/streamline.png", class: "img-responsive", style: "height: 230px; display: inline;") %>
+      </div>
+    </div>
+
+    <div class="row no-margin landing-feature">
+      <div class="col-lg-6 text-center">
+        
+        <%= image_tag("landing/features/sync.png", class: "img-responsive", style: "display:inline; height: 200px;") %>
+      </div>
+
+      <div class="col-lg-5">
+        <h3 style="">Syncronize</h3>
+        <p>
+          Integrates with your accounting system, allowing you to cut time spent on data entry and easily export the data you need, be it in excel or in PDF format.
+        </p>
+      </div>
+    </div>
+
+    <div class="row no-margin landing-feature">
+      <div class="col-lg-5 col-lg-offset-1">
+        <h3 style="">Mobile</h3>
+        <p>
+          Never lose a receipt again! Snap pictures of receipts on the go Create and submit expense reports from your phone Free mobile app for Android.
+        </p>
+      </div>
+
+      <div class="col-lg-6 text-center">
+        <%= image_tag("landing/features/mobile.png", class: "img-responsive", style: "display:inline; height: 200px; clip: rect(0, 100px, 200px, 0);") %>
+      </div>
+    </div>
+
+    <div class="row no-margin landing-feature">
+      <div class="col-lg-6 text-center">
+        <%= image_tag("landing/features/analysis.png", class: "img-responsive", style: "display:inline; height: 250px;") %>
+      </div>
+
+      <div class="col-lg-5">
+        <h3 style="">Thorough Analysis</h3>
+        <p>
+          Analyze overall expense spending for opportunities to reduce costs and get better insight into company's spend.
+        </p>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+
+<!-- Testimonials -->
+<div class="jumbotron" style="min-height: 200px; background: #FEE252;">
+  <div class="container">
+    <h2 class="text-center" style="color: white; text-shadow: none; font-size: 25px;">What people are saying</h2>
+    
+  </div>
+</div>
+<!-- End Testimonials -->
+
+
+<div class="jumbotron" style="background-color: #F2F2F2; color: white;">
+  <div class="container">
+    <h2 class="text-center" style="color: #456B9F;">Join Us</h2>
+    <div class="row">
+      <div class="col-lg-6 text-center">
+        <%= image_tag("landing/contact-us.png", class: 'img-responsive', style: "height: 290px; display: inline;") %>
+      </div>
+
+      <div class="col-lg-5 col-lg-offset-1">
+        <div style="display: inline-block; vertical-align: middle; height: 100%;">
+          <p style="color: #565656; font-size: 24px; font-weight: 500;">Interested in joining us early?<br />Leave us your contact details.</p>
+          <form data-remote data-turboboost method="post" action="<%= %>">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <div class="form-group">
+              <input class="contact-fields inputWorkEmail" name="register[email]" type="text" placeholder="Work Email"><br />
+              <input class="contact-fields inputWorkMobile" name="register[mobile]" type="text" placeholder="Phone Number">
+            </div>
+            <button id="addComment" class="contact-button btn btn-xs btn-success requestDemo" type="submit">Request Early Access</button>
+          </form>  
+        </div>
+      </div>
+    </div><!-- .row -->
+    <div class="row">
+      <div class="row no-margin">
+        <h2 class="text-center" style="font-weight: 100px; color: #456B9F;">We are social</h2>
+        <div class="text-center">
+          <a href="http://facebook.com">
+            <%= image_tag("landing/social/facebook.png", height: "50", class: "social-icons") %>
+          </a>
+          <a href="#">
+            <%= image_tag("landing/social/twitter.png", height: "50", class: "social-icons") %>
+          </a>
+          <a href="#">
+            <%= image_tag("landing/social/linkedin.png", height: "50", class: "social-icons") %>
+          </a>
+          <a href="#">
+            <%= image_tag("landing/social/instgram.png", height: "50", class: "social-icons") %>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<footer>
+  <div class="footer" id="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
+            <h4>Product</h4>
+            <!-- <hr /> -->
+            <ul>
+              <li> <a href="#">Features</a></li>
+              <li><a href="#">Security</a></li>
+              <li> <a href="#">Playstore</a></li>
+              <li> <a href="#">iTunes</a></li>
+            </ul>
+        </div>
+        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+          <h4>Get in touch</h4>
+          <!-- <hr /> -->
+          <ul>
+            <li> <a href="#">Facebook</a> </li>
+            <li> <a href="#">Twitter</a> </li>
+            <li> <a href="#">LinkedIn</a> </li>
+            <li> <a href="#">Email</a> </li>
+          </ul>
+        </div>
+        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+          <h4>Company</h4>
+          <!-- <hr /> -->
+          <ul>
+            <li> <a href="#">About Us</a> </li>
+            <li> <a href="#">Blog</a> </li>
+            <li> <a href="#">Team</a> </li>
+            <li> <a href="#">Jobs</a> </li>
+          </ul>
+        </div>
+        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+          <h4>Other</h4>
+          <!-- <hr /> -->
+          <ul>
+            <li> <a href="#">Terms of Service</a> </li>
+            <li> <a href="#">Privacy Policy</a> </li>
+            <li> <a href="#">FAQ</a> </li>
+            <li><a href="#">Sitemap</a></li>
+          </ul>
+        </div>
+      </div>
+      <!--/.row--> 
+    </div>
+    <!--/.container--> 
+  </div>
+  <!--/.footer-->
+  <div class="container">
+    <hr />
+  </div>
+  
+  <div class="footer-bottom">
+    <div class="container">
+      <p class="pull-right" style="color: #eee; font-size: 11px;"> Copyright &#169; 2016 <span style="font-weight: bold;">Jouska</span>, Pvt. Tech. Ltd. </p>
+    </div>
+  </div>
+  <!--/.footer-bottom--> 
+</footer>
+
+
+<style type="text/css">
+
+  footer{
+    padding-top: 25px;
+    background: #46568B;
+    background: #594DA8;
+  }
+
+  footer hr{
+    border-color: #CD925A;
+  }
+  .footer h4{
+    font-size: 13px;
+    color: #eee;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .footer hr{
+    margin: 3px 0 0 0;
+    border-color: #CDBC5A;
+  }
+
+  .footer ul {
+    font-size: 13px;
+    list-style-type: none;
+    margin-left: 0;
+    padding-left: 0;
+    margin-top: 10px;
+    color: #fff;
+  }
+  .footer ul li a {
+    padding: 0 0 5px 0;
+    display: block;
+    font-size: 13px;
+  }
+  .footer a {
+    color: #ddd;
+  }
+  .footer-bottom{
+    padding-bottom: 20px;
+  } 
+
+
+  body{
+    padding-top: 0;
+  }
+
+  .no-margin{
+    margin: 0;
+  }
+  .no-padding{
+    padding: 0;
+  }
+
+  .jumbotron{
+    /*height: calc(100% - 50px);*/
+    /*min-height: calc(100vh);*/
+    background: #423689;
+    /*background: #46568b;*/
+    background:#594DA8;
+    /*color: #efefef;*/
+    margin-bottom: 0;
+    padding-top: 20px;
+  }
+
+  .jumbotron p{
+    font-size: 15px;
+    font-weight: 300;
+    /*font-weight: 200;*/
+    color: #898989;
+  }
+
+  .jumbotron .feature_image{
+    width: 75%;
+    margin-left: 12.5%;
+  }
+
+  /*.jumbotron h1{
+    font-size: 
+  }
+*/
+  .jumbotron h2{
+    font-size: 35px;
+    font-weight: 200;
+    color: #594DA8;
+    color: #CD925A;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
+    margin: 10px auto 30px auto;
+  }
+  .jumbotron h3{
+    /*font-family: Roboto;*/
+    font-size: 24px;
+    font-weight: 200;
+    color: #CD925A;
+    color: #594DA8;
+    /*color: rgb(147, 193, 120);*/
+  }
+
+  .landing-feature{
+    margin: 100px auto;
+    /*height: 400px;*/
+  }
+
+  
+  .contact-fields{
+    padding: 10px;
+    color: #232332;
+    color: #594DA8;
+    border-radius: 5px;
+    border: 0.5px solid #ddd;
+    width: 90%;
+    margin-bottom: 15px;
+  }
+
+  .contact-button{
+    padding: 10px 20px;
+  }
+
+  /*Social Icons*/
+  .social-icons{
+    text-decoration: none;
+    filter: grayscale(100%) brightness(150%);
+  }
+  .social-icons:hover{
+    text-decoration: none;
+    filter: grayscale(10%);
+  }
+
+.animation-element {
+  opacity: 0;
+  position: relative;
+}
+</style>

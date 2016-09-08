@@ -1,41 +1,484 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/app/controllers/users_controller.rb" line="46" />
     <bookmark url="file://$PROJECT_DIR$/app/controllers/policies_controller.rb" line="3" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="API Implementation">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/receipt_email.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/receipt_email_attachment.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/initializers/imgkit.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/initializers/receipt_processor.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/initializers/sendgrid.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/proselytism.yml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160820114823_create_receipt_emails.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160820114906_create_receipt_email_attachments.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/email_processor.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/receipt_processor/base_converter.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/receipt_processor/html_converter.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/receipt_processor/image_converter.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/receipt_processor/msdoc_converter.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/receipt_processor/pdf_converter.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/sendgrid_email_check.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sendgrid.env" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/receipt_email_attachments.yml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/receipt_emails.yml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/receipt_email_attachment_test.rb" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/receipt_email_test.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.rakeTasks" afterPath="$PROJECT_DIR$/.idea/.rakeTasks" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Finly.iml" afterPath="$PROJECT_DIR$/.idea/Finly.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/contact-us.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/contact-us0.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/features/analysis.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/features/mobile.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/features/policy.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/features/stopwatch.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/features/streamline.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/features/sync.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/report/tick.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/social/facebook.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/social/instgram.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/social/linkedin.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/landing/social/twitter.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/loading.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/api/v1/configuration/category.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/application_backbone.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/application_static.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/customized/jquery-ui.min.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/external_url.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/application_finlyf.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/collections/expenses.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/collections/receipts.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/collections/reports.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/collections/settlements.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/collections/users.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/finly_f.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/helpers/handlebars_helpers.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/models/expense.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/models/receipt.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/models/report.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/models/settlement.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/models/user.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/routers/expenses_router.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/routers/main_router.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/routers/reports_router.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/expenses/expense.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/expenses/expenses_index.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/receipts/receipt.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/receipts/receipts_index.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/reports/report.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/reports/reports_index.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/settlements/settlement.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/settlements/settlements_index.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/users/user.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/users/users_index.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/stylesheets/api/v1/configuration/category.scss" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/stylesheets/application_backbone.css.scss" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/stylesheets/application_static.css.scss" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/stylesheets/customized/jquery-ui.min.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/stylesheets/external_url.scss" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/base/navbarPrimary.jst.hbs.erb.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/base/skeleton.jst.hbs.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/base/skeletonIndexOnly.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/crud/main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/expense.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/index.jst.hbs.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/navbar/navbar_main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/navbar/navbar_sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/new.jst.hbs.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/show.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/show_details.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/sidebar/sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/receipts/crud/index.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/receipts/crud/new.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/receipts/crud/receipt.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/receipts/navbar/navbar_main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/receipts/navbar/navbar_sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/receipts/sidebar/sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/new.jst.hbs.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/report.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/show.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/show_details.jst.hbs.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/expenses/existingExpenses.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/expenses/show.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/navbar/navbar_main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/navbar/navbar_sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/sidebar/sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/admin/addPayment.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/admin/reimburse.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/admin/settleDebts.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/index.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/indexPayments.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/payment.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/settlement.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/settlementReport.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/navbar/navbar_main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/navbar/navbar_sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/sidebar/sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/skeleton.jst.hbs.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/skeletonAdmin.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/summary.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/crud/show.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/crud/userList.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/crud/userSettlements.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/navbar/navbar_main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/navbar/navbar_sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/skeleton.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/controllers/api/v1/configuration/category_controller.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/controllers/autocomplete_controller.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/controllers/external_url_controller.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/controllers/home_controller.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/controllers/rules_controller.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/formatter/api/expense.yaml.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/helpers/api/v1/configuration/category_helper.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/helpers/external_url_helper.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/mailers/application_mailer.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/mailers/devise_mailer.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/mailers/report_mailer.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/mailers/settlement_mailer.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/mailers/user_mailer.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_configuration.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_expense.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_request.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_request_action.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_request_comment.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_request_comment_action.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_request_status.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_request_track.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_load_tracking_action.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_request_status.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_status.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_transaction.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/card_type.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/event.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/event_configuration.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/new_card_request.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/api/card_transaction/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/api/card_transaction/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/base_operation.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/assign/assign_card.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/assign/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/configuration/disable_card.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/configuration/enable_card.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/load_cash.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/approve.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/comment/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/reject.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/retract.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/take_control.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/request/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/load/unload_cash.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/card/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/add_balance.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/configuration/category/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/configuration/category/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/configuration/category/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/configuration/category/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/company/register.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/multi_event_base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/approve.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/comment.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/expense/reject.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/reject.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/retract.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/submit.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/take_control.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/report/unapprove.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/set_notification.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/settlement/add_advance.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/settlement/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/settlement/clear_debt.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/settlement/reimburse.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/settlement/settle.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/event/unset_notification.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/add_receipt.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/card/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/card/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/card/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/card/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/manual/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/manual/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/manual/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/manual/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/expense/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/export/as_csv.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/export/as_xml.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/export/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/export/field/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/export/field/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/export/field/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/not_authorized_exception.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/invitable_users.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/rules/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/rules/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/rules/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/rules/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/users/add_user.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/users/remove_user.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/users/update_configuration.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/receipt/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/receipt/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/receipt/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/receipt/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/receipt/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/approve.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/archive.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/comment/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/expenses/add.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/expenses/reject.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/expenses/remove.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/mark_as_reimbursed.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/policies/assign.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/receipts/add.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/receipts/attach.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/receipts/detach.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/reimburse_confirm.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/reject.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/retract.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/submit.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/take_control.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/unapprove.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/report/violation.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/add_cash_advance.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/add_debt_to_company_clearance.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/add_reimbursement.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/settle.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/report_approved.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/report_unapproved.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/settlement/show_actions.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/configuration/update_password.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/invite/accept.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/invite/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/invite/create.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/invite/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/invite/resend.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/invite/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/role/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/role/set.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/role/update.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/show.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/approver.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/final_finance_manager.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/is_approver.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/mappings/base.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/mappings/index.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/mappings/reset.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/mappings/set.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/review/next_reviewer.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/review/reject_to_users_list.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/user/team/review/user_role.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/api/v1/configuration/category/index.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/application_mailer/_body.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/application_mailer/_footer.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/application_mailer/_general.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/application_mailer/_header.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/application_mailer/_template.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/autocomplete/user.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/expenses/index.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/expenses/show.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/home/about.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/home/index.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/home/welcome.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/layouts/backbone.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/layouts/mailer.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/layouts/mailer.text.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/layouts/static.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/receipts/index.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/report_mailer/template.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/report_mailer/update.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/reports/create.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/reports/index.html.erb.bak.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/reports/index.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/reports/show.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/settlement_mailer/template.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/settlements/index.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/settlements/show.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/settlements/summary.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/shared/_header_backup.html.erb.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/shared/_header_navigation_backup.html.erb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/static_pages/home_backup.html.erb.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/users/show.json.jbuilder" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/data/view_wise_data.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812133245_create_card_request_statuses.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812133328_create_card_types.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812133531_create_new_card_requests.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812133900_create_card_statuses.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812134204_create_cards.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812134256_create_card_load_request_statuses.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812134438_create_card_load_requests.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812135333_create_card_load_request_tracks.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812140111_create_card_configurations.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812140608_create_card_load_request_actions.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160812140705_add_action_to_tracks.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160815125059_add_company_to_cards.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160815145613_add_disabled_by_to_card.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160815152217_add_active_to_card.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160816135637_create_card_load_request_comments.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160816140638_create_card_transactions.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160816141203_create_card_expenses.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160821105056_create_events.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/db/migrate/20160821105444_create_event_configurations.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/callback_handler.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/operation_callbacks.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/request_formatter.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/controllers/api/v1/configuration/category_controller_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/controllers/external_url_controller_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/card_load_request_comment_actions.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/card_load_request_comments.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/card_load_tracking_actions.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/event_configurations.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/fixtures/events.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/helpers/report_operation_test_helper.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/mailers/previews/report_mailer_preview.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/mailers/previews/settlement_mailer_preview.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/mailers/report_mailer_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/mailers/settlement_mailer_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/card_load_request_comment_action_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/card_load_request_comment_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/card_load_tracking_action_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/event_configuration_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/models/event_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/assign/assign_card_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/configuration/disable_card_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/load/request/approve_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/load/request/create_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/load/request/reject_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/load/request/retract_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/load/request/take_control_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/card/load/request/update_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/expense/add_receipt_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/expense/card/create_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/expense/card/update_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/expense/list_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/expense/manual/create_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/expense/manual/update_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/export/field/add_and_remove_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/export/field/update_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/policy/create_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/policy/destroy_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/policy/rules/create_and_destroy_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/policy/users/add_and_remove_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/policy/users/update_configuration_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/receipt/create_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/receipt/destroy_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/add_expenses_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/add_receipt_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/approve_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/archive_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/assign_policy_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/create_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/destroy_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/reimburse_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/reject_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/retract_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/take_control_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/report/unapprove_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/settlement/add_reimbursement_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/settlement/cash_advance_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/user/invite/accept_invite_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/user/invite/create_invite_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/user/invite/destroy_invite_test.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/operations/user/invite/update_invite_test.rb" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.byebug_history" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/272/original/1363397.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gemfile" afterPath="$PROJECT_DIR$/Gemfile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gemfile.lock" afterPath="$PROJECT_DIR$/Gemfile.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/application.js" afterPath="$PROJECT_DIR$/app/assets/javascripts/application.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/stylesheets/application.css.scss" afterPath="$PROJECT_DIR$/app/assets/stylesheets/application.css.scss" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/stylesheets/static_pages.scss" afterPath="$PROJECT_DIR$/app/assets/stylesheets/static_pages.scss" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/stylesheets/users.scss" afterPath="$PROJECT_DIR$/app/assets/stylesheets/users.scss" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/api/v1/base_api_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/api/v1/base_api_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/api/v1/expenses_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/api/v1/expenses_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/api/v1/receipts_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/api/v1/receipts_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/application_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/application_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/categories_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/categories_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/expenses_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/expenses_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/export_preferences_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/export_preferences_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/pending_invites_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/pending_invites_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/policies_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/policies_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/receipts_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/receipts_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/reports_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/reports_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/settlements_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/settlements_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/static_pages_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/static_pages_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/users_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/users_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/helpers/application_helper.rb" afterPath="$PROJECT_DIR$/app/helpers/application_helper.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/amount.rb" afterPath="$PROJECT_DIR$/app/models/amount.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/balance_sheet.rb" afterPath="$PROJECT_DIR$/app/models/balance_sheet.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/budget_rule.rb" afterPath="$PROJECT_DIR$/app/models/budget_rule.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/category.rb" afterPath="$PROJECT_DIR$/app/models/category.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/company.rb" afterPath="$PROJECT_DIR$/app/models/company.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/expense.rb" afterPath="$PROJECT_DIR$/app/models/expense.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/expense_rule.rb" afterPath="$PROJECT_DIR$/app/models/expense_rule.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/manual_expense.rb" afterPath="$PROJECT_DIR$/app/models/manual_expense.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/payment.rb" afterPath="$PROJECT_DIR$/app/models/payment.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/policy.rb" afterPath="$PROJECT_DIR$/app/models/policy.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/receipt.rb" afterPath="$PROJECT_DIR$/app/models/receipt.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/report.rb" afterPath="$PROJECT_DIR$/app/models/report.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/report_comment_action.rb" afterPath="$PROJECT_DIR$/app/models/report_comment_action.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/user.rb" afterPath="$PROJECT_DIR$/app/models/user.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/user_manager_mapping.rb" afterPath="$PROJECT_DIR$/app/models/user_manager_mapping.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/user_role.rb" afterPath="$PROJECT_DIR$/app/models/user_role.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/policies/category_policy.rb" afterPath="$PROJECT_DIR$/app/policies/category_policy.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/policies/export_preference_policy.rb" afterPath="$PROJECT_DIR$/app/policies/export_preference_policy.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/policies/organization_account_policy.rb" afterPath="$PROJECT_DIR$/app/policies/organization_account_policy.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/expense_service.rb" afterPath="$PROJECT_DIR$/app/services/expense_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/policy_create_service.rb" afterPath="$PROJECT_DIR$/app/services/policy_create_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/policy_retrieval_service.rb" afterPath="$PROJECT_DIR$/app/services/policy_retrieval_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/policy_user_service.rb" afterPath="$PROJECT_DIR$/app/services/policy_user_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/report_service.rb" afterPath="$PROJECT_DIR$/app/services/report_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/user_invite_service.rb" afterPath="$PROJECT_DIR$/app/services/user_invite_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/user_team_service.rb" afterPath="$PROJECT_DIR$/app/services/user_team_service.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/api/v1/expenses/index.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/api/v1/expenses/index.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/api/v1/expenses/show.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/api/v1/expenses/show.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/api/v1/receipts/index.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/api/v1/receipts/index.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/api/v1/reports/index.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/api/v1/reports/index.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/expenses/_expense.html.erb" afterPath="$PROJECT_DIR$/app/views/expenses/_expense.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/export/report.pdf.erb" afterPath="$PROJECT_DIR$/app/views/export/report.pdf.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/layouts/application.html.erb" afterPath="$PROJECT_DIR$/app/views/layouts/application.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/layouts/pdf.html.erb" afterPath="$PROJECT_DIR$/app/views/layouts/pdf.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/pending_invites/edit.html.erb" afterPath="$PROJECT_DIR$/app/views/pending_invites/edit.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/_budget_rules.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/_budget_rules.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/_expense_rules.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/_expense_rules.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/_policy_members.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/_policy_members.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/_users.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/_users.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/show.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/show.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/reports/_perform_actions_on_report.html.erb" afterPath="$PROJECT_DIR$/app/views/reports/_perform_actions_on_report.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/reports/export.pdf.erb" afterPath="$PROJECT_DIR$/app/views/reports/export.pdf.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/reports/show.html.erb" afterPath="$PROJECT_DIR$/app/views/reports/show.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/shared/_header.html.erb" afterPath="$PROJECT_DIR$/app/views/shared/_header.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/shared/_header_navigation.html.erb" afterPath="$PROJECT_DIR$/app/views/shared/_header_navigation.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/static_pages/home.html.erb" afterPath="$PROJECT_DIR$/app/views/static_pages/home.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/users/_all_people_template.html.erb" afterPath="$PROJECT_DIR$/app/views/users/_all_people_template.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/users/_assigned_policies.html.erb" afterPath="$PROJECT_DIR$/app/views/users/_assigned_policies.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/users/_edit_invite.html.erb" afterPath="$PROJECT_DIR$/app/views/users/_edit_invite.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/users/_profile_info.html.erb" afterPath="$PROJECT_DIR$/app/views/users/_profile_info.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/users/_user_policy_list.html.erb" afterPath="$PROJECT_DIR$/app/views/users/_user_policy_list.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/environments/development.rb" afterPath="$PROJECT_DIR$/config/environments/development.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/environments/production.rb" afterPath="$PROJECT_DIR$/config/environments/production.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/initializers/assets.rb" afterPath="$PROJECT_DIR$/config/initializers/assets.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/initializers/devise.rb" afterPath="$PROJECT_DIR$/config/initializers/devise.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/routes.rb" afterPath="$PROJECT_DIR$/config/routes.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/schema.rb" afterPath="$PROJECT_DIR$/db/schema.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/migrate/20160627044612_create_user_manager_mappings.rb" afterPath="$PROJECT_DIR$/db/migrate/20160627044612_create_user_manager_mappings.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/seeds.rb" afterPath="$PROJECT_DIR$/db/seeds.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/math_util.rb" afterPath="$PROJECT_DIR$/lib/math_util.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/fixtures/user_manager_mappings.yml" afterPath="$PROJECT_DIR$/test/fixtures/user_manager_mappings.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/models/user_manager_mapping_test.rb" afterPath="$PROJECT_DIR$/test/models/user_manager_mapping_test.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test_helper.rb" afterPath="$PROJECT_DIR$/test/test_helper.rb" />
     </list>
     <list id="7d878649-6630-420c-bf50-2b6db9b1c134" name="New changelist" comment="" />
     <ignored path="Finly.iws" />
@@ -48,6 +491,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Finly@Development__Finly.coverage" NAME="Development: Finly Coverage Results" MODIFIED="1468913332244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" MODULE_NAME="Finly" />
   </component>
@@ -67,7 +511,28 @@
     <favorites_list name="Finly" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file leaf-file-name="routes.rb" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config/routes.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="81" column="19" selection-start-line="81" selection-start-column="19" selection-end-line="81" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Gemfile" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Gemfile">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.5899772">
+              <caret line="75" column="19" selection-start-line="75" selection-start-column="19" selection-end-line="75" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -126,7 +591,6 @@
         <option value="$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder" />
         <option value="$PROJECT_DIR$/config/database.yml" />
         <option value="$PROJECT_DIR$/Gemfile" />
-        <option value="$PROJECT_DIR$/config/routes.rb" />
         <option value="$PROJECT_DIR$/db/migrate/20160820114906_create_receipt_email_attachments.rb" />
         <option value="$PROJECT_DIR$/db/migrate/20160820114823_create_receipt_emails.rb" />
         <option value="$PROJECT_DIR$/db/seeds.rb" />
@@ -134,14 +598,14 @@
         <option value="$PROJECT_DIR$/app/models/receipt_email_attachment.rb" />
         <option value="$PROJECT_DIR$/app/models/user.rb" />
         <option value="$PROJECT_DIR$/app/models/receipt.rb" />
+        <option value="$PROJECT_DIR$/config/routes.rb" />
       </list>
     </option>
   </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolGruntFileManager" detection-done="true" />
+  <component name="JsBuildToolPackageJson" detection-done="true" />
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
-    <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="JsbtTreeLayoutManager">
     <layout place="tools.popupGrunt">
@@ -156,9 +620,9 @@
     <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="24" />
+    <option name="y" value="31" />
     <option name="width" value="1920" />
-    <option name="height" value="1056" />
+    <option name="height" value="1000" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -185,7 +649,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="RailsProjectView" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -214,120 +680,12 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="public" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Finly" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="finly-server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="public" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="receipts" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="images" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="000" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="001" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="037" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="original" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Finly" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="finly-server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="public" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="receipts" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="images" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="000" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="001" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Finly" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="finly-server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="public" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="system" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="receipts" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="images" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="000" />
+              <option name="myItemId" value="config" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="RailsProjectView" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -338,6 +696,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="SearchEverywhereHistoryKey" value="routes&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/config/routes.rb&#10;user&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/user.rb&#10;user_team&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/user_team_service.rb&#10;users&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/controllers/users_controller.rb&#10;seeds&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/db/seeds.rb&#10;people&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/views/people/people.html.erb&#10;sessions&#9;FILE&#9;file:///home/sreeram/.rvm/gems/ruby-2.3.0/gems/devise-4.2.0/app/controllers/devise/sessions_controller.rb&#10;schema&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/db/schema.rb&#10;database&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/config/database.yml&#10;userteam&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/user_team_service.rb&#10;expense&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/expense_service.rb&#10;gemfile&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/Gemfile&#10;report&#9;null&#9;null&#10;GEMFILE&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/Gemfile&#10;violation&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/violation_service.rb&#10;reportserv&#9;null&#9;null&#10;budget&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/budget_rule.rb&#10;policy&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/policy.rb&#10;category&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/category.rb&#10;expense_ru&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/expense_rule.rb&#10;receipt&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/receipt.rb&#10;usermanager&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/user_manager_mapping.rb&#10;expenserule&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/expense_rule.rb&#10;greater_than_amount&#9;null&#9;null" />
     <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -515,7 +874,6 @@
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
-      <node-interpreter>project</node-interpreter>
       <node-options />
       <gulpfile />
       <tasks />
@@ -526,7 +884,6 @@
     <configuration default="true" type="js.build_tools.npm" factoryName="npm">
       <command value="run-script" />
       <scripts />
-      <node-interpreter value="project" />
       <envs />
       <method />
     </configuration>
@@ -537,9 +894,7 @@
       <item index="3" class="java.lang.String" itemvalue="Rails.Development: Finly" />
     </list>
   </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
-  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -549,7 +904,6 @@
       <changelist id="7d878649-6630-420c-bf50-2b6db9b1c134" name="New changelist" comment="" />
       <created>1466925530024</created>
       <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
       <updated>1466925530024</updated>
       <workItem from="1470422193815" duration="754000" />
       <workItem from="1470426164932" duration="33000" />
@@ -593,154 +947,132 @@
     <task id="LOCAL-00001" summary="First commit">
       <created>1467012839750</created>
       <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
       <updated>1467012839750</updated>
     </task>
     <task id="LOCAL-00002" summary="First commit">
       <created>1467057573862</created>
       <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
       <updated>1467057573862</updated>
     </task>
     <task id="LOCAL-00003" summary="First commit">
       <created>1467095350993</created>
       <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1467095350993</updated>
     </task>
     <task id="LOCAL-00004" summary="First commit">
       <created>1467119867920</created>
       <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
       <option name="project" value="LOCAL" />
       <updated>1467119867920</updated>
     </task>
     <task id="LOCAL-00005" summary="Created tables and basics of service&#10;">
       <created>1467277260253</created>
       <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
       <option name="project" value="LOCAL" />
       <updated>1467277260253</updated>
     </task>
     <task id="LOCAL-00006" summary="Added test cases for ExpenseService">
       <created>1467295785484</created>
       <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
       <option name="project" value="LOCAL" />
       <updated>1467295785484</updated>
     </task>
     <task id="LOCAL-00007" summary="Added seeds for expenses.">
       <created>1467296661682</created>
       <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
       <option name="project" value="LOCAL" />
       <updated>1467296661682</updated>
     </task>
     <task id="LOCAL-00008" summary="Merged origin and modified expense test a bit.">
       <created>1467298869211</created>
       <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
       <option name="project" value="LOCAL" />
       <updated>1467298869211</updated>
     </task>
     <task id="LOCAL-00009" summary="added a test case.">
       <created>1467299225404</created>
       <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
       <option name="project" value="LOCAL" />
       <updated>1467299225404</updated>
     </task>
     <task id="LOCAL-00010" summary="created tables and models for receipt along with associations.">
       <created>1467358424608</created>
       <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
       <option name="project" value="LOCAL" />
       <updated>1467358424608</updated>
     </task>
     <task id="LOCAL-00011" summary="added receipts model and basic tests for creation and destruction">
       <created>1467376559754</created>
       <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
       <option name="project" value="LOCAL" />
       <updated>1467376559754</updated>
     </task>
     <task id="LOCAL-00012" summary="added tests for receipt and expense creation cases.">
       <created>1467380135772</created>
       <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
       <option name="project" value="LOCAL" />
       <updated>1467380135772</updated>
     </task>
     <task id="LOCAL-00013" summary="Created tables and models for rules and warnings. Along with annotate gem to annotate models.">
       <created>1467739137479</created>
       <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
       <option name="project" value="LOCAL" />
       <updated>1467739137480</updated>
     </task>
     <task id="LOCAL-00014" summary="Minor changes.">
       <created>1467779288402</created>
       <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
       <option name="project" value="LOCAL" />
       <updated>1467779288402</updated>
     </task>
     <task id="LOCAL-00015" summary="Created service classes for creation and deletion of rules, and for checking violations. Violation Service yet to be completed.">
       <created>1467901500263</created>
       <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
       <option name="project" value="LOCAL" />
       <updated>1467901500263</updated>
     </task>
     <task id="LOCAL-00016" summary="Basic tests for rule creation and deletion. &#10;Code for checking rules done - untested though.">
       <created>1468240605208</created>
       <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
       <option name="project" value="LOCAL" />
       <updated>1468240605208</updated>
     </task>
     <task id="LOCAL-00017" summary="migrated static pages from previous code.">
       <created>1468834918009</created>
       <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
       <option name="project" value="LOCAL" />
       <updated>1468834918009</updated>
     </task>
     <task id="LOCAL-00018" summary="created tables required for opro.">
       <created>1468838023449</created>
       <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
       <option name="project" value="LOCAL" />
       <updated>1468838023449</updated>
     </task>
     <task id="LOCAL-00019" summary="Integrated devise user log in, and added pundit.">
       <created>1468846703823</created>
       <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
       <option name="project" value="LOCAL" />
       <updated>1468846703823</updated>
     </task>
     <task id="LOCAL-00020" summary="implemented api for expenses">
       <created>1470719782592</created>
       <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
       <option name="project" value="LOCAL" />
       <updated>1470719782592</updated>
     </task>
     <task id="LOCAL-00021" summary="Implemented reports api for index and show">
       <created>1470724596000</created>
       <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
       <option name="project" value="LOCAL" />
       <updated>1470724596000</updated>
     </task>
     <task id="LOCAL-00022" summary="API Implementation">
       <created>1471015387684</created>
       <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
       <option name="project" value="LOCAL" />
       <updated>1471015387684</updated>
     </task>
@@ -760,27 +1092,27 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
-    <editor active="false" />
+    <frame x="0" y="31" width="1920" height="1000" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2769477" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4644309" sideWeight="0.50533617" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27955273" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3281768" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3160221" sideWeight="0.5079872" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299763" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3262195" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.62093496" sideWeight="0.49466383" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39126018" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6198895" sideWeight="0.49466383" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31707317" sideWeight="0.49353796" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3160221" sideWeight="0.49201277" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39126018" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -835,7 +1167,6 @@
     <MESSAGE value="Implemented reports api for index and show" />
     <MESSAGE value="API Implementation" />
     <option name="LAST_COMMIT_MESSAGE" value="API Implementation" />
-    <option name="PRESELECT_EXISTING_CHANGELIST" value="false" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -844,42 +1175,42 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/app/models/manual_expense.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
+        <state vertical-scroll-proportion="0.0">
           <caret line="16" column="6" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/db/schema.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
+        <state vertical-scroll-proportion="0.0">
           <caret line="163" column="31" selection-start-line="163" selection-start-column="16" selection-end-line="163" selection-end-column="31" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/shared/success.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="0" column="17" selection-start-line="0" selection-start-column="17" selection-end-line="0" selection-end-column="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/expense_status.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state vertical-scroll-proportion="0.0">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/base_api_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state vertical-scroll-proportion="0.0">
           <caret line="1" column="2" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/policies/expense_policy.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state vertical-scroll-proportion="0.0">
           <caret line="23" column="8" selection-start-line="23" selection-start-column="8" selection-end-line="23" selection-end-column="8" />
         </state>
       </provider>
@@ -887,77 +1218,77 @@
     <entry file="file://$USER_HOME$/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/bundler/gems/opro-6e0fe4e3a097/lib/opro/controllers/application_controller_helper.rb" />
     <entry file="file://$PROJECT_DIR$/app/controllers/expenses_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="918">
+        <state vertical-scroll-proportion="0.0">
           <caret line="51" column="7" selection-start-line="51" selection-start-column="7" selection-end-line="51" selection-end-column="7" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/expense.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
+        <state vertical-scroll-proportion="0.0">
           <caret line="38" column="52" selection-start-line="38" selection-start-column="52" selection-end-line="38" selection-end-column="52" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/reports_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
+        <state vertical-scroll-proportion="0.0">
           <caret line="3" column="55" selection-start-line="3" selection-start-column="55" selection-end-line="3" selection-end-column="55" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/report_comment.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
+        <state vertical-scroll-proportion="0.0">
           <caret line="6" column="27" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="27" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/expenses/show.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state vertical-scroll-proportion="0.0">
           <caret line="1" column="12" selection-start-line="1" selection-start-column="12" selection-end-line="2" selection-end-column="44" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/expenses/_expense.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
+        <state vertical-scroll-proportion="0.0">
           <caret line="11" column="20" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/_report.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
+        <state vertical-scroll-proportion="0.0">
           <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/index.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state vertical-scroll-proportion="0.0">
           <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/expenses/index.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state vertical-scroll-proportion="0.0">
           <caret line="2" column="36" selection-start-line="2" selection-start-column="36" selection-end-line="2" selection-end-column="36" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/report.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
+        <state vertical-scroll-proportion="0.0">
           <caret line="9" column="15" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/shared/failure.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state vertical-scroll-proportion="0.0">
           <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
         </state>
       </provider>
@@ -965,91 +1296,91 @@
     <entry file="file://$USER_HOME$/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/jbuilder-2.6.0/lib/jbuilder/jbuilder_template.rb" />
     <entry file="file://$PROJECT_DIR$/app/services/report_service.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1854">
+        <state vertical-scroll-proportion="0.0">
           <caret line="103" column="6" selection-start-line="103" selection-start-column="6" selection-end-line="103" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/receipts_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state vertical-scroll-proportion="0.0">
           <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="98" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/receipts/index.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
+        <state vertical-scroll-proportion="0.0">
           <caret line="10" column="3" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/services/receipt_service.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
+        <state vertical-scroll-proportion="0.0">
           <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/helpers/sessions_helper.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
+        <state vertical-scroll-proportion="0.0">
           <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/receipts_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
+        <state vertical-scroll-proportion="0.0">
           <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bin/bundle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/log/development.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9918">
+        <state vertical-scroll-proportion="0.0">
           <caret line="551" column="0" selection-start-line="551" selection-start-column="0" selection-end-line="551" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/services/expense_service.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
+        <state vertical-scroll-proportion="0.0">
           <caret line="53" column="6" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/expenses_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state vertical-scroll-proportion="0.0">
           <caret line="1" column="42" selection-start-line="0" selection-start-column="62" selection-end-line="1" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/initializers/opro.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
+        <state vertical-scroll-proportion="0.0">
           <caret line="25" column="3" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/report_status.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="965">
+        <state vertical-scroll-proportion="0.0">
           <caret line="85" column="5" selection-start-line="55" selection-start-column="2" selection-end-line="85" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/policies_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state vertical-scroll-proportion="0.0">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
         </state>
@@ -1057,21 +1388,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="965">
+        <state vertical-scroll-proportion="0.0">
           <caret line="61" column="5" selection-start-line="61" selection-start-column="5" selection-end-line="61" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
+        <state vertical-scroll-proportion="0.0">
           <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/database.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
+        <state vertical-scroll-proportion="0.0">
           <caret line="19" column="12" selection-start-line="19" selection-start-column="12" selection-end-line="19" selection-end-column="12" />
           <folding />
         </state>
@@ -1079,15 +1410,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/config/proselytism.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/initializers/imgkit.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -1095,9 +1425,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/receipt_processor/pdf_converter.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1108,7 +1437,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/db/migrate/20160820114906_create_receipt_email_attachments.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
+        <state vertical-scroll-proportion="0.0">
           <caret line="8" column="59" selection-start-line="8" selection-start-column="59" selection-end-line="8" selection-end-column="59" />
           <folding />
         </state>
@@ -1116,7 +1445,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/db/migrate/20160820114823_create_receipt_emails.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state vertical-scroll-proportion="0.0">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding />
         </state>
@@ -1124,20 +1453,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/db/seeds.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
+        <state vertical-scroll-proportion="0.0">
           <caret line="104" column="3" selection-start-line="104" selection-start-column="3" selection-end-line="104" selection-end-column="3" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/public/system/receipts/images/000/001/037/original/4.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/models/receipt.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
+        <state vertical-scroll-proportion="0.0">
           <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
           <folding />
         </state>
@@ -1145,23 +1469,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/receipt_email.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
+        <state vertical-scroll-proportion="0.0">
           <caret line="3" column="18" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/receipt_email_attachment.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
+        <state vertical-scroll-proportion="0.0">
           <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/user.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
+        <state vertical-scroll-proportion="0.0">
           <caret line="54" column="47" selection-start-line="54" selection-start-column="47" selection-end-line="54" selection-end-column="47" />
           <folding />
         </state>
@@ -1169,32 +1491,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/email_processor.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
+        <state vertical-scroll-proportion="0.0">
           <caret line="20" column="30" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sendgrid.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="33" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/routes.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="81" column="19" selection-start-line="81" selection-start-column="19" selection-end-line="81" selection-end-column="19" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gemfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="78" column="19" selection-start-line="78" selection-start-column="19" selection-end-line="78" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/routes.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="188" column="33" selection-start-line="188" selection-start-column="33" selection-end-line="188" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sendgrid.env">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="33" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.5899772">
+          <caret line="75" column="19" selection-start-line="75" selection-start-column="19" selection-end-line="75" selection-end-column="19" />
           <folding />
         </state>
       </provider>

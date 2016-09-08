@@ -19,10 +19,8 @@ gem 'rails', '4.2.6'
 # Use mysql as the database for Active Record
 gem 'mysql2', '>= 0.3.13', '< 0.5'
 
-
 #Bundles for pagination
 gem 'will_paginate'
-
 
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails'
@@ -46,6 +44,10 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 
+gem 'handlebars_assets'
+
+
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -54,6 +56,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+
+gem 'backbone-on-rails'
 
 gem 'bootstrap-will_paginate'
 # gem for image manipulation
@@ -65,11 +69,9 @@ gem 'faker'
 
 gem 'paper_trail', '~> 5.1.1'
 
-
 gem 'turboboost'
 
 gem 'remotipart', '~> 1.0'
-
 
 gem 'bootbox-rails', '~>0.4'
 
@@ -90,7 +92,12 @@ gem 'proselytism', git: 'git://github.com/ramanbedi1989/proselytism.git'
 
 # gem for devise authentication
 gem 'devise'
+
 gem 'devise_invitable'
+
+gem 'has_scope'
+
+gem 'hooks'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -100,6 +107,8 @@ group :development, :test do
   gem 'capistrano-rails', require: false
   gem 'capistrano-bundler', require: false
   gem 'capistrano-rvm'
+  gem 'hirb'
+  gem 'awesome_print'
 end
 
 group :development do

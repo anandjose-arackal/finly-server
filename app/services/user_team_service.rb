@@ -75,6 +75,14 @@ class UserTeamService < BaseService
         return true if m.id == managing_user.id
         m = UserTeamService.new(m).approves_to(report: report)
       end
+    elsif obj.is_a?(CardLoadRequest)
+      card_load_request = obj
+      emp = card_load_request.user
+      m = UserTeamService.new(emp).manager(card_load_request: card_load_request)
+      while m.present?
+        return true if m.id == managing_user.id
+        m = UserTeamService.new(m).approves_to(card_load_request: card_load_request)
+      end
     elsif obj.is_a?(User)
       for_user = obj
       emp = UserManagerMapping.has_manager(managing_user.id).with_user(for_user.id)
@@ -116,6 +124,14 @@ class UserTeamService < BaseService
       while m.present?
         return true if m.id == managing_user.id
         m = UserTeamService.new(m).approves_finance_to(report)
+      end
+    elsif obj.is_a?(CardLoadRequest)
+      card_load_request = obj
+      emp = card_load_request.user
+      m = UserTeamService.new(emp).finance_manager(card_load_request)
+      while m.present?
+        return true if m.id == managing_user.id
+        m = UserTeamService.new(m).approves_finance_to(card_load_request)
       end
     elsif obj.is_a?(User)
       for_user = obj
@@ -180,7 +196,7 @@ class UserTeamService < BaseService
     return nil unless user.manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_to_user rescue nil
+    obj = @mappings.approves_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_to rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -189,7 +205,7 @@ class UserTeamService < BaseService
     return nil unless user.finance_manager?
     load_retrieve params
     @policy_id = nil unless @policy_id.blank? or PolicyRetrievalService.new(user).list.with_id(@policy_id).present?
-    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_finance_to_user rescue nil
+    obj = @mappings.approves_finance_to.policy(@policy_id).amount(@currency_id, @amount).first.approves_finance_to rescue nil
     return nil unless obj.present? and obj.is_a?(User)
     obj
   end
@@ -199,22 +215,23 @@ class UserTeamService < BaseService
     errors.clear
     load_update params
     # updating greater than amount for non-default if it needs to be updated
-    if !@mapping.default and !params['amount'].blank? and params['amount'] != @mapping.greater_than_amount_value and params['currency_id'] != @mapping.greater_than_amount_currency_id
+    if not @mapping.default and not params['amount'].blank? and params['amount'] != @mapping.greater_than_amount_value and
+        params['currency_id'] != @mapping.greater_than_amount_currency_id
       greater_than_amount = Amount.create(value: params['amount'], currency_id: params['currency_id'])
       @mapping.update_attributes(greater_than_amount_id: greater_than_amount.id)
     end
     manager_id = params[:manager_id] || params['manager_id']
     finance_manager_id = params[:finance_manager_id] || params['finance_manager_id']
-    approves_to_user_id = params[:approves_to_user_id] || params['approves_to_user_id']
-    approves_finance_to_user_id = params[:approves_finance_to_user_id] || params['approves_finance_to_user_id']
+    approves_to_id = params[:approves_to_id] || params['approves_to_id']
+    approves_finance_to_id = params[:approves_finance_to_id] || params['approves_finance_to_id']
     # if amount is left empty, remove the conditional manager params
-    if params['amount'] and params['amount'].empty?
-      manager_id = finance_manager_id = approves_to_user_id = approves_finance_to_user_id = nil
+    if params['amount'] and params['amount'].empty? and not @mapping.default
+      manager_id = finance_manager_id = approves_to_id = approves_finance_to_id = nil
     end
     if @mapping.update_attributes(manager_id: manager_id,
-                               finance_manager_id: finance_manager_id,
-                               approves_to_user_id: approves_to_user_id,
-                               approves_finance_to_user_id: approves_finance_to_user_id)
+                                  finance_manager_id: finance_manager_id,
+                                  approves_to_id: approves_to_id,
+                                  approves_finance_to_id: approves_finance_to_id)
       return true
     else
       errors << @mapping.errors.full_messages
@@ -234,11 +251,11 @@ class UserTeamService < BaseService
     if params[:finance_manager_id].present? || params['finance_manager_id'].present?
       mapping.finance_manager_id = params[:finance_manager_id] || params['finance_manager_id']
     end
-    if params[:approves_to_user_id].present?
-      mapping.approves_to_user_id = params[:approves_to_user_id]
+    if params[:approves_to_id].present?
+      mapping.approves_to_id = params[:approves_to_id]
     end
-    if params[:approves_finance_to_user_id].present?
-      mapping.approves_finance_to_user_id = params[:approves_finance_to_user_id]
+    if params[:approves_finance_to_id].present?
+      mapping.approves_finance_to_id = params[:approves_finance_to_id]
     end
     return true if mapping.save
     errors << mapping.errors.full_messages
@@ -299,7 +316,6 @@ class UserTeamService < BaseService
     @user_team_service = UserTeamService.new(user)
     roles_to_remove = params[:user_role_id]
     roles_to_remove.each do |role|
-      debugger
       if @user_team_service.team(role)
         unless @user_team_service.team(role).empty?
           errors << "#{self.user.name} has other team members under him. "
@@ -319,11 +335,11 @@ class UserTeamService < BaseService
     @admin_view = nil
     @manager_view = nil
     @finance_view = nil
+    @currency_id = params[:currency_id]
+    @amount = params[:amount]
     @mappings = self.user.team_mapping.with_details
     if params[:policy_id]
       @policy_id = params[:policy_id]
-      @currency_id = params[:currency_id]
-      @amount = params[:amount]
     elsif params[:policy].present?
       policy = params[:policy]
       @policy_id = policy.id
@@ -333,15 +349,25 @@ class UserTeamService < BaseService
         @currency_id = policy.configuration.report_currency
       end
       @amount = params[:amount]
-    elsif params[:report.present?]
+    elsif params[:report].present?
       report = params[:report]
       if report.policy_id.present? and user.policies.with_id(report.policy_id).present?
         @policy_id = report.policy_id
       else
         @policy_id = nil
       end
+      rds = ReportDetailService.new(report)
       @currency_id = rds.currency
       @amount = rds.total_amount
+    elsif params[:card_load_request].present?
+      card_load_request = params[:card_load_request]
+      if card_load_request.policy_id.present? and user.policies.with_id(card_load_request.policy_id).present?
+        @policy_id = card_load_request.policy_id
+      else
+        @policy_id = nil
+      end
+      @currency_id = card_load_request.amount.currency
+      @amount = card_load_request.amount.value
     end
 
     load_view params
@@ -385,10 +411,10 @@ class UserTeamService < BaseService
     if params[:finance_manager_id].present?
       errors << 'Another finance manager is already configured for the given amount' if mapping.finance_manager.present?
     end
-    if params[:approves_to_user_id].present?
+    if params[:approves_to_id].present?
       errors << 'Another manager is already configured for the given amount' if mapping.approves_to.present?
     end
-    if params[:approves_finance_to_user_id].present?
+    if params[:approves_finance_to_id].present?
       errors << 'Another manager is already configured for the given amount' if mapping.approves_finance_to.present?
     end
     errors.blank?

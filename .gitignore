@@ -8,9 +8,12 @@
 /.bundle
 /Gemfile.lock
 /config/database.yml
+/.byebug_history
 
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
 /tmp
 /public/system/receipts
+
+/.idea

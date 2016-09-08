@@ -17,7 +17,7 @@
     </form>
 <% end %>
 
-<% if @views[:review] %>
+<% if @views[:team] %>
     <!--APPROVE REPORT-->
     <form data-remote data-turboboost  data-confirm="Are you sure you want to approve this report?" action="<%= report_approve_path(@report, view: params[:view]) %>" method="post">
       <input name="_method" type="hidden" value="patch"/>

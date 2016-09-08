@@ -1,0 +1,9 @@
+//= require underscore
+//= require backbone
+//= require ./finly_f
+//= require_tree ../../templates/finlyf
+//= require_tree ./models
+//= require_tree ./collections
+//= require_tree ./views
+//= require_tree ./routers
+//= require_tree ./helpers

@@ -1,0 +1,26 @@
+# == Schema Information
+#
+# Table name: event_configurations
+#
+#  id                      :integer          not null, primary key
+#  user_id                 :integer          not null
+#  event_id                :integer          not null
+#  allow_push_notification :boolean
+#  allow_mailer            :boolean
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 
+  event_id: 
+  allow_push_notification: false
+  allow_mailer: false
+
+two:
+  user_id: 
+  event_id: 
+  allow_push_notification: false
+  allow_mailer: false

@@ -16,7 +16,6 @@
 #  report_id            :integer
 #  category_id          :integer
 #
-
 class Expense < ActiveRecord::Base
   belongs_to :amount
   belongs_to :expense_status
@@ -29,8 +28,9 @@ class Expense < ActiveRecord::Base
   has_many :receipts, as: :parent
 
   has_one :manual_expense, dependent: :destroy
+  has_one :card_expense, dependent: :destroy
 
-  accepts_nested_attributes_for :amount, :manual_expense
+  accepts_nested_attributes_for :amount, :manual_expense, :card_expense
   accepts_nested_attributes_for :receipts
 
   # delegating to associated classes the dependent attribute calls
@@ -49,11 +49,23 @@ class Expense < ActiveRecord::Base
   validate :report_status
 
   # i.e. an expense associated with a report can't be destroyed
-  before_destroy {
+  before_destroy do
     if self.report_id
       errors.add(:expense, "associated with a report can't be destroyed.")
     end
-  }
+  end
+
+  before_save do
+    if self.expense_status_id.blank?
+      if self.report_id.blank?
+        self.expense_status_id = ExpenseStatus.unreported_id
+      else
+        self.expense_status_id = ExpenseStatus.unsubmitted_id
+      end
+    end
+  end
+
+  default_scope {order('created_at DESC')}
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -80,6 +92,8 @@ class Expense < ActiveRecord::Base
       type_val = :date
       date_from = "1990-01-01" if date_from.blank?
       date_to = Date.today if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
       expenses = arel_table
       where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
     end
@@ -92,13 +106,17 @@ class Expense < ActiveRecord::Base
   scope :filter_receipt, -> (value) do
     case value
       when 'present'
-        joins(:receipts).select('expenses.*').where('')
+        where("id IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
       when 'nil'
-        joins(:receipts).select('expenses.*')
+        where("id NOT IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
     end
   end
 
+  scope :manual, -> { joins(:manual_expense)}
+  scope :card, -> {joins(:card_expense)}
+
   scope :with_id, ->(ids) { where id: ids }
+  scope :with_date, ->(dates) { where date: dates }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }

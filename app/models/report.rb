@@ -20,6 +20,9 @@
 #
 
 class Report < ActiveRecord::Base
+
+  include MathUtil
+
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
@@ -37,7 +40,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
 
-  default_scope { order report_status_id: :asc }
+  default_scope { order(created_at: :desc,report_status_id: :asc ) }
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
@@ -46,11 +49,13 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
+  scope :open, -> {where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
+  scope :processing, -> {where report_status_id: ReportStatus.processing_id }
   scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
@@ -73,6 +78,8 @@ class Report < ActiveRecord::Base
     unless date_from.blank? && date_to.blank?
       date_from = "1990-01-01" if date_from.blank?
       date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
       # date_to = Date.today if date_to.blank?
       reports = arel_table
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
@@ -89,7 +96,7 @@ class Report < ActiveRecord::Base
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
   def associated_users(user_before = nil, ordered = false)
-    return nil if tracks.blank?
+    return nil if self.tracks.blank?
     trackings = tracks.without_take_control_action
     if user_before.present?
       track = trackings.find_by(action_user_id: user_before.id)
@@ -166,6 +173,11 @@ class Report < ActiveRecord::Base
     open? or retracted? or rejected?
   end
 
+  def can_destroy?
+    # same as can_submit
+    can_submit?
+  end
+
   def can_archive?
     reimbursed? or reimbursement_confirmed? or closed?
   end
@@ -186,10 +198,6 @@ class Report < ActiveRecord::Base
     self.accounted
   end
 
-  def controlling_user?(user)
-    self.controlling_user == user
-  end
-
   def relative_status_name(user)
     if processing? and controlling_user? user
       return 'Pending Review'
@@ -198,17 +206,44 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
+  def total_amount
+    return precision_value(self.expenses.with_amount.sum(:value)) if self.expenses.present?
+    0
+  end
+
+  def controlling_user?(user)
+    self.controlling_user.id == user.id
+  end
+
+  def versioned_policy
+    if self.submitted_at.present?
+      if self.policy
+        return self.policy.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
+      end
+    end
+    self.policy
+  end
+
+  def final_approver
+    return nil unless self.approved? or self.reimbursed? or self.reimbursement_confirmed? or self.closed?
+    tracks = self.tracks.with_action(ReportTrackingAction.approve_id)
+    if tracks.present?
+      return tracks.last.action_user
+    end
+    nil
+  end
+
   def first_date
     return nil unless self.expenses.count > 0
-    self.expenses.sort_date_asc.first.date
+    expenses.sort_date_asc.first.date
   end
 
   def last_date
-    return nil unless self.expenses.count > 0
-    self.expenses.sort_date_desc.first.date
+    return nil unless expenses.count > 0
+    expenses.sort_date_desc.first.date
   end
 
-  def get_date_string
+  def date_as_string
     d_start = first_date
     d_end = last_date
     if d_start.blank? and d_end.blank?
@@ -221,6 +256,19 @@ class Report < ActiveRecord::Base
     end
   end
 
+  def latest_expense
+    return nil unless self.expenses.count > 0
+    self.expenses.sort_date_desc.first
+  end
+
+  def require_reimbursement?
+    report_total = total_amount
+    latest_expense = latest_expense
+    date = nil
+    date = latest_expense.date if latest_expense.present?
+    cash = self.user.cash_in_hand date
+    cash.value - report_total < 0
+  end
 
   private
   def is_employee
