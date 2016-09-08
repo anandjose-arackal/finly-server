@@ -22,19 +22,17 @@ class Report::Expenses::Add < Report::Base
   end
 
   def init
-    self.report = Report.find_by(id: params[:report_id])
+    index_operation = Report::Index.new(self.user, self.params)
+    reports_presenter = index_operation.run
+    unless index_operation.is_success?
+      self.errors = index_operation.errors
+      return false
+    end
+    self.report = reports_presenter.reports.find_by(id: params[:report_id]) rescue nil
     ids = (params[:expense_ids] or params[:expense_id])
     # Split if IDS are sent as one comma delimited string
     ids= ids.split(',')
     self.expenses = user.expenses.where(id: ids)
-  end
-
-  def validate
-    # checking state of the report
-    unless report.open? or report.retracted?
-      errors << 'Cannot add expenses to report unless report is in open or retracted state'
-      return false
-    end
   end
 
   def authorize
@@ -51,6 +49,14 @@ class Report::Expenses::Add < Report::Base
 
     unless report.user_id == user.id
       errors << "You cannot add expenses to this report."
+    end
+  end
+
+  def validate
+    # checking state of the report
+    unless report.open? or report.retracted?
+      errors << 'Cannot add expenses to report unless report is in open or retracted state'
+      return false
     end
   end
 

@@ -28,16 +28,14 @@ class Report::Create < Report::Base
     if report.save
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
-      if params[:expense_ids].present?
+      expense_id = (params[:expense_id] or params[:expense_ids])
+      if expense_id.present?
         add_expense_op = Report::Expenses::Add.new(user, {report_id: report.id, expense_ids: params[:expense_ids]})
-        unless add_expense_op.run
-          # empty report gets created and is returned
-          return report
-        end
+        add_expense_op.run
       end
-      return report
+    else
+      errors << report.errors.full_messages
     end
-    errors << report.errors.full_messages
   end
 
 end
