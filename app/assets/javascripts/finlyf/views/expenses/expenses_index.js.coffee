@@ -211,13 +211,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $(@el).find("#item-details-main").html(preview_view.render().el)
     
   closeDetails: (e)->
-    e.preventDefault()
-    target = $(e.currentTarget)
-    if $(target).attr('data-refresh-true')
-      # alert("Data refresh is true")
-      # @filter()
-      @refetchCollection()
-      $(target).removeAttr('data-refresh-true') 
+    if e
+      e.preventDefault()
+      target = $(e.currentTarget)
+      if $(target).attr('data-refresh-true')
+        # alert("Data refresh is true")
+        # @filter()
+        @refetchCollection()
+        $(target).removeAttr('data-refresh-true') 
     
     main = $(@el).find(".main")
     $(main).removeClass("preview")
