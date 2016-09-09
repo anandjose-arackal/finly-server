@@ -30,14 +30,9 @@ class GcmMessenger
     type_id = nil
     view = nil
     case params[:event_id]
-      when Event.report_submit_id
-      when Event.report_approve_id
-      when Event.report_retract_id
-      when Event.report_reject_id
-      when Event.report_comment_id
-      when Event.report_reject_expense_id
-      when Event.report_take_control_id
-      when Event.report_reimbursed_id
+      when Event.report_submit_id, Event.report_approve_id, Event.report_retract_id,
+          Event.report_reject_id, Event.report_comment_id, Event.report_reject_expense_id,
+          Event.report_take_control_id, Event.report_reimbursed_id
         type = 'report'
         type_id = params[:report_id]
         view = params[:view]
