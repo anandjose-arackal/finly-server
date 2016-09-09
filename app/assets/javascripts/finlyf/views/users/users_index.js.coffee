@@ -5,9 +5,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   templateNavbarSidebar: HandlebarsTemplates['finlyf/users/navbar/navbar_sidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/users/navbar/navbar_main']
 
+  #Employees
+  templateInviteEmployee: HandlebarsTemplates['finlyf/users/inviteEmployee']
+
   events:
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
+    'click .btn-invite-employee': 'processEmployeeInvitation'
 
   initialize: (options) ->
     @params = options.params
@@ -141,6 +145,12 @@ class FinlyF.Views.UsersIndex extends Backbone.View
           console.log "Couldn't fetch Successfully."
       })
 
+  processEmployeeInvitation: ->
+    modal = $(@el).find("#modal-mp")
+    $(modal).html(@templateInviteEmployee())
+    $(modal).modal('show')
+
+  ##Funactionalities
 
   resetPageCount: (options) ->
     if options.target
