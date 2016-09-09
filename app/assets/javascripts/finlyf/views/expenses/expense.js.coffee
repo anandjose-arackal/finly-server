@@ -67,6 +67,7 @@ class FinlyF.Views.Expense extends Backbone.View
       },
       processData: true,
       success: (model, res) ->
+        $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
         _this.parent.trigger('item:destroyed')
       error: (err) ->
         console.log "Error", err

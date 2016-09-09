@@ -211,13 +211,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $(@el).find("#item-details-main").html(preview_view.render().el)
     
   closeDetails: (e)->
-    e.preventDefault()
-    target = $(e.currentTarget)
-    if $(target).attr('data-refresh-true')
-      # alert("Data refresh is true")
-      # @filter()
-      @refetchCollection()
-      $(target).removeAttr('data-refresh-true') 
+    if e
+      e.preventDefault()
+      target = $(e.currentTarget)
+      if $(target).attr('data-refresh-true')
+        # alert("Data refresh is true")
+        # @filter()
+        @refetchCollection()
+        $(target).removeAttr('data-refresh-true') 
     
     main = $(@el).find(".main")
     $(main).removeClass("preview")
@@ -277,9 +278,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     # console.log expenses
     model_report = new FinlyF.Models.Report({
-      "report": {
-        "expense_id": expenses.join(","),
-      },
+      "expense_ids": expenses.join(","),
+      # "expense_ids": expenses,
       "authenticity_token": $("#authenticity_token").val()
       "utf8": $("#form_utf8").val()
     })
