@@ -21,7 +21,7 @@ class User::Index < User::Base
 
     has_scope :filter_search
     has_scope :filter_role
-    has_scope :filter_status
+    has_scope :filter_state
 
     def initialize(user, params)
       super(user, params)
