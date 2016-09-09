@@ -1,6 +1,6 @@
 require 'test_helper'
-require_relative '../../../../app/operations/expense/card/update'
-require_relative '../../../../app/operations/expense/card/create'
+require_relative '../../../../operations/expense/card/update'
+require_relative '../../../../operations/expense/card/create'
 
 class UpdateTest < ActiveSupport::TestCase
 

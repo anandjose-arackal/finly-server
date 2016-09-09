@@ -192,6 +192,9 @@ class Report::Violation < Report::Base
   end
 
   def check_budget(rule, expense)
+    start_date = nil
+    end_date = nil
+    budget_message = nil
     if rule.amount_value
       if rule.period
         # setting the start and end date based on the kind of period set by the user
@@ -220,16 +223,20 @@ class Report::Violation < Report::Base
         if budget_violation?(expense, rule, start_date, end_date, category)
           if rule.type == 'Warning'
             if category
-              self.warning_messages[expense.id]['budget_warning'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount_value.to_s
+              self.warning_messages[expense.id]['budget_warning']['category'] = [] if self.warning_messages[expense.id]['budget_warning'][category.id].blank?
+              self.warning_messages[expense.id]['budget_warning']['category'] << "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
             else
-              self.warning_messages[expense.id]['budget_warning']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount_value.to_s
+              self.warning_messages[expense.id]['budget_warning']['total'] = [] if self.warning_messages[expense.id]['budget_warning']['total'].blank?
+              self.warning_messages[expense.id]['budget_warning']['total'] << "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
             end
             return
           elsif rule.type == 'Blocking'
             if category
-              self.warning_messages[expense.id]['budget_blocking'][category.name] = "Total expenses under category " + category.name + budget_message + " have exceeded " + rule.amount_value.to_s
+              self.warning_messages[expense.id]['budget_blocking']['category'] = [] if self.warning_messages[expense.id]['budget_blocking'][category.id].blank?
+              self.warning_messages[expense.id]['budget_blocking']['category'] << "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
             else
-              self.warning_messages[expense.id]['budget_blocking']['total'] = "Total expenses " + budget_message + " have exceeded " + rule.amount_value.to_s
+              self.warning_messages[expense.id]['budget_blocking']['total'] = [] if self.warning_messages[expense.id]['budget_blocking']['total'].blank?
+              self.warning_messages[expense.id]['budget_blocking']['total'] << "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
             end
             return
           end

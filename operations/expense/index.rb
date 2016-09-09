@@ -55,7 +55,7 @@ class Expense::Index < Expense::Base
   class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :paginated_unreported_expenses, :categories, :unreported_expenses
+    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
@@ -72,7 +72,7 @@ class Expense::Index < Expense::Base
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
         self.unreported_expenses = expenses.unreported
-        self.paginated_unreported_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+        self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
       end
       self.categories = user.company.active_categories
     end
