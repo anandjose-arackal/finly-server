@@ -7,10 +7,6 @@ class Report::Index < Report::Base
     [:employee, :manager, :finance_manager, :admin]
   end
 
-  def self.call(user, params)
-    self.new(user, params).run
-  end
-
   def init
     self.role_id = params[:role_id]
     if self.role_id.blank? and params[:view].present?

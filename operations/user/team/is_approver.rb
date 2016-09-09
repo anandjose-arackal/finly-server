@@ -1,8 +1,8 @@
 class User::Team::IsApprover < User::Team::Base
-  attr_accessor :report, :card_load_request, :for_user, :type, :result
+  attr_accessor :report, :money_request, :for_user, :type, :result
 
   def pre_validate
-    unless params[:report].present? or params[:card_load_request].present? or params[:user].present?
+    unless params[:report].present? or params[:money_request].present? or params[:user].present?
       errors << 'Error validating approver'
     end
     unless params[:type].present?
@@ -19,7 +19,7 @@ class User::Team::IsApprover < User::Team::Base
   def init
     self.type = params[:type]
     self.report = params[:report]
-    self.card_load_request = params[:card_load_request]
+    self.money_request = params[:money_request]
     self.for_user = params[:user]
   end
 
@@ -32,8 +32,8 @@ class User::Team::IsApprover < User::Team::Base
       self.response = false
       return
     end
-    if self.card_load_request.present?
-      if process_card_load_request
+    if self.money_request.present?
+      if process_money_request
         self.response = true
         return
       end
@@ -82,8 +82,8 @@ class User::Team::IsApprover < User::Team::Base
     process_request :report, report
   end
 
-  def process_card_load_request
-    process_request :card_load_request, card_load_request
+  def process_money_request
+    process_request :money_request, money_request
   end
 
   def process_request(symbol, obj)

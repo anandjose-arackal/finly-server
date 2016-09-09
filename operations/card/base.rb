@@ -6,7 +6,7 @@ class Card::Base < BaseOperation
     return if params.blank?
     params = self.params
     params = ActionController::Parameters.new(params) if self.params.is_a?(Hash)
-    params.require(:card_load_request).permit(:note, amount_attributes: [:id, :value, :currency_id])
+    params.require(:money_request).permit(:note, amount_attributes: [:id, :value, :currency_id])
   end
 
 
