@@ -204,7 +204,7 @@ class User < ActiveRecord::Base
   end
 
   def invite_accepted?
-    self.invitation_token
+    !self.invitation_token
   end
 
   def cash_in_hand(date = nil)

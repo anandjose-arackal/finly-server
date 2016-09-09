@@ -65,7 +65,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  default_scope {order('created_at DESC')}
+  default_scope {order('expenses.created_at DESC')}
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
