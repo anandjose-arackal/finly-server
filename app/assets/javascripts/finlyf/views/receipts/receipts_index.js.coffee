@@ -311,6 +311,14 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
     $("#modal-new .modal-body").html(@templateNewExpense({receipt: {id: selected_receipt.get('id')}}))
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
+
+    category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
+    options = $("#newExpenseCategory option")
+    for option in options
+      $('<option/>', {
+        value: $(option).attr('value')
+        text: $(option).text()
+      }).appendTo(category_select)
     $("#modal-new").modal('show')
 
     # console.log selected_receipt.toJSON()

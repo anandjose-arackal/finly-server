@@ -1,4 +1,4 @@
-<div class="modal-dialog" role="document" style="width: 60%;">
+<div class="modal-dialog" role="document" style="width: 50%;">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -6,22 +6,20 @@
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="col-sm-12">
-          EMAIL
+        <div class="col-sm-4">
+          <label class="control-label">Email:</label>
         </div>
 
-        <div class="col-sm-12">
+        <div class="col-sm-8">
           <input name="pending_invite[email]" class="form-control" placeholder="example@company.com, two@asa.com" type="text">
           <textarea class="form-control" name="pending_invite[note]" placeholder="Add a note (optional)"></textarea>    
         </div>
-
-        <hr />
-
-
       </div>
 
+      <hr />
+
       <div class="row">
-        <div class="col-sm-4"><label class="control-label">Assign Admin Role</label></div>
+        <div class="col-sm-4"><label class="control-label">Assign Admin Role?</label></div>
         <div class="col-sm-8">
           <label class="radio-inline" style="font-size: 12px">
             <input id="" name="admin" style="font-size: 8px" value="1" type="radio">Yes
@@ -32,140 +30,89 @@
         </div>
       </div>
 
+      <hr />
+
       <div class="row">
-        <div class="col-sm-4"><label class="control-label">Assign Manager Role?</label></div>
+
+        <div class="col-sm-12 no-padding">
+          <div class="col-sm-4"><label class="control-label">Assign Manager Role?</label></div>
+          <div class="col-sm-8">
+            <label class="radio-inline">
+              <input name="manager" value="1" type="radio">Yes
+            </label>
+            <label class="radio-inline">
+              <input name="manager" value="0" checked="checked" type="radio">No
+            </label>
+          </div>
+        </div>
+        
+
+        <div class="col-sm-12 no-padding">
+          <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
+          <div class="col-sm-8">
+            <select class="form-control">
+              <option value="">None</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col-sm-12 no-padding">
+          <div class="col-sm-4"><label class="control-label">Assign Finance Manager Role?</label></div>
+          <div class="col-sm-8">
+            <label class="radio-inline">
+              <input name="finance_manager" value="1" type="radio">Yes
+            </label>
+            <label class="radio-inline">
+              <input name="finance_manager" value="0" checked="checked" type="radio">No
+            </label>
+          </div>
+        </div>
+        
+
+        <div class="col-sm-12 no-padding">
+          <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
+          <div class="col-sm-8">
+            <select class="form-control">
+              <option value="">None</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col-sm-4"><label class="control-label">Managed By:</label></div>
         <div class="col-sm-8">
-          <label class="radio-inline">
-            <input name="manager" value="1" type="radio">Yes
-          </label>
-          <label class="radio-inline">
-            <input name="manager" value="0" checked="checked" type="radio">No
-          </label>
+          <select class="form-control">
+            <option value="">None</option>
+          </select>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-sm-4"><label class="control-label">Assign Finance Manager Role?</label></div>
+        <div class="col-sm-4"><label class="control-label">Finance Managed By:</label></div>
         <div class="col-sm-8">
-          <label class="radio-inline">
-            <input name="finance_manager" value="1" type="radio">Yes
-          </label>
-          <label class="radio-inline">
-            <input name="finance_manager" value="0" checked="checked" type="radio">No
-          </label>
+          <select class="form-control">
+            <option value="">None</option>
+          </select>
         </div>
-      </div>     
+      </div>
 
+      <hr />
 
-
-          <div id="approvesReportsTo" style="display: none">
-            <label class="editProfileDialogHeaders">Approves Reports To : </label>
-
-
-                <select form="inviteMembersForm" id="userManager" name="pending_invite[approves_to_user_id]" class="selectors">
-                  <option value=""></option>
-                      <option value="2">Finly King</option>
-                      <option value="3">Vivek</option>
-                      <option value="8">Finly Manager 0</option>
-                      <option value="9">Finly Manager 1</option>
-                      <option value="10">Finly Manager 2</option>
-                      <option value="11">Finly Manager 3</option>
-                      <option value="12">Finly Manager 4</option>
-                      <option value="13">Finly Manager 5</option>
-
-                </select>
-
-
-          </div>
-
-
-      <hr style=" margin: 15px 0 0 0">
-
-
-          <label class="editProfileDialogHeaders">Assign Finance Manager Role?</label>
-
-          <label class="radio-inline" style="font-size: 12px">
-            <input id="financeManagerTrue" name="finance_manager" onclick="displayApprovesFinanceReports(true)" style="font-size: 8px" value="1" type="radio">Yes
-          </label>
-          <label class="radio-inline" style="font-size: 12px">
-            <input id="financeManagerTrue" name="finance_manager" onclick="displayApprovesFinanceReports(false)" value="0" checked="checked" style="font-size: 8px" type="radio">No
-          </label>
-
-          <div id="approvesFinanceReports" style="display: none">
-            <label class="editProfileDialogHeaders">Approves Finance Reports To : </label>
-
-
-                <select form="inviteMembersForm" id="userFinanceManager" name="pending_invite[approves_finance_to_user_id]" class="selectors">
-                  <option value=""></option>
-                      <option value="2">Finly King</option>
-                      <option value="3">Vivek</option>
-                      <option value="4">Finly Finance Manager 0</option>
-                      <option value="5">Finly Finance Manager 1</option>
-                      <option value="6">Finly Finance Manager 2</option>
-                      <option value="7">Finly Finance Manager 3</option>
-                </select>
-
-
-          </div>
-
-
-      <hr style=" margin: 15px 0 0 0">
-
-      <label class="editProfileDialogHeaders">Managed By :
-        <span class="spanEditProfile"> (this is the person who will review user's expenses first)</span>
-      </label>
-
-
-          <select class="dialogInputStyle" name="pending_invite[manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
-            
-              <option value="">None</option>
-                  <option value="2">Finly King</option>
-                  <option value="3">Vivek</option>
-                  <option value="8">Finly Manager 0</option>
-                  <option value="9">Finly Manager 1</option>
-                  <option value="10">Finly Manager 2</option>
-                  <option value="11">Finly Manager 3</option>
-                  <option value="12">Finly Manager 4</option>
-                  <option value="13">Finly Manager 5</option>
-            
+      <div class="row">
+        <div class="col-sm-4"><label class="control-label">Add Policy to User</label></div>
+        <div class="col-sm-8">
+          <select class="form-control">
+            <option value="">None</option>
           </select>
-
-
-
-      <hr style=" margin: 15px 0 0 0">
-
-
-      <label class="editProfileDialogHeaders">Finance Managed By :
-        <span class="spanEditProfile"> (this is the person who will reimburse the user's expenses)</span>
-      </label>
-
-
-          <select class="dialogInputStyle" name="pending_invite[finance_manager_id]" placeholder="( Optional ) Assign Manager" list="suggestionList" id="answerInput">
-            
-              <option value="">None</option>
-                  <option value="2">Finly King</option>
-                  <option value="3">Vivek</option>
-                  <option value="4">Finly Finance Manager 0</option>
-                  <option value="5">Finly Finance Manager 1</option>
-                  <option value="6">Finly Finance Manager 2</option>
-                  <option value="7">Finly Finance Manager 3</option>
-            
-          </select>
-
-
-
-
-          <hr style=" margin: 15px 0 0 0">
-          <label class="editProfileDialogHeaders">Add policy to user
-            <span class="spanEditProfile"> (this policy will hence be available to the user)</span>
-          </label>
-
-          <select name="pending_invite[policy_id]" class="selectors" style="width: 81%;margin-left: 20px; padding: 5px;margin-top: 10px">
-            <option value="" selected="selected">None</option>
-                <option value="1"></option>
-                <option value="2">Test Policy</option>
-                <option value="3">Another test Policy</option>
-          </select>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
