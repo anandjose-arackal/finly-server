@@ -1,128 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/app/controllers/users_controller.rb" line="46" />
+    <bookmark url="file://$PROJECT_DIR$/app/controllers/users_controller.rb" line="15" />
     <bookmark url="file://$PROJECT_DIR$/app/controllers/policies_controller.rb" line="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="Implemented">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/947/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/948/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/949/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/950/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/951/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/952/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/953/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/954/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/955/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/956/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/957/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/958/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/959/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/960/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/961/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/962/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/963/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/964/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/965/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/966/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/967/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/968/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/969/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/970/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/971/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/972/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/973/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/974/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/975/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/976/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/977/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/978/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/979/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/980/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/981/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/982/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/983/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/984/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/985/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/986/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/987/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/988/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/989/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/990/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/991/original/1363397.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/992/original/Telegram_logo.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/993/original/Telegram_logo.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.ids" afterPath="$PROJECT_DIR$/.idea/dataSources.ids" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/favicon.ico" afterPath="$PROJECT_DIR$/public/favicon.ico" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/001/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/001/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/002/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/002/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/003/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/003/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/004/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/004/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/005/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/005/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/006/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/006/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/007/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/007/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/008/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/008/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/009/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/009/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/010/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/010/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/011/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/011/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/012/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/012/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/013/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/013/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/014/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/014/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/015/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/015/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/016/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/016/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/017/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/017/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/018/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/018/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/019/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/019/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/020/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/020/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/021/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/021/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/022/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/022/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/023/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/023/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/024/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/024/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/025/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/025/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/026/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/026/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/027/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/027/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/028/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/028/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/029/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/029/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/030/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/030/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/031/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/031/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/032/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/032/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/033/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/033/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/034/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/034/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/035/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/035/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/036/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/036/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/037/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/037/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/038/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/038/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/039/original/1363397.jpg" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/039/original/1363397.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/632/original/expense_details.png" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/632/original/expense_details.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/system/receipts/images/000/000/633/original/expense_details.png" afterPath="$PROJECT_DIR$/public/system/receipts/images/000/000/633/original/expense_details.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/assets/javascripts/.keep" afterPath="$PROJECT_DIR$/vendor/assets/javascripts/.keep" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/assets/stylesheets/.keep" afterPath="$PROJECT_DIR$/vendor/assets/stylesheets/.keep" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.byebug_history" afterPath="$PROJECT_DIR$/.byebug_history" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.generators" afterPath="$PROJECT_DIR$/.idea/.generators" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.rakeTasks" afterPath="$PROJECT_DIR$/.idea/.rakeTasks" />
+    <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Finly.iml" afterPath="$PROJECT_DIR$/.idea/Finly.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/runConfigurations/Development__Finly.xml" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Development__Finly.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/runConfigurations/Production__Finly.xml" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Production__Finly.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/runConfigurations/spec__Finly.xml" afterPath="$PROJECT_DIR$/.idea/runConfigurations/spec__Finly.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/runConfigurations/test__Finly.xml" afterPath="$PROJECT_DIR$/.idea/runConfigurations/test__Finly.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gemfile" afterPath="$PROJECT_DIR$/Gemfile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gemfile.lock" afterPath="$PROJECT_DIR$/Gemfile.lock" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rakefile" afterPath="$PROJECT_DIR$/Rakefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/schema.rb" afterPath="$PROJECT_DIR$/db/schema.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/404.html" afterPath="$PROJECT_DIR$/public/404.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/422.html" afterPath="$PROJECT_DIR$/public/422.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/500.html" afterPath="$PROJECT_DIR$/public/500.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/robots.txt" afterPath="$PROJECT_DIR$/public/robots.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/application_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/application_controller.rb" />
     </list>
     <list id="7d878649-6630-420c-bf50-2b6db9b1c134" name="New changelist" comment="" />
     <ignored path="Finly.iws" />
@@ -154,12 +40,32 @@
     <favorites_list name="Finly" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="Gemfile" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Gemfile">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="gcm_messenger.rb" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/gcm_messenger.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="473">
-              <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+            <state relative-caret-position="234">
+              <caret line="13" column="20" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="20" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="home_controller.rb" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/home_controller.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="36">
+              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="application_controller.rb" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/controllers/application_controller.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="18">
+              <caret line="1" column="29" selection-start-line="1" selection-start-column="29" selection-end-line="1" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -181,10 +87,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/services/violation_service.rb" />
-        <option value="$PROJECT_DIR$/app/controllers/static_pages_controller.rb" />
-        <option value="$PROJECT_DIR$/app/views/static_pages/about.html.erb" />
-        <option value="$PROJECT_DIR$/app/controllers/application_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/static_pages/home.html.erb" />
         <option value="$PROJECT_DIR$/app/assets/stylesheets/static_pages.scss" />
         <option value="$PROJECT_DIR$/app/assets/stylesheets/application.css" />
@@ -231,7 +133,11 @@
         <option value="$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb" />
         <option value="$PROJECT_DIR$/app/controllers/policies_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder" />
+        <option value="$PROJECT_DIR$/config/application.rb" />
+        <option value="$PROJECT_DIR$/app/controllers/api/v1/configuration/category_controller.rb" />
         <option value="$PROJECT_DIR$/Gemfile" />
+        <option value="$PROJECT_DIR$/config/secrets.yml" />
+        <option value="$PROJECT_DIR$/app/controllers/application_controller.rb" />
       </list>
     </option>
   </component>
@@ -269,7 +175,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -282,7 +188,57 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Finly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Finly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="finly-server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Finly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="finly-server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scratches" />
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+        <subPane subId="Default" />
+      </pane>
+      <pane id="RailsProjectView">
+        <subPane />
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -294,15 +250,16 @@
     <property name="full.screen.before.presentation.mode" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="G:\RubymineProjects\Finly\lib" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/views/api/v1/shared" />
       <recent name="$PROJECT_DIR$/app/controllers/api/v1" />
       <recent name="$PROJECT_DIR$/app/views/users" />
       <recent name="$PROJECT_DIR$/app/views/devise" />
       <recent name="G:\RubymineProjects\Finly\test\services" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="G:\RubymineProjects\Finly\lib" />
     </key>
   </component>
   <component name="RunManager" selected="Rails.Development: Finly">
@@ -693,11 +650,18 @@
       <option name="project" value="LOCAL" />
       <updated>1471015387684</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Migrated  operations outside /app">
+      <created>1473401185602</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1473401185602</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="66492000" />
+    <option name="totallyTimeSpent" value="68970000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -710,42 +674,42 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2078125" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3288364" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.464666" sideWeight="0.50646204" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.255603" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4004065" sideWeight="0.51280683" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299763" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6214908" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3262195" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25813007" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39126116" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20630081" sideWeight="0.49353796" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3140244" sideWeight="0.48719317" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39126116" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32623428" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3288364" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.464666" sideWeight="0.50646204" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4004065" sideWeight="0.51280683" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6214908" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25813007" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39126116" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21646342" sideWeight="0.49353796" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2078125" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3140244" sideWeight="0.48719317" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.255603" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299763" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32623428" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3262195" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
@@ -783,7 +747,8 @@
     <MESSAGE value="implemented api for expenses" />
     <MESSAGE value="Implemented reports api for index and show" />
     <MESSAGE value="API Implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="API Implementation" />
+    <MESSAGE value="Migrated  operations outside /app" />
+    <option name="LAST_COMMIT_MESSAGE" value="Migrated  operations outside /app" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="false" />
   </component>
   <component name="XDebuggerManager">
@@ -791,55 +756,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/db/seeds.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="145" column="43" selection-start-line="145" selection-start-column="43" selection-end-line="145" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/users/profile.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="666">
-          <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/users/_my_profile.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="24" column="78" selection-start-line="24" selection-start-column="78" selection-end-line="24" selection-end-column="78" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/users/_change_password.html.erb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="5" column="52" selection-start-line="5" selection-start-column="52" selection-end-line="5" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/services/user_team_service.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1386">
-          <caret line="77" column="7" selection-start-line="77" selection-start-column="7" selection-end-line="77" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/company.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/helpers/application_helper.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/database.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
@@ -1065,7 +981,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="9918">
           <caret line="551" column="0" selection-start-line="551" selection-start-column="0" selection-end-line="551" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1073,7 +988,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="954">
           <caret line="53" column="6" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1089,7 +1003,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="450">
           <caret line="25" column="3" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1097,7 +1010,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="965">
           <caret line="85" column="5" selection-start-line="55" selection-start-column="2" selection-end-line="85" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1133,10 +1045,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/db/seeds.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="341">
+          <caret line="304" column="9" selection-start-line="304" selection-start-column="9" selection-end-line="304" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/configuration/category_controller.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="22" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/secrets.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="21" column="48" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Gemfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="473">
-          <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+        <state relative-caret-position="432">
+          <caret line="81" column="16" selection-start-line="81" selection-start-column="16" selection-end-line="81" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/application.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="19" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/gcm_messenger.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="13" column="20" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/home_controller.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/application_controller.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="29" selection-start-line="1" selection-start-column="29" selection-end-line="1" selection-end-column="29" />
           <folding />
         </state>
       </provider>
