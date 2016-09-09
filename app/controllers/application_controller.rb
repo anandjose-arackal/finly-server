@@ -1,3 +1,6 @@
+require 'require_all'
+require_all 'operations/event
+'
 class ApplicationController < ActionController::Base
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
   # Prevent CSRF attacks by raising an exception.

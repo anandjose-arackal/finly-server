@@ -1,5 +1,5 @@
 require 'test_helper'
-require '../../../../../app/operations/card/load/request/create'
+require '../../../../../operations/card/load/request/create'
 
 class CreateTest < ActiveSupport::TestCase
 
