@@ -1,4 +1,4 @@
-require "#{Rails.root}/app/operations/settlement/index"
+require "#{Rails.root}/operations/settlement/index"
 class Settlement::Show < Settlement::Base
   attr_accessor :selected_user, :reports, :payments, :actions, :type, :view_to_load
 
