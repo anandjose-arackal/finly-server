@@ -102,6 +102,9 @@ gem 'has_scope'
 
 gem 'hooks'
 
+# todo - temporary, will be removed during final deployment.
+gem 'awesome_print'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
@@ -111,7 +114,7 @@ group :development, :test do
   gem 'capistrano-bundler', require: false
   gem 'capistrano-rvm'
   gem 'hirb'
-  gem 'awesome_print'
+
 end
 
 group :development do

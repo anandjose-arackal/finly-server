@@ -163,12 +163,12 @@ if User.count == 0
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
   end
 
-  m[0].team_mapping.default.first.update_attributes(approves_to_user: m[1])
-  m[0].team_mapping.build(approves_to_user: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
+  m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
+  m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
   u[0].team_mapping.build(manager: m[3], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
 
-  fm[0].team_mapping.default.first.update_attributes(approves_finance_to_user: fm[1])
-  fm[0].team_mapping.build(approves_finance_to_user: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
+  fm[0].team_mapping.default.first.update_attributes(approves_finance_to: fm[1])
+  fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
 
   User.all.each do |user|
