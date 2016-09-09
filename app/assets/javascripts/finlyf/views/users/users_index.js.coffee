@@ -12,6 +12,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
     'click .btn-invite-employee': 'processEmployeeInvitation'
+    'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
   initialize: (options) ->
     @params = options.params
@@ -146,11 +147,37 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       })
 
   processEmployeeInvitation: ->
+    _this = @
+
     modal = $(@el).find("#modal-mp")
-    $(modal).html(@templateInviteEmployee())
     $(modal).modal('show')
 
+    $.ajax({
+      url: '/users/get_managers'
+      dataType: 'json'
+      data: @params
+      success: (res) ->
+        managers = {
+          company_managers: res.company_managers
+          company_finance_managers: res.company_finance_managers
+        }
+        $(modal).html(_this.templateInviteEmployee({item: managers}))
+        
+        # console.log res.company_managers
+      error: (err) ->
+        console.log "Err", err
+    })
+    # console.log managers 
+
   ##Funactionalities
+
+  showOptionalManagers: (e) ->
+    target = $(e.currentTarget)
+    if parseInt($(target).val()) == 1
+      $(target).closest('.conditional-container').find('.conditional-managers').slideDown('fast')
+    else
+      $(target).closest('.conditional-container').find('.conditional-managers').slideUp('fast')
+
 
   resetPageCount: (options) ->
     if options.target

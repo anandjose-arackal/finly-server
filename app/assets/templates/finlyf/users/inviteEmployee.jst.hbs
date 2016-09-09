@@ -5,6 +5,11 @@
       <h4 class="modal-title">Invite Employee</h4>
     </div>
     <div class="modal-body">
+    {{log item}}
+    {{#each item.company_managers}}
+      {{this.name}}
+    {{/each}}
+
       <div class="row">
         <div class="col-sm-4">
           <label class="control-label">Email:</label>
@@ -32,7 +37,7 @@
 
       <hr />
 
-      <div class="row">
+      <div class="row conditional-container">
 
         <div class="col-sm-12 no-padding">
           <div class="col-sm-4"><label class="control-label">Assign Manager Role?</label></div>
@@ -47,11 +52,14 @@
         </div>
         
 
-        <div class="col-sm-12 no-padding">
+        <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
           <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
           <div class="col-sm-8">
             <select class="form-control">
               <option value="">None</option>
+              {{#each item.company_managers}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
             </select>
           </div>
         </div>
@@ -59,7 +67,7 @@
 
       <hr />
 
-      <div class="row">
+      <div class="row conditional-container">
         <div class="col-sm-12 no-padding">
           <div class="col-sm-4"><label class="control-label">Assign Finance Manager Role?</label></div>
           <div class="col-sm-8">
@@ -73,11 +81,14 @@
         </div>
         
 
-        <div class="col-sm-12 no-padding">
-          <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
+        <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
+          <div class="col-sm-4"><label class="control-label">Approves Finance Reports To?</label></div>
           <div class="col-sm-8">
             <select class="form-control">
               <option value="">None</option>
+              {{#each item.company_finance_managers}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
             </select>
           </div>
         </div>

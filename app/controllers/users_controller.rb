@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    ap @result.user
+    # ap @result.user
     respond_to do |format|
       format.json {}
     end
@@ -24,6 +24,15 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.json {render json: @result.team.as_json}
+    end
+  end
+
+  def get_managers
+    params[:id] = current_user.id
+    @result = User::Show.(current_user, params)
+    # ap @result.user
+    respond_to do |format|
+      format.json {}
     end
   end
 
