@@ -139,6 +139,9 @@ GEM
       thor (~> 0.14)
     font-awesome-rails (4.6.3.1)
       railties (>= 3.2, < 5.1)
+    gcm (0.1.1)
+      httparty
+      json
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     griddler (1.3.1)
@@ -158,6 +161,8 @@ GEM
     hooks (0.4.1)
       uber (~> 0.0.14)
     htmlentities (4.3.4)
+    httparty (0.14.0)
+      multi_xml (>= 0.5.2)
     i18n (0.7.0)
     imgkit (1.6.1)
     jbuilder (2.6.0)
@@ -182,6 +187,7 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.9.0)
     multi_json (1.12.1)
+    multi_xml (0.5.5)
     mysql2 (0.4.4)
     mysql2 (0.4.4-x86-mingw32)
     net-scp (1.2.1)
@@ -246,6 +252,7 @@ GEM
       json (~> 1.4)
     remotipart (1.2.1)
     request_store (1.3.1)
+    require_all (1.3.3)
     responders (2.2.0)
       railties (>= 4.2.0, < 5.1)
     rmagick (2.16.0)
@@ -328,6 +335,7 @@ DEPENDENCIES
   faker
   figaro
   font-awesome-rails
+  gcm
   griddler
   griddler-sendgrid
   handlebars_assets
@@ -349,6 +357,7 @@ DEPENDENCIES
   rails (= 4.2.6)
   rails-erd
   remotipart (~> 1.0)
+  require_all
   rmagick
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
