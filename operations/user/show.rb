@@ -51,7 +51,7 @@ class User::Show < User::Base
     def retrieve_mapping(policy)
       policy_id = policy.id rescue nil
       company_default_mapping = team_mapping.policy(policy_id)
-      default_mapping = company_default_mapping.default.first rescue nil
+      default_mapping = company_default_mapping.default rescue nil
       conditional_manager = company_default_mapping.non_default.manager rescue nil
       conditional_finance_manager = company_default_mapping.non_default.finance_manager rescue nil
       conditional_approves_to = company_default_mapping.non_default.approves_to rescue nil
