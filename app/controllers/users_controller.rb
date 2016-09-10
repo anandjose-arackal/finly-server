@@ -47,7 +47,7 @@ class UsersController < ApplicationController
     success_message = nil
     case type
       when 'password'
-        operation = User::Configuration::UpdatePassword.new(user, params)
+        operation = User::Configuration::UpdatePassword.new(current_user, params)
         success_message = 'Password updated'
       when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
@@ -55,6 +55,9 @@ class UsersController < ApplicationController
       when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = "Role updated"
+      when 'details'
+        operation = User::Configuration::UpdateDetails.new(current_user, params)
+        success_message = "Details updated."
       else
         # do nothing, ha!
     end
