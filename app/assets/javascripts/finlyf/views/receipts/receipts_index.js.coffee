@@ -182,9 +182,11 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   new: ->
     $("#modal-new .modal-body").html(@templateNew)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
+    $("#modal-new").attr('data-backdrop', false)
     $("#modal-new").modal('show')
 
   create: ->
+    _this = @
     values = {};
 
     # if(event){ event.preventDefault(); }
@@ -192,10 +194,20 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     _.each($(@el).find('form#new-item').serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
-    console.log values
+    # console.log values
     model = new FinlyF.Models.Receipt()
     # console.log("Putting data")
-    console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
+    response = model.save(values,{
+      iframe: true,
+      files: this.$('form :file'),
+      data: values
+      success: (model, res) ->
+        console.log "Success", model, res
+        $("#modal-new").modal('hide')
+        _this.filter()
+      error: (err) ->
+        console.log "Err", err
+    })
 
 
 
@@ -293,9 +305,9 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
 
   newExpense: ->
-    console.log 'hey'
+    # console.log 'hey'
     items = $(@el).find("#items .item")
-    console.log items.length
+    # console.log items.length
      # "report"=>{"expense_id"=>"15,36,39"}}
     # items = $(@el).find('#items .item')
     # receipt= []
@@ -319,6 +331,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         value: $(option).attr('value')
         text: $(option).text()
       }).appendTo(category_select)
+    $("#modal-new").attr('data-backdrop', false)
     $("#modal-new").modal('show')
 
     # console.log selected_receipt.toJSON()
@@ -344,15 +357,13 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       data: values
       processData: true
       success: (model, res) ->
-        $("#modal-new").modal('hide')
-        # _this.model.fetch({
-        #   data: _this.current_view
-        # })
+        $(_this.el).find("#modal-new").modal('hide')
+        _this.filter()
       error: (err) ->
         console.log "Error", err
     })
 
-    console.log response
+    # console.log response
 
     # # console.log expenses
     # model_report = new FinlyF.Models.Report({
