@@ -21,7 +21,8 @@ json.mapping @result.mapping.each do |mapping|
     json.set! key do
       maps = mapping[key]
       next if maps.blank?
-      json.array! maps do |map|
+      if key == :default
+        map = maps.first
         json.mapping_id map.id
         if map.greater_than_amount_id.present?
           json.greater_than_amount do
@@ -35,6 +36,25 @@ json.mapping @result.mapping.each do |mapping|
             json.set! k do
               json.id map.send("#{k}_id")
               json.name map.send(k).name
+            end
+          end
+        end
+      else
+        json.array! maps do |map|
+          json.mapping_id map.id
+          if map.greater_than_amount_id.present?
+            json.greater_than_amount do
+              # json.id map.greater_than_amount_id
+              json.value map.greater_than_amount.value
+              json.currency_id map.greater_than_amount.currency_id
+            end
+          end
+          [:manager, :finance_manager, :approves_to, :approves_finance_to].each do |k|
+            if map.send("#{k}_id").present?
+              json.set! k do
+                json.id map.send("#{k}_id")
+                json.name map.send(k).name
+              end
             end
           end
         end
