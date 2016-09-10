@@ -21,7 +21,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   def init
     self.expense_params = manual_expense_params
     self.expense_params[:expense_type_id] = ExpenseType.manual_expense_id
-    if expense_params[:receipt_id].present?
+    if params[:receipt_id].present?
       self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
     end
     if expense_params[:receipts_attributes] == [nil]
