@@ -14,14 +14,14 @@
 //= require jquery_ujs
 //= require jquery-ui
 //= require bootstrap
-// require turbolinks
+//// require turbolinks
 //= require turboboost
 //= require jquery.remotipart
 //= require bootbox
 //= require nprogress
 //= require nprogress-turbolinks
 //= require handlebars.runtime
-//= require_tree .
+//// require_tree .
 
 NProgress.configure({
     showSpinner: false,
