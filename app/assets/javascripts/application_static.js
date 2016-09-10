@@ -11,11 +11,11 @@
 // about supported directives.
 //
 //= require jquery
-//= require turbolinks
-//= require turboboost
-//= require nprogress
-//= require nprogress-turbolinks
+//// require turbolinks
+//// require turboboost
+// require nprogress
+// require nprogress-turbolinks
 
-NProgress.configure({
-  showSpinner: false,
-});
+// NProgress.configure({
+//   showSpinner: false,
+// });
