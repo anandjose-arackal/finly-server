@@ -1,22 +1,22 @@
 class User::Team::FinalFinanceManager < User::Team::Base
-  attr_accessor :report, :card_load_request
+  attr_accessor :report, :money_request
 
   def pre_validate
     if user.blank?
       errors << 'User not found'
     end
-    if params[:report].blank? and params[:card_load_request].blank?
+    if params[:report].blank? and params[:money_request].blank?
       errors << 'Report or card load request not defined'
     end
 
-    if params[:report].present? and params[:card_load_request].present?
+    if params[:report].present? and params[:money_request].present?
       errors << 'You can only request for finance manager for either report or card load request'
     end
   end
 
   def init
     self.report = params[:report]
-    self.card_load_request = params[:card_load_request]
+    self.money_request = params[:money_request]
   end
 
   def process

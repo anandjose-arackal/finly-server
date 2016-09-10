@@ -19,8 +19,8 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   def process
-    if obj.is_a?(CardLoadRequest)
-      self.response = next_reviewer(:card_load_request, obj)
+    if obj.is_a?(MoneyRequest)
+      self.response = next_reviewer(:money_request, obj)
     elsif obj.is_a?(Report)
       self.response = next_reviewer(:report, obj)
     elsif obj.is_a?(Hash)

@@ -27,8 +27,8 @@ class User::Team::Base < BaseOperation
       load_policy
     elsif params[:report].present?
       load_report
-    elsif params[:card_load_request].present?
-      load_card_load_request
+    elsif params[:money_request].present?
+      load_money_request
     end
   end
 
@@ -58,15 +58,15 @@ class User::Team::Base < BaseOperation
     self.amount_value = rds.total_amount
   end
 
-  def load_card_load_request
-    card_load_request = params[:card_load_request]
-    if card_load_request.policy_id.present? and user.policies.with_id(card_load_request.policy_id).present?
-      self.policy_id = card_load_request.policy_id
+  def load_money_request
+    money_request = params[:money_request]
+    if money_request.policy_id.present? and user.policies.with_id(money_request.policy_id).present?
+      self.policy_id = money_request.policy_id
     else
       self.policy_id = nil
     end
-    self.currency_id = card_load_request.amount.currency
-    self.amount_value = card_load_request.amount.value
+    self.currency_id = money_request.amount.currency
+    self.amount_value = money_request.amount.value
   end
 
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160821105444) do
+ActiveRecord::Schema.define(version: 20160909142303) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -79,91 +79,6 @@ ActiveRecord::Schema.define(version: 20160821105444) do
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
   add_index "card_expenses", ["expense_id"], name: "index_card_expenses_on_expense_id", using: :btree
-
-  create_table "card_load_request_actions", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "card_load_request_comment_actions", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "card_load_request_comments", force: :cascade do |t|
-    t.integer  "card_load_request_id", limit: 4,     null: false
-    t.integer  "comment_action_id",    limit: 4,     null: false
-    t.integer  "user_id",              limit: 4
-    t.integer  "expense_id",           limit: 4
-    t.string   "updated_field",        limit: 255
-    t.text     "updated_from",         limit: 65535
-    t.text     "updated_to",           limit: 65535
-    t.integer  "rejected_to_id",       limit: 4
-    t.text     "content",              limit: 65535
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-  end
-
-  add_index "card_load_request_comments", ["card_load_request_id"], name: "index_card_load_request_comments_on_card_load_request_id", using: :btree
-  add_index "card_load_request_comments", ["comment_action_id"], name: "index_card_load_request_comments_on_comment_action_id", using: :btree
-  add_index "card_load_request_comments", ["expense_id"], name: "index_card_load_request_comments_on_expense_id", using: :btree
-  add_index "card_load_request_comments", ["rejected_to_id"], name: "index_card_load_request_comments_on_rejected_to_id", using: :btree
-  add_index "card_load_request_comments", ["user_id"], name: "index_card_load_request_comments_on_user_id", using: :btree
-
-  create_table "card_load_request_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "card_load_request_tracks", force: :cascade do |t|
-    t.integer  "card_load_request_id",         limit: 4, null: false
-    t.integer  "action_user_id",               limit: 4
-    t.integer  "card_load_tracking_action_id", limit: 4
-    t.integer  "status_id",                    limit: 4
-    t.integer  "user_request_role_id",         limit: 4
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.integer  "action_id",                    limit: 4
-  end
-
-  add_index "card_load_request_tracks", ["action_user_id"], name: "index_card_load_request_tracks_on_action_user_id", using: :btree
-  add_index "card_load_request_tracks", ["card_load_request_id"], name: "index_card_load_request_tracks_on_card_load_request_id", using: :btree
-  add_index "card_load_request_tracks", ["card_load_tracking_action_id"], name: "index_card_load_request_tracks_on_card_load_tracking_action_id", using: :btree
-  add_index "card_load_request_tracks", ["status_id"], name: "index_card_load_request_tracks_on_status_id", using: :btree
-  add_index "card_load_request_tracks", ["user_request_role_id"], name: "index_card_load_request_tracks_on_user_request_role_id", using: :btree
-
-  create_table "card_load_requests", force: :cascade do |t|
-    t.integer  "user_id",                 limit: 4,   null: false
-    t.integer  "card_id",                 limit: 4,   null: false
-    t.integer  "amount_id",               limit: 4,   null: false
-    t.integer  "policy_id",               limit: 4
-    t.integer  "status_id",               limit: 4,   null: false
-    t.integer  "controlling_user_id",     limit: 4
-    t.integer  "controlling_for_user_id", limit: 4
-    t.integer  "loaded_by",               limit: 4
-    t.datetime "loaded_at"
-    t.string   "note",                    limit: 255
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-  end
-
-  add_index "card_load_requests", ["amount_id"], name: "index_card_load_requests_on_amount_id", using: :btree
-  add_index "card_load_requests", ["card_id"], name: "index_card_load_requests_on_card_id", using: :btree
-  add_index "card_load_requests", ["controlling_for_user_id"], name: "index_card_load_requests_on_controlling_for_user_id", using: :btree
-  add_index "card_load_requests", ["controlling_user_id"], name: "index_card_load_requests_on_controlling_user_id", using: :btree
-  add_index "card_load_requests", ["loaded_by"], name: "index_card_load_requests_on_loaded_by", using: :btree
-  add_index "card_load_requests", ["policy_id"], name: "index_card_load_requests_on_policy_id", using: :btree
-  add_index "card_load_requests", ["status_id"], name: "index_card_load_requests_on_status_id", using: :btree
-  add_index "card_load_requests", ["user_id"], name: "index_card_load_requests_on_user_id", using: :btree
-
-  create_table "card_load_tracking_actions", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
 
   create_table "card_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -396,6 +311,108 @@ ActiveRecord::Schema.define(version: 20160821105444) do
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
 
+  create_table "money_request_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "money_request_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "money_request_comments", force: :cascade do |t|
+    t.integer  "money_request_id",  limit: 4,     null: false
+    t.integer  "comment_action_id", limit: 4,     null: false
+    t.integer  "user_id",           limit: 4
+    t.integer  "expense_id",        limit: 4
+    t.string   "updated_field",     limit: 255
+    t.text     "updated_from",      limit: 65535
+    t.text     "updated_to",        limit: 65535
+    t.integer  "rejected_to_id",    limit: 4
+    t.text     "content",           limit: 65535
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "money_request_comments", ["comment_action_id"], name: "index_money_request_comments_on_comment_action_id", using: :btree
+  add_index "money_request_comments", ["expense_id"], name: "index_money_request_comments_on_expense_id", using: :btree
+  add_index "money_request_comments", ["money_request_id"], name: "index_money_request_comments_on_money_request_id", using: :btree
+  add_index "money_request_comments", ["rejected_to_id"], name: "index_money_request_comments_on_rejected_to_id", using: :btree
+  add_index "money_request_comments", ["user_id"], name: "index_money_request_comments_on_user_id", using: :btree
+
+  create_table "money_request_items", force: :cascade do |t|
+    t.integer  "money_request_id", limit: 4, null: false
+    t.integer  "category_id",      limit: 4, null: false
+    t.integer  "amount_id",        limit: 4, null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "money_request_items", ["amount_id"], name: "index_money_request_items_on_amount_id", using: :btree
+  add_index "money_request_items", ["category_id"], name: "index_money_request_items_on_category_id", using: :btree
+  add_index "money_request_items", ["money_request_id"], name: "index_money_request_items_on_money_request_id", using: :btree
+
+  create_table "money_request_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "money_request_tracking_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "money_request_tracks", force: :cascade do |t|
+    t.integer  "money_request_id",                 limit: 4,   null: false
+    t.integer  "action_user_id",                   limit: 4
+    t.integer  "money_request_tracking_action_id", limit: 4
+    t.integer  "status_id",                        limit: 4
+    t.integer  "user_request_role_id",             limit: 4
+    t.integer  "payment_id",                       limit: 4
+    t.string   "memo",                             limit: 255
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "action_id",                        limit: 4
+  end
+
+  add_index "money_request_tracks", ["action_user_id"], name: "index_money_request_tracks_on_action_user_id", using: :btree
+  add_index "money_request_tracks", ["money_request_id"], name: "index_money_request_tracks_on_money_request_id", using: :btree
+  add_index "money_request_tracks", ["money_request_tracking_action_id"], name: "index_money_request_tracks_on_money_request_tracking_action_id", using: :btree
+  add_index "money_request_tracks", ["payment_id"], name: "index_money_request_tracks_on_payment_id", using: :btree
+  add_index "money_request_tracks", ["status_id"], name: "index_money_request_tracks_on_status_id", using: :btree
+  add_index "money_request_tracks", ["user_request_role_id"], name: "index_money_request_tracks_on_user_request_role_id", using: :btree
+
+  create_table "money_requests", force: :cascade do |t|
+    t.integer  "user_id",                 limit: 4,                 null: false
+    t.integer  "policy_id",               limit: 4
+    t.integer  "payment_mode_id",         limit: 4,                 null: false
+    t.integer  "payment_id",              limit: 4,                 null: false
+    t.date     "required_by_date"
+    t.integer  "status_id",               limit: 4,                 null: false
+    t.integer  "controlling_user_id",     limit: 4
+    t.integer  "controlling_for_user_id", limit: 4
+    t.integer  "loaded_by",               limit: 4
+    t.datetime "loaded_at"
+    t.datetime "submitted_at",                        precision: 6
+    t.string   "note",                    limit: 255
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+  end
+
+  add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
+  add_index "money_requests", ["controlling_user_id"], name: "index_money_requests_on_controlling_user_id", using: :btree
+  add_index "money_requests", ["loaded_by"], name: "index_money_requests_on_loaded_by", using: :btree
+  add_index "money_requests", ["payment_id"], name: "index_money_requests_on_payment_id", using: :btree
+  add_index "money_requests", ["payment_mode_id"], name: "index_money_requests_on_payment_mode_id", using: :btree
+  add_index "money_requests", ["policy_id"], name: "index_money_requests_on_policy_id", using: :btree
+  add_index "money_requests", ["status_id"], name: "index_money_requests_on_status_id", using: :btree
+  add_index "money_requests", ["user_id"], name: "index_money_requests_on_user_id", using: :btree
+
   create_table "new_card_requests", force: :cascade do |t|
     t.integer  "company_id",         limit: 4
     t.integer  "requesting_user_id", limit: 4
@@ -438,6 +455,12 @@ ActiveRecord::Schema.define(version: 20160821105444) do
 
   add_index "opro_client_apps", ["app_id", "app_secret"], name: "index_opro_client_apps_on_app_id_and_app_secret", unique: true, using: :btree
   add_index "opro_client_apps", ["app_id"], name: "index_opro_client_apps_on_app_id", unique: true, using: :btree
+
+  create_table "payment_modes", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "payment_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -746,15 +769,6 @@ ActiveRecord::Schema.define(version: 20160821105444) do
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
-  add_foreign_key "card_load_request_comments", "card_load_requests"
-  add_foreign_key "card_load_request_comments", "expenses"
-  add_foreign_key "card_load_request_comments", "users"
-  add_foreign_key "card_load_request_tracks", "card_load_requests"
-  add_foreign_key "card_load_request_tracks", "card_load_tracking_actions"
-  add_foreign_key "card_load_requests", "amounts"
-  add_foreign_key "card_load_requests", "cards"
-  add_foreign_key "card_load_requests", "policies"
-  add_foreign_key "card_load_requests", "users"
   add_foreign_key "card_transactions", "cards"
   add_foreign_key "card_transactions", "users"
   add_foreign_key "cards", "card_types"
@@ -779,6 +793,19 @@ ActiveRecord::Schema.define(version: 20160821105444) do
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
   add_foreign_key "manual_expenses", "expenses"
+  add_foreign_key "money_request_comments", "expenses"
+  add_foreign_key "money_request_comments", "money_requests"
+  add_foreign_key "money_request_comments", "users"
+  add_foreign_key "money_request_items", "amounts"
+  add_foreign_key "money_request_items", "categories"
+  add_foreign_key "money_request_items", "money_requests"
+  add_foreign_key "money_request_tracks", "money_request_tracking_actions"
+  add_foreign_key "money_request_tracks", "money_requests"
+  add_foreign_key "money_request_tracks", "payments"
+  add_foreign_key "money_requests", "payment_modes"
+  add_foreign_key "money_requests", "payments"
+  add_foreign_key "money_requests", "policies"
+  add_foreign_key "money_requests", "users"
   add_foreign_key "new_card_requests", "card_types"
   add_foreign_key "new_card_requests", "companies"
   add_foreign_key "payments", "amounts"

@@ -20,7 +20,6 @@
 #
 
 class Report < ActiveRecord::Base
-
   include MathUtil
 
   belongs_to :user

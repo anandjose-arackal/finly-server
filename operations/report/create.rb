@@ -9,17 +9,9 @@ class Report::Create < Report::Base
     [:employee]
   end
 
-  def init
-    # nothing to retrieve, so empty
-  end
-
-  def authorize
-    # nothing to authorize here.
-  end
-
   def pre_validate
     if user.blank?
-      errors << "User not passed."
+      errors << 'User not found'
     end
   end
 
