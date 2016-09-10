@@ -262,6 +262,9 @@
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" value="{{this.conditional_finance_manager.finance_manager.id}}"> --}}
               </div>
 
+            </div><!-- .conditional -->
+            <div class="col-sm-12 add-condition">
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="finance_manager">Add More Condition</button>
             </div>
           </div><!-- .col-sm-6 -->
         </div><!-- .row -->
@@ -341,6 +344,9 @@
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" value="{{this.conditional_approves_to.approves_to.id}}"> --}}
               </div>
             </div>
+            <div class="col-sm-12 add-condition">
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_to">Add More Condition</button>
+            </div>
           </div><!-- .col-sm-6 -->
 
 
@@ -413,6 +419,9 @@
                 </select>
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" value="{{this.conditional_approves_finance_to.approves_to.id}}"> --}}
               </div>
+            </div>
+            <div class="col-sm-12 add-condition">
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_finance_to">Add More Condition</button>
             </div>
             
           </div><!-- .col-sm-6 -->
