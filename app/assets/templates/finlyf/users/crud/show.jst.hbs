@@ -12,7 +12,7 @@
       <div class="col-sm-3">Name</div>
       <div class="col-sm-9">
         <label class="item-attr-preview">{{item.name}}</label>
-        <input class="item-attr-edit" type="text" name="user[name]" value="{{item.name}}" />
+        <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.name}}" />
       </div>
     </div>
 
@@ -20,7 +20,7 @@
       <div class="col-sm-3">Email</div>
       <div class="col-sm-9">
         <label class="item-attr-preview">{{item.email}}</label>
-        <input class="item-attr-edit" type="text" name="user[email]" value="{{item.email}}" />
+        <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.email}}" />
       </div>
     </div>
 
@@ -28,9 +28,11 @@
       <div class="col-sm-3">Mobile</div>
       <div class="col-sm-9">
         <label class="item-attr-preview">{{item.mobile_number}}</label>
-        <input class="item-attr-edit" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
+        <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
       </div>
     </div>
+
+    <input type="hidden" name="type" value="configuration">
   </form>
 </section>
 

@@ -97,11 +97,11 @@ class FinlyF.Views.User extends Backbone.View
   update: (e) ->
     e.preventDefault()
     target = $(e.currentTarget)
-    container = $(target).closest('form')
+    form = $(target).closest('section').find('form')
     values = {}
 
     # _.each($(container).find('form').serializeArray(), (input) ->
-    _.each($(container).serializeArray(), (input) ->
+    _.each($(form).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
     # console.log values
