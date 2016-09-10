@@ -13,7 +13,8 @@ class User::Invite::Destroy < User::Invite::Base
   end
 
   def init
-    self.invited_user = User.invitation_not_accepted.find_by_id(params[:invited_user_id])
+    id = params[:id] or params[:invited_user_id]
+    self.invited_user = User.invitation_not_accepted.find_by_id(id)
   end
 
   def validate
