@@ -35,7 +35,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def process
     self.updating_mapping.each do |key, map|
       # to remove all empty values
-      RequestFormatter.clean_hash map
+      Formatter.remove_blanks map
       next if map.blank?
       id = map[:mapping_id]
       updated_params = map[:mapping]
