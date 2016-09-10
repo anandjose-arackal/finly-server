@@ -138,7 +138,7 @@ class FinlyF.Views.User extends Backbone.View
     }
 
     # console.log item
-    $(target).closest('.add-condition').siblings('.conditional').after(@templateAddCondition({item: item}))
+    $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
 
 
 #Features

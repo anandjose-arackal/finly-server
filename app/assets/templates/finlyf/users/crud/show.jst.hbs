@@ -137,7 +137,13 @@
               <div class="col-sm-7">
 
                 <input type="hidden" class="conditional-mapping-id" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">{{!-- (Mapping ID 0) --}}
-                <label class="control-label item-attr-preview">{{this.default.manager.name}}</label>{{!-- Manager 0 --}}
+                <label class="control-label item-attr-preview">
+                  {{#if this.default.manager.name}}
+                    {{this.default.manager.name}}
+                  {{else}}
+                    Not Set
+                  {{/if}}
+                </label>{{!-- Manager 0 --}}
                 <select class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
                   <option value="">None</option>
                   {{#each ../item.company_managers}}
@@ -197,7 +203,7 @@
 
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="manager">Add More Condition</button>
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="manager">Add Condition</button>
             </div>
           </div><!-- .col-sm-6 -->
 
@@ -209,7 +215,13 @@
               </div>
 
               <div class="col-sm-7">
-                <label class="control-label item-attr-preview">{{this.default.finance_manager.name}}</label>{{!-- (Finance Manager 0) --}}
+                <label class="control-label item-attr-preview">
+                  {{#if this.default.finance_manager.name}}
+                    {{this.default.finance_manager.name}}
+                  {{else}}
+                    Not Set
+                  {{/if}}
+                </label>{{!-- (Finance Manager 0) --}}
                 <select class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
                   <option value="">None</option>
                   {{#each ../item.company_finance_managers}}
@@ -270,7 +282,7 @@
             </div><!-- .conditional -->
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="finance_manager">Add More Condition</button>
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="finance_manager">Add Condition</button>
             </div>
           </div><!-- .col-sm-6 -->
         </div><!-- .row -->
@@ -355,7 +367,7 @@
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_to">Add More Condition</button>
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_to">Add Condition</button>
             </div>
             {{/if}}
           </div><!-- .col-sm-6 -->
@@ -434,7 +446,7 @@
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_finance_to">Add More Condition</button>
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_finance_to">Add Condition</button>
             </div>
 
             {{/if}}
