@@ -22,7 +22,8 @@ json.mapping @result.mapping.each do |mapping|
       maps = mapping[key]
       next if maps.blank?
       if key == :default
-        map = maps.first
+        map = maps.first rescue nil
+        next if map.blank?
         json.mapping_id map.id
         if map.greater_than_amount_id.present?
           json.greater_than_amount do
