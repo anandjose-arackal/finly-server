@@ -9,6 +9,10 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   templateInviteEmployee: HandlebarsTemplates['finlyf/users/inviteEmployee']
 
   events:
+    #Filter by state
+    'click .filter-state': 'filterState'
+
+
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
     'click .btn-invite-employee': 'processEmployeeInvitation'
@@ -18,7 +22,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   initialize: (options) ->
     @params = options.params
-    @params.filter_state = 1
+    unless @params.filter_state
+      @params.filter_state = 1
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
       reset: true,
@@ -29,7 +34,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   render: ->
     $(@el).html(@templateSkeleton())
-    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     FinlyF.structureActions(@el, @params) 
     @
@@ -174,7 +179,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   inviteEmployee: (e) ->
     e.preventDefault()
-
+    modal = $(e.currentTarget).closest('#modal-mp')
     form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
     values = {}
 
@@ -189,10 +194,20 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: values
       success: (res) ->
-        console.log res
+        $(modal).modal('hide')
+        # console.log res
       error: (err) ->
         console.log "Err", err
     })
+
+  filterState: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    @params.filter_state = parseInt($(target).attr('data-filter-state'))
+
+    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})  
+
 
   ##Funactionalities
 
