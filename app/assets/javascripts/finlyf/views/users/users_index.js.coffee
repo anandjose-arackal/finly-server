@@ -184,7 +184,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     
     # console.log values
     $.ajax({
-      url: "/users/invitation"
+      url: "/pending_invites"
       type: "POST",
       dataType: 'json'
       data: values

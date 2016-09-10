@@ -340,8 +340,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     # console.log("Putting data")
     response = model.save(values, {
       iframe: true,
-      files: this.$('form :file'),
-      # data: values
+      # files: this.$('form :file'),
+      data: values
       processData: true
       success: (model, res) ->
         $("#modal-new").modal('hide')
