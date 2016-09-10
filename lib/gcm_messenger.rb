@@ -18,7 +18,6 @@ class GcmMessenger
       gcm_ids << profile.gcm_sender_id if profile.present? and profile.gcm_sender_id.present?
     end
     gcm_ids.compact!
-    # RequestFormatter.clean_hash gcm_ids
     return if gcm_ids.blank?
     begin
       payload = generate_json_payload params

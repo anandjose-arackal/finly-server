@@ -21,7 +21,7 @@ json.mapping @result.mapping.each do |mapping|
     json.set! key do
       maps = mapping[key]
       next if maps.blank?
-      maps.each do |map|
+      json.array! maps do |map|
         json.mapping_id map.id
         if map.greater_than_amount_id.present?
           json.greater_than_amount do

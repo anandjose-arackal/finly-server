@@ -25,41 +25,9 @@ class RequestFormatter
     b.local_variable_set(:user, user)
     b.local_variable_set(:params, params)
     map = YAML.load(ERB.new(File.read("./app/formatter/#{path_to_file}")).result(b))
-    clean_hash map
-    symbolize_hash_keys map
+    Formatter.remove_blanks map
+    Formatter.symbolize_hash_keys map
     map
-  end
-
-  # Delete all null values in a hash
-  def self.clean_hash(hash)
-    hash.each do |key, value|
-      if value.kind_of?(Hash)
-        clean_hash value
-      elsif value.kind_of?(Array)
-        value.each do |k, v|
-          clean_hash v if v.kind_of?(Hash)
-        end
-        value.compact!
-      end
-    end
-    hash.delete_if { |k, v| v.blank? }
-    hash
-  end
-
-  # Symbolize all keys in the hash
-  def self.symbolize_hash_keys(hash)
-    hash.each do |key, value|
-      if value.kind_of?(Hash)
-        symbolize_hash_keys value
-      elsif value.kind_of?(Array)
-        value.each do |k, v|
-          symbolize_hash_keys v if v.kind_of?(Hash)
-        end
-      else
-      end
-    end
-    hash.symbolize_keys!
-    hash
   end
 
   def self.parse_receipt(user, params)
