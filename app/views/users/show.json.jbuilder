@@ -19,21 +19,23 @@ json.mapping @result.mapping.each do |mapping|
   [:default, :conditional_manager, :conditional_finance_manager,
    :conditional_approves_to, :conditional_approves_finance_to].each do |key|
     json.set! key do
-      map = mapping[key]
-      next if map.blank?
-      json.mapping_id map.id
-      if map.greater_than_amount_id.present?
-        json.greater_than_amount do
-          # json.id map.greater_than_amount_id
-          json.value map.greater_than_amount.value
-          json.currency_id map.greater_than_amount.currency_id
+      maps = mapping[key]
+      next if maps.blank?
+      map.each do |map|
+        json.mapping_id map.id
+        if map.greater_than_amount_id.present?
+          json.greater_than_amount do
+            # json.id map.greater_than_amount_id
+            json.value map.greater_than_amount.value
+            json.currency_id map.greater_than_amount.currency_id
+          end
         end
-      end
-      [:manager, :finance_manager, :approves_to, :approves_finance_to].each do |k|
-        if map.send("#{k}_id").present?
-          json.set! k do
-            json.id map.send("#{k}_id")
-            json.name map.send(k).name
+        [:manager, :finance_manager, :approves_to, :approves_finance_to].each do |k|
+          if map.send("#{k}_id").present?
+            json.set! k do
+              json.id map.send("#{k}_id")
+              json.name map.send(k).name
+            end
           end
         end
       end

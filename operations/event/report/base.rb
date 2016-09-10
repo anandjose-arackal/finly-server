@@ -17,6 +17,12 @@ class Event::Report::Base < Event::SetNotification
     self.report = params[:report]
   end
 
+  def validate
+    unless self.report.present?
+      errors << 'Report not found'
+    end
+  end
+
   def send_mailer(user)
     subject = self.mailer_subject(user)
     body = self.mailer_body(user)

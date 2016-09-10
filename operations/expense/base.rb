@@ -16,12 +16,8 @@ class Expense::Base < BaseOperation
     self.expense = Expense::Index.(user, params).expenses.with_id(id).first rescue nil
   end
 
-  def retrieve
-    if is_success?
-      Expense::Base::Presenter.new(user, expense: self.expense)
-    else
-      false
-    end
+  def success
+    Expense::Base::Presenter.new(user, expense: self.expense)
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter

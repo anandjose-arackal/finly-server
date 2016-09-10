@@ -31,7 +31,7 @@ class Report::Submit < Report::Base
       errors << "Cannot submit an empty report."
     end
     # checking for blocking violations
-    violations = Report::Violation.new(user, report: report)
+    violations = Report::Violation.(user, report: report)
     violations_present = false
     violations.each do |key, value|
       if value['expense_blocking'].present? or value['budget_blocking'].present?

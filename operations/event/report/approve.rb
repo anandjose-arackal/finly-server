@@ -1,13 +1,19 @@
 class Event::Report::Approve < Event::Report::Base
-  attr_accessor :approved
-
-  def event_id
-    Event.report_approve_id
-  end
+  attr_accessor :approved, :approving_user
 
   def init
     super
+    self.approving_user = self.report.tracks.last.user
     self.approved = (report.approved? or report.closed?) if report.present?
+  end
+
+  def validate
+    super
+    self.approving_user.present?
+  end
+
+  def event_id
+    Event.report_approve_id
   end
 
   def affected_users
@@ -18,8 +24,15 @@ class Event::Report::Approve < Event::Report::Base
     end
   end
 
-  def send_push_notification(user, gcm_sender_id)
-
+  def send_push_notification(user)
+    if approved
+      return unless user == report.user
+      message = "Report approved: #{self.report.name}"
+    else
+      return unless user == report.controlling_user
+      message = "Report is awaiting your approval: #{self.report.name}"
+    end
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
   def set_notification(user)
@@ -33,7 +46,7 @@ class Event::Report::Approve < Event::Report::Base
       if approved and user.id == self.report.user.id
         "Congratulations! Your report #{report.name} has been approved"
       else
-        "#{user.name} has approved the report: #{self.report.name}"
+        "#{approving_user.name} has approved the report: #{self.report.name}"
       end
     end
   end

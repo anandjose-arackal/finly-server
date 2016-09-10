@@ -6,6 +6,13 @@ class Event::Report::Expense::Reject < Event::Report::Base
     self.rejected_expense = params[:rejected_expense]
   end
 
+  def validate
+    super
+    unless self.rejected_expense.present?
+      errors << 'Expense not found'
+    end
+  end
+
   def event_id
     Event.report_expense_reject_id
   end
@@ -14,8 +21,9 @@ class Event::Report::Expense::Reject < Event::Report::Base
     self.report.user
   end
 
-  def send_push_notification(user, gcm_sender_id)
-
+  def send_push_notification(user)
+    message = "Expense rejected : #{self.rejected_expense}"
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
   def set_notification(user)
@@ -23,10 +31,10 @@ class Event::Report::Expense::Reject < Event::Report::Base
   end
 
   def mailer_subject(user)
-    "Expense rejected : #{}"
+    "Expense rejected : #{self.rejected_expense}"
   end
 
   def mailer_body(user)
-    "#{user.name} has rejected the expense at #{rejected_expense.merchant_name} in the report: '#{self.report.name}'"
+    "#{self.report.controlling_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in the report: '#{self.report.name}'"
   end
 end

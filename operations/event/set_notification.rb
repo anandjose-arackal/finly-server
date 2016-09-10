@@ -11,7 +11,7 @@ class Event::SetNotification < Event::Base
 
   end
 
-  def send_push_notification(user, gcm_sender_id)
+  def send_push_notification(user)
 
   end
 
@@ -32,8 +32,8 @@ class Event::SetNotification < Event::Base
     users.each do |user|
       next if user.blank? or not user.is_a?(User)
       user_event_configuration = load_configuration(user)
-      if allow_push_notification(user_event_configuration) and user.profile.gcm_sender_id.present?
-        send_push_notification(user, user.profile.gcm_sender_id)
+      if allow_push_notification(user_event_configuration)
+        send_push_notification(user)
       end
       if allow_mailer(user_event_configuration)
         send_mailer(user)

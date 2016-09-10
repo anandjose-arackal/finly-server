@@ -4,7 +4,7 @@ class Event::Settlement::AddAdvance < Event::Settlement::Base
     Event.settlement_add_advance_id
   end
 
-  def send_push_notification(user, gcm_sender_id)
+  def send_push_notification(user)
 
   end
 
