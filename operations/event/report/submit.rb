@@ -8,8 +8,10 @@ class Event::Report::Submit < Event::Report::Base
     [self.report.user, self.report.controlling_user]
   end
 
-  def send_push_notification(user, gcm_sender_id)
-
+  def send_push_notification(user)
+    return if user.id == report.user.id
+    message = "#{self.report.user.name} has submitted the report: #{self.report.name}"
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
   def set_notification(user)

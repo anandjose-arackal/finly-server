@@ -10,8 +10,10 @@ class Event::Report::Retract < Event::Report::Base
     [self.user, manager]
   end
 
-  def send_push_notification(user, gcm_sender_id)
-
+  def send_push_notification(user)
+    return if user.id == report.controlling_user_id
+    message = "#{self.report.user.name} retracted the report: #{self.report.name}"
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
   def set_notification(user)
@@ -19,10 +21,10 @@ class Event::Report::Retract < Event::Report::Base
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user.id
+    if user.id == report.controlling_user_id
       "Report retracted : #{self.report.name}"
     else
-      "#{user.name} has retracted the report: #{self.report.name}"
+      "#{report.user.name} has retracted the report: #{self.report.name}"
     end
   end
 
@@ -30,7 +32,7 @@ class Event::Report::Retract < Event::Report::Base
     if user.id == report.user.id
       "You have successfully retracted the report : #{self.report.name}"
     else
-      "#{user.name} has retracted the report '#{self.report.name}'."
+      "#{report.user.name} has retracted the report '#{self.report.name}'."
     end
   end
 

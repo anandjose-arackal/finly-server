@@ -5,14 +5,21 @@ class GcmMessenger
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
   def self.push(users=[], params)
+    # self.new.perform_async(users, params)
+    self.new.perform(users, params)
+  end
+
+  def perform(users, params)
     return unless params[:event_id].present? and params[:message].present?
     gcm_ids = []
+    users = [users] unless users.is_a?(Array)
     users.each do |user|
       profile = user.profile
       gcm_ids << profile.gcm_sender_id if profile.present? and profile.gcm_sender_id.present?
     end
     gcm_ids.compact!
     # RequestFormatter.clean_hash gcm_ids
+    return if gcm_ids.blank?
     begin
       payload = generate_json_payload params
       gcm = GCM.new("AIzaSyAo-LOXQBqKlAujuV_VzpevSx2itK_350I")
@@ -25,7 +32,7 @@ class GcmMessenger
   end
 
   private
-  def self.generate_json_payload(params)
+  def generate_json_payload(params)
     type = nil
     type_id = nil
     view = nil

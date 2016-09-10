@@ -1,4 +1,15 @@
 class Event::Report::Comment < Event::Report::Base
+  attr_accessor :comment
+
+  def init
+    self.comment = report.comments.last rescue nil
+  end
+
+  def validate
+    unless self.comment.present?
+      errors << 'Error loading comment'
+    end
+  end
 
   def event_id
     Event.report_comment_id
@@ -10,8 +21,11 @@ class Event::Report::Comment < Event::Report::Base
     users
   end
 
-  def send_push_notification(user, gcm_sender_id)
-
+  def send_push_notification(user)
+    content = comment.content
+    comment_user = comment.user
+    message = "#{comment_user.name} added a comment: #{content}"
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
   def set_notification(user)
@@ -19,12 +33,14 @@ class Event::Report::Comment < Event::Report::Base
   end
 
   def mailer_subject(user)
-    "#{user.name} has commented on the report: #{self.report.name}"
+    comment_user = comment.user
+    "#{comment_user.name} has commented on the report: #{self.report.name}"
   end
 
   def mailer_body(user)
-    comment = report.comments.last.content rescue nil
-    "#{user.name} has comment on the report '#{self.report.name}'<br/><br/>'#{comment}'"
+    content = comment.content
+    comment_user = comment.user
+    "#{comment_user.name} has comment on the report '#{self.report.name}'<br/><br/>'#{content}'"
   end
 
   def mailer_button_name

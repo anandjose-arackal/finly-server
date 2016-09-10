@@ -10,9 +10,14 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   def create
     param = RequestFormatter.api_expense(current_user, params)
     operation = Expense::Manual::Create.new(current_user, param)
-    operation.run
+    @result = operation.run
     if operation.is_success?
-      render 'api/v1/shared/success'
+      if @result.expense.report_id.present?
+        @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
+        render 'api/v1/reports/show'
+      else
+        render 'api/v1/expenses/show'
+      end
     else
       @errors = operation.errors
       render 'api/v1/shared/failure'
@@ -39,7 +44,12 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     operation = Expense::Manual::Update.new(current_user, param)
     @result = operation.run
     if operation.is_success?
-      render 'api/v1/expenses/show'
+      if @result.expense.report_id.present?
+        @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
+        render 'api/v1/reports/show'
+      else
+        render 'api/v1/expenses/show'
+      end
     else
       @errors = operation.errors
       render 'api/v1/shared/failure'

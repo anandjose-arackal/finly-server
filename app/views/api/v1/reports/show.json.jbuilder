@@ -7,7 +7,7 @@ json.data do
   json.total @result.total
   json.date @result.dates
   json.report do
-    json.partial! 'report', report: @result.report
+    json.partial! '/api/v1/reports/report', report: @result.report
   end
   json.actions do
     json.take_control @result.actions[:take_control].present?
