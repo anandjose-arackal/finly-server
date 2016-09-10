@@ -121,11 +121,11 @@ class User < ActiveRecord::Base
   scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
   scope :filter_state, -> (state) {
     case (state)
-      when 1
+      when '1' or 1
         where(active: true)
-      when 2
+      when '2' or 2
         where(active: false)
-      when 3
+      when '3' or 3
         where.not(invitation_token: nil)
     end
   }
