@@ -32,6 +32,6 @@ class User::Configuration::UpdateDetails < BaseOperation
   private
 
   def details_params
-    params.require(:user).permit(:name, :mobile_number, :active)
+    params.require(:user).permit(:name, :mobile_number)
   end
 end
