@@ -10,6 +10,7 @@ json.export_pdf export_report_path(report_id: @result.report.id, view: params[:v
 
 if @result.report.policy
   json.policy @result.report.policy.name
+  json.policy_id @result.report.policy.id
 end
 
 json.policies @result.report.user.policies do |policy|

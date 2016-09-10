@@ -2,6 +2,7 @@ class FinlyF.Views.User extends Backbone.View
   templateList: HandlebarsTemplates['finlyf/users/crud/userList']
   template: HandlebarsTemplates['finlyf/users/crud/userSettlements']
   templateShow: HandlebarsTemplates['finlyf/users/crud/show']
+  templateAddCondition: HandlebarsTemplates['finlyf/users/crud/addCondition']
   # templateShowDetails: HandlebarsTemplates['finlyf/users/crud/showDetails']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
@@ -12,6 +13,7 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-update-user': 'update'
     'click .btn-edit-policy': 'editPolicy'
     'click .btn-update-policy': 'updatePolicy'
+    'click .btn-add-condition': 'newCondition'
 
   initialize: (options) ->
     @params = options.params
@@ -44,6 +46,8 @@ class FinlyF.Views.User extends Backbone.View
     container = $(target).closest('section')
     $(container).find('.item-attr-preview').addClass('hide')
     $(container).find('.item-attr-edit').addClass('show')
+
+
     #edit
 
     #change edit button to update
@@ -54,6 +58,11 @@ class FinlyF.Views.User extends Backbone.View
     policy = $(target).closest('.policy')
     $(policy).find('.item-attr-preview').addClass('hide')
     $(policy).find('.item-attr-edit').addClass('show')
+
+    selects = $(policy).find("select.item-attr-edit")
+    for select in selects
+      $(select).val($(select).attr('data-default-value'))
+    # console.log selects.length 
     #edit
 
     #change edit button to update
@@ -108,6 +117,28 @@ class FinlyF.Views.User extends Backbone.View
       error: (err) ->
         console.log "Err", err
     })
+
+  newCondition: (e) ->
+    _this = @
+    e.preventDefault()
+    target = $(e.currentTarget)
+    policy = $(target).closest('.policy-rules')
+
+    arr = []
+    conditionals = $(policy).find('.conditional')
+    console.log "count", conditionals.length
+    for conditional in conditionals
+      arr.push(parseInt($(conditional).attr('data-condition-serial')))
+
+    item = {
+      condition_serial: Math.max.apply(Math,arr) + 1
+      policy_id: $(target).attr('data-policy-id')
+      manager_type: $(target).attr('data-manager-type')
+      managers: _this.model.get('company_managers')
+    }
+
+    # console.log item
+    $(target).closest('.add-condition').siblings('.conditional').after(@templateAddCondition({item: item}))
 
 
 #Features

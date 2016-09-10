@@ -196,25 +196,29 @@ class FinlyF.Views.Report extends Backbone.View
     $(e.currentTarget).addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
 
     _this = @
-    $(@el).find(".item-name").html("<input type='text' class='item-name-edit' />")
-    $(@el).find(".item-name .item-name-edit").val(_this.model.get('name'))
+    # $(@el).find(".item-name").html("<input type='text' class='item-name-edit' />")
+    # $(@el).find(".item-name .item-name-edit").val(_this.model.get('name'))
 
-    target_select = $(@el).find(".item-policy")
-    select = $('<select />', {
-      name: 'item-policy',
-      class: 'item-policy-edit',
+    target_select = $(@el).find(".item-policy-edit")
+    $(target_select).val($(target_select).attr('data-default-value'))
 
-    })
+    $(@el).find('.item-attr-edit').css("display", "inline")
+    $(@el).find('.item-attr-preview').css('display', 'none')
+    # select = $('<select />', {
+    #   name: 'item-policy',
+    #   class: 'item-policy-edit',
 
-    policies = $(@model.get('policies'))
-    for policy in policies
-      console.log policy
-      $('<option />', {
-        text: policy.name,
-        value: policy.id
-      }).appendTo(select)
+    # })
 
-    $(target_select).html(select)
+    # policies = $(@model.get('policies'))
+    # for policy in policies
+    #   console.log policy
+    #   $('<option />', {
+    #     text: policy.name,
+    #     value: policy.id
+    #   }).appendTo(select)
+
+    # $(target_select).html(select)
 
   update: (e) ->
     $(e.currentTarget).html("<i class='fa fa-circle-o-notch fa-spin'></i>")

@@ -12,10 +12,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
     'click .btn-invite-employee': 'processEmployeeInvitation'
+    'click .btn-confirm-invite-employee': 'inviteEmployee'
+
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
   initialize: (options) ->
     @params = options.params
+    @params.filter_state = 2
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
       reset: true,
@@ -157,17 +160,39 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: @params
       success: (res) ->
-        managers = {
-          company_managers: res.company_managers
-          company_finance_managers: res.company_finance_managers
-        }
-        $(modal).html(_this.templateInviteEmployee({item: managers}))
+        # managers = {
+        #   company_managers: res.company_managers
+        #   company_finance_managers: res.company_finance_managers
+        # }
+        $(modal).html(_this.templateInviteEmployee({item: res}))
         
         # console.log res.company_managers
       error: (err) ->
         console.log "Err", err
     })
     # console.log managers 
+
+  inviteEmployee: (e) ->
+    e.preventDefault()
+
+    form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
+    values = {}
+
+    _.each((form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    
+    # console.log values
+    $.ajax({
+      url: "/users/invitation"
+      type: "POST",
+      dataType: 'json'
+      data: values
+      success: (res) ->
+        console.log res
+      error: (err) ->
+        console.log "Err", err
+    })
 
   ##Funactionalities
 

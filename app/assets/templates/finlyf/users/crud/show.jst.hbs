@@ -109,10 +109,12 @@
   <div class="policy">
     <div class="row policy-name">
       <div class="col-sm-6">
-        {{#if this.company_default}}Default{{else}}{{this.policy.name}}{{/if}}
-        {{#if this.company_default}}{{else}}
-          <input type="number" name="user_manager_mapping[0][mapping][policy_id]" value="{{this.policy.id}}">{{this.policy.name}}(PolicyName 0)
-        {{/if}}  
+        {{#if this.company_default}}
+          Default
+        {{else}}
+          <input type="hidden" name="user_manager_mapping[0][mapping][policy_id]" value="{{this.policy.id}}">
+          {{this.policy.name}}{{!-- (PolicyName 0) --}}
+        {{/if}}
       </div>
 
       <div class="col-sm-6 text-right">
@@ -132,19 +134,21 @@
 
               <div class="col-sm-7">
 
-                <input type="number" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">(Mapping ID 0)
-                <label class="control-label item-attr-preview">{{this.default.manager.name}}</label>(Manger 0)
-                <select class="item-attr-edit">
-                  <option>1</option>
+                <input type="hidden" class="conditional-mapping-id" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">{{!-- (Mapping ID 0) --}}
+                <label class="control-label item-attr-preview">{{this.default.manager.name}}</label>{{!-- Manager 0 --}}
+                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
                 </select>
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" value="{{this.default.manager.id}}">
-
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" value="{{this.default.manager.id}}"> --}}
               </div>
             </div>
             
             <hr />
 
-            <div class="row x conditional">
+            <div class="row x conditional" data-condition-serial="1">
 
               <div class="col-sm-12 hideme">
                 {{#if this.company_default}}{{else}}
@@ -162,7 +166,7 @@
                 {{else}}
                   Not Set
                 {{/if}}
-                </label>(Greater than amount 1)
+                </label>{{!-- (Greater than amount 1) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[1][mapping][greater_than_amount_attributes][currency_id]" value="1">
                 <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][greater_than_amount_attributes][value]" value="{{this.conditional_manager.greater_than_amount.value}}">
               </div>
@@ -176,32 +180,44 @@
                 {{else}}
                   Not Set
                 {{/if}}
-                </label>(Conditional Manager 1)
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" value="{{this.conditional_manager.manager.id}}">
+                </label>{{!-- (Conditional Manager 1) --}}
+                <select class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" data-default-value="{{this.conditional_manager.manager.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
+                </select>
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" value="{{this.conditional_manager.manager.id}}"> --}}
               </div>
+              
             </div><!-- .conditional -->
+            <div class="col-sm-12 add-condition">
+              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="manager">Add More Condition</button>
+            </div>
           </div><!-- .col-sm-6 -->
-
 
           <div class="col-sm-6 finance-manager-data">
 
             <div class="row finance-manager non-conditional">
               <div class="col-sm-5">
-                Reports to:
+                Reports Finance to:
               </div>
 
               <div class="col-sm-7">
-                <label class="control-label item-attr-preview">{{this.default.finance_manager.name}}</label>(Finance Manager 0)
-                <select class="item-attr-edit">
-                  <option>1</option>
+                <label class="control-label item-attr-preview">{{this.default.finance_manager.name}}</label>{{!-- (Finance Manager 0) --}}
+                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_finance_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
                 </select>
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" value="{{this.default.finance_manager.id}}">
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" value="{{this.default.finance_manager.id}}"> --}}
               </div>
             </div>
 
             <hr />
 
-            <div class="row finance-manager conditional">
+            <div class="row finance-manager conditional" data-condition-serial="2">
               <div class="col-sm-12 hideme">
                 {{#if this.company_default}}{{else}}
                   <input type="number" name="user_manager_mapping[2][mapping][policy_id]" value="{{this.policy.id}}">{{this.policy.name}}(Policy Name 2)
@@ -219,7 +235,7 @@
                   {{else}}
                     Not Set
                   {{/if}}
-                </label>(Greater than amount 2)
+                </label>{{!-- (Greater than amount 2) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[2][mapping][greater_than_amount_attributes][currency_id]" value="1">
                 <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][greater_than_amount_attributes][value]" value="{{this.conditional_finance_manager.greater_than_amount.value}}">
               </div>
@@ -236,8 +252,14 @@
                 {{else}}
                   Not Set
                 {{/if}}
-                </label>(Conditional Manager 2)
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" value="{{this.conditional_finance_manager.finance_manager.id}}">
+                </label>{{!-- (Conditional Manager 2) --}}
+                <select class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" data-default-value="{{this.conditional_finance_manager.finance_manager.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_finance_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
+                </select>
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" value="{{this.conditional_finance_manager.finance_manager.id}}"> --}}
               </div>
 
             </div>
@@ -261,18 +283,21 @@
                 {{else}}
                   Not Set
                 {{/if}}
-                </label>(Approves_to 0)
+                </label>{{!-- (Approves_to 0) --}}
 
-                <select class="item-attr-edit">
-                  <option>1</option>
+                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
                 </select>
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" value="{{this.default.approves_to.id}}">
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" value="{{this.default.approves_to.id}}"> --}}
               </div>
             </div>
 
             <hr />
 
-            <div class="row conditional approves_to">
+            <div class="row conditional approves_to" data-condition-serial="3">
 
               <div class="col-sm-12 hideme">
                 {{#if this.company_default}}{{else}}
@@ -290,7 +315,7 @@
                   {{else}}
                     Not Set
                   {{/if}}
-                </label>(Greater than amount 3)
+                </label>{{!-- (Greater than amount 3) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[3][mapping][greater_than_amount_attributes][currency_id]" value="1">
                 <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][greater_than_amount_attributes][value]" value="{{this.conditional_approves_to.greater_than_amount.value}}">
 
@@ -305,12 +330,15 @@
                   {{else}}
                     Not Set
                   {{/if}}
-                </label>(Conditional approves to 3)
+                </label>{{!-- (Conditional approves to 3) --}}
 
-                <select class="item-attr-edit">
-                  <option>1</option>
+                <select class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" data-default-value="{{this.conditional_approves_to.approves_to.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
                 </select>
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" value="{{this.conditional_approves_to.approves_to.id}}">
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" value="{{this.conditional_approves_to.approves_to.id}}"> --}}
               </div>
             </div>
           </div><!-- .col-sm-6 -->
@@ -328,19 +356,22 @@
                   {{else}}
                     Not Set
                   {{/if}}
-                </label>(Approves Finance to 0)
+                </label>{{!-- (Approves Finance to 0) --}}
 
-                <select class="item-attr-preview">
-                  <option>1</option>
+                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_finance_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
                 </select>
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" value="{{this.default.approves_finance_to.id}}">
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" value="{{this.default.approves_finance_to.id}}"> --}}
 
               </div>
             </div>
 
             <hr />
 
-            <div class="row conditional approves-finance-to">
+            <div class="row conditional approves-finance-to" data-condition-serial="4">
               <div class="col-sm-12 hideme">
                 {{#if this.company_default}}{{else}}
                   <input type="number" name="user_manager_mapping[4][mapping][policy_id]" value="{{this.policy.id}}">{{this.policy.name}}(Policy Name 4)
@@ -358,7 +389,7 @@
                   {{else}}
                     Not Set
                   {{/if}}
-                </label>(Greater than amount 4)
+                </label>{{!-- (Greater than amount 4) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[4][mapping][greater_than_amount_attributes][currency_id]" value="1">
                 <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][greater_than_amount_attributes][value]" value="{{this.conditional_approves_finance_to.greater_than_amount.value}}">
 
@@ -368,16 +399,19 @@
 
               <div class="col-sm-7">
                 <label class="control-label item-attr-preview">
-                  {{#if this.conditional_approves_finance_to.approves_to.name}}
-                    {{this.conditional_approves_finance_to.approves_to.name}}
+                  {{#if this.conditional_approves_finance_to.approves_finance_to.name}}
+                    {{this.conditional_approves_finance_to.approves_finance_to.name}}
                   {{else}}
                     Not Set
                   {{/if}}
-                </label>(Conditional approves to 4)
-                <select class="item-attr-edit">
-                  <option>1</option>
+                </label>{{!-- (Conditional approves to 4) --}}
+                <select class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" data-default-value="{{this.conditional_approves_finance_to.approves_finance_to.id}}">
+                  <option value="">None</option>
+                  {{#each ../item.company_finance_managers}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                  {{/each}}
                 </select>
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" value="{{this.conditional_approves_finance_to.approves_to.id}}">
+                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" value="{{this.conditional_approves_finance_to.approves_to.id}}"> --}}
               </div>
             </div>
             
@@ -404,6 +438,7 @@
 
   .hideme{
     background: yellow;
+    display: none;
   }
 </style>
 

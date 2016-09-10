@@ -28,7 +28,7 @@ class User::Show < User::Base
   end
 
   class User::Show::Presenter < BaseOperation::BasePresenter
-    attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers, :company_finance_managers, :company_admins
+    attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers, :company_finance_managers, :company_admins, :company_policies
 
     def initialize(user, params)
       super(user, params)
@@ -44,6 +44,7 @@ class User::Show < User::Base
       self.company_managers = company.managers
       self.company_finance_managers = company.finance_managers
       self.company_admins = company.admins
+      self.company_policies = company.policies
     end
 
     private
