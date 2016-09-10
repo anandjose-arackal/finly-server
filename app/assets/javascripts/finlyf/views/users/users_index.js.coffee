@@ -18,7 +18,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   initialize: (options) ->
     @params = options.params
-    @params.filter_state = 2
+    @params.filter_state = 1
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
       reset: true,
