@@ -206,7 +206,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     @params.filter_state = parseInt($(target).attr('data-filter-state'))
 
-    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})  
+    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
+
+
 
 
   ##Funactionalities

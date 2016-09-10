@@ -14,6 +14,7 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-edit-policy': 'editPolicy'
     'click .btn-update-policy': 'updatePolicy'
     'click .btn-add-condition': 'newCondition'
+    'click .btn-user-action': 'userAction'
 
   initialize: (options) ->
     @params = options.params
@@ -139,6 +140,31 @@ class FinlyF.Views.User extends Backbone.View
 
     # console.log item
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
+
+  userAction: (e) ->
+    console.log "working"
+    target = e.currentTarget
+    active = $(target).attr('data-action-type')
+    # type = 'state'
+
+    data = {
+      type: 'state'
+      user: {
+        active: active
+      }
+      view: @params.view
+    }
+
+    $.ajax({
+      url: '/users/' + @model.get('id')
+      data: data
+      dataType: 'json'
+      type: "PUT"
+      success: (res) ->
+        console.log "Success", res
+      error: (err) ->
+        console.log "Err", err
+    })
 
 
 #Features

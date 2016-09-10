@@ -1,3 +1,14 @@
+<section>
+  <div class="row">
+    <div class="col-sm-6">Actions</div>
+    <div class="col-sm-6">
+      <button class="btn btn-sm btn-danger btn-user-action" data-action-type=false>Deactivate Employee</button>
+      <button class="btn btn-sm btn-success btn-user-action" data-action-type=true>Reactivate Employee</button>
+      <button class="btn btn-sm btn-danger btn-user-action" data-action-type="delete_invitation">Delete Employee Invitation</button>
+    </div>
+  </div>
+</section>
+
 <section class="user-info">
   <div class="row">
     <div class="col-sm-6">
@@ -203,7 +214,7 @@
 
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="manager">Add Condition</button>
+              <button class="btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="manager">Add Condition</button>
             </div>
           </div><!-- .col-sm-6 -->
 
@@ -282,7 +293,7 @@
             </div><!-- .conditional -->
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="finance_manager">Add Condition</button>
+              <button class="btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="finance_manager">Add Condition</button>
             </div>
           </div><!-- .col-sm-6 -->
         </div><!-- .row -->
@@ -367,7 +378,7 @@
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_to">Add Condition</button>
+              <button class="btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_to">Add Condition</button>
             </div>
             {{/if}}
           </div><!-- .col-sm-6 -->
@@ -446,7 +457,7 @@
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn-sm btn-default btn-add-condition" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_finance_to">Add Condition</button>
+              <button class="btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_finance_to">Add Condition</button>
             </div>
 
             {{/if}}
