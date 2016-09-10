@@ -1,6 +1,6 @@
 class Formatter
 
-# Delete all null values in a hash
+# Delete all null values in a hash/array
   def self.remove_blanks(item)
     if item.kind_of?(Array)
       item.each do |k, v|
@@ -8,7 +8,7 @@ class Formatter
       end
       item.compact!
     elsif item.kind_of?(Hash)
-      hash.each do |key, value|
+      item.each do |key, value|
         if value.kind_of?(Hash)
           remove_blanks value
         elsif value.kind_of?(Array)
@@ -18,8 +18,8 @@ class Formatter
           value.compact!
         end
       end
-      hash.delete_if { |k, v| v.blank? }
-      return hash
+      item.delete_if { |k, v| v.blank? }
+      return item
     end
   end
 
