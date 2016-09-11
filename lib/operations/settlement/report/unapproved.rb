@@ -4,7 +4,7 @@
 # report_id: id of the report that is being unapproved
 
 
-class Settlement::ReportUnapproved < Settlement::Base
+class Settlement::Report::Unapproved < Settlement::Base
 
   attr_accessor :report
 
@@ -34,7 +34,7 @@ class Settlement::ReportUnapproved < Settlement::Base
 
   def validate
     unless report.accounted?
-      errors << "Report has not been accounted for. Chill out."
+      errors << 'Report has not been accounted for'
     end
   end
 

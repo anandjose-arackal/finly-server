@@ -4,7 +4,7 @@
 # report_id: id of the report being marked as approved
 #
 
-class Settlement::ReportApproved < Report::Base
+class Settlement::Report::Approved < Report::Base
 
   attr_accessor :report
 

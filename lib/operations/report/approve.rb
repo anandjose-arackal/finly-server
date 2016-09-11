@@ -80,7 +80,7 @@ class Report::Approve < Report::Base
 
       # recomputing settlement and marking the report as accounted
       unless report.processing?
-        Settlement::ReportApproved.(report.user, report_id: report.id)
+        Settlement::Report::Approved.(report.user, report_id: report.id)
         report.reload
       end
       # if report is closed, add the relevant comment
