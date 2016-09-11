@@ -144,7 +144,7 @@ class ReportService < BaseService
     if report.update_attributes report_status_id: ReportStatus.processing_id, controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo, submitted_at: submitted_at
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.submit_id, report_status_id: ReportStatus.processing_id, memo: memo
       track.save
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_submit_id
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
       comment.save
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
