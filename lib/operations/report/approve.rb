@@ -87,6 +87,8 @@ class Report::Approve < Report::Base
         comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.report_closed_id
         comment.save
       end
+      # Send notifications
+      Event::Report::Approve.(self.user, report: self.report)
     end
   end
 

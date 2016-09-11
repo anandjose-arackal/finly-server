@@ -96,14 +96,14 @@ if MoneyRequestStatus.count == 0
   end
 end
 
-# if Event.count == 0
-#   Event::ACTIONS.each do |item|
-#     Event.create id: Event::ACTIONS.find_index(item), name: item[:key].to_s,
-#                  has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
-#                  configurable_push_notification: item[:configurable_push_notification],
-#                  configurable_mailer: item[:configurable_mailer]
-#   end
-# end
+if Event.count == 0
+  Event::ACTIONS.each do |item|
+    Event.create id: (Event::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
+                 has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
+                 configurable_push_notification: item[:configurable_push_notification],
+                 configurable_mailer: item[:configurable_mailer]
+  end
+end
 
 if Currency.count == 0
   Currency.create(id: 1, country: 'India', country_code: 'INR')

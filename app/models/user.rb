@@ -119,7 +119,7 @@ class User < ActiveRecord::Base
 
   # scopes for filters
   scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
-  scope :filter_state, -> (state) {
+  scope :filter_state, -> (state) do
     case (state)
       when '1', 1
         where(active: true)
@@ -128,7 +128,7 @@ class User < ActiveRecord::Base
       when '3', 3
         where.not(invitation_token: nil)
     end
-  }
+  end
 
   scope :filter_role, -> (role) {
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)

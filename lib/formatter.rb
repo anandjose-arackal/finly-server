@@ -1,5 +1,20 @@
 class Formatter
 
+  def self.handle_api_nil(hash)
+    hash.each do |key, value|
+      if value.kind_of?(Hash)
+        handle_api_nil value
+      elsif value.kind_of?(Array)
+        value.each do |v|
+          handle_api_nil v
+        end
+      elsif value.is_a?(String) and value == 'nil'
+        hash[key] = nil
+      end
+    end
+    hash
+  end
+
 # Delete all null values in a hash/array
   def self.remove_blanks(item)
     if item.kind_of?(Array)
@@ -12,7 +27,7 @@ class Formatter
         if value.kind_of?(Hash)
           remove_blanks value
         elsif value.kind_of?(Array)
-          value.each do |k, v|
+          value.each do |v|
             remove_blanks v if v.kind_of?(Hash)
           end
           value.compact!
@@ -29,7 +44,7 @@ class Formatter
       if value.kind_of?(Hash)
         symbolize_hash_keys value
       elsif value.kind_of?(Array)
-        value.each do |k, v|
+        value.each do |v|
           symbolize_hash_keys v if v.kind_of?(Hash)
         end
       else

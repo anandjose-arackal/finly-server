@@ -11,6 +11,7 @@ class RequestFormatter
       map[:expense][:receipts_attributes]= []
       map[:expense][:receipts_attributes][0] = params[:receipt]
     end
+    Formatter.handle_api_nil map
     map
   end
 

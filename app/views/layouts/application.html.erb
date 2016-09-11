@@ -4,7 +4,7 @@
 <head>
   <title>Finly</title>
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+
   <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
 
@@ -17,176 +17,10 @@
 
   <%= csrf_meta_tags %>
 </head>
-<body>
+<body style="background: #594da8 !important">
   <%= render 'shared/header' %>
   <%= snap_flash %>
   <%= yield %>
 
-
-
-
-<script>
-
-  var formDisabled = false;
-  var disabledTimer;
-  var clickDisabled = false;
-  var clickTimer;
-
-  var noty_loading = null;
-
-  $(document).ready(function () {
-
-//    $ = jQuery;
-
-    $.noty.defaults.timeout = 8000;
-    $.noty.defaults.layout = 'bottomRight';
-    $.noty.defaults.theme = 'bootstrapTheme';
-    $.noty.defaults.dismissQueue = true;
-//  $.noty.defaults.animation = {open: 'animated slideInRight', close: 'animated fadeOutRight'};
-
-    formDisabled = false;
-    $(".alert").delay(6000).fadeOut(2000);
-    Turboboost.handleFormDisabling = false;
-
-    $("input:submit").on('click', function (e) {
-      disableClick(e);
-    });
-
-    $("button").on('click', function (e) {
-      disableClick(e);
-    });
-
-    function disableClick(e) {
-      if (clickDisabled) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-      clickDisabled = true;
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(doneClicking, 300);
-    }
-
-    function doneClicking() {
-      clickDisabled = false;
-    }
-
-    $('form').on('submit', function (e) {
-      console.log('disabledCheck: ' + formDisabled);
-      if (formDisabled) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        return;
-      }
-      formDisabled = true;
-      clearTimeout(disabledTimer);
-      disabledTimer = setTimeout(enableForm, 10000);
-    });
-
-    function enableForm() {
-      console.log('disabledCheck: auto-enabling form after 10seconds');
-      formDisabled = false;
-    }
-
-    $(document).on('page:fetch', function () {
-//      noty({text: 'Loading..', type: 'success'});
-    });
-    $(document).on('page:change', function () {
-      console.log('change')
-    });
-    $(document).on('page:restore', function () {
-      console.log('restore');
-//      Clear all ohSnap elements
-      var myNode = document.getElementById("ohsnap");
-      console.log('myNode' + (myNode == null));
-      while (myNode.firstChild) {
-        myNode.removeChild(myNode.firstChild);
-      }
-    });
-
-    $(document).on("turboboost:success", function (e, flash) {
-      formDisabled = false;
-
-//      handleFlash(flash);
-
-//      if (flash != null && flash != undefined) {
-//        var dynamicFlashContainer = document.getElementById("dynamicFlashContainer");
-//        while (dynamicFlashContainer.firstChild) {
-//          dynamicFlashContainer.removeChild(dynamicFlashContainer.firstChild);
-//        }
-//        for (var key in flash) {
-//          if (flash.hasOwnProperty(key)) {
-//            var value = flash[key];
-//            var clone = null;
-//            var itm = null;
-//            if (value == 'failure') {
-//              itm = document.getElementById("dynamic_flash_failure");
-//              clone = itm.cloneNode(true);
-//            } else {
-//              itm = document.getElementById("dynamic_flash_success");
-//              clone = itm.cloneNode(true);
-//            }
-//            clone.hidden = null;
-//            clone.appendChild(document.createTextNode(value));
-//            $(clone).delay(6000).fadeOut(2000);
-//            dynamicFlashContainer.appendChild(clone);
-//          }
-//        }
-//        $(dynamicFlashContainer).show();
-//    }
-    });
-
-    $(document).on("turboboost:error", function (e, flash) {
-      formDisabled = false;
-//      handleFlash(flash);
-    });
-
-  });
-
-  function redirectBack() {
-    redirectBack(null);
-  }
-
-  function redirectBack(path) {
-    var redirect_path;
-    <% if request.referrer.present? and URI(request.referer).path != request.path %>
-    redirect_path = '<%= request.referrer %>';
-    <% else %>
-    redirect_path = '<%= root_path %>';
-    if (path != null && path.length > 0) {
-      redirect_path = path
-    }
-    <% end %>
-    Turbolinks.visit(redirect_path);
-  }
-
-  function handleFlash(flash) {
-    if (flash != null && flash != undefined) {
-      for (var key in flash) {
-        var value = flash[key];
-        var type = key;
-
-        if (key == 'info' || key == 'notice') {
-          type = 'information'
-        } else if (key == 'failure' || key == 'danger') {
-          type = 'error'
-        }
-        console.log('type : ' + type);
-        if (type != null && value != null) {
-          noty({text: value, type: type});
-        }
-      }
-    }
-  }
-
-  function closeConfirmModal() {
-    formDisabled = false;
-    $('#confirmationModal').modal('hide');
-  }
-
-  function closeAllFlash(element) {
-    $(element).parent().hide();
-  }
-
-</script>
 </body>
 </html>
