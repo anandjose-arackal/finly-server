@@ -62,5 +62,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
   def post_process
     # todo computing settlements
     # todo sending notifications
+
+    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
   end
 end

@@ -4,8 +4,7 @@
 # report_id: id of the report that is being unapproved
 
 
-class Settlement::Report::Unapproved < Settlement::Base
-
+class Settlement::Report::Unapproved < Report::Base
   attr_accessor :report
 
   def authorized_user_types
@@ -57,11 +56,8 @@ class Settlement::Report::Unapproved < Settlement::Base
     # mailer
   end
 
-  def retrieve
-    if is_success?
-      return report
-    else
-      return false
-    end
+  def success
+    report
   end
+
 end

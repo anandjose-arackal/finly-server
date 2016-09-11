@@ -12,10 +12,6 @@ class Settlement::Report::Approved < Report::Base
     [:employee]
   end
 
-  def self.call(user, params)
-    self.new(user, params).run
-  end
-
   def pre_validate
     if user.blank? or params.blank?
       errors << "No user or params passed."
@@ -81,11 +77,8 @@ class Settlement::Report::Approved < Report::Base
     # mailer
   end
 
-  def retrieve
-    if is_success?
-      return report
-    else
-      return false
-    end
+  def success
+    return report
   end
+
 end
