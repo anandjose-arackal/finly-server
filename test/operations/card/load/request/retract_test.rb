@@ -5,14 +5,14 @@ class RetractTest < ActiveSupport::TestCase
   def setup
     @user= User.find_by_email('user0@finlytest.io')
     @c = Card.create(ending_number: '1234', proxy: '1234', user: @user)
-    @request = Card::Load::Request::Create.(@user, {id: @c.id, card_load_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).card_load_request
+    @request = MoneyRequest::Create.(@user, {id: @c.id, money_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).money_request
   end
 
   test 'successful retract' do
     assert @request.processing?
     assert @request.user.id, @user.id
-    assert_difference 'CardLoadRequestTrack.count', 1 do
-      assert Card::Load::Request::Retract.(@user, id: @request.id)
+    assert_difference 'MoneyRequestTrack.count', 1 do
+      assert MoneyRequest::Retract.(@user, id: @request.id)
     end
     assert @request.reload.retracted?
     assert_equal @request.controlling_user.id, @user.id
@@ -20,11 +20,11 @@ class RetractTest < ActiveSupport::TestCase
 
   test 'can only be retracted when in processing state' do
     assert @request.processing?
-    assert Card::Load::Request::Retract.(@user, id: @request.id)
+    assert MoneyRequest::Retract.(@user, id: @request.id)
     assert @request.reload.retracted?
     rescued = false
     begin
-      Card::Load::Request::Retract.(@user, id: @request.id)
+      MoneyRequest::Retract.(@user, id: @request.id)
     rescue
       rescued = true
     end
@@ -36,7 +36,7 @@ class RetractTest < ActiveSupport::TestCase
     assert @request.user.id, @user.id
     rescued = false
     begin
-      Card::Load::Request::Retract.(User.last, id: @request.id)
+      MoneyRequest::Retract.(User.last, id: @request.id)
     rescue
       rescued = true
     end

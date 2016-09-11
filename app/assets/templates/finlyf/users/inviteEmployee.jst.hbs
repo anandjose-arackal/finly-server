@@ -1,0 +1,153 @@
+<div class="modal-dialog" role="document" style="width: 50%;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Invite Employee</h4>
+    </div>
+    <div class="modal-body">
+    <form class="new-invite-employee">
+      <input type="hidden" name="pending_invite[company_id]" value="{{item.company.id}}">
+
+      <div class="row">
+        <div class="col-sm-4">
+          <label class="control-label">Email:</label>
+        </div>
+
+        <div class="col-sm-8">
+          <input name="pending_invite[email]" class="form-control" placeholder="example@company.com, two@asa.com" type="text">
+          <textarea class="form-control" name="pending_invite[note]" placeholder="Add a note (optional)"></textarea>    
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col-sm-4"><label class="control-label">Assign Admin Role?</label></div>
+        <div class="col-sm-8">
+          <label class="radio-inline" style="font-size: 12px">
+            <input id="" name="admin" style="font-size: 8px" value="1" type="radio">Yes
+          </label>
+          <label class="radio-inline" style="font-size: 12px">
+            <input id="" name="admin" value="0" checked="checked" type="radio">No
+          </label>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row conditional-container">
+
+        <div class="col-sm-12 no-padding">
+          <div class="col-sm-4"><label class="control-label">Assign Manager Role?</label></div>
+          <div class="col-sm-8">
+            <label class="radio-inline">
+              <input name="manager" value="1" type="radio">Yes
+            </label>
+            <label class="radio-inline">
+              <input name="manager" value="0" checked="checked" type="radio">No
+            </label>
+          </div>
+        </div>
+        
+
+        <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
+          <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
+          <div class="col-sm-8">
+            <select class="form-control" name="pending_invite[team_mapping_attributes][approves_to_id]">
+              <option value="">None</option>
+              {{#each item.company_admins}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+              {{#each item.company_managers}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row conditional-container">
+        <div class="col-sm-12 no-padding">
+          <div class="col-sm-4"><label class="control-label">Assign Finance Manager Role?</label></div>
+          <div class="col-sm-8">
+            <label class="radio-inline">
+              <input name="finance_manager" value="1" type="radio">Yes
+            </label>
+            <label class="radio-inline">
+              <input name="finance_manager" value="0" checked="checked" type="radio">No
+            </label>
+          </div>
+        </div>
+        
+
+        <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
+          <div class="col-sm-4"><label class="control-label">Approves Finance Reports To?</label></div>
+          <div class="col-sm-8">
+            <select class="form-control" name="pending_invite[team_mapping_attributes][approves_finance_to_id]">
+              <option value="">None</option>
+              {{#each item.company_admins}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+              {{#each item.company_finance_managers}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col-sm-4"><label class="control-label">Managed By:</label></div>
+        <div class="col-sm-8">
+          <select class="form-control">
+            <option value="">None</option>
+            {{#each item.company_admins}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+            {{#each item.company_managers}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-4"><label class="control-label">Finance Managed By:</label></div>
+        <div class="col-sm-8">
+          <select class="form-control">
+            <option value="">None</option>
+            {{#each item.company_admins}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+            {{#each item.company_finance_managers}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col-sm-4"><label class="control-label">Add Policy to User</label></div>
+        <div class="col-sm-8">
+          <select class="form-control" name="pending_invite[policy_id]">
+            <option value="">None</option>
+            {{#each item.company_policies}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+    </div>
+    </form>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      <button type="button" class="btn-confirm-invite-employee btn btn-primary">Invite Employee</button>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

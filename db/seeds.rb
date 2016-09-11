@@ -72,43 +72,38 @@ if ReportCommentAction.count == 0
   end
 end
 
-if CardLoadRequestCommentAction.count == 0
-  CardLoadRequestCommentAction.create id: 1, name: 'Create'
-  CardLoadRequestCommentAction.create id: 2, name: 'Retract'
-  CardLoadRequestCommentAction.create id: 3, name: 'Submit'
-  CardLoadRequestCommentAction.create id: 4, name: 'Approve'
-  CardLoadRequestCommentAction.create id: 5, name: 'Reject'
-  CardLoadRequestCommentAction.create id: 6, name: 'Unapprove'
-  CardLoadRequestCommentAction.create id: 7, name: 'Take Control'
-  CardLoadRequestCommentAction.create id: 8, name: 'Comment'
-  CardLoadRequestCommentAction.create id: 9, name: 'Update'
+if MoneyRequestCommentAction.count == 0
+  MoneyRequestCommentAction.create id: 1, name: 'Create'
+  MoneyRequestCommentAction.create id: 2, name: 'Retract'
+  MoneyRequestCommentAction.create id: 3, name: 'Submit'
+  MoneyRequestCommentAction.create id: 4, name: 'Approve'
+  MoneyRequestCommentAction.create id: 5, name: 'Reject'
+  MoneyRequestCommentAction.create id: 6, name: 'Unapprove'
+  MoneyRequestCommentAction.create id: 7, name: 'Take Control'
+  MoneyRequestCommentAction.create id: 8, name: 'Comment'
+  MoneyRequestCommentAction.create id: 9, name: 'Update'
 end
 
-if CardLoadTrackingAction.count == 0
-  CardLoadTrackingAction.create(id: 1, name: 'Create')
-  CardLoadTrackingAction.create(id: 2, name: 'Retract')
-  CardLoadTrackingAction.create(id: 3, name: 'Submit')
-  CardLoadTrackingAction.create(id: 4, name: 'Approve')
-  CardLoadTrackingAction.create(id: 5, name: 'Reject')
-  CardLoadTrackingAction.create(id: 6, name: 'Unapprove')
-  CardLoadTrackingAction.create(id: 7, name: 'Take Control')
+if MoneyRequestTrackingAction.count == 0
+  MoneyRequestTrackingAction::ACTIONS.each do |key, value|
+    MoneyRequestTrackingAction.create id: value, name: key
+  end
 end
 
-if CardLoadRequestStatus.count == 0
-  CardLoadRequestStatus.create id: 1, name: 'Processing'
-  CardLoadRequestStatus.create id: 2, name: 'Retracted'
-  CardLoadRequestStatus.create id: 3, name: 'Rejected'
-  CardLoadRequestStatus.create id: 4, name: 'Credited'
+if MoneyRequestStatus.count == 0
+  MoneyRequestStatus::VALUES.each do |key, value|
+    MoneyRequestStatus.create id: value, name: key
+  end
 end
 
-# if Event.count == 0
-#   Event::ACTIONS.each do |item|
-#     Event.create id: Event::ACTIONS.find_index(item), name: item[:key].to_s,
-#                  has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
-#                  configurable_push_notification: item[:configurable_push_notification],
-#                  configurable_mailer: item[:configurable_mailer]
-#   end
-# end
+if Event.count == 0
+  Event::ACTIONS.each do |item|
+    Event.create id: (Event::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
+                 has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
+                 configurable_push_notification: item[:configurable_push_notification],
+                 configurable_mailer: item[:configurable_mailer]
+  end
+end
 
 if Currency.count == 0
   Currency.create(id: 1, country: 'India', country_code: 'INR')
@@ -284,8 +279,7 @@ if Report.count == 0
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                        user_id: user.id}])
+                                 receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
       end
@@ -301,8 +295,7 @@ if Report.count == 0
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                        user_id: user.id}])
+                                 receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
       end
@@ -319,8 +312,7 @@ if Report.count == 0
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
-                                 receipts_attributes: [{image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-                                                        user_id: user.id}])
+                                 receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
       end

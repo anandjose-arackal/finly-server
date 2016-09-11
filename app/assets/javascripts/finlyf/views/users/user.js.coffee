@@ -2,6 +2,7 @@ class FinlyF.Views.User extends Backbone.View
   templateList: HandlebarsTemplates['finlyf/users/crud/userList']
   template: HandlebarsTemplates['finlyf/users/crud/userSettlements']
   templateShow: HandlebarsTemplates['finlyf/users/crud/show']
+  templateAddCondition: HandlebarsTemplates['finlyf/users/crud/addCondition']
   # templateShowDetails: HandlebarsTemplates['finlyf/users/crud/showDetails']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
@@ -12,6 +13,8 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-update-user': 'update'
     'click .btn-edit-policy': 'editPolicy'
     'click .btn-update-policy': 'updatePolicy'
+    'click .btn-add-condition': 'newCondition'
+    'click .btn-user-action': 'userAction'
 
   initialize: (options) ->
     @params = options.params
@@ -44,6 +47,8 @@ class FinlyF.Views.User extends Backbone.View
     container = $(target).closest('section')
     $(container).find('.item-attr-preview').addClass('hide')
     $(container).find('.item-attr-edit').addClass('show')
+
+
     #edit
 
     #change edit button to update
@@ -54,6 +59,11 @@ class FinlyF.Views.User extends Backbone.View
     policy = $(target).closest('.policy')
     $(policy).find('.item-attr-preview').addClass('hide')
     $(policy).find('.item-attr-edit').addClass('show')
+
+    selects = $(policy).find("select.item-attr-edit")
+    for select in selects
+      $(select).val($(select).attr('data-default-value'))
+    # console.log selects.length 
     #edit
 
     #change edit button to update
@@ -88,11 +98,11 @@ class FinlyF.Views.User extends Backbone.View
   update: (e) ->
     e.preventDefault()
     target = $(e.currentTarget)
-    container = $(target).closest('form')
+    form = $(target).closest('section').find('form')
     values = {}
 
     # _.each($(container).find('form').serializeArray(), (input) ->
-    _.each($(container).serializeArray(), (input) ->
+    _.each($(form).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
     # console.log values
@@ -105,6 +115,53 @@ class FinlyF.Views.User extends Backbone.View
       processData: true
       success: (model, res) ->
         console.log model, res
+      error: (err) ->
+        console.log "Err", err
+    })
+
+  newCondition: (e) ->
+    _this = @
+    e.preventDefault()
+    target = $(e.currentTarget)
+    policy = $(target).closest('.policy-rules')
+
+    arr = []
+    conditionals = $(policy).find('.conditional')
+    console.log "count", conditionals.length
+    for conditional in conditionals
+      arr.push(parseInt($(conditional).attr('data-condition-serial')))
+
+    item = {
+      condition_serial: Math.max.apply(Math,arr) + 1
+      policy_id: $(target).attr('data-policy-id')
+      manager_type: $(target).attr('data-manager-type')
+      managers: _this.model.get('company_managers')
+    }
+
+    # console.log item
+    $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
+
+  userAction: (e) ->
+    console.log "working"
+    target = e.currentTarget
+    active = $(target).attr('data-action-type')
+    # type = 'state'
+
+    data = {
+      type: 'state'
+      user: {
+        active: active
+      }
+      view: @params.view
+    }
+
+    $.ajax({
+      url: '/users/' + @model.get('id')
+      data: data
+      dataType: 'json'
+      type: "PUT"
+      success: (res) ->
+        console.log "Success", res
       error: (err) ->
         console.log "Err", err
     })

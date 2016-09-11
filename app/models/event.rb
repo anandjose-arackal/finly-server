@@ -42,7 +42,7 @@ class Event < ActiveRecord::Base
               configurable_push_notification: false, configurable_mailer: true},
              {key: :user_role_updated, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
-             {key: :user_manager_updated, has_push_notification: false, has_masiler: true,
+             {key: :user_manager_updated, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :user_policy_added, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},

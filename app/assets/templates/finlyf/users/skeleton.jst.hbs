@@ -295,8 +295,20 @@
 </nav>
 
 <div class="container-fluid container-main" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-  <div class="col-sm-3 sidebar no-padding" id="users">
-  
+  <div class="col-sm-3 sidebar no-padding">
+    {{!-- <div class="row no-margin">
+      <form class="navbar-form" role="search" style="width: 100%;">
+        <div class="input-group" style="width: 100%;">
+          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
+          <div class="input-group-btn">
+            <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+      </form>
+    </div> --}}
+
+    <div class="row no-margin" id="users">
+    </div>
   </div>
 
   <div class="col-sm-9 col-sm-offset-3 main" id="user-details">
@@ -319,5 +331,8 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-mp">
+    
+  </div><!-- /.modal -->
   
 </div>

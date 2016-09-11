@@ -23,4 +23,8 @@ class ReportCommentAction < ActiveRecord::Base
     end
   end
 
+  def self.id_for(action)
+    ACTIONS[action]
+  end
+
 end

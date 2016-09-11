@@ -6,10 +6,16 @@ class PendingInvitesController < ApplicationController
     invite_op = User::Invite::Create.new(current_user, params)
     if invite_op.run
       flash[:success] = "User invited!"
+      respond_to do |format|
+        format.json {render json: {"success": true}}
+      end
     else
       flash[:error] = invite_op.errors
+      respond_to do |format|
+        format.json {render json: {"success": true, errors: invite_op.errors}}
+      end
     end
-    redirect_to request.referer
+    # redirect_to request.referer
   end
 
   def edit

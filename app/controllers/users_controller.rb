@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    ap @result.user
+    # ap @result.user
     respond_to do |format|
       format.json {}
     end
@@ -27,6 +27,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def get_managers
+    params[:id] = current_user.id
+    @result = User::Show.(current_user, params)
+    # ap @result.user
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   private
   def update_handler(type = nil)
     unless type
@@ -38,7 +47,7 @@ class UsersController < ApplicationController
     success_message = nil
     case type
       when 'password'
-        operation = User::Configuration::UpdatePassword.new(user, params)
+        operation = User::Configuration::UpdatePassword.new(current_user, params)
         success_message = 'Password updated'
       when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
@@ -46,6 +55,12 @@ class UsersController < ApplicationController
       when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = "Role updated"
+      when 'details'
+        operation = User::Configuration::UpdateDetails.new(current_user, params)
+        success_message = "Details updated."
+      when 'state'
+        operation = User::Configuration::UpdateState.new(current_user, params)
+        success_message = "State updated."
       else
         # do nothing, ha!
     end

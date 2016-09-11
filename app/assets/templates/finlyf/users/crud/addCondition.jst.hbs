@@ -1,0 +1,34 @@
+<div class="row x conditional" data-condition-serial="{{item.condition_serial}}">
+  <div class="col-sm-12 hideme">
+    {{#if this.policy_id}}{{else}}
+      <input type="number" name="user_manager_mapping[{{item.condition_serial}}][mapping][policy_id]" value="{{item.policy_id}}">(Policy Name {{item.condition_serial}})
+    {{/if}}
+    <input type="number" name="user_manager_mapping[{{item.condition_serial}}][mapping_id]" value="">(Mapping ID {{item.condition_serial}})
+  </div>
+
+  <div class="col-sm-5">If amount is greater than:</div>
+
+  <div class="col-sm-7">
+    <input type="hidden" class="" name="user_manager_mapping[{{item.condition_serial}}][mapping][greater_than_amount_attributes][currency_id]" value="1">
+    <input type="number" class="" name="user_manager_mapping[{{item.condition_serial}}][mapping][greater_than_amount_attributes][value]" value="">
+  </div>
+
+  <div class="col-sm-5">Then Reports to:</div>
+
+  <div class="col-sm-7">
+    <select class="" name="user_manager_mapping[{{item.condition_serial}}][mapping][{{item.manager_type}}_id]" data-default-value="">
+      <option value="">None</option>
+      {{#each item.managers}}
+        <option value="{{this.id}}">{{this.name}}</option>
+      {{/each}}
+    </select>
+    {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" value="{{this.conditional_manager.manager.id}}"> --}}
+  </div>
+</div><!-- .conditional -->
+{{!-- 
+conditional_serial
+managers
+policy_id
+manager_type
+
+ --}}

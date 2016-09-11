@@ -5,12 +5,25 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   templateNavbarSidebar: HandlebarsTemplates['finlyf/users/navbar/navbar_sidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/users/navbar/navbar_main']
 
+  #Employees
+  templateInviteEmployee: HandlebarsTemplates['finlyf/users/inviteEmployee']
+
   events:
+    #Filter by state
+    'click .filter-state': 'filterState'
+
+
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
+    'click .btn-invite-employee': 'processEmployeeInvitation'
+    'click .btn-confirm-invite-employee': 'inviteEmployee'
+
+    'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
   initialize: (options) ->
     @params = options.params
+    unless @params.filter_state
+      @params.filter_state = 1
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
       reset: true,
@@ -21,7 +34,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   render: ->
     $(@el).html(@templateSkeleton())
-    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     FinlyF.structureActions(@el, @params) 
     @
@@ -140,6 +153,72 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         error: ->
           console.log "Couldn't fetch Successfully."
       })
+
+  processEmployeeInvitation: ->
+    _this = @
+
+    modal = $(@el).find("#modal-mp")
+    $(modal).modal('show')
+
+    $.ajax({
+      url: '/users/get_managers'
+      dataType: 'json'
+      data: @params
+      success: (res) ->
+        # managers = {
+        #   company_managers: res.company_managers
+        #   company_finance_managers: res.company_finance_managers
+        # }
+        $(modal).html(_this.templateInviteEmployee({item: res}))
+        
+        # console.log res.company_managers
+      error: (err) ->
+        console.log "Err", err
+    })
+    # console.log managers 
+
+  inviteEmployee: (e) ->
+    e.preventDefault()
+    modal = $(e.currentTarget).closest('#modal-mp')
+    form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
+    values = {}
+
+    _.each((form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    
+    # console.log values
+    $.ajax({
+      url: "/pending_invites"
+      type: "POST",
+      dataType: 'json'
+      data: values
+      success: (res) ->
+        $(modal).modal('hide')
+        # console.log res
+      error: (err) ->
+        console.log "Err", err
+    })
+
+  filterState: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    @params.filter_state = parseInt($(target).attr('data-filter-state'))
+
+    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
+
+
+
+
+  ##Funactionalities
+
+  showOptionalManagers: (e) ->
+    target = $(e.currentTarget)
+    if parseInt($(target).val()) == 1
+      $(target).closest('.conditional-container').find('.conditional-managers').slideDown('fast')
+    else
+      $(target).closest('.conditional-container').find('.conditional-managers').slideUp('fast')
 
 
   resetPageCount: (options) ->

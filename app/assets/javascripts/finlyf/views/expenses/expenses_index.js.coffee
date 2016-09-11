@@ -408,8 +408,11 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $('.main .load-more').attr('data-page', options.page)
 
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()

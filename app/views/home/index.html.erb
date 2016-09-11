@@ -33,7 +33,7 @@
     <% if current_user.admin? %>
       <% views["admin"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
       <% end %>
     <% elsif current_user.finance_manager? %>
