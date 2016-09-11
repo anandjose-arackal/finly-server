@@ -10,40 +10,18 @@
 
 class MoneyRequestCommentAction < ActiveRecord::Base
 
-  def self.create_id
-    1
+  ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7, take_control: 8, comment: 9, update: 10}
+
+  self.class.instance_eval do
+    ACTIONS.each do |key,value|
+      define_method "#{key}_id" do
+        value
+      end
+    end
   end
 
-  def self.retract_id
-    2
-  end
-
-  def self.submit_id
-    3
-  end
-
-  def self.approve_id
-    4
-  end
-
-  def self.reject_id
-    5
-  end
-
-  def self.unapprove_id
-    6
-  end
-
-  def self.take_control_id
-    7
-  end
-
-  def self.comment_id
-    8
-  end
-
-  def self.update_id
-    9
+  def self.id_for(action)
+    ACTIONS[action]
   end
 
 end

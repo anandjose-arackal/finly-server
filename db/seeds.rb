@@ -73,15 +73,9 @@ if ReportCommentAction.count == 0
 end
 
 if MoneyRequestCommentAction.count == 0
-  MoneyRequestCommentAction.create id: 1, name: 'Create'
-  MoneyRequestCommentAction.create id: 2, name: 'Retract'
-  MoneyRequestCommentAction.create id: 3, name: 'Submit'
-  MoneyRequestCommentAction.create id: 4, name: 'Approve'
-  MoneyRequestCommentAction.create id: 5, name: 'Reject'
-  MoneyRequestCommentAction.create id: 6, name: 'Unapprove'
-  MoneyRequestCommentAction.create id: 7, name: 'Take Control'
-  MoneyRequestCommentAction.create id: 8, name: 'Comment'
-  MoneyRequestCommentAction.create id: 9, name: 'Update'
+  MoneyRequestCommentAction::ACTIONS.each do |key, value|
+    MoneyRequestCommentAction.create id: value, name: key
+  end
 end
 
 if MoneyRequestTrackingAction.count == 0

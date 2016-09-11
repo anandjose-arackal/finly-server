@@ -6,8 +6,11 @@ class Report::Base < BaseOperation
 
 
   def pre_validate
-    if user.blank? or params.blank?
-      errors << "No user or params passed."
+    if user.blank?
+      errors << 'User not found'
+    end
+    if params.blank?
+      errors << 'Error loading report'
     end
   end
 
@@ -30,16 +33,6 @@ class Report::Base < BaseOperation
       present_report
     else
       return false
-    end
-  end
-
-  def user_role_for_report
-    if user.id == report.user.id
-      return UserRole.employee_id
-    elsif user.manager? and User::Team::IsApprover.new(user, {report: self.report, type: :manager}).run
-      return UserRole.manager_id
-    elsif user.finance_manager? and User::Team::IsApprover.new(user, {report: self.report, type: :finance_manager}).run
-      return UserRole.finance_manager_id
     end
   end
 

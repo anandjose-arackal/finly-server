@@ -1,5 +1,5 @@
 class MoneyRequest::Approve < MoneyRequest::Base
-  attr_accessor :to_user, :user_role
+  attr_accessor :auto_approve
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -17,29 +17,50 @@ class MoneyRequest::Approve < MoneyRequest::Base
   def init
     self.money_request = user.controlling_money_requests.with_id(params[:id]).first rescue nil
     return unless self.money_request.present?
-    self.to_user = User::Team::Review::NextReviewer.(money_request)
-    self.user_role = User::Team::Review::UserRole.((money_request.controlling_for_user or money_request.controlling_user), self.money_request)
+    self.auto_approve = params[:auto_approve]
   end
 
   def authorize
-    if self.money_request.blank?
+    unless money_request
+      raise_unauthorized_exception
+    end
+    unless money_request.controlling_user_id == user.id
       raise_unauthorized_exception
     end
   end
 
-  def process
-    if to_user.blank?
-      params[:money_request_id] = money_request.id
-      Card::Load::LoadCash.(user, params)
-    else
-      if money_request.update_attributes status_id: MoneyRequestStatus.processing_id, controlling_user_id: to_user.id,
-                                             controlling_for_user_id: nil, note: self.params[:note]
-        money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.approve_id,
-                                        status_id: MoneyRequestStatus.processing_id, user_request_role_id: user_role
-        self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.approve_id
-      else
-        errors << money_request.errors.full_messages
-      end
+  def validate
+    unless report.processing? or params[:auto_approve]
+      errors << 'Cannot approve this report as it is not in processing state'
     end
+  end
+
+  def process
+    manager = User::Team::Review::NextReviewer.(money_request)
+    status = MoneyRequestStatus.id_for(:processing)
+    if auto_approve or manager.blank?
+      status = MoneyRequestStatus.id_for(:approved)
+    end
+    manager_id = manager.id rescue nil
+    user_role = User::Team::Review::UserRole.((money_request.controlling_for_user or money_request.controlling_user), self.money_request)
+
+    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, note: self.params[:note]
+      if auto_approve
+        money_request.tracks.create action_user: nil, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
+                                    status_id: status
+        self.money_request.comments.create comment_action_id: MoneyRequestCommentAction.id_for(:auto_approve)
+      else
+        money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
+                                    status_id: status, user_request_role_id: user_role
+        self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
+      end
+      return true
+    end
+    errors << money_request.errors.full_messages
+  end
+
+  def post_process
+    # todo computing settlements
+    # todo sending notifications
   end
 end
