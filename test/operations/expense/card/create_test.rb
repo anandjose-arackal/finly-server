@@ -1,5 +1,5 @@
 require 'test_helper'
-require_relative '../../../../operations/expense/card/create'
+require_relative '../../../../lib/operations/expense/card/create'
 
 class CreateTest < ActiveSupport::TestCase
 

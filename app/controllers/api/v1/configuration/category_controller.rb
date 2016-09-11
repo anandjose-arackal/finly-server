@@ -1,4 +1,4 @@
-require "#{Rails.root}/operations/company/configuration/category/index"
+require "#{Rails.root}/lib/operations/company/configuration/category/index"
 class Api::V1::Configuration::CategoryController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 

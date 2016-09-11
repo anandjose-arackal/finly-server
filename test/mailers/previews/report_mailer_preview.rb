@@ -1,4 +1,4 @@
-Dir["#{Rails.root}/operations/event/*.rb"].each {|file| require file }
+Dir["#{Rails.root}/lib/operations/event/*.rb"].each {|file| require file }
 
 # Preview all emails at http://localhost:3000/rails/mailers/report_mailer
 class ReportMailerPreview < ActionMailer::Preview

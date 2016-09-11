@@ -11,8 +11,6 @@
  * file per style scope.
  *
 
- *= require nprogress
- *= require nprogress-bootstrap
  *= require font-awesome
  *= require customized/jquery-ui.min
 */
@@ -31,12 +29,6 @@
 
 @import "bootstrap";
 @import "bootstrap-sprockets";
-
-$nprogress-color: #FFEB3B;
-$nprogress-height: 3px;
-$nprogress-zindex: 10100;
-@import 'nprogress';
-@import 'nprogress-bootstrap';
 
 @import "bootstrap";
 @import "bootstrap-sprockets";
