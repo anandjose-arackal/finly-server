@@ -25,7 +25,7 @@ class Event::Settlement::Base < Event::SetNotification
     subject = self.mailer_subject(user)
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
-    return unless subject.present? and method.present?
+    return unless subject.present? and body.present?
     SettlementMailer.send_mail Event::Settlement::Base::MailerPresenter.new(user, payment, subject, body, button_name)
   end
 

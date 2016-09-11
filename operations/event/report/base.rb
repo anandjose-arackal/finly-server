@@ -8,7 +8,7 @@ class Event::Report::Base < Event::SetNotification
     if params.blank? or params[:report].blank?
       errors << 'Report not found'
     end
-    unless params[:report].is_a?(Report)
+    unless params[:report].is_a?(::Report)
       errors << 'Error loading report'
     end
   end
@@ -27,7 +27,7 @@ class Event::Report::Base < Event::SetNotification
     subject = self.mailer_subject(user)
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
-    return unless subject.present? and method.present?
+    return unless subject.present? and body.present?
     ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(user, report, subject, body, button_name))
   end
 

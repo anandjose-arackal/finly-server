@@ -89,8 +89,10 @@ class Report::Submit < Report::Base
 
   def post_process
     # adding comment regarding the change in status of this report
-    comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_submit_id
+    comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
     comment.save
+
+    Event::Report::Submit.(user, report: report)
   end
 
 end

@@ -74,6 +74,8 @@ gem 'remotipart', '~> 1.0'
 
 gem 'bootbox-rails', '~>0.4'
 
+gem 'sidekiq'
+
 # gem for font awesome
 gem 'font-awesome-rails'
 
