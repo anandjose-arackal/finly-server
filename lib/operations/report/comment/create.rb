@@ -10,26 +10,21 @@ class Report::Comment::Create < Report::Base
     [:employee, :manager, :finance_manager, :admin]
   end
 
-  def init
-    super()
-  end
-
-  def validate
-    super()
+  def pre_validate
+    super
     if params[:comment].blank?
-      errors << "No content to post."
+      errors << 'Nothing to post'
     end
   end
 
   def process
     comment = report.comments.build(report_comment_action_id: ReportCommentAction.report_comment_id, user_id: user.id, content: params[:comment])
-    if comment.save
-      return true
+    unless comment.save
+      self.errors = comment.errors.full_messages
     end
-    self.errors = comment.errors.full_messages
   end
 
   def post_process
-    # mailer?
+    Event::Report::Comment::Create.(user, report: self.report)
   end
 end

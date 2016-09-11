@@ -6,7 +6,7 @@
 class Report::TakeControl < Report::Base
 
   def authorized_user_types
-    [:admin, :policy_admin]
+    [:admin]
   end
 
 
@@ -14,15 +14,13 @@ class Report::TakeControl < Report::Base
     if user.policy_admin?
       if report.policy and not user.policy_admin?(report.policy) # that is the report has a policy and the user is not policy admin
         raise_unauthorized_exception
-        return false
       end
     end
   end
 
   def validate
     unless report.can_take_control?
-      errors << "Report cannot be taken control of at this stage."
-      return false
+      errors << 'Report cannot be taken control of at this stage'
     end
   end
 
@@ -31,9 +29,9 @@ class Report::TakeControl < Report::Base
       track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.take_control_id,
                                   report_status_id: report.status_id, memo: params[:memo]
       track.save
-      return true
+      return
     end
-    return false
+    self.errors = report.errors.full_messages
   end
 
   def post_process
@@ -41,5 +39,8 @@ class Report::TakeControl < Report::Base
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_take_control_id, content: params[:memo]
       comment.save
     end
+
+    Event::Report::TakeControl.(self.user, report: self.report)
   end
+
 end

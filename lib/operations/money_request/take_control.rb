@@ -1,52 +1,38 @@
 class MoneyRequest::TakeControl < MoneyRequest::Base
-  attr_accessor :user_role
 
   def authorized_user_types
-    :admin
+    [:admin]
   end
-
-  def pre_validate
-    if params[:id].blank?
-      errors << 'Request not found'
-    end
-    if user.blank?
-      errors << 'User not found'
-    end
-  end
-
-  def init
-    self.money_request = MoneyRequest.with_id(params[:id]).first rescue nil
-    return if self.money_request.blank?
-    self.user_role = User::Team::Review::UserRole.((money_request.controlling_for_user or money_request.controlling_user), self.money_request)
-  end
-
+  
   def authorize
-    return if user.company_admin?
-    if money_request.blank?
-      raise_unauthorized_exception
-    end
-    unless money_request.processing?
-      raise_unauthorized_exception
-    end
-    # If Policy ID is blank, only company admins can take control
-    if money_request.policy_id.blank?
-      raise_unauthorized_exception
-    end
-    policy_id = money_request.policy_id
-    unless user.admin_policies.with_id(policy_id).present?
-      raise_unauthorized_exception
+    super
+    if user.policy_admin?
+      if money_request.policy and not user.policy_admin?(money_request.policy) # that is the money_request has a policy and the user is not policy admin
+        raise_unauthorized_exception
+        return false
+      end
     end
   end
 
-  def process
-    controlling_user_id = money_request.controlling_user.id
-    if money_request.update_attributes controlling_for_user_id: controlling_user_id, controlling_user_id: user.id, note: params[:note]
-      money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.take_control_id,
-                                      status_id: money_request.status_id, user_request_role_id: self.user_role
-      self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.take_control_id
-    else
-      errors << money_request.errors.full_messages
+  def validate
+    unless money_request.can_take_control?
+      errors << 'You cannot take control of a request unless its in processing or approved state'
     end
+  end
+  
+  def process
+    if money_request.update_attributes controlling_user: user, controlling_for_user: money_request.controlling_user, memo: params[:memo]
+      money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control),
+                                  money_request_status_id: money_request.status_id, memo: params[:memo]
+      money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+                                    content: params[:memo]
+      return
+    end
+    self.errors = money_request.errors.full_messages
+  end
+
+  def post_process
+
   end
 
 end

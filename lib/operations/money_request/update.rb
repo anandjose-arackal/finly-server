@@ -8,7 +8,7 @@ class MoneyRequest::Update < MoneyRequest::Base
   def pre_validate
     super
     if params[:money_request].blank? or ((params[:money_request][:items].blank?) and
-        (params[:money_request][:note].blank?))
+        (params[:money_request][:note].blank?) and params[:items_attributes].blank?)
       errors << 'Nothing to update'
     end
   end
