@@ -2,7 +2,7 @@ class Expense::Base < BaseOperation
   attr_accessor :expense
 
   def authorized_user_types
-    [:employee]
+    [:employee, :manager, :admin, :finance_manager]
   end
 
   def pre_validate
