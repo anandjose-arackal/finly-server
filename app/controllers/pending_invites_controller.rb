@@ -35,10 +35,28 @@ class PendingInvitesController < ApplicationController
   def accept
     accept_op = User::Invite::Accept.new(params)
     if accept_op.run
-      redirect_to root_url
+      respond_to do |format|
+        format.json {render json: {success: true}}
+      end
     else
       flash[:error] = accept_op.errors
-      # render the flash message
+      respond_to do |format|
+        format.json {render json: {success: false}}
+      end
+    end
+  end
+
+  def resend
+    operation = User::Invite::Resend.new(params)
+    if operation.run
+      respond_to do |format|
+        format.json {render json: {success: true}}
+      end
+    else
+      flash[:error] = operation.errors
+      respond_to do |format|
+        format.json {render json: {success: false}}
+      end
     end
   end
 

@@ -37,7 +37,7 @@ class Receipt::Create < Receipt::Base
 
   private
   def create_params
-    params.require(:receipt).permit!
+    params.require(:receipt).permit(:image, :note)
   end
 
 end

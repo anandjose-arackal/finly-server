@@ -70,3 +70,4 @@ end
     json.email manager.email
   end
 end
+json.actions @result.actions

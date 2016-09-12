@@ -9,7 +9,8 @@ class Receipt::Update < Receipt::Base
 
   def init
     params[:note] = nil if params[:note] == 'nil'
-    self.receipt = user.receipts.find_by_id(params[:receipt_id])
+    id = params[:id] or params[:receipt_id]
+    self.receipt = user.receipts.find_by_id(id)
   end
 
   def authorize

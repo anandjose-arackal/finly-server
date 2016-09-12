@@ -2,7 +2,7 @@ class MoneyRequest::Update < MoneyRequest::Base
   attr_accessor :changes, :update_param
 
   def authorized_user_types
-    [:employee]
+    [:employee, :manager, :finance_manager, :admin]
   end
 
   def pre_validate
@@ -69,13 +69,13 @@ class MoneyRequest::Update < MoneyRequest::Base
       next unless value.present? and key.present?
       case key
         when :name
-          self.report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id,
-                                     updated_field: 'name', updated_from: report.name_was,
-                                     updated_to: report.name
+          self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
+                                     updated_field: 'name', updated_from: money_request.name_was,
+                                     updated_to: money_request.name
         when :policy_id
-          self.report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id,
-                                     updated_field: 'policy', updated_from: report.policy_id_was,
-                                     updated_to: report.policy_id
+          self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
+                                     updated_field: 'policy', updated_from: money_request.policy_id_was,
+                                     updated_to: money_request.policy_id
         when :items_attributes
           value.each do |updating_mapping|
             # todo test it out and add comments
