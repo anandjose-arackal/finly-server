@@ -526,32 +526,6 @@ ActiveRecord::Schema.define(version: 20160912042748) do
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
-  create_table "receipt_email_attachments", force: :cascade do |t|
-    t.integer  "receipt_email_id",                 limit: 4
-    t.string   "original_attachment_file_name",    limit: 255
-    t.string   "original_attachment_content_type", limit: 255
-    t.integer  "original_attachment_file_size",    limit: 4
-    t.datetime "original_attachment_updated_at"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-  end
-
-  add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
-
-  create_table "receipt_emails", force: :cascade do |t|
-    t.string   "subject",     limit: 255
-    t.text     "body",        limit: 65535
-    t.text     "raw_text",    limit: 65535
-    t.text     "raw_html",    limit: 65535
-    t.text     "raw_headers", limit: 65535
-    t.datetime "sent_at"
-    t.integer  "user_id",     limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
-
   create_table "receipts", force: :cascade do |t|
     t.integer  "expense_id",         limit: 4
     t.integer  "user_id",            limit: 4
@@ -564,12 +538,10 @@ ActiveRecord::Schema.define(version: 20160912042748) do
     t.integer  "parent_id",          limit: 4
     t.string   "parent_type",        limit: 255
     t.text     "note",               limit: 65535
-    t.integer  "receipt_email_id",   limit: 4
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
-  add_index "receipts", ["receipt_email_id"], name: "index_receipts_on_receipt_email_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
 
   create_table "report_comment_actions", force: :cascade do |t|
@@ -844,7 +816,6 @@ ActiveRecord::Schema.define(version: 20160912042748) do
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "receipts", "expenses"
-  add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
   add_foreign_key "report_comments", "expenses"
   add_foreign_key "report_comments", "report_comment_actions"

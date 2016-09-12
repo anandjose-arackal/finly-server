@@ -123,7 +123,9 @@ class FinlyF.Views.Report extends Backbone.View
       success: (model, res) ->
         $("#modal-new").modal('hide')
         _this.model.fetch({
-          data: _this.current_view
+          data: {
+            view: _this.current_view
+          }
         })
       error: (err) ->
         console.log "Error", err

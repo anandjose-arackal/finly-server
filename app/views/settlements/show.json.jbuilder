@@ -10,7 +10,6 @@
 # end
 json.array! @result.items do |report|
   json.merge! report.attributes
-
   json.total_amount report.total_amount
   json.reimbursement_amount report.reimbursement_amount.value
 
