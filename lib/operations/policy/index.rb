@@ -3,16 +3,13 @@
 # view: the view for the policy listing - admin, policy_admin, or personal.
 
 class Policy::Index < Policy::Base
-
   attr_accessor :view, :policies
 
   class Policy::Index::IndexPresenter < Policy::Base::PolicyPresenter
-
     attr_accessor :policies
 
-    def initialize(user, params)
+    def init
       self.policies = params[:policies]
-
     end
   end
 
@@ -40,7 +37,7 @@ class Policy::Index < Policy::Base
   end
 
   def success
-    Policy::Index::IndexPresenter.new(user, {policies: policies})
+    Policy::Index::IndexPresenter.new(user, {policies: policies}, messages)
   end
 
 end

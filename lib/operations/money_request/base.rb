@@ -20,7 +20,7 @@ class MoneyRequest::Base < Card::Base
 
   def success
     params[:money_request] = self.money_request
-    MoneyRequestPresenter.new(user, params)
+    MoneyRequest::Presenter.new(user, params, messages)
   end
 
   def user_role_for_money_request
@@ -33,11 +33,10 @@ class MoneyRequest::Base < Card::Base
     end
   end
 
-  class MoneyRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class MoneyRequest::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_request
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.money_request = params[:money_request]
     end
   end

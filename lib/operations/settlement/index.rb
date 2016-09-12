@@ -23,14 +23,13 @@ class Settlement::Index < Settlement::Base
 
   def success
     params[:users] = self.users
-    Settlement::Index::Presenter.new(user, params)
+    Settlement::Index::Presenter.new(user, params, messages)
   end
 
   class Settlement::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :users
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.users = params[:users].paginate(page: params[:page], per_page: 30)
     end
   end

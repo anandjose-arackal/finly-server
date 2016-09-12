@@ -16,14 +16,13 @@ class Company::Configuration::Category::Base < BaseOperation
   end
 
   def success
-    Company::Configuration::Category::Base::Presenter.new(user, {categories: categories})
+    Company::Configuration::Category::Base::Presenter.new(user, {categories: categories}, messages)
   end
 
   class Company::Configuration::Category::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :categories
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.categories = params[:categories]
     end
 

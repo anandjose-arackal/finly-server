@@ -4,8 +4,7 @@ class Settlement::Payment::Base < Settlement::Base
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter
     attr_accessor :payment
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.payment = params[:payment]
     end
   end
@@ -22,6 +21,6 @@ class Settlement::Payment::Base < Settlement::Base
   end
 
   def success
-    Settlement::Payment::Base::Presenter.new(user, self.payment)
+    Settlement::Payment::Base::Presenter.new(user, self.payment, messages)
   end
 end

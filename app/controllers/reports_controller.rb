@@ -99,4 +99,13 @@ class ReportsController < ApplicationController
     respond render: :show
   end
 
+  protected
+  def respond(item=nil)
+    if @result.failure?
+      super()
+    else
+      super(item)
+    end
+  end
+
 end

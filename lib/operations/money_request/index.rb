@@ -57,7 +57,7 @@ class MoneyRequest::Index < MoneyRequest::Base
 
   def success
     params[:money_requests] = money_requests
-    MoneyRequest::Index::Presenter.new(user, params)
+    MoneyRequest::Index::Presenter.new(user, params, self.messages)
   end
 
   class MoneyRequest::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -69,8 +69,7 @@ class MoneyRequest::Index < MoneyRequest::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
 
-    def initialize(user, params)
-      self.user = user
+    def init
       self.money_requests = params[:money_requests]
       get_counts
       if self.money_requests.present?

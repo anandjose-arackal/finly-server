@@ -3,10 +3,9 @@ class User::Team::Base < BaseOperation
 
 
   class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
     attr_accessor :team
 
-    def initialize(user, params)
+    def init
       self.team = params[:team]
     end
   end

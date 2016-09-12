@@ -7,13 +7,13 @@ class Receipt::Index < Receipt::Base
 
   def success
     params[:receipts] = receipts
-    Receipt::Index::ReceiptsPresenter.new(user, params)
+    Receipt::Index::ReceiptsPresenter.new(user, params, messages)
   end
 
   class Receipt::Index::ReceiptsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :receipts
 
-    def initialize(user, params)
+    def init
       self.receipts = params[:receipts].paginate(page: params[:page], per_page: 30) rescue nil
     end
   end

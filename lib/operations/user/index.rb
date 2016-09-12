@@ -13,7 +13,7 @@ class User::Index < User::Base
 
   def success
     params[:team] = users
-    User::Index::Presenter.new(user, params)
+    User::Index::Presenter.new(user, params, messages)
   end
 
   class User::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -23,8 +23,7 @@ class User::Index < User::Base
     has_scope :filter_role
     has_scope :filter_state
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       if params[:team].present?
         self.team = apply_scopes(params[:team], params)
         self.users_type_count = self.team.joins(:role_mapping).group(:user_role_id).count

@@ -1,16 +1,13 @@
 # Base class for rule creation and deletion and updation
 
 class Policy::Rules::Base < Policy::Base
-
   attr_accessor :rule_params, :rule
 
   class Policy::Rules::Base::RulePresenter < Policy::Base::PolicyPresenter
-
     attr_accessor :rule
 
-    def initialize(user, params)
+    def init
       self.rule = params[:rules]
-
     end
   end
 

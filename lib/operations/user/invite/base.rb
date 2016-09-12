@@ -9,7 +9,7 @@ class User::Invite::Base < BaseOperation
 
     attr_accessor :invite, :accepted_user
 
-    def initialize(user, params)
+    def init
       self.invite = params[:invite]
       self.accepted_user = params[:accepted_user]
     end

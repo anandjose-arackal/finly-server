@@ -60,8 +60,8 @@ class Expense::Manual::Create < Expense::Manual::Base
     end
   end
 
-  def success
-    Expense::Manual::Create::CreatePresenter.new(expense)
-  end
+  # def success
+  #   Expense::Manual::Create::CreatePresenter.new(expense)
+  # end
 
 end

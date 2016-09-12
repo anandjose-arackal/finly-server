@@ -24,17 +24,16 @@ class Report::Create < Report::Base
   end
 
   def process
-    self.report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
+    self.report = user.reports.build report_status_id: ReportStatus.open_id, controlling_user: user, name: params[:name]
     if report.save
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
       expense_id = (params[:expense_id] or params[:expense_ids])
       if expense_id.present?
-        add_expense_op = Report::Expenses::Add.new(user, {report_id: report.id, expense_ids: params[:expense_ids]})
-        add_expense_op.run
+        Report::Expenses::Add.(user, {report_id: report.id, expense_ids: params[:expense_ids]})
       end
     else
-      messages[:error] << report.errors.full_messages
+      messages[:error] = report.errors.full_messages
     end
   end
 

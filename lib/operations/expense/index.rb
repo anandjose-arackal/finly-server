@@ -37,7 +37,7 @@ class Expense::Index < Expense::Base
 
   def success
     params[:expenses] = self.expenses
-    Expense::Index::ListPresenter.new(user, params)
+    Expense::Index::ListPresenter.new(user, params, messages)
   end
 
   class Expense::Index::ListPresenter < Expense::Base::Presenter
@@ -55,7 +55,7 @@ class Expense::Index < Expense::Base
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash
 
-    def initialize(user, params)
+    def init
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)

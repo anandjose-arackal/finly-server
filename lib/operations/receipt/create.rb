@@ -20,13 +20,13 @@ class Receipt::Create < Receipt::Base
   end
 
   def success
-    Receipt::Create::ReceiptPresenter.new(user, receipt: receipt)
+    Receipt::Create::ReceiptPresenter.new(user, {receipt: receipt}, messages)
   end
 
   class Receipt::Create::ReceiptPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :receipt
 
-    def initialize(user, params)
+    def init
       self.receipt = params[:receipt]
     end
   end

@@ -9,7 +9,7 @@ class Policy::InvitableUsers < Policy::Base
     has_scope :filter_email
     has_scope :filter_name
 
-    def initialize(user, params)
+    def init
       self.invitable_users = apply_scopes(params[:invitable_users], params)
       self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
     end
@@ -54,7 +54,7 @@ class Policy::InvitableUsers < Policy::Base
 
   def success
     params[:invitable_users] = invitable_users
-    Policy::InvitableUsers::InvitableUsersPresenter.new(user, params)
+    Policy::InvitableUsers::InvitableUsersPresenter.new(user, params, messages)
   end
 
 

@@ -31,6 +31,6 @@ class Export::Field::Update < Export::Base
   end
 
   def success
-    Export::Base::FieldPresenter.new(user, {preference: preference})
+    Export::Base::FieldPresenter.new(user, {preference: preference}, messages)
   end
 end

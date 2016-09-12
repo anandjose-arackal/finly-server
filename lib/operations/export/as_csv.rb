@@ -39,7 +39,7 @@ class Export::AsCsv < Export::Base
   end
 
   def success
-    Export::Base::ExportPresenter.new(user, {data: result})
+    Export::Base::ExportPresenter.new(user, {data: result}, messages)
   end
 
 end

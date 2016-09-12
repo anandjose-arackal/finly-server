@@ -97,6 +97,7 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           format.json { render 'layouts/application' }
         end
+        return
       elsif type[:render].present?
         respond_to do |format|
           format.json { render type[:render] }
@@ -106,6 +107,7 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           format.json { render 'layouts/application' }
         end
+        return
       end
     end
     if @result.present? and @result.success?

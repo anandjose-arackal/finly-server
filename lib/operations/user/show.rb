@@ -24,7 +24,7 @@ class User::Show < User::Base
   end
 
   def success
-    User::Show::Presenter.new(selected_user, params)
+    User::Show::Presenter.new(selected_user, params, messages)
   end
 
   class User::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -32,8 +32,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.roles = {admin: self.user.company_admin?, manager: self.user.manager?,
                     finance_manager: self.user.finance_manager?}
       self.team_mapping = self.user.team_mapping

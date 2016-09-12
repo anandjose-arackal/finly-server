@@ -17,14 +17,13 @@ class Expense::Base < BaseOperation
   end
 
   def success
-    Expense::Base::Presenter.new(user, expense: self.expense)
+    Expense::Base::Presenter.new(user, {expense: self.expense}, self.messages)
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.expense = params[:expense]
     end
   end

@@ -59,7 +59,7 @@ class Report::Index < Report::Base
 
   def success
     params[:reports] = reports
-    Report::Index::Presenter.new(user, params)
+    Report::Index::Presenter.new(user, params, messages)
   end
 
   class Report::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -71,9 +71,7 @@ class Report::Index < Report::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
 
-    def initialize(user, params={}, messages={})
-      super user, params, messages
-      self.user = user
+    def init
       self.reports = params[:reports]
       get_counts
       if self.reports.present?

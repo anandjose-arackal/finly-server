@@ -151,7 +151,7 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def success
-    User::Invite::Base::InvitePresenter.new(user, invite: new_user)
+    User::Invite::Base::InvitePresenter.new(user, {invite: new_user}, messages)
   end
 
 end

@@ -1,12 +1,10 @@
 class Policy::Show < Policy::Base
-
   attr_accessor :policy, :users
 
   class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
-
     attr_accessor :policy, :users
 
-    def initialize(user, params)
+    def init
       self.policy = params[:policy]
       self.users = params[:users]
     end
@@ -71,7 +69,7 @@ class Policy::Show < Policy::Base
   end
 
   def success
-    Policy::Show::ShowPresenter.new(user, {policy: policy, users: users})
+    Policy::Show::ShowPresenter.new(user, {policy: policy, users: users}, messages)
   end
 
 end

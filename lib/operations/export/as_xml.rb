@@ -29,7 +29,7 @@ class Export::AsXml < Export::Base
   end
 
   def success
-    Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data})
+    Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data}, messages)
   end
 
 

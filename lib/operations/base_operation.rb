@@ -127,6 +127,11 @@ class BaseOperation
       self.user = user
       self.params = params
       self.messages = messages
+      init
+    end
+
+    def init
+
     end
 
     def admin_view?
