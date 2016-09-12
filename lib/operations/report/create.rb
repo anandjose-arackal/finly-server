@@ -15,6 +15,14 @@ class Report::Create < Report::Base
     end
   end
 
+  def init
+
+  end
+
+  def authorize
+    
+  end
+
   def process
     self.report = user.reports.build status: ReportStatus.open, controlling_user: user, name: params[:name]
     if report.save
