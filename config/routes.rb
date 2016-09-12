@@ -309,6 +309,7 @@ Rails.application.routes.draw do
     post 'invite', to: 'pending_invites#invite', as: :new_invite
     patch 'update_invite', to: 'pending_invites#update_invite', as: :edit_invite
     patch 'accept', to: 'pending_invites#accept', as: :accept
+    patch 'resend', to: 'pending_invites#resend', as: :resend
   end
 
 
