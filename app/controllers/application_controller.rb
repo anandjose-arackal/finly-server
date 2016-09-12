@@ -153,22 +153,4 @@ class ApplicationController < ActionController::Base
   def after_sign_out_path_for(resource)
     root_url
   end
-
-  # def load_view
-  #   view = params[:view] || params['view']
-  #   current_user.view = params[:view] || params['view'] if current_user
-  #   view.tr!('?', '') if view.present?
-  #   case view
-  #     when 'admin'
-  #       @admin_view = true
-  #     when 'manager'
-  #       @manager_view = true
-  #     when 'finance'
-  #       @finance_view = true
-  #     when 'auditor'
-  #       @auditor_view = true
-  #     else
-  #       @personal_view = true
-  #   end
-  # end
 end
