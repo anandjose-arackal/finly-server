@@ -7,7 +7,7 @@ class Expense::Index < Expense::Base
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -35,13 +35,9 @@ class Expense::Index < Expense::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      params[:expenses] = self.expenses
-      Expense::Index::ListPresenter.new(user, params)
-    else
-      false
-    end
+  def success
+    params[:expenses] = self.expenses
+    Expense::Index::ListPresenter.new(user, params)
   end
 
   class Expense::Index::ListPresenter < Expense::Base::Presenter

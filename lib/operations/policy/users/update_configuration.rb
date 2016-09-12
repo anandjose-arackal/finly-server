@@ -45,7 +45,7 @@ class Policy::Users::UpdateConfiguration < Policy::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed"
+      messages[:error] << "No user or params passed"
     end
   end
 
@@ -100,14 +100,6 @@ class Policy::Users::UpdateConfiguration < Policy::Base
 
   def post_process
 
-  end
-
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
   end
 
   private

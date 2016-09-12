@@ -17,7 +17,7 @@ class Export::AsCsv < Export::Base
 
   def authorize
     unless reports
-      errors << "Report not found."
+      messages[:error] << "Report not found."
     end
   end
 
@@ -38,13 +38,8 @@ class Export::AsCsv < Export::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      csv_presenter = Export::Base::ExportPresenter.new(user, {data: result})
-      return csv_presenter
-    else
-      return false
-    end
+  def success
+    Export::Base::ExportPresenter.new(user, {data: result})
   end
 
 end

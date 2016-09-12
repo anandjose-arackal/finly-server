@@ -3,7 +3,7 @@ class MoneyRequest::Base < Card::Base
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -33,7 +33,7 @@ class MoneyRequest::Base < Card::Base
     end
   end
 
-  class MoneyRequestPresenter < BaseOperation::BasePresenter
+  class MoneyRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_request
 
     def initialize(user, params)

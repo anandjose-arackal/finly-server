@@ -16,7 +16,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
 
   def validate
     unless money_request.can_take_control?
-      errors << 'You cannot take control of a request unless its in processing or approved state'
+      messages[:error] << 'You cannot take control of a request unless its in processing or approved state'
     end
   end
   
@@ -28,7 +28,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
                                     content: params[:memo]
       return
     end
-    self.errors = money_request.errors.full_messages
+    self.messages = money_request.errors.full_messages
   end
 
   def post_process

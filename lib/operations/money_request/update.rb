@@ -9,7 +9,7 @@ class MoneyRequest::Update < MoneyRequest::Base
     super
     if params[:money_request].blank? or ((params[:money_request][:items].blank?) and
         (params[:money_request][:note].blank?) and params[:items_attributes].blank?)
-      errors << 'Nothing to update'
+      messages[:error] << 'Nothing to update'
     end
   end
 
@@ -39,7 +39,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def authorize
     if self.money_request.blank?
-      errors << 'You cannot update this request'
+      messages[:error] << 'You cannot update this request'
       raise_unauthorized_exception
     end
   end
@@ -50,7 +50,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def process
     unless money_request.update_attributes(self.update_param)
-      errors << money_request.errors.full_messages
+      messages[:error] << money_request.errors.full_messages
     end
   end
 

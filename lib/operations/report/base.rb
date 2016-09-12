@@ -4,13 +4,12 @@
 class Report::Base < BaseOperation
   attr_accessor :report, :report_id
 
-
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
     if params.blank?
-      errors << 'Error loading report'
+      messages[:error] << 'Error loading report'
     end
   end
 
@@ -28,12 +27,8 @@ class Report::Base < BaseOperation
   end
 
   # added here because in most cases we will be returning the report itself
-  def retrieve
-    if is_success?
+  def success
       present_report
-    else
-      return false
-    end
   end
 
   def receipt_params
@@ -44,11 +39,11 @@ class Report::Base < BaseOperation
     Report::Base::Presenter.new(self.user, report: self.report, view: params[:view])
   end
 
-  class Report::Base::Presenter < BaseOperation::BasePresenter
+  class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result
 
-    def initialize(user, params={})
+    def initialize(user, params={}, messages={})
       super(user, params)
       self.report = params[:report]
       self.categories = user.company.categories

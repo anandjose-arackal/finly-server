@@ -9,7 +9,7 @@ class User::Team::Approver < User::Team::Base
     end
     unless params[:type] == :manager or params[:type] == :finance_manager or
         params[:type] == :approves_to or params[:type] == :approves_finance_to
-      errors << 'User type not valid'
+      messages[:error] << 'User type not valid'
     end
   end
 
@@ -19,7 +19,7 @@ class User::Team::Approver < User::Team::Base
 
   def authorize
     unless mappings.present?
-      errors << 'Mapping not found'
+      messages[:error] << 'Mapping not found'
     end
   end
 
@@ -27,10 +27,6 @@ class User::Team::Approver < User::Team::Base
     obj = self.mappings.send(params[:type]).policy(self.policy_id).amount(self.currency_id, self.amount_value).first.send(params[:type]) rescue nil
     return nil unless obj.present?
     self.response = obj
-  end
-
-  def retrieve
-    self.response
   end
 
 end

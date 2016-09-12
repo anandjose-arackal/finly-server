@@ -38,7 +38,6 @@ class ExportController < ApplicationController
         load_info_for_views(report)
         render pdf: "report-#{report.name}", layout: "pdf.html.erb" # Excluding ".pdf" extension.
       end
-
     end
   end
 

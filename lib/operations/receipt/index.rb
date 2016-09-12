@@ -10,7 +10,7 @@ class Receipt::Index < Receipt::Base
     Receipt::Index::ReceiptsPresenter.new(user, params)
   end
 
-  class Receipt::Index::ReceiptsPresenter < BaseOperation::BasePresenter
+  class Receipt::Index::ReceiptsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :receipts
 
     def initialize(user, params)

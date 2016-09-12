@@ -1,4 +1,5 @@
 class Settlement::Payment::Base < Settlement::Base
+  attr_accessor :payment
 
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter
     attr_accessor :payment
@@ -18,5 +19,9 @@ class Settlement::Payment::Base < Settlement::Base
 
   def payment_params
     params.require(:payment).permit(:amount, :date, :note, :currency_id, :total)
+  end
+
+  def success
+    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 end

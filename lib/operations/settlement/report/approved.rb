@@ -14,7 +14,7 @@ class Settlement::Report::Approved < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -30,7 +30,7 @@ class Settlement::Report::Approved < Report::Base
 
   def validate
     if report.accounted?
-      errors << "Report already accounted for "
+      messages[:error] << "Report already accounted for "
       return false
     end
   end
@@ -52,7 +52,7 @@ class Settlement::Report::Approved < Report::Base
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
       unless report_amount.save
-        errors << report_amount.errors.full_messages
+        messages[:error] << report_amount.errors.full_messages
         return false
       end
       report.reimbursement_amount = report_amount
@@ -61,13 +61,13 @@ class Settlement::Report::Approved < Report::Base
       report_amount.value = pending_reimbursement
       report_amount.currency = currency
       unless report_amount.save
-        errors << report_amount.errors.full_messages
+        messages[:error] << report_amount.errors.full_messages
         return false
       end
     end
     report.accounted = true
     unless report.save
-      errors << report.errors.full_messages
+      messages[:error] << report.errors.full_messages
       return false
     end
     return true

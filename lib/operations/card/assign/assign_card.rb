@@ -14,14 +14,14 @@ class Card::Assign::AssignCard < Card::Base
 
   def pre_validate
     if user.blank?
-      errors << "User not found!"
+      messages[:error] << "User not found!"
     end
     if params[:employee_id].blank?
-      errors << "No user to assign card to!"
+      messages[:error] << "No user to assign card to!"
     end
     # for unassigning cases
     if params[:unassign] and params[:card_id].blank?
-      errors << "Cannot unassign card without card id."
+      messages[:error] << "Cannot unassign card without card id."
     end
   end
 
@@ -35,17 +35,17 @@ class Card::Assign::AssignCard < Card::Base
 
   def validate
     unless employee
-      errors << "Employee does not exist!"
+      messages[:error] << "Employee does not exist!"
     end
     if params[:unassign]
       # checking that card exists and belongs to the specified employee
       unless card and card.user_id == employee.id
-        errors << "Card not found. Pliss try again."
+        messages[:error] << "Card not found. Pliss try again."
       end
     else
       # if assigning a card, checking if there are available cards to assign
       unless unassigned_card
-        errors << "There are no more available cards to allocate. Please ask your administrator to request more cards."
+        messages[:error] << "There are no more available cards to allocate. Please ask your administrator to request more cards."
       end
     end
   end
@@ -53,11 +53,11 @@ class Card::Assign::AssignCard < Card::Base
   def authorize
     if user.manager?
       unless User::Team::Index.call(user, 3, indirect_associations: true).include?(employee)
-        errors << "You are not a manager for this user."
+        messages[:error] << "You are not a manager for this user."
       end
     elsif user.admin?
       unless employee.company_id == user.company_id
-        errors << "You are not an admin for this employee."
+        messages[:error] << "You are not an admin for this employee."
       end
     end
   end
@@ -67,13 +67,13 @@ class Card::Assign::AssignCard < Card::Base
       if card.update_attributes(user_id: nil, active: nil)
         self.response = success
       else
-        errors << "Couldn't unassign card. Please try again."
+        messages[:error] << "Couldn't unassign card. Please try again."
       end
     else
       if unassigned_card.update_attributes(user_id: employee.id, active: true)
         self.response = unassigned_card
       else
-        errors << "Couldn't assign card. Please try again."
+        messages[:error] << "Couldn't assign card. Please try again."
       end
     end
   end
@@ -82,12 +82,8 @@ class Card::Assign::AssignCard < Card::Base
     # mail to user informing them of their new card allocation
   end
 
-  def retrieve
-    if is_success?
-      return unassigned_card # though the card is now assigned, heh
-    else
-      return false
-    end
+  def success
+      unassigned_card # though the card is now assigned, heh
   end
 
 end

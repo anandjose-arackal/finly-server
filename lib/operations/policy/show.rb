@@ -27,7 +27,7 @@ class Policy::Show < Policy::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or policy params passed."
+      messages[:error] << "No user or policy params passed."
     end
   end
 
@@ -65,17 +65,13 @@ class Policy::Show < Policy::Base
       conditional_approves_finance_to = caft.first if caft.present?
 
       users << {user: user, admin: admin, default_mapping: default_mapping, conditional_manager: conditional_manager,
-                 conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
-                 conditional_approves_finance_to: conditional_approves_finance_to}
+                conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
+                conditional_approves_finance_to: conditional_approves_finance_to}
     end
   end
 
-  def retrieve
-    if is_success?
-      Policy::Show::ShowPresenter.new(user, {policy: policy, users: users})
-    else
-      false
-    end
+  def success
+    Policy::Show::ShowPresenter.new(user, {policy: policy, users: users})
   end
 
 end

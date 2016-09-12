@@ -7,7 +7,7 @@ class User::Configuration::UpdateState < BaseOperation
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or params not passed."
+      messages[:error] << "User or params not passed."
     end
   end
 
@@ -25,7 +25,7 @@ class User::Configuration::UpdateState < BaseOperation
 
   def process
     unless to_user.update(state_params)
-      errors << to_user.errors.full_messages
+      messages[:error] << to_user.errors.full_messages
     end
   end
 

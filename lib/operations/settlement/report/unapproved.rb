@@ -17,7 +17,7 @@ class Settlement::Report::Unapproved < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -33,7 +33,7 @@ class Settlement::Report::Unapproved < Report::Base
 
   def validate
     unless report.accounted?
-      errors << 'Report has not been accounted for'
+      messages[:error] << 'Report has not been accounted for'
     end
   end
 
@@ -48,7 +48,7 @@ class Settlement::Report::Unapproved < Report::Base
     if report.update(accounted: false)
       return true
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
     return false
   end
 

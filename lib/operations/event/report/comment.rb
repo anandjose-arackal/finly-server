@@ -7,7 +7,7 @@ class Event::Report::Comment < Event::Report::Base
 
   def validate
     unless self.comment.present?
-      errors << 'Error loading comment'
+      messages[:error] << 'Error loading comment'
     end
   end
 

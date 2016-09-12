@@ -3,7 +3,7 @@ class Event::Report::Reject < Event::Report::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.user
+    self.rejecting_user = self.report.tracks.last.action_user
   end
 
   def validate

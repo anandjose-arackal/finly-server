@@ -2,7 +2,7 @@ class User::Team::Base < BaseOperation
   attr_accessor :currency_id, :amount_value, :mappings, :policy_id
 
 
-  class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter
+  class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :team
 

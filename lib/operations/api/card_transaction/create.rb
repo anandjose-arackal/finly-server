@@ -16,7 +16,7 @@ class API::CardTransaction::Create < CardTransaction::Base
 
   def pre_validate
     if params.blank?
-      errors << "Params are empty."
+      messages[:error] << "Params are empty."
     end
   end
 
@@ -35,7 +35,7 @@ class API::CardTransaction::Create < CardTransaction::Base
   def process
     self.card_transaction = user.card_transactions.build(params)
     unless card_transaction.save
-      errors << "Error creating the trasnaction."
+      messages[:error] << "Error creating the trasnaction."
     end
   end
 
@@ -43,7 +43,7 @@ class API::CardTransaction::Create < CardTransaction::Base
   def post_process
     card_expense_create = Expense::Card::Create.new(card_transaction, card)
     unless card_expense_create.run
-      errors << "Card expense not created."
+      messages[:error] << "Card expense not created."
     end
 
     # notify user about card having been used

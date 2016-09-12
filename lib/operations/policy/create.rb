@@ -12,11 +12,11 @@ class Policy::Create < Policy::Base
 
   def pre_validate
     if user.blank?
-      errors << "No user passed."
+      messages[:error] << "No user passed."
       return false
     end
     if params[:name].blank?
-      errors << "Cannot create policy without name."
+      messages[:error] << "Cannot create policy without name."
       return false
     end
   end
@@ -37,12 +37,12 @@ class Policy::Create < Policy::Base
       self.policy = cloned_policy
       return true
     end
-    errors << cloned_policy.errors.full_messages
+    messages[:error] << cloned_policy.errors.full_messages
     return false
   end
 
   def post_process
-    if is_success?
+    if success?
       add_user_op = Policy::Users::AddUser.new(user, {policy_id: cloned_policy.id, added_user_id: user.id, admin: true})
       # Add the creating user as admin
       add_user_op.run

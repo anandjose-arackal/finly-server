@@ -8,7 +8,7 @@ class User::Invite::Destroy < User::Invite::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or params not found."
+      messages[:error] << "User or params not found."
     end
   end
 
@@ -33,7 +33,7 @@ class User::Invite::Destroy < User::Invite::Base
 
   def process
     unless invited_user.destroy
-      errors << "Invite couldn't be deleted. Please try again."
+      messages[:error] << "Invite couldn't be deleted. Please try again."
       return false
     end
   end
@@ -42,12 +42,4 @@ class User::Invite::Destroy < User::Invite::Base
     # probably nothing right now.
   end
 
-  # since it's a destoy operation, return truw or false
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
-  end
 end

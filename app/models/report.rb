@@ -18,7 +18,6 @@
 #  accounted               :boolean          default(FALSE), not null
 #  archived                :boolean          default(FALSE), not null
 #
-
 class Report < ActiveRecord::Base
   include MathUtil
 
@@ -211,6 +210,7 @@ class Report < ActiveRecord::Base
   end
 
   def controlling_user?(user)
+    return false if self.controlling_user_id.blank?
     self.controlling_user.id == user.id
   end
 

@@ -2,14 +2,14 @@ class Settlement::Base < BaseOperation
 
   attr_accessor :to_user
 
-  class Settlement::Base::BasePresenter < BaseOperation::BasePresenter
+  class Settlement::Base::BasePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
 
   end
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
       return false
     end
     # todo - temporary, will be changed once currencies is implemented. Error will be thrown if currency is not provided
@@ -21,7 +21,7 @@ class Settlement::Base < BaseOperation
 
   def validate_date(date)
     if date.blank?
-      errors << 'Date cannot be blank'
+      messages[:error] << 'Date cannot be blank'
       return false
     end
     unless date.is_a?(Date)
@@ -29,7 +29,7 @@ class Settlement::Base < BaseOperation
     end
 
     if date.present? and date > Date.today
-      errors << 'Date cannot be later than the current date'
+      messages[:error] << 'Date cannot be later than the current date'
       return false
     end
     return true
@@ -51,7 +51,7 @@ class Settlement::Base < BaseOperation
   end
 
   # def retrieve
-  #   if is_success?
+  #   if success?
   #     return true
   #   else
   #     return false

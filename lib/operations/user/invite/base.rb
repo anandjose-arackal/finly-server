@@ -5,7 +5,7 @@ class User::Invite::Base < BaseOperation
 
   attr_accessor :invite_params
 
-  class User::Invite::Base::InvitePresenter < BaseOperation::BasePresenter
+  class User::Invite::Base::InvitePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :invite, :accepted_user
 
@@ -19,13 +19,8 @@ class User::Invite::Base < BaseOperation
     [:manager, :finance_manager, :admin]
   end
 
-
-  def retrieve
-    if is_success?
-      return invited_user
-    else
-      return false
-    end
+  def success
+     invited_user
   end
 
   def create_invite_params

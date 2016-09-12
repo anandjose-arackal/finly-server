@@ -3,7 +3,7 @@ class Receipt::Create < Receipt::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "No user or parameters present."
+      messages[:error] << "No user or parameters present."
     end
   end
 
@@ -15,19 +15,15 @@ class Receipt::Create < Receipt::Base
   def process
     self.receipt = user.receipts.build(create_params)
     unless receipt.save
-      errors << receipt.errors.full_messages
+      messages[:error] << receipt.errors.full_messages
     end
   end
 
-  def retrieve
-    if is_success?
-      Receipt::Create::ReceiptPresenter.new(user, receipt: receipt)
-    else
-      false
-    end
+  def success
+    Receipt::Create::ReceiptPresenter.new(user, receipt: receipt)
   end
 
-  class Receipt::Create::ReceiptPresenter < BaseOperation::BasePresenter
+  class Receipt::Create::ReceiptPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :receipt
 
     def initialize(user, params)

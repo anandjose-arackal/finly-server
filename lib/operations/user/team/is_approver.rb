@@ -3,16 +3,16 @@ class User::Team::IsApprover < User::Team::Base
 
   def pre_validate
     unless params[:report].present? or params[:money_request].present? or params[:user].present?
-      errors << 'Error validating approver'
+      messages[:error] << 'Error validating approver'
     end
     unless params[:type].present?
-      errors << 'Error validating approver. Type not defined'
+      messages[:error] << 'Error validating approver. Type not defined'
     end
     unless params[:type] == :manager or params[:type] == :finance_manager
-      errors << 'Error validating approver. Invalid type.'
+      messages[:error] << 'Error validating approver. Invalid type.'
     end
     unless user.present?
-      errors << 'user not defined'
+      messages[:error] << 'user not defined'
     end
   end
 

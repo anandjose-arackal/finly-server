@@ -3,7 +3,7 @@ class User::Show < User::Base
 
   def pre_validate
     unless user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -14,11 +14,11 @@ class User::Show < User::Base
       id = (params[:id] or params[:user_id])
       operation = User::Team::Index.new(user, params)
       result = operation.run
-      if operation.is_success?
+      if operation.success?
         self.selected_user = result.with_id(id).first rescue nil
-        errors << 'User not found' if self.selected_user.blank?
+        messages[:error] << 'User not found' if self.selected_user.blank?
       else
-        errors << operation.errors
+        messages[:error] << operation.errors
       end
     end
   end
@@ -27,7 +27,7 @@ class User::Show < User::Base
     User::Show::Presenter.new(selected_user, params)
   end
 
-  class User::Show::Presenter < BaseOperation::BasePresenter
+  class User::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions
