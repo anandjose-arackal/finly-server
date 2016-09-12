@@ -6,6 +6,7 @@
 #  user_id                 :integer          not null
 #  policy_id               :integer
 #  payment_mode_id         :integer          not null
+#  payment_id              :integer          not null
 #  required_by_date        :date
 #  status_id               :integer          not null
 #  controlling_user_id     :integer
