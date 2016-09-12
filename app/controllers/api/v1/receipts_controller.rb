@@ -9,7 +9,7 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
     RequestFormatter.parse_receipt(current_user, params)
     operation = Receipt::Create.new(current_user, params)
     operation.run
-    if operation.is_success?
+    if operation.success?
       render 'api/v1/shared/success'
     else
       @errors = operation.errors
@@ -34,7 +34,7 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
   def update
     operation = Receipt::Update.new(current_user, params)
     operation.run
-    if operation.is_success?
+    if operation.success?
       render 'api/v1/shared/success'
     else
       @errors = operation.errors

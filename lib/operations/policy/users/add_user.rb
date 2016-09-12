@@ -22,7 +22,7 @@ class Policy::Users::AddUser < Policy::Base
   def validate
     super()
     if policy and self.policy.users.find_by(id: added_user.id).present?
-      errors << 'User is already part of the policy'
+      messages[:error] << 'User is already part of the policy'
       return false
     end
     unless admin
@@ -35,11 +35,11 @@ class Policy::Users::AddUser < Policy::Base
       # check if it's an empty policy, for adding a user for the first time
       self.policy = Policy.find_by(id: params[:policy_id])
       unless policy.users.blank?
-        errors << "Policy not found."
+        messages[:error] << "Policy not found."
       end
     end
     unless user.policy_admin?(policy) or user.admin?
-      errors << "You are not a policy admin for this particular policy."
+      messages[:error] << "You are not a policy admin for this particular policy."
     end
   end
 
@@ -52,7 +52,7 @@ class Policy::Users::AddUser < Policy::Base
       cloned_item = item.dup
       cloned_item.policy_id = self.policy.id
       unless cloned_item.save
-        errors << "User couldn't be added to the policy."
+        messages[:error] << "User couldn't be added to the policy."
         return false
       end
     end

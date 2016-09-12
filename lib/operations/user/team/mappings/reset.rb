@@ -3,13 +3,13 @@ class User::Team::Mappings::Reset < User::Team::Mappings::Base
   def pre_validate
     super
     unless params[:policy_id].present?
-      errors << 'Cannot reset default policy'
+      messages[:error] << 'Cannot reset default policy'
     end
   end
 
   def validate
     if policy.blank? or policy.default
-      errors << 'Cannot reset default policy'
+      messages[:error] << 'Cannot reset default policy'
       return
     end
     super
@@ -20,7 +20,7 @@ class User::Team::Mappings::Reset < User::Team::Mappings::Base
     self.updating_user.team_mapping.policy(nil).each do |item|
       clone = item.dup
       clone.policy_id = params[:policy_id]
-      errors << clone.errors.full_messages unless clone.save
+      messages[:error] << clone.errors.full_messages unless clone.save
     end
   end
 

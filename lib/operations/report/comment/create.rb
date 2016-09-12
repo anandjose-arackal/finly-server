@@ -13,14 +13,14 @@ class Report::Comment::Create < Report::Base
   def pre_validate
     super
     if params[:comment].blank?
-      errors << 'Nothing to post'
+      messages[:error] << 'Nothing to post'
     end
   end
 
   def process
     comment = report.comments.build(report_comment_action_id: ReportCommentAction.report_comment_id, user_id: user.id, content: params[:comment])
     unless comment.save
-      self.errors = comment.errors.full_messages
+      self.messages = comment.errors.full_messages
     end
   end
 

@@ -12,7 +12,7 @@ class Report::ReimburseConfirm < Report::Base
 
   def validate
     unless report.reimbursed?
-      errors << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
+      messages[:error] << 'Report cannot be confirm reimbursement as the report is not marked as reimbursed'
     end
   end
 
@@ -22,11 +22,11 @@ class Report::ReimburseConfirm < Report::Base
       track.save
       return true
     end
-    errors << "Report could not be marked as reimbursed. Please try again."
+    messages[:error] << "Report could not be marked as reimbursed. Please try again."
   end
 
   def post_process
-    if is_success?
+    if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursement_confirmed_id
       comment.save
     end

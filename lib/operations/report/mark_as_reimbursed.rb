@@ -22,7 +22,7 @@ class Report::MarkAsReimbursed < Report::Base
 
   def validate
     unless report.reimbursement_pending?
-      errors << "Report cannot be reimbursed at this stage."
+      messages[:error] << "Report cannot be reimbursed at this stage."
       return false
     end
   end
@@ -35,7 +35,7 @@ class Report::MarkAsReimbursed < Report::Base
   end
 
   def post_process
-    if is_success?
+    if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursed_id
       comment.save
     end

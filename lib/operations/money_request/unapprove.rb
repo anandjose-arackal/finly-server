@@ -5,7 +5,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << 'User or params not passed'
+      messages[:error] << 'User or params not passed'
     end
   end
 
@@ -17,7 +17,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
   def authorize
     super
     if money_request.user_id == user.id
-      errors << 'You cannot unapprove your own money_request'
+      messages[:error] << 'You cannot unapprove your own money_request'
       raise_unauthorized_exception
     end
   end
@@ -26,12 +26,12 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
     # checking if this user can unapprove this money_request at this stage
     associated_users = money_request.associated_users money_request.controlling_user
     unless associated_users.present? and associated_users.with_id(user.id).present?
-      errors << 'User has not yet reviewed the money_request to unapprove it'
+      messages[:error] << 'User has not yet reviewed the money_request to unapprove it'
       return false
     end
 
     unless money_request.can_unapprove?
-      errors << 'The money_request cannot be unapproved at this stage'
+      messages[:error] << 'The money_request cannot be unapproved at this stage'
     end
   end
 
@@ -43,7 +43,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
                                          money_request_status_id: MoneyRequestStatus.id_for(:processing)
       return
     end
-    errors << money_request.errors.full_messages
+    messages[:error] << money_request.errors.full_messages
   end
 
   def post_process

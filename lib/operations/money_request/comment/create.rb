@@ -8,7 +8,7 @@ class MoneyRequest::Comment::Create < MoneyRequest::Base
     super
     content = (params[:comment] or params[:content])
     if content.blank?
-      errors << 'Nothing to post'
+      messages[:error] << 'Nothing to post'
     end
   end
 
@@ -16,7 +16,7 @@ class MoneyRequest::Comment::Create < MoneyRequest::Base
     content = (params[:comment] or params[:content])
     comment = money_request.comments.build(comment_action_id: MoneyRequestCommentAction.id_for(:comment), user_id: user.id, content: content)
     unless comment.save
-      self.errors = comment.errors.full_messages
+      self.messages = comment.errors.full_messages
     end
   end
 

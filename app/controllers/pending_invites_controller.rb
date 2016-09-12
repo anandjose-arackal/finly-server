@@ -4,83 +4,36 @@ class PendingInvitesController < ApplicationController
 
   def create
     invite_op = User::Invite::Create.new(current_user, params)
-    if invite_op.run
-      flash[:success] = "User invited!"
-      respond_to do |format|
-        format.json {render json: {"success": true}}
-      end
-    else
-      flash[:error] = invite_op.errors
-      respond_to do |format|
-        format.json {render json: {"success": true, errors: invite_op.errors}}
-      end
-    end
-    # redirect_to request.referer
+    @result = invite_op.run
+    respond(response: :success)
   end
 
   def edit
     @pending_user = User.find_by(email: params[:email])
   end
 
-  # def update
-  #   if @user_invite_service.accept_invitation(user_params)
-  #     flash[:success] = "Registration done!"
-  #     redirect_to root_url
-  #   else
-  #     flash[:error] = @user_invite_service.errors
-  #     render_flash_message
-  #   end
-  # end
-
   def accept
     accept_op = User::Invite::Accept.new(params)
-    if accept_op.run
-      respond_to do |format|
-        format.json {render json: {success: true}}
-      end
-    else
-      flash[:error] = accept_op.errors
-      respond_to do |format|
-        format.json {render json: {success: false}}
-      end
-    end
+    @result = accept_op.run
+    respond(response: :success)
   end
 
   def resend
     operation = User::Invite::Resend.new(params)
-    if operation.run
-      respond_to do |format|
-        format.json {render json: {success: true}}
-      end
-    else
-      flash[:error] = operation.errors
-      respond_to do |format|
-        format.json {render json: {success: false}}
-      end
-    end
+    @result = operation.run
+    respond(response: :success)
   end
 
   def update_invite
     update_invite_op = User::Invite::Update.new(current_user, params)
-    if update_invite_op.run
-      flash[:success] = "Invite updated!"
-      redirect_to request.referrer
-    else
-      flash[:error] = update_invite_op.errors
-      # render the flash message
-    end
+    @result = update_invite_op.run
+    respond(response: :success)
   end
-
 
   def destroy
     destroy_op = User::Invite::Destroy.new(current_user, params)
-    if destroy_op.run
-      flash[:success] = "Invite deleted!"
-      redirect_to request.referrer
-    else
-      flash[:error] = destroy_op.errors
-      # render flash
-    end
+    @result = destroy_op.run
+    respond(response: :success)
   end
 
   private

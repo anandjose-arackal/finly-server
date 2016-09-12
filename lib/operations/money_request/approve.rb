@@ -7,10 +7,10 @@ class MoneyRequest::Approve < MoneyRequest::Base
 
   def pre_validate
     if params[:id].blank?
-      errors << 'Request not found'
+      messages[:error] << 'Request not found'
     end
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -31,7 +31,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
 
   def validate
     unless report.processing? or params[:auto_approve]
-      errors << 'Cannot approve this report as it is not in processing state'
+      messages[:error] << 'Cannot approve this report as it is not in processing state'
     end
   end
 
@@ -56,7 +56,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
       end
       return true
     end
-    errors << money_request.errors.full_messages
+    messages[:error] << money_request.errors.full_messages
   end
 
   def post_process

@@ -12,7 +12,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def create
     operation = Report::Create.new(current_user, params)
     @result = operation.run
-    if operation.is_success?
+    if operation.success?
       render 'api/v1/reports/show'
       return
     end
@@ -23,7 +23,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def index
     operation = Report::Index.new(current_user, params)
     @result =operation.run
-    if operation.is_success?
+    if operation.success?
       render 'api/v1/reports/index'
     else
       @errors = operation.errors
@@ -34,7 +34,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def update
     updater = Report::Update.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -49,7 +49,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def destroy
     updater = Report::Destroy.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       flash.now[:success] = 'Report Deleted'
       render 'api/v1/shared/success'
     else
@@ -61,7 +61,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def add_expenses
     updater = Report::Expenses::Add.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -72,7 +72,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def remove_expenses
     updater = Report::Expenses::Remove.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -83,7 +83,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def reject_expense
     updater = Report::Expenses::Reject.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -94,7 +94,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def submit
     updater = Report::Submit.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -105,7 +105,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def retract
     updater = Report::Retract.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -116,7 +116,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def approve
     updater = Report::Approve.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -127,7 +127,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def reject
     updater = Report::Reject.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -138,7 +138,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def unapprove
     updater = Report::Unapprove.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -149,7 +149,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def take_control
     updater = Report::Submit.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       flash.now[:success] = 'You have successfully taken control of the report'
       render 'api/v1/reports/show'
     else
@@ -161,7 +161,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def reimbursement_confirm
     updater = Report::ReimburseConfirm.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors
@@ -172,7 +172,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def comment
     updater = Report::Comment::Create.new(current_user, params)
     @result = updater.run
-    if updater.is_success?
+    if updater.success?
       render 'api/v1/reports/show'
     else
       @errors = updater.errors

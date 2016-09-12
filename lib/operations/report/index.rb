@@ -33,7 +33,7 @@ class Report::Index < Report::Base
           self.reports = Report.not_open.with_user(user_ids).with_policy(policy_ids)
         end
         unless user.admin?
-          errors << 'User is not an admin'
+          messages[:error] << 'User is not an admin'
           return false
         end
       when UserRole.manager_id
@@ -57,16 +57,12 @@ class Report::Index < Report::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      params[:reports] = reports
-      Report::Index::Presenter.new(user, params)
-    else
-      false
-    end
+  def success
+    params[:reports] = reports
+    Report::Index::Presenter.new(user, params)
   end
 
-  class Report::Index::Presenter < BaseOperation::BasePresenter
+  class Report::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reports, :counts, :paginated_reports
 
     has_scope :filter_search
@@ -75,7 +71,8 @@ class Report::Index < Report::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
 
-    def initialize(user, params)
+    def initialize(user, params={}, messages={})
+      super user, params, messages
       self.user = user
       self.reports = params[:reports]
       get_counts

@@ -4,10 +4,10 @@ class User::Index < User::Base
   def process
     operation = User::Team::Index.new(user, params)
     result = operation.run
-    if operation.is_success?
+    if operation.success?
       self.users = result
     else
-      errors << operation.errors
+      messages[:error] << operation.errors
     end
   end
 
@@ -16,7 +16,7 @@ class User::Index < User::Base
     User::Index::Presenter.new(user, params)
   end
 
-  class User::Index::Presenter < BaseOperation::BasePresenter
+  class User::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team, :users_type_count, :users_status_count, :pending_invites_count
 
     has_scope :filter_search

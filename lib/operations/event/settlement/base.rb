@@ -3,13 +3,13 @@ class Event::Settlement::Base < Event::SetNotification
 
   def pre_validate
     unless user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
     if params.blank? or params[:payment].blank?
-      errors << 'Payment not found'
+      messages[:error] << 'Payment not found'
     end
     unless params[:payment].is_a?(Payment)
-      errors << 'Error loading payment'
+      messages[:error] << 'Error loading payment'
     end
   end
 

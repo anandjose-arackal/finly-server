@@ -3,7 +3,7 @@ class Gcm::Base < BaseOperation
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -13,7 +13,7 @@ class Gcm::Base < BaseOperation
 
   def validate
     unless self.profile.present?
-      errors << 'Profile not found'
+      messages[:error] << 'Profile not found'
     end
   end
 end

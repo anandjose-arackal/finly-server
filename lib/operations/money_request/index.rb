@@ -31,7 +31,7 @@ class MoneyRequest::Index < MoneyRequest::Base
           self.money_requests = MoneyRequest.not_open.with_user(user_ids).with_policy(policy_ids)
         end
         unless user.admin?
-          errors << 'User is not an admin'
+          messages[:error] << 'User is not an admin'
           return false
         end
       when UserRole.manager_id
@@ -55,16 +55,12 @@ class MoneyRequest::Index < MoneyRequest::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      params[:money_requests] = money_requests
-      MoneyRequest::Index::Presenter.new(user, params)
-    else
-      false
-    end
+  def success
+    params[:money_requests] = money_requests
+    MoneyRequest::Index::Presenter.new(user, params)
   end
 
-  class MoneyRequest::Index::Presenter < BaseOperation::BasePresenter
+  class MoneyRequest::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_requests, :counts, :paginated_money_requests
 
     has_scope :filter_search

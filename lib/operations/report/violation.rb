@@ -33,7 +33,7 @@ class Report::Violation < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or params not found."
+      messages[:error] << "User or params not found."
     end
   end
 
@@ -52,7 +52,7 @@ class Report::Violation < Report::Base
 
   def validate
     if self.report.blank? or not self.report.is_a?(Report)
-      errors << 'Report not found'
+      messages[:error] << 'Report not found'
     end
     unless policy
       self.no_policy = true
@@ -70,10 +70,6 @@ class Report::Violation < Report::Base
         end
       end
     end
-    self.response = warning_messages
-  end
-
-  def retrieve
     self.response = warning_messages
   end
 

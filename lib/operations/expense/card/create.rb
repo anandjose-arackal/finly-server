@@ -8,7 +8,7 @@ class Expense::Card::Create < Expense::Card::Base
 
   # overriding initialize because the only info available will be the transaction and card
   def initialize(transaction, card)
-    self.errors = []
+    self.messages = []
     self.transaction = transaction
     self.card = card
     self.user = card.user if card
@@ -17,7 +17,7 @@ class Expense::Card::Create < Expense::Card::Base
 
   def pre_validate
     if transaction.blank? or card.blank?
-      errors << "Card or Transaction not present."
+      messages[:error] << "Card or Transaction not present."
     end
   end
 
@@ -29,14 +29,14 @@ class Expense::Card::Create < Expense::Card::Base
 
   def validate
     unless user
-      errors << "Card does not belong to any user" # probably indicates a pretty serious problem. todo - deal with ghost card
+      messages[:error] << "Card does not belong to any user" # probably indicates a pretty serious problem. todo - deal with ghost card
     end
   end
 
   def process
     self.expense = user.expenses.build(expense_params)
     unless self.expense.save
-      errors << self.expense.errors.full_messages
+      messages[:error] << self.expense.errors.full_messages
       return false
     end
     success

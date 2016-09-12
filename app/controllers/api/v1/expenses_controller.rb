@@ -11,7 +11,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     param = RequestFormatter.api_expense(current_user, params)
     operation = Expense::Manual::Create.new(current_user, param)
     @result = operation.run
-    if operation.is_success?
+    if operation.success?
       if @result.expense.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         render 'api/v1/reports/show'
@@ -27,7 +27,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   def index
     operation = Expense::Index.new(current_user, params)
     @result = operation.run
-    if operation.is_success?
+    if operation.success?
       render 'api/v1/expenses/index'
     else
       @errors = operation.errors
@@ -43,7 +43,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     param = RequestFormatter.api_expense(current_user, params)
     operation = Expense::Manual::Update.new(current_user, param)
     @result = operation.run
-    if operation.is_success?
+    if operation.success?
       if @result.expense.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         render 'api/v1/reports/show'
@@ -59,7 +59,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   def destroy
     operation = Expense::Manual::Update.new(current_user, params)
     operation.run
-    if operation.is_success?
+    if operation.success?
       render 'api/v1/shared/success'
     else
       @errors = operation.errors

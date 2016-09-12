@@ -11,7 +11,7 @@ class Report::Unapprove < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << 'User or params not passed'
+      messages[:error] << 'User or params not passed'
     end
   end
 
@@ -23,7 +23,7 @@ class Report::Unapprove < Report::Base
   def authorize
     super
     if report.user_id == user.id
-      errors << 'You cannot unapprove your own report'
+      messages[:error] << 'You cannot unapprove your own report'
       raise_unauthorized_exception
     end
   end
@@ -32,12 +32,12 @@ class Report::Unapprove < Report::Base
     # checking if this user can unapprove this report at this stage
     associated_users = report.associated_users report.controlling_user
     unless associated_users.present? and associated_users.with_id(user.id).present?
-      errors << 'User has not yet reviewed the report to unapprove it'
+      messages[:error] << 'User has not yet reviewed the report to unapprove it'
       return false
     end
 
     unless report.can_unapprove?
-      errors << 'The report cannot be unapproved at this stage'
+      messages[:error] << 'The report cannot be unapproved at this stage'
     end
   end
 
@@ -47,7 +47,7 @@ class Report::Unapprove < Report::Base
       report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.unapprove_id, report_status_id: ReportStatus.processing_id
       return
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process

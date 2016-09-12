@@ -12,7 +12,7 @@ class Report::Retract < Report::Base
     super
     id = (params[:id] or params[:report_id])
     if id.blank?
-      errors << 'Error loading report'
+      messages[:error] << 'Error loading report'
     end
   end
 
@@ -24,13 +24,13 @@ class Report::Retract < Report::Base
   def authorize
     super
     unless report.user_id == user.id
-      errors << "You don't own this report."
+      messages[:error] << "You don't own this report."
     end
   end
 
   def validate
     unless report.processing?
-      errors << 'Cannot retract report that is not in processing state'
+      messages[:error] << 'Cannot retract report that is not in processing state'
     end
   end
 
@@ -43,11 +43,11 @@ class Report::Retract < Report::Base
       end
       return
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process
-    if is_success?
+    if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_retract_id
       comment.save
       # mailers here

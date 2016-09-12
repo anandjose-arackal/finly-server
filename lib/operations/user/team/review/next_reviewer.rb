@@ -15,7 +15,7 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   def validate
-    errors << 'Error retrieving next approver' if obj.blank?
+    messages[:error] << 'Error retrieving next approver' if obj.blank?
   end
 
   def process
@@ -38,10 +38,6 @@ class User::Team::Review::NextReviewer < BaseOperation
         self.response = User::Team::Approver.(user, type: :finance_manager, amount: amount, currency_id: currency_id)
       end
     end
-  end
-
-  def retrieve
-    response
   end
 
   private

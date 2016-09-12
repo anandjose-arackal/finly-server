@@ -9,7 +9,7 @@ class MoneyRequest::Reject < MoneyRequest::Base
     super
     id = (params[:id] or params[:request_id])
     if id.blank?
-      errors << 'Request not found'
+      messages[:error] << 'Request not found'
     end
   end
   
@@ -33,18 +33,18 @@ class MoneyRequest::Reject < MoneyRequest::Base
   def authorize
     super
     unless money_request.controlling_user.id == user.id
-      errors << 'You cannot reject the request at the moment'
+      messages[:error] << 'You cannot reject the request at the moment'
       raise_unauthorized_exception
     end
   end
 
   def validate
     unless money_request.processing?
-      errors << 'Cannot reject this request as the request is not processing'
+      messages[:error] << 'Cannot reject this request as the request is not processing'
       return
     end
     unless reject_to_user.present?
-      errors << 'Reject to user not found'
+      messages[:error] << 'Reject to user not found'
     end
   end
 
@@ -56,6 +56,6 @@ class MoneyRequest::Reject < MoneyRequest::Base
       money_request.comments.create user: user, report_comment_action_id: MoneyRequestCommentAction.id_for(:reject), rejected_to_id: reject_to_user.id, content: params[:memo]
       return
     end
-    errors << money_request.errors.full_messages
+    messages[:error] << money_request.errors.full_messages
   end
 end

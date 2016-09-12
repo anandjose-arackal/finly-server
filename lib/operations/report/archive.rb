@@ -9,7 +9,7 @@ class Report::Archive < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -21,7 +21,7 @@ class Report::Archive < Report::Base
 
     # check if report can be archived at all
     unless report.can_archive?
-      errors << "Repoert is still not completely processed to archive it."
+      messages[:error] << "Repoert is still not completely processed to archive it."
     end
   end
 
@@ -36,7 +36,7 @@ class Report::Archive < Report::Base
 
   def process
     unless report.update(archived: true)
-      errors << "Couldn't archive report. PLease try again."
+      messages[:error] << "Couldn't archive report. PLease try again."
     end
   end
 

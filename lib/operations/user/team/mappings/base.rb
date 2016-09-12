@@ -3,7 +3,7 @@ class User::Team::Mappings::Base < User::Team::Base
 
   def pre_validate
     if user.blank? or (params[:user_id].blank? and params[:id].blank?)
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -31,14 +31,14 @@ class User::Team::Mappings::Base < User::Team::Base
 
   def authorize
     if self.mappings.blank?
-      errors << 'Configuration not found'
+      messages[:error] << 'Configuration not found'
       raise_unauthorized_exception
     end
   end
 
   def validate
     if self.updating_user.blank?
-      errors << 'User not found in policy'
+      messages[:error] << 'User not found in policy'
     end
   end
 

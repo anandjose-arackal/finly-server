@@ -3,7 +3,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
 
   def pre_validate
     unless params[:name].present?
-      errors << 'Name of the category cannot be blank'
+      messages[:error] << 'Name of the category cannot be blank'
     end
   end
 
@@ -20,7 +20,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
       self.category = self.categories.build(company_id: user.company_id, name: params[:name])
     end
     unless category.save
-      errors << category.errors.full_messages
+      messages[:error] << category.errors.full_messages
     end
   end
 end

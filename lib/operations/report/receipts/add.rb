@@ -20,7 +20,7 @@ class Report::Receipts::Add < Report::Base
       raise_unauthorized_exception
     end
     unless report.open? or report.retracted?
-      errors << 'Cannot attach receipt unless report is open or retracted'
+      messages[:error] << 'Cannot attach receipt unless report is open or retracted'
       return false
     end
   end
@@ -28,16 +28,10 @@ class Report::Receipts::Add < Report::Base
   def process
     self.receipt = report.receipts.build(new_receipt_params)
     receipt.user = user
-    unless receipt.save
-      errors << receipt.errors.full_messages
-    end
-  end
-
-  def retrieve
-    if is_success?
-      return receipt
+    if receipt.save
+      self.response = receipt
     else
-      return false
+      messages[:error] << receipt.errors.full_messages
     end
   end
 end

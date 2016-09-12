@@ -8,7 +8,7 @@ class MoneyRequest::Retract < MoneyRequest::Base
     super
     id = (params[:id] or params[:report_id])
     if id.blank?
-      errors << 'Error loading request'
+      messages[:error] << 'Error loading request'
     end
   end
 
@@ -19,19 +19,19 @@ class MoneyRequest::Retract < MoneyRequest::Base
 
   def authorize
     if self.money_request.blank?
-      errors << 'You cannot retract this request'
+      messages[:error] << 'You cannot retract this request'
       raise_unauthorized_exception
       return
     end
     unless self.money_request.user.id == user.id
-      errors << 'Only owners can retract card load requests'
+      messages[:error] << 'Only owners can retract card load requests'
       raise_unauthorized_exception
     end
   end
 
   def validate
     unless self.money_request.processing?
-      errors << 'Card Load Requests can only be retracted when in processing state'
+      messages[:error] << 'Card Load Requests can only be retracted when in processing state'
     end
   end
 
@@ -42,7 +42,7 @@ class MoneyRequest::Retract < MoneyRequest::Base
                                       status_id: MoneyRequestStatus.id_for(:retracted), user_request_role_id: UserRole.id_for(:employee)
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retracted)
     else
-      errors << money_request.errors.full_messages
+      messages[:error] << money_request.errors.full_messages
     end
   end
 end

@@ -4,10 +4,10 @@ class Settlement::Show < Settlement::Base
 
   def pre_validate
     unless user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
     unless params[:view_to_load].present?
-      errors << 'Error loading reports'
+      messages[:error] << 'Error loading reports'
     end
   end
 
@@ -18,13 +18,13 @@ class Settlement::Show < Settlement::Base
 
   def process
     load_selected_user
-    return unless errors.blank?
+    return if has_errors?
     if self.view_to_load == 'payments'
       load_payments
     else
       load_reports
     end
-    return unless errors.blank?
+    return if has_errors?
     self.type[view_to_load.to_sym] = true
     load_actions
   end
@@ -38,7 +38,7 @@ class Settlement::Show < Settlement::Base
     Settlement::Show::Presenter.new(user, params)
   end
 
-  class Settlement::Show::Presenter < BaseOperation::BasePresenter
+  class Settlement::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :selected_user, :items, :actions, :type
 
     def initialize(user, params)
@@ -67,19 +67,23 @@ class Settlement::Show < Settlement::Base
     end
     user_op = Settlement::Index.new(user, params)
     user_result = user_op.run
-    unless user_op.is_success?
-      self.errors = user_op.errors
+    unless user_op.success?
+      self.messages[:error] = user_op.messages[:error]
       return
     end
     user_id = (params[:id] or params[:user_id])
     self.selected_user = user_result.users.with_id(user_id).first rescue nil
     if self.selected_user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
   def load_reports
-    self.reports = self.selected_user.reports.send(self.view_to_load)
+    if self.view_to_load.blank?
+      self.reports = self.selected_user.reports
+    else
+      self.reports = self.selected_user.reports.send(self.view_to_load)
+    end
   end
 
   def load_payments

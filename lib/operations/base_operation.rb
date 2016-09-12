@@ -2,11 +2,11 @@ require 'hooks'
 
 class BaseOperation
   include CallbackHandler, MathUtil, HasScope
-  attr_accessor :user, :params, :errors, :process_complete, :response
+  attr_accessor :user, :params, :messages, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
-    self.errors = []
+    clear_messages
     self.user = user
     self.params = (ActionController::Parameters.new(params) or {})
   end
@@ -18,28 +18,28 @@ class BaseOperation
 
   # Used to run the operation
   def run
-    errors.clear
+    clear_messages
     authorize_user authorized_user_types
-    return false if has_errors?
+    return failure if has_errors?
     pre_validate
-    return false if has_errors?
+    return failure if has_errors?
     pre_authorize
-    return false if has_errors?
+    return failure if has_errors?
     init
-    return false if has_errors?
+    return failure if has_errors?
     authorize
-    return false if has_errors?
+    return failure if has_errors?
     validate
-    return false if has_errors?
+    return failure if has_errors?
     subscribe
-    return false if has_errors?
+    return failure if has_errors?
     pre_process
-    return false if has_errors?
+    return failure if has_errors?
     process
-    return false if has_errors?
+    return failure if has_errors?
     self.process_complete = true
     post_process
-    return false if has_errors?
+    return failure if has_errors?
     retrieve
   end
 
@@ -95,7 +95,7 @@ class BaseOperation
   def retrieve
     if self.response.present?
       response
-    elsif is_success?
+    elsif success?
       success
     else
       failure
@@ -103,29 +103,30 @@ class BaseOperation
   end
 
   def has_errors?
-    self.errors.present?
+    self.messages[:error].present?
   end
 
   def processing?
     not self.process_complete
   end
 
-  def is_success?
-    self.process_complete and not errors.present?
+  def success?
+    self.process_complete and not has_errors?
   end
 
-  def is_failure?
-    self.process_complete and errors.present?
+  def failure?
+    self.process_complete and has_errors?
   end
 
   # Used to present the data to the UI
   class BaseOperation::BasePresenter
     include MathUtil, HasScope
-    attr_accessor :user, :params
+    attr_accessor :user, :params, :messages
 
-    def initialize(user, params={})
+    def initialize(user, params={}, messages={})
       self.user = user
       self.params = params
+      self.messages = messages
     end
 
     def admin_view?
@@ -152,16 +153,43 @@ class BaseOperation
       type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
     end
 
+    def success?
+      false
+    end
+
+    def failure?
+      false
+    end
+
+    class BaseOperation::BasePresenter::SuccessPresenter < BaseOperation::BasePresenter
+      def success?
+        true
+      end
+
+      def failure?
+        false
+      end
+    end
+
+    class BaseOperation::BasePresenter::FailurePresenter < BaseOperation::BasePresenter
+      def success?
+        false
+      end
+
+      def failure?
+        true
+      end
+    end
+
   end
 
   protected
-
   def success
-    true
+    BaseOperation::BasePresenter::SuccessPresenter.new(self.user, self.params, self.messages)
   end
 
   def failure
-    false
+    BaseOperation::BasePresenter::FailurePresenter.new(self.user, self.params, self.messages)
   end
 
   def authorize_user(user_types)
@@ -205,6 +233,10 @@ class BaseOperation
 
   def is_view?(type)
     type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
+  end
+
+  def clear_messages
+    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
 end

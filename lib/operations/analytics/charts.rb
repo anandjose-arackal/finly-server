@@ -9,7 +9,7 @@ class Analytics::Charts < BaseOperation
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params present."
+      messages[:error] << "No user or params present."
     end
   end
 

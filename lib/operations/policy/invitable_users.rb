@@ -29,7 +29,7 @@ class Policy::InvitableUsers < Policy::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -52,13 +52,9 @@ class Policy::InvitableUsers < Policy::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      params[:invitable_users] = invitable_users
-      Policy::InvitableUsers::InvitableUsersPresenter.new(user, params)
-    else
-      return false
-    end
+  def success
+    params[:invitable_users] = invitable_users
+    Policy::InvitableUsers::InvitableUsersPresenter.new(user, params)
   end
 
 

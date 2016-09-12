@@ -11,7 +11,7 @@ class Report::Create < Report::Base
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -20,7 +20,7 @@ class Report::Create < Report::Base
   end
 
   def authorize
-    
+
   end
 
   def process
@@ -34,7 +34,7 @@ class Report::Create < Report::Base
         add_expense_op.run
       end
     else
-      errors << report.errors.full_messages
+      messages[:error] << report.errors.full_messages
     end
   end
 

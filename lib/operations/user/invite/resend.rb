@@ -8,7 +8,7 @@ class User::Invite::Resend < User::Invite::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << 'User or Params not found'
+      messages[:error] << 'User or Params not found'
     end
   end
 
@@ -24,24 +24,24 @@ class User::Invite::Resend < User::Invite::Base
 
   def authorize
     unless user.admin? or user.id == invited_user.invited_by
-      errors << 'Only inviting users or admins can delete invites.'
+      messages[:error] << 'Only inviting users or admins can delete invites.'
       raise_unauthorized_exception
     end
   end
 
   def validate
     unless invited_user
-      errors << 'Invite not found'
+      messages[:error] << 'Invite not found'
       return
     end
     unless invited_user.invitation_accepted_at.blank?
-      errors << 'Invite cannot be resent as user has already signed up with Finly'
+      messages[:error] << 'Invite cannot be resent as user has already signed up with Finly'
     end
   end
 
   def process
     unless invited_user.resend_invitation
-      self.errors = self.invited_user.errors.full_messages
+      self.messages = self.invited_user.errors.full_messages
     end
   end
 

@@ -2,7 +2,7 @@ class User::Team::Mappings::Index < User::Team::Mappings::Base
 
   def pre_authorize
     unless user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 

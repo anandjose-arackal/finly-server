@@ -9,7 +9,7 @@
   # date: date of the payment
 
 class Settlement::Payment::Settle < Settlement::Payment::Base
-  attr_accessor :payment, :reports, :role
+  attr_accessor :reports, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -18,10 +18,10 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
   def pre_validate
     super()
     if params[:payment][:amount] and params[:payment][:amount].to_i < 0
-      errors << "Reimbursement amount cannot be negative."
+      messages[:error] << "Reimbursement amount cannot be negative."
     end
     if params[:report_ids].blank?
-      errors << "No reports to reimburse."
+      messages[:error] << "No reports to reimburse."
       return false
     end
   end
@@ -50,21 +50,21 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
 
   def validate
     if reports.blank?
-      errors << "Reports to reimburse not found."
+      messages[:error] << "Reports to reimburse not found."
     end
     validate_date payment_params[:date]
 
     value = payment_params[:amount].to_f if payment_params[:amount].present?
     cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date]
     unless value <= cash_in_hand_on_date.value
-      errors << 'Settlement amount cannot be greater than the cash in hand amount'
+      messages[:error] << 'Settlement amount cannot be greater than the cash in hand amount'
       return false
     end
 
     # is this really necessary?
     total_amount = precision_value(reports.with_amount.sum(:value))
     unless total_amount == precision_value(payment_params[:amount])
-      errors << "Reimbursement amount does not match report totals."
+      messages[:error] << "Reimbursement amount does not match report totals."
     end
   end
 
@@ -79,13 +79,9 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
       end
       return true
     end
-    self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
+    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
     false
-  end
-
-  def success
-    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 
 

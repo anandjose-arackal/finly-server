@@ -10,21 +10,14 @@ class Export::Field::Destroy < Export::Base
 
   def authorize
     unless preference
-      errors << "Cannot find field to delete."
+      messages[:error] << "Cannot find field to delete."
     end
   end
 
   def process
     unless preference.destroy
-      errors << preference.errors.full_messages
+      messages[:error] << preference.errors.full_messages
     end
   end
 
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
-  end
 end

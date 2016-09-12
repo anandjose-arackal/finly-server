@@ -5,7 +5,7 @@
 # expense_rule_id: id of the expense rule that needs to be destroyed
 # budget_rule_id: id of the budget rule that needs to be destroyed
 
-  # only one of the above will be passed of course
+# only one of the above will be passed of course
 
 
 class Policy::Rules::Destroy < Policy::Rules::Base
@@ -18,27 +18,19 @@ class Policy::Rules::Destroy < Policy::Rules::Base
 
   def validate
     unless rule
-      errors << "Rule not found."
+      messages[:error] << "Rule not found."
       return false
     end
   end
 
   def process
     unless rule.destroy
-      errors << rule.errors.full_messages
+      messages[:error] << rule.errors.full_messages
     end
   end
 
   def post_process
     # nothing
-  end
-
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
   end
 
 end

@@ -5,13 +5,13 @@ class Report::Update < Report::Base
   def pre_validate
     super
     if params[:name].blank? and params[:policy_id].blank?
-      errors << 'Nothing to update'
+      messages[:error] << 'Nothing to update'
     end
   end
 
   def pre_authorize
     unless self.user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
       raise_unauthorized_exception
     end
   end
@@ -27,18 +27,18 @@ class Report::Update < Report::Base
 
   def authorize
     unless user == report.user
-      errors << 'Only report owners can update report'
+      messages[:error] << 'Only report owners can update report'
       raise_unauthorized_exception
     end
     unless user == report.controlling_user
-      errors << 'Only report owners can update report'
+      messages[:error] << 'Only report owners can update report'
       raise_unauthorized_exception
     end
   end
 
   def validate
     unless report.retracted? or report.open?
-      errors << 'Cannot update report unless retracted'
+      messages[:error] << 'Cannot update report unless retracted'
     end
   end
 
@@ -49,7 +49,7 @@ class Report::Update < Report::Base
   def process
     return unless update_param.present?
     unless report.update(update_param)
-      errors << report.errors.full_messages
+      messages[:error] << report.errors.full_messages
       false
     end
   end
