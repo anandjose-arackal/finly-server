@@ -3,7 +3,7 @@ class Event::Report::Approve < Event::Report::Base
 
   def init
     super
-    self.approving_user = self.report.tracks.last.user
+    self.approving_user = self.report.tracks.last.action_user
     self.approved = (report.approved? or report.closed?) if report.present?
   end
 
