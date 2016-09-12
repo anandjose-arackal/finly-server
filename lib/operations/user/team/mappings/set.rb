@@ -32,6 +32,10 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
     self.updating_mapping = params[:user_manager_mapping]
   end
 
+  def validate
+
+  end
+
   def process
     self.updating_mapping.each do |key, map|
       # to remove all empty values
@@ -63,7 +67,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
         # If ID is not present, create new user mapping
         if updated_params.present?
           updated_params[:user_id] = updating_user.id
-          updated_params["greater_than_amount_attributes"]["currency_id"] = 1
+          updated_params['greater_than_amount_attributes']['currency_id'] = 1
           self.mappings.create(update_params(updated_params))
         end
       end

@@ -48,6 +48,7 @@ end
       json.date expense.date.strftime("%d %b %y")
       json.merchant_name expense.merchant_name
       json.amount_value expense.amount.precision_value
+      json.violations @result.violations[expense.id]
     end
   end
 end

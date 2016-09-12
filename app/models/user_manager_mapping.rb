@@ -97,13 +97,13 @@ class UserManagerMapping < ActiveRecord::Base
   private
   def valid_default
     if default and greater_than_amount.present?
-      errors.add(:cannot, "set greater than amount for default configuration")
+      errors.add(:cannot, 'set greater than amount for default configuration')
     end
   end
 
   def valid_non_default
     if greater_than_amount.blank? and not default
-      errors.add(:greater_than_amount, "cannot be blank")
+      errors.add(:greater_than_amount, 'cannot be blank')
     end
   end
 
