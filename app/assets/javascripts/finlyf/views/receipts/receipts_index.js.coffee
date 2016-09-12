@@ -156,29 +156,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $(e.currentTarget).find('.select-item').prop('checked', true)
     @receiptSelectOptions()
 
-
-    #Returns if clicked on the checkbox
-    # if $(e.target).hasClass("select-item")
-    #   return
-      
-    # main = $(@el).find(".main")
-    # unless $(main).hasClass("preview")
-    #   $(main).addClass("preview")
-
-    # model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
-    # model = @collection.get(model_id)
-
-    # preview_view = new FinlyF.Views.Report({
-    #   model: model
-    #   preview: true
-    # })
-
-    # $(@el).find("#item-details-main").html(preview_view.render().el)
-    
-  # closeDetails: ->
-  #   main = $(@el).find(".main")
-  #   $(main).removeClass("preview")
-
   new: ->
     $("#modal-new .modal-body").html(@templateNew)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
@@ -209,28 +186,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         console.log "Err", err
     })
 
-
-
-
-
-
-    # _this = @
-    # form = $(@el).find('#new-report')
-    # data = {
-    #   amount: $(form).find('input[name="report[amount]"]').val()
-    #   merchant: $(form).find('input[name="report[merchant]"]').val()
-    #   date: $(form).find('input[name="report[date]"]').val()
-    #   category_id: $(form).find('select[name="report[category_id]"]').val()
-    # }
-
-    # model = new FinlyF.Models.report(data)
-    # console.log model.toJSON()
-    # model.save({
-    #   success: ->
-    #     @collection.fetch({reset: true})
-    # })
-
-
   resetFilters: ->
     params = {}
     params.view = @params.view
@@ -249,44 +204,12 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
     FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
-  # autoComplete: (e) ->
-  #   target = $(e.currentTarget)
-  #   query = $(target).val()
-
-  #   $(target).autocomplete({
-  #     minLength: 2,
-  #     source: (request, response) ->
-  #       $.ajax({
-  #         dataType: "json"
-  #         type : 'get'
-  #         url: '/autocomplete/merchant'
-  #         data: 
-  #           remote: "true"
-  #           query: query
-  #           # area: 'central'
-  #         success: (data) ->
-  #           response(data)
-  #         error: (err) ->
-  #           console.log err
-  #       })
-  #     select: (event, ui) ->
-  #       console.log "Selected."
-  #   })
-
-  # resetPageCount: (options) ->
-  #   if options.target
-  #     $(options.target).attr('data-page', options.page)
-  #   else if options.selector
-  #     $(options.selector).attr('data-page', options.page)
-  #   else
-  #     $('.main .load-more').attr('data-page', options.page)
-
-
-
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
-
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()
@@ -338,7 +261,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
     $("#modal-new .modal-body #preview-image").attr('src', selected_receipt.get('url'))
 
-
   createExpense: (e) ->
     _this =   @
     values = {}
@@ -362,22 +284,3 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
-
-    # console.log response
-
-    # # console.log expenses
-    # model_report = new FinlyF.Models.Report({
-    #   "report": {
-    #     "expense_id": expenses.join(","),
-    #   },
-    #   "authenticity_token": $("#authenticity_token").val()
-    #   "utf8": $("#form_utf8").val()
-    # })
-    # # console.log "Model", model_report.toJSON()
-    # model_report.save(null, {
-    #   success: (model, res) ->
-    #     if res.status == "success"
-    #       FinlyF.primary_router.navigate('reports', {trigger: true})
-    #   error: (err) ->
-    #     console.log "Error", err
-    # })

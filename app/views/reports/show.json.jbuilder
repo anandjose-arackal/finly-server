@@ -38,6 +38,7 @@ json.expense_sections @result.expenses_category_sorted do |category|
     json.extract! expense, :id, :note, :merchant_name, :amount_value
     # json.extract! expense, :id, :note
     json.date expense.date.strftime("%d %b %y")
+    json.violations @result.violations[expense.id]
   end
 end
 

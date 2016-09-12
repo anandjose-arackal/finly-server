@@ -109,6 +109,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(@el).find(".settlements-index").html(@templateMain())
     else
       $(@el).find(".settlements-index").html(@templateMain())
+    
     FinlyF.structureActions(@el, @params)
 
     # Populate summary
@@ -243,8 +244,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $('.main .load-more').attr('data-page', options.page)
 
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()
@@ -405,7 +409,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "err", err
     })
 
-
   ##Helpers
   processSettlementReport: (e) ->
     _this = @
@@ -440,5 +443,3 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       memo + value.get('total_amount')
     ), 0)
     return total
-
-

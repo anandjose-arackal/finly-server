@@ -13,7 +13,7 @@ window.FinlyF =
     $(el).find(".company-name").text(company_name)
 
     views = $("#menu-nav-views-dropdown li")
-    # console.log "views", views
+    console.log "menus", params
     dropdown = $(el).find('#primary-navbar .menu-nav-views-dropdown')
     for view in views
       $(dropdown).append($(view).clone())
@@ -46,16 +46,14 @@ window.FinlyF =
           $(navbar_right).prepend($(menu).clone())
         $(el).find('.current-view-type').text("Personal View")
 
-
-
     navbar_cog = $(el).find("#primary-navbar .navbar-right .navbar-cog")
     menus = $("#navbar-cog-navigation-admin li")
     for menu in menus
       $(navbar_cog).prepend($(menu).clone())
 
     #Sidebar
-    $(el).find('.sidebar .filter-category-id').val(params.filter_category_id)
-    $(el).find('.sidebar .filter-receipt').val(params.filter_receipt)
+    # $(el).find('.sidebar .filter-category-id').val(params.filter_category_id)
+    # $(el).find('.sidebar .filter-receipt').val(params.filter_receipt)
 
   navigate: (e, attr)->
     target = e.currentTarget
