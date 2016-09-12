@@ -24,6 +24,7 @@ class FinlyF.Views.Expense extends Backbone.View
       $(@el).removeClass("item")
       @model.fetch({
         data: {
+          view: view
           authenticity_token: $("#authenticity_token").val()
         }
       })

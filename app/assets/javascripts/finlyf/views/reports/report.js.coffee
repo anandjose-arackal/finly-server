@@ -333,6 +333,7 @@ class FinlyF.Views.Report extends Backbone.View
     })
 
   viewSub: (e)->
+    console.log "view", @current_view
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
 
