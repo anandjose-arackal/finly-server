@@ -52,7 +52,7 @@ class Event::Report::Approve < Event::Report::Base
   end
 
   def mailer_body(user)
-    if user.id == report.controlling_user.id
+    if user.id == self.report.tracks.last.action_user.id
       message = "You have successfully approved the report : #{self.report.name}"
     else
       if approved and user.id == report.user.id
