@@ -1,5 +1,5 @@
 class Company::Configuration::Category::Create < Company::Configuration::Category::Base
-  attr_accessor :category
+  attr_accessor :category, :category_params
 
   def pre_validate
     unless params[:name].present?
@@ -17,10 +17,16 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
     if self.category.present?
       self.category.active = true
     else
-      self.category = self.categories.build(company_id: user.company_id, name: params[:name])
+      self.category = self.categories.build(company_id: user.company_id, name: category_params[:name])
     end
     unless category.save
       errors << category.errors.full_messages
     end
+  end
+
+  private
+
+  def category_params
+    params.require(:category).permit(:name)
   end
 end

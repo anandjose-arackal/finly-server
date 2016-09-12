@@ -1,2 +1,4 @@
-class Base
+class Company::Base < BaseOperation
+
+
 end

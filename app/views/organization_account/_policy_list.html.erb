@@ -12,7 +12,7 @@
 
   <hr>
 
-  <% unless @policies.present? %>
+  <% unless @result.policies.present? %>
       <div>
         <p> No Policies to Display.</p>
       </div>
@@ -21,7 +21,7 @@
 
   <div id="policyListTable">
 
-    <% @policies.each do |policy| %>
+    <% @result.policies.each do |policy| %>
 
     <table>
       <thead>
