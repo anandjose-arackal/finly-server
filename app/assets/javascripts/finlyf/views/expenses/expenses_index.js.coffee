@@ -32,7 +32,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'submit .navbar-form': 'globalSearch'
     'click .input-search-icon': 'clearGlobalSearch'
     'click .btn-reset-filters': 'resetFilters'
-
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter-expenses': 'filter'
@@ -106,7 +105,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(@el).find('.main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
-  
   processItems: ->
     #Append all the expenses
     @dump = @collection.models.slice()
@@ -118,8 +116,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
-
-
 
   appendItems: (item) ->
     #Creating view for each expense and appending them
@@ -151,7 +147,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch successfully."
     })
-
 
   loadMore: (e) ->
     _this = @
@@ -209,7 +204,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
-    
+
   closeDetails: (e)->
     if e
       e.preventDefault()
@@ -264,7 +259,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     })
 
     # if response.responseJSON.status = "success"
-      
 
   createReport: ->
     #  "report"=>{"expense_id"=>"15,36,39"}}
@@ -349,7 +343,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           error: ->
             console.log "Couldn't fetch Successfully."
         })
-    
 
   globalSearch: (e) ->
     e.preventDefault()

@@ -8,7 +8,11 @@
       <h4>{{item.image_updated_at}}</h4>
     </div>
     <div class="col-sm-12">
-      this is a demo note!
+      {{#if item.note}}
+        {{item.note}}
+      {{else}}
+        No note found!
+      {{/if}}
     </div>
   </div>
 </div>
