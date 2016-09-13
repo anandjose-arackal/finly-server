@@ -16,13 +16,13 @@ class Card::Configuration::EnableCard < Card::Base
 
   def pre_validate
     if self.user.blank?
-      errors << "User not found!"
+      messages[:error] << "User not found!"
     end
     if params[:card_id].blank?
-      errors << "Card not found!"
+      messages[:error] << "Card not found!"
     end
     if !params[:self] and params[:employee_id].blank?
-      errors << "Employee not found!"
+      messages[:error] << "Employee not found!"
     end
   end
 
@@ -34,28 +34,28 @@ class Card::Configuration::EnableCard < Card::Base
   def validate
     # i.e. it's manager view
     if employee.nil? and params[:self].nil?
-      errors << "Employee does not exist."
+      messages[:error] << "Employee does not exist."
     end
     # i.e. if the card is already deactivated
     if card.active
-      errors << "Card is already active."
+      messages[:error] << "Card is already active."
     end
   end
 
   def authorize
     if user.admin? and !!params[:self]
       unless employee.company_id == user.company_id
-        errors << "You are not an admin for this employee."
+        messages[:error] << "You are not an admin for this employee."
       end
       # if manager view, user must be employee's manager
     elsif user.manager? and !params[:self]
       unless User::Team::Index.call(user, 3, indirect_associations: true).include?(employee) and card.disabled_by_role_id >= 3
-        errors << "You are not authorized to enable this card."
+        messages[:error] << "You are not authorized to enable this card."
       end
       # if employee, he must own the card and should have been disabled by him
     elsif user.employee? and params[:self]
       unless card.user_id == user.id and card.disabled_by_role_id >= 4
-        errors << "You are not authorized to enable this card."
+        messages[:error] << "You are not authorized to enable this card."
       end
     end
   end
@@ -64,7 +64,7 @@ class Card::Configuration::EnableCard < Card::Base
     if card.update_attributes(active: true, disabled_by_role_id: nil)
       success
     else
-      errors << card.errors.full_messages
+      messages[:error] << card.errors.full_messages
     end
   end
 

@@ -1,23 +1,22 @@
 class Export::Base < BaseOperation
-
   attr_accessor :company, :preference
 
 
-  class Export::Base::ExportPresenter < BaseOperation::BasePresenter
+  class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :data, :header
 
-    def initialize(user, params)
+    def init
       self.data = params[:data]
       self.header = params[:header]
     end
 
   end
 
-  class Export::Field::FieldPresenter < BaseOperation::BasePresenter
+  class Export::Field::FieldPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :field
 
-    def initialize(user, params)
+    def init
       self.field = params[:preference]
       self.result = params[:result]
     end
@@ -29,7 +28,7 @@ class Export::Base < BaseOperation
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or parameters not present."
+      messages[:error] << "User or parameters not present."
     end
   end
 
@@ -37,12 +36,8 @@ class Export::Base < BaseOperation
     params.require(:export).permit(:export_field_id, :name)
   end
 
-  def retrieve
-    if is_success?
-      self.preference
-    else
-      false
-    end
+  def success
+    self.preference
   end
 
   def retrieve_data(preferences, report, expense)

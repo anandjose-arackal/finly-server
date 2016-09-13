@@ -8,7 +8,7 @@ class User::Role::Set < BaseOperation
 
   def pre_validate
     unless params[:user_id].present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 

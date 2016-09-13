@@ -14,7 +14,7 @@ class Report::Policies::Assign < Report::Base
   def pre_validate
     super()
     if params[:report_id].blank?
-      errors << "Report id not passed"
+      messages[:error] << "Report id not passed"
     end
   end
 
@@ -31,18 +31,18 @@ class Report::Policies::Assign < Report::Base
     end
 
     if report.policy_id == policy.id
-      errors << "Report is already assigned to this policy"
+      messages[:error] << "Report is already assigned to this policy"
     end
 
     # checking if the user is actually this policy
     if policy and !user.policies.includes?(policy)
-      errors << "You are not associated with this policy."
+      messages[:error] << "You are not associated with this policy."
     end
   end
 
   def process
     unless report.update_attribute(:policy_id, params[:policy_id], submitted_at: nil)
-      errors << report.errors.full_messages
+      messages[:error] << report.errors.full_messages
     end
   end
 

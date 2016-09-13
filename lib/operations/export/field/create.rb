@@ -1,8 +1,8 @@
 # action to create and destroy an export field.
 # params:
 # export :
-  # export_field_id: id of the export field that needs to be created
-  # name: the custom name that is to be given to the select field. If nil, the export field retains the default name
+# export_field_id: id of the export field that needs to be created
+# name: the custom name that is to be given to the select field. If nil, the export field retains the default name
 #
 class Export::Field::Create < Export::Base
 
@@ -15,14 +15,14 @@ class Export::Field::Create < Export::Base
 
   def validate
     if create_params.blank?
-      errors << "Invalid data."
+      messages[:error] << "Invalid data."
     end
   end
 
   def process
     self.preference = company.export_preferences.build(create_params)
     unless preference.save
-      errors << preference.errors.full_messages
+      messages[:error] << preference.errors.full_messages
     end
   end
 
@@ -30,13 +30,8 @@ class Export::Field::Create < Export::Base
 
   end
 
-  def retrieve
-    if is_success?
-      field_presenter = Export::Base::FieldPresenter.new(user, {preference: preference})
-      return field_presenter
-    else
-      return false
-    end
+  def success
+    Export::Base::FieldPresenter.new(user, {preference: preference}, messages)
   end
 
 end

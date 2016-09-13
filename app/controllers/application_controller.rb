@@ -1,5 +1,8 @@
 require 'require_all'
-require_all 'lib/operations/event'
+
+# Dir[File.expand_path "#{Rails.root}/lib/operations/event/**/*.rb"].each{|f| require_relative(f)}
+# require_all "#{Rails.root}/lib/operations"
+# require_all "#{Rails.root}/lib/operations/event"
 class ApplicationController < ActionController::Base
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
   # Prevent CSRF attacks by raising an exception.
@@ -9,7 +12,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
-  before_action :load_view
   # to add custom parameters to the user hash being taken as input
   before_action :configure_permitted_parameters if :devise_controller?
 
@@ -37,7 +39,6 @@ class ApplicationController < ActionController::Base
       format.any { head :not_found }
     end
   end
-
 
   def store_location
     # store last url - this is needed for post-login redirect to whatever the user last visited.
@@ -83,6 +84,50 @@ class ApplicationController < ActionController::Base
   # end
 
   protected
+  def respond(type=nil)
+    if type.present?
+      if type[:response] == :success
+        @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, {success: [type[:message]]})
+        respond_to do |format|
+          format.json { render 'shared/success' }
+        end
+        return
+      elsif type[:response] == :failure
+        @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: [type[:message]]})
+        respond_to do |format|
+          format.json { render 'layouts/application' }
+        end
+        return
+      elsif type[:render].present?
+        respond_to do |format|
+          format.json { render type[:render] }
+        end
+        return
+      elsif type[:view].present? and type[:view] == false
+        respond_to do |format|
+          format.json { render 'layouts/application' }
+        end
+        return
+      end
+    end
+    if @result.present? and @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond_to do |format|
+        format.json { render 'layouts/application' }
+      end
+    end
+  end
+
+  def respond_failure(message=nil)
+    messages = [message] unless message.is_a?(Array)
+    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {errors: messages})
+    respond_to do |format|
+      format.json { render 'layouts/application' }
+    end
+  end
 
   # Used by API's
   def action_success
@@ -109,23 +154,5 @@ class ApplicationController < ActionController::Base
 
   def after_sign_out_path_for(resource)
     root_url
-  end
-
-  def load_view
-    view = params[:view] || params['view']
-    current_user.view = params[:view] || params['view'] if current_user
-    view.tr!('?', '') if view.present?
-    case view
-      when 'admin'
-        @admin_view = true
-      when 'manager'
-        @manager_view = true
-      when 'finance'
-        @finance_view = true
-      when 'auditor'
-        @auditor_view = true
-      else
-        @personal_view = true
-    end
   end
 end

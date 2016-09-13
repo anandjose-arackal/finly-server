@@ -1,16 +1,13 @@
 # Base class for rule creation and deletion and updation
 
 class Policy::Rules::Base < Policy::Base
-
   attr_accessor :rule_params, :rule
 
   class Policy::Rules::Base::RulePresenter < Policy::Base::PolicyPresenter
-
     attr_accessor :rule
 
-    def initialize(user, params)
+    def init
       self.rule = params[:rules]
-
     end
   end
 
@@ -20,7 +17,7 @@ class Policy::Rules::Base < Policy::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or policy passed."
+      messages[:error] << "No user or policy passed."
     end
   end
 
@@ -30,7 +27,7 @@ class Policy::Rules::Base < Policy::Base
 
   def authorize
     unless user.admin? or user.policy_admin?(policy)
-      errors << "You are not an admin or policy admin for this policy"
+      messages[:error] << "You are not an admin or policy admin for this policy"
     end
   end
 
@@ -44,12 +41,8 @@ class Policy::Rules::Base < Policy::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      return rule
-    else
-      return false
-    end
+  def success
+     rule
   end
 
 end

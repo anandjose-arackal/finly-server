@@ -13,7 +13,7 @@ class MoneyRequest::Create < MoneyRequest::Base
       self.money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
                                        status_id: MoneyRequestStatus.open_id, user_request_role_id: UserRole.employee_id
     else
-      self.errors = money_request.errors.full_messages
+      self.messages = money_request.errors.full_messages
     end
   end
 

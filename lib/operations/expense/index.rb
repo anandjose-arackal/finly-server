@@ -7,7 +7,7 @@ class Expense::Index < Expense::Base
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -35,13 +35,9 @@ class Expense::Index < Expense::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      params[:expenses] = self.expenses
-      Expense::Index::ListPresenter.new(user, params)
-    else
-      false
-    end
+  def success
+    params[:expenses] = self.expenses
+    Expense::Index::ListPresenter.new(user, params, messages)
   end
 
   class Expense::Index::ListPresenter < Expense::Base::Presenter
@@ -59,7 +55,7 @@ class Expense::Index < Expense::Base
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash
 
-    def initialize(user, params)
+    def init
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)

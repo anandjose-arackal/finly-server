@@ -3,14 +3,14 @@ class User::Team::FinalFinanceManager < User::Team::Base
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
     if params[:report].blank? and params[:money_request].blank?
-      errors << 'Report or card load request not defined'
+      messages[:error] << 'Report or card load request not defined'
     end
 
     if params[:report].present? and params[:money_request].present?
-      errors << 'You can only request for finance manager for either report or card load request'
+      messages[:error] << 'You can only request for finance manager for either report or card load request'
     end
   end
 

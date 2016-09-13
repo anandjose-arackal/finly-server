@@ -12,10 +12,10 @@ class Report::Approve < Report::Base
 
   def pre_validate
     if user.blank?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
     if params.blank?
-      errors << 'Error loading configuration'
+      messages[:error] << 'Error loading configuration'
     end
   end
 
@@ -36,7 +36,7 @@ class Report::Approve < Report::Base
 
   def validate
     unless report.processing? or params[:auto_approve]
-      errors << 'Cannot approve this report as it is not in processing state'
+      messages[:error] << 'Cannot approve this report as it is not in processing state'
     end
   end
 
@@ -66,11 +66,11 @@ class Report::Approve < Report::Base
       end
       return true
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process
-    if is_success?
+    if success?
       if auto_approve
         comment = report.comments.build report_comment_action_id: ReportCommentAction.report_auto_approve_id
       else

@@ -9,7 +9,7 @@ class Policy::InvitableUsers < Policy::Base
     has_scope :filter_email
     has_scope :filter_name
 
-    def initialize(user, params)
+    def init
       self.invitable_users = apply_scopes(params[:invitable_users], params)
       self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
     end
@@ -29,7 +29,7 @@ class Policy::InvitableUsers < Policy::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -52,13 +52,9 @@ class Policy::InvitableUsers < Policy::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      params[:invitable_users] = invitable_users
-      Policy::InvitableUsers::InvitableUsersPresenter.new(user, params)
-    else
-      return false
-    end
+  def success
+    params[:invitable_users] = invitable_users
+    Policy::InvitableUsers::InvitableUsersPresenter.new(user, params, messages)
   end
 
 

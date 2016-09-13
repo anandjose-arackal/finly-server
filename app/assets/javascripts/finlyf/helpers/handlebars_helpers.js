@@ -30,3 +30,40 @@ Handlebars.registerHelper("case", function(value, options) {
         return options.fn(this);
     }
 });
+
+Handlebars.registerHelper('if_all', function() {
+  var args = [].slice.apply(arguments);
+  var opts = args.pop();
+
+  var fn = opts.fn;
+  for(var i = 0; i < args.length; ++i) {
+    if(args[i])
+      continue;
+    fn = opts.inverse;
+    break;
+  }
+  return fn(this);
+});
+
+Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+  switch (operator) {
+    case '==':
+      return (v1 == v2) ? options.fn(this) : options.inverse(this);
+    case '===':
+      return (v1 === v2) ? options.fn(this) : options.inverse(this);
+    case '<':
+      return (v1 < v2) ? options.fn(this) : options.inverse(this);
+    case '<=':
+      return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+    case '>':
+      return (v1 > v2) ? options.fn(this) : options.inverse(this);
+    case '>=':
+      return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+    case '&&':
+      return (v1 && v2) ? options.fn(this) : options.inverse(this);
+    case '||':
+      return (v1 || v2) ? options.fn(this) : options.inverse(this);
+    default:
+      return options.inverse(this);
+  }
+});

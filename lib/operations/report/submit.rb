@@ -18,12 +18,12 @@ class Report::Submit < Report::Base
   def validate
     # checking report status
     unless report.can_submit?
-      errors << 'Cannot submit this report'
+      messages[:error] << 'Cannot submit this report'
       return false
     end
     # checking if the report has expenses
     unless report.expenses.present?
-      errors << 'Cannot submit an empty report'
+      messages[:error] << 'Cannot submit an empty report'
     end
     # checking for blocking violations
     violations = Report::Violation.(user, report: report)
@@ -34,7 +34,7 @@ class Report::Submit < Report::Base
       end
     end
     if violations_present
-      errors << 'Reports with blocking violations cannot be submitted'
+      messages[:error] << 'Reports with blocking violations cannot be submitted'
     end
   end
 
@@ -65,8 +65,8 @@ class Report::Submit < Report::Base
       # call the approve class with the right parameters
       approve_op = Report::Approve.new(user, {report_id: report.id, auto_approve: true})
       unless approve_op.run
-        self.errors = self.errors.merge approve_op.errors
-        # self.errors << "Error auto-approving report. Please try again."
+        self.messages[:error] = messages[:error].merge approve_op.errors
+        # self.messages[:error] << "Error auto-approving report. Please try again."
         return false
       end
       report.reload
@@ -82,7 +82,7 @@ class Report::Submit < Report::Base
       end
       return true
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process

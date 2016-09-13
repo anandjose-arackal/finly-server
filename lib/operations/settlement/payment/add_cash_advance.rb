@@ -8,8 +8,6 @@
   # date: date of the payment
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
-  attr_accessor :payment
-
   def authorized_user_types
     [:finance_manager, :admin]
   end
@@ -17,7 +15,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   def pre_validate
     super()
     if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
-      errors << "Amount being added blank or negative."
+      messages[:error] << "Amount being added blank or negative."
     end
   end
 
@@ -39,7 +37,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def validate
     unless validate_date payment_params[:date]
-      errors << "Invalid date passed. Try again."
+      messages[:error] << "Invalid date passed. Try again."
     end
   end
 
@@ -50,13 +48,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     if payment.save and balance_sheet.add_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
       return true
     end
-    self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
+    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
     false
-  end
-
-  def success
-    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 
 end

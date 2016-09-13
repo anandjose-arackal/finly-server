@@ -93,7 +93,7 @@ class Event::SetNotification < Event::Base
     true
   end
 
-  class MailerPresenter < BaseOperation::BasePresenter
+  class MailerPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     def validate
     end

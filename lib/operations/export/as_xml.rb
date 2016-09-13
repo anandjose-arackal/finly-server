@@ -14,7 +14,7 @@ class Export::AsXml < Export::Base
 
   def authorize
     unless reports
-      errors << "Reports to export not found."
+      messages[:error] << "Reports to export not found."
     end
   end
 
@@ -28,13 +28,8 @@ class Export::AsXml < Export::Base
     end
   end
 
-  def retrieve
-    if is_success?
-      xml_presenter = Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data})
-      return xml_presenter
-    else
-      false
-    end
+  def success
+    Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data}, messages)
   end
 
 

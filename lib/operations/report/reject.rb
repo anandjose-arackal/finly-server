@@ -30,18 +30,18 @@ class Report::Reject < Report::Base
   def authorize
     super
     unless report.controlling_user.id == user.id
-      errors << 'You cannot reject the report at the moment'
+      messages[:error] << 'You cannot reject the report at the moment'
       raise_unauthorized_exception
     end
   end
 
   def validate
     unless report.processing?
-      errors << 'Cannot reject this report after the report is approved'
+      messages[:error] << 'Cannot reject this report after the report is approved'
       return
     end
     unless reject_to_user.present?
-      errors << 'Reject to user not found'
+      messages[:error] << 'Reject to user not found'
     end
   end
 
@@ -61,7 +61,7 @@ class Report::Reject < Report::Base
   end
 
   def post_process
-    if is_success?
+    if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reject_id, rejected_to_id: reject_to_user.id, content: params[:memo]
       comment.save
     end

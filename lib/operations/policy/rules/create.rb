@@ -27,7 +27,7 @@ class Policy::Rules::Create < Policy::Rules::Base
   def validate
     super()
     if rule_parameters.blank?
-      errors << "Rule attributes not provided"
+      messages[:error] << "Rule attributes not provided"
       return false
     end
   end
@@ -36,13 +36,13 @@ class Policy::Rules::Create < Policy::Rules::Base
     if params[:expense_rule]
       self.rule = @policy.expense_rules.create!(rule_params)
       unless rule.save
-        errors << rule.errors.full_messages
+        messages[:error] << rule.errors.full_messages
         return false
       end
     else
       self.rule = @policy.budget_rules.create!(rule_params)
       unless rule.save
-        errors << rule.errors.full_messages
+        messages[:error] << rule.errors.full_messages
         return false
       end
     end

@@ -9,7 +9,7 @@ class Event::Report::Expense::Reject < Event::Report::Base
   def validate
     super
     unless self.rejected_expense.present?
-      errors << 'Expense not found'
+      messages[:error] << 'Expense not found'
     end
   end
 

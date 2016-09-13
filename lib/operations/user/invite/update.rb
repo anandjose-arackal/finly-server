@@ -10,7 +10,7 @@ class User::Invite::Update < User::Invite::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or params is blank"
+      messages[:error] << "User or params is blank"
     end
   end
 
@@ -22,20 +22,20 @@ class User::Invite::Update < User::Invite::Base
 
   def validate
     unless invited_user
-      errors << "User to be updated not found."
+      messages[:error] << "User to be updated not found."
     end
   end
 
   def authorize
     unless user.admin? or user.id == invited_user.invited_by
-      errors << 'Only inviting users or admins can delete invites.'
+      messages[:error] << 'Only inviting users or admins can delete invites.'
       return false
     end
   end
 
   def process
     unless user_team_service.update(params)
-      errors << user_team_service.errors
+      messages[:error] << user_team_service.errors
       return false
     end
     if params[:manager] == '1'

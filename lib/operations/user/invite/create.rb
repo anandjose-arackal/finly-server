@@ -13,7 +13,7 @@ class User::Invite::Create < User::Invite::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "No user or param passed."
+      messages[:error] << "No user or param passed."
     end
   end
 
@@ -23,43 +23,43 @@ class User::Invite::Create < User::Invite::Base
 
   def validate
     if invite_params[:company].blank? and invite_params[:company_id].blank? and invite_params['company_id'].blank?
-      errors << 'A user can only be invited to a company. Please enter the company the user has to be assigned to'
+      messages[:error] << 'A user can only be invited to a company. Please enter the company the user has to be assigned to'
       return false
     end
     company_id = invite_params[:company_id] or invite_params[:company] or invite_params['company_id']
     if company_id.to_i != self.user.company_id
-      errors << 'User can only be invited in the same company'
+      messages[:error] << 'User can only be invited in the same company'
       return false
     end
 
     if invite_params[:email].blank?
-      errors << 'User email is required for inviting users'
+      messages[:error] << 'User email is required for inviting users'
       return false
     end
 
     if User.find_by_email(invite_params[:email]).present?
-      errors << 'Cannot invite an existing user'
+      messages[:error] << 'Cannot invite an existing user'
       return false
     end
 
     # checking validity of user role params
     role_mapping = invite_params[:role_mapping_attributes]
     if role_mapping.blank?
-      errors << 'User must be assigned a role to be invited'
+      messages[:error] << 'User must be assigned a role to be invited'
       return false
     end
     unless role_mapping.is_a?(Array) and role_mapping.size > 0
-      errors << 'User must be assigned a role to be invited'
+      messages[:error] << 'User must be assigned a role to be invited'
       return false
     end
     # checking validity of user team params
     team_mapping = invite_params[:team_mapping_attributes]
     if team_mapping.blank?
-      errors << 'User must be assigned a manager and a finance manager to be invited'
+      messages[:error] << 'User must be assigned a manager and a finance manager to be invited'
       return false
     end
     unless team_mapping.is_a?(Array) and team_mapping.size > 0
-      errors << 'User must be assigned a manager and a finance manager to be invited'
+      messages[:error] << 'User must be assigned a manager and a finance manager to be invited'
       return false
     end
 
@@ -72,7 +72,7 @@ class User::Invite::Create < User::Invite::Base
       role_mapping.each do |role|
         rid = role[:user_role_id]
         unless rid.present? and (rid == UserRole.manager_id or rid == UserRole.employee_id)
-          errors << "#{self.user.name} can only invite the user as an employee or manager"
+          messages[:error] << "#{self.user.name} can only invite the user as an employee or manager"
           return false
         end
       end
@@ -80,7 +80,7 @@ class User::Invite::Create < User::Invite::Base
       role_mapping.each do |role|
         rid = role[:user_role_id]
         unless rid.present? and (rid == UserRole.finance_manager_id or rid == UserRole.employee_id)
-          errors << "#{self.user.name} can only invite the user as an employee or finance manager"
+          messages[:error] << "#{self.user.name} can only invite the user as an employee or finance manager"
           return false
         end
       end
@@ -114,7 +114,7 @@ class User::Invite::Create < User::Invite::Base
         end
       end
       unless default_present and valid
-        errors << 'User can only be assigned to the inviting user'
+        messages[:error] << 'User can only be assigned to the inviting user'
         return false
       end
     end
@@ -133,30 +133,25 @@ class User::Invite::Create < User::Invite::Base
       # u.skip_invitation = true
     end
     unless new_user
-      errors << "Invite failed. Try again!"
+      messages[:error] << "Invite failed. Try again!"
     end
   end
 
   def post_process
     # adding the user to the policy after he has been successfully invited
-    if is_success?
+    if success?
       @policy = Policy.find_by(id: @policy_id)
       if @policy
         unless Policy::Users::AddUser.new(user, {policy_id: @policy.id, added_user_id: new_user.id})
-          errors << "User could not be added to policy."
+          messages[:error] << "User could not be added to policy."
           return false
         end
       end
     end
   end
 
-  def retrieve
-    if is_success?
-      invite_presenter = User::Invite::Base::InvitePresenter.new(user, invite: new_user)
-      return invite_presenter
-    else
-      return false
-    end
+  def success
+    User::Invite::Base::InvitePresenter.new(user, {invite: new_user}, messages)
   end
 
 end

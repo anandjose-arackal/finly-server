@@ -8,15 +8,15 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "Parameters or user not found"
+      messages[:error] << "Parameters or user not found"
       return false
     end
     if params[:expense_id].nil? and params[:id].blank?
-      errors << "Expense ID missing!"
+      messages[:error] << "Expense ID missing!"
       return false
     end
     if params[:expense].present? and params[:expense][:amount].present? and params[:expense][:amount].to_i < 0
-      errors << "Amount can't be negative."
+      messages[:error] << "Amount can't be negative."
       return false
     end
   end
@@ -53,7 +53,7 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def process
     unless expense.update(updated_expense_params)
-      errors << self.expense.errors.full_messages
+      messages[:error] << self.expense.errors.full_messages
       return false
     end
     true

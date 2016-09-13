@@ -3,7 +3,7 @@ class Settlement::Index < Settlement::Base
 
   def pre_validate
     unless user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -11,26 +11,25 @@ class Settlement::Index < Settlement::Base
     params[:indirect_associations] = true
     operation = User::Team::Index.new(user, params)
     user_team = operation.run
-    unless operation.is_success?
-      self.errors = operation.errors
+    unless operation.success?
+      self.messages[:error] = operation.messages[:error]
       return
     end
     self.users = user_team.with_balance_sheet.with_roles.only_employees
     if self.users.nil?
-      errors << 'Users not found'
+      messages[:error] << 'Users not found'
     end
   end
 
   def success
     params[:users] = self.users
-    Settlement::Index::Presenter.new(user, params)
+    Settlement::Index::Presenter.new(user, params, messages)
   end
 
-  class Settlement::Index::Presenter < BaseOperation::BasePresenter
+  class Settlement::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :users
 
-    def initialize(user, params)
-      super(user, params)
+    def init
       self.users = params[:users].paginate(page: params[:page], per_page: 30)
     end
   end

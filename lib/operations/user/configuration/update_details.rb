@@ -4,29 +4,25 @@ class User::Configuration::UpdateDetails < BaseOperation
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
   def validate
     if details_params[:name].blank?
-      errors << "Name cannot be blank."
+      messages[:error] << "Name cannot be blank."
       return false
     end
     if details_params[:mobile_number].blank?
-      errors << "Mobile number cannot be blank."
+      messages[:error] << "Mobile number cannot be blank."
     end
   end
 
 
   def process
     unless user.update(details_params)
-      errors << user.errors.full_messages
+      messages[:error] << user.errors.full_messages
     end
-  end
-
-  def success
-    self.user
   end
 
   private

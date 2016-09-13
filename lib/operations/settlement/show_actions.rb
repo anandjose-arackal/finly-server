@@ -22,13 +22,13 @@ class Settlement::ShowActions < Settlement::Base
   end
 
   def success
-    Settlement::ShowActions::ShowPresenter.new(user, params).actions
+    Settlement::ShowActions::ShowPresenter.new(user, params, messages).actions
   end
 
   class Settlement::ShowActions::ShowPresenter < Settlement::Base::BasePresenter
     attr_accessor :actions
 
-    def initialize(user, params)
+    def init
       self.actions = load_actions
     end
 
