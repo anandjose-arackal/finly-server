@@ -6,6 +6,10 @@ class Policy::Base < BaseOperation
 
     attr_accessor :policy
 
+    def init
+
+    end
+
   end
 
   def pre_validate

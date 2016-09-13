@@ -12,9 +12,9 @@ class Export::Base < BaseOperation
 
   end
 
-  class Export::Field::FieldPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Export::Base::FieldPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :field
+    attr_accessor :field, :result
 
     def init
       self.field = params[:preference]
@@ -36,9 +36,7 @@ class Export::Base < BaseOperation
     params.require(:export).permit(:export_field_id, :name)
   end
 
-  def success
-    self.preference
-  end
+
 
   def retrieve_data(preferences, report, expense)
     data_arr = []

@@ -18,10 +18,9 @@ class Category < ActiveRecord::Base
   validates :company_id, presence: true
   validates :name, presence: true
 
-  # returns the name of the category if it's active
+  # returns the name of the category
   def category_name
-    return self.name if self.active
-    false
+    self.name
   end
 
   scope :active, -> {where active: true}

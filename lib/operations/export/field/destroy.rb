@@ -5,7 +5,8 @@ class Export::Field::Destroy < Export::Base
   def init
     self.company = user.company
     self.destroy_params = export_params
-    self.preference = company.export_preferences.find_by(id: destroy_params[:export_field_id])
+    id = params[:id] or destroy_params[:export_field_id]
+    self.preference = company.export_preferences.find_by(id: id)
   end
 
   def authorize
@@ -18,6 +19,10 @@ class Export::Field::Destroy < Export::Base
     unless preference.destroy
       messages[:error] << preference.errors.full_messages
     end
+  end
+
+  def success
+    Export::Base::FieldPresenter.new(user, {result: true}, messages)
   end
 
 end

@@ -33,4 +33,8 @@ class Policy::Rules::Destroy < Policy::Rules::Base
     # nothing
   end
 
+  def success
+    Policy::Rules::Base::RulePresenter.new(user, {result: true}, messages)
+  end
+
 end
