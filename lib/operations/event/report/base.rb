@@ -38,7 +38,8 @@ class Event::Report::Base < Event::SetNotification
   end
 
   def mailer_button_name(user)
-    if user.id == report.controlling_user.id and not user.id == report.user.id
+    if report.controlling_user_id.present? and
+        user.id == report.controlling_user_id and not user.id == report.user.id
       'Review Report'
     else
       'View Report'

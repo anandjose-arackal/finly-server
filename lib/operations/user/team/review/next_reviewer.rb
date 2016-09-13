@@ -40,6 +40,10 @@ class User::Team::Review::NextReviewer < BaseOperation
     end
   end
 
+  def retrieve
+    self.response
+  end
+
   private
   def next_reviewer(sym, obj)
     user = obj.controlling_for_user

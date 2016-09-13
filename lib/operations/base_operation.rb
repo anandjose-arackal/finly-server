@@ -121,9 +121,10 @@ class BaseOperation
   # Used to present the data to the UI
   class BaseOperation::BasePresenter
     include MathUtil, HasScope
-    attr_accessor :user, :params, :messages
+    attr_accessor :user, :params, :messages, :config
 
     def initialize(user, params={}, messages={})
+      self.config = {}
       self.user = user
       self.params = params
       self.messages = messages

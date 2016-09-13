@@ -40,7 +40,8 @@ class Event::Report::Approve < Event::Report::Base
   end
 
   def mailer_subject(user)
-    if user.id == self.report.tracks.last.action_user.id
+    approver_id = self.report.tracks.last.action_user.id rescue nil
+    if approver_id.present? and user.id == approver_id
       "Report approved : #{self.report.name}"
     else
       if approved and user.id == self.report.user.id
@@ -52,7 +53,8 @@ class Event::Report::Approve < Event::Report::Base
   end
 
   def mailer_body(user)
-    if user.id == self.report.tracks.last.action_user.id
+    approver_id = self.report.tracks.last.action_user.id rescue nil
+    if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the report : #{self.report.name}"
     else
       if approved and user.id == report.user.id
