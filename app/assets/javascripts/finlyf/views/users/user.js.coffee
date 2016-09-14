@@ -145,12 +145,10 @@ class FinlyF.Views.User extends Backbone.View
     target = e.currentTarget
     url = $(target).attr('data-url')
     type = $(target).attr('data-method')
-
+    data = {}
     data_presence = $(target).attr('data-presence')
     if data_presence
-      data = {
-        type: $(target).attr('data-type')
-      }
+      data.type = $(target).attr('data-type')
     else
       data = {}
 
@@ -161,8 +159,9 @@ class FinlyF.Views.User extends Backbone.View
       dataType: 'json',
       success: (res) ->
         console.log "Suc", res
+        FinlyF.snapNotify(res)
       error: (err) ->
-        console.log "Err"
+        console.log "Err", err
     })
     # # console.log "working"
     # target = e.currentTarget

@@ -82,6 +82,8 @@ window.FinlyF =
     else
       FinlyF.primary_router.navigate('expenses', {trigger: true})
 
+  snapNotify: (obj) ->
+    console.log obj
 
 $(document).ready ->
   FinlyF.initialize()
