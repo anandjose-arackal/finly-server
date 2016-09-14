@@ -51,7 +51,7 @@ class UsersController < ApplicationController
         success_message = "Details updated."
       when 'state'
         operation = User::Configuration::UpdateState.new(current_user, params)
-        success_message = "State updated."
+        success_message = 'State updated'
       else
         # do nothing, ha!
     end
