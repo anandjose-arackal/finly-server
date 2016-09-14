@@ -305,12 +305,7 @@ Rails.application.routes.draw do
     post 'update_password', to: 'users#update_password', as: :update_password
   end
 
-  resources :pending_invites do
-    post 'invite', to: 'pending_invites#invite', as: :new_invite
-    patch 'update_invite', to: 'pending_invites#update_invite', as: :edit_invite
-    patch 'accept', to: 'pending_invites#accept', as: :accept
-    patch 'resend', to: 'pending_invites#resend', as: :resend
-  end
+  resources :pending_invites, only: [:create, :destroy, :update]
 
 
   get 'settlements/summary' => 'settlements#summary'

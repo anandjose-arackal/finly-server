@@ -87,7 +87,9 @@ class ApplicationController < ActionController::Base
   def respond(type=nil)
     if type.present?
       if type[:response] == :success
-        @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, {success: [type[:message]]})
+        messages = {}
+        messages[:success] = [type[:message]] if type[:message].present?
+        @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
         respond_to do |format|
           format.json { render 'shared/success' }
         end
