@@ -20,7 +20,7 @@ class User::Invite::Base < BaseOperation
   end
 
   def success
-     invited_user
+    User::Invite::Base::InvitePresenter.new(user, {invite: new_user}, messages)
   end
 
   def create_invite_params

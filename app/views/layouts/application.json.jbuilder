@@ -8,6 +8,11 @@ if @result.present?
     # For handling mobile apis
     if @result.config.present? and @result.config[:mobile_api]
       json.success true
+      if @result.messages.present?
+        unless @result.messages[:error].blank?
+          @result[:messages]
+        end
+      end
       json.messages @result.messages
       json.data data
     else

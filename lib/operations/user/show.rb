@@ -73,9 +73,9 @@ class User::Show < User::Base
       else
         # If user has signed up
         if self.user.active
-          actions[:deactivate] = Rails.application.routes.url_helpers.pending_invite_path(id: self.user.id)
+          actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.user.id)
         else
-          actions[:activate] = Rails.application.routes.url_helpers.pending_invite_path(id: self.user.id)
+          actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.user.id)
         end
       end
       actions
