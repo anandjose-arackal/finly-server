@@ -250,6 +250,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       files: this.$('form :file'),
       data: values,
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         if res.status == "success"
           $("#modal-new").modal('hide')
           _this.refetchCollection()
@@ -257,6 +258,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         console.log "Error", err
 
     })
+
+    console.log "Response", response
 
     # if response.responseJSON.status = "success"
 
@@ -306,8 +309,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   filter: (e) ->
-    e.preventDefault()
-    target = $(e.currentTarget)
+    if e
+      e.preventDefault()
+      target = $(e.currentTarget)
 
     sidebar = $(@el).find(".sidebar")
     params = {

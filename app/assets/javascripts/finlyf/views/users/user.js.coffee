@@ -21,6 +21,7 @@ class FinlyF.Views.User extends Backbone.View
     @page = options.page
 
     if @page == 'user'
+      @model = new FinlyF.Models.User({id: options.model_id})
       @model.fetch({
         data: @params
       })
@@ -40,6 +41,8 @@ class FinlyF.Views.User extends Backbone.View
     @
 
   populateDetails: ->
+    # console.log "here we are in after sync"
+    # console.log @model.toJSON()
     $(@el).html(@templateShow({item: @model.toJSON()}))
 
   edit: (e) ->
@@ -159,9 +162,9 @@ class FinlyF.Views.User extends Backbone.View
       dataType: 'json',
       success: (res) ->
         console.log "Suc", res
-        FinlyF.snapNotify(res)
+        FinlyF.snapNotify(res.messages)
       error: (err) ->
-        console.log "Err", err
+        console.log "Err", err.messages
     })
     # # console.log "working"
     # target = e.currentTarget

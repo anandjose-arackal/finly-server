@@ -121,6 +121,7 @@ class FinlyF.Views.Report extends Backbone.View
       data: values
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         $("#modal-new").modal('hide')
         _this.model.fetch({
           data: {
@@ -184,6 +185,7 @@ class FinlyF.Views.Report extends Backbone.View
         expense_ids: expense_ids
       },
       success: (res)->
+        FinlyF.snapNotify(res.messages)
         $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         # $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         $(modal).modal('hide')
@@ -236,9 +238,11 @@ class FinlyF.Views.Report extends Backbone.View
     model = new FinlyF.Models.Report({id: @model.get('id')})
     model.save(data, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         _this.model.fetch()
       error: (err) ->
+        FinlyF.snapNotify(err.messages)
         console.log "Err", err
     })
     # @model.save({report: {name: name}}, {
@@ -268,6 +272,7 @@ class FinlyF.Views.Report extends Backbone.View
     # console.log _this.parent.params.view
     model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         console.log model, res
         _this.model.fetch({
           data: {
@@ -289,6 +294,7 @@ class FinlyF.Views.Report extends Backbone.View
       }
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         console.log res
         _this.parent.trigger('item:destroyed')
       error: (err) ->
@@ -305,6 +311,7 @@ class FinlyF.Views.Report extends Backbone.View
       type: 'PATCH',
       dataType: 'json',
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         _this.model.fetch({
           data: {view: _this.current_view}
         })
@@ -312,6 +319,7 @@ class FinlyF.Views.Report extends Backbone.View
 
 
   refreshData: (e)->
+    _this = @
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh")
       @model.fetch({ data: {view: _this.current_view }})

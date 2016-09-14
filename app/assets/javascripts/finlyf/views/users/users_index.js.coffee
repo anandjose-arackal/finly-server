@@ -92,7 +92,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.User({
-      model: model,
+      model_id: model.get('id'),
       page: 'user'
       params: @params
       # preview: true

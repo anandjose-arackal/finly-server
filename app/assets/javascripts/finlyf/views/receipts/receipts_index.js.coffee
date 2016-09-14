@@ -182,8 +182,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         console.log "Success", model, res
         $("#modal-new").modal('hide')
         _this.filter()
-      error: (err) ->
-        console.log "Err", err
+      error: (err, model) ->
+        console.log "Err", err, model
     })
 
   resetFilters: ->
@@ -279,6 +279,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       data: values
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        # console.log "Success", model, res
         $(_this.el).find("#modal-new").modal('hide')
         _this.filter()
       error: (err) ->

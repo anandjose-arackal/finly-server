@@ -84,6 +84,29 @@ window.FinlyF =
 
   snapNotify: (obj) ->
     console.log obj
+    for type, messages of obj
+      switch type
+        when 'error'
+          color = 'red'
+          container = 'ohsnap-priority'
+        when 'success'
+          color = 'green'
+          container = 'ohsnap'
+        when 'failure'
+          color: 'orange'
+          container = 'ohsnap-priority'
+        when 'message'
+          color: 'blue'
+          container = 'ohsnap'
+        when 'notice'
+          color: 'blue'
+          container = 'ohsnap'
+        else
+          color: 'blue'
+          container = 'ohsnap'
+      if messages.length
+        for message in messages
+          ohSnap(message, {color: color, 'duration': '10000', 'container-id': container});
 
 $(document).ready ->
   FinlyF.initialize()

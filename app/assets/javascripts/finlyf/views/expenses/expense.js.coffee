@@ -68,6 +68,8 @@ class FinlyF.Views.Expense extends Backbone.View
       },
       processData: true,
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        # console.log "suc", res
         $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
         _this.parent.trigger('item:destroyed')
       error: (err) ->
@@ -117,8 +119,10 @@ class FinlyF.Views.Expense extends Backbone.View
       files: this.$('form :file'),
       data: values,
       patch: true,
-      put: true,# processData: true
+      put: true,
+      processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         #Refresh expense index if data changed. Refresh is done - expense_index.js.coffee.closeDetails
         $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
 

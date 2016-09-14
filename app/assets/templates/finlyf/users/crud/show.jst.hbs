@@ -29,24 +29,30 @@
     <div class="row">
       <div class="col-sm-3">Name</div>
       <div class="col-sm-9">
-        <label class="item-attr-preview">{{item.name}}</label>
-        <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.name}}" />
+        <label class="item-attr-preview">{{item.user.name}}</label>
+        <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.user.name}}" />
       </div>
     </div>
 
     <div class="row">
       <div class="col-sm-3">Email</div>
       <div class="col-sm-9">
-        <label class="item-attr-preview">{{item.email}}</label>
-        <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.email}}" />
+        <label class="item-attr-preview">{{item.user.email}}</label>
+        <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.user.email}}" />
       </div>
     </div>
 
     <div class="row">
       <div class="col-sm-3">Mobile</div>
       <div class="col-sm-9">
-        <label class="item-attr-preview">{{item.mobile_number}}</label>
-        <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
+        <label class="item-attr-preview">
+          {{#if item.user.mobile_number}}
+            {{item.user.mobile_number}}
+          {{else}}
+            Not Set
+          {{/if}}
+        </label>
+        <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.user.mobile_number}}" />
       </div>
     </div>
 
@@ -64,7 +70,7 @@
       <button class="btn btn-sm navbar-btn btn-warning btn-edit-user">Edit</button>
     </div>
   </div> 
-  <form class="fomr-user-roles">
+  <form class="form-user-roles">
     
   
     <div class="row">

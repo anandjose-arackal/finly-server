@@ -25,7 +25,9 @@
 
 
 // Oh snap codes
-.alert {
+#ohsnap .alert {
+  cursor: pointer;
+  text-align: center;
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid #eed3d7;
@@ -61,6 +63,37 @@
   background-color: #E9573F;
 }
 
+#ohsnap-priority{
+  position: absolute;
+  margin-top: 60px; 
+  position: absolute;
+  z-index: 20;
+  width: 33%;
+  margin-right: auto;
+  margin-left: auto;
+  right: auto;
+  left: 33%;
+  top: 0px;
+}
+
+#ohsnap-priority .alert {
+  cursor: pointer;
+  text-align: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #eed3d7;
+  border-radius: 4px;
+  // position: absolute;
+  left: auto;
+  right: auto;
+  // bottom: 0px;
+  // right: 21px;
+  /* Each alert has its own width */
+  // float: right;
+  // clear: right;
+  // background-color: white;
+  // z-index: 15;
+}
 //Oh snap codes end
 
 // Home css scss content ends
