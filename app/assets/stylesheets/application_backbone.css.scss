@@ -25,6 +25,30 @@
 
 
 // Oh snap codes
+
+.alert-red {
+  color: white;
+  background-color: #DA4453;
+}
+#ohsnap .alert-green {
+  color: white;
+  background-color: #37BC9B;
+}
+#ohsnap .alert-blue {
+  color: white;
+  background-color: #4A89DC;
+}
+
+#ohsnap .alert-yellow {
+  color: white;
+  background-color: #F6BB42;
+}
+.alert-orange {
+  color:white;
+  background-color: #E9573F;
+}
+
+
 #ohsnap .alert {
   cursor: pointer;
   text-align: center;
@@ -40,27 +64,6 @@
   clear: right;
   background-color: white;
   z-index: 15;
-}
-
-.alert-red {
-  color: white;
-  background-color: #DA4453;
-}
-.alert-green {
-  color: white;
-  background-color: #37BC9B;
-}
-.alert-blue {
-  color: white;
-  background-color: #4A89DC;
-}
-.alert-yellow {
-  color: white;
-  background-color: #F6BB42;
-}
-.alert-orange {
-  color:white;
-  background-color: #E9573F;
 }
 
 #ohsnap-priority{

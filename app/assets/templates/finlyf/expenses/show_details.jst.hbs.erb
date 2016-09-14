@@ -67,7 +67,9 @@
         {{else}}
           <img class="preview-image img-responsive" id="preview-image" src="<%= image_url('missing.png') %>" />
         {{/if}}
+
       </label>
+      <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .pdf, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
     </div>
     
   </div>

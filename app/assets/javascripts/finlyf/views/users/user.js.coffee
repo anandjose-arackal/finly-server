@@ -99,6 +99,7 @@ class FinlyF.Views.User extends Backbone.View
 
 
   update: (e) ->
+    _this = @
     e.preventDefault()
     target = $(e.currentTarget)
     form = $(target).closest('section').find('form')
@@ -108,6 +109,7 @@ class FinlyF.Views.User extends Backbone.View
     _.each($(form).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
+    values.view = @params.view
     # console.log values
     # values.authenticity_token = $("#authenticity_token").val()
 
@@ -117,7 +119,13 @@ class FinlyF.Views.User extends Backbone.View
       data: values,
       processData: true
       success: (model, res) ->
-        console.log model, res
+        if res.success == true
+          FinlyF.snapNotify(res.messages)
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
       error: (err) ->
         console.log "Err", err
     })

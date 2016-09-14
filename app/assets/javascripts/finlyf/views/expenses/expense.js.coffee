@@ -22,6 +22,7 @@ class FinlyF.Views.Expense extends Backbone.View
       view = options.view
       # console.log "Preview is passed true"
       $(@el).removeClass("item")
+      @model = new FinlyF.Models.Expense({id: options.model_id})
       @model.fetch({
         data: {
           view: view
@@ -101,44 +102,67 @@ class FinlyF.Views.Expense extends Backbone.View
     $(target).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-expense').addClass('btn-edit-expense')
 
     _this = @
+    e.preventDefault()
+    formData = new FormData($(@el).find('form#form-update-item')[0])
+
+    $.ajax({
+      url: '/expenses/' + _this.model.get('id')
+      type: "PUT",
+      data: formData,
+      success: (res) ->
+        # console.log res
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch()
+          # $("#modal-new").modal('hide')
+          # _this.refetchCollection()
+      error: (err) ->
+        console.log "Error", err 
+      cache: false,
+      contentType: false,
+      processData: false
+    })
+
+
+
     values = {}
 
     # if(event){ event.preventDefault(); }
 
-    _.each($(@el).find('form#form-update-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    values.authenticity_token = $("#authenticity_token").val()
-    model = new FinlyF.Models.Expense({
-      id: @model.get('id')
-    })
-    console.log "Putting data", values, model.toJSON()
-    response = model.save(values, {
+    # _.each($(@el).find('form#form-update-item').serializeArray(), (input) ->
+    #   values[ input.name ] = input.value
+    # )
+    # values.authenticity_token = $("#authenticity_token").val()
+    # model = new FinlyF.Models.Expense({
+    #   id: @model.get('id')
+    # })
+    # console.log "Putting data", values, model.toJSON()
+    # response = model.save(values, {
       
-      iframe: true,
-      files: this.$('form :file'),
-      data: values,
-      patch: true,
-      put: true,
-      processData: true
-      success: (model, res) ->
-        FinlyF.snapNotify(res.messages)
-        #Refresh expense index if data changed. Refresh is done - expense_index.js.coffee.closeDetails
-        $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+    #   iframe: true,
+    #   files: this.$('form :file'),
+    #   data: values,
+    #   patch: true,
+    #   put: true,
+    #   processData: true
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     #Refresh expense index if data changed. Refresh is done - expense_index.js.coffee.closeDetails
+    #     $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
 
-        #Refresh report if data changed, refresh is done in - report.js.coffee.refreshData
-        if $(target).closest("#modal-mp")
-          $(target).closest("#modal-mp").find(".modal-content").attr("data-refresh", true)
-        _this.model.fetch()
-        # console.log "Success"
-        # console.log model, res
-        # if res.status == "success"
-        #   $("#modal-new").modal('hide')
-        #   _this.refetchCollection()
-      error: (err) ->
-        console.log "Error", err
+    #     #Refresh report if data changed, refresh is done in - report.js.coffee.refreshData
+    #     if $(target).closest("#modal-mp")
+    #       $(target).closest("#modal-mp").find(".modal-content").attr("data-refresh", true)
+    #     _this.model.fetch()
+    #     # console.log "Success"
+    #     # console.log model, res
+    #     # if res.status == "success"
+    #     #   $("#modal-new").modal('hide')
+    #     #   _this.refetchCollection()
+    #   error: (err) ->
+    #     console.log "Error", err
 
-    })
+    # })
     
 
 

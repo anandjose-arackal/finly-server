@@ -22,7 +22,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     'click .item': 'selectCurrent'
     'click .close-details': 'closeDetails'
     'click .btn-new': 'new'
-    'click .btn-create': 'create'
+    # 'click .btn-create': 'create'
+    'submit form#new-item': 'create'
     'click .load-more': 'loadMore'
     'click .filter-status li a': 'filterStatus'
     'click .navbar-menu-li': 'navigate'
@@ -162,29 +163,47 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $("#modal-new").attr('data-backdrop', false)
     $("#modal-new").modal('show')
 
-  create: ->
+  create: (e)->
     _this = @
-    values = {};
+    e.preventDefault()
+    formData = new FormData(e.currentTarget)
 
-    # if(event){ event.preventDefault(); }
-
-    _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    # console.log values
-    model = new FinlyF.Models.Receipt()
-    # console.log("Putting data")
-    response = model.save(values,{
-      iframe: true,
-      files: this.$('form :file'),
-      data: values
-      success: (model, res) ->
-        console.log "Success", model, res
-        $("#modal-new").modal('hide')
-        _this.filter()
-      error: (err, model) ->
-        console.log "Err", err, model
+    $.ajax({
+      url: '/receipts'
+      type: 'POST',
+      data: formData,
+      async: true,
+      success: (res) ->
+        # console.log(data)
+        if res.success == true
+          FinlyF.snapNotify(res.messages)
+          $("#modal-new").modal('hide')
+          _this.filter()
+      error: (err) ->
+        console.log "Err", err
+      cache: false,
+      contentType: false,
+      processData: false
     })
+
+
+    # _.each($(@el).find('form#new-item').serializeArray(), (input) ->
+    #   values[ input.name ] = input.value
+    # )
+    # # console.log values
+    # model = new FinlyF.Models.Receipt()
+    # # console.log("Putting data")
+    # response = model.save(values,{
+    #   iframe: true,
+    #   files: this.$('form :file'),
+    #   data: values
+    #   success: (model, res) ->
+    #     console.log "Success", model, res
+    #     $("#modal-new").modal('hide')
+    #     _this.filter()
+    #   error: (err, model) ->
+    #     console.log "Err", err, model
+    # })
 
   resetFilters: ->
     params = {}

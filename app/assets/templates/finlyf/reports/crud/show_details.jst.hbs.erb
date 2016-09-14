@@ -109,26 +109,38 @@
       <h4>Report Violations</h4>
       <div class="col-sm-12">
         {{#each item.violations}}
-          {{#if this.expense_warning.note}}
+          {{#ifCond this.expense_warning.note '||' this.expense_warning.receipt}}
             {{#each this.expense_warning.note}}
               <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
             {{/each}}
-          {{/if}}
-          {{#if this.expense_blocking.note}}
+            {{#each this.expense_warning.receipt}}
+              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
+            {{/each}}
+          {{/ifCond}}
+          {{#ifCond this.expense_blocking.note '||' this.expense_blocking.receipt}}
             {{#each this.expense_blocking.note}}
               <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
             {{/each}}
-          {{/if}}
-          {{#if this.budget_warning.note}}
+            {{#each this.expense_blocking.receipt}}
+              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
+            {{/each}}
+          {{/ifCond}}
+          {{#ifCond this.budget_warning.note '||' this.budget_warning.receipt}}
             {{#each this.budget_warning.note}}
               <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
             {{/each}}
-          {{/if}}
-          {{#if this.budget_blocking.note}}
+            {{#each this.budget_warning.receipt}}
+              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
+            {{/each}}
+          {{/ifCond}}
+          {{#ifCond this.budget_blocking.note '||' this.budget_blocking.receipt}}
             {{#each this.budget_blocking.note}}
               <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
             {{/each}}
-          {{/if}}
+            {{#each this.budget_blocking.receipt}}
+              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
+            {{/each}}
+          {{/ifCond}}
           <!-- {{#each this}}
             {{#if this}}
               {{this.note}}

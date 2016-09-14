@@ -198,7 +198,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.Expense({
-      model: model
+      model_id: model.get('id')
       preview: true
       parent: @
     })
@@ -233,33 +233,55 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     
     $("#modal-new").modal('show')
 
-  create: ->
+  create: (e)->
     _this = @
-    values = {}
+    e.preventDefault()
+    formData = new FormData($(@el).find('form#new-item')[0])
 
-    # if(event){ event.preventDefault(); }
-
-    _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    # console.log values
-    model = new FinlyF.Models.Expense()
-    # console.log("Putting data")
-    response = model.save(values, {
-      iframe: true,
-      files: this.$('form :file'),
-      data: values,
-      success: (model, res) ->
+    $.ajax({
+      url: '/expenses'
+      type: "POST",
+      data: formData,
+      success: (res) ->
+        console.log res
         FinlyF.snapNotify(res.messages)
-        if res.status == "success"
+        if res.success == true
           $("#modal-new").modal('hide')
           _this.refetchCollection()
       error: (err) ->
-        console.log "Error", err
-
+        console.log "Error", err 
+      cache: false,
+      contentType: false,
+      processData: false
     })
 
-    console.log "Response", response
+
+
+    # values = {}
+
+    # # if(event){ event.preventDefault(); }
+
+    # _.each($(@el).find('form#new-item').serializeArray(), (input) ->
+    #   values[ input.name ] = input.value
+    # )
+    # # console.log values
+    # model = new FinlyF.Models.Expense()
+    # # console.log("Putting data")
+    # response = model.save(values, {
+    #   iframe: true,
+    #   files: this.$('form :file'),
+    #   data: values,
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     if res.status == "success"
+    #       $("#modal-new").modal('hide')
+    #       _this.refetchCollection()
+    #   error: (err) ->
+    #     console.log "Error", err
+
+    # })
+
+    # console.log "Response", response
 
     # if response.responseJSON.status = "success"
 
@@ -283,7 +305,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Model", model_report.toJSON()
     model_report.save(null, {
       success: (model, res) ->
-        if res.status == "success"
+        if res.success == true
           FinlyF.primary_router.navigate('reports', {trigger: true})
       error: (err) ->
         console.log "Error", err

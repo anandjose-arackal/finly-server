@@ -43,6 +43,7 @@ class FinlyF.Views.Report extends Backbone.View
       if @current_view
         data.view = @current_view
       $(@el).removeClass("item").addClass("bg-white")
+      @model = new FinlyF.Models.Report({id: options.model_id})
       @model.fetch({data: data})
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
@@ -347,10 +348,10 @@ class FinlyF.Views.Report extends Backbone.View
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
 
-    model = new FinlyF.Models.Expense({id: expense_id})
+    # model = new FinlyF.Models.Expense({id: expense_id})
 
     preview_view = new FinlyF.Views.Expense({
-      model: model
+      model_id: expense_id
       preview: true
       view: @current_view
     })
