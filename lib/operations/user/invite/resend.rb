@@ -23,7 +23,7 @@ class User::Invite::Resend < User::Invite::Base
   end
 
   def authorize
-    unless user.admin? or user.id == invited_user.invited_by
+    unless user.admin? or user.id == invited_user.invited_by_id
       messages[:error] << 'Only inviting users or admins can delete invites.'
       raise_unauthorized_exception
     end
@@ -34,13 +34,13 @@ class User::Invite::Resend < User::Invite::Base
       messages[:error] << 'Invite not found'
       return
     end
-    unless invited_user.invitation_accepted_at.blank?
+    unless invited_user.invitation_sent_at.present? and invited_user.invitation_accepted_at.blank?
       messages[:error] << 'Invite cannot be resent as user has already signed up with Finly'
     end
   end
 
   def process
-    unless invited_user.resend_invitation
+    unless invited_user.invite!
       self.messages = self.invited_user.errors.full_messages
     end
   end
