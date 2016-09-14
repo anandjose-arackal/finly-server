@@ -31,7 +31,6 @@ class PendingInvitesController < ApplicationController
 
   def destroy
     @result = User::Invite::Destroy.(current_user, params)
-    debugger
     if @result.present? and @result.success?
       respond(response: :success)
     else

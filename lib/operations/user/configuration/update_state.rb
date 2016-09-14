@@ -4,6 +4,7 @@
 #      active: true or false depending on active or inactive
 
 class User::Configuration::UpdateState < BaseOperation
+  attr_accessor :to_user
 
   def pre_validate
     if user.blank? or params.blank?
