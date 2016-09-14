@@ -4,31 +4,38 @@ class PendingInvitesController < ApplicationController
 
   def create
     @result = User::Invite::Create.(current_user, params)
-    respond(response: :success)
+    if @result.present? and @result.success?
+      respond(response: :success)
+    else
+      respond
+    end
   end
 
-  # def edit
-  #   @pending_user = User.find_by(email: params[:email])
-  # end
-
-  def accept
-    @result = User::Invite::Accept.(params)
-    respond(response: :success)
-  end
-
-  def resend
-    @result = User::Invite::Resend.(params)
-    respond(response: :success)
-  end
-
-  def update_invite
-    @result = User::Invite::Update.(current_user, params)
-    respond(response: :success)
+  def update
+    if params[:type].present?
+      case params[:type].to_sym
+        when :accept
+          @result = User::Invite::Accept.(params)
+        when :resend
+          @result = User::Invite::Resend.(current_user, params)
+        when :update
+          @result = User::Invite::Update.(current_user, params)
+      end
+    end
+    if @result.present? and @result.success?
+      respond(response: :success)
+    else
+      respond
+    end
   end
 
   def destroy
     @result = User::Invite::Destroy.(current_user, params)
-    respond(response: :success)
+    if @result.present? and @result.success?
+      respond(response: :success)
+    else
+      respond
+    end
   end
 
   private
