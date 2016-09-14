@@ -142,29 +142,51 @@ class FinlyF.Views.User extends Backbone.View
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
 
   userAction: (e) ->
-    # console.log "working"
     target = e.currentTarget
     url = $(target).attr('data-url')
-    # type = 'state'
+    type = $(target).attr('data-method')
 
-    data = {
-      type: 'state'
-      user: {
-        active: active
+    data_presence = $(target).attr('data-presence')
+    if data_presence
+      data = {
+        type: $(target).attr('data-type')
       }
-      view: @params.view
-    }
+    else
+      data = {}
 
     $.ajax({
-      url: url
-      data: data
-      dataType: 'json'
-      type: "PUT"
+      url: url,
+      type: type,
+      data: data,
+      dataType: 'json',
       success: (res) ->
-        console.log "Success", res
+        console.log "Suc", res
       error: (err) ->
-        console.log "Err", err
+        console.log "Err"
     })
+    # # console.log "working"
+    # target = e.currentTarget
+    # url = $(target).attr('data-url')
+    # # type = 'state'
+
+    # data = {
+    #   type: 'state'
+    #   user: {
+    #     active: active
+    #   }
+    #   view: @params.view
+    # }
+
+    # $.ajax({
+    #   url: url
+    #   data: data
+    #   dataType: 'json'
+    #   type: "PUT"
+    #   success: (res) ->
+    #     console.log "Success", res
+    #   error: (err) ->
+    #     console.log "Err", err
+    # })
 
 
 #Features
