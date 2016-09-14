@@ -142,9 +142,9 @@ class FinlyF.Views.User extends Backbone.View
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
 
   userAction: (e) ->
-    console.log "working"
+    # console.log "working"
     target = e.currentTarget
-    active = $(target).attr('data-action-type')
+    url = $(target).attr('data-url')
     # type = 'state'
 
     data = {
@@ -156,7 +156,7 @@ class FinlyF.Views.User extends Backbone.View
     }
 
     $.ajax({
-      url: '/users/' + @model.get('id')
+      url: url
       data: data
       dataType: 'json'
       type: "PUT"

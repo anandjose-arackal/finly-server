@@ -110,13 +110,14 @@ class FinlyF.Views.Expense extends Backbone.View
     model = new FinlyF.Models.Expense({
       id: @model.get('id')
     })
-    # # console.log("Putting data")
+    console.log "Putting data", values, model.toJSON()
     response = model.save(values, {
-      patch: true,
+      
       iframe: true,
       files: this.$('form :file'),
       data: values,
-      processData: true
+      patch: true,
+      put: true,# processData: true
       success: (model, res) ->
         #Refresh expense index if data changed. Refresh is done - expense_index.js.coffee.closeDetails
         $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
