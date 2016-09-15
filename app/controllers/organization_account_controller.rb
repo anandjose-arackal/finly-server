@@ -4,7 +4,11 @@ class OrganizationAccountController < ApplicationController
 
   def show
     @result = Company::Configuration::Show.new(current_user, params).run
-  end
 
+    respond_to do |format|
+      format.html {render 'organization_account/show'}
+      format.json {render 'organization_account/show'}
+    end
+  end
 
 end

@@ -61,4 +61,8 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     payment.destroy
     false
   end
+
+  def post_process
+    messages[:success] = "Added debt to company clearance."
+  end
 end

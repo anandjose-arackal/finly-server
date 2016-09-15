@@ -27,4 +27,8 @@ class Policy::Destroy < Policy::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Policy destroyed."
+  end
+
 end

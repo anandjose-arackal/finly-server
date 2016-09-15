@@ -26,4 +26,8 @@ class Receipt::Destroy < Receipt::Base
       messages[:error] << "DB Error. Try again."
     end
   end
+
+  def post_process
+    messages[:success] = "Receipt destroyed."
+  end
 end

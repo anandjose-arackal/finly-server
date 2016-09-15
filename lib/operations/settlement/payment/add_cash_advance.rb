@@ -53,4 +53,8 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     false
   end
 
+  def post_process
+    messages[:success] = "Cash advance added!"
+  end
+
 end

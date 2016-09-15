@@ -21,6 +21,10 @@ class Export::Field::Destroy < Export::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Export Field destroyed."
+  end
+
   def success
     Export::Base::FieldPresenter.new(user, {result: true}, messages)
   end

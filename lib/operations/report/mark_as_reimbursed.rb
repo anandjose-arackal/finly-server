@@ -38,6 +38,7 @@ class Report::MarkAsReimbursed < Report::Base
     if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursed_id
       comment.save
+      messages[:success] = "Report marked as reimbursed."
     end
   end
 end

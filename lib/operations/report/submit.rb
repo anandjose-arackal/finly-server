@@ -90,6 +90,9 @@ class Report::Submit < Report::Base
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
 
     Event::Report::Submit.(user, report: report)
+
+    messages[:success] = "Report Submitted."
+
   end
 
 end

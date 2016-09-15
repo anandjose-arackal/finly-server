@@ -46,8 +46,10 @@ class Policy::Create < Policy::Base
       add_user_op = Policy::Users::AddUser.new(user, {policy_id: cloned_policy.id, added_user_id: user.id, admin: true})
       # Add the creating user as admin
       add_user_op.run
+      messages[:success] = "New Policy created!."
       return cloned_policy
     end
+
   end
 
 end

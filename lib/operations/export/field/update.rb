@@ -31,6 +31,10 @@ class Export::Field::Update < Export::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Export Field updated."
+  end
+
   def success
     Export::Base::FieldPresenter.new(user, {preference: preference}, messages)
   end

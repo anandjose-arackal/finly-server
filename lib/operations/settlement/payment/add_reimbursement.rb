@@ -76,4 +76,8 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
   end
+
+  def post_process
+    messages[:success] = "Reports reimbursed."
+  end
 end

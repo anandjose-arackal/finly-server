@@ -43,6 +43,7 @@ class Expense::Manual::Destroy < Expense::Manual::Base
 
   def post_process
     # mail?
+    messages[:success] = "Expense destroyed."
   end
 
 end

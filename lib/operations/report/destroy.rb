@@ -42,4 +42,8 @@ class Report::Destroy < Report::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Report destroyed."
+  end
+
 end

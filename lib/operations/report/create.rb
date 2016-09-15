@@ -37,4 +37,8 @@ class Report::Create < Report::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Report created."
+  end
+
 end

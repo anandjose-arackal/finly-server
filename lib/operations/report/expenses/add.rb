@@ -76,6 +76,7 @@ class Report::Expenses::Add < Report::Base
           comment.save
         end
       end
+      messages[:success] = "Expenses added."
     end
   end
 end

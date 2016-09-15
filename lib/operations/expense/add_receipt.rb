@@ -38,6 +38,10 @@ class Expense::AddReceipt < Expense::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Receipt added."
+  end
+
   private
   def receipt_params
     params.require(:receipt).permit(:image)

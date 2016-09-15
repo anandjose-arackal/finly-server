@@ -18,7 +18,7 @@ class Report::Retract < Report::Base
 
   def init
     id = (params[:id] or params[:report_id])
-    self.report = user.reports.with_id(id: id).first rescue nil
+    self.report = user.reports.with_id(id).first rescue nil
   end
 
   def authorize

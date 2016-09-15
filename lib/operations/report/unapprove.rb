@@ -56,5 +56,7 @@ class Report::Unapprove < Report::Base
     if prev_status.approved? or prev_status.closed?
       Settlement::Report::Unapproved.(report.user, report_id: report.id)
     end
+
+    messages[:success] = "Report unapproved."
   end
 end

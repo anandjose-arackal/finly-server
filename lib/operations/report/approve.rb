@@ -91,6 +91,8 @@ class Report::Approve < Report::Base
       end
       # Send notifications
       Event::Report::Approve.(self.user, report: self.report)
+
+      messages[:success] = "Report approved!"
     end
   end
 

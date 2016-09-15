@@ -1,10 +1,22 @@
+# action to update a particular user's details.
+
 class User::Configuration::UpdateDetails < BaseOperation
 
-  attr_accessor :details_params
+  attr_accessor :details_params, :being_updated_user
 
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "No user or params passed."
+    end
+  end
+
+  def init
+    self.being_updated_user = user.company.users.find_by(id: params[:id])
+  end
+
+  def authorize
+    unless user.id == being_updated_user.id
+      messages[:error] << "You are not authorized to change these details."
     end
   end
 

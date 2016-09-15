@@ -40,6 +40,8 @@ class Report::TakeControl < Report::Base
       comment.save
     end
     Event::Report::TakeControl.(self.user, report: self.report)
+
+    messages[:success] = "You've taken control of this report."
   end
 
 end

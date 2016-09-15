@@ -84,6 +84,10 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     false
   end
 
+  def post_process
+    messages[:success] = "Debt settled against selected reports."
+  end
+
 
 end
 

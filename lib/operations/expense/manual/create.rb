@@ -58,6 +58,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         messages[:error] << comment.errors.full_messages
       end
     end
+    messages[:success] = "Expense created."
   end
 
   # def success

@@ -29,6 +29,7 @@ class Report::ReimburseConfirm < Report::Base
     if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursement_confirmed_id
       comment.save
+      messages[:success] = "Report reimbursement confirmed."
     end
   end
 end

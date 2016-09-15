@@ -147,6 +147,7 @@ class User::Invite::Create < User::Invite::Base
           return false
         end
       end
+      messages[:success] = "User successdully invited."
     end
   end
 

@@ -59,6 +59,6 @@ class Policy::Users::AddUser < Policy::Base
   end
 
   def post_process
-    # mailer
+    messages[:success] = "User added to policy."
   end
 end

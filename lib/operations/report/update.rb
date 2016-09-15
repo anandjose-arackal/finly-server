@@ -56,6 +56,7 @@ class Report::Update < Report::Base
 
   def post_process
     save_comments
+    messages[:success] = "Report updated."
   end
 
   protected
