@@ -53,7 +53,7 @@ class User::Team::Base < BaseOperation
       self.policy_id = nil
     end
 
-    self.currency_id = report.policy.configuration.report_currency
+    self.currency_id = report.policy.configuration.report_currency if report.policy
     self.amount_value = report.total_amount
   end
 
