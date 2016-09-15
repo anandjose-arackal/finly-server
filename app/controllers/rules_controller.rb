@@ -7,7 +7,7 @@ class RulesController < ApplicationController
     if @result.success?
       flash[:success] = "Rule created!"
     else
-      flash.now[:error] = create_op.errors
+      flash.now[:error] = @result.messages[:error]
     end
     redirect_to request.referrer
   end
@@ -17,7 +17,7 @@ class RulesController < ApplicationController
     if @result.success?
       flash[:success] = "Rule destroyed."
     else
-      flash.now[:error] = destroy_op.errors
+      flash.now[:error] = @result.messages[:error]
     end
     redirect_to request.referrer
   end

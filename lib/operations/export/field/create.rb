@@ -1,8 +1,8 @@
 # action to create and destroy an export field.
 # params:
 # export :
-# export_field_id: id of the export field that needs to be created
-# name: the custom name that is to be given to the select field. If nil, the export field retains the default name
+#   export_field_id: id of the export field that needs to be created
+#   name: the custom name that is to be given to the select field. If nil, the export field retains the default name
 #
 class Export::Field::Create < Export::Base
 

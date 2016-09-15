@@ -2,14 +2,14 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   attr_accessor :category, :category_params
 
   def pre_validate
-    unless params[:name].present?
+    unless params[:category][:name].present?
       messages[:error] << 'Name of the category cannot be blank'
     end
   end
 
   def init
     super
-    id = (params[:id].present? or params[:category_id])
+    id = (params[:id] or params[:category_id])
     self.category = self.categories.with_id(id).first rescue nil if id.present?
   end
 

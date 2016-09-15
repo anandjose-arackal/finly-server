@@ -9,7 +9,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
 
   def init
     super
-    id = (params[:id].present? or params[:category_id])
+    id = (params[:id] or params[:category_id])
     self.category = self.categories.with_id(id).first rescue nil if id.present?
   end
 
@@ -20,7 +20,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
   end
 
   def process
-    unless self.category.update_attribute(active: false)
+    unless self.category.update_attributes(active: false)
       messages[:error] << self.category.errors.full_messages
     end
   end

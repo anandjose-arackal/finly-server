@@ -22,7 +22,7 @@ class Company::Configuration::Category::Base < BaseOperation
   class Company::Configuration::Category::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :categories
 
-    def init
+    def initialize(user, params, messages)
       self.categories = params[:categories]
     end
 

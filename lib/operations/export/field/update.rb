@@ -9,7 +9,8 @@ class Export::Field::Update < Export::Base
   def init
     self.company = user.company
     self.update_params = export_params
-    self.preference = company.export_preferences.find_by(id: update_params[:export_field_id])
+    id = params[:id] or update_params[:export_field_id]
+    self.preference = company.export_preferences.find_by(id: id)
   end
 
   def authorize
