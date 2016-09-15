@@ -23,6 +23,7 @@
 // require nprogress-turbolinks
 //= require handlebars.runtime
 //= require finlyf/application_finlyf
+//= require ohsnap.min
 
 // NProgress.configure({
 //   showSpinner: false,

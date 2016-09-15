@@ -10,173 +10,152 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   respond_to :json
 
   def create
-    operation = Report::Create.new(current_user, params)
-    @result = operation.run
-    if operation.success?
-      render 'api/v1/reports/show'
-      return
+    @result = Report::Create.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     end
-    @errors = operation.errors
-    render 'api/v1/shared/failure'
+    respond
   end
 
   def index
-    operation = Report::Index.new(current_user, params)
-    @result =operation.run
-    if operation.success?
-      render 'api/v1/reports/index'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Report::Index.(current_user, params)
+    @result.config[:mobile_api] = true
+    respond
   end
 
   def update
-    updater = Report::Update.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
-    else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+    @result = Report::Update.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     end
+    respond
   end
 
   def show
     @result = Report::Show.(current_user, params)
+    @result.config[:mobile_api] = true
+    respond
   end
 
   def destroy
-    updater = Report::Destroy.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      flash.now[:success] = 'Report Deleted'
-      render 'api/v1/shared/success'
-    else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Report::Destroy.(current_user, params)
+    @result.config[:mobile_api] = true
+    # if @result.success?
+    #   flash.now[:success] = 'Report Deleted'
+    #   render 'api/v1/shared/success'
+    # end
+    respond view: false
   end
 
   def add_expenses
-    updater = Report::Expenses::Add.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Expenses::Add.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def remove_expenses
-    updater = Report::Expenses::Remove.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Expenses::Remove.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def reject_expense
-    updater = Report::Expenses::Reject.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Expenses::Reject.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def submit
-    updater = Report::Submit.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Submit.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def retract
-    updater = Report::Retract.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Retract.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def approve
-    updater = Report::Approve.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Approve.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def reject
-    updater = Report::Reject.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Reject.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def unapprove
-    updater = Report::Unapprove.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Unapprove.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def take_control
-    updater = Report::Submit.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      flash.now[:success] = 'You have successfully taken control of the report'
-      render 'api/v1/reports/show'
+    @result = Report::Submit.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def reimbursement_confirm
-    updater = Report::ReimburseConfirm.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::ReimburseConfirm.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def comment
-    updater = Report::Comment::Create.new(current_user, params)
-    @result = updater.run
-    if updater.success?
-      render 'api/v1/reports/show'
+    @result = Report::Comment::Create.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'api/v1/reports/show'
     else
-      @errors = updater.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 

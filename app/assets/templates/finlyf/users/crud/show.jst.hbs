@@ -2,9 +2,16 @@
   <div class="row">
     <div class="col-sm-6">Actions</div>
     <div class="col-sm-6">
-      <button class="btn btn-sm btn-danger btn-user-action" data-action-type=false>Deactivate Employee</button>
-      <button class="btn btn-sm btn-success btn-user-action" data-action-type=true>Reactivate Employee</button>
-      <button class="btn btn-sm btn-danger btn-user-action" data-action-type="delete_invitation">Delete Employee Invitation</button>
+
+      {{#if item.actions.delete_invite}}
+        <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
+      {{/if}}
+      {{#if item.actions.resend_invite}}
+        <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
+      {{/if}}
+      {{#if item.actions.deactivate}}
+        <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-url="{{item.actions.deactivate}}">Deactivate</button>
+      {{/if}}
     </div>
   </div>
 </section>
@@ -22,24 +29,30 @@
     <div class="row">
       <div class="col-sm-3">Name</div>
       <div class="col-sm-9">
-        <label class="item-attr-preview">{{item.name}}</label>
-        <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.name}}" />
+        <label class="item-attr-preview">{{item.user.name}}</label>
+        <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.user.name}}" />
       </div>
     </div>
 
     <div class="row">
       <div class="col-sm-3">Email</div>
       <div class="col-sm-9">
-        <label class="item-attr-preview">{{item.email}}</label>
-        <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.email}}" />
+        <label class="item-attr-preview">{{item.user.email}}</label>
+        <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.user.email}}" />
       </div>
     </div>
 
     <div class="row">
       <div class="col-sm-3">Mobile</div>
       <div class="col-sm-9">
-        <label class="item-attr-preview">{{item.mobile_number}}</label>
-        <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.mobile_number}}" />
+        <label class="item-attr-preview">
+          {{#if item.user.mobile_number}}
+            {{item.user.mobile_number}}
+          {{else}}
+            Not Set
+          {{/if}}
+        </label>
+        <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.user.mobile_number}}" />
       </div>
     </div>
 
@@ -57,7 +70,7 @@
       <button class="btn btn-sm navbar-btn btn-warning btn-edit-user">Edit</button>
     </div>
   </div> 
-  <form class="fomr-user-roles">
+  <form class="form-user-roles">
     
   
     <div class="row">

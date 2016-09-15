@@ -29,4 +29,8 @@ class User::Team::Approver < User::Team::Base
     self.response = obj
   end
 
+  def retrieve
+    self.response
+  end
+
 end

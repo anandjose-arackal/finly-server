@@ -14,9 +14,16 @@ json.array! @result.items do |item|
 
   json.total_amount item.total_amount
   if item.is_a?(Report)
-    json.amount item.reimbursement_amount.value
+    json.type 'report'
+    if item.final_approver
+      json.final_approver item.final_approver.name
+    end
+    json.reimbursement_amount item.reimbursement_amount.value
   elsif item.is_a?(Payment)
-    json.amount item.amount.value
+    json.type 'payment'
+    json.payment_amount item.amount.value
+    json.initiating_user item.initiating_user.name
+    json.payment_type item.payment_type.name
   end
 
 #   json.merge! report.attributes

@@ -19,13 +19,7 @@ class ReportsController < ApplicationController
 
   def show
     @result = Report::Show.(current_user, params)
-    # debugger
-    # load_view_for_report
-    # @comments = @report.comments.all.order(created_at: :desc)
-    # # ap @actions
-    respond_to do |format|
-      format.json {}
-    end
+    respond
   end
 
   def destroy

@@ -157,7 +157,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.Report({
-      model: model
+      model_id: model.get('id')
       preview: true
       parent: @
       current_view: @params.view || 'personal'
@@ -191,8 +191,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     }
     model.save(data, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         preview_view = new FinlyF.Views.Report({
-          model: model
+          model_id: model.get('id')
           preview: true
           parent: _this
         })

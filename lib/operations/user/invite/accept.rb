@@ -6,13 +6,14 @@
 # password:
 
 class User::Invite::Accept < User::Invite::Base
-
   attr_accessor :invited_user, :accept_params
 
+  def self.call(params)
+    super(nil, params)
+  end
+
   def initialize(params)
-    self.params = params
-    # self.params = (ActionController::Parameters.new(params) or {})
-    self.messages = []
+    super(nil, params)
   end
 
   def authorized_user_types
@@ -22,7 +23,6 @@ class User::Invite::Accept < User::Invite::Base
   def pre_validate
     if params.blank?
       messages[:error] << 'All fields are empty'
-      return false
     end
   end
 
@@ -37,19 +37,19 @@ class User::Invite::Accept < User::Invite::Base
     password = accept_params[:password]
     if invitation_token.blank?
       messages[:error] << 'Invite not found'
-      return false
+      return
     end
     if name.blank?
       messages[:error] << 'Name can\'t be blank'
-      return false
+      return
     end
     if mobile_number.blank?
       messages[:error] << 'Mobile number can\'t be blank'
-      return false
+      return
     end
     if password.blank?
       messages[:error] << 'Password can\'t be blank'
-      return false
+      return
     end
   end
 

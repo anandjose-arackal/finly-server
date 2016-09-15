@@ -8,7 +8,7 @@ class User::Invite::Destroy < User::Invite::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "User or params not found."
+      messages[:error] << 'User or params not found'
     end
   end
 
@@ -33,13 +33,16 @@ class User::Invite::Destroy < User::Invite::Base
 
   def process
     unless invited_user.destroy
-      messages[:error] << "Invite couldn't be deleted. Please try again."
-      return false
+      messages[:error] << "Invite couldn't be deleted. Please try again"
     end
   end
 
   def post_process
     # probably nothing right now.
+  end
+
+  def success
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
   end
 
 end

@@ -69,13 +69,13 @@ class User::Show < User::Base
       # Check if user has a already signed up, if not give option to delete/resend invite
       if self.user.invitation_token.present? and self.user.invitation_accepted_at.blank?
         actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.user.id)
-        actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_resend_path(pending_invite_id: self.user.id)
+        actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.user.id)
       else
         # If user has signed up
         if self.user.active
-          actions[:deactivate] = Rails.application.routes.url_helpers.edit_pending_invite_path(id: self.user.id)
+          actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.user.id)
         else
-          actions[:activate] = Rails.application.routes.url_helpers.edit_pending_invite_path(id: self.user.id)
+          actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.user.id)
         end
       end
       actions

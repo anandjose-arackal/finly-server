@@ -5,66 +5,54 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   allow_oauth!
   before_action :authenticate_user!
 
-  respond_to :json
-
   def create
     param = RequestFormatter.api_expense(current_user, params)
-    operation = Expense::Manual::Create.new(current_user, param)
-    @result = operation.run
-    if operation.success?
+    @result = Expense::Manual::Create.(current_user, param)
+    @result.config[:mobile_api] = true
+    if @result.success?
       if @result.expense.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
-        render 'api/v1/reports/show'
+        respond render: 'api/v1/reports/show'
       else
-        render 'api/v1/expenses/show'
+        respond render: 'api/v1/expenses/show'
       end
     else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def index
-    operation = Expense::Index.new(current_user, params)
-    @result = operation.run
-    if operation.success?
-      render 'api/v1/expenses/index'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Expense::Index.(current_user, params)
+    @result.config[:mobile_api] = true
+    respond
   end
 
   def show
     @result = Expense::Show.(current_user, params)
+    @result.config[:mobile_api] = true
+    respond
   end
 
   def update
     param = RequestFormatter.api_expense(current_user, params)
-    operation = Expense::Manual::Update.new(current_user, param)
-    @result = operation.run
-    if operation.success?
+    @result = Expense::Manual::Update.(current_user, param)
+    @result.config[:mobile_api] = true
+    if @result.success?
       if @result.expense.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
-        render 'api/v1/reports/show'
+        respond render: 'api/v1/reports/show'
       else
-        render 'api/v1/expenses/show'
+        respond render: 'api/v1/expenses/show'
       end
     else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
+      respond
     end
   end
 
   def destroy
-    operation = Expense::Manual::Update.new(current_user, params)
-    operation.run
-    if operation.success?
-      render 'api/v1/shared/success'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Expense::Manual::Update.(current_user, params)
+    @result.config[:mobile_api] = true
+    respond view: false
   end
 
 end

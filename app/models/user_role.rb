@@ -27,7 +27,7 @@ class UserRole < ActiveRecord::Base
     end
   end
 
-  def id_for(role)
+  def self.id_for(role)
     VALUES[role]
   end
 
