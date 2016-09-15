@@ -5,7 +5,6 @@
 #
 
 class Settlement::Report::Approved < Report::Base
-
   attr_accessor :report
 
   def authorized_user_types
@@ -14,24 +13,17 @@ class Settlement::Report::Approved < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "No user or params passed."
+      messages[:error] << 'No user or params passed'
     end
   end
 
   def init
-    self.report = user.reports.find_by(id: params[:report_id])
-  end
-
-  def authorize
-    unless report
-      raise_unauthorized_exception
-    end
+    self.report = params[:report]
   end
 
   def validate
     if report.accounted?
-      messages[:error] << "Report already accounted for "
-      return false
+      messages[:error] << 'Report has already been accounted for'
     end
   end
 
@@ -53,7 +45,7 @@ class Settlement::Report::Approved < Report::Base
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
       unless report_amount.save
         messages[:error] << report_amount.errors.full_messages
-        return false
+        return
       end
       report.reimbursement_amount = report_amount
     else
@@ -62,15 +54,13 @@ class Settlement::Report::Approved < Report::Base
       report_amount.currency = currency
       unless report_amount.save
         messages[:error] << report_amount.errors.full_messages
-        return false
+        return
       end
     end
     report.accounted = true
     unless report.save
       messages[:error] << report.errors.full_messages
-      return false
     end
-    return true
   end
 
   def post_process
@@ -78,7 +68,7 @@ class Settlement::Report::Approved < Report::Base
   end
 
   def success
-    return report
+    report
   end
 
 end

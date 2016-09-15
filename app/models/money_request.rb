@@ -79,8 +79,8 @@ class MoneyRequest < ActiveRecord::Base
 
   before_save :handle_name
 
-  # Used to retrieve all the users associated with this report. If user before is provided,
-  # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  # Used to retrieve all the users associated with this money request. If user before is provided,
+  # it provides a list of all users who interacted with the money request before this given user. Mainly used for reject_to
   def associated_users(user_before = nil, ordered = false)
     return nil if tracks.blank?
     trackings = tracks.without_take_control_action

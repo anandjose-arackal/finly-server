@@ -18,6 +18,7 @@ class CreateMoneyRequests < ActiveRecord::Migration
       t.datetime :loaded_at
       t.datetime :submitted_at, limit: 6
       t.string :note
+      t.boolean :accounted, default: false, null: false
 
       t.timestamps null: false
     end

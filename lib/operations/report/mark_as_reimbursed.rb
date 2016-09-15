@@ -12,7 +12,7 @@ class Report::MarkAsReimbursed < Report::Base
   end
 
   def init
-    super
+    self.report = params[:report]
     self.payment = params[:payment]
   end
 
