@@ -50,7 +50,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
 
   def validate
     if reports.blank?
-      messages[:error] << "Reports to reimburse not found."
+      messages[:error] << 'Reports to reimburse not found'
     end
     validate_date payment_params[:date]
 
@@ -64,7 +64,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     # is this really necessary?
     total_amount = precision_value(reports.with_amount.sum(:value))
     unless total_amount == precision_value(payment_params[:amount])
-      messages[:error] << "Reimbursement amount does not match report totals."
+      messages[:error] << 'Reimbursement amount does not match report totals'
     end
   end
 
@@ -75,7 +75,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], payment_params[:currency_id] and balance_sheet.subtract_cash_in_hand payment_params[:amount], payment_params[:currency_id]
       reports.each do |report|
-        Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id, role_id: role}).run
+        Report::MarkAsReimbursed.new(user, {payment: payment, report_id: report.id, role_id: role}).run
       end
       return true
     end
@@ -85,7 +85,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
   end
 
   def post_process
-    messages[:success] = "Debt settled against selected reports."
+    messages[:success] = 'Debt settled against selected reports'
   end
 
 
