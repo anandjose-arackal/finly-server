@@ -191,6 +191,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     }
     model.save(data, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         preview_view = new FinlyF.Views.Report({
           model_id: model.get('id')
           preview: true

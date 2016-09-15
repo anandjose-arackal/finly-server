@@ -92,6 +92,7 @@ class FinlyF.Views.User extends Backbone.View
       data: values,
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         console.log model, res
       error: (err) ->
         console.log "Err", err

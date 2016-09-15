@@ -162,6 +162,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: @params
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         # managers = {
         #   company_managers: res.company_managers
         #   company_finance_managers: res.company_finance_managers
@@ -190,6 +191,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: values
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         $(modal).modal('hide')
         # console.log res
       error: (err) ->

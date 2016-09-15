@@ -338,6 +338,7 @@ class FinlyF.Views.Report extends Backbone.View
         authenticity_token: $("#authenticity_token").val()
       },
       success: (res)->
+        FinlyF.snapNotify(res.messages)
         _this.model.fetch({ data: {view: _this.current_view}})
       error: (err) ->
         console.log "Error", err
@@ -386,6 +387,7 @@ class FinlyF.Views.Report extends Backbone.View
       },
       type: 'PATCH',
       success: (res) ->
+        FinlyF.snapNotify(messages)
         console.log res
         _this.model.fetch({
           data: {
@@ -410,6 +412,7 @@ class FinlyF.Views.Report extends Backbone.View
       },
       type: 'PATCH',
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         # console.log res
         _this.model.fetch({
           data: {

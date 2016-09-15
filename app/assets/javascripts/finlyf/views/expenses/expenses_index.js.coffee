@@ -306,6 +306,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     model_report.save(null, {
       success: (model, res) ->
         if res.success == true
+          FinlyF.snapNotify(res.messages)
           FinlyF.primary_router.navigate('reports', {trigger: true})
       error: (err) ->
         console.log "Error", err
