@@ -107,7 +107,7 @@ class Expense < ActiveRecord::Base
     case value
       when 'present'
         where("id IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
-      when 'nil'
+      when 'absent'
         where("id NOT IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
     end
   end

@@ -3,7 +3,7 @@ class ReportsController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    @result = Report::Create.(current_user)
+    @result = Report::Create.(current_user, params)
     respond render: :show
   end
 
@@ -19,7 +19,7 @@ class ReportsController < ApplicationController
 
   def show
     @result = Report::Show.(current_user, params)
-    respond
+    respond render: :show
   end
 
   def destroy

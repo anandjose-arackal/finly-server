@@ -64,7 +64,7 @@ class Report::Submit < Report::Base
     if manager.blank?
       # call the approve class with the right parameters
       approve_op = Report::Approve.new(user, {report_id: report.id, auto_approve: true})
-      unless approve_op.run
+      unless approve_op.run.success?
         self.messages[:error] = messages[:error].merge approve_op.errors
         # self.messages[:error] << "Error auto-approving report. Please try again."
         return false
@@ -89,6 +89,7 @@ class Report::Submit < Report::Base
     # adding comment regarding the change in status of this report
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
 
+    # todo - top level constant error
     Event::Report::Submit.(user, report: report)
 
     messages[:success] = "Report Submitted."
