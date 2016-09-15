@@ -10,8 +10,7 @@
 
 class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   include MathUtil
-
-  attr_accessor :payment,:reports, :role
+  attr_accessor :reports, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -20,11 +19,11 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   def pre_validate
     super()
     if params[:payment][:amount] and params[:payment][:amount].to_i < 0
-      errors << "Reimbursement amount cannot be negative."
+      messages[:error] << "Reimbursement amount cannot be negative."
       return false
     end
     if params[:report_ids].blank?
-      errors << "No reports to reimburse."
+      messages[:error] << "No reports to reimburse."
       return false
     end
   end
@@ -60,7 +59,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     # is this really necessary
     total_amount = precision_value(reports.with_amount.sum(:value))
     unless total_amount == precision_value(payment_params[:amount])
-      errors << "Reimbursement amount does not match report totals."
+      messages[:error] << "Reimbursement amount does not match report totals."
     end
   end
 
@@ -74,13 +73,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
       end
       return true
     end
-    self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
+    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
-    return false
   end
-
-  def success
-    Settlement::Payment::Base::Presenter.new(user, self.payment)
-  end
-
 end

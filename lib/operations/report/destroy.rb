@@ -10,7 +10,7 @@ class Report::Destroy < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or params not passed."
+      messages[:error] << "User or params not passed."
     end
   end
 
@@ -21,7 +21,7 @@ class Report::Destroy < Report::Base
   def validate
     # check if the report can be destroyed at all
     unless report.can_destroy?
-      errors << "Report can only be deleted once it's retracted or rejected."
+      messages[:error] << "Report can only be deleted once it's retracted or rejected."
     end
   end
 
@@ -37,16 +37,9 @@ class Report::Destroy < Report::Base
 
   def process
     unless report.destroy
-      errors << report.errors.full_messages
+      messages[:error] << report.errors.full_messages
       return false
     end
   end
 
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
-  end
 end

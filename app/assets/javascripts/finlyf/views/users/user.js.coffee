@@ -21,6 +21,7 @@ class FinlyF.Views.User extends Backbone.View
     @page = options.page
 
     if @page == 'user'
+      @model = new FinlyF.Models.User({id: options.model_id})
       @model.fetch({
         data: @params
       })
@@ -40,6 +41,8 @@ class FinlyF.Views.User extends Backbone.View
     @
 
   populateDetails: ->
+    # console.log "here we are in after sync"
+    # console.log @model.toJSON()
     $(@el).html(@templateShow({item: @model.toJSON()}))
 
   edit: (e) ->
@@ -89,6 +92,7 @@ class FinlyF.Views.User extends Backbone.View
       data: values,
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         console.log model, res
       error: (err) ->
         console.log "Err", err
@@ -96,6 +100,7 @@ class FinlyF.Views.User extends Backbone.View
 
 
   update: (e) ->
+    _this = @
     e.preventDefault()
     target = $(e.currentTarget)
     form = $(target).closest('section').find('form')
@@ -105,6 +110,7 @@ class FinlyF.Views.User extends Backbone.View
     _.each($(form).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
+    values.view = @params.view
     # console.log values
     # values.authenticity_token = $("#authenticity_token").val()
 
@@ -114,7 +120,13 @@ class FinlyF.Views.User extends Backbone.View
       data: values,
       processData: true
       success: (model, res) ->
-        console.log model, res
+        if res.success == true
+          FinlyF.snapNotify(res.messages)
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
       error: (err) ->
         console.log "Err", err
     })
@@ -142,29 +154,50 @@ class FinlyF.Views.User extends Backbone.View
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
 
   userAction: (e) ->
-    console.log "working"
     target = e.currentTarget
-    active = $(target).attr('data-action-type')
-    # type = 'state'
-
-    data = {
-      type: 'state'
-      user: {
-        active: active
-      }
-      view: @params.view
-    }
+    url = $(target).attr('data-url')
+    type = $(target).attr('data-method')
+    data = {}
+    data_presence = $(target).attr('data-presence')
+    if data_presence
+      data.type = $(target).attr('data-type')
+    else
+      data = {}
 
     $.ajax({
-      url: '/users/' + @model.get('id')
-      data: data
-      dataType: 'json'
-      type: "PUT"
+      url: url,
+      type: type,
+      data: data,
+      dataType: 'json',
       success: (res) ->
-        console.log "Success", res
+        console.log "Suc", res
+        FinlyF.snapNotify(res.messages)
       error: (err) ->
-        console.log "Err", err
+        console.log "Err", err.messages
     })
+    # # console.log "working"
+    # target = e.currentTarget
+    # url = $(target).attr('data-url')
+    # # type = 'state'
+
+    # data = {
+    #   type: 'state'
+    #   user: {
+    #     active: active
+    #   }
+    #   view: @params.view
+    # }
+
+    # $.ajax({
+    #   url: url
+    #   data: data
+    #   dataType: 'json'
+    #   type: "PUT"
+    #   success: (res) ->
+    #     console.log "Success", res
+    #   error: (err) ->
+    #     console.log "Err", err
+    # })
 
 
 #Features

@@ -5,11 +5,11 @@ class User::Invite::Base < BaseOperation
 
   attr_accessor :invite_params
 
-  class User::Invite::Base::InvitePresenter < BaseOperation::BasePresenter
+  class User::Invite::Base::InvitePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :invite, :accepted_user
 
-    def initialize(user, params)
+    def init
       self.invite = params[:invite]
       self.accepted_user = params[:accepted_user]
     end
@@ -19,13 +19,8 @@ class User::Invite::Base < BaseOperation
     [:manager, :finance_manager, :admin]
   end
 
-
-  def retrieve
-    if is_success?
-      return invited_user
-    else
-      return false
-    end
+  def success
+    User::Invite::Base::InvitePresenter.new(user, {invite: new_user}, messages)
   end
 
   def create_invite_params

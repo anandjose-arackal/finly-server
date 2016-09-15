@@ -33,25 +33,25 @@
     <% if current_user.admin? %>
       <% views["admin"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
       <% end %>
     <% elsif current_user.finance_manager? %>
       <% views["finance"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
       <% end %>
     <% elsif current_user.manager? %>
       <% views["manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
       <% end %>
     <% elsif current_user.employee? %>
       <% views["personal"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
       <% end %>
     <% end %>
@@ -102,4 +102,6 @@
   </ul>
 </div>
 
+<div id="ohsnap"></div>
+<div id="ohsnap-priority"></div>
 

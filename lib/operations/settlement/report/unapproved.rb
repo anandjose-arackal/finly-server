@@ -4,8 +4,7 @@
 # report_id: id of the report that is being unapproved
 
 
-class Settlement::ReportUnapproved < Settlement::Base
-
+class Settlement::Report::Unapproved < Report::Base
   attr_accessor :report
 
   def authorized_user_types
@@ -18,7 +17,7 @@ class Settlement::ReportUnapproved < Settlement::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -34,7 +33,7 @@ class Settlement::ReportUnapproved < Settlement::Base
 
   def validate
     unless report.accounted?
-      errors << "Report has not been accounted for. Chill out."
+      messages[:error] << 'Report has not been accounted for'
     end
   end
 
@@ -49,7 +48,7 @@ class Settlement::ReportUnapproved < Settlement::Base
     if report.update(accounted: false)
       return true
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
     return false
   end
 
@@ -57,11 +56,8 @@ class Settlement::ReportUnapproved < Settlement::Base
     # mailer
   end
 
-  def retrieve
-    if is_success?
-      return report
-    else
-      return false
-    end
+  def success
+    report
   end
+
 end

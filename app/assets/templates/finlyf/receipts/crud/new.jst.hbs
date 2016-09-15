@@ -3,30 +3,36 @@
   <input name="utf8" type="hidden" value="&#x2713;"/>
   <input type="hidden" name="authenticity_token" value="" />
   <div class="row no-margin">
-    <div class="col-sm-7 no-padding">
+    <div class="col-sm-12 no-padding">
 
       <div class="row no-margin">
-        <div class="col-sm-5 text-right">
-          <label class="control-label">File</label>
+        <div class="col-sm-4 text-right">
+          <label>Receipt Image</label>
         </div>
-        <div class="col-sm-7">
-          <input type="file" name="receipt[image]" class="form-control" accept=".png, .jpg, .pdf, .jpeg" />
+
+        <div class="col-sm-8">
+          <label for="receipt-image-upload">
+            <img class="preview-image img-responsive" id="preview-image" src="#" alt="Click to upload image"/>
+          </label>
+          <input type="file" id="receipt-image-upload" accept=".png, .jpg, .pdf, .jpeg" name="receipt[image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
         </div>
       </div>
 
-{{!--       <div class="row no-margin">
-        <div class="col-sm-5 text-right">
+      <div class="row no-margin">
+        <div class="col-sm-4 text-right">
           <label class="control-label">Note</label>
         </div>
         <div class="col-sm-7">
-          <textarea name="receipt[note]" placeholder="Add a Note. (Optional)"></textarea>
+          <textarea class="form-control" name="receipt[note]" placeholder="Add a Note. (Optional)" style="width: 50%;"></textarea>
         </div>
-      </div> --}}
+      </div>
+      <br />
 
       <div class="row no-margin">
         <div class="col-sm-7 col-sm-offset-5">
           
-          <buttun class="btn-create btn btn-primary">Create</buttun>
+          {{!-- <buttun class="btn-create btn btn-primary">Create</buttun> --}}
+          <input type="submit" name="Submit" class="btn btn-primary">
         </div>
         
       </div>      
@@ -34,3 +40,23 @@
   </div>
 </form>
 
+<style type="text/css">
+  .form-group{
+    margin-bottom: 10px;
+  }
+
+  .preview-image{
+    height: 200px;
+    margin-left: 10%;
+    cursor: pointer;
+    padding: 20px;
+    border: 1px dotted rgb(187, 187, 187);
+  }
+
+  .input-upload-image{
+    display: none !important;
+    background: transparent none repeat scroll 0% 0%;
+    border: medium none !important;
+    box-shadow: none;
+  }
+</style>

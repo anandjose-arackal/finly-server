@@ -6,13 +6,9 @@
 class User::Team::Index < User::Team::Base
   attr_accessor :role_id
 
-  def self.call(user, params)
-    self.new(user, params).run
-  end
-
   def pre_validate
     unless user.present?
-      errors << 'User not found'
+      messages[:error] << 'User not found'
     end
   end
 
@@ -27,17 +23,17 @@ class User::Team::Index < User::Team::Base
     case role_id
       when UserRole.admin_id
         unless user.admin?
-          errors << 'User is not an Admin'
+          messages[:error] << 'User is not an Admin'
           raise_unauthorized_exception
         end
       when UserRole.finance_manager_id
         unless user.finance_manager?
-          errors << 'User is not a Finance Manager'
+          messages[:error] << 'User is not a Finance Manager'
           raise_unauthorized_exception
         end
       when UserRole.manager_id
         unless user.manager?
-          errors << 'User is not a Manager'
+          messages[:error] << 'User is not a Manager'
           raise_unauthorized_exception
         end
       else
@@ -47,7 +43,7 @@ class User::Team::Index < User::Team::Base
 
   def validate
     unless role_id.present?
-      errors << 'User role not defined'
+      messages[:error] << 'User role not defined'
     end
   end
 
@@ -86,7 +82,7 @@ class User::Team::Index < User::Team::Base
 
   private
   def admin_team
-    errors.clear
+    clear_messages
     if user.company_admin?
       return user.company.users
     elsif user.policy_admin?
@@ -96,7 +92,7 @@ class User::Team::Index < User::Team::Base
         return users.with_id(PolicyUserMapping.with_policy(policies).pluck(:user_id))
       end
     end
-    errors << 'User is not an admin'
+    messages[:error] << 'User is not an admin'
     false
   end
 

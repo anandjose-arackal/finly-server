@@ -43,6 +43,7 @@ class FinlyF.Views.Report extends Backbone.View
       if @current_view
         data.view = @current_view
       $(@el).removeClass("item").addClass("bg-white")
+      @model = new FinlyF.Models.Report({id: options.model_id})
       @model.fetch({data: data})
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
@@ -121,9 +122,12 @@ class FinlyF.Views.Report extends Backbone.View
       data: values
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         $("#modal-new").modal('hide')
         _this.model.fetch({
-          data: _this.current_view
+          data: {
+            view: _this.current_view
+          }
         })
       error: (err) ->
         console.log "Error", err
@@ -182,6 +186,7 @@ class FinlyF.Views.Report extends Backbone.View
         expense_ids: expense_ids
       },
       success: (res)->
+        FinlyF.snapNotify(res.messages)
         $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         # $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         $(modal).modal('hide')
@@ -234,9 +239,11 @@ class FinlyF.Views.Report extends Backbone.View
     model = new FinlyF.Models.Report({id: @model.get('id')})
     model.save(data, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         _this.model.fetch()
       error: (err) ->
+        FinlyF.snapNotify(err.messages)
         console.log "Err", err
     })
     # @model.save({report: {name: name}}, {
@@ -266,6 +273,7 @@ class FinlyF.Views.Report extends Backbone.View
     # console.log _this.parent.params.view
     model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         console.log model, res
         _this.model.fetch({
           data: {
@@ -287,6 +295,7 @@ class FinlyF.Views.Report extends Backbone.View
       }
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         console.log res
         _this.parent.trigger('item:destroyed')
       error: (err) ->
@@ -303,6 +312,7 @@ class FinlyF.Views.Report extends Backbone.View
       type: 'PATCH',
       dataType: 'json',
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         _this.model.fetch({
           data: {view: _this.current_view}
         })
@@ -310,6 +320,7 @@ class FinlyF.Views.Report extends Backbone.View
 
 
   refreshData: (e)->
+    _this = @
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh")
       @model.fetch({ data: {view: _this.current_view }})
@@ -327,19 +338,21 @@ class FinlyF.Views.Report extends Backbone.View
         authenticity_token: $("#authenticity_token").val()
       },
       success: (res)->
+        FinlyF.snapNotify(res.messages)
         _this.model.fetch({ data: {view: _this.current_view}})
       error: (err) ->
         console.log "Error", err
     })
 
   viewSub: (e)->
+    console.log "view", @current_view
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
 
-    model = new FinlyF.Models.Expense({id: expense_id})
+    # model = new FinlyF.Models.Expense({id: expense_id})
 
     preview_view = new FinlyF.Views.Expense({
-      model: model
+      model_id: expense_id
       preview: true
       view: @current_view
     })
@@ -374,6 +387,7 @@ class FinlyF.Views.Report extends Backbone.View
       },
       type: 'PATCH',
       success: (res) ->
+        FinlyF.snapNotify(messages)
         console.log res
         _this.model.fetch({
           data: {
@@ -398,6 +412,7 @@ class FinlyF.Views.Report extends Backbone.View
       },
       type: 'PATCH',
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         # console.log res
         _this.model.fetch({
           data: {

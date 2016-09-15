@@ -30,7 +30,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: @params
     })
     @collection.on('reset', @processUsers, @)
-    
 
   render: ->
     $(@el).html(@templateSkeleton())
@@ -61,7 +60,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-
   processUsers: ->
     # console.log "processing users"
     @dump = @collection.models.slice()
@@ -86,7 +84,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
 
-
   showDetails: (e) ->
     $(e.currentTarget).siblings().removeClass('active')
     $(e.currentTarget).addClass('active')
@@ -95,7 +92,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.User({
-      model: model,
+      model_id: model.get('id'),
       page: 'user'
       params: @params
       # preview: true
@@ -165,6 +162,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: @params
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         # managers = {
         #   company_managers: res.company_managers
         #   company_finance_managers: res.company_finance_managers
@@ -175,7 +173,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       error: (err) ->
         console.log "Err", err
     })
-    # console.log managers 
 
   inviteEmployee: (e) ->
     e.preventDefault()
@@ -194,6 +191,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: values
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         $(modal).modal('hide')
         # console.log res
       error: (err) ->
@@ -208,18 +206,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
 
-
-
-
   ##Funactionalities
-
   showOptionalManagers: (e) ->
     target = $(e.currentTarget)
     if parseInt($(target).val()) == 1
       $(target).closest('.conditional-container').find('.conditional-managers').slideDown('fast')
     else
       $(target).closest('.conditional-container').find('.conditional-managers').slideUp('fast')
-
 
   resetPageCount: (options) ->
     if options.target
@@ -229,17 +222,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     else
       $('.main .load-more').attr('data-page', options.page)
 
-
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
-
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
-
-
-
-
-

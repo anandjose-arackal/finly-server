@@ -6,6 +6,7 @@
 #  user_id                  :integer
 #  cash_in_hand_id          :integer
 #  pending_reimbursement_id :integer
+#  pending_advance_id       :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #
@@ -14,6 +15,7 @@ class BalanceSheet < ActiveRecord::Base
   belongs_to :user
   belongs_to :cash_in_hand, class_name: 'Amount'
   belongs_to :pending_reimbursement, class_name: 'Amount'
+  belongs_to :pending_advance, class_name: 'Amount'
 
   delegate :pending_reimbursement_value, to: :pending_reimbursement
 
@@ -27,6 +29,10 @@ class BalanceSheet < ActiveRecord::Base
     if self.pending_reimbursement.blank?
       amount = Amount.create(value: 0, currency: Currency.first)
       self.pending_reimbursement= amount
+    end
+    if self.pending_advance.blank?
+      amount = Amount.create(value: 0, currency: Currency.first)
+      self.pending_advance = amount
     end
   end
 
@@ -72,6 +78,27 @@ class BalanceSheet < ActiveRecord::Base
     end
     value = value.to_f
     pr = self.pending_reimbursement
+    pr.value -= value
+    pr.value = 0 if pr.value < 0
+    pr.save
+  end
+
+  def add_pending_advance(value, currency=nil)
+    if value.present? and value.to_f <= 0
+      return
+    end
+    value = value.to_f
+    pa = self.pending_advance
+    pa.value += value
+    pa.save
+  end
+
+  def subtract_pending_advance(value, currency=nil)
+    if value.present? and value.to_f <= 0
+      return
+    end
+    value = value.to_f
+    pr = self.pending_advance
     pr.value -= value
     pr.value = 0 if pr.value < 0
     pr.save

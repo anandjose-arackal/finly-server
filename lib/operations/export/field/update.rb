@@ -9,7 +9,8 @@ class Export::Field::Update < Export::Base
   def init
     self.company = user.company
     self.update_params = export_params
-    self.preference = company.export_preferences.find_by(id: update_params[:export_field_id])
+    id = params[:id] or update_params[:export_field_id]
+    self.preference = company.export_preferences.find_by(id: id)
   end
 
   def authorize
@@ -20,22 +21,17 @@ class Export::Field::Update < Export::Base
 
   def validate
     if update_params.blank?
-      errors << "Nothing to update."
+      messages[:error] << "Nothing to update."
     end
   end
 
   def process
     unless preference.update(update_params)
-      errors << preference.errors.full_messages
+      messages[:error] << preference.errors.full_messages
     end
   end
 
-  def retrieve
-    if is_success?
-      field_presenter = Export::Base::FieldPresenter.new(user, {preference: preference})
-      return field_presenter
-    else
-      return false
-    end
+  def success
+    Export::Base::FieldPresenter.new(user, {preference: preference}, messages)
   end
 end

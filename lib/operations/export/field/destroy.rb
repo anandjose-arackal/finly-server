@@ -5,26 +5,24 @@ class Export::Field::Destroy < Export::Base
   def init
     self.company = user.company
     self.destroy_params = export_params
-    self.preference = company.export_preferences.find_by(id: destroy_params[:export_field_id])
+    id = params[:id] or destroy_params[:export_field_id]
+    self.preference = company.export_preferences.find_by(id: id)
   end
 
   def authorize
     unless preference
-      errors << "Cannot find field to delete."
+      messages[:error] << "Cannot find field to delete."
     end
   end
 
   def process
     unless preference.destroy
-      errors << preference.errors.full_messages
+      messages[:error] << preference.errors.full_messages
     end
   end
 
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
+  def success
+    Export::Base::FieldPresenter.new(user, {result: true}, messages)
   end
+
 end

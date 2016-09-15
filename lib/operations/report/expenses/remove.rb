@@ -13,11 +13,11 @@ class Report::Expenses::Remove < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
 
     if params[:expense_ids].blank? and params[:expense_id].blank?
-      errors << "No expenses to add."
+      messages[:error] << "No expenses to add."
     end
   end
 
@@ -36,13 +36,13 @@ class Report::Expenses::Remove < Report::Base
 
     # checking if the expense ids correspond to actual expenses
     unless expenses
-      errors << "No expenses found to be removed from the report."
+      messages[:error] << "No expenses found to be removed from the report."
       return false
     end
 
     # checking state of the report
     unless report.open? or report.retracted?
-      errors << 'Cannot remove expenses from report unless report is in open or retracted state'
+      messages[:error] << 'Cannot remove expenses from report unless report is in open or retracted state'
       return false
     end
   end
@@ -53,20 +53,20 @@ class Report::Expenses::Remove < Report::Base
       return false
     end
     unless report.user_id == user.id
-      errors << "You cannot add expenses to this report."
+      messages[:error] << "You cannot add expenses to this report."
     end
   end
 
   def process
     expenses.each do |expense|
       unless expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.unreported_id, manager_memo: nil, rejecting_manager: nil)
-        errors << expense.errors.full_messages
+        messages[:error] << expense.errors.full_messages
       end
     end
   end
 
   def post_process
-    if is_success?
+    if success?
       if retracted
         expenses.each do |expense|
           comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_remove_id, expense_id: expense.id

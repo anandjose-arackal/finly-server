@@ -4,7 +4,7 @@
 # report_id: id of the report being marked as approved
 #
 
-class Settlement::ReportApproved < Report::Base
+class Settlement::Report::Approved < Report::Base
 
   attr_accessor :report
 
@@ -12,13 +12,9 @@ class Settlement::ReportApproved < Report::Base
     [:employee]
   end
 
-  def self.call(user, params)
-    self.new(user, params).run
-  end
-
   def pre_validate
     if user.blank? or params.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -34,7 +30,7 @@ class Settlement::ReportApproved < Report::Base
 
   def validate
     if report.accounted?
-      errors << "Report already accounted for "
+      messages[:error] << "Report already accounted for "
       return false
     end
   end
@@ -56,7 +52,7 @@ class Settlement::ReportApproved < Report::Base
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
       unless report_amount.save
-        errors << report_amount.errors.full_messages
+        messages[:error] << report_amount.errors.full_messages
         return false
       end
       report.reimbursement_amount = report_amount
@@ -65,13 +61,13 @@ class Settlement::ReportApproved < Report::Base
       report_amount.value = pending_reimbursement
       report_amount.currency = currency
       unless report_amount.save
-        errors << report_amount.errors.full_messages
+        messages[:error] << report_amount.errors.full_messages
         return false
       end
     end
     report.accounted = true
     unless report.save
-      errors << report.errors.full_messages
+      messages[:error] << report.errors.full_messages
       return false
     end
     return true
@@ -81,11 +77,8 @@ class Settlement::ReportApproved < Report::Base
     # mailer
   end
 
-  def retrieve
-    if is_success?
-      return report
-    else
-      return false
-    end
+  def success
+    return report
   end
+
 end

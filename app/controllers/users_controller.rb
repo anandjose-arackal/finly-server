@@ -5,16 +5,11 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    # ap @result.user
-    respond_to do |format|
-      format.json {}
-    end
+    respond
   end
 
   # this would call the respective private method to update the respective attributes
   def update
-    ap params
-    # fail
     update_handler(params[:type])
   end
 
@@ -30,17 +25,13 @@ class UsersController < ApplicationController
   def get_managers
     params[:id] = current_user.id
     @result = User::Show.(current_user, params)
-    # ap @result.user
-    respond_to do |format|
-      format.json {}
-    end
+    respond
   end
 
   private
   def update_handler(type = nil)
     unless type
-      flash.now[:error] = "Invalid data."
-      # display error
+      respond(response: :failure, message: 'Error while updating data')
       return
     end
     operation = nil
@@ -60,20 +51,16 @@ class UsersController < ApplicationController
         success_message = "Details updated."
       when 'state'
         operation = User::Configuration::UpdateState.new(current_user, params)
-        success_message = "State updated."
+        success_message = 'State updated'
       else
         # do nothing, ha!
     end
     unless operation.present?
-      flash.now[:error] = 'Unknown error'
+      respond(response: :failure, message: 'Error while updating data')
       return
     end
     @result = operation.run
-    if operation.is_success?
-      flash.now[:success] = success_message if success_message.present?
-    else
-      flash.now[:errors] = operation.errors
-    end
+    respond(response: :success, message: success_message)
   end
 
 end

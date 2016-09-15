@@ -60,7 +60,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-
+    
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
@@ -74,7 +74,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
     $(target).find('span').text('Loading....')
     @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
-
+    
     @collection.fetch({
       data: _this.params,
       reset: false,
@@ -157,7 +157,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.Report({
-      model: model
+      model_id: model.get('id')
       preview: true
       parent: @
       current_view: @params.view || 'personal'
@@ -165,10 +165,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
 
-  # createReport: ->
-
-
-    
   closeDetails: (e)->
     # console.log "Closing", e, e.currentTarget
     e.preventDefault()
@@ -195,8 +191,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     }
     model.save(data, {
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         preview_view = new FinlyF.Views.Report({
-          model: model
+          model_id: model.get('id')
           preview: true
           parent: _this
         })
@@ -205,7 +202,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
-
 
   filterStatus: (e) ->
     e.preventDefault()
@@ -296,9 +292,11 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       $('.main .load-more').attr('data-page', options.page)
 
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
-
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()

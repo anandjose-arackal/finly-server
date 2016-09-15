@@ -7,17 +7,17 @@ class Expense::AddReceipt < Expense::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
   def authorize
     unless expense
-      errors << "Expense not found."
+      messages[:error] << "Expense not found."
       return
     end
     unless expense.user_id == user.id
-      errors << "You do not own this expense."
+      messages[:error] << "You do not own this expense."
     end
   end
 
@@ -34,7 +34,7 @@ class Expense::AddReceipt < Expense::Base
     self.receipt = user.receipts.build(receipt_params)
     receipt.parent = expense
     unless receipt.save
-      errors << "DB Error. Try again."
+      messages[:error] << "DB Error. Try again."
     end
   end
 

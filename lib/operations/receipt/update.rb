@@ -3,13 +3,14 @@ class Receipt::Update < Receipt::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "No user or parameters present."
+      messages[:error] << "No user or parameters present."
     end
   end
 
   def init
     params[:note] = nil if params[:note] == 'nil'
-    self.receipt = user.receipts.find_by_id(params[:receipt_id])
+    id = params[:id] or params[:receipt_id]
+    self.receipt = user.receipts.find_by_id(id)
   end
 
   def authorize
@@ -23,7 +24,7 @@ class Receipt::Update < Receipt::Base
 
   def process
     unless receipt.update_attributes(update_params)
-      errors << receipt.errors.full_messages
+      messages[:error] << receipt.errors.full_messages
     end
   end
 

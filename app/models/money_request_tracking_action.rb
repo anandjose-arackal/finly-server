@@ -10,7 +10,7 @@
 
 class MoneyRequestTrackingAction < ActiveRecord::Base
 
-  ACTIONS={create: 1, retract: 2, submit: 3, approve: 4, reject: 5, unapprove: 6, take_control: 7, credited: 8}
+  ACTIONS={create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7, take_control: 8, credited: 9}
 
   self.class.instance_eval do
     ACTIONS.each do |key, value|
@@ -18,6 +18,10 @@ class MoneyRequestTrackingAction < ActiveRecord::Base
         value
       end
     end
+  end
+
+  def self.id_for(action)
+    ACTIONS[action]
   end
 
 end

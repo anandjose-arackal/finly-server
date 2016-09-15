@@ -7,10 +7,10 @@ class Expense::Card::Update < Expense::Card::Base
   def pre_validate
     super
     if params.blank?
-      errors << "Parameters not present."
+      messages[:error] << "Parameters not present."
     end
     if params[:expense_id].blank? or params[:id].blank?
-      errors << "Expense ID missing!"
+      messages[:error] << "Expense ID missing!"
     end
   end
 
@@ -30,21 +30,21 @@ class Expense::Card::Update < Expense::Card::Base
 
   def validate
     unless expense
-      errors << "Cannot find expense to edit. "
+      messages[:error] << "Cannot find expense to edit. "
     end
   end
 
 
   def authorize
     unless expense.user_id == user.id
-      errors << "You do not own this expense."
+      messages[:error] << "You do not own this expense."
     end
   end
 
 
   def process
     unless expense.update(updated_expense_params)
-      errors << self.expense.errors.full_messages
+      messages[:error] << self.expense.errors.full_messages
       return false
     end
     success

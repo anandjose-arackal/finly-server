@@ -3,7 +3,7 @@ class Receipt::Destroy < Receipt::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      errors << "No user or parameters present."
+      messages[:error] << "No user or parameters present."
     end
   end
 
@@ -23,7 +23,7 @@ class Receipt::Destroy < Receipt::Base
 
   def process
     unless receipt.destroy
-      errors << "DB Error. Try again."
+      messages[:error] << "DB Error. Try again."
     end
   end
 end

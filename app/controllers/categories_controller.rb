@@ -1,36 +1,28 @@
 class CategoriesController < ApplicationController
 
+  before_action :authenticate_user!
+
   def create
-    authorize Category
-    category = current_company.categories.build(category_params)
-    if category.save
-      category.update_attributes(active: true)
-      flash[:success] = "Category added."
+    create_op = Company::Configuration::Category::Create.new(current_user, params)
+    @result = create_op.run
+    if @result.success?
+      @result = Company::Configuration::Show.new(current_user, params).run
+      render partial: 'organization_account/category_list', replace: "#categoriesList"
     else
-      flash[:error] = category.errors.full_messages
+      flash[:error] = @result.messages[:error]
     end
-    @categories = current_company.categories.active
-    render partial: 'organization_account/category_list', replace: "#categoriesList"
   end
 
   def destroy
-    authorize Category
-    category = current_company.categories.active.find_by(id: params[:category_id])
-    if category and category.update_attributes(active: false)
-      flash[:success] = "Category removed."
-    elsif category.nil?
-      flash[:error] = "Category not found."
+    destroy_op = Company::Configuration::Category::Destroy.new(current_user, params)
+    @result = destroy_op.run
+    if @result.success?
+      @result = Company::Configuration::Show.new(current_user, params).run
+      render partial: 'organization_account/category_list', replace: "#categoriesList"
     else
-      flash[:error] = category.errors.full_messages
+      flash[:error] = @result.messages[:error]
     end
-    @categories = current_company.categories.active
-    render partial: 'organization_account/category_list', replace: "#categoriesList"
-  end
 
-  private
-
-  def category_params
-    params.require(:category).permit(:name)
   end
 
 end

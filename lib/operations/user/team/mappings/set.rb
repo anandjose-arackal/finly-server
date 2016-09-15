@@ -4,7 +4,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def pre_validate
     super
     unless params[:user_manager_mapping].present?
-      errors << 'Nothing to update'
+      messages[:error] << 'Nothing to update'
     end
   end
 
@@ -17,7 +17,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
         admin_policy_id = user.admin_policies.pluck(:id)
         params[:user_manager_mapping].each do |key, mapping|
           unless admin_policy_id.include?(mapping[:mapping_id])
-            errors << 'You do not have the permission to make the following update'
+            messages[:error] << 'You do not have the permission to make the following update'
             raise_unauthorized_exception
           end
         end
@@ -32,6 +32,10 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
     self.updating_mapping = params[:user_manager_mapping]
   end
 
+  def validate
+
+  end
+
   def process
     self.updating_mapping.each do |key, map|
       # to remove all empty values
@@ -42,7 +46,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       if id.present?
         updating_map = self.mappings.with_id(id).first rescue nil
         if updating_map.blank?
-          errors << 'Error updating configuration'
+          messages[:error] << 'Error updating configuration'
           return
         end
         if updated_params.present?
@@ -63,15 +67,11 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
         # If ID is not present, create new user mapping
         if updated_params.present?
           updated_params[:user_id] = updating_user.id
-          updated_params["greater_than_amount_attributes"]["currency_id"] = 1
+          updated_params['greater_than_amount_attributes']['currency_id'] = 1
           self.mappings.create(update_params(updated_params))
         end
       end
     end
-  end
-
-  def success
-    true
   end
 
   private

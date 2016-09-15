@@ -10,25 +10,20 @@ class Report::Submit < Report::Base
     [:employee]
   end
 
-  def pre_validate
-    if user.blank? or params.blank?
-      errors << "No user or params passed."
-    end
-  end
-
   def init
-    self.report = user.reports.find_by(id: params[:report_id])
+    id = (params[:report_id] or params[:id])
+    self.report = user.reports.find_by(id: id)
   end
 
   def validate
     # checking report status
     unless report.can_submit?
-      errors << "Cannot submit this report."
+      messages[:error] << 'Cannot submit this report'
       return false
     end
     # checking if the report has expenses
     unless report.expenses.present?
-      errors << "Cannot submit an empty report."
+      messages[:error] << 'Cannot submit an empty report'
     end
     # checking for blocking violations
     violations = Report::Violation.(user, report: report)
@@ -39,7 +34,7 @@ class Report::Submit < Report::Base
       end
     end
     if violations_present
-      errors << "Reports with blocking violations cannot be submitted"
+      messages[:error] << 'Reports with blocking violations cannot be submitted'
     end
   end
 
@@ -48,17 +43,19 @@ class Report::Submit < Report::Base
       raise_unauthorized_exception
       return false
     end
-    # if submitting a report for someone else, ensure he has the right to
-    if params[:controlling_for_user_id]
-      unless report.controlling_for_user_id == user.id
-        raise_unauthorized_exception
-        return false
-      end
-    else
+    # # if submitting a report for someone else, ensure he has the right to
+    # if params[:controlling_for_user_id]
+    #   unless report.controlling_for_user_id == user.id
+    #     raise_unauthorized_exception
+    #     return false
+    #   end
+    # else
+
+    # Only report owners can submit report
       unless report.user_id == user.id
         raise_unauthorized_exception
       end
-    end
+    # end
   end
 
   def process
@@ -68,7 +65,8 @@ class Report::Submit < Report::Base
       # call the approve class with the right parameters
       approve_op = Report::Approve.new(user, {report_id: report.id, auto_approve: true})
       unless approve_op.run
-        errors << "Couldn't auto-approve report for some reason. Please try again."
+        self.messages[:error] = messages[:error].merge approve_op.errors
+        # self.messages[:error] << "Error auto-approving report. Please try again."
         return false
       end
       report.reload
@@ -84,13 +82,12 @@ class Report::Submit < Report::Base
       end
       return true
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process
     # adding comment regarding the change in status of this report
-    comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
-    comment.save
+    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
 
     Event::Report::Submit.(user, report: report)
   end

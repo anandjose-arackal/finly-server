@@ -123,11 +123,16 @@ class User < ActiveRecord::Base
   scope :filter_state, -> (state) do
     case (state)
       when '1', 1
-        where(active: true)
+        # Active
+        # Name nil is to ensure user has signed up
+        where(active: true).where.not(name: nil)
       when '2', 2
-        where(active: false)
+        # Pending
+        self.invitation_not_accepted
       when '3', 3
-        where.not(invitation_token: nil)
+        # Inactive
+        # Name nil is to ensure user has signed up
+        where(active: false).where.not(name: nil)
     end
   end
 

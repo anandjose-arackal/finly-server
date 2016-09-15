@@ -15,7 +15,7 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   def validate
-    errors << 'Error retrieving next approver' if obj.blank?
+    messages[:error] << 'Error retrieving next approver' if obj.blank?
   end
 
   def process
@@ -41,7 +41,7 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   def retrieve
-    response
+    self.response
   end
 
   private

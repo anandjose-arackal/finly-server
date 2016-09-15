@@ -32,7 +32,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .navbar-view-type': 'changeView'
 
     #Filters
-    'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter': 'filter'
     'click .user': 'userSettlements'
 
@@ -46,6 +45,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .settlement-report-select:checkbox': 'processSettlementReport'
     'click .btn-settlement-action': 'processSettlementAction'
     'click .confirm-report-action': 'confirmReportAction'
+    'keyup .search-user': 'prepareSearch'
 
   initialize: (options) ->
     # console.log options
@@ -60,6 +60,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @view = 'personal'
         @user = options.user
         @params.id = @user
+
+        unless @params.view_to_load
+          @params.view_to_load = 'approved'
         
         @collection.url = @collection.url + "/" + @user.toString()
         @collection.fetch({
@@ -108,7 +111,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       else
         $(@el).find(".settlements-index").html(@templateMain())
     else
-      $(@el).find(".settlements-index").html(@templateMain())
+      $(@el).find(".settlements-index").html(@templateMainPayments())
+    
     FinlyF.structureActions(@el, @params)
 
     # Populate summary
@@ -221,6 +225,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     if @view == 'personal'
       FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
     else
+      $(target).parent().siblings('li').removeClass('active')
+      $(target).parent().addClass('active')
+      if view_to_load == 'payments'
+        $(@el).find(".settlements-index").html(@templateMainPayments())
+      else
+        $(@el).find(".settlements-index").html(@templateMain())
       # console.log @collection.url
       @params.view_to_load = view_to_load
       @collection.fetch({
@@ -243,12 +253,22 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $('.main .load-more').attr('data-page', options.page)
 
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  prepareSearch: (e) ->
+    _.debounce(@searchUser(e), 500, true)
+
+  searchUser: (e) ->
+    query = $(e.currentTarget).val()
+    console.log query
 
   userSettlements: (e) ->
     $(@el).find('.settlements-content').css('display', 'block')
@@ -277,11 +297,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-  initReimburse: (e)->
-    console.log "Processing btn-process-reimburse"
-
-  initDebt: (e)->
-    console.log "Processing btn-process-debt"
 
   initPayment: (e) ->
     # console.log "Process Cash"
@@ -309,6 +324,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       type: "POST",
       data: data,
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         $(_this.el).find("#modal-settlements").modal('hide')
         #refresh data
         _this.populateSummary(_this.user_id)
@@ -397,6 +413,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       type: "POST",
       dataType: 'json',
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         $(_this.el).find("#modal-settlements").modal('hide')
         #refresh sreen
         # console.log "success"
@@ -404,7 +421,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       error: (err) ->
         console.log "err", err
     })
-
 
   ##Helpers
   processSettlementReport: (e) ->
@@ -440,5 +456,3 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       memo + value.get('total_amount')
     ), 0)
     return total
-
-

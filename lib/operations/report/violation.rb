@@ -22,9 +22,7 @@
 #                   }
 
 class Report::Violation < Report::Base
-
   include ActionView::Helpers::NumberHelper
-
   attr_accessor :no_policy, :warning_messages, :policy
 
   def authorized_user_types
@@ -33,7 +31,7 @@ class Report::Violation < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      errors << "User or params not found."
+      messages[:error] << "User or params not found."
     end
   end
 
@@ -52,7 +50,7 @@ class Report::Violation < Report::Base
 
   def validate
     if self.report.blank? or not self.report.is_a?(Report)
-      errors << 'Report not found'
+      messages[:error] << 'Report not found'
     end
     unless policy
       self.no_policy = true
@@ -73,12 +71,11 @@ class Report::Violation < Report::Base
     self.response = warning_messages
   end
 
-  def retrieve
-    self.response = warning_messages
+  def success
+    self.response
   end
 
   private
-
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ""
     if rule.amount_value
@@ -135,9 +132,9 @@ class Report::Violation < Report::Base
       warning += message
       broken = true
     end
-    warning += " require a receipt." if rule.expense_rule_type_id == 1
-    warning += " require a note." if rule.expense_rule_type_id == 2
-    warning += " are not allowed." if rule.expense_rule_type_id == 3
+    warning += ' require a receipt' if rule.expense_rule_type_id == 1
+    warning += ' require a note' if rule.expense_rule_type_id == 2
+    warning += ' are not allowed' if rule.expense_rule_type_id == 3
 
     # initializing the rule name
     case rule.expense_rule_type_id
@@ -201,18 +198,18 @@ class Report::Violation < Report::Base
         if rule.period == 'Month'
           start_date = expense.date.beginning_of_month
           end_date = expense.date.end_of_month
-          budget_message = " for the month of " + start_date.strftime("%B") + ", " + start_date.strftime("%Y")
+          budget_message = " for the month of #{start_date.strftime('%B')}, #{start_date.strftime('%Y')}"
         elsif rule.period == 'Week'
           start_date = expense.date.beginning_of_week
           end_date = expense.date.end_of_week
-          budget_message = " for the week beginning " + start_date.to_s
+          budget_message = " for the week beginning #{start_date.to_s}"
         elsif rule.period == 'Year'
           start_date = expense.date.beginning_of_year
           end_date = expense.date.end_of_year
-          budget_message = " for the year " + start_date.strftime("%Y")
+          budget_message = " for the year #{start_date.strftime('%Y')}"
         elsif rule.period == 'Day'
           start_date = end_date = expense.date
-          budget_message = " for date " + start_date.strftime("%B %d, %Y")
+          budget_message = " for date #{start_date.strftime('%B %d, %Y')}"
         end
         return if expense.category_id != rule.category_id && rule.category_id
         if rule.category_id

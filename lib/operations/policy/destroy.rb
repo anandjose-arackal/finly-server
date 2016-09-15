@@ -23,15 +23,8 @@ class Policy::Destroy < Policy::Base
 
   def process
     unless self.policy.destroy
-      errors << "Couldn't delete policy. PLease try again."
+      messages[:error] << "Couldn't delete policy. PLease try again."
     end
   end
 
-  def retrieve
-    if is_success?
-      return true
-    else
-      return false
-    end
-  end
 end

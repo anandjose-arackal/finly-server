@@ -8,7 +8,7 @@
   # date: date of the payment
 
 class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
-  attr_accessor :payment, :role
+  attr_accessor :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -17,7 +17,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   def pre_validate
     super()
     if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
-      errors << "Reimbursement cannot be negative."
+      messages[:error] << "Reimbursement cannot be negative."
     end
   end
 
@@ -45,7 +45,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     value = payment_params[:amount].to_f if payment_params[:amount].present?
     cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date]
     unless value <= cash_in_hand_on_date.value
-      errors << 'Settlement amount cannot be greater than the cash in hand amount'
+      messages[:error] << 'Settlement amount cannot be greater than the cash in hand amount'
       return false
     end
   end
@@ -57,12 +57,8 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     if self.payment.save and balance_sheet.subtract_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
       return true
     end
-    self.errors = payment.errors.full_messages + balance_sheet.errors.full_messages
+    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
     false
-  end
-
-  def success
-    Settlement::Payment::Base::Presenter.new(user, self.payment)
   end
 end

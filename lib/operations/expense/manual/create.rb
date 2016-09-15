@@ -7,14 +7,14 @@ class Expense::Manual::Create < Expense::Manual::Base
   def pre_validate
     super
     if params.blank?
-      errors << 'Parameters not present.'
+      messages[:error] << 'Parameters not present.'
     end
     if params[:expense].blank?
-      errors << 'You have not provided any details to create an expense'
+      messages[:error] << 'You have not provided any details to create an expense'
       return
     end
     if params[:expense][:amount].to_i < 0
-      errors << "Amount can't be negative."
+      messages[:error] << "Amount can't be negative."
     end
   end
 
@@ -32,7 +32,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   def validate
     # can't think of anything for now
     if expense_params[:receipt_id].present? and receipt.blank?
-      errors << 'Receipt not found'
+      messages[:error] << 'Receipt not found'
     end
   end
 
@@ -46,7 +46,7 @@ class Expense::Manual::Create < Expense::Manual::Base
       end
       self.response = expense
     else
-      errors << self.expense.errors.full_messages
+      messages[:error] << self.expense.errors.full_messages
     end
   end
 
@@ -55,13 +55,13 @@ class Expense::Manual::Create < Expense::Manual::Base
     if self.expense.report_id.present? and self.expense.report.open?
       comment = self.expense.report.comments.build report: self.expense.report, user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense: expense
       unless comment.save
-        errors << comment.errors.full_messages
+        messages[:error] << comment.errors.full_messages
       end
     end
   end
 
-  def success
-    Expense::Manual::Create::CreatePresenter.new(expense)
-  end
+  # def success
+  #   Expense::Manual::Create::CreatePresenter.new(expense)
+  # end
 
 end

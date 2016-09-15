@@ -2,24 +2,24 @@ class Policy::Base < BaseOperation
 
   attr_accessor :policy
 
-  class Policy::Base::PolicyPresenter < BaseOperation::BasePresenter
+  class Policy::Base::PolicyPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :policy
+
+    def init
+
+    end
 
   end
 
   def pre_validate
     if user.blank?
-      errors << "No user passed."
+      messages[:error] << "No user passed."
     end
   end
 
-  def retrieve
-    if is_success?
-      return policy
-    else
-      return false
-    end
+  def success
+    policy
   end
 
   def validate

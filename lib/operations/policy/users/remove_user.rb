@@ -36,7 +36,7 @@ class Policy::Users::RemoveUser < Policy::Base
   def process
     # Remove user
     unless self.policy.users.destroy(removed_user)
-      errors << "Couldn't remove user from the policy."
+      messages[:error] << "Couldn't remove user from the policy."
       return false
     end
     # Remove user configuration
@@ -44,7 +44,7 @@ class Policy::Users::RemoveUser < Policy::Base
   end
 
   def post_process
-    if is_success?
+    if success?
 
     end
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160909142303) do
+ActiveRecord::Schema.define(version: 20160912042748) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20160909142303) do
     t.integer  "pending_reimbursement_id", limit: 4
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.integer  "pending_advance_id",       limit: 4
   end
 
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree

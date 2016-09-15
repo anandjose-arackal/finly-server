@@ -2,11 +2,10 @@ class User::Team::Base < BaseOperation
   attr_accessor :currency_id, :amount_value, :mappings, :policy_id
 
 
-  class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter
-
+  class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team
 
-    def initialize(user, params)
+    def init
       self.team = params[:team]
     end
   end
@@ -53,9 +52,9 @@ class User::Team::Base < BaseOperation
     else
       self.policy_id = nil
     end
-    rds = ReportDetailService.new(report)
-    self.currency_id = rds.currency
-    self.amount_value = rds.total_amount
+
+    self.currency_id = report.policy.configuration.report_currency
+    self.amount_value = report.total_amount
   end
 
   def load_money_request

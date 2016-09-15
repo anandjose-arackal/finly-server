@@ -4,30 +4,33 @@
 
 class Report::Retract < Report::Base
 
+  def authorized_user_types
+    :employee
+  end
 
   def pre_validate
-    if user.blank? or params.blank?
-      errors << "User or params not passed."
+    super
+    id = (params[:id] or params[:report_id])
+    if id.blank?
+      messages[:error] << 'Error loading report'
     end
   end
 
   def init
-    self.report = user.reports.find_by(id: params[:report_id])
-  end
-
-  def validate
-    unless report
-      errors << "Report not found."
-    end
-
-    unless report.processing?
-      errors << "Cannot retract report that isn't in processing state."
-    end
+    id = (params[:id] or params[:report_id])
+    self.report = user.reports.with_id(id: id).first rescue nil
   end
 
   def authorize
+    super
     unless report.user_id == user.id
-      errors << "You don't own this report."
+      messages[:error] << "You don't own this report."
+    end
+  end
+
+  def validate
+    unless report.processing?
+      messages[:error] << 'Cannot retract report that is not in processing state'
     end
   end
 
@@ -38,13 +41,13 @@ class Report::Retract < Report::Base
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.unsubmitted_id)
       end
-      return true
+      return
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process
-    if is_success?
+    if success?
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_retract_id
       comment.save
       # mailers here

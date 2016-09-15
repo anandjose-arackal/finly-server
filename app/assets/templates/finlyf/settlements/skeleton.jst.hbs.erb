@@ -207,6 +207,7 @@
 .nav-pills > li > a {
   border-radius: 0;
 }
+
 </style>
 
 
@@ -246,7 +247,13 @@
           
           <ul class="nav navbar-nav navbar-right">
             
-            <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></a>
+              <ul class="navbar-cog dropdown-menu">
+
+                <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+              </ul>
+            </li>
           </ul>
         </div><!-- /.navbar-collapse -->     
       </div>
@@ -258,18 +265,18 @@
 
 <div class="container-fluid container-main" style="background: #fff;position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
 
-  <div class="col-sm-10 col-sm-offset-1 main">
+  <div class="col-sm-8 col-sm-offset-2 main">
 
-    <div class="summary row no-margin" style="background: #B2EDAC;color: #555;margin: -10px; margin-bottom: 0px; height: 150px;padding-top: 20px;">
+    <div class="summary row no-margin" style="background: #DDDAEA;color: #555;; margin-bottom: 0px; height: 150px;padding-top: 20px;">
       <div class="col-sm-10 col-sm-offset-1">
         <div class="col-sm-6">
-          <h4>Pending Reimbursement</h4>
-          <h4>0</h4>
+          <h4 class="text-center">Pending Reimbursement</h4>
+          <h4 class="text-center">&#8377; 0</h4>
         </div>
 
         <div class="col-sm-6">
-          <h4>Cash in Hand</h4>
-          <h4>0</h4>
+          <h4 class="text-center">Cash in Hand</h4>
+          <h4 class="text-center">&#8377; 0</h4>
         </div>
       </div>
     </div>  

@@ -9,7 +9,7 @@ class User::Team::Approver < User::Team::Base
     end
     unless params[:type] == :manager or params[:type] == :finance_manager or
         params[:type] == :approves_to or params[:type] == :approves_finance_to
-      errors << 'User type not valid'
+      messages[:error] << 'User type not valid'
     end
   end
 
@@ -19,7 +19,7 @@ class User::Team::Approver < User::Team::Base
 
   def authorize
     unless mappings.present?
-      errors << 'Mapping not found'
+      messages[:error] << 'Mapping not found'
     end
   end
 

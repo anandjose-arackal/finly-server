@@ -26,7 +26,7 @@ class User::Role::Destroy < BaseOperation
     roles_to_remove.each do |role|
       team = User::Team::Index.new(being_updated_user, role_id: role).run.team
       unless team.blank?
-        errors << "#{being_updated_user.name} has other team members under him. "
+        messages[:error] << "#{being_updated_user.name} has other team members under him. "
         return false
       end
     end
@@ -34,7 +34,7 @@ class User::Role::Destroy < BaseOperation
 
   def process
     unless user.role_mapping.role(roles_to_remove).destroy_all
-      errors << user.role_mapping.errors.full_messages
+      messages[:error] << user.role_mapping.errors.full_messages
       return false
     end
   end

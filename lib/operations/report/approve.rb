@@ -4,7 +4,6 @@
 # auto_approve : optional - set to true if the report is to be auto-approved. i.e. if there is no reporting manager
 
 class Report::Approve < Report::Base
-
   attr_accessor :auto_approve
 
   def authorized_user_types
@@ -12,20 +11,18 @@ class Report::Approve < Report::Base
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      errors << "No user or params passed."
+    if user.blank?
+      messages[:error] << 'User not found'
+    end
+    if params.blank?
+      messages[:error] << 'Error loading configuration'
     end
   end
 
   def init
-    self.report = Report.find_by(id: params[:report_id])
+    id = (params[:id] or params[:report_id])
+    self.report = user.controlling_reports.with_id(id).first rescue nil
     self.auto_approve = params[:auto_approve]
-  end
-
-  def validate
-    unless report.processing? or params[:auto_approve]
-      errors << "Cannot approve this report."
-    end
   end
 
   def authorize
@@ -34,6 +31,12 @@ class Report::Approve < Report::Base
     end
     unless report.controlling_user_id == user.id
       raise_unauthorized_exception
+    end
+  end
+
+  def validate
+    unless report.processing? or params[:auto_approve]
+      messages[:error] << 'Cannot approve this report as it is not in processing state'
     end
   end
 
@@ -46,9 +49,8 @@ class Report::Approve < Report::Base
         status = ReportStatus.closed_id
       end
     end
-    manager_id = nil
-    manager_id = manager.id if manager.present?
-    user_role = user_role_for_report
+    manager_id = manager.id rescue nil
+    user_role = User::Team::Review::UserRole.(user, self.report)
     if report.update_attributes report_status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: nil
       if auto_approve
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
@@ -64,11 +66,11 @@ class Report::Approve < Report::Base
       end
       return true
     end
-    errors << report.errors.full_messages
+    messages[:error] << report.errors.full_messages
   end
 
   def post_process
-    if is_success?
+    if success?
       if auto_approve
         comment = report.comments.build report_comment_action_id: ReportCommentAction.report_auto_approve_id
       else
@@ -78,7 +80,7 @@ class Report::Approve < Report::Base
 
       # recomputing settlement and marking the report as accounted
       unless report.processing?
-        Settlement::ReportApproved.(report.user, report_id: report.id)
+        Settlement::Report::Approved.(report.user, report_id: report.id)
         report.reload
       end
       # if report is closed, add the relevant comment

@@ -2,14 +2,14 @@ class MoneyRequest::Update < MoneyRequest::Base
   attr_accessor :changes, :update_param
 
   def authorized_user_types
-    [:employee]
+    [:employee, :manager, :finance_manager, :admin]
   end
 
   def pre_validate
     super
     if params[:money_request].blank? or ((params[:money_request][:items].blank?) and
-        (params[:money_request][:note].blank?))
-      errors << 'Nothing to update'
+        (params[:money_request][:note].blank?) and params[:items_attributes].blank?)
+      messages[:error] << 'Nothing to update'
     end
   end
 
@@ -39,7 +39,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def authorize
     if self.money_request.blank?
-      errors << 'You cannot update this request'
+      messages[:error] << 'You cannot update this request'
       raise_unauthorized_exception
     end
   end
@@ -50,7 +50,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def process
     unless money_request.update_attributes(self.update_param)
-      errors << money_request.errors.full_messages
+      messages[:error] << money_request.errors.full_messages
     end
   end
 
@@ -69,13 +69,13 @@ class MoneyRequest::Update < MoneyRequest::Base
       next unless value.present? and key.present?
       case key
         when :name
-          self.report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id,
-                                     updated_field: 'name', updated_from: report.name_was,
-                                     updated_to: report.name
+          self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
+                                     updated_field: 'name', updated_from: money_request.name_was,
+                                     updated_to: money_request.name
         when :policy_id
-          self.report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_update_id,
-                                     updated_field: 'policy', updated_from: report.policy_id_was,
-                                     updated_to: report.policy_id
+          self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
+                                     updated_field: 'policy', updated_from: money_request.policy_id_was,
+                                     updated_to: money_request.policy_id
         when :items_attributes
           value.each do |updating_mapping|
             # todo test it out and add comments
