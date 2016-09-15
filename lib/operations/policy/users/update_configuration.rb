@@ -30,7 +30,7 @@
 #       approves_finance_to_id: id of the conditional finance manager
 #       team_mapping_id: id of the conditional approves finance to mapping. Leave blank if it's being created anew
 
-require "#{Rails.root}/lib/operations/user/team/mappings/update"
+require "#{Rails.root}/lib/operations/user/team/mappings/set"
 
 class Policy::Users::UpdateConfiguration < Policy::Base
 

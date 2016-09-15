@@ -20,7 +20,7 @@ class Policy::InvitableUsers < Policy::Base
         approver_op = User::Team::Approver.new(user, {type: :manager, policy_id: policy.id})
         manager = approver_op.run
         manager_email = nil
-        manager_email = manager.email if manager.present?
+        manager_email = manager.email if manager.is_a?(User)
         users << {user: user, manager: manager_email}
       end
       users

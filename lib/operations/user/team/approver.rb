@@ -25,7 +25,6 @@ class User::Team::Approver < User::Team::Base
 
   def process
     obj = self.mappings.send(params[:type]).policy(self.policy_id).amount(self.currency_id, self.amount_value).first.send(params[:type]) rescue nil
-    
     return nil unless obj.present?
     self.response = obj
   end
