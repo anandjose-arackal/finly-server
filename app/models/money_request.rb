@@ -168,6 +168,10 @@ class MoneyRequest < ActiveRecord::Base
     self.controlling_user.id == user.id
   end
 
+  def payment_pending?
+    self.payment_id.blank?
+  end
+
   def versioned_policy
     if self.submitted_at.present?
       if self.policy

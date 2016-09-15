@@ -14,10 +14,6 @@ class Report::Destroy < Report::Base
     end
   end
 
-  def init
-    super()
-  end
-
   def validate
     # check if the report can be destroyed at all
     unless report.can_destroy?
