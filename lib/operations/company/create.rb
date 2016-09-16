@@ -16,7 +16,4 @@ class Company::Create < Company::Base
     end
   end
 
-  
-
-
 end
