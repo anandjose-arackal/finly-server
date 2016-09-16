@@ -1,0 +1,32 @@
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
+
+    <h3>Company: <%=@company.name%></h3>
+    <h3>Add a new admin</h3>
+
+      <form data-remote="true" data-turboboost="true" accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_new_admin_path(@company) %>" method="post">
+        <input name="utf8" type="hidden" value="&#x2713;"/>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+        <p>Admin Name: </p>
+        <input type="text" name="admin[name]" placeholder="Name" title="Admin name">
+
+        <p>Admin Email: </p>
+        <input id="email" type="text" name="admin[email]" placeholder="Email" title="Admin Email Address">
+
+        <p>Admin password: </p>
+        <input id="password" type="password" name="admin[password]" placeholder="Password" title="Enter Password">
+
+        <p>Retype password: </p>
+        <input id="passwordConfirmation" type="password" name="admin[password]" placeholder="Repeat Password">
+
+        <p>Number: </p>
+        <input type="text" name="admin[mobile_number]" placeholder="XXX" title="Admin number">
+
+        <input type="submit" class="abaButton" id="addCompanyButton" value="Add Admin">
+
+      </form>
+
+  </div>
+</div>

@@ -316,6 +316,12 @@ Rails.application.routes.draw do
 
   end
 
+  namespace :superadmin do
+    resources :companies do
+      post 'add_admin', to: 'companies#add_admin', as: :new_admin
+    end
+  end
+
   # get 'settlements/summary' => 'settlements#summary'
 
   root 'home#index'
