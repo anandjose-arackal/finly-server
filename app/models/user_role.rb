@@ -28,6 +28,7 @@ class UserRole < ActiveRecord::Base
   end
 
   def self.id_for(role)
+    role == :finance_manager if role == :finance
     VALUES[role]
   end
 
