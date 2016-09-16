@@ -357,7 +357,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       params.view = @params.view
 
     if $(target).attr('data-navigate')
-      if $(target).attr('data-navigate') == true
+      if $.parseJSON($(target).attr('data-navigate')) == true
         #Filters by navigating to a Backbone route
         FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})  
       else

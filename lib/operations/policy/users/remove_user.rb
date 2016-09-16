@@ -44,8 +44,6 @@ class Policy::Users::RemoveUser < Policy::Base
   end
 
   def post_process
-    if success?
-
-    end
+    messages[:success] = "User removed from policy."
   end
 end

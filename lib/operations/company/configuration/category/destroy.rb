@@ -25,4 +25,8 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
     end
   end
 
+  def post_process
+    messages[:success] = "Category destroyed."
+  end
+
 end

@@ -69,11 +69,15 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement precision_value(payment_params[:amount]), payment_params[:currency_id]
       reports.each do |report|
-        Report::MarkAsReimbursed.new(user, {payment_id: payment.id, report_id: report.id, role_id: role}).run
+        Report::MarkAsReimbursed.(user, {payment: payment, report: report, role_id: role})
       end
       return true
     end
     self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
+  end
+
+  def post_process
+    messages[:success] = "Reports reimbursed."
   end
 end

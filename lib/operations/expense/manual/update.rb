@@ -61,7 +61,7 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def post_process
     # add comment in report if expense is added within report
-
+    messages[:success] = "Expense updated."
     # send mailer indicating updation of expense
   end
 

@@ -14,10 +14,6 @@ class Report::Destroy < Report::Base
     end
   end
 
-  def init
-    super()
-  end
-
   def validate
     # check if the report can be destroyed at all
     unless report.can_destroy?
@@ -40,6 +36,10 @@ class Report::Destroy < Report::Base
       messages[:error] << report.errors.full_messages
       return false
     end
+  end
+
+  def post_process
+    messages[:success] = "Report destroyed."
   end
 
 end

@@ -40,4 +40,8 @@ class Report::Archive < Report::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Expenses archived."
+  end
+
 end

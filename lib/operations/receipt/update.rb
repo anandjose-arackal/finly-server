@@ -28,6 +28,10 @@ class Receipt::Update < Receipt::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Receipt updated."
+  end
+
   private
   def update_params
     params.require(:receipt).permit(:image, :note)

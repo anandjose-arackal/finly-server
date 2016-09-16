@@ -4,7 +4,6 @@
 # policy_id: id of the policy to be assigned to the report
 
 class Report::Policies::Assign < Report::Base
-
   attr_accessor :policy
 
   def authorized_user_types
@@ -14,7 +13,7 @@ class Report::Policies::Assign < Report::Base
   def pre_validate
     super()
     if params[:report_id].blank?
-      messages[:error] << "Report id not passed"
+      messages[:error] << 'Report id not passed'
     end
   end
 
@@ -31,12 +30,12 @@ class Report::Policies::Assign < Report::Base
     end
 
     if report.policy_id == policy.id
-      messages[:error] << "Report is already assigned to this policy"
+      messages[:error] << 'Report is already assigned to this policy'
     end
 
     # checking if the user is actually this policy
     if policy and !user.policies.includes?(policy)
-      messages[:error] << "You are not associated with this policy."
+      messages[:error] << 'You are not associated with this policy.'
     end
   end
 

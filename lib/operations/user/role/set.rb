@@ -48,4 +48,8 @@ class User::Role::Set < BaseOperation
     being_updated_user.role_mapping.with_id(roles_to_remove).destroy_all if roles_to_remove.present?
   end
 
+  def post_process
+    messages[:success] = "User roles updated."
+  end
+
 end

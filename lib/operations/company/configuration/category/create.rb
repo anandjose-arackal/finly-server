@@ -24,6 +24,10 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
     end
   end
 
+  def post_process
+    messages[:success] = "Category added."
+  end
+
   private
 
   def category_params

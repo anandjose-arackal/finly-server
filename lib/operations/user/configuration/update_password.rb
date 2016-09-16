@@ -30,6 +30,10 @@ class User::Configuration::UpdatePassword < BaseOperation
     end
   end
 
+  def post_process
+    messages[:success] = "Password updated."
+  end
+
   private
   def password_params
     params.require(:user).permit(:current_password, :password, :password_confirmation)

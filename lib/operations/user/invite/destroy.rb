@@ -38,7 +38,7 @@ class User::Invite::Destroy < User::Invite::Base
   end
 
   def post_process
-    # probably nothing right now.
+    messages[:success] = "User invite destroyed."
   end
 
   def success

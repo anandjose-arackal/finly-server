@@ -28,6 +28,11 @@ class UsersController < ApplicationController
     respond
   end
 
+  # action that imports from a CSV or Excel file for mass invitations
+  def import
+
+  end
+
   private
   def update_handler(type = nil)
     unless type

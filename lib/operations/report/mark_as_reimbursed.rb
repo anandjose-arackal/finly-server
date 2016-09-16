@@ -12,32 +12,27 @@ class Report::MarkAsReimbursed < Report::Base
   end
 
   def init
-    super()
-    self.payment = Payment.find_by(id: params[:payment_id])
-  end
-
-  def authorize
-
+    self.report = params[:report]
+    self.payment = params[:payment]
   end
 
   def validate
     unless report.reimbursement_pending?
-      messages[:error] << "Report cannot be reimbursed at this stage."
-      return false
+      messages[:error] << 'Report cannot be reimbursed at this stage'
     end
   end
 
   def process
-    if report.update_attributes controlling_user: nil, controlling_for_user: nil, report_status_id: ReportStatus.reimbursed_id, memo: nil
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id, report_status_id: ReportStatus.reimbursed_id
-      track.save
+    if report.update_attributes controlling_user: nil, controlling_for_user: nil,
+                                report_status_id: ReportStatus.reimbursed_id, memo: nil
+      report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id,
+                                  report_status_id: ReportStatus.reimbursed_id
     end
   end
 
   def post_process
     if success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_reimbursed_id
-      comment.save
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.report_reimbursed_id
     end
   end
 end

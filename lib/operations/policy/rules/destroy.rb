@@ -30,7 +30,7 @@ class Policy::Rules::Destroy < Policy::Rules::Base
   end
 
   def post_process
-    # nothing
+    messages[:success] = "Rule destroyed."
   end
 
   def success

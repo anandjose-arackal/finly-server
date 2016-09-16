@@ -48,4 +48,8 @@ class Policy::Rules::Create < Policy::Rules::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Rule added."
+  end
+
 end

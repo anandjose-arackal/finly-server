@@ -44,7 +44,6 @@ class Expense::Manual::Create < Expense::Manual::Base
         self.receipt.parent = expense
         self.receipt.save
       end
-      self.response = expense
     else
       messages[:error] << self.expense.errors.full_messages
     end
@@ -58,6 +57,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         messages[:error] << comment.errors.full_messages
       end
     end
+    messages[:success] = "Expense created."
   end
 
   # def success

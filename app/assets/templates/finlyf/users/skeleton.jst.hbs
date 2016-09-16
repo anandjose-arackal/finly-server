@@ -116,7 +116,7 @@
   background: rgb(252, 252, 252) none repeat scroll 0% 0%;
   background: #F5F6F9;
   max-height: calc(100% - 103px); 
-  padding: 10px;
+  /*padding: 10px;*/
   box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
   height: calc(100% - 100px);
 }
@@ -229,6 +229,13 @@
 .item-attr-edit.show{
   display: inline !important;
 }
+
+section {
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 5px;
+}
 </style>
 
 
@@ -302,22 +309,23 @@
 
 <div class="container-fluid container-main" style="background: #fff; margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
   <div class="col-sm-3 sidebar no-padding">
-    {{!-- <div class="row no-margin">
-      <form class="navbar-form" role="search" style="width: 100%;">
+  
+    <div class="row no-margin">
+      <form class="navbar-form" role="search">
         <div class="input-group" style="width: 100%;">
-          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
+          <input type="text" class="search-user input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
           <div class="input-group-btn">
             <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
           </div>
         </div>
       </form>
-    </div> --}}
+    </div>
 
     <div class="row no-margin" id="users">
     </div>
   </div>
 
-  <div class="col-sm-9 col-sm-offset-3 main" id="user-details">
+  <div class="col-sm-9 col-sm-offset-3 main no-padding" id="user-details">
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">

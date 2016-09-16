@@ -169,7 +169,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     # console.log "Closing", e, e.currentTarget
     e.preventDefault()
     target = $(e.currentTarget)
-    if $(target).attr('data-refresh-true')
+    attr = $(target).attr('data-refresh-true')
+
+    if (typeof attr != typeof undefined && attr != false)
       # alert("Data refresh is true")
       # @filter()
       @refetchCollection()

@@ -220,6 +220,11 @@ class User < ActiveRecord::Base
     !self.invitation_token
   end
 
+  # activates the user in devise
+  def activate
+    self.confirm
+  end
+
   def cash_in_hand(date = nil)
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == Date.today

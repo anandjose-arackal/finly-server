@@ -50,8 +50,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   initialize: (options) ->
     # console.log options
     _this = @
-    @collectoinUsers = new FinlyF.Collections.Users()
-    @collectoinUsers.url = "/settlements"
+    @collectionUsers = new FinlyF.Collections.Users()
+    @collectionUsers.url = "/settlements"
     @collection = new FinlyF.Collections.Settlements()
     @collectionSettlementReports = new FinlyF.Collections.Settlements()
     if options.params
@@ -80,7 +80,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "params for admin is", @params
         # @params = options.params || {}
         
-        @collectoinUsers.fetch({
+        @collectionUsers.fetch({
           reset: true,
           data: @params,
           success: (res)->
@@ -92,7 +92,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     
     @collection.on('reset', @processItems, @)
-    @collectoinUsers.on('reset', @processUsers, @)
+    @collectionUsers.on('reset', @processUsers, @)
 
   render: ->
     # console.log "Step 3. Rendering."
@@ -164,10 +164,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   processUsers: ->
     console.log "processing users"
-    @dump = @collectoinUsers.models.slice()
+    @dump = @collectionUsers.models.slice()
     $(@el).find("#users").html("")
 
-    @collectoinUsers.each(@appendUsers, @)
+    @collectionUsers.each(@appendUsers, @)
 
   appendUsers: (user) ->
     console.log "appending users"
@@ -264,11 +264,21 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     FinlyF.changeView(e)
 
   prepareSearch: (e) ->
-    _.debounce(@searchUser(e), 500, true)
+    # console.log _.debounce(@searchUser(e), 500, true)
+    if $(e.currentTarget).val().length > 2
+      @searchUser(e)
 
   searchUser: (e) ->
     query = $(e.currentTarget).val()
-    console.log query
+    @collectionUsers.fetch({
+      reset: true,
+      data: {
+        view: @params.view
+        filter_search: query
+      }
+    }) 
+
+    # console.log query
 
   userSettlements: (e) ->
     $(@el).find('.settlements-content').css('display', 'block')

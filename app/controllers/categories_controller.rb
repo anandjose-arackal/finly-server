@@ -22,7 +22,6 @@ class CategoriesController < ApplicationController
     else
       flash[:error] = @result.messages[:error]
     end
-
   end
 
 end

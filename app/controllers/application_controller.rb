@@ -1,6 +1,6 @@
 require 'require_all'
 
- Dir[File.expand_path "#{Rails.root}/lib/operations/event/**/*.rb"].each{|f| require_relative(f)}
+ Dir[File.expand_path "#{Rails.root}/lib/operations/event/**/*.rb"].each{|f| require(f)}
 # require_all "#{Rails.root}/lib/operations"
 # require_all "#{Rails.root}/lib/operations/event"
 class ApplicationController < ActionController::Base
@@ -87,15 +87,17 @@ class ApplicationController < ActionController::Base
   def respond(type=nil)
     if type.present?
       if type[:response] == :success
-        messages = {}
-        messages[:success] = [type[:message]] if type[:message].present?
-        @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
+        if @result.blank?
+          messages = {}
+          messages[:success] = [type[:message]] if type[:message].present?
+          @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
+        end
         respond_to do |format|
           format.json { render 'shared/success' }
         end
         return
       elsif type[:response] == :failure
-        @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: [type[:message]]})
+        @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: [type[:message]]}) if @result.blank?
         respond_to do |format|
           format.json { render 'layouts/application' }
         end

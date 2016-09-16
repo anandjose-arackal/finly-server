@@ -90,6 +90,12 @@ if MoneyRequestStatus.count == 0
   end
 end
 
+if PaymentMode.count == 0
+  PaymentMode::MODES.each do |key,value|
+    PaymentMode.create id: value, name: key
+  end
+end
+
 if Event.count == 0
   Event::ACTIONS.each do |item|
     Event.create id: (Event::ACTIONS.find_index(item) + 1), name: item[:key].to_s,

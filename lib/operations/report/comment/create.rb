@@ -27,5 +27,6 @@ class Report::Comment::Create < Report::Base
 
   def post_process
     Event::Report::Comment::Create.(user, report: self.report)
+    messages[:success] = "Comment added."
   end
 end

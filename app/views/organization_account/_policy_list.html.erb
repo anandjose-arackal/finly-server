@@ -40,7 +40,7 @@
           <tr>
             <td style="width: 30%;"> <% link_to policy.name, policy %></td>
             <td style="width: 40%;">
-              <a id="showReportsButton" class="btn btn-primary green-button" href="<%=reports_path(filter_policy: policy.id, view: params[:view])%>">View Reports</a>
+              <a id="showReportsButton" class="btn btn-primary green-button" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>
               <i class="fa fa-trash-o"></i></td>
           </tr>
 

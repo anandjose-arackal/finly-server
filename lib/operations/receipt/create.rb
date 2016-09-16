@@ -19,6 +19,10 @@ class Receipt::Create < Receipt::Base
     end
   end
 
+  def post_process
+    messages[:success] = "Receipt added."
+  end
+
   def success
     Receipt::Create::ReceiptPresenter.new(user, {receipt: receipt}, messages)
   end

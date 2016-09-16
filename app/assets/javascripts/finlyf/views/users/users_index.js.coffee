@@ -20,6 +20,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
+    'keyup .search-user': 'prepareSearch'
+
   initialize: (options) ->
     @params = options.params
     unless @params.filter_state
@@ -205,6 +207,23 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     @params.filter_state = parseInt($(target).attr('data-filter-state'))
 
     FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
+
+  prepareSearch: (e) ->
+    # console.log "abinash"
+    # console.log _.debounce(@searchUser(e), 500, true)
+    if $(e.currentTarget).val().length > 2 || $(e.currentTarget).val().length == 0
+      @searchUser(e)
+
+  searchUser: (e) ->
+    query = $(e.currentTarget).val()
+    @collection.fetch({
+      reset: true,
+      data: {
+        view: @params.view
+        filter_state: @params.filter_state
+        filter_search: query
+      }
+    }) 
 
   ##Funactionalities
   showOptionalManagers: (e) ->

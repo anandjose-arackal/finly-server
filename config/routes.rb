@@ -286,6 +286,8 @@ Rails.application.routes.draw do
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
   end
 
+  resources :money_request, only: [:create, :index, :show, :destroy, :update]
+
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
@@ -317,6 +319,12 @@ Rails.application.routes.draw do
 
   resources :receipts do
 
+  end
+
+  namespace :superadmin do
+    resources :companies do
+      post 'add_admin', to: 'companies#add_admin', as: :new_admin
+    end
   end
 
   # get 'settlements/summary' => 'settlements#summary'

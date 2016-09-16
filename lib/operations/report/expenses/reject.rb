@@ -60,5 +60,6 @@ class Report::Expenses::Reject < Report::Base
         comment.save
       end
     end
+    messages[:success] = "Expenses rejected. You can find it in your unreported expenses."
   end
 end
