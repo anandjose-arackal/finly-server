@@ -9,4 +9,11 @@
 #
 
 class PaymentMode < ActiveRecord::Base
+
+  MODES = {cash: 1}
+
+  def self.id_for(item)
+    MODES[item]
+  end
+
 end

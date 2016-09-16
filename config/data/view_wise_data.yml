@@ -16,11 +16,12 @@ admin:
 personal:
   links:
     primary_navbar:
-      - Expenses: expenses
+      - Settlements: settlements
+      - Request: request
       - Reports: reports
       - Receipts: receipts
+      - Expenses: expenses
       # - Analytics: analytics
-      - Settlements: settlements
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'

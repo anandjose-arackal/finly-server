@@ -7,7 +7,7 @@ class User::Index < User::Base
     if operation.success?
       self.users = result
     else
-      messages[:error] << operation.errors
+      messages[:error] << (operation.messages[:error] + operation.messages[:failure])
     end
   end
 

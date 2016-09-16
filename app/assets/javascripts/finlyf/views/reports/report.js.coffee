@@ -113,7 +113,7 @@ class FinlyF.Views.Report extends Backbone.View
     _.each($("#modal-new form#new-item").serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
-    console.log values
+    # console.log values
     model = new FinlyF.Models.Expense()
     # console.log("Putting data")
     response = model.save(values, {
@@ -123,6 +123,7 @@ class FinlyF.Views.Report extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
+        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         $("#modal-new").modal('hide')
         _this.model.fetch({
           data: {
@@ -133,7 +134,7 @@ class FinlyF.Views.Report extends Backbone.View
         console.log "Error", err
     })
 
-    console.log response
+    # console.log response
 
   existingExpense: (e) ->
     report_id = $(e.currentTarget).attr('data-item-id')
