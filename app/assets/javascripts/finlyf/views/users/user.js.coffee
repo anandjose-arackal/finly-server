@@ -33,7 +33,7 @@ class FinlyF.Views.User extends Backbone.View
         $(@el).attr('data-item-id', @model.get('id'))
         $(@el).html(@templateList({ item: @model.toJSON() }))
       when 'user'
-        $(@el).removeClass('user').addClass('user-details')
+        $(@el).removeClass('user').addClass('user-details no-padding')
         # $(@el).html(@templateShow({ item: @model.toJSON()}))
       when 'settlements'
         $(@el).attr('data-item-id', @model.get('id'))
@@ -73,6 +73,7 @@ class FinlyF.Views.User extends Backbone.View
     $(target).addClass('success btn-update-policy').removeClass('warning btn-edit-policy').text('Update')
 
   updatePolicy: (e) ->
+    _this = @
     e.preventDefault()
     target = $(e.currentTarget)
     policy = $(target).closest('.policy')
@@ -93,7 +94,10 @@ class FinlyF.Views.User extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        console.log model, res
+        _this.model.fetch({
+          view: _this.params.view
+        })
+        # console.log model, res
       error: (err) ->
         console.log "Err", err
     }) 

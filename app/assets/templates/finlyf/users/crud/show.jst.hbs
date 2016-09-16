@@ -1,8 +1,9 @@
-<section>
+<section class="user-info">
   <div class="row">
-    <div class="col-sm-6">Actions</div>
     <div class="col-sm-6">
-
+      <h4>User Info</h4>
+    </div>
+    <div class="col-sm-6 text-right">
       {{#if item.actions.delete_invite}}
         <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
       {{/if}}
@@ -12,17 +13,6 @@
       {{#if item.actions.deactivate}}
         <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-url="{{item.actions.deactivate}}">Deactivate</button>
       {{/if}}
-    </div>
-  </div>
-</section>
-
-<section class="user-info">
-  <div class="row">
-    <div class="col-sm-6">
-      <h4>User Info</h4>
-    </div>
-    <div class="col-sm-6 text-right">
-      <button class="btn btn-sm navbar-btn btn-warning btn-edit-user">Edit</button>
     </div>
   </div>
   <form class="form-user-info">
