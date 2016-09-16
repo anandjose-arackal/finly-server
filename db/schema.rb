@@ -389,10 +389,11 @@ ActiveRecord::Schema.define(version: 20160912042748) do
   add_index "money_request_tracks", ["user_request_role_id"], name: "index_money_request_tracks_on_user_request_role_id", using: :btree
 
   create_table "money_requests", force: :cascade do |t|
+    t.string   "name",                    limit: 255
     t.integer  "user_id",                 limit: 4,                                 null: false
     t.integer  "policy_id",               limit: 4
     t.integer  "payment_mode_id",         limit: 4,                                 null: false
-    t.integer  "payment_id",              limit: 4,                                 null: false
+    t.integer  "payment_id",              limit: 4
     t.date     "required_by_date"
     t.integer  "status_id",               limit: 4,                                 null: false
     t.integer  "controlling_user_id",     limit: 4

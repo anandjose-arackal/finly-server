@@ -22,7 +22,7 @@ class MoneyRequest::Index < MoneyRequest::Base
 
   def process
     case self.role_id
-      when UserRole.admin_id
+      when UserRole.id_for(:admin)
         if self.user.company_admin?
           self.money_requests = MoneyRequest.not_open.with_user(user.company.users.pluck(:id))
         elsif user.policy_admin?
@@ -34,21 +34,21 @@ class MoneyRequest::Index < MoneyRequest::Base
           messages[:error] << 'User is not an admin'
           return false
         end
-      when UserRole.manager_id
+      when UserRole.id_for(:manager)
         controlling_money_request_query = user.controlling_money_requests.non_owner(user.id)
         interacted_money_requests_query= user.manager_money_requests
         sql = MoneyRequest.connection.unprepared_statement {
           "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
         }
         self.money_requests = MoneyRequest.from(sql)
-      when UserRole.finance_manager_id
+      when UserRole.id_for(:finance_manager)
         controlling_money_request_query = user.controlling_money_requests.non_owner(user.id)
         interacted_money_requests_query = user.finance_money_requests
         sql = MoneyRequest.connection.unprepared_statement {
           "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
         }
         self.money_requests = MoneyRequest.from(sql)
-      when UserRole.auditor_id
+      when UserRole.id_for(:auditor)
         # todo auditor
       else
         self.money_requests = user.money_requests
@@ -79,7 +79,7 @@ class MoneyRequest::Index < MoneyRequest::Base
     end
 
     def get_counts
-      type_counts = money_requests.group(:money_request_status_id)
+      type_counts = money_requests.group(:status_id)
       self.counts = {}
       counts[:open] = (type_counts[MoneyRequestStatus.open_id] or 0)
       counts[:processing] = (type_counts[MoneyRequestStatus.processing_id] or 0)

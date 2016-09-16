@@ -24,4 +24,8 @@ class MoneyRequestComment < ActiveRecord::Base
   belongs_to :expense
   belongs_to :rejected_to, class_name: 'User'
 
+  def generate(u=nil)
+    # todo
+  end
+
 end

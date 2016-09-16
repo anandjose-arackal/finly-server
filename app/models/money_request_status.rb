@@ -24,4 +24,8 @@ class MoneyRequestStatus < ActiveRecord::Base
     VALUES[status]
   end
 
+  def status_name
+    self.name
+  end
+
 end
