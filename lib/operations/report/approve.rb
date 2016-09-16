@@ -80,7 +80,7 @@ class Report::Approve < Report::Base
 
       # recomputing settlement and marking the report as accounted
       unless report.processing?
-        Settlement::Report::Approved.(report.user, report_id: report.id)
+        Settlement::Report::Approved.(user, report: report)
         report.reload
       end
       # if report is closed, add the relevant comment
@@ -90,6 +90,7 @@ class Report::Approve < Report::Base
         comment.save
       end
       # Send notifications
+      # todo - top level constant error here
       Event::Report::Approve.(self.user, report: self.report)
 
       messages[:success] = "Report approved!"

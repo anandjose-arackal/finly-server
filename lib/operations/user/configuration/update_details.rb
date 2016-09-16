@@ -25,9 +25,6 @@ class User::Configuration::UpdateDetails < BaseOperation
       messages[:error] << "Name cannot be blank."
       return false
     end
-    if details_params[:mobile_number].blank?
-      messages[:error] << "Mobile number cannot be blank."
-    end
   end
 
 
@@ -35,6 +32,10 @@ class User::Configuration::UpdateDetails < BaseOperation
     unless user.update(details_params)
       messages[:error] << user.errors.full_messages
     end
+  end
+
+  def post_process
+    messages[:success] = "Details updated."
   end
 
   private

@@ -29,23 +29,25 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
   belongs_to :payment_mode
+  belongs_to :status, class_name: 'MoneyRequestStatus'
+  belongs_to :policy
 
-  has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id
-  has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id
-  has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id
+  has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
+  has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
+  has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id, dependent: :destroy
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :open, -> {where status_id: MoneyRequestStatus.open_id }
-  scope :approved, -> { where status_id: MoneyRequestStatus.approved_id }
-  scope :credited, -> { where status_id: MoneyRequestStatus.credited_id }
+  scope :open, -> {where status_id: MoneyRequestStatus.id_for(:open) }
+  scope :approved, -> { where status_id: MoneyRequestStatus.id_for(:approved) }
+  scope :credited, -> { where status_id: MoneyRequestStatus.id_for(:credited) }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
-  scope :processing, -> {where status_id: MoneyRequestStatus.processing_id }
+  scope :processing, -> {where status_id: MoneyRequestStatus.id_for(:processing) }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
-  scope :not_open, -> { where.not status_id: MoneyRequestStatus.open_id }
+  scope :not_open, -> { where.not status_id: MoneyRequestStatus.id_for(:open) }
   scope :include_user, -> { includes :user }
   scope :with_payment, ->{ where.not payment_id: nil }
   scope :without_payment, ->{ where payment_id: nil }
@@ -74,13 +76,15 @@ class MoneyRequest < ActiveRecord::Base
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
   accepts_nested_attributes_for :items
+  delegate :status_name, to: :status
 
   default_scope { order(created_at: :desc,status_id: :asc ) }
 
   before_save :handle_name
+  before_create :create_items
 
-  # Used to retrieve all the users associated with this report. If user before is provided,
-  # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  # Used to retrieve all the users associated with this money request. If user before is provided,
+  # it provides a list of all users who interacted with the money request before this given user. Mainly used for reject_to
   def associated_users(user_before = nil, ordered = false)
     return nil if tracks.blank?
     trackings = tracks.without_take_control_action
@@ -168,6 +172,10 @@ class MoneyRequest < ActiveRecord::Base
     self.controlling_user.id == user.id
   end
 
+  def payment_pending?
+    self.payment_id.blank?
+  end
+
   def versioned_policy
     if self.submitted_at.present?
       if self.policy
@@ -194,6 +202,13 @@ class MoneyRequest < ActiveRecord::Base
   def handle_name
     if self.name.blank?
       self.name = MoneyRequest.get_default_name(self.user)
+    end
+  end
+
+  def create_items
+    self.user.company.categories.each do |category|
+      amount = Amount.create value: 0, currency_id: Currency.first.id
+      self.items.build category_id: category.id, amount_id: amount.id
     end
   end
 

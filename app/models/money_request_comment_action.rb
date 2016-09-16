@@ -10,7 +10,8 @@
 
 class MoneyRequestCommentAction < ActiveRecord::Base
 
-  ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7, take_control: 8, comment: 9, update: 10}
+  ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
+             take_control: 8, comment: 9, update: 10, credited: 11}
 
   self.class.instance_eval do
     ACTIONS.each do |key,value|

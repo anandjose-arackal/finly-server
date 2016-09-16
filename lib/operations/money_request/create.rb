@@ -4,10 +4,19 @@ class MoneyRequest::Create < MoneyRequest::Base
     :employee
   end
 
+  def init
+
+  end
+
+  def authorize
+
+  end
+
   def process
     param = create_params
-    param[:status_id] = MoneyRequestStatus.open_id
+    param[:status_id] = MoneyRequestStatus.id_for(:open)
     param[:controlling_user] = self.user
+    param[:payment_mode_id] = PaymentMode.id_for(:cash)
     self.money_request = user.money_requests.build param
     if money_request.save
       self.money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
@@ -19,7 +28,8 @@ class MoneyRequest::Create < MoneyRequest::Base
 
   private
   def create_params
-    params.require(:money_request).permit(:name, :required_by_date, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    return {} unless params[:money_request].present?
+    params[:money_request].permit(:name, :required_by_date, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end

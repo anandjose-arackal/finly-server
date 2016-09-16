@@ -61,6 +61,11 @@ class MoneyRequest::Approve < MoneyRequest::Base
 
   def post_process
     # todo computing settlements
+    unless report.processing?
+      Settlement::MoneyRequest::Approved.(user, money_request: money_request)
+      money_request.reload
+    end
+
     # todo sending notifications
 
     Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)

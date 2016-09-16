@@ -76,6 +76,10 @@ class User::Team::Index < User::Team::Base
     end
   end
 
+  def retrieve
+    self.response
+  end
+
   # def success
   #   User::Team::Base::TeamPresenter.new(user, team: response)
   # end

@@ -1,6 +1,6 @@
 require 'require_all'
 
- Dir[File.expand_path "#{Rails.root}/lib/operations/event/**/*.rb"].each{|f| require_relative(f)}
+ Dir[File.expand_path "#{Rails.root}/lib/operations/event/**/*.rb"].each{|f| require(f)}
 # require_all "#{Rails.root}/lib/operations"
 # require_all "#{Rails.root}/lib/operations/event"
 class ApplicationController < ActionController::Base

@@ -22,13 +22,7 @@ class Settlement::Report::Unapproved < Report::Base
   end
 
   def init
-    self.report = user.reports.find_by(id: params[:report_id])
-  end
-
-  def authorize
-    unless report
-      raise_unauthorized_exception
-    end
+    self.report = params[:report]
   end
 
   def validate
@@ -45,11 +39,9 @@ class Settlement::Report::Unapproved < Report::Base
     user.balance_sheet.add_cash_in_hand (total_amount - pending_reimbursement), currency
     user.balance_sheet.subtract_pending_reimbursement pending_reimbursement, currency
     report.reimbursement_amount.update(value: 0) if report.reimbursement_amount.present?
-    if report.update(accounted: false)
-      return true
+    unless report.update_attributes(accounted: false)
+      messages[:error] << report.errors.full_messages
     end
-    messages[:error] << report.errors.full_messages
-    return false
   end
 
   def post_process
