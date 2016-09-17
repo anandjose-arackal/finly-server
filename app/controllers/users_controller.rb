@@ -37,7 +37,9 @@ class UsersController < ApplicationController
   def import
     import_op = User::Invite::Import.new(current_user, params)
     @result = import_op.run
-    redirect_to request.referrer
+    respond_to do |format|
+      format.csv {send_data @result}
+    end
   end
 
   private

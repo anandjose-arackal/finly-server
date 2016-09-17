@@ -2,7 +2,7 @@ class User::Invite::Import < BaseOperation
 
   require 'roo'
 
-  attr_accessor :file, :success_hash
+  attr_accessor :file, :success_hash, :header
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -30,7 +30,7 @@ class User::Invite::Import < BaseOperation
 
   def process
     sheet = open_spreadsheet(params[:file])
-    header = sheet.row(1)
+    self.header = sheet.row(1)
     (2..sheet.last_row).each do |i|
       row = Hash[[header, sheet.row(i)].transpose]
       row = process_row(row)
@@ -42,11 +42,29 @@ class User::Invite::Import < BaseOperation
         success_hash[i] = user.errors.full_messages
       end
     end
-    self.response = success_hash
+  end
+
+  def post_process
+    # generating the success csv
+    self.response = generate_response_csv
   end
 
 
   private
+
+  def generate_response_csv
+    CSV.generate(headers: true) do |csv|
+      sheet = open_spreadsheet(params[:file])
+      headers = sheet.row(1)
+      headers << "Result"
+      csv << headers
+      (2..sheet.last_row).each do |i|
+        row = sheet.row(i)
+        row << success_hash[i]
+        csv << row
+      end
+    end
+  end
 
   def open_spreadsheet(file)
     case File.extname(file.original_filename)
