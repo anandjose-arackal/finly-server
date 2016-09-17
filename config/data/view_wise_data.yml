@@ -7,10 +7,10 @@ admin:
       - Employees: employees
       - Company Reports: reports
     cog:
-      - Ogranization Account: '/organization_account?view=admin'
+      - Organization Account: '/organization_account?view=admin'
       - Policies: '/policies'
       - My Account: '/users/'
-      - Expense Policies: '/policies?view=admin'
+      # - Expense Policies: '/policies?view=admin'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
 personal:

@@ -10,6 +10,8 @@
 #
 
 class Company < ActiveRecord::Base
+  include Constants
+
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
@@ -54,10 +56,14 @@ class Company < ActiveRecord::Base
     users.with_roles.only_finance_managers
   end
 
+
   private
   def init_config_present
     self.build_configuration.save unless self.configuration.present?
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
+    DEFAULT_CATEGORIES.each do |category|
+      self.categories.create!(name: category)
+    end
   end
 end

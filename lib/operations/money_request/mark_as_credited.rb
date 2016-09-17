@@ -18,9 +18,9 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
 
   def process
     if money_request.update_attributes controlling_user: nil, controlling_for_user: nil,
-                                       money_request_status_id: MoneyRequestStatus.id_for(:credited), memo: nil
+                                       status_id: MoneyRequestStatus.id_for(:credited), note: nil
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:credited),
-                                  money_request_status_id: MoneyRequestStatus.id_for(:credited)
+                                  status_id: MoneyRequestStatus.id_for(:credited)
     end
   end
 

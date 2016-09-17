@@ -28,6 +28,18 @@ class UsersController < ApplicationController
     respond
   end
 
+  # placeholder action for importing file
+  def mass_import
+
+  end
+
+  # action that imports from a CSV or Excel file for mass invitations
+  def import
+    import_op = User::Invite::Import.new(current_user, params)
+    @result = import_op.run
+    redirect_to request.referrer
+  end
+
   private
   def update_handler(type = nil)
     unless type

@@ -64,8 +64,8 @@ class User::Team::Base < BaseOperation
     else
       self.policy_id = nil
     end
-    self.currency_id = money_request.amount.currency
-    self.amount_value = money_request.amount.value
+    self.currency_id = 1
+    self.amount_value = money_request.total_amount
   end
 
 end

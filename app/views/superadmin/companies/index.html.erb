@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
+
+   <% @companies.each do |company| %>
+    <%= link_to company.name, superadmin_company_path(company) %>
+
+        <hr class="listDivider">
+
+    <% end %>
+
+    <form action="<%=new_superadmin_company_path%>">
+      <input type="submit" class="abaButton" id="addCompanyButton" value="Add Company">
+    </form>
+
+  </div>
+</div>

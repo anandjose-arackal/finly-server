@@ -100,7 +100,7 @@ class Report::Base < BaseOperation
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
         elsif (self.report.can_unapprove?) and self.report.associated_users(self.report.controlling_user).include?(user)
-          actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_path(id: report.id, view: params[:view])}
+          actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
         end
       else
         if self.report.open? or self.report.retracted? or self.report.rejected?
