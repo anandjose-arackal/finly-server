@@ -14,7 +14,8 @@ class MoneyRequest::Reject < MoneyRequest::Base
   end
   
   def init
-    super
+    id = (params[:id] or params[:money_request_id])
+    self.money_request = user.controlling_money_requests.with_id(id).first rescue nil
     if params[:reject_to_user_id].present?
       rejectable_users = User::Team::Review::RejectToUsersList.(self.money_request, self.user)
       self.reject_to_user = rejectable_users.with_id(params[:reject_to_user_id]).first if rejectable_users.present?
@@ -50,10 +51,11 @@ class MoneyRequest::Reject < MoneyRequest::Base
 
   def process
     user_role = User::Team::Review::UserRole.(user, self.money_request)
-    if money_request.update_attributes report_status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, memo: params[:memo]
-      money_request.tracks.create action_user: user, report_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject), report_status_id: status, memo: params[:memo],
-                                  user_report_role_id: user_role
-      money_request.comments.create user: user, report_comment_action_id: MoneyRequestCommentAction.id_for(:reject), rejected_to_id: reject_to_user.id, content: params[:memo]
+    note= (params[:note] or params[:memo])
+    if money_request.update_attributes status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, note: note
+      money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject), status_id: status, memo: note,
+                                  user_request_role_id: user_role
+      money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:reject), rejected_to_id: reject_to_user.id, content: note
       return
     end
     messages[:error] << money_request.errors.full_messages

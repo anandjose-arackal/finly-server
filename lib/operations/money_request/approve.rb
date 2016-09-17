@@ -15,8 +15,8 @@ class MoneyRequest::Approve < MoneyRequest::Base
   end
 
   def init
-    self.money_request = user.controlling_money_requests.with_id(params[:id]).first rescue nil
-    return unless self.money_request.present?
+    id = (params[:id] or params[:money_request_id])
+    self.money_request = user.controlling_money_requests.with_id(id).first rescue nil
     self.auto_approve = params[:auto_approve]
   end
 
@@ -30,8 +30,8 @@ class MoneyRequest::Approve < MoneyRequest::Base
   end
 
   def validate
-    unless report.processing? or params[:auto_approve]
-      messages[:error] << 'Cannot approve this report as it is not in processing state'
+    unless money_request.processing? or params[:auto_approve]
+      messages[:error] << 'Cannot approve this request as it is not in processing state'
     end
   end
 
@@ -61,7 +61,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
 
   def post_process
     # todo computing settlements
-    unless report.processing?
+    unless money_request.processing?
       Settlement::MoneyRequest::Approved.(user, money_request: money_request)
       money_request.reload
     end

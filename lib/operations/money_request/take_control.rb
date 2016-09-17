@@ -23,7 +23,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
   def process
     if money_request.update_attributes controlling_user: user, controlling_for_user: money_request.controlling_user, memo: params[:memo]
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control),
-                                  money_request_status_id: money_request.status_id, memo: params[:memo]
+                                  status_id: money_request.status_id, memo: params[:memo]
       money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
                                     content: params[:memo]
       return

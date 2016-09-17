@@ -1,4 +1,4 @@
-class MoneyRequest::Base < Card::Base
+class MoneyRequest::Base < BaseOperation
   attr_accessor :money_request
 
   def pre_validate

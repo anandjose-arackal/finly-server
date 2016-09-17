@@ -11,9 +11,9 @@ class MoneyRequest::Destroy < MoneyRequest::Base
   end
 
   def validate
-    # check if the report can be destroyed at all
-    unless report.can_destroy?
-      messages[:error] << "Report can only be deleted once it's retracted or rejected"
+    # check if the money_request can be destroyed at all
+    unless money_request.can_destroy?
+      messages[:error] << "Money Request can only be deleted once it's retracted or rejected"
     end
   end
 
@@ -32,6 +32,10 @@ class MoneyRequest::Destroy < MoneyRequest::Base
 
   def post_process
     messages[:success] = 'Money Request destroyed'
+  end
+
+  def success
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
   end
 
 end

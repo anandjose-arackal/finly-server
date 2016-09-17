@@ -47,17 +47,24 @@ class MoneyRequest::Submit < MoneyRequest::Base
       money_request.reload
       return
     end
-    memo = params[:memo]
+    memo = (params[:note] or params[:memo])
     submitted_at = DateTime.now
-    if money_request.update_attributes money_request_status_id: MoneyRequestStatus.id_for(:processing),
-                                       controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo,
+    if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
+                                       controlling_user_id: manager.id, controlling_for_user_id: nil, note: memo,
                                        submitted_at: submitted_at
       money_request.tracks.create action_user: user,
                                          money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:submit),
-                                         money_request_status_id: MoneyRequestStatus.id_for(:processing), memo: memo
+                                         status_id: MoneyRequestStatus.id_for(:processing), memo: memo
       return true
     end
     messages[:error] << money_request.errors.full_messages
+  end
+
+  def post_process
+    # adding comment regarding the change in status of this report
+    money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
+
+    messages[:success] = 'Money Request Submitted'
   end
 
 end

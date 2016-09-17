@@ -5,14 +5,6 @@ class MoneyRequest::Update < MoneyRequest::Base
     [:employee, :manager, :finance_manager, :admin]
   end
 
-  def pre_validate
-    super
-    if params[:money_request].blank? or ((params[:money_request][:items].blank?) and
-        (params[:money_request][:note].blank?) and params[:items_attributes].blank?)
-      messages[:error] << 'Nothing to update'
-    end
-  end
-
   def init
     super
     self.update_param = {}
@@ -60,7 +52,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   protected
   def generate_comments(model)
-    self.changes = model.changes.merge(model.amount.changes)
+    self.changes = model.changes
   end
 
   def save_comments
