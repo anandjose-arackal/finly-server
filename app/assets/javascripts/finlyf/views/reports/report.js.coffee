@@ -100,6 +100,7 @@ class FinlyF.Views.Report extends Backbone.View
       }).appendTo(category_select) 
     
     $("#modal-new").modal('show')
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
     $("#modal-new").find('.btn-create-expense').on('click', (e) ->
       _this.createExpense(@);
     )
@@ -123,13 +124,14 @@ class FinlyF.Views.Report extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        $("#modal-new").modal('hide')
-        _this.model.fetch({
-          data: {
-            view: _this.current_view
-          }
-        })
+        if res.success == true
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          $("#modal-new").modal('hide')
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+          })
       error: (err) ->
         console.log "Error", err
     })
@@ -145,6 +147,7 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
     $(@el).find("#modal-mp").modal('show')
+    $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   showExpenseSelectOption: ->
     console.log "Here we are"
@@ -188,10 +191,11 @@ class FinlyF.Views.Report extends Backbone.View
       },
       success: (res)->
         FinlyF.snapNotify(res.messages)
-        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        # $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        $(modal).modal('hide')
-        _this.model.fetch({ data: {view: _this.current_view}})
+        if res.success == true
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          $(modal).modal('hide')
+          _this.model.fetch({ data: {view: _this.current_view}})
       error: (err) ->
         console.log "Error", err
     })
@@ -297,7 +301,7 @@ class FinlyF.Views.Report extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        console.log res
+        # console.log res
         _this.parent.trigger('item:destroyed')
       error: (err) ->
         console.log "Error", err
@@ -346,7 +350,7 @@ class FinlyF.Views.Report extends Backbone.View
     })
 
   viewSub: (e)->
-    console.log "view", @current_view
+    # console.log "view", @current_view
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
 
@@ -356,10 +360,13 @@ class FinlyF.Views.Report extends Backbone.View
       model_id: expense_id
       preview: true
       view: @current_view
+      report: true
     })
     $(@el).find("#modal-mp").html(@templateShowExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
     $(@el).find("#modal-mp").modal('show')
+    $("#modal-mp").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+
 
   rejectSub: (e) ->
     target = e.currentTarget

@@ -34,6 +34,8 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
+    $("#primary-navbar a[href=expenses]").parent().addClass('active')
+
   reports: (query, action) ->
     # if typeof action != 'undefined'
     #   actions = JSON.parse(query)
@@ -47,6 +49,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href=reports]").parent().addClass('active')
 
   receipts:(query) ->
     if typeof query != 'undefined'
@@ -57,6 +60,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     view = new FinlyF.Views.ReceiptsIndex({ params: params })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href=receipts]").parent().addClass('active')
 
   requests: (query) ->
     if typeof query != 'undefined'
@@ -68,6 +72,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href=requests]").parent().addClass('active')
 
   settlements: (query) ->
     # Admin & Finance view
@@ -80,6 +85,8 @@ class FinlyF.Routers.Main extends Backbone.Router
       params: params
     })
     $("#backbone-container").html(view.render().el)
+    @features()
+    $("#primary-navbar a[href=settlements]").parent().addClass('active')
 
   settlements_show: (user, query) ->
     console.log "settlements show"
@@ -103,6 +110,8 @@ class FinlyF.Routers.Main extends Backbone.Router
       params: params
     })
     $("#backbone-container").html(view.render().el)
+    @features()
+    $("#primary-navbar a[href=settlements]").parent().addClass('active')
 
   users: (query)->
     # Admin & Finance view
@@ -115,6 +124,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href=employees]").parent().addClass('active')
 
   features: ->
     $(".datepicker").datepicker({

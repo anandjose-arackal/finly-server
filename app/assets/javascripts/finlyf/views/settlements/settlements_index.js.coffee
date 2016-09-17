@@ -40,6 +40,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-process-payment': 'initPayment'
 
     #settlements
+    'click .btn-cancel-confirmation': 'cancelConfirmation'
     'click .btn-add-payment': 'addPayment'
     # 'click .settlement-report': 'processSettlementReport'
     'click .settlement-report-select:checkbox': 'processSettlementReport'
@@ -460,6 +461,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     container = $(e.currentTarget).closest('.modal-body')
     $(container).find('.confirmation-screen').css("display", "block")
     $(container).find('.process-screen').css('display', 'none')
+
+  cancelConfirmation: (e) ->
+    e.preventDefault()
+    container = $(e.currentTarget).closest('.modal-body')
+    $(container).find('.confirmation-screen').css("display", "none")
+    $(container).find('.process-screen').css('display', 'block')
 
   selectedReportsTotal: ->
     total = _.reduce(@selectedReports, ((memo, value) ->

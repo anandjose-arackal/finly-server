@@ -15,14 +15,20 @@
 
   <div class="col-sm-4 text-center">
     {{#if item.actions.add_cash_advance}}
-      <button class="btn btn-sm btn-success btn-process-payment">Add Cash</button>
+      <button class="btn btn-sm btn-success btn-process-payment btn-report-summary-action">Add Cash</button>
     {{/if}}
     {{#if item.actions.add_reimbursement}}
-      <button class="btn btn-sm btn-warning btn-process-reimburse" data-url="{{item.actions.add_reimbursement}}">Reimburse</button>
+      <button class="btn btn-sm btn-warning btn-process-reimburse btn-report-summary-action" data-url="{{item.actions.add_reimbursement}}">Reimburse</button>
     {{/if}}
     {{#if item.actions.settle}}
-      <button class="btn btn-sm btn-warning btn-process-debt" data-url="{{item.actions.settle}}">Settle Debt</button>
+      <button class="btn btn-sm btn-warning btn-process-debt btn-report-summary-action" data-url="{{item.actions.settle}}">Settle Debt</button>
     {{/if}}
   </div>
 </div>
-
+<style type="text/css">
+.btn-report-summary-action{
+  width: 150px;
+  margin-bottom: 5px;
+  display: block;
+}
+</style>
