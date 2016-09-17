@@ -7,7 +7,7 @@ admin:
       - Employees: employees
       - Company Reports: reports
     cog:
-      - Ogranization Account: '/orgranization_account?view=admin'
+      - Ogranization Account: '/organization_account?view=admin'
       - Policies: '/policies'
       - My Account: '/users/'
       - Expense Policies: '/policies?view=admin'

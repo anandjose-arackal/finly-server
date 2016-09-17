@@ -54,9 +54,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     @on('item:destroyed', @itemDeleted, @)
 
   render: ->
-    # console.log "Step 3. Rendering."
-    #Appending Partials to Skeleton
-
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
@@ -158,6 +155,22 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
     preview_view = new FinlyF.Views.Report({
       model_id: model.get('id')
+      preview: true
+      parent: @
+      current_view: @params.view || 'personal'
+    })
+
+    $(@el).find("#item-details-main").html(preview_view.render().el)
+
+  showReport: (report_id) ->
+    # model = @collection.get(report_id)
+    # console.log model.toJSON()
+    main = $(@el).find(".main")
+    unless $(main).hasClass("preview")
+      $(main).addClass("preview")
+
+    preview_view = new FinlyF.Views.Report({
+      model_id: report_id
       preview: true
       parent: @
       current_view: @params.view || 'personal'

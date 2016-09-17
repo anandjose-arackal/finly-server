@@ -51,6 +51,9 @@ class FinlyF.Routers.Main extends Backbone.Router
     @features()
     $("#primary-navbar a[href=reports]").parent().addClass('active')
 
+    if params.report_id
+      view.showReport(params.report_id)
+
   receipts:(query) ->
     if typeof query != 'undefined'
       params = JSON.parse(query)

@@ -7,7 +7,10 @@ class ExportPreferencesController < ApplicationController
     @result = create_op.run
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
-      render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:error] = @result.messages[:error]
     end
@@ -28,7 +31,10 @@ class ExportPreferencesController < ApplicationController
     @result = destroy_op.run
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
-      render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:error] = @result.messages[:error]
     end
@@ -49,7 +55,10 @@ class ExportPreferencesController < ApplicationController
     @result = destroy_op.run
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
-      render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:error] = @result.messages[:error]
     end
