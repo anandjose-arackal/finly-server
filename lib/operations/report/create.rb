@@ -28,7 +28,7 @@ class Report::Create < Report::Base
     if report.save
       report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
       report_track.save
-      expense_ids = params[:expense_ids].split(',')
+      expense_ids = params[:expense_ids].split(',') if params[:expense_ids]
       if expense_ids.present?
         Report::Expenses::Add.(user, {report_id: report.id, expense_ids: expense_ids})
       end
