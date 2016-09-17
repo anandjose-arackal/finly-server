@@ -51,7 +51,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
     @collection.on('reset', @processItems, @)
-    @on('item:destroyed', @filter, @)
+    @on('item:destroyed', @itemDeleted, @)
 
   render: ->
     # console.log "Step 3. Rendering."
@@ -59,7 +59,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
-    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
     
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
@@ -283,6 +283,22 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
         $(event.target).attr('data-item-id', ui.item.value)
         return false
 
+    })
+
+  itemDeleted: (e) ->
+    console.log "item destoryed"
+    _this = @
+    main = $(@el).find(".main")
+    $(main).removeClass("preview")
+
+    @params.page = 1
+    @collection.fetch({
+      data: @params
+      reset: true
+      success: ->
+        _this.dump.length = 0
+        _this.dump = _this.collection.models.slice()
+        _this.resetPageCount({selector: '.main .load-more', page: 1})
     })
 
   resetPageCount: (options) ->

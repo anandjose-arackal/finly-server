@@ -14,18 +14,22 @@ class FinlyF.Views.Expense extends Backbone.View
   initialize: (options) ->
     _this = @
     @preview = options.preview
+
+    #is being previewed from a report
+    if options.report
+      @report_preview = options.report
     # if options.report
     #   @preview_in_report = true
     if options.parent
       @parent = options.parent
     if @preview
-      view = options.view
+      @view = options.view
       # console.log "Preview is passed true"
       $(@el).removeClass("item")
       @model = new FinlyF.Models.Expense({id: options.model_id})
       @model.fetch({
         data: {
-          view: view
+          view: _this.view
           authenticity_token: $("#authenticity_token").val()
         }
       })
@@ -39,14 +43,6 @@ class FinlyF.Views.Expense extends Backbone.View
       $(@el).html(@templateShow())
     @
 
-  updateModel: (e) ->
-    # _this = @
-    field = $(e.target).attr('data-field')
-    value = e.target.innerText
-    @model.set(field, value);
-
-  
-
   toggleSelect: (e) ->
     if $(e.currentTarget).prop('checked')
       $(@el).addClass('selected')
@@ -56,6 +52,9 @@ class FinlyF.Views.Expense extends Backbone.View
     @parent.trigger('item:selected')
 
   populateDetails: ->
+    if @report_preview
+      @model.set('report_preview', true)
+      @model.set('view', @view)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
   showSaveOption: ->
@@ -114,6 +113,7 @@ class FinlyF.Views.Expense extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           _this.model.fetch()
+          # if _this.report_preview
           # $("#modal-new").modal('hide')
           # _this.refetchCollection()
       error: (err) ->
