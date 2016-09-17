@@ -64,7 +64,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     })
     @collection.on('reset', @processItems, @)
     @on('item:selected', @expenseSelectOptions, @)
-    @on('item:destroyed', @filter, @)
+    @on('item:destroyed', @itemDeleted, @)
 
   render: ->
     # console.log "Step 3. Rendering."
@@ -128,8 +128,11 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   refetchCollection: (e) ->
     #REFRESH
     #Spin refresh-spinner
-    console.log "Hi"
+    # console.log "Hi"
     _this = @
+
+    main = $(@el).find(".main")
+    $(main).removeClass("preview")
 
     if e
       target = e.currentTarget
@@ -232,6 +235,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       }).appendTo(category_select) 
     
     $("#modal-new").modal('show')
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   create: (e)->
     _this = @
@@ -243,7 +247,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       type: "POST",
       data: formData,
       success: (res) ->
-        console.log res
+        console.log res.messages
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $("#modal-new").modal('hide')
@@ -418,6 +422,22 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       select: (event, ui) ->
         console.log "Selected."
     })
+
+  itemDeleted: (e) ->
+    _this = @
+    main = $(@el).find(".main")
+    $(main).removeClass("preview")
+
+    @params.page = 1
+    @collection.fetch({
+      data: @params
+      reset: true
+      success: ->
+        _this.dump.length = 0
+        _this.dump = _this.collection.models.slice()
+        _this.resetPageCount({selector: '.main .load-more', page: 1})
+    })
+
 
   resetPageCount: (options) ->
     if options.target

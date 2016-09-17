@@ -1,7 +1,14 @@
 <div class="row no-margin no-padding">
   <div class="col-sm-6">
      <ul class="nav navbar-nav">
-      <li><button class="navbar-btn btn btn-new">New Report</button></li> 
+      <li><button class="navbar-btn btn navbar-btn-refresh"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</button></li>
+      {{#if item.view}}
+        {{#if_eq item.view 'personal'}}
+          <li><button class="navbar-btn btn btn-new">New Report</button></li> 
+        {{/if_eq}}
+      {{else}}
+        <li><button class="navbar-btn btn btn-new">New Report</button></li> 
+      {{/if}}
     </ul>   
   </div>
 
@@ -9,7 +16,6 @@
 
   <div class="col-sm-6">
     <ul class="nav navbar-nav navbar-right">
-      <li><button class="navbar-btn btn navbar-btn-refresh"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</button></li>    
     </ul>   
   </div>
 

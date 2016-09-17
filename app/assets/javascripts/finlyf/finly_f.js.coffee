@@ -83,7 +83,7 @@ window.FinlyF =
       FinlyF.primary_router.navigate('expenses', {trigger: true})
 
   snapNotify: (obj) ->
-    console.log obj
+    # console.log obj
     for type, messages of obj
       switch type
         when 'error'
@@ -107,7 +107,7 @@ window.FinlyF =
       if messages.length
         for message in messages
           console.log "Message ", message, "Color:", color, "container", container
-          ohSnap(message, {color: color, 'duration': '100000', 'container-id': container});
+          ohSnap(message, {color: color, 'duration': '6000', 'container-id': container});
 
 $(document).ready ->
   FinlyF.initialize()

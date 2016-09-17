@@ -15,7 +15,10 @@
  *= require customized/jquery-ui.min
 */
 
-
+@font-face {
+  font-family: "Bree Serif";
+  src: font_url('bree_regular.otf') format("opentype");
+}
 
 // Will be moved to home.css.scss
 .dropdown{
@@ -104,8 +107,6 @@
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
-@import "bootstrap";
-@import "bootstrap-sprockets";
 
 $background-blue: #f5f6f9;
 $button-green: #93c178;

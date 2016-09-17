@@ -1,11 +1,11 @@
 admin:
   links:
     primary_navbar:
-      - Company Reports: reports
       # - Company Expenses: expenses
-      - Employees: employees
       # - Analytics: analytics
       - Settlements: settlements
+      - Employees: employees
+      - Company Reports: reports
     cog:
       - Ogranization Account: '/orgranization_account?view=admin'
       - Policies: '/policies'
@@ -30,10 +30,10 @@ personal:
 manager:
   links:
     primary_navbar:
+      # - Team Expenses: expenses
+      # - Team Analytics: analytics
+      - Team Members: employees
       - Team Reports: reports
-      - Team Expenses: expenses
-      - Team Analytics: analytics
-      - Team Members: users
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -42,11 +42,11 @@ manager:
 finance:
   links:
     primary_navbar:
-      - Company Reports: reports
       # - Company Expenses: expenses
-      - Employees: employees
       # - Analytics: analytics
       - Settlements: settlements
+      - Employees: employees
+      - Company Reports: reports
 
     cog:
       - My Account: '/users/'

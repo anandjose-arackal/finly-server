@@ -33,6 +33,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #receipt
     'click .btn-new-expense': 'newExpense'
     'click .btn-create-expense': 'createExpense'
+    # 'click .btn-delete-receipt': 'delete'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -149,12 +150,17 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         $(item).find(".select-item").prop("checked", false)
 
   selectCurrent: (e) ->
-    console.log "hi"
+    # if $(e.currentTarget).hasClass('fa-trash')
+    #   @delete(e)
+    #   return
+    # console.log "hi"
     items = $(@el).find("#items .item")
     for item in items
       $(item).find('.select-item').prop('checked', false)
+      $(item).removeClass('selected')
 
     $(e.currentTarget).find('.select-item').prop('checked', true)
+    $(e.currentTarget).closest('.item').addClass('selected')
     @receiptSelectOptions()
 
   new: ->
@@ -304,4 +310,14 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         _this.filter()
       error: (err) ->
         console.log "Error", err
+    })
+
+  delete: (e) ->
+    target = e.currentTarget
+    model_id = $(target).attr('data-item-id')
+
+    model = @collection.get(model_id)
+    model.destroy({
+      success: (res) ->
+        console.log "deleted", res
     })

@@ -1,62 +1,42 @@
 class Superadmin::CompaniesController < ApplicationController
 
   before_action :authenticate_user!
-  before_action :check_superadmin
 
   def new
 
   end
 
   def show
-    @company = Company.find_by(id: params[:id])
+    @result = Company::Show.new(current_user, params).run
   end
 
   def create
-    @company = Company.create!(company_params)
-    @admin = @company.users.build(admin_params)
-    if @company.save && @admin.save
-      @admin.activate
-      redirect_to request.referrer
+    create_op = Company::Create.new(current_user, params)
+    @result = create_op.run
+    # temporary rendering for html testing.
+    if @result.success?
+      flash[:success] = "Company created"
     else
-      flash.now[:danger] = "Adding new company failed. Please try again."
-      redirect_to request.referrer
+      flash[:error] = "Failed. Try again"
     end
+    redirect_to request.referrer
   end
 
   def add_admin
-    @company = Company.find_by(id: params[:company_id])
-    @admin = @company.users.build(admin_params)
-    if @admin.save
-      @admin.activate
-      redirect_to request.referrer
+    add_admin_op = Company::Create.new(current_user, params)
+    @result = add_admin_op.run
+    # temporary rendering for html testing.
+    if @result.success?
+      flash[:success] = "Company created"
     else
-      flash.now[:danger] = "Unable to add admin"
-      redirect_to request.referrer
+      flash[:error] = "Failed. Try again"
     end
+    redirect_to request.referrer
   end
 
   def index
     @companies = Company.all
   end
 
-  private
-
-  def admin_params
-    params[:admin][:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},
-                                            {user_role_id: UserRole.employee_id}]
-
-    params.require(:admin).permit(:name, :email, :password, :password_confirmation,
-                                  :mobile_number, team_mapping_attributes: [:default], role_mapping_attributes: [:user_role_id])
-  end
-
-  def company_params
-    params.require(:company).permit(:name)
-  end
-
-  def check_superadmin
-    unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
-      redirect_to root_url
-    end
-  end
 
 end

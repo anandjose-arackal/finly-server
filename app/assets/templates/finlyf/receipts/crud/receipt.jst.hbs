@@ -4,8 +4,11 @@
     <img class="img-responsive" src="{{item.url}}" style=""/>
   </div>
   <div class="row no-margin receipt-details">
-    <div class="col-sm-12">
+    <div class="col-sm-9">
       <h4>{{item.image_updated_at}}</h4>
+    </div>
+    <div class="col-sm-3">
+      <h4 class="text-right"><i class="fa fa-trash btn-delete-receipt" data-item-id="{{item.id}}"></i></h4>
     </div>
     <div class="col-sm-12">
       {{#if item.note}}
