@@ -66,9 +66,11 @@
     {{/if}}
 
       
-    <div class="col-sm-4 no-padding">
+    <div class="col-sm-4 no-padding text-center">
+      <label class="text-center control-label">Receipt</label><br />
+
       <label for="expense-receipt-upload">
-        <img class="preview-image img-responsive" id="preview-image" src="#" alt="Click to upload image"/>
+        <img class="preview-image img-responsive" id="preview-image" src="<%= image_url('receipt-placeholder.png') %>" alt="Click to upload image" style="max-width: 200px;max-height: 200px;"/>
       </label>
       {{#if receipt}}
         <input type="number" id="expense-receipt-upload" name="receipt_id" class="form-control input-upload-image" value="{{receipt.id}}"/>

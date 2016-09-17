@@ -157,8 +157,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     items = $(@el).find("#items .item")
     for item in items
       $(item).find('.select-item').prop('checked', false)
+      $(item).removeClass('selected')
 
     $(e.currentTarget).find('.select-item').prop('checked', true)
+    $(e.currentTarget).closest('.item').addClass('selected')
     @receiptSelectOptions()
 
   new: ->
