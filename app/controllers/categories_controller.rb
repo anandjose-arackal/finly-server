@@ -7,7 +7,10 @@ class CategoriesController < ApplicationController
     @result = create_op.run
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
-      render partial: 'organization_account/category_list', replace: "#categoriesList"
+      respond_to do |format|
+        format.js {}
+      end
+      # render partial: 'organization_account/category_list', replace: "#categoriesList"
     else
       flash[:error] = @result.messages[:error]
     end
@@ -18,7 +21,10 @@ class CategoriesController < ApplicationController
     @result = destroy_op.run
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
-      render partial: 'organization_account/category_list', replace: "#categoriesList"
+      respond_to do |format|
+        format.js {}
+      end
+      # render partial: 'organization_account/category_list', replace: "#categoriesList"
     else
       flash[:error] = @result.messages[:error]
     end
