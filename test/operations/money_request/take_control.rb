@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require "#{Rails.root}/lib/operations/money_request/take_control.rb"
+require "#{Rails.root}/app/operations/money_request/take_control.rb"
 class TakeControl < ActiveSupport::TestCase
 
   def setup

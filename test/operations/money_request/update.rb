@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require "#{Rails.root}/lib/operations/money_request/update.rb"
+require "#{Rails.root}/app/operations/money_request/update.rb"
 class Update < ActiveSupport::TestCase
 
   def setup

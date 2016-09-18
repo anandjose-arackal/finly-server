@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require "#{Rails.root}/lib/operations/money_request/submit.rb"
+require "#{Rails.root}/app/operations/money_request/submit.rb"
 class Submit < ActiveSupport::TestCase
 
   def setup

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require "#{Rails.root}/lib/operations/money_request/destroy.rb"
+require "#{Rails.root}/app/operations/money_request/destroy.rb"
 class Destroy < ActiveSupport::TestCase
   def setup
     @user = User.find(13)

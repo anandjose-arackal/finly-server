@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require "#{Rails.root}/lib/operations/money_request/unapprove.rb"
+require "#{Rails.root}/app/operations/money_request/unapprove.rb"
 class Unapprove < ActiveSupport::TestCase
   def setup
     @manager = User.find_by_email('manager0@finlytest.io')
