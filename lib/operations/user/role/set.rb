@@ -7,7 +7,8 @@ class User::Role::Set < BaseOperation
   attr_accessor :roles_to_add, :roles_to_remove, :being_updated_user
 
   def pre_validate
-    unless params[:user_id].present?
+    id = (params[:id] or params[:user_id])
+    unless id.present?
       messages[:error] << 'User not found'
     end
   end
@@ -19,7 +20,8 @@ class User::Role::Set < BaseOperation
   end
 
   def init
-    self.being_updated_user = user.company.users.with_id(params[:user_id]).first rescue nil
+    id = (params[:id] or params[:user_id])
+    self.being_updated_user = user.company.users.with_id(id).first rescue nil
     return unless being_updated_user.present?
     existing_role_ids = being_updated_user.role_mapping.map(&:user_role_id)
     new_role_ids = params[:user_role_id]
@@ -37,15 +39,14 @@ class User::Role::Set < BaseOperation
     self.roles_to_remove = existing_role_ids - new_role_ids
   end
 
-
   def process
     return unless roles_to_add.present? or roles_to_remove.present?
     create = []
     roles_to_add.each do |role_id|
-      create << {user_id: updating_user.id, user_role_id: role_id}
+      create << {user_id: being_updated_user.id, user_role_id: role_id}
     end
     UserRoleMapping.create(create) if create.present?
-    being_updated_user.role_mapping.with_id(roles_to_remove).destroy_all if roles_to_remove.present?
+    being_updated_user.role_mapping.role(roles_to_remove).destroy_all if roles_to_remove.present?
   end
 
   def post_process
