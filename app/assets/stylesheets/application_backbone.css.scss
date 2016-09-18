@@ -66,14 +66,14 @@
   float: right;
   clear: right;
   background-color: white;
-  z-index: 15;
+  z-index: 1051;//Above modal's z index
 }
 
 #ohsnap-priority{
   position: absolute;
   margin-top: 60px; 
   position: absolute;
-  z-index: 20;
+  z-index: 1051;//Above modal's z index
   width: 33%;
   margin-right: auto;
   margin-left: auto;

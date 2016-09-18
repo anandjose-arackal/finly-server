@@ -317,6 +317,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     })
 
   delete: (e) ->
+    _this = @
     items = $(@el).find("#items .item")
     for item in items
       selected_item = $(item).find('.select-item')
@@ -329,5 +330,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     selected_receipt.destroy({
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        console.log "deleted", res
+        _this.filter()
+        # console.log "deleted", res
     })

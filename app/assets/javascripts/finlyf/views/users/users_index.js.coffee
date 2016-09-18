@@ -21,6 +21,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
     'keyup .search-user': 'prepareSearch'
+    'submit .navbar-form': 'cancelEvents' 
 
   initialize: (options) ->
     @params = options.params
@@ -194,7 +195,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: values
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        $(modal).modal('hide')
+        if res.success == true
+          $(modal).modal('hide')
         # console.log res
       error: (err) ->
         console.log "Err", err
@@ -207,6 +209,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     @params.filter_state = parseInt($(target).attr('data-filter-state'))
 
     FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
+
+  cancelEvents: (e) ->
+    e.preventDefault()
 
   prepareSearch: (e) ->
     # console.log "abinash"

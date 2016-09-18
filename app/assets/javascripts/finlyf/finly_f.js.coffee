@@ -107,7 +107,7 @@ window.FinlyF =
       if messages.length
         for message in messages
           console.log "Message ", message, "Color:", color, "container", container
-          ohSnap(message, {color: color, 'duration': '6000', 'container-id': container});
+          ohSnap(message, {color: color, 'duration': '160000', 'container-id': container});
 
 $(document).ready ->
   FinlyF.initialize()
