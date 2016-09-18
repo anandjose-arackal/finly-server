@@ -284,6 +284,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       }).appendTo(category_select)
     $("#modal-new").attr('data-backdrop', false)
     $("#modal-new").modal('show')
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
     # console.log selected_receipt.toJSON()
 
