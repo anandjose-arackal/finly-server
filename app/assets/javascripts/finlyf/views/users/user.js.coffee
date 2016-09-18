@@ -94,10 +94,11 @@ class FinlyF.Views.User extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        _this.model.fetch({
-          view: _this.params.view
-        })
-        # console.log model, res
+        console.log res
+        if res.success == true
+          _this.model.fetch({
+            view: _this.params.view
+          })
       error: (err) ->
         console.log "Err", err
     }) 
@@ -167,6 +168,8 @@ class FinlyF.Views.User extends Backbone.View
       data.type = $(target).attr('data-type')
     else
       data = {}
+
+    data.view = @params.view
 
     $.ajax({
       url: url,
