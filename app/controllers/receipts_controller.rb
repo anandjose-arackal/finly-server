@@ -2,7 +2,6 @@ class ReceiptsController < ApplicationController
 
   before_action :authenticate_user!
 
-
   def index
     @result = Receipt::Index.(current_user, params)
     respond
@@ -14,7 +13,7 @@ class ReceiptsController < ApplicationController
   end
 
   def destroy
-    @result = Receipt::Create.(current_user, params)
+    @result = Receipt::Destroy.(current_user, params)
     respond response: :success
   end
 
@@ -22,6 +21,5 @@ class ReceiptsController < ApplicationController
     @result = Receipt::Update.(current_user, params)
     respond response: :success
   end
-
 
 end

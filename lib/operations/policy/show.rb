@@ -1,28 +1,6 @@
 class Policy::Show < Policy::Base
   attr_accessor :policy, :users
 
-  class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
-    attr_accessor :policy, :users
-
-    def init
-      self.policy = params[:policy]
-      self.users = params[:users]
-    end
-
-    def company_managers
-      policy.company.managers
-    end
-
-    def company_finance_managers
-      policy.company.finance_managers
-    end
-
-    def categories
-      policy.company.categories.active
-    end
-
-  end
-
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "No user or policy params passed."
@@ -30,7 +8,8 @@ class Policy::Show < Policy::Base
   end
 
   def init
-    self.policy = user.policies.find_by(id: params[:policy_id] || params[:id])
+    id = (params[:policy_id] or params[:id])
+    self.policy = Policy::Index.(user, params).policies.with_id(id).first rescue nil
   end
 
   def authorize
@@ -70,6 +49,28 @@ class Policy::Show < Policy::Base
 
   def success
     Policy::Show::ShowPresenter.new(user, {policy: policy, users: users}, messages)
+  end
+
+  class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
+    attr_accessor :policy, :users
+
+    def init
+      self.policy = params[:policy]
+      self.users = params[:users]
+    end
+
+    def company_managers
+      policy.company.managers
+    end
+
+    def company_finance_managers
+      policy.company.finance_managers
+    end
+
+    def categories
+      policy.company.categories.active
+    end
+
   end
 
 end

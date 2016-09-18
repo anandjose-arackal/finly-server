@@ -1,4 +1,6 @@
 class MoneyRequest::Unapprove < MoneyRequest::Base
+  attr_accessor :prev_status
+
   def authorized_user_types
     [:manager, :finance_manager, :admin]
   end
@@ -37,7 +39,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def process
     self.prev_status = money_request.status
-    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil,
+    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, note: nil,
                                        status_id: MoneyRequestStatus.id_for(:processing)
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:unapprove),
                                          status_id: MoneyRequestStatus.id_for(:processing)
@@ -47,7 +49,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
   end
 
   def post_process
-    money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
+    money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
     # Recalculate settlement when money_request is unapproved from an approved/closed state
     if prev_status.id == MoneyRequestStatus.id_for(:approved)
       Event::MoneyRequest::Unapprove.(self.user, money_request: self.money_request)

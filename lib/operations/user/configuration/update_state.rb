@@ -14,12 +14,11 @@ class User::Configuration::UpdateState < BaseOperation
 
   def init
     id = params[:id] or params[:to_user_id]
-    self.to_user = user.company.users.find_by(id: id)
+    self.to_user = User::Team::Index.(user, params).with_id(id: id).first rescue nil
   end
 
   def authorize
-    team = User::Team::Index.(user, params)
-    unless team.include?(to_user)
+    if to_user.blank?
       raise_unauthorized_exception
     end
   end
