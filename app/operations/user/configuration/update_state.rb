@@ -13,8 +13,9 @@ class User::Configuration::UpdateState < BaseOperation
   end
 
   def init
+    params[:view] = 'admin'
     id = params[:id] or params[:to_user_id]
-    self.to_user = User::Team::Index.(user, params).with_id(id: id).first rescue nil
+    self.to_user = User::Team::Index.(user, params).with_id(id).first rescue nil
   end
 
   def authorize
