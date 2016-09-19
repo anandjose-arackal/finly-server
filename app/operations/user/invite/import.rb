@@ -1,7 +1,5 @@
+require 'roo'
 class User::Invite::Import < BaseOperation
-
-  require 'roo'
-
   attr_accessor :file, :success_hash
 
   def authorized_user_types
