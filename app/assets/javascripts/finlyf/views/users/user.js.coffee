@@ -71,7 +71,7 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('success btn-update-policy').removeClass('warning btn-edit-policy').text('Update')
+    $(target).addClass('btn-success btn-update-policy').removeClass('btn-warning btn-edit-policy').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
 
   updatePolicy: (e) ->
     _this = @
