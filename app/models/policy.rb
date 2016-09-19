@@ -60,7 +60,7 @@ class Policy < ActiveRecord::Base
     count = 0
     count += self.expense_rules.count
     count += self.budget_rules.count
-    return count
+    count
   end
 
   private

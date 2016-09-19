@@ -98,7 +98,6 @@ class FinlyF.Views.Expense extends Backbone.View
 
   update: (e) ->
     target = e.currentTarget
-    $(target).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-expense').addClass('btn-edit-expense')
 
     _this = @
     e.preventDefault()
@@ -109,13 +108,15 @@ class FinlyF.Views.Expense extends Backbone.View
       type: "PUT",
       data: formData,
       success: (res) ->
-        # console.log res
         FinlyF.snapNotify(res.messages)
         if res.success == true
           _this.model.fetch()
           # if _this.report_preview
           # $("#modal-new").modal('hide')
           # _this.refetchCollection()
+        # else
+          # $(target).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-expense').addClass('btn-edit-expense')
+
       error: (err) ->
         console.log "Error", err 
       cache: false,

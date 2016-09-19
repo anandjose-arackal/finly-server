@@ -336,7 +336,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       data: data,
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        $(_this.el).find("#modal-settlements").modal('hide')
+        if res.success == true
+          $(_this.el).find("#modal-settlements").modal('hide')
         #refresh data
         _this.populateSummary(_this.user_id)
     })
@@ -425,10 +426,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        $(_this.el).find("#modal-settlements").modal('hide')
-        #refresh sreen
-        # console.log "success"
-        _this.populateSummary(_this.user_id)
+        if res.success == true
+          $(_this.el).find("#modal-settlements").modal('hide')
+          _this.populateSummary(_this.user_id)
       error: (err) ->
         console.log "err", err
     })

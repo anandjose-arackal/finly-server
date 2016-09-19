@@ -33,6 +33,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #receipt
     'click .btn-new-expense': 'newExpense'
     'click .btn-create-expense': 'createExpense'
+    'click .btn-delete-receipt': 'delete'
     # 'click .btn-delete-receipt': 'delete'
 
     #Filters
@@ -248,8 +249,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       if $(item).find('.select-item').prop('checked')
         flag = true
     if flag == true
+      $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'inline')
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'inline')
     else
+      $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
 
   newExpense: ->
@@ -281,6 +284,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       }).appendTo(category_select)
     $("#modal-new").attr('data-backdrop', false)
     $("#modal-new").modal('show')
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
     # console.log selected_receipt.toJSON()
 
@@ -313,11 +317,19 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     })
 
   delete: (e) ->
-    target = e.currentTarget
-    model_id = $(target).attr('data-item-id')
+    _this = @
+    items = $(@el).find("#items .item")
+    for item in items
+      selected_item = $(item).find('.select-item')
+      if $(selected_item).prop('checked')
+        receipt_id = $(selected_item).attr('data-item-id')
+        break
+    
+    selected_receipt = @collection.get(parseInt(receipt_id))
 
-    model = @collection.get(model_id)
-    model.destroy({
+    selected_receipt.destroy({
       success: (res) ->
-        console.log "deleted", res
+        FinlyF.snapNotify(res.messages)
+        _this.filter()
+        # console.log "deleted", res
     })

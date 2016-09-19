@@ -265,6 +265,7 @@ class FinlyF.Views.Report extends Backbone.View
     # $(e.currentTarget).addClass('btn-edit-item btn-warning').removeClass('btn-update-item btn-success').html("Edit  <i class='fa fa-edit'></i>")
 
   postComment: (e) ->
+    $(e.currentTarget).text('Posting...')
     _this = @
     target = $(e.currentTarget)
     report_id = $(target).attr('data-item-id')
@@ -279,14 +280,17 @@ class FinlyF.Views.Report extends Backbone.View
     model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        console.log model, res
-        _this.model.fetch({
-          data: {
-            view: _this.current_view
-          }
-        })
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+          })
+        else
+          $(e.currentTarget).text('Post')
       error: (err) ->
         console.log "Error", err
+        $(e.currentTarget).text('Post')
     })
     # console.log report_id
 
@@ -363,7 +367,7 @@ class FinlyF.Views.Report extends Backbone.View
       report: true
     })
     $(@el).find("#modal-mp").html(@templateShowExpense())
-    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    $(@el).find("#modal-mp .modal-content .modal-body .row").html(preview_view.render().el)
     $(@el).find("#modal-mp").modal('show')
     $("#modal-mp").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 

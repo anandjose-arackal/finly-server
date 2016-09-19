@@ -143,7 +143,7 @@ class MoneyRequest < ActiveRecord::Base
     processing?
   end
 
-  def can_delete?
+  def can_destroy?
     (open? or retracted? or rejected?)
   end
 

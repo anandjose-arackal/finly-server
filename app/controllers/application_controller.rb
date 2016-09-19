@@ -1,8 +1,6 @@
 require 'require_all'
 
- Dir[File.expand_path "#{Rails.root}/lib/operations/event/**/*.rb"].each{|f| require(f)}
-# require_all "#{Rails.root}/lib/operations"
-# require_all "#{Rails.root}/lib/operations/event"
+Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
   # Prevent CSRF attacks by raising an exception.
@@ -89,7 +87,7 @@ class ApplicationController < ActionController::Base
       if type[:response] == :success
         if @result.blank?
           messages = {}
-          messages[:success] = [type[:message]] if type[:message].present?
+          messages[:success] << type[:message] if type[:message].present?
           @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
         end
         respond_to do |format|

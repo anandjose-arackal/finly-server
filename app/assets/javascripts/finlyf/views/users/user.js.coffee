@@ -94,10 +94,14 @@ class FinlyF.Views.User extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        _this.model.fetch({
-          view: _this.params.view
-        })
-        # console.log model, res
+        # console.log res
+        if res.success == true
+          console.log "now it will fetch ", _this.params.view
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
       error: (err) ->
         console.log "Err", err
     }) 
@@ -158,6 +162,7 @@ class FinlyF.Views.User extends Backbone.View
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
 
   userAction: (e) ->
+    _this = @
     target = e.currentTarget
     url = $(target).attr('data-url')
     type = $(target).attr('data-method')
@@ -165,8 +170,15 @@ class FinlyF.Views.User extends Backbone.View
     data_presence = $(target).attr('data-presence')
     if data_presence
       data.type = $(target).attr('data-type')
+      if $(target).attr('data-state-active')
+        if $(target).attr('data-state-active') == 'true'
+          data.active = true
+        else
+          data.active = false
     else
       data = {}
+
+    data.view = @params.view
 
     $.ajax({
       url: url,
@@ -174,8 +186,12 @@ class FinlyF.Views.User extends Backbone.View
       data: data,
       dataType: 'json',
       success: (res) ->
-        console.log "Suc", res
+        # console.log "Suc", res
         FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            view: _this.params.view
+          })
       error: (err) ->
         console.log "Err", err.messages
     })
