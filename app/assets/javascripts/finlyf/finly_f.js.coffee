@@ -13,7 +13,7 @@ window.FinlyF =
     $(el).find(".company-name").text(company_name)
 
     views = $("#menu-nav-views-dropdown li")
-    console.log "menus", params
+    # console.log "menus", params
     dropdown = $(el).find('#primary-navbar .menu-nav-views-dropdown')
     for view in views
       $(dropdown).append($(view).clone())
