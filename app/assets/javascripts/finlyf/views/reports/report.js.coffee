@@ -312,7 +312,6 @@ class FinlyF.Views.Report extends Backbone.View
 
     })
 
-
   reportAction: (e) ->
     _this = @
     url = $(e.currentTarget).attr('data-url')
@@ -327,11 +326,10 @@ class FinlyF.Views.Report extends Backbone.View
         })
     })
 
-
   refreshData: (e)->
     _this = @
     target = e.currentTarget
-    if $(target).find(".modal-content").attr("data-refresh")
+    if $(target).find(".modal-content").attr("data-refresh-true")
       @model.fetch({ data: {view: _this.current_view }})
     # console.log "Closed Bootstrap modal"
 
