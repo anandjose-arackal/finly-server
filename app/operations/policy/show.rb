@@ -1,6 +1,32 @@
 class Policy::Show < Policy::Base
   attr_accessor :policy, :users
 
+  class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
+    attr_accessor :policy, :users
+
+    def init
+      self.policy = params[:policy]
+      self.users = params[:users]
+    end
+
+    def company_managers
+      policy.company.managers
+    end
+
+    def company_finance_managers
+      policy.company.finance_managers
+    end
+
+    def categories
+      policy.company.categories.active
+    end
+
+  end
+
+  def authorized_user_types
+    [:company_admin, :policy_admin]
+  end
+
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << 'No user or policy params passed'
@@ -51,26 +77,5 @@ class Policy::Show < Policy::Base
     Policy::Show::ShowPresenter.new(user, {policy: policy, users: users}, messages)
   end
 
-  class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
-    attr_accessor :policy, :users
-
-    def init
-      self.policy = params[:policy]
-      self.users = params[:users]
-    end
-
-    def company_managers
-      policy.company.managers
-    end
-
-    def company_finance_managers
-      policy.company.finance_managers
-    end
-
-    def categories
-      policy.company.categories.active
-    end
-
-  end
 
 end

@@ -4,12 +4,12 @@ class Policy::Base < BaseOperation
 
   class Policy::Base::PolicyPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :policy
+    attr_accessor :policy, :policies
 
     def init
-
+      self.policy = params[:policy]
+      self.policies = Policy::Index.new(user, view: params[:view]).policies
     end
-
   end
 
   def pre_validate

@@ -22,7 +22,7 @@ class Policy::Rules::Base < Policy::Base
   end
 
   def init
-    self.policy = user.policies.find_by(id: params[:policy_id] || params[:id])
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
   end
 
   def authorize

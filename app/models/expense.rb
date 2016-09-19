@@ -16,7 +16,11 @@
 #  report_id            :integer
 #  category_id          :integer
 #
+include MathUtil
+
 class Expense < ActiveRecord::Base
+
+
   belongs_to :amount
   belongs_to :expense_status
   belongs_to :user
@@ -78,7 +82,7 @@ class Expense < ActiveRecord::Base
       when 'gteq'
         joins(:amount).select('expenses.*').where('value >= ?', value)
       when 'eq'
-        joins(:amount).select('expenses.*').where('value = ?', value)
+        joins(:amount).select('expenses.*').where('ROUND(value, 2) = ?', precision_value(value))
       else
         # do nothing
     end

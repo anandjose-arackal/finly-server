@@ -21,8 +21,8 @@ class Policy < ActiveRecord::Base
   has_many :reports
   has_many :money_requests
 
-  has_many :expense_rules
-  has_many :budget_rules
+  has_many :expense_rules, dependent: :destroy
+  has_many :budget_rules, dependent: :destroy
 
   scope :default, -> { where default: true }
   scope :non_default, -> { where default: false }

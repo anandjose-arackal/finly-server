@@ -4,8 +4,7 @@ class Export::Field::Destroy < Export::Base
 
   def init
     self.company = user.company
-    self.destroy_params = export_params
-    id = params[:id] or destroy_params[:export_field_id]
+    id = params[:id] or params[:export_field_id]
     self.preference = company.export_preferences.find_by(id: id)
   end
 
