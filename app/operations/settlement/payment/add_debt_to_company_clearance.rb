@@ -43,7 +43,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def validate
     value = payment_params[:amount].to_f if payment_params[:amount].present?
-    cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date]
+    cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date].to_date
     unless value <= cash_in_hand_on_date.value
       messages[:error] << 'Settlement amount cannot be greater than the cash in hand amount'
       return false
