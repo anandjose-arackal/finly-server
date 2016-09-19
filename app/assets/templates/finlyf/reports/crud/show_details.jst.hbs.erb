@@ -115,50 +115,39 @@
       </div>
     </div>
     <hr />
+    {{#ifCond item.violations.blocking_present '||' item.violations.warning_present}}
     <div class="row no-margin violations">
       <h4>Report Violations</h4>
       <div class="col-sm-12">
-        {{#each item.violations}}
-          {{#ifCond this.expense_warning.note '||' this.expense_warning.receipt}}
-            {{#each this.expense_warning.note}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
-            {{/each}}
-            {{#each this.expense_warning.receipt}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
-            {{/each}}
-          {{/ifCond}}
-          {{#ifCond this.expense_blocking.note '||' this.expense_blocking.receipt}}
-            {{#each this.expense_blocking.note}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
-            {{/each}}
-            {{#each this.expense_blocking.receipt}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
-            {{/each}}
-          {{/ifCond}}
-          {{#ifCond this.budget_warning.note '||' this.budget_warning.receipt}}
-            {{#each this.budget_warning.note}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
-            {{/each}}
-            {{#each this.budget_warning.receipt}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this}}</div>
-            {{/each}}
-          {{/ifCond}}
-          {{#ifCond this.budget_blocking.note '||' this.budget_blocking.receipt}}
-            {{#each this.budget_blocking.note}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
-            {{/each}}
-            {{#each this.budget_blocking.receipt}}
-              <div class="col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this}}</div>
-            {{/each}}
-          {{/ifCond}}
-          <!-- {{#each this}}
-            {{#if this}}
-              {{this.note}}
+        {{#each item.violations.items}}
+          {{#each this.expense_warning}}
+            {{#if this.message}}
+              <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
             {{/if}}
-          {{/each}} -->
+          {{/each}}
+          {{#each this.budget_warning}}
+            {{#if this.message}}
+              <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
+            {{/if}}
+          {{/each}}
+        {{/each}}
+        <div class="col-sm-10"><hr /></div>
+        {{#each item.violations.items}}
+          {{#each this.expense_blocking}}
+            {{#if this.message}}
+              <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+            {{/if}}
+          {{/each}}
+          {{#each this.budget_blocking}}
+            {{#if this.message}}
+              <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+            {{/if}}
+          {{/each}}
         {{/each}}
       </div>
+      <hr />
     </div><!-- .violations -->
+    {{/ifCond}}
 
     <div class="row no-margin">
       <div class="col-sm-6 no-padding">
@@ -182,36 +171,34 @@
           <div class="col-sm-1 no-padding">Sl. No.</div>
           <div class="col-sm-2 no-padding">Date</div>
           <div class="col-sm-2 no-padding">Merchant</div>
-          <div class="col-sm-2 no-padding">Note</div>
+          <div class="col-sm-3 no-padding">Note</div>
           <div class="col-sm-1 no-padding text-right">Total</div>
-          <div class="col-sm-2 no-padding text-right">Violations</div>
-          <div class="col-sm-2 no-padding text-right">Actions</div>
+          <div class="col-sm-3 no-padding text-right">Actions</div>
         </div>
 
         {{#each this.expenses}}
-        <div class="row" style="padding: 3px 10px;">
+        {{#ifCond this.violations.warning_present '&&' this.violations.blocking_present}}
+          <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
+        {{else}}
+          {{#ifCond this.violations.warning_present '||' this.violations.blocking_present}}
+            {{#if this.violations.warning_present}}
+              <div class="row" style="padding: 3px 10px; background: #FCF8E3;">
+            {{else}}
+              <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
+            {{/if}}
+          {{else}}
+            <div class="row" style="padding: 3px 10px;">
+          {{/ifCond}}
+        {{/ifCond}}
           <div class="col-sm-1 no-padding">{{increment @index 1}}</div>
           <div class="col-sm-2 no-padding">{{this.date}}</div>
           <div class="col-sm-2 no-padding">{{this.merchant_name}}</div>
-          <div class="col-sm-2 no-padding">{{this.note}}</div>
+          <div class="col-sm-3 no-padding">{{this.note}}</div>
           <div class="col-sm-1 no-padding text-right">$<span>{{amount_value}}</span></div>
 
-          <div class="col-sm-2 no-padding text-right">
-            {{#ifCond this.violations.expense_warning.note "||" this.violations.budget_warning.note}}
-              <i class="fa fa-warning" style="color: yellow;"></i>
-            {{else}}
-              <i class="fa fa-check" style="color: green;"></i>
-            {{/ifCond}}
 
-            {{#ifCond this.violations.expense_blocking.note "||" this.violations.budget_blocking.note}}
-              <i class="fa fa-ban" style="color: red;"></i>
-            {{else}}
-              <i class="fa fa-check" style="color: green;"></i>
-            {{/ifCond}}
-          </div>
-
-          <div class="col-sm-2 no-padding text-right">
-            <button data-item-id="{{this.id}}" class="btn btn-view-sub-item btn-xs btn-warning">View</button>
+          <div class="col-sm-3 no-padding text-right">
+            <button data-item-id="{{this.id}}" class="btn btn-view-sub-item btn-xs btn-warning">Details</button>
           {{#if ../../item.actions.editable}}
             <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
           {{/if}}
@@ -220,7 +207,6 @@
           {{/if}}
           </div>
 
-          
         </div>
         {{/each}}
       </div>
@@ -294,6 +280,11 @@
 </div><!-- .row -->
 
 <style type="text/css">
+
+  .violation{
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 
   .item-attr-edit{
     display: none;

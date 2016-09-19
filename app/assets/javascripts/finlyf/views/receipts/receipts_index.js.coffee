@@ -171,6 +171,11 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $("#modal-new").modal('show')
 
   create: (e)->
+    target = e.currentTarget
+    button = $(target).find("button[type=submit]")
+    $(button).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;")
+
+    # $(target).text("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;")
     _this = @
     e.preventDefault()
     formData = new FormData(e.currentTarget)
@@ -181,13 +186,16 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       data: formData,
       async: true,
       success: (res) ->
+        FinlyF.snapNotify(res.messages)
         # console.log(data)
         if res.success == true
-          FinlyF.snapNotify(res.messages)
           $("#modal-new").modal('hide')
           _this.filter()
+        else
+          $(button).html('Add Receipt')
       error: (err) ->
         console.log "Err", err
+        $(button).html('Add Receipt')
       cache: false,
       contentType: false,
       processData: false
@@ -310,8 +318,9 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
         # console.log "Success", model, res
-        $(_this.el).find("#modal-new").modal('hide')
-        _this.filter()
+        if res.success == true
+          $(_this.el).find("#modal-new").modal('hide')
+          _this.filter()
       error: (err) ->
         console.log "Error", err
     })
