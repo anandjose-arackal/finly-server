@@ -37,6 +37,6 @@ class User::Configuration::UpdateState < BaseOperation
   private
 
   def state_params
-    params.require(:user).permit(:active)
+    params.permit(:active)
   end
 end

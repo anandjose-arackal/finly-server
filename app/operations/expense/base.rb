@@ -21,10 +21,18 @@ class Expense::Base < BaseOperation
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense
+    attr_accessor :expense, :violation
 
     def init
       self.expense = params[:expense]
+      self.violation = retrieve_violation
+    end
+
+    def retrieve_violation
+      if expense.report_id and expense.report.policy
+        violations = Report::Violation.(user, report: expense.report)
+        return violations[expense.id]
+      end
     end
   end
 
