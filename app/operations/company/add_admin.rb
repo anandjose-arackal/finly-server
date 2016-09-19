@@ -4,7 +4,7 @@ class Company::AddAdmin < Company::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] = "No user or params passed."
+      messages[:error] << "No user or params passed."
     end
   end
 
@@ -31,8 +31,7 @@ class Company::AddAdmin < Company::Base
       admin.activate
       messages[:success] << "Company created!"
     else
-      messages[:error] = "Failed, Try again."
-      return false
+      messages[:error] << "Failed, Try again."
     end
   end
 

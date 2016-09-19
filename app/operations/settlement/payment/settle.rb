@@ -52,28 +52,31 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     if reports.blank?
       messages[:error] << 'Reports to reimburse not found'
     end
-    validate_date payment_params[:date]
+    param = payment_params
+    validate_date param[:date]
 
-    value = payment_params[:amount].to_f if payment_params[:amount].present?
-    cash_in_hand_on_date = cash_in_hand to_user, payment_params[:date]
-    unless value <= cash_in_hand_on_date.value
+    value = nil
+    value = param[:amount].to_f if param[:amount].present?
+    cash_in_hand_on_date = cash_in_hand to_user, param[:date].to_date
+    unless value.present? and value <= cash_in_hand_on_date.value
       messages[:error] << 'Settlement amount cannot be greater than the cash in hand amount'
       return false
     end
 
     # is this really necessary?
     total_amount = precision_value(reports.with_amount.sum(:value))
-    unless total_amount == precision_value(payment_params[:amount])
+    unless total_amount == precision_value(param[:amount])
       messages[:error] << 'Reimbursement amount does not match report totals'
     end
   end
 
   def process
+    param = payment_params
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.settlement_id,
-                                  date: payment_params[:date], note: payment_params[:note],
-                                  amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
+                                  date: param[:date], note: param[:note],
+                                  amount_attributes: {value: param[:amount], currency_id: param[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.subtract_pending_reimbursement payment_params[:amount], payment_params[:currency_id] and balance_sheet.subtract_cash_in_hand payment_params[:amount], payment_params[:currency_id]
+    if payment.save and balance_sheet.subtract_pending_reimbursement param[:amount], param[:currency_id] and balance_sheet.subtract_cash_in_hand param[:amount], param[:currency_id]
       reports.each do |report|
         Report::MarkAsReimbursed.(user, {payment: payment, report: report, role_id: role})
       end

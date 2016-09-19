@@ -36,6 +36,9 @@ class Settlement::Base < BaseOperation
   end
 
   def cash_in_hand(user, date=nil)
+    unless date.present? and date.is_a?(Date)
+      date = Date.parse(date)
+    end
     cash = user.balance_sheet.cash_in_hand
     return cash if date.blank? or date == Date.today
     payments = user.payments.made_after(date).with_amount
