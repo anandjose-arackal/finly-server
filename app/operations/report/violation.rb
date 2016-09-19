@@ -41,10 +41,10 @@ class Report::Violation < Report::Base
     self.policy = report.versioned_policy
     report.expenses.each do |expense|
       self.warning_messages[expense.id] = {}
-      self.warning_messages[expense.id]['expense_warning'] = {}
-      self.warning_messages[expense.id]['expense_blocking'] = {}
-      self.warning_messages[expense.id]['budget_warning'] = {}
-      self.warning_messages[expense.id]['budget_blocking'] = {}
+      self.warning_messages[expense.id]['expense_warning'] = []
+      self.warning_messages[expense.id]['expense_blocking'] = []
+      self.warning_messages[expense.id]['budget_warning'] = []
+      self.warning_messages[expense.id]['budget_blocking'] = []
     end
   end
 
@@ -149,17 +149,9 @@ class Report::Violation < Report::Base
 
     if broken
       if rule.type == 'Warning'
-        if self.warning_messages[expense.id]['expense_warning'].nil?
-          self.warning_messages[expense.id]['expense_warning'] = [{type: rule_name, message: warning}]
-        else
-          self.warning_messages[expense.id]['expense_warning'] << {type: rule_name, message: warning}
-        end
+        self.warning_messages[expense.id]['expense_warning'] << {type: rule_name, message: warning}
       elsif rule.type == 'Blocking'
-        if self.warning_messages[expense.id]['expense_blocking'].nil?
-          self.warning_messages[expense.id]['expense_blocking'] = [{type: rule_name, message: warning}]
-        else
-          self.warning_messages[expense.id]['expense_blocking'] << {type: rule_name, message: warning}
-        end
+        self.warning_messages[expense.id]['expense_blocking'] << {type: rule_name, message: warning}
       end
     end
   end
@@ -220,22 +212,18 @@ class Report::Violation < Report::Base
           if rule.type == 'Warning'
             if category
               message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
-              self.warning_messages[expense.id]['budget_warning'] = [] if self.warning_messages[expense.id]['budget_warning'][category.id].blank?
               self.warning_messages[expense.id]['budget_warning'] << {type: 'category', message: message}
             else
               message = "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
-              self.warning_messages[expense.id]['budget_warning'] = [] if self.warning_messages[expense.id]['budget_warning']['total'].blank?
               self.warning_messages[expense.id]['budget_warning'] << {type: 'total', message: message}
             end
             return
           elsif rule.type == 'Blocking'
             if category
               message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
-              self.warning_messages[expense.id]['budget_blocking'] = [] if self.warning_messages[expense.id]['budget_blocking'][category.id].blank?
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'category', message: message}
             else
               message = "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
-              self.warning_messages[expense.id]['budget_blocking'] = [] if self.warning_messages[expense.id]['budget_blocking']['total'].blank?
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'total', message: message}
             end
             return
