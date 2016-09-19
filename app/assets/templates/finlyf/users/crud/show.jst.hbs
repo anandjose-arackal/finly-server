@@ -11,7 +11,7 @@
         <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
       {{/if}}
       {{#if item.actions.deactivate}}
-        <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-url="{{item.actions.deactivate}}">Deactivate</button>
+        <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
       {{/if}}
     </div>
   </div>
@@ -502,8 +502,6 @@
     <hr /><hr />
   </div><!-- .policy -->
   {{/each}}
-
-
 </section>
 
 

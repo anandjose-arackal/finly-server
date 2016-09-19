@@ -39,7 +39,7 @@ manager:
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
-finance:
+finance_manager:
   links:
     primary_navbar:
       # - Company Expenses: expenses

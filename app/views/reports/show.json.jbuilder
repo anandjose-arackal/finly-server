@@ -54,6 +54,7 @@ end
 end
 
 json.actions do
+  json.dummy 'dummy'
   @result.actions.each do |key, value|
     json.set! key, (value[:url] or value[:value])
   end

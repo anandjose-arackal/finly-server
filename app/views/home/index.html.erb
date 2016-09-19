@@ -18,7 +18,7 @@
       <li><a href="#" class="navbar-view-type" data-view-type="admin">Admin View</a></li>
     <% end %>
     <% if current_user.finance_manager? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="finance">Finance View</a></li>
+      <li><a href="#" class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
     <% end %>
     <% if current_user.manager? %>
       <li><a href="#" class="navbar-view-type" data-view-type="manager">Manager View</a></li>
@@ -41,7 +41,7 @@
         <% end %>
       <% end %>
     <% elsif current_user.finance_manager? %>
-      <% views["finance"]["links"]["cog"].each do |item| %>
+      <% views["finance_manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
           <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
@@ -97,7 +97,7 @@
 
   <ul id="navbar-menu-navigation-finance">
     <% if current_user.finance_manager? %>
-      <% views["finance"]["links"]["primary_navbar"].each do |item| %>
+      <% views["finance_manager"]["links"]["primary_navbar"].each do |item| %>
         <% item.select do |key, value| %>
           <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
         <% end %>
