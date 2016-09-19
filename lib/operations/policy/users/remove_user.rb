@@ -6,15 +6,16 @@
 
 class Policy::Users::RemoveUser < Policy::Base
 
-  attr_accessor :removed_user
+  attr_accessor :removed_users
 
   def authorized_user_types
     [:policy_admin, :admin]
   end
 
   def init
-    self.policy = user.policies.find_by(id: params[:policy_id])
-    self.removed_user = user.company.users.find_by(id: params[:removed_user_id] || params[:user_id])
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
+    ids = params[:user_id].split(',')
+    self.removed_users = user.company.users.where(id: ids)
   end
 
   def validate
@@ -23,24 +24,28 @@ class Policy::Users::RemoveUser < Policy::Base
   end
 
   def authorize
-    unless removed_user
+    unless removed_users.present?
       raise_unauthorized_exception
       return false
     end
-    if removed_user.policy_admin?(policy) and policy.admins.count <= 1
-      raise_unauthorized_exception
-      return false
+    removed_users.each do |removed_user|
+      if removed_user.policy_admin?(policy) and policy.admins.count <= 1
+        raise_unauthorized_exception
+        return false
+      end
     end
   end
 
   def process
-    # Remove user
-    unless self.policy.users.destroy(removed_user)
-      messages[:error] << "Couldn't remove user from the policy."
-      return false
+    removed_users.each do |removed_user|
+      # Remove user
+      unless self.policy.users.destroy(removed_user)
+        messages[:error] << "Couldn't remove user from the policy."
+        return false
+      end
+      # Remove user configuration
+      user.team_mapping.policy(policy.id).destroy_all
     end
-    # Remove user configuration
-    user.team_mapping.policy(policy.id).destroy_all
   end
 
   def post_process

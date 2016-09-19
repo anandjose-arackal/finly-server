@@ -18,7 +18,7 @@ class ExportPreferencesController < ApplicationController
     @result = destroy_op.run
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
-      render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      redirect_to request.referrer
     else
       flash[:error] = @result.messages[:error]
     end

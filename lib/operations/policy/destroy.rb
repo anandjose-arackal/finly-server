@@ -12,7 +12,7 @@ class Policy::Destroy < Policy::Base
 
   def init
     self.view = params[:view]
-    self.policy = Policy::List.(user, view: view).find_by(id: params[:policy_id])
+    self.policy = Policy::Index.(user, view: view).policies.find_by(id: params[:policy_id] || params[:id])
   end
 
   def authorize
@@ -29,6 +29,10 @@ class Policy::Destroy < Policy::Base
 
   def post_process
     messages[:success] = "Policy destroyed."
+  end
+
+  def success
+    Policy::Base::PolicyPresenter.new(user, {view: params[:view]})
   end
 
 end

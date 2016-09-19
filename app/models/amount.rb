@@ -23,8 +23,14 @@ class Amount < ActiveRecord::Base
 
   validate :no_negative_amount
 
-  validates :value, presence: true
+
   validates :currency_id, presence: true
+
+  before_create do
+    if self.value.nil?
+      self.value = 0
+    end
+  end
 
   # method that returns the amount value
   def amount_value

@@ -23,6 +23,10 @@ class Policy::Show < Policy::Base
 
   end
 
+  def authorized_user_types
+    [:company_admin, :policy_admin]
+  end
+
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "No user or policy params passed."
@@ -30,7 +34,7 @@ class Policy::Show < Policy::Base
   end
 
   def init
-    self.policy = user.policies.find_by(id: params[:policy_id] || params[:id])
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
   end
 
   def authorize

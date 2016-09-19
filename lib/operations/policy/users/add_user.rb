@@ -7,24 +7,27 @@
 
 class Policy::Users::AddUser < Policy::Base
 
-  attr_accessor :added_user, :admin
+  attr_accessor :added_users, :admin
 
   def authorized_user_types
     [:policy_admin, :admin]
   end
 
   def init
-    self.policy = user.policies.find_by(id: params[:policy_id])
-    self.added_user = user.company.users.find_by(id: params[:added_user_id] || params[:user_id])
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
+    ids = params[:user_id].split(',')
+    self.added_users = user.company.users.where(id: ids)
     self.admin = params[:admin]
   end
 
   def validate
     super()
-    if policy and self.policy.users.find_by(id: added_user.id).present?
-      messages[:error] << 'User is already part of the policy'
-      return false
+    added_users.each do |added_user|
+      if self.policy.users.find_by(id: added_user.id).present?
+        added_users.reject {|user| user.id == added_user.id}
+      end
     end
+
     unless admin
       self.admin = false # setting user's admin status as false by default
     end
@@ -44,21 +47,23 @@ class Policy::Users::AddUser < Policy::Base
   end
 
   def process
-    # Add user to policy mapping
-    policy.user_mapping.create(user: added_user, admin: admin)
+    added_users.each do |added_user|
+      # Add user to policy mapping
+      policy.user_mapping.create(user: added_user, admin: admin)
 
-    # Add user configuration - the user configuration is cloned from the default mapping, and additional rules have to be added separately.
-    added_user.team_mapping.policy(nil).each do |item|
-      cloned_item = item.dup
-      cloned_item.policy_id = self.policy.id
-      unless cloned_item.save
-        messages[:error] << "User couldn't be added to the policy."
-        return false
+      # Add user configuration - the user configuration is cloned from the default mapping, and additional rules have to be added separately.
+      added_user.team_mapping.policy(nil).each do |item|
+        cloned_item = item.dup
+        cloned_item.policy_id = self.policy.id
+        unless cloned_item.save
+          messages[:error] << "Some users couldn't be added to the policy."
+          return false
+        end
       end
     end
   end
 
   def post_process
-    messages[:success] = "User added to policy."
+    messages[:success] = "Users added to policy."
   end
 end
