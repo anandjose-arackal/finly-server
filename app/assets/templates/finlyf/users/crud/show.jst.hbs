@@ -13,6 +13,9 @@
       {{#if item.actions.deactivate}}
         <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
       {{/if}}
+      {{#if item.actions.activate}}
+        <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
+      {{/if}}
     </div>
   </div>
   <form class="form-user-info">
@@ -144,31 +147,33 @@
 <section class="user-policies">
   <div class="row">
     <div class="col-sm-6">
-      <h4>Policies</h4>
+      <h4>POLICIES</h4>
     </div>
   </div>
 
   
   {{#each item.mapping}}
   <div class="policy">
-    <div class="row policy-name">
+    <div class="row policy-name no-margin">
       <div class="col-sm-6">
-        {{#if this.company_default}}
-          Default
-        {{else}}
-          <input type="hidden" name="user_manager_mapping[0][mapping][policy_id]" value="{{this.policy.id}}">
-          {{this.policy.name}}{{!-- (PolicyName 0) --}}
-        {{/if}}
+        <h4>
+          {{#if this.company_default}}
+            Default
+          {{else}}
+            <input type="hidden" name="user_manager_mapping[0][mapping][policy_id]" value="{{this.policy.id}}">
+            {{this.policy.name}}{{!-- (PolicyName 0) --}}
+          {{/if}}
+        </h4>
       </div>
 
       <div class="col-sm-6 text-right">
-        <button class="btn btn-sm btn-warning btn-edit-policy">Edit</button>
+        <button class="btn btn-sm btn-warning btn-edit-policy"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
       </div>
     </div>
 
     <div class="policy-rules row no-margin">
       <form>
-        <div class="row no-margin">
+        <div class="row no-margin" style="padding: 10px;">
           <div class="col-sm-6 manager-data">
             <div class="row manager non-conditional">
 
@@ -186,7 +191,7 @@
                     Not Set
                   {{/if}}
                 </label>{{!-- Manager 0 --}}
-                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
                   <option value="">None</option>
                   {{#each ../item.company_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -219,7 +224,7 @@
                 {{/if}}
                 </label>{{!-- (Greater than amount 1) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[1][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+                <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[1][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
               </div>
 
               <div class="col-sm-5">Then Reports to:</div>
@@ -232,7 +237,7 @@
                   Not Set
                 {{/if}}
                 </label>{{!-- (Conditional Manager 1) --}}
-                <select class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" data-default-value="{{this.manager.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" data-default-value="{{this.manager.id}}">
                   <option value="">None</option>
                   {{#each ../../item.company_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -264,7 +269,7 @@
                     Not Set
                   {{/if}}
                 </label>{{!-- (Finance Manager 0) --}}
-                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
                   <option value="">None</option>
                   {{#each ../item.company_finance_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -296,7 +301,7 @@
                   {{/if}}
                 </label>{{!-- (Greater than amount 2) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[2][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+                <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[2][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
               </div>
 
               
@@ -305,14 +310,14 @@
 
 
               <div class="col-sm-7">
-                <label class="control-label">
+                <label class="control-label item-attr-preview">
                 {{#if this.finance_manager.name}}
                   {{this.finance_manager.name}}
                 {{else}}
                   Not Set
                 {{/if}}
                 </label>{{!-- (Conditional Manager 2) --}}
-                <select class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" data-default-value="{{this.finance_manager.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" data-default-value="{{this.finance_manager.id}}">
                   <option value="">None</option>
                   {{#each ../../item.company_finance_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -350,7 +355,7 @@
                 {{/if}}
                 </label>{{!-- (Approves_to 0) --}}
 
-                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
                   <option value="">None</option>
                   {{#each ../item.company_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -383,7 +388,7 @@
                   {{/if}}
                 </label>{{!-- (Greater than amount 3) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[3][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+                <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[3][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
 
               </div>
 
@@ -398,7 +403,7 @@
                   {{/if}}
                 </label>{{!-- (Conditional approves to 3) --}}
 
-                <select class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" data-default-value="{{this.approves_to.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" data-default-value="{{this.approves_to.id}}">
                   <option value="">None</option>
                   {{#each ../../item.company_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -429,7 +434,7 @@
                   {{/if}}
                 </label>{{!-- (Approves Finance to 0) --}}
 
-                <select class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
                   <option value="">None</option>
                   {{#each ../item.company_finance_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -463,7 +468,7 @@
                   {{/if}}
                 </label>{{!-- (Greater than amount 4) --}}
                 <input type="hidden" class="item-attr-edit" name="user_manager_mapping[4][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+                <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[4][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
 
               </div>
 
@@ -477,7 +482,7 @@
                     Not Set
                   {{/if}}
                 </label>{{!-- (Conditional approves to 4) --}}
-                <select class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" data-default-value="{{this.approves_finance_to.id}}">
+                <select class="form-control item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" data-default-value="{{this.approves_finance_to.id}}">
                   <option value="">None</option>
                   {{#each ../../item.company_finance_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
@@ -506,6 +511,13 @@
 
 
 <style type="text/css">
+  .policy{
+    background: #efefef;
+  }
+  .policy .policy-name{
+    background: #ccc;
+  }
+
   .pad{
     padding: 10px;
     background: white;

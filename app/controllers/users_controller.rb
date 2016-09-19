@@ -76,5 +76,4 @@ class UsersController < ApplicationController
     @result = operation.run
     respond(response: :success, message: success_message)
   end
-
 end

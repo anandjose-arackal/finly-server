@@ -59,6 +59,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       data: _this.params,
       success: ->
 
+        _this.toggleLoadMore(_this.collection)
       error: ->
         console.log "Couldn't fetch Successfully."
     })
@@ -143,6 +144,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
@@ -162,6 +164,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       data: _this.params,
       reset: false,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
         $(target).find('span').text('Load More')
         _this.resetPageCount({target: target, page: _this.params.page })
@@ -173,6 +176,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch Successfully."
     })
+
+  toggleLoadMore: (collection) ->
+    console.log "Loading", collection.models.length
+    if collection.models.length < 30
+      console.log "Should hide"
+      $(@el).find('.load-more').css('display', 'none')
+    else
+      $(@el).find('.load-more').css('display', 'inline')
 
   toggleSelectAll: (e) ->
     target = e.currentTarget
@@ -375,6 +386,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           reset: true,
           data: params,
           success: ->
+            _this.toggleLoadMore(_this.collection)
             console.log "Fetched all the data"
           error: ->
             console.log "Couldn't fetch Successfully."
@@ -438,6 +450,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       data: @params
       reset: true
       success: ->
+        _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})

@@ -11,6 +11,11 @@
   {{/unless}}
 </div>
 
+<div class="row no-margin">
+  {{#ifCond item.violations.blocking_present '||' item.violations.warning_present}}
+
+  {{/ifCond}}
+</div>
 
 <form id="form-update-item" enctype="multipart/form-data">
 <div class="row no-margin" style="">

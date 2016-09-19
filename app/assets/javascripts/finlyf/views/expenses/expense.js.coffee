@@ -111,6 +111,8 @@ class FinlyF.Views.Expense extends Backbone.View
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
+          if $(target).closest('.modal-content')
+            $(target).closest('.modal-content').attr('data-refresh-true', true)
           _this.model.fetch()
           # if _this.report_preview
           # $("#modal-new").modal('hide')

@@ -19,6 +19,7 @@ class FinlyF.Views.User extends Backbone.View
   initialize: (options) ->
     @params = options.params
     @page = options.page
+    @parent = options.parent
 
     if @page == 'user'
       @model = new FinlyF.Models.User({id: options.model_id})
@@ -70,7 +71,7 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('success btn-update-policy').removeClass('warning btn-edit-policy').text('Update')
+    $(target).addClass('btn-success btn-update-policy').removeClass('btn-warning btn-edit-policy').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
 
   updatePolicy: (e) ->
     _this = @
@@ -189,9 +190,10 @@ class FinlyF.Views.User extends Backbone.View
         # console.log "Suc", res
         FinlyF.snapNotify(res.messages)
         if res.success == true
-          _this.model.fetch({
-            view: _this.params.view
-          })
+          _this.parent.trigger('refresh')
+          # _this.model.fetch({
+          #   view: _this.params.view
+          # })
       error: (err) ->
         console.log "Err", err.messages
     })

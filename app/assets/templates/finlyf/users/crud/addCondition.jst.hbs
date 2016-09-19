@@ -10,13 +10,13 @@
 
   <div class="col-sm-7">
     <input type="hidden" class="" name="user_manager_mapping[{{item.condition_serial}}][mapping][greater_than_amount_attributes][currency_id]" value="1">
-    <input type="number" class="" name="user_manager_mapping[{{item.condition_serial}}][mapping][greater_than_amount_attributes][value]" value="">
+    <input type="number" class="form-control" name="user_manager_mapping[{{item.condition_serial}}][mapping][greater_than_amount_attributes][value]" value="">
   </div>
 
   <div class="col-sm-5">Then Reports to:</div>
 
   <div class="col-sm-7">
-    <select class="" name="user_manager_mapping[{{item.condition_serial}}][mapping][{{item.manager_type}}_id]" data-default-value="">
+    <select class="form-control" name="user_manager_mapping[{{item.condition_serial}}][mapping][{{item.manager_type}}_id]" data-default-value="">
       <option value="">None</option>
       {{#each item.managers}}
         <option value="{{this.id}}">{{this.name}}</option>
