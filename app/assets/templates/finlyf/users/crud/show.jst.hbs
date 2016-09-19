@@ -13,6 +13,9 @@
       {{#if item.actions.deactivate}}
         <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
       {{/if}}
+      {{#if item.actions.activate}}
+        <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
+      {{/if}}
     </div>
   </div>
   <form class="form-user-info">

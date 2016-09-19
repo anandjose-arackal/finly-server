@@ -30,9 +30,9 @@ class User::Configuration::UpdateState < BaseOperation
     end
   end
 
-  def success
-    self.to_user
-  end
+  # def success
+  #   self.to_user
+  # end
 
   private
 

@@ -33,6 +33,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: @params
     })
     @collection.on('reset', @processUsers, @)
+    @on('refresh', @refetchCollection, @)
 
   render: ->
     $(@el).html(@templateSkeleton())
@@ -98,6 +99,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       model_id: model.get('id'),
       page: 'user'
       params: @params
+      parent: @
       # preview: true
       # parent: @
     })
@@ -108,17 +110,21 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     # @params.page = 1
+    console.log @params
     @collection.fetch({
       reset: true,
-      # data: _this.params,
+      data: _this.params,
       success: ->
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
+
+        $(_this.el).find("#user-details").html("<div class='col-sm-10 col-sm-offset-1'><h2>Please Select an Employee from the list on the left to view/edit their details, policies, roles etc.</h2></div>")
 
       error: ->
         console.log "Couldn't fetch successfully."
