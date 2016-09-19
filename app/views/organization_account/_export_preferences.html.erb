@@ -41,7 +41,7 @@
 
 </form>
 
-  <form data-turboboost id="deleteExportField<%=export_preference.id%>" action="<%= export_preference_path(export_preference)%>" method="post">
+  <form data-turboboost data-remote id="deleteExportField<%=export_preference.id%>" action="<%= export_preference_path(export_preference)%>" method="post">
     <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
     <input name="_method" type="hidden" value="delete">
     <input name="export_field_id" value="<%=export_preference.id%>" type="hidden">

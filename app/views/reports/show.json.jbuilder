@@ -36,9 +36,9 @@ json.expense_sections @result.expenses_category_sorted do |category|
 
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :merchant_name, :amount_value
-    if expense.note.length < 29
+    if expense.note and expense.note.length < 29
       json.note expense.note
-    else
+    elsif expense.note
       json.note expense.note[0..29] + "..."
     end
     # json.extract! expense, :id, :note

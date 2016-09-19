@@ -31,7 +31,13 @@ class Expense::Base < BaseOperation
     def retrieve_violation
       if expense.report_id and expense.report.policy
         violations = Report::Violation.(user, report: expense.report)
-        return violations[expense.id]
+        items = violations[expense.id]
+        # constructing the violation hash as required
+        violations = {}
+        violations[:blocking_present] = (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
+        violations[:warning_present] = (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
+        violations[:items] = items
+        return violations
       end
     end
   end

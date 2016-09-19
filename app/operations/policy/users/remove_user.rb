@@ -44,7 +44,7 @@ class Policy::Users::RemoveUser < Policy::Base
         return false
       end
       # Remove user configuration
-      user.team_mapping.policy(policy.id).destroy_all
+      removed_user.team_mapping.policy(policy.id).destroy_all
     end
   end
 
