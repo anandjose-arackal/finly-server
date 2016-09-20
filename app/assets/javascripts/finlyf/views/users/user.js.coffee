@@ -14,6 +14,7 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-edit-policy': 'editPolicy'
     'click .btn-update-policy': 'updatePolicy'
     'click .btn-add-condition': 'newCondition'
+    'click .btn-remove-condition': 'removeCondition'
     'click .btn-user-action': 'userAction'
 
   initialize: (options) ->
@@ -162,6 +163,32 @@ class FinlyF.Views.User extends Backbone.View
 
     # console.log item
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
+
+  removeCondition: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    conditional = $(target).closest('.conditional')
+    mapping_id = $(conditional).find('.hideme .mapping-id').val()
+
+    if mapping_id
+      $.ajax({
+        url: '/users/' + @model.get('id')
+        type: "DELETE",
+        dataType: 'JSON',
+        data: {
+          mapping_id: mapping_id
+        },
+        success: (res) ->
+          FinlyF.snapNotify(res.messages)
+          console.log "Deleted it perhaps", res
+          $(conditional).remove()
+        error: (err) ->
+          console.log "Error", err
+      })
+    else
+      $(conditional).remove()
+
 
   userAction: (e) ->
     _this = @

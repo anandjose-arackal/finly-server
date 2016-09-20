@@ -178,7 +178,7 @@
             <div class="row manager non-conditional no-margin">
               Submits reports To:&nbsp;&nbsp;
 
-              <input type="hidden" class="conditional-mapping-id" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">{{!-- (Mapping ID 0) --}}
+              <input type="hidden" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">{{!-- (Mapping ID 0) --}}
               <label class="control-label item-attr-preview">
                 {{#if this.default.manager.name}}
                   {{this.default.manager.name}}
@@ -203,7 +203,7 @@
                 {{#if ../this.company_default}}{{else}}
                   <input type="number" name="user_manager_mapping[1][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 1)
                 {{/if}}
-                <input type="number" name="user_manager_mapping[1][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 1)
+                <input type="number" class="mapping-id" name="user_manager_mapping[1][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 1)
               </div>
 
               <div class="col-sm-3">If report total is greater than:</div>
@@ -239,7 +239,7 @@
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" value="{{this.conditional_manager.manager.id}}"> --}}
               </div>
               <div class="col-sm-1">
-                <button class="btn btn-xs btn-danger">Remove</button>
+                <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
               </div>
               
             </div><!-- .conditional -->
@@ -277,7 +277,7 @@
                   <input type="number" name="user_manager_mapping[2][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 2)
                 {{/if}}
 
-                <input type="number" name="user_manager_mapping[2][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 2)
+                <input type="number" class="mapping-id" name="user_manager_mapping[2][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 2)
               </div>
 
               <div class="col-sm-3">If report total is greater than:</div>
@@ -316,7 +316,7 @@
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" value="{{this.conditional_finance_manager.finance_manager.id}}"> --}}
               </div>
 
-              <div class="col-sm-1"><button class="btn btn-xs btn-danger">Remove</button></div>
+              <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
 
             </div><!-- .conditional -->
             {{/each}}
@@ -355,7 +355,7 @@
                 {{#if ../this.company_default}}{{else}}
                   <input type="number" name="user_manager_mapping[3][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 3)
                 {{/if}}
-                <input type="number" name="user_manager_mapping[3][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 3)
+                <input type="number" class="mapping-id" name="user_manager_mapping[3][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 3)
               </div>
 
               <div class="col-sm-3">If report total is greater than:</div>
@@ -392,7 +392,7 @@
                 </select>
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" value="{{this.conditional_approves_to.approves_to.id}}"> --}}
               </div>
-              <div class="col-sm-1"><button class="btn btn-xs btn-danger">Remove</button></div>
+              <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
@@ -431,7 +431,7 @@
                   <input type="number" name="user_manager_mapping[4][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 4)
                 {{/if}}
 
-                <input type="number" name="user_manager_mapping[4][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 4)
+                <input type="number" class="mapping-id" name="user_manager_mapping[4][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 4)
               </div>
 
               <div class="col-sm-3">If report total is greater than:</div>
@@ -467,7 +467,7 @@
                 </select>
                 {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" value="{{this.conditional_approves_finance_to.approves_to.id}}"> --}}
               </div>
-              <div class="col-sm-1"><button class="btn btn-xs btn-danger">Remove</button></div>
+              <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
