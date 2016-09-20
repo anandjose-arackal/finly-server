@@ -22,6 +22,11 @@ class UsersController < ApplicationController
     end
   end
 
+  # For destroying user manager mapping
+  def destroy
+
+  end
+
   def get_managers
     params[:id] = current_user.id
     @result = User::Show.(current_user, params)
