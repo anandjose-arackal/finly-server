@@ -96,7 +96,11 @@ class ApplicationController < ActionController::Base
         end
         return
       elsif type[:response] == :failure
-        @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: [type[:message]]}) if @result.blank?
+        if @result.blank?
+          messages = {}
+          messages[:failure] << type[:message] if type[:message].present?
+          @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, messages)
+        end
         respond_to do |format|
           format.json { render 'layouts/application' }
         end
