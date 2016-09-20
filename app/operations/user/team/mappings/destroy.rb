@@ -3,7 +3,7 @@ class User::Team::Mappings::Destroy < User::Team::Mappings::Base
 
   def pre_validate
     super
-    unless params[:user_team_mapping_id].present?
+    unless params[:mapping_id].present?
       messages[:error] << 'Nothing to remove'
     end
   end
@@ -28,7 +28,7 @@ class User::Team::Mappings::Destroy < User::Team::Mappings::Base
   end
 
   def init
-    self.updating_mapping = updating_user.team_mapping.with_id(params[:user_team_mapping_id]).first rescue nil
+    self.updating_mapping = updating_user.team_mapping.with_id(params[:mapping_id]).first rescue nil
   end
 
   def authorize

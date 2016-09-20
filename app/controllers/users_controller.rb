@@ -23,6 +23,7 @@ class UsersController < ApplicationController
   end
 
   # For destroying user manager mapping
+  # params= { user_id: 22, mapping_id: 43 }
   def destroy
     @result = User::Team::Mappings::Destroy.(current_user, params)
     respond(response: :success)
