@@ -374,15 +374,15 @@ class FinlyF.Views.Report extends Backbone.View
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
 
-    model = new FinlyF.Models.Expense({id: expense_id})
+    # model = new FinlyF.Models.Expense({id: expense_id})
 
-    preview_view = new FinlyF.Views.Expense({
-      model: model
-      preview: true
-    })
-    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
-    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
-    $(@el).find("#modal-mp").modal('show')
+    # preview_view = new FinlyF.Views.Expense({
+    #   model: model
+    #   preview: true
+    # })
+    # $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    # $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    # $(@el).find("#modal-mp").modal('show')
 
   submit: (e) ->
     _this = @
