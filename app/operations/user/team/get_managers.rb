@@ -8,10 +8,10 @@ class User::Team::GetManagers < User::Team::Base
 
     def init
       self.team = params[:team]
-      self.team_managers = params[:team_managers]
-      self.team_finance_managers = params[:team_finance_managers]
-      self.team_policies = user.admin_policies
-      self.team_admins = params[:team_admins]
+      self.team_admins = params[:team_admins] || []
+      self.team_managers = params[:team_managers] + team_admins
+      self.team_finance_managers = params[:team_finance_managers] + team_admins
+      self.team_policies = user.admin_policies || []
     end
   end
 
@@ -29,6 +29,7 @@ class User::Team::GetManagers < User::Team::Base
 
   def process
     self.team = User::Team::Index.new(user, params).run
+    self.team_admins = []
     if role_id == UserRole.manager_id
       self.team_managers = team.with_roles.only_managers
       self.team_managers << user
