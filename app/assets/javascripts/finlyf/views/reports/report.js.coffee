@@ -371,8 +371,29 @@ class FinlyF.Views.Report extends Backbone.View
 
 
   rejectSub: (e) ->
+    _this = @
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
+    console.log "Expense_id", expense_id
+    $.ajax({
+      url: '/reports/' + _this.model.get('id') + '/reject_expense'
+      method: 'PATCH'
+      dataType: 'JSON'
+      data: {
+        expense_id: expense_id
+        view: _this.current_view
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+        })
+      error: (err) ->
+        console.log err
+    })
 
     # model = new FinlyF.Models.Expense({id: expense_id})
 

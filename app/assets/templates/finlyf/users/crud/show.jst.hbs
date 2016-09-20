@@ -175,26 +175,24 @@
       <form>
         <div class="row no-margin" style="padding: 10px 10px 0;">
           <div class="col-sm-12 manager-data manager-container">
-            <div class="row manager non-conditional">
-              <div class="col-sm-2">Submits reports To:</div>
+            <div class="row manager non-conditional no-margin">
+              Submits reports To:&nbsp;&nbsp;
 
-              <div class="col-sm-3">
-                <input type="hidden" class="conditional-mapping-id" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">{{!-- (Mapping ID 0) --}}
-                <label class="control-label item-attr-preview">
-                  {{#if this.default.manager.name}}
-                    {{this.default.manager.name}}
-                  {{else}}
-                    Not Set
-                  {{/if}}
-                </label>{{!-- Manager 0 --}}
-                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
-                  <option value="">None</option>
-                  {{#each ../item.company_managers}}
-                    <option value="{{this.id}}">{{this.name}}</option>
-                  {{/each}}
-                </select>
-                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" value="{{this.default.manager.id}}"> --}}
-              </div>
+              <input type="hidden" class="conditional-mapping-id" name="user_manager_mapping[0][mapping_id]" value="{{this.default.mapping_id}}">{{!-- (Mapping ID 0) --}}
+              <label class="control-label item-attr-preview">
+                {{#if this.default.manager.name}}
+                  {{this.default.manager.name}}
+                {{else}}
+                  Not Set
+                {{/if}}
+              </label>{{!-- Manager 0 --}}
+              <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
+                <option value="">None</option>
+                {{#each ../item.company_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
+              {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" value="{{this.default.manager.id}}"> --}}
             </div>
             
 
@@ -253,27 +251,23 @@
           </div><!-- .col-sm-12 -->
           <hr />
           <div class="col-sm-12 finance-manager-data manager-container">
-            <div class="row finance-manager non-conditional">
-              <div class="col-sm-2">
-                Submits Report Finance to:
-              </div>
+            <div class="row finance-manager non-conditional no-margin">
+              Submits Report Finance to:&nbsp;&nbsp;
 
-              <div class="col-sm-3">
-                <label class="control-label item-attr-preview">
-                  {{#if this.default.finance_manager.name}}
-                    {{this.default.finance_manager.name}}
-                  {{else}}
-                    Not Set
-                  {{/if}}
-                </label>{{!-- (Finance Manager 0) --}}
-                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
-                  <option value="">None</option>
-                  {{#each ../item.company_finance_managers}}
-                    <option value="{{this.id}}">{{this.name}}</option>
-                  {{/each}}
-                </select>
-                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" value="{{this.default.finance_manager.id}}"> --}}
-              </div>
+              <label class="control-label item-attr-preview">
+                {{#if this.default.finance_manager.name}}
+                  {{this.default.finance_manager.name}}
+                {{else}}
+                  Not Set
+                {{/if}}
+              </label>{{!-- (Finance Manager 0) --}}
+              <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
+                <option value="">None</option>
+                {{#each ../item.company_finance_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
+              {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" value="{{this.default.finance_manager.id}}"> --}}
             </div>
 
             {{#each conditional_finance_manager}}
@@ -335,28 +329,23 @@
         <div class="row no-margin" style="padding:0 10px;">
           {{#if ../item.role.manager}}
           <div class="col-sm-12 approves-to-data manager-container">
-            <div class="row approves-to non-conditional">
-              <div class="col-sm-2">
-                Approves To:
-              </div>
+            <div class="row approves-to non-conditional no-margin">
+              Approves To:&nbsp;&nbsp;
+              <label class="control-label item-attr-preview">
+              {{#if this.default.approves_to.name}}
+                {{this.default.approves_to.name}}
+              {{else}}
+                Not Set
+              {{/if}}
+              </label>{{!-- (Approves_to 0) --}}
 
-              <div class="col-sm-3">
-                <label class="control-label item-attr-preview">
-                {{#if this.default.approves_to.name}}
-                  {{this.default.approves_to.name}}
-                {{else}}
-                  Not Set
-                {{/if}}
-                </label>{{!-- (Approves_to 0) --}}
-
-                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
-                  <option value="">None</option>
-                  {{#each ../item.company_managers}}
-                    <option value="{{this.id}}">{{this.name}}</option>
-                  {{/each}}
-                </select>
-                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" value="{{this.default.approves_to.id}}"> --}}
-              </div>
+              <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
+                <option value="">None</option>
+                {{#each ../item.company_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
+              {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" value="{{this.default.approves_to.id}}"> --}}
             </div>
 
             {{#each conditional_approves_to}}
@@ -415,31 +404,28 @@
 
           {{#if ../item.role.finance_manager}}
           <div class="col-sm-12 approves-finance-to-data manager-container">
-            <div class="row approves-finance-to non-conditional">
-              <div class="col-sm-2">Approves Finance To</div>
+            <div class="row approves-finance-to non-conditional no-margin">
+              Approves Finance To:&nbsp;&nbsp;
 
-              <div class="col-sm-3">
-                <label class="control-label item-attr-preview">
-                  {{#if this.default.approves_finance_to.name}}
-                    {{this.default.approves_finance_to.name}}
-                  {{else}}
-                    Not Set
-                  {{/if}}
-                </label>{{!-- (Approves Finance to 0) --}}
+              <label class="control-label item-attr-preview">
+                {{#if this.default.approves_finance_to.name}}
+                  {{this.default.approves_finance_to.name}}
+                {{else}}
+                  Not Set
+                {{/if}}
+              </label>{{!-- (Approves Finance to 0) --}}
 
-                <select class="form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
-                  <option value="">None</option>
-                  {{#each ../item.company_finance_managers}}
-                    <option value="{{this.id}}">{{this.name}}</option>
-                  {{/each}}
-                </select>
-                {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" value="{{this.default.approves_finance_to.id}}"> --}}
-
-              </div>
+              <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
+                <option value="">None</option>
+                {{#each ../item.company_finance_managers}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
+              {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" value="{{this.default.approves_finance_to.id}}"> --}}
             </div>
 
             {{#each this.conditional_approves_finance_to}}
-            <div class="row conditional approves-finance-to" data-condition-serial="4">
+            <div class="row conditional approves-finance-to no-margin" data-condition-serial="4">
               <div class="col-sm-12 hideme">
                 {{#if ../this.company_default}}{{else}}
                   <input type="number" name="user_manager_mapping[4][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 4)
@@ -516,6 +502,10 @@
   .non-conditional{
     padding: 10px;
     margin-top: 5px;
+  }
+
+  .non-conditional .select-assign-manager{
+    width: 250px;
   }
 
   .pad{
