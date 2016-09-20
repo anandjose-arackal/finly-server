@@ -172,13 +172,12 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: @params
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        # managers = {
-        #   company_managers: res.company_managers
-        #   company_finance_managers: res.company_finance_managers
-        # }
         $(modal).html(_this.templateInviteEmployee({item: res}))
+        if _this.params.view == 'manager'
+          $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
+        else if _this.params.view == 'finance_manager'
+          $(modal).find('.invitee-finance-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
         
-        # console.log res.company_managers
       error: (err) ->
         console.log "Err", err
     })

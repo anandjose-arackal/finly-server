@@ -122,8 +122,9 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     @params.page = 1
     @collection.fetch({
@@ -190,7 +191,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         # console.log(data)
         if res.success == true
           $("#modal-new").modal('hide')
-          _this.filter()
+          _this.refetchCollection()
         else
           $(button).html('Add Receipt')
       error: (err) ->
@@ -219,6 +220,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #   error: (err, model) ->
     #     console.log "Err", err, model
     # })
+
+
 
   resetFilters: ->
     params = {}
@@ -297,6 +300,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     # console.log selected_receipt.toJSON()
 
     $("#modal-new .modal-body #preview-image").attr('src', selected_receipt.get('url'))
+    $("#modal-new .modal-body textarea[name=expense\\[note\\]]").val(selected_receipt.get('note'))
 
   createExpense: (e) ->
     _this =   @
@@ -320,7 +324,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         # console.log "Success", model, res
         if res.success == true
           $(_this.el).find("#modal-new").modal('hide')
-          _this.filter()
+          _this.refetchCollection()
       error: (err) ->
         console.log "Error", err
     })
@@ -336,9 +340,27 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     
     selected_receipt = @collection.get(parseInt(receipt_id))
 
-    selected_receipt.destroy({
+    # selected_receipt.destroy({
+    #   silent: true
+    #   success: (res) ->
+    #     console.log "deleted", res
+    #     FinlyF.snapNotify(res.messages)
+    #     if res.success == true
+    #       _this.filter()
+    #       console.log "deleted", res
+    #   error: (err) ->
+    #     console.log "Error", err
+    # })
+    $.ajax({
+      url: selected_receipt.urlRoot + '/' + selected_receipt.get('id')
+      type: "DELETE",
+      dataType: 'JSON',
       success: (res) ->
+        console.log "deleted", res
         FinlyF.snapNotify(res.messages)
-        _this.filter()
-        # console.log "deleted", res
-    })
+        if res.success == true
+          _this.refetchCollection()
+          console.log "deleted", res
+      error: (err) ->
+        console.log "Error", err
+      })

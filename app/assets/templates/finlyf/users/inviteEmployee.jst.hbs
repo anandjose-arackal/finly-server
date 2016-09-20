@@ -53,12 +53,9 @@
         <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
           <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
           <div class="col-sm-8">
-            <select class="form-control" name="pending_invite[team_mapping_attributes][approves_to_id]">
+            <select class="form-control invitee-managed-by" name="pending_invite[team_mapping_attributes][approves_to_id]">
               <option value="">None</option>
-              {{#each item.company_admins}}
-                <option value="{{this.id}}">{{this.name}}</option>
-              {{/each}}
-              {{#each item.company_managers}}
+              {{#each item.team_managers}}
                 <option value="{{this.id}}">{{this.name}}</option>
               {{/each}}
             </select>
@@ -85,12 +82,9 @@
         <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
           <div class="col-sm-4"><label class="control-label">Approves Finance Reports To?</label></div>
           <div class="col-sm-8">
-            <select class="form-control" name="pending_invite[team_mapping_attributes][approves_finance_to_id]">
+            <select class="form-control invitee-finance-managed-by" name="pending_invite[team_mapping_attributes][approves_finance_to_id]">
               <option value="">None</option>
-              {{#each item.company_admins}}
-                <option value="{{this.id}}">{{this.name}}</option>
-              {{/each}}
-              {{#each item.company_finance_managers}}
+              {{#each item.team_finance_managers}}
                 <option value="{{this.id}}">{{this.name}}</option>
               {{/each}}
             </select>
@@ -103,12 +97,9 @@
       <div class="row">
         <div class="col-sm-4"><label class="control-label">Managed By:</label></div>
         <div class="col-sm-8">
-          <select class="form-control">
+          <select class="form-control invitee-managed-by">
             <option value="">None</option>
-            {{#each item.company_admins}}
-              <option value="{{this.id}}">{{this.name}}</option>
-            {{/each}}
-            {{#each item.company_managers}}
+            {{#each item.team_managers}}
               <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
           </select>
@@ -118,12 +109,9 @@
       <div class="row">
         <div class="col-sm-4"><label class="control-label">Finance Managed By:</label></div>
         <div class="col-sm-8">
-          <select class="form-control">
+          <select class="form-control invitee-finance-managed-by">
             <option value="">None</option>
-            {{#each item.company_admins}}
-              <option value="{{this.id}}">{{this.name}}</option>
-            {{/each}}
-            {{#each item.company_finance_managers}}
+            {{#each item.team_finance_managers}}
               <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
           </select>
@@ -146,8 +134,8 @@
     </div>
     </form>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-      <button type="button" class="btn-confirm-invite-employee btn btn-primary">Invite Employee</button>
+      <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+      <button type="button" class="btn-confirm-invite-employee btn btn-sm btn-primary" style="margin-bottom: 10px;">Invite Employee</button>
     </div>
   </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
