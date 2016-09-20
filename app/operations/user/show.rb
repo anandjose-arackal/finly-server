@@ -8,7 +8,7 @@ class User::Show < User::Base
   end
 
   def process
-    if personal_view?
+    if personal_view? or params[:id] == user.id
       self.selected_user = user
     else
       id = (params[:id] or params[:user_id])
@@ -30,7 +30,7 @@ class User::Show < User::Base
   class User::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
-                  :actions
+                  :actions, :team, :team_managers, :team_finance_managers, :team_policies
 
     def init
       self.roles = {admin: self.user.company_admin?, manager: self.user.manager?,
@@ -42,6 +42,16 @@ class User::Show < User::Base
         self.mapping << retrieve_mapping(policy)
       end
       company = user.company
+      self.team = User::Team::Index.new(user, params).run
+      self.team_managers = team.with_roles.only_managers
+      if params[:view] == 'manager'
+        team_managers << user
+      end
+      self.team_finance_managers = team.with_roles.only_finance_managers
+      if params[:view] == 'finance_manager'
+        team_finance_managers << user
+      end
+      self.team_policies = user.admin_policies
       self.company_managers = company.managers
       self.company_finance_managers = company.finance_managers
       self.company_admins = company.admins
@@ -62,6 +72,10 @@ class User::Show < User::Base
        conditional_finance_manager: conditional_finance_manager,
        conditional_approves_to: conditional_approves_to,
        conditional_approves_finance_to: conditional_approves_finance_to}
+    end
+
+    def get_managers
+
     end
 
     def load_actions
