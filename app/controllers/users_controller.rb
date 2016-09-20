@@ -5,6 +5,7 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
+    @managers = User::Team::GetManagers.new(current_user, params).run
     respond
   end
 
@@ -30,8 +31,8 @@ class UsersController < ApplicationController
   end
 
   def get_managers
-    params[:id] = current_user.id
-    @result = User::Show.(current_user, params)
+    # params[:id] = current_user.id
+    @result = User::Team::GetManagers.new(current_user, params).run
     respond
   end
 

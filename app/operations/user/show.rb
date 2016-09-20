@@ -30,7 +30,8 @@ class User::Show < User::Base
   class User::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
-                  :actions, :team, :team_managers, :team_finance_managers, :team_policies
+                  :actions, :team, :team_managers, :team_finance_managers, :team_policies,
+                  :team_members_presenter
 
     def init
       self.roles = {admin: self.user.company_admin?, manager: self.user.manager?,
@@ -41,21 +42,6 @@ class User::Show < User::Base
       self.policies.each do |policy|
         self.mapping << retrieve_mapping(policy)
       end
-      company = user.company
-      self.team = User::Team::Index.new(user, params).run
-      self.team_managers = team.with_roles.only_managers
-      if params[:view] == 'manager'
-        team_managers << user
-      end
-      self.team_finance_managers = team.with_roles.only_finance_managers
-      if params[:view] == 'finance_manager'
-        team_finance_managers << user
-      end
-      self.team_policies = user.admin_policies
-      self.company_managers = company.managers
-      self.company_finance_managers = company.finance_managers
-      self.company_admins = company.admins
-      self.company_policies = company.policies
       self.actions = load_actions
     end
 

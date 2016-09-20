@@ -4,6 +4,7 @@ class User::Team::Base < BaseOperation
 
   class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team
+    attr_accessor :team_managers, :team_finance_managers, :team_admins
 
     def init
       self.team = params[:team]

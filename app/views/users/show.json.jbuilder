@@ -63,8 +63,8 @@ json.mapping @result.mapping.each do |mapping|
     end
   end
 end
-[:company_managers, :company_finance_managers].each do |key|
-  json.set! key, @result.send(key).each do |manager|
+[:team_managers, :team_finance_managers].each do |key|
+  json.set! key, @managers.send(key).each do |manager|
     json.id manager.id
     json.name manager.name
     json.email manager.email
