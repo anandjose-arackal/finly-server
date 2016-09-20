@@ -321,9 +321,14 @@ class FinlyF.Views.Report extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        _this.model.fetch({
-          data: {view: _this.current_view}
-        })
+        if res.success == true
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          
+      error: (err) ->
+        console.log "Error", err
     })
 
   refreshData: (e)->
