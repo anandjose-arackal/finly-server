@@ -10,30 +10,30 @@
       <div class="col-sm-6 text-right">
 
         {{#if item.actions.take_control}}
-          <button class="btn btn-warning navbar-btn btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+          <button class="btn btn-warning btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
         {{/if}}
 
         {{#if item.actions.submit}}
           {{#if item.actions.editable}}
-            <button class="btn navbar-btn btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+            <button class="btn bnt-warning btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
           {{/if}}
-          <button class="btn btn-sm btn-report-action navbar-btn" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+          <button class="btn btn-sm btn-report-action btn-success" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
         {{/if}}
 
         {{#if item.actions.retract}}
-          <button class="btn btn-sm btn-report-action navbar-btn" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+          <button class="btn btn-sm btn-report-action btn-danger" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
         {{/if}}
 
         {{#if item.actions.approve}}
-          <button class="btn btn-sm navbar-btn btn-report-action" data-url="{{item.actions.approve}}">Approve</button>
+          <button class="btn btn-sm btn-success btn-report-action" data-url="{{item.actions.approve}}">Approve</button>
         {{/if}}
 
         {{#if item.actions.unapprove}}
-          <button class="btn btn-sm navbar-btn btn-report-action" data-url="{{item.actions.unapprove}}">Unapprove</button>
+          <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.unapprove}}">Unapprove</button>
         {{/if}}
 
         {{#if item.actions.reject}}
-          <button class="btn btn-sm navbar-btn btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
+          <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
         {{/if}}
         
       </div>
@@ -104,7 +104,7 @@
         <div class="row">
 
           <div class="dropdown">
-            <button class="navbar-btn btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">Export <span class="caret"></span></button>
+            <button class="btn-primary btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">Export <span class="caret"></span></button>
             <ul class="dropdown-menu dropdown-menu-right">
               <li><a href="{{item.export_pdf}}" target="_blank">PDF</a></li>
               <li><a href="{{item.export_xls}}" target="_blank">XLS</a></li>
