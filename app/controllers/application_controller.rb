@@ -88,7 +88,7 @@ class ApplicationController < ActionController::Base
       if type[:response] == :success
         if @result.blank?
           messages = {}
-          messages[:success] << type[:message] if type[:message].present?
+          messages[:success] = [type[:message]] if type[:message].present?
           @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
         end
         respond_to do |format|
@@ -98,7 +98,7 @@ class ApplicationController < ActionController::Base
       elsif type[:response] == :failure
         if @result.blank?
           messages = {}
-          messages[:failure] << type[:message] if type[:message].present?
+          messages[:failure] = [type[:message]] if type[:message].present?
           @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, messages)
         end
         respond_to do |format|
