@@ -20,11 +20,10 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     super()
     if params[:payment][:amount] and params[:payment][:amount].to_i < 0
       messages[:error] << "Reimbursement amount cannot be negative."
-      return false
+      return
     end
     if params[:report_ids].blank?
       messages[:error] << "No reports to reimburse."
-      return false
     end
   end
 
@@ -58,7 +57,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
     # is this really necessary
     total_amount = precision_value(reports.with_amount.sum(:value))
-    unless total_amount == precision_value(payment_params[:amount])
+    unless total_amount == precision_value(payment_params[:amount]).to_f
       messages[:error] << "Reimbursement amount does not match report totals."
     end
   end

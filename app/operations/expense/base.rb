@@ -29,6 +29,7 @@ class Expense::Base < BaseOperation
     end
 
     def retrieve_violation
+      violations = {blocking_present: false, wanring_present: false, items: []}
       if expense.report_id and expense.report.policy
         violations = Report::Violation.(user, report: expense.report)
         items = violations[expense.id]
@@ -37,8 +38,8 @@ class Expense::Base < BaseOperation
         violations[:blocking_present] = (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
         violations[:warning_present] = (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
         violations[:items] = items
-        return violations
       end
+      violations
     end
   end
 

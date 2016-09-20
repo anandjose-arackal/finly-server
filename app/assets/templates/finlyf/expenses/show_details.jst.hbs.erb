@@ -11,9 +11,28 @@
   {{/unless}}
 </div>
 
-<div class="row no-margin">
+<div class="row no-margin expense-violations">
   {{#ifCond item.violations.blocking_present '||' item.violations.warning_present}}
-
+    {{#each item.violations.items.expense_warning}}
+      {{#if this.message}}
+        <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
+      {{/if}}
+    {{/each}}
+    {{#each item.violations.items.budget_warning}}
+      {{#if this.message}}
+        <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
+      {{/if}}
+    {{/each}}
+    {{#each item.violations.items.expense_blocking}}
+      {{#if this.message}}
+        <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+      {{/if}}
+    {{/each}}
+    {{#each item.violations.items.budget_blocking}}
+      {{#if this.message}}
+        <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+      {{/if}}
+    {{/each}}
   {{/ifCond}}
 </div>
 
@@ -96,5 +115,7 @@
   border: medium none !important;
   box-shadow: none;
 }
-
+.expense-violations{
+  margin-bottom: 10px;
+}
 </style>

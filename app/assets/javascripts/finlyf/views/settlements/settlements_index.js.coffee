@@ -313,6 +313,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     # console.log "Process Cash"
     $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment())
     $(@el).find('#modal-settlements').modal('show')
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   addPayment: (e) ->
     _this = @
@@ -347,6 +348,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     console.log "cash in hand", cash_in_hand
     $(@el).find('#modal-settlements .modal-content').html(@templateSettleDebts())
     $(@el).find('#modal-settlements').modal('show')
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
     $(@el).find('#modal-settlements .modal-content .cash_in_hand').text(cash_in_hand)
     e.preventDefault()
     _this = @
@@ -374,6 +376,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     pending_reimbursement = parseFloat($(@el).find('.summary input[name=pending_reimbursement]').val())
     $(@el).find('#modal-settlements .modal-content').html(@templateReimburse())
     $(@el).find('#modal-settlements').modal('show')
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
     $(@el).find('#modal-settlements .modal-content .pending_reimbursement').text(pending_reimbursement)
     e.preventDefault()
     _this = @

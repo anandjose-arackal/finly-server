@@ -22,6 +22,13 @@ class UsersController < ApplicationController
     end
   end
 
+  # For destroying user manager mapping
+  # params= { user_id: 22, mapping_id: 43 }
+  def destroy
+    @result = User::Team::Mappings::Destroy.(current_user, params)
+    respond(response: :success)
+  end
+
   def get_managers
     params[:id] = current_user.id
     @result = User::Show.(current_user, params)
@@ -59,10 +66,10 @@ class UsersController < ApplicationController
         success_message = 'User team updated.'
       when 'role'
         operation = User::Role::Set.new(current_user, params)
-        success_message = "Role updated"
+        success_message = 'Role updated'
       when 'details'
         operation = User::Configuration::UpdateDetails.new(current_user, params)
-        success_message = "Details updated."
+        success_message = 'Details updated'
       when 'state'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'

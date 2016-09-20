@@ -371,18 +371,39 @@ class FinlyF.Views.Report extends Backbone.View
 
 
   rejectSub: (e) ->
+    _this = @
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
-
-    model = new FinlyF.Models.Expense({id: expense_id})
-
-    preview_view = new FinlyF.Views.Expense({
-      model: model
-      preview: true
+    console.log "Expense_id", expense_id
+    $.ajax({
+      url: '/reports/' + _this.model.get('id') + '/reject_expense'
+      method: 'PATCH'
+      dataType: 'JSON'
+      data: {
+        expense_id: expense_id
+        view: _this.current_view
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+        })
+      error: (err) ->
+        console.log err
     })
-    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
-    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
-    $(@el).find("#modal-mp").modal('show')
+
+    # model = new FinlyF.Models.Expense({id: expense_id})
+
+    # preview_view = new FinlyF.Views.Expense({
+    #   model: model
+    #   preview: true
+    # })
+    # $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    # $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    # $(@el).find("#modal-mp").modal('show')
 
   submit: (e) ->
     _this = @

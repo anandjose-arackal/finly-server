@@ -363,6 +363,8 @@ Rails.application.routes.draw do
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
 
   get 'users/get_managers', to: 'users#get_managers'
+
+  resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details
     patch 'update_user_team', to: 'users#update_team', as: :update_team
