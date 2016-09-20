@@ -11,7 +11,7 @@ class Export::AsCsv < Export::Base
   end
 
   def init
-    self.reports = Report.where(id: params[:report_ids])
+    self.reports = Report.where(id: params[:report_id])
     self.preferences = user.company.export_preferences
   end
 
@@ -26,7 +26,6 @@ class Export::AsCsv < Export::Base
   end
 
   def process
-    # todo - figure out how to return the csv
     column_names = preferences.pluck(:name)
     self.result = CSV.generate do |csv|
       csv << column_names
