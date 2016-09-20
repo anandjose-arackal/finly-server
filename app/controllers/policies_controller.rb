@@ -45,7 +45,6 @@ class PoliciesController < ApplicationController
       format.html {}
       format.js
     end
-
   end
 
   def add_users
@@ -72,12 +71,14 @@ class PoliciesController < ApplicationController
 
 
   def update_user_configuration
-    update_configuration_op = Policy::Users::UpdateConfiguration.new(current_user, params)
-    if update_configuration_op.run
+    update_configuration_op = Policy::Users::UpdateMapping.new(current_user, params)
+    @result = update_configuration_op.run
+    if @result.success?
+      @result = Policy::Show.new(current_user, params).run
       flash[:success] = "Configuration updated"
       redirect_to request.referrer
     else
-      flash[:danger] = "Update failed."
+      flash[:danger] = update_configuration_op.messages[:error]
       # render flash message
     end
   end
