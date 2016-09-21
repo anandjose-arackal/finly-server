@@ -313,6 +313,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     # console.log "Process Cash"
     $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment())
     $(@el).find('#modal-settlements').modal('show')
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   addPayment: (e) ->
     _this = @
@@ -336,7 +337,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       data: data,
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        $(_this.el).find("#modal-settlements").modal('hide')
+        if res.success == true
+          $(_this.el).find("#modal-settlements").modal('hide')
         #refresh data
         _this.populateSummary(_this.user_id)
     })
@@ -346,6 +348,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     console.log "cash in hand", cash_in_hand
     $(@el).find('#modal-settlements .modal-content').html(@templateSettleDebts())
     $(@el).find('#modal-settlements').modal('show')
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
     $(@el).find('#modal-settlements .modal-content .cash_in_hand').text(cash_in_hand)
     e.preventDefault()
     _this = @
@@ -373,6 +376,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     pending_reimbursement = parseFloat($(@el).find('.summary input[name=pending_reimbursement]').val())
     $(@el).find('#modal-settlements .modal-content').html(@templateReimburse())
     $(@el).find('#modal-settlements').modal('show')
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
     $(@el).find('#modal-settlements .modal-content .pending_reimbursement').text(pending_reimbursement)
     e.preventDefault()
     _this = @
@@ -425,10 +429,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        $(_this.el).find("#modal-settlements").modal('hide')
-        #refresh sreen
-        # console.log "success"
-        _this.populateSummary(_this.user_id)
+        if res.success == true
+          $(_this.el).find("#modal-settlements").modal('hide')
+          _this.populateSummary(_this.user_id)
       error: (err) ->
         console.log "err", err
     })

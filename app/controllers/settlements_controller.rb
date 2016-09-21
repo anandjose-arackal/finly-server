@@ -22,7 +22,7 @@ class SettlementsController < ApplicationController
       return
     end
     @result = operation.run
-    respond(response: :success)
+    respond(response: :success, message: success_message)
   end
 
   def index

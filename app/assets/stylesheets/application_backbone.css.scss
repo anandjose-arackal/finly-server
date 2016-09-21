@@ -51,29 +51,38 @@
   background-color: #E9573F;
 }
 
+#ohsnap{
+  bottom: 0;
+  left: auto;
+  margin-top: 60px;
+  position: absolute;
+  z-index: 1051;
+  width: 33%;
+  margin-right: auto;
+  margin-left: auto;
+  right: 10px;
+}
+
 
 #ohsnap .alert {
   cursor: pointer;
   text-align: center;
   padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid #eed3d7;
   border-radius: 4px;
-  position: absolute;
+  // position: absolute;
   bottom: 0px;
   right: 21px;
   /* Each alert has its own width */
   float: right;
   clear: right;
-  background-color: white;
-  z-index: 15;
+  z-index: 1051;//Above modal's z index
 }
 
 #ohsnap-priority{
-  position: absolute;
   margin-top: 60px; 
   position: absolute;
-  z-index: 20;
+  z-index: 1051;//Above modal's z index
   width: 33%;
   margin-right: auto;
   margin-left: auto;
@@ -123,6 +132,23 @@ $button-border: #dfdfdf;
 $button-gray-bg: #f9f9f9;
 
 $header-grey: #efefef;
+
+// Buttons
+.btn{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  // background: transparent none repeat scroll 0% 0%;
+  // border: 0.5px solid rgb(89, 77, 168);
+  border-radius: 2px;
+}
+
+.input-group .btn{
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 14px;
+}
 
 body {
   padding: 70px 0 0 0;

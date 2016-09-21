@@ -14,11 +14,13 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-edit-policy': 'editPolicy'
     'click .btn-update-policy': 'updatePolicy'
     'click .btn-add-condition': 'newCondition'
+    'click .btn-remove-condition': 'removeCondition'
     'click .btn-user-action': 'userAction'
 
   initialize: (options) ->
     @params = options.params
     @page = options.page
+    @parent = options.parent
 
     if @page == 'user'
       @model = new FinlyF.Models.User({id: options.model_id})
@@ -70,7 +72,7 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('success btn-update-policy').removeClass('warning btn-edit-policy').text('Update')
+    $(target).addClass('btn-success btn-update-policy').removeClass('btn-warning btn-edit-policy').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
 
   updatePolicy: (e) ->
     _this = @
@@ -94,10 +96,14 @@ class FinlyF.Views.User extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        _this.model.fetch({
-          view: _this.params.view
-        })
-        # console.log model, res
+        # console.log res
+        if res.success == true
+          console.log "now it will fetch ", _this.params.view
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
       error: (err) ->
         console.log "Err", err
     }) 
@@ -152,12 +158,40 @@ class FinlyF.Views.User extends Backbone.View
       policy_id: $(target).attr('data-policy-id')
       manager_type: $(target).attr('data-manager-type')
       managers: _this.model.get('company_managers')
+      finance_managers: _this.model.get('company_finance_managers')
     }
 
     # console.log item
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
 
+  removeCondition: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    conditional = $(target).closest('.conditional')
+    mapping_id = $(conditional).find('.hideme .mapping-id').val()
+
+    if mapping_id
+      $.ajax({
+        url: '/users/' + @model.get('id')
+        type: "DELETE",
+        dataType: 'JSON',
+        data: {
+          mapping_id: mapping_id
+        },
+        success: (res) ->
+          FinlyF.snapNotify(res.messages)
+          console.log "Deleted it perhaps", res
+          $(conditional).remove()
+        error: (err) ->
+          console.log "Error", err
+      })
+    else
+      $(conditional).remove()
+
+
   userAction: (e) ->
+    _this = @
     target = e.currentTarget
     url = $(target).attr('data-url')
     type = $(target).attr('data-method')
@@ -165,8 +199,15 @@ class FinlyF.Views.User extends Backbone.View
     data_presence = $(target).attr('data-presence')
     if data_presence
       data.type = $(target).attr('data-type')
+      if $(target).attr('data-state-active')
+        if $(target).attr('data-state-active') == 'true'
+          data.active = true
+        else
+          data.active = false
     else
       data = {}
+
+    data.view = @params.view
 
     $.ajax({
       url: url,
@@ -174,8 +215,13 @@ class FinlyF.Views.User extends Backbone.View
       data: data,
       dataType: 'json',
       success: (res) ->
-        console.log "Suc", res
+        # console.log "Suc", res
         FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.parent.trigger('refresh')
+          # _this.model.fetch({
+          #   view: _this.params.view
+          # })
       error: (err) ->
         console.log "Err", err.messages
     })

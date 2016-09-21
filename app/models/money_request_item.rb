@@ -18,4 +18,6 @@ class MoneyRequestItem < ActiveRecord::Base
   scope :with_amount, -> { joins :amount }
   scope :with_category, ->(category_id){ where category_id: category_id }
 
+  accepts_nested_attributes_for :amount
+
 end

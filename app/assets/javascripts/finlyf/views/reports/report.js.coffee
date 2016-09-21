@@ -265,6 +265,7 @@ class FinlyF.Views.Report extends Backbone.View
     # $(e.currentTarget).addClass('btn-edit-item btn-warning').removeClass('btn-update-item btn-success').html("Edit  <i class='fa fa-edit'></i>")
 
   postComment: (e) ->
+    $(e.currentTarget).text('Posting...')
     _this = @
     target = $(e.currentTarget)
     report_id = $(target).attr('data-item-id')
@@ -279,14 +280,17 @@ class FinlyF.Views.Report extends Backbone.View
     model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        console.log model, res
-        _this.model.fetch({
-          data: {
-            view: _this.current_view
-          }
-        })
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+          })
+        else
+          $(e.currentTarget).text('Post')
       error: (err) ->
         console.log "Error", err
+        $(e.currentTarget).text('Post')
     })
     # console.log report_id
 
@@ -308,7 +312,6 @@ class FinlyF.Views.Report extends Backbone.View
 
     })
 
-
   reportAction: (e) ->
     _this = @
     url = $(e.currentTarget).attr('data-url')
@@ -318,16 +321,20 @@ class FinlyF.Views.Report extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        _this.model.fetch({
-          data: {view: _this.current_view}
-        })
+        if res.success == true
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          
+      error: (err) ->
+        console.log "Error", err
     })
-
 
   refreshData: (e)->
     _this = @
     target = e.currentTarget
-    if $(target).find(".modal-content").attr("data-refresh")
+    if $(target).find(".modal-content").attr("data-refresh-true")
       @model.fetch({ data: {view: _this.current_view }})
     # console.log "Closed Bootstrap modal"
 
@@ -363,24 +370,45 @@ class FinlyF.Views.Report extends Backbone.View
       report: true
     })
     $(@el).find("#modal-mp").html(@templateShowExpense())
-    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    $(@el).find("#modal-mp .modal-content .modal-body .row").html(preview_view.render().el)
     $(@el).find("#modal-mp").modal('show')
     $("#modal-mp").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
 
   rejectSub: (e) ->
+    _this = @
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
-
-    model = new FinlyF.Models.Expense({id: expense_id})
-
-    preview_view = new FinlyF.Views.Expense({
-      model: model
-      preview: true
+    console.log "Expense_id", expense_id
+    $.ajax({
+      url: '/reports/' + _this.model.get('id') + '/reject_expense'
+      method: 'PATCH'
+      dataType: 'JSON'
+      data: {
+        expense_id: expense_id
+        view: _this.current_view
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+        })
+      error: (err) ->
+        console.log err
     })
-    $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
-    $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
-    $(@el).find("#modal-mp").modal('show')
+
+    # model = new FinlyF.Models.Expense({id: expense_id})
+
+    # preview_view = new FinlyF.Views.Expense({
+    #   model: model
+    #   preview: true
+    # })
+    # $(@el).find("#modal-mp .modal-content").html(@templateExistingExpense())
+    # $(@el).find("#modal-mp .modal-content .modal-body").html(preview_view.render().el)
+    # $(@el).find("#modal-mp").modal('show')
 
   submit: (e) ->
     _this = @

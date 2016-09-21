@@ -8,6 +8,10 @@ gem 'wkhtmltopdf-binary'
 gem 'figaro'
 gem 'puma'
 
+# gem to import from excel
+gem 'roo'
+gem 'roo-xls'
+
 # Gem pundit for permission check in actions etc.
 gem 'pundit'
 

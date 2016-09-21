@@ -8,29 +8,24 @@ class PoliciesController < ApplicationController
 
   def create
     create_policy_op = Policy::Create.new(current_user, params)
-    @policy = create_policy_op.run
-    if @policy
+    @result = create_policy_op.run
+    if @result.success?
       flash.now[:success] = 'Policy Created'
-      @policies = Policy::Index.new(current_user, view: 'admin')
-      render partial: 'organization_account/policy_list', replace: '#policyListAdmin'
-      return
+    else
+      flash.now[:failure] = create_policy_op.messages[:error]
     end
-    flash.now[:failure] = create_policy_op.errors
-    render_flash_message
+    redirect_to request.referrer
   end
 
   def destroy
     destroy_op = Policy::Destroy.new(current_user, params)
     @result = destroy_op.run
-    if @result
+    if @result.success?
       flash.now[:success] = "Policy destroyed."
-      respond_to do |format|
-        format.json { render json: {"status": "success"} }
-      end
     else
-      flash[:danger] = destroy_op.errors
-      render_flash_message
+      flash[:danger] = destroy_op.messages[:error]
     end
+    redirect_to request.referrer
   end
 
   def index
@@ -50,7 +45,6 @@ class PoliciesController < ApplicationController
       format.html {}
       format.js
     end
-
   end
 
   def add_users
@@ -59,7 +53,7 @@ class PoliciesController < ApplicationController
       flash[:success] = "User successfully addded"
       redirect_to request.referrer
     else
-      flash[:danger] = add_user_op.errors
+      flash[:danger] = add_user_op.messages[:error]
       # render error message
     end
   end
@@ -70,52 +64,23 @@ class PoliciesController < ApplicationController
       flash[:success] = "User successfully removed"
       redirect_to request.referrer
     else
-      flash[:danger] = remove_user_op.errors
+      flash[:danger] = remove_user_op.messages[:error]
       # render error message
     end
   end
 
 
   def update_user_configuration
-    update_configuration_op = Policy::Users::UpdateConfiguration.new(current_user, params)
-    if update_configuration_op.run
+    update_configuration_op = Policy::Users::UpdateMapping.new(current_user, params)
+    @result = update_configuration_op.run
+    if @result.success?
+      @result = Policy::Show.new(current_user, params).run
       flash[:success] = "Configuration updated"
       redirect_to request.referrer
     else
-      flash[:danger] = "Update failed."
+      flash[:danger] = update_configuration_op.messages[:error]
       # render flash message
     end
   end
-
-  private
-
-  # def load_users
-  #   @users = []
-  #   @policy.user_mapping.each do |map|
-  #     user = map.user
-  #     admin = map.admin
-  #     conditional_manager = nil
-  #     conditional_finance = nil
-  #     conditional_approves_to = nil
-  #     conditional_approves_finance_to = nil
-  #
-  #     mappings = user.team_mapping.with_details.policy(@policy.id)
-  #     dm = mappings.default
-  #     default_mapping = dm.first if dm.present?
-  #     conditional_mapping = mappings.non_default
-  #     cm = conditional_mapping.manager
-  #     conditional_manager = cm.first if cm.present?
-  #     cf = conditional_mapping.finance_manager
-  #     conditional_finance = cf.first if cf.present?
-  #     cat = conditional_mapping.approves_to
-  #     conditional_approves_to = cat.first if cat.present?
-  #     caft = conditional_mapping.approves_finance_to
-  #     conditional_approves_finance_to = caft.first if caft.present?
-  #
-  #     @users << {user: user, admin: admin, default_mapping: default_mapping, conditional_manager: conditional_manager,
-  #                conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
-  #                conditional_approves_finance_to: conditional_approves_finance_to}
-  #   end
-  # end
 
 end

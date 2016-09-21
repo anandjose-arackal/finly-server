@@ -21,6 +21,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
     'keyup .search-user': 'prepareSearch'
+    'submit .navbar-form': 'cancelEvents' 
 
   initialize: (options) ->
     @params = options.params
@@ -32,6 +33,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: @params
     })
     @collection.on('reset', @processUsers, @)
+    @on('refresh', @refetchCollection, @)
 
   render: ->
     $(@el).html(@templateSkeleton())
@@ -97,6 +99,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       model_id: model.get('id'),
       page: 'user'
       params: @params
+      parent: @
       # preview: true
       # parent: @
     })
@@ -107,17 +110,21 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     # @params.page = 1
+    console.log @params
     @collection.fetch({
       reset: true,
-      # data: _this.params,
+      data: _this.params,
       success: ->
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
+
+        $(_this.el).find("#user-details").html("<div class='col-sm-10 col-sm-offset-1'><h2>Please Select an Employee from the list on the left to view/edit their details, policies, roles etc.</h2></div>")
 
       error: ->
         console.log "Couldn't fetch successfully."
@@ -165,13 +172,12 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: @params
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        # managers = {
-        #   company_managers: res.company_managers
-        #   company_finance_managers: res.company_finance_managers
-        # }
         $(modal).html(_this.templateInviteEmployee({item: res}))
+        if _this.params.view == 'manager'
+          $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
+        else if _this.params.view == 'finance_manager'
+          $(modal).find('.invitee-finance-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
         
-        # console.log res.company_managers
       error: (err) ->
         console.log "Err", err
     })
@@ -194,7 +200,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       data: values
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        $(modal).modal('hide')
+        if res.success == true
+          $(modal).modal('hide')
         # console.log res
       error: (err) ->
         console.log "Err", err
@@ -207,6 +214,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     @params.filter_state = parseInt($(target).attr('data-filter-state'))
 
     FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
+
+  cancelEvents: (e) ->
+    e.preventDefault()
 
   prepareSearch: (e) ->
     # console.log "abinash"

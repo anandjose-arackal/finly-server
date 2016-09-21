@@ -46,7 +46,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
-
+        _this.toggleLoadMore(_this.collection)
       error: ->
         console.log "Couldn't fetch Successfully."
     })
@@ -54,9 +54,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     @on('item:destroyed', @itemDeleted, @)
 
   render: ->
-    # console.log "Step 3. Rendering."
-    #Appending Partials to Skeleton
-
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
@@ -79,6 +76,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       data: _this.params,
       reset: false,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
         $(target).find('span').text('Load More')
         _this.resetPageCount({target: target, page: _this.params.page })
@@ -90,6 +88,14 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch Successfully."
     })
+
+  toggleLoadMore: (collection) ->
+    console.log "Loading", collection.models.length
+    if collection.models.length < 30
+      console.log "Should hide"
+      $(@el).find('.load-more').css('display', 'none')
+    else
+      $(@el).find('.load-more').css('display', 'inline')
 
   processItems: ->
     #Append all the reports
@@ -121,6 +127,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
@@ -158,6 +165,22 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
     preview_view = new FinlyF.Views.Report({
       model_id: model.get('id')
+      preview: true
+      parent: @
+      current_view: @params.view || 'personal'
+    })
+
+    $(@el).find("#item-details-main").html(preview_view.render().el)
+
+  showReport: (report_id) ->
+    # model = @collection.get(report_id)
+    # console.log model.toJSON()
+    main = $(@el).find(".main")
+    unless $(main).hasClass("preview")
+      $(main).addClass("preview")
+
+    preview_view = new FinlyF.Views.Report({
+      model_id: report_id
       preview: true
       parent: @
       current_view: @params.view || 'personal'
@@ -296,6 +319,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       data: @params
       reset: true
       success: ->
+        _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})

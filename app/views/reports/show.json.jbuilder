@@ -1,12 +1,12 @@
-json.extract! @result.report, :id, :name, :memo, :status_name, :memo, :report_status_id
+json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id
 json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + (@result.report.user.name.split(' ')[1][0] || @result.report.user.name.split(' ').first[1])
 json.status @result.status
 json.manager_name @result.manager.name rescue nil
 json.finance_manager_name @result.finance_manager.name rescue nil
-json.export_csv export_report_path(report_id: @result.report.id, view: params[:view],:format => :csv)
-json.export_xls export_report_path(report_id: @result.report.id, view: params[:view],:format => :xls)
-json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view],:format => :pdf)
+json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
+json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
+json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
 
 if @result.report.policy
   json.policy @result.report.policy.name
@@ -35,10 +35,22 @@ json.expense_sections @result.expenses_category_sorted do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :note, :merchant_name, :amount_value
+    json.extract! expense, :id, :merchant_name, :amount_value
+    if expense.note
+      if expense.note.length < 29
+        json.note expense.note
+      else
+        json.note expense.note[0..29] + "..."
+      end
+    end
     # json.extract! expense, :id, :note
     json.date expense.date.strftime("%d %b %y")
-    json.violations @result.violations[expense.id]
+    json.violations do
+      items = @result.violations[expense.id]
+      json.blocking_present (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
+      json.warning_present (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
+      json.items items
+    end
   end
 end
 
@@ -54,9 +66,29 @@ end
 end
 
 json.actions do
+  json.dummy 'dummy'
   @result.actions.each do |key, value|
     json.set! key, (value[:url] or value[:value])
   end
 end
 
-json.violations @result.violations
+json.violations do
+  blocking_present = false
+  warning_present = false
+  @result.violations.each do |key, violation|
+    if violation[:expense_warning].present? or violation[:budget_warning].present? or
+        violation['expense_warning'].present? or violation['budget_warning'].present?
+      warning_present = true
+    end
+    if violation[:expense_blocking].present? or violation[:budget_blocking].present? or
+        violation['expense_blocking'].present? or violation['budget_blocking'].present?
+      blocking_present = true
+    end
+    if warning_present and blocking_present
+      break
+    end
+  end
+  json.blocking_present blocking_present
+  json.warning_present warning_present
+  json.items @result.violations
+end

@@ -47,7 +47,7 @@
 
       <% @result.users.each do |user| %>
           <% default_mapping = user[:default_mapping] %>
-          <tr onclick="userSettingsModal('<%= user[:user].id %>')">
+          <tr>
             <td style="width: 1%; padding-left: 20px">
 
               <!-- deleting a user from policy -->
@@ -79,7 +79,7 @@
             </td>
 
             <td style="width:  25%;">
-              <i style="cursor: pointer; font-size: 20px" data-toggle="modal" data-target="#policyMemberSettings" class="fa fa-cog"></i>
+              <i style="cursor: pointer; font-size: 20px" onclick="userSettingsModal('<%= user[:user].id %>')" class="fa fa-cog"></i>
             </td>
           </tr>
 
