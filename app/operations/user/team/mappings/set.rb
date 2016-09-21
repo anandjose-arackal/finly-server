@@ -30,7 +30,6 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def init
     self.mappings = updating_user.team_mapping
     self.updating_mapping = params[:user_manager_mapping]
-    self.policy = Policy.find_by(id: params[:policy_id])
   end
 
   def validate
@@ -45,7 +44,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       end
       updated_params = map[:mapping]
       amount_value = updated_params['greater_than_amount_attributes']['value'] rescue nil
-      policy_id = policy.id rescue nil
+      policy_id = updated_params[:policy_id] rescue nil
       if amount_value.blank? or amount_value.to_f <= 0
         messages[:error] << 'Error setting configuration. Amount value cannot be 0'
         next
@@ -99,8 +98,6 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
         # If ID is not present, create new user mapping
         if updated_params.present?
           updated_params[:user_id] = updating_user.id
-          # if the mapping is specific to a policy
-          updated_params[:policy_id] = policy.id if policy
           updated_params['greater_than_amount_attributes']['currency_id'] = 1
           self.mappings.create(update_params(updated_params))
         end

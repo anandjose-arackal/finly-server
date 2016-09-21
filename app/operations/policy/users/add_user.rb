@@ -53,8 +53,13 @@ class Policy::Users::AddUser < Policy::Base
 
       # Add user configuration - the user configuration is cloned from the default mapping, and additional rules have to be added separately.
       added_user.team_mapping.policy(nil).each do |item|
-        cloned_item = item.dup
+        cloned_item = item.deep_clone
         cloned_item.policy_id = self.policy.id
+        if cloned_item.greater_than_amount.present?
+          amount = cloned_item.greater_than_amount.deep_clone
+          amount.save
+          cloned_item.greater_than_amount = amount
+        end
         unless cloned_item.save
           messages[:error] << "Some users couldn't be added to the policy."
           return false
