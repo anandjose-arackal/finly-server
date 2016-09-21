@@ -73,22 +73,8 @@ json.actions do
 end
 
 json.violations do
-  blocking_present = false
-  warning_present = false
-  @result.violations.each do |key, violation|
-    if violation[:expense_warning].present? or violation[:budget_warning].present? or
-        violation['expense_warning'].present? or violation['budget_warning'].present?
-      warning_present = true
-    end
-    if violation[:expense_blocking].present? or violation[:budget_blocking].present? or
-        violation['expense_blocking'].present? or violation['budget_blocking'].present?
-      blocking_present = true
-    end
-    if warning_present and blocking_present
-      break
-    end
-  end
-  json.blocking_present blocking_present
-  json.warning_present warning_present
-  json.items @result.violations
+  json.blocking_present @result.has_blocking?
+  json.warning_present @result.has_warning?
+  json.blocking_messages @result.blocking_array
+  json.warning_messages @result.warning_array
 end
