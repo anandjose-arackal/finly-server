@@ -71,4 +71,9 @@ class Policy::Users::AddUser < Policy::Base
   def post_process
     messages[:success] = "Users added to policy."
   end
+
+  def success
+    Policy::Show.(user, params)
+  end
+
 end

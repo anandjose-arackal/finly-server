@@ -18,4 +18,8 @@ class DeviseMailer < Devise::Mailer
     UserMailer.password_changed record
   end
 
+  def invitation_instructions(record, token, opts={})
+
+  end
+
 end
