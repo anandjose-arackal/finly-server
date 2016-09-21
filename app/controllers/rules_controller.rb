@@ -25,7 +25,7 @@ class RulesController < ApplicationController
     else
       flash.now[:error] = @result.messages[:error]
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
   end
 
 
