@@ -14,9 +14,7 @@ end
 
 json.violations do
   items = @result.violation
-  if items
-    json.blocking_present (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
-    json.warning_present (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
-    json.items items
-  end
+  json.warning_present items[:warning_present]
+  json.blocking_present items[:blocking_present]
+  json.items items[:items]
 end
