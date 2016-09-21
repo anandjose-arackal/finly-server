@@ -35,7 +35,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def validate
     currency_id = Currency.first.id
     self.updating_mapping.each do |key, map|
-      Formatter.remove_blanks map
+      # Formatter.remove_blanks map
       next if map.blank? or map[:mapping].blank?
       mapping_id = map[:mapping_id]
       if mapping_id.present?
@@ -70,7 +70,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def process
     self.updating_mapping.each do |key, map|
       # to remove all empty values
-      Formatter.remove_blanks map
+      # Formatter.remove_blanks map
       next if map.blank?
       id = map[:mapping_id]
       updated_params = map[:mapping]
