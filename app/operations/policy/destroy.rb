@@ -23,16 +23,17 @@ class Policy::Destroy < Policy::Base
 
   def process
     unless self.policy.destroy
-      messages[:error] << "Couldn't delete policy. PLease try again."
+      messages[:error] << "Couldn't delete policy. PLease try again"
     end
   end
 
   def post_process
-    messages[:success] << "Policy destroyed."
+    messages[:success] << 'Policy destroyed'
   end
 
   def success
-    Policy::Base::PolicyPresenter.new(user, {view: params[:view]})
+    # Policy::Base::PolicyPresenter.new(user, {view: params[:view]})
+    Policy::Index.(user, params)
   end
 
 end

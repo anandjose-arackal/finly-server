@@ -29,8 +29,10 @@ class Settlement::Index < Settlement::Base
   class Settlement::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :users
 
+    has_scope :filter_search
+
     def init
-      self.users = params[:users].paginate(page: params[:page], per_page: 30)
+      self.users = apply_scopes(params[:users], params).paginate(page: params[:page], per_page: 30)
     end
   end
 

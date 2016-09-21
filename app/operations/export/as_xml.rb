@@ -4,12 +4,15 @@
 
 class Export::AsXml < Export::Base
 
+  attr_accessor :reports, :preferences, :result
+
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
   end
 
   def init
-    self.reports = Report.where(id: params[:report_ids])
+    self.reports = Report.where(id: params[:report_id])
+    self.preferences = user.company.export_preferences
   end
 
   def authorize

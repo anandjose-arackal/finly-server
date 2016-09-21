@@ -38,7 +38,7 @@ class Formatter
     end
   end
 
-  # Symbolize all keys in the hash
+# Symbolize all keys in the hash
   def self.symbolize_hash_keys(hash)
     hash.each do |key, value|
       if value.kind_of?(Hash)
