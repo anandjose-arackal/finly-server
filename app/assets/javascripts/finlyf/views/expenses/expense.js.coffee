@@ -77,7 +77,7 @@ class FinlyF.Views.Expense extends Backbone.View
     })
 
   edit: (e) ->
-    $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-expense').addClass('btn-update-expense')
+    $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-expense btn-warning').addClass('btn-update-expense btn-success')
     $(@el).find(".item-attr-preview").css("display", "none")
     $(@el).find(".item-attr-edit").css("display", "block")
 
@@ -98,7 +98,7 @@ class FinlyF.Views.Expense extends Backbone.View
 
   update: (e) ->
     target = e.currentTarget
-    $(target).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;").removeClass('btn-update-expense')
+    $(target).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;").removeClass('btn-update-expense')
 
     _this = @
     e.preventDefault()

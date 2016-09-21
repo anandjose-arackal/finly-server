@@ -37,6 +37,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#primary-navbar a[href=expenses]").parent().addClass('active')
 
   reports: (query, action) ->
+    console.log "hit router"
     # if typeof action != 'undefined'
     #   actions = JSON.parse(query)
 
@@ -92,8 +93,8 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#primary-navbar a[href=settlements]").parent().addClass('active')
 
   settlements_show: (user, query) ->
-    console.log "settlements show"
-    console.log user, query
+    # console.log "settlements show"
+    # console.log user, query
     if typeof query != 'undefined'
       # console.log "we're here"
       if query != null

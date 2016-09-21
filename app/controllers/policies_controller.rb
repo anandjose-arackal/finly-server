@@ -11,10 +11,16 @@ class PoliciesController < ApplicationController
     @result = create_policy_op.run
     if @result.success?
       flash.now[:success] = 'Policy Created'
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash.now[:failure] = create_policy_op.messages[:error]
     end
-    redirect_to request.referrer
+    respond_to do |format|
+      format.js {}
+    end
+    # redirect_to request.referrer
   end
 
   def destroy
@@ -22,10 +28,13 @@ class PoliciesController < ApplicationController
     @result = destroy_op.run
     if @result.success?
       flash.now[:success] = "Policy destroyed."
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:danger] = destroy_op.messages[:error]
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
   end
 
   def index

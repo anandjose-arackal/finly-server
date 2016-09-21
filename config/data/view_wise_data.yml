@@ -9,7 +9,7 @@ admin:
     cog:
       - Organization Account: '/organization_account?view=admin'
       - Policies: '/policies'
-      - My Account: '/users/'
+      # - My Account: '/users/'
       # - Expense Policies: '/policies?view=admin'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
@@ -23,7 +23,7 @@ personal:
       - Expenses: expenses
       # - Analytics: analytics
     cog:
-      - My Account: '/users/'
+      # - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
@@ -35,7 +35,7 @@ manager:
       - Team Members: employees
       - Team Reports: reports
     cog:
-      - My Account: '/users/'
+      # - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
@@ -49,6 +49,6 @@ finance_manager:
       - Company Reports: reports
 
     cog:
-      - My Account: '/users/'
+      # - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'  

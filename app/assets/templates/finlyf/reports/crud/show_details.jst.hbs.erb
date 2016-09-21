@@ -35,6 +35,10 @@
         {{#if item.actions.reject}}
           <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
         {{/if}}
+
+        {{#if item.actions.reimbursement_confirm}}
+          <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reimbursement_confirm}}">Confirm Reimbursement</button>
+        {{/if}}
         
       </div>
     </div>
@@ -204,12 +208,12 @@
 
 
           <div class="col-sm-3 no-padding text-right">
-            <button data-item-id="{{this.id}}" class="btn btn-view-sub-item btn-xs btn-warning">Details</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn btn-view-sub-item btn-xs btn-warning">Details</button>
           {{#if ../../item.actions.editable}}
-            <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
           {{/if}}
           {{#if ../../item.actions.reject}}
-            <button data-item-id="{{this.id}}" class="btn-reject-sub-item btn btn-xs btn-danger">Reject</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn-reject-sub-item btn btn-xs btn-danger">Reject</button>
           {{/if}}
           </div>
 

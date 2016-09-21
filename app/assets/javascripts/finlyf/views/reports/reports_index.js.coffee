@@ -37,7 +37,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     else
       @params = {}
     @params.page = 1
-    console.log "Params from view", @params
+    # console.log "Params from view", @params
     # console.log "Step x. Init View"
     _this = @
     @dump = []
@@ -90,9 +90,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
 
   toggleLoadMore: (collection) ->
-    console.log "Loading", collection.models.length
+    # console.log "Loading", collection.models.length
     if collection.models.length < 30
-      console.log "Should hide"
+      # console.log "Should hide"
       $(@el).find('.load-more').css('display', 'none')
     else
       $(@el).find('.load-more').css('display', 'inline')
@@ -229,6 +229,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
 
   filterStatus: (e) ->
+    # console.log "hit filter"
     e.preventDefault()
 
     target = $(e.currentTarget)
@@ -243,11 +244,14 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     if @params.view
       params.view = @params.view
 
+    # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   resetFilters: ->
     params = {}
     params.view = @params.view
+    
+    # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
@@ -273,6 +277,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     if @params.view
       params.view = @params.view
 
+    # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
@@ -309,7 +314,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
 
   itemDeleted: (e) ->
-    console.log "item destoryed"
+    # console.log "item destoryed"
     _this = @
     main = $(@el).find(".main")
     $(main).removeClass("preview")
