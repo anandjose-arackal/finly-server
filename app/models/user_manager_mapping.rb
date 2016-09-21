@@ -34,6 +34,7 @@ class UserManagerMapping < ActiveRecord::Base
   validate :valid_non_default
 
   scope :with_id, ->(id) { where id: id }
+  scope :without_id, ->(id) { where.not id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
   scope :default, -> { where default: true }
   scope :non_default, -> { where.not default: true }

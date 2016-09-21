@@ -34,7 +34,38 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   end
 
   def validate
-
+    currency_id = Currency.first.id
+    self.updating_mapping.each do |key, map|
+      Formatter.remove_blanks map
+      next if map.blank? or map[:mapping].blank?
+      mapping_id = map[:mapping_id]
+      if mapping_id.present?
+        updating_map = self.mappings.with_id(mapping_id).first rescue nil
+        next if updating_map.present? and updating_map.default
+      end
+      updated_params = map[:mapping]
+      amount_value = updated_params['greater_than_amount_attributes']['value'] rescue nil
+      policy_id = policy.id rescue nil
+      if amount_value.blank? or amount_value.to_f <= 0
+        messages[:error] << 'Error setting configuration. Amount value cannot be 0'
+        next
+      end
+      if updated_params[:manager_id].blank? and updated_params[:finance_manager_id].blank? and updated_params[:approves_to_id].blank? and updated_params[:approves_finance_to_id].blank?
+        messages[:error] << 'Error setting configuration. Manager cannot be blank'
+      end
+      v = self.mappings.policy(policy_id).exact_amount(currency_id, amount_value)
+      v = v.without_id(mapping_id) if mapping_id.present?
+      present= false
+      {manager: :manager_id, finance_manager: :finance_manager_id, approved_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
+        if updated_params[item].present? and v.send(key).present?
+          present = true
+        end
+      end
+      if present
+        messages[:error] << 'A configuration for the given amount has already been defined!'
+        break
+      end
+    end
   end
 
   def process
@@ -78,7 +109,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   end
 
   def post_process
-    messages[:success] << 'Updated successfully'
+    messages[:success] << 'Updated!'
   end
 
   private
