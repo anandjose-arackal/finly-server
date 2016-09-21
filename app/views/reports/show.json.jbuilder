@@ -31,7 +31,8 @@ json.comments @result.comments do |comment|
   end
 end
 
-json.expense_sections @result.expenses_category_sorted do |category|
+categorized_expense = @result.expenses_category_sorted
+json.expense_sections categorized_expense do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
@@ -54,16 +55,21 @@ json.expense_sections @result.expenses_category_sorted do |category|
   end
 end
 
-@result.expenses_category_sorted.each do |category|
-  json.receipts category[:expenses] do |expense|
-    unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
-      json.url expense.receipts.first.image.url
-      json.date expense.date.strftime('%d %b %y')
-      json.merchant_name expense.merchant_name
-      json.amount_value expense.amount.precision_value
+if categorized_expense.present?
+  categorized_expense.each do |category|
+    json.receipts category[:expenses] do |expense|
+      unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
+        json.url expense.receipts.first.image.url
+        json.date expense.date.strftime('%d %b %y')
+        json.merchant_name expense.merchant_name
+        json.amount_value expense.amount.precision_value
+      end
     end
   end
+else
+  json.receipts []
 end
+
 
 json.actions do
   json.dummy 'dummy'
