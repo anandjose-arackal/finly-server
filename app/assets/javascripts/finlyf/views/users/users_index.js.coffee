@@ -199,6 +199,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     # console.log manager, finance_manager
     # return
 
+    $(form).find(':disabled').removeAttr('disabled');
+
     _.each((form).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
