@@ -28,7 +28,7 @@ class ApplicationPolicy
   end
 
   def check_finance_view
-    unless @user.view == 'finance' and @user.finance_manager?
+    unless (@user.view == 'finance' or @user.view == 'finance_manager') and @user.finance_manager?
       return false
     end
     true
