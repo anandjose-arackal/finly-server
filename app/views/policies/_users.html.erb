@@ -1,16 +1,11 @@
-<div id="invitableUsersContainer">
-  <table style="width:100%">
-    <% if @result.users_with_manager_email.present? %>
-        <% @result.users_with_manager_email.each do |item| %>
-            <% user = item[:user] %>
-            <tr style="margin: 0;font-size: 13px; text-align: left; padding-top: 10px; height: 30px">
-              <td style="width: 15% ">
-                <input class="checkboxes" type="checkbox" name="add_user_id" value="<%= user.id %>" onclick="makeButtonVisible()" style="margin: 4px 8px 0 8px"><%= user.name %>
-              </td>
-              <td style="width: 20% "><%= user.email %></td>
-              <td style="width: 30% "><%= item[:manager] %></td>
-            </tr>
-        <% end %>
+<% if @result.users_with_manager_email.present? %>
+    <% @result.users_with_manager_email.each do |item| %>
+        <% user = item[:user] %>
+        <div class="row" style="margin: 0;font-size: 12px; text-align: left; padding: 10px 0 10px 0;height: 30px;border-bottom: 1px solid #d8d8d8;">
+          <div class="col-md-1"><input class="checkboxes" type="checkbox" name="add_user_id" value="<%= user.id %>" onclick="makeButtonVisible()" style="margin: 4px 8px 0 8px"></div>
+          <div class="col-md-3" style="padding-left: 20px"><%= user.name %></div>
+          <div class="col-md-4" style="padding-left: 25px"><%= user.email %></div>
+          <div class="col-md-4" style="text-align: center;padding-left: 38px"><%= item[:manager] %></div>
+        </div>
     <% end %>
-  </table>
-</div>
+<% end %>

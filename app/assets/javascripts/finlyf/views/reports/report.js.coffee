@@ -193,6 +193,7 @@ class FinlyF.Views.Report extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
+          $(modal).html("")
           _this.model.fetch({ data: {view: _this.current_view}})
           $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
