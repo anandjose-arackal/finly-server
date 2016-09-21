@@ -1,6 +1,8 @@
 <% if params[:expense_rule] %>
+  $("#createNewExpenseRuleModal").modal('hide');
   $("#expense-rules").html("<%= j render partial: 'policies/expense_rules' %>")
 <% elsif params[:budget_rule] %>
-  $("#budget-rules").html("<%= j render partial: 'policies/budget_rules' %>")
+  $("#createNewBudgetRuleModal").modal('hide');
+  $("#budget-rules").html("<%= j render partial: 'policies/budget_rules' %>");
 <% end %>
 
