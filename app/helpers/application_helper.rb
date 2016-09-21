@@ -24,7 +24,7 @@ module ApplicationHelper
 
   def is_finance_view
     view = params[:view]
-    if view == 'finance'
+    if view == 'finance' or view == 'finance_manager'
       return true
     end
     false

@@ -46,13 +46,14 @@ class Policy::Create < Policy::Base
       add_user_op = Policy::Users::AddUser.new(user, {policy_id: cloned_policy.id, user_id: user.id.to_s, admin: true})
       # Add the creating user as admin
       add_user_op.run
-      messages[:success] << "New Policy created!."
-      return cloned_policy
+      messages[:success] << 'New Policy created!'
+      cloned_policy
     end
   end
 
   def success
-    Policy::Base::PolicyPresenter.new(user, {policy: policy, view: params[:view]})
+    # Policy::Base::PolicyPresenter.new(user, {policy: policy, view: params[:view]})
+    Policy::Index.(user, params)
   end
 
 end
