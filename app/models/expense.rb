@@ -54,9 +54,9 @@ class Expense < ActiveRecord::Base
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
-    if self.report_id
-      errors.add(:expense, "associated with a report can't be destroyed.")
-    end
+    errors.add(:expense, "associated with a report can't be destroyed.") if self.report_id
+
+    self.receipts.update_all(parent_id: nil, parent_type: nil) if self.receipts.present?
   end
 
   before_save do
@@ -69,7 +69,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  default_scope {order('expenses.created_at DESC')}
+  default_scope { order('expenses.created_at DESC') }
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -116,8 +116,8 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  scope :manual, -> { joins(:manual_expense)}
-  scope :card, -> {joins(:card_expense)}
+  scope :manual, -> { joins(:manual_expense) }
+  scope :card, -> { joins(:card_expense) }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }

@@ -8,10 +8,16 @@ json.export_csv export_report_path(report_id: @result.report.id, view: params[:v
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
 
+policy_id = nil
+policy_name = nil
 if @result.report.policy
+  policy_id = @result.report.policy_id
+  policy_name = @result.report.policy.name
   json.policy @result.report.policy.name
-  json.policy_id @result.report.policy.id
+  json.policy_id @result.report.policy_id
 end
+json.policy policy_name
+json.policy_id policy_id
 
 json.policies @result.report.user.policies do |policy|
   json.extract! policy, :id, :name
@@ -55,19 +61,13 @@ json.expense_sections categorized_expense do |category|
   end
 end
 
-if categorized_expense.present?
-  categorized_expense.each do |category|
-    json.receipts category[:expenses] do |expense|
-      unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
-        json.url expense.receipts.first.image.url
-        json.date expense.date.strftime('%d %b %y')
-        json.merchant_name expense.merchant_name
-        json.amount_value expense.amount.precision_value
-      end
-    end
+json.receipts @result.expenses do |expense|
+  unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
+    json.url expense.receipts.first.image.url
+    json.date expense.date.strftime('%d %b %y')
+    json.merchant_name expense.merchant_name
+    json.amount_value expense.amount.precision_value
   end
-else
-  json.receipts []
 end
 
 

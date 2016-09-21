@@ -6,10 +6,10 @@ class Expense::Manual::Destroy < Expense::Manual::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "Parameters or user not present."
+      messages[:error] << 'Parameters or user not present'
     end
     if params[:expense_id].nil? and params[:id].nil?
-      messages[:error] << "Expense ID missing!"
+      messages[:error] << 'Expense ID missing!'
     end
   end
 
@@ -19,12 +19,12 @@ class Expense::Manual::Destroy < Expense::Manual::Base
 
   def authorize
     unless expense
-      messages[:error] << "Cannot find expense to destroy"
+      messages[:error] << 'Cannot find expense to delete'
       raise_unauthorized_exception
     end
 
     unless expense.user_id == user.id
-      messages[:error] << "You do not own this expense."
+      messages[:error] << 'You do not own this expense'
       raise_unauthorized_exception
     end
   end
@@ -43,7 +43,7 @@ class Expense::Manual::Destroy < Expense::Manual::Base
 
   def post_process
     # mail?
-    messages[:success] << "Expense destroyed."
+    messages[:success] << 'Expense deleted'
   end
 
 end
