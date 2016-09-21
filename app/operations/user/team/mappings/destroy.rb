@@ -45,7 +45,7 @@ class User::Team::Mappings::Destroy < User::Team::Mappings::Base
   end
 
   def post_process
-    messages[:success] << 'Team updated successfully'
+    messages[:success] << 'Updated!'
   end
 
 end
