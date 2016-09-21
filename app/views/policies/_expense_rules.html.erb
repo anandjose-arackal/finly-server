@@ -112,7 +112,7 @@
       </div>
       <div class="modal-body" style="padding: 0 35px 35px 35px">
 
-        <form data-turboboost name="submitNewRuleForm"  action="<%= policy_add_rule_path(@result.policy, view: params[:view])%>" method="post">
+        <form data-remote="true" name="submitNewRuleForm"  action="<%= policy_add_rule_path(@result.policy, view: params[:view])%>" method="post">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
           <h5>The rule is...</h5>

@@ -12,9 +12,4 @@ json.receipts @result.expense.receipts do |receipt|
   json.image_url receipt.image.url
 end
 
-json.violations do
-  items = @result.violation
-  json.warning_present items[:warning_present]
-  json.blocking_present items[:blocking_present]
-  json.items items[:items]
-end
+json.violations @result.violation

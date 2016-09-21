@@ -18,8 +18,13 @@ class User::Team::Mappings::Reset < User::Team::Mappings::Base
   def process
     mappings.destroy_all
     self.updating_user.team_mapping.policy(nil).each do |item|
-      clone = item.dup
+      clone = item.deep_clone
       clone.policy_id = params[:policy_id]
+      if clone.greater_than_amount.present?
+        amount = clone.greater_than_amount.deep_clone
+        amount.save
+        clone.greater_than_amount = amount
+      end
       messages[:error] << clone.errors.full_messages unless clone.save
     end
   end

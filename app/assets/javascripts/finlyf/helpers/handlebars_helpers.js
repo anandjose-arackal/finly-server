@@ -46,6 +46,7 @@ Handlebars.registerHelper('if_all', function() {
 });
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+  //access actual object by ../ inside ifCond
   switch (operator) {
     case '==':
       return (v1 == v2) ? options.fn(this) : options.inverse(this);

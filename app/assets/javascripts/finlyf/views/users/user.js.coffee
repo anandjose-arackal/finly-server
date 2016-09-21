@@ -149,17 +149,26 @@ class FinlyF.Views.User extends Backbone.View
 
     arr = []
     conditionals = $(policy).find('.conditional')
-    console.log "count", conditionals.length
+    # console.log "count", conditionals.length
     for conditional in conditionals
+      # console.log "Conditional counter", $(conditional).attr('data-condition-serial')
       arr.push(parseInt($(conditional).attr('data-condition-serial')))
 
+    # console.log Math.max.apply(Math,arr) + 1
+
     item = {
-      condition_serial: Math.max.apply(Math,arr) + 1
+      # condition_serial: Math.max.apply(Math,arr) + 1
       policy_id: $(target).attr('data-policy-id')
       manager_type: $(target).attr('data-manager-type')
       managers: _this.model.get('team_managers')
       finance_managers: _this.model.get('team_finance_managers')
     }
+    if arr.length == 0
+      item.condition_serial = 1
+    else
+      item.condition_serial = Math.max.apply(Math,arr) + 1
+
+    # console.log item
 
     # console.log item
     $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
