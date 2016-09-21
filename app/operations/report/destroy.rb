@@ -22,7 +22,6 @@ class Report::Destroy < Report::Base
   end
 
   def authorize
-
     unless report
       raise_unauthorized_exception
     end

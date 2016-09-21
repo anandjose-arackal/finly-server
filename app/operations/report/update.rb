@@ -4,9 +4,6 @@ class Report::Update < Report::Base
 
   def pre_validate
     super
-    if params[:name].blank? and params[:policy_id].blank?
-      messages[:error] << 'Nothing to update'
-    end
   end
 
   def pre_authorize
@@ -48,7 +45,7 @@ class Report::Update < Report::Base
 
   def process
     return unless update_param.present?
-    unless report.update(update_param)
+    unless report.update_attributes(update_param)
       messages[:error] << report.errors.full_messages
       false
     end

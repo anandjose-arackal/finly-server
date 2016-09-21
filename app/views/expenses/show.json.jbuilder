@@ -13,3 +13,5 @@ json.receipts @result.expense.receipts do |receipt|
 end
 
 json.violations @result.violation
+
+json.editable (@result.expense.report_id.present? and @result.expense.report.editable?)
