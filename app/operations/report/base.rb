@@ -142,13 +142,13 @@ class Report::Base < BaseOperation
     def blocking_array
       blocking_messages = []
       self.violations.each do |key, violation|
-        blocking_messages.merge violation[:expense_blocking] if violation[:expense_blocking].present?
-        blocking_messages.merge violation[:budget_blocking] if violation[:budget_blocking].present?
-        blocking_messages.merge violation['expense_blocking'] if violation['expense_blocking'].present?
-        blocking_messages.merge violation['budget_blocking'] if violation['budget_blocking'].present?
+        blocking_messages.concat violation[:expense_blocking] if violation[:expense_blocking].present?
+        blocking_messages.concat violation[:budget_blocking] if violation[:budget_blocking].present?
+        blocking_messages.concat violation['expense_blocking'] if violation['expense_blocking'].present?
+        blocking_messages.concat violation['budget_blocking'] if violation['budget_blocking'].present?
       end
       if blocking_messages.size > 0
-        blocking_messages.uniq
+        blocking_messages.uniq!
         Formatter.remove_blanks blocking_messages
       end
       blocking_messages
@@ -157,13 +157,13 @@ class Report::Base < BaseOperation
     def warning_array
       warning_messages = []
       self.violations.each do |key, violation|
-        warning_messages.merge violation[:expense_warning] if violation[:expense_warning].present?
-        warning_messages.merge violation[:budget_warning] if violation[:budget_warning].present?
-        warning_messages.merge violation['expense_warning'] if violation['expense_warning'].present?
-        warning_messages.merge violation['expense_warning'] if violation['expense_warning'].present?
+        warning_messages.concat violation[:expense_warning] if violation[:expense_warning].present?
+        warning_messages.concat violation[:budget_warning] if violation[:budget_warning].present?
+        warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
+        warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
       end
       if warning_messages.size > 0
-        warning_messages.uniq
+        warning_messages.uniq!
         Formatter.remove_blanks warning_messages
       end
       warning_messages
