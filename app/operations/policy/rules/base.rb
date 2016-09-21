@@ -4,10 +4,13 @@ class Policy::Rules::Base < Policy::Base
   attr_accessor :rule_params, :rule
 
   class Policy::Rules::Base::RulePresenter < Policy::Base::PolicyPresenter
-    attr_accessor :rule
+    attr_accessor :rule, :policy, :expense_rules, :budget_rules
 
     def init
       self.rule = params[:rule]
+      self.policy = params[:policy]
+      self.expense_rules = policy.expense_rules
+      self.budget_rules = policy.budget_rules
     end
   end
 
@@ -40,7 +43,7 @@ class Policy::Rules::Base < Policy::Base
   end
 
   def success
-    Policy::Rules::Base::RulePresenter.new(user, {rule: rule}, messages)
+    Policy::Rules::Base::RulePresenter.new(user, {rule: rule, policy: policy}, messages)
   end
 
 end
