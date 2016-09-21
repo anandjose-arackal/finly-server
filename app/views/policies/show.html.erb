@@ -75,7 +75,7 @@
 
 <% if current_user.policy_admin?(@result.policy) or current_user.admin? %>
 
-<form data-turboboost hidden="hidden" id="removeUsersFromPolicy" action="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>" method="post">
+<form data-remote="true" hidden="hidden" id="removeUsersFromPolicy" action="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>" method="post">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
   <input id="removeUserIds" name="user_id" type="text">
 </form>

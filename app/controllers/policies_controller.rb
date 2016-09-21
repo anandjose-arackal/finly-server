@@ -92,7 +92,10 @@ class PoliciesController < ApplicationController
     if @result.success?
       @result = Policy::Show.new(current_user, params).run
       flash[:success] = "Configuration updated"
-      redirect_to request.referrer
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:danger] = update_configuration_op.messages[:error]
       # render flash message
