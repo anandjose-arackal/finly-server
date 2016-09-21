@@ -6,16 +6,22 @@ class RulesController < ApplicationController
     @result = Policy::Rules::Create.(current_user, params)
     if @result.success?
       flash[:success] = "Rule created!"
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash.now[:error] = @result.messages[:error]
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
   end
 
   def destroy
     @result = Policy::Rules::Destroy.new(current_user, params)
     if @result.success?
       flash[:success] = "Rule destroyed."
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash.now[:error] = @result.messages[:error]
     end

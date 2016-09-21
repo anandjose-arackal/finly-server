@@ -183,10 +183,10 @@
           <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
         {{else}}
           {{#ifCond this.violations.warning_present '||' this.violations.blocking_present}}
-            {{#if this.violations.warning_present}}
-              <div class="row" style="padding: 3px 10px; background: #FCF8E3;">
-            {{else}}
+            {{#if ../this.violations.blocking_present}}
               <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
+            {{else}}
+              <div class="row" style="padding: 3px 10px; background: #FCF8E3;">
             {{/if}}
           {{else}}
             <div class="row" style="padding: 3px 10px;">
