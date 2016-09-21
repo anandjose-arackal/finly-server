@@ -16,7 +16,7 @@ class RulesController < ApplicationController
   end
 
   def destroy
-    @result = Policy::Rules::Destroy.new(current_user, params)
+    @result = Policy::Rules::Destroy.(current_user, params)
     if @result.success?
       flash[:success] = "Rule destroyed."
       respond_to do |format|
