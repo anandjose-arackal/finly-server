@@ -20,6 +20,5 @@ class ExportController < ApplicationController
       }
     end
   end
-  
 
 end
