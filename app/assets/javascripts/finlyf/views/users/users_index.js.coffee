@@ -242,6 +242,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       $(target).closest('.conditional-container').find('.conditional-managers').slideDown('fast')
     else
       $(target).closest('.conditional-container').find('.conditional-managers').slideUp('fast')
+      $(target).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
 
   resetPageCount: (options) ->
     if options.target

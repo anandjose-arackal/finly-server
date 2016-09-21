@@ -14,7 +14,7 @@
         </div>
 
         <div class="col-sm-8">
-          <input name="pending_invite[email]" class="form-control" placeholder="example@company.com, two@asa.com" type="text">
+          <input name="pending_invite[email]" class="form-control" placeholder="name@email.com" type="text">
           <textarea class="form-control" name="pending_invite[note]" placeholder="Add a note (optional)"></textarea>    
         </div>
       </div>
@@ -53,7 +53,7 @@
         <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
           <div class="col-sm-4"><label class="control-label">Approves Reports To?</label></div>
           <div class="col-sm-8">
-            <select class="form-control invitee-managed-by" name="pending_invite[team_mapping_attributes][approves_to_id]">
+            <select class="form-control invitee-managed-by select-conditional-manager" name="pending_invite[team_mapping_attributes][approves_to_id]">
               <option value="">None</option>
               {{#each item.team_managers}}
                 <option value="{{this.id}}">{{this.name}}</option>
@@ -82,7 +82,7 @@
         <div class="col-sm-12 no-padding conditional-managers" style="display: none;">
           <div class="col-sm-4"><label class="control-label">Approves Finance Reports To?</label></div>
           <div class="col-sm-8">
-            <select class="form-control invitee-finance-managed-by" name="pending_invite[team_mapping_attributes][approves_finance_to_id]">
+            <select class="form-control invitee-finance-managed-by select-conditional-manager" name="pending_invite[team_mapping_attributes][approves_finance_to_id]">
               <option value="">None</option>
               {{#each item.team_finance_managers}}
                 <option value="{{this.id}}">{{this.name}}</option>
@@ -97,7 +97,7 @@
       <div class="row">
         <div class="col-sm-4"><label class="control-label">Managed By:</label></div>
         <div class="col-sm-8">
-          <select class="form-control invitee-managed-by">
+          <select class="form-control invitee-managed-by" name="pending_invite[team_mapping_attributes][manager_id]">
             <option value="">None</option>
             {{#each item.team_managers}}
               <option value="{{this.id}}">{{this.name}}</option>
@@ -109,7 +109,7 @@
       <div class="row">
         <div class="col-sm-4"><label class="control-label">Finance Managed By:</label></div>
         <div class="col-sm-8">
-          <select class="form-control invitee-finance-managed-by">
+          <select class="form-control invitee-finance-managed-by" name="pending_invite[team_mapping_attributes][finance_manager_id]">
             <option value="">None</option>
             {{#each item.team_finance_managers}}
               <option value="{{this.id}}">{{this.name}}</option>
@@ -125,7 +125,7 @@
         <div class="col-sm-8">
           <select class="form-control" name="pending_invite[policy_id]">
             <option value="">None</option>
-            {{#each item.company_policies}}
+            {{#each item.team_policies}}
               <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
           </select>

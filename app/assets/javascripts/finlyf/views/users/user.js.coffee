@@ -157,8 +157,8 @@ class FinlyF.Views.User extends Backbone.View
       condition_serial: Math.max.apply(Math,arr) + 1
       policy_id: $(target).attr('data-policy-id')
       manager_type: $(target).attr('data-manager-type')
-      managers: _this.model.get('company_managers')
-      finance_managers: _this.model.get('company_finance_managers')
+      managers: _this.model.get('team_managers')
+      finance_managers: _this.model.get('team_finance_managers')
     }
 
     # console.log item
