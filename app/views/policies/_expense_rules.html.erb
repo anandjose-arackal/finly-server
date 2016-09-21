@@ -15,23 +15,25 @@
       <% @result.policy.expense_rules.each do |rule| %>
         <% if rule.rule_type_id == 1 %>
               <!-- deleting a particular rule or warning -->
-              <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-              <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="expense_rule<%= rule.id %>"
-                    action="<%= policy_remove_rule_path(@result.policy) %>" method="post">
-
-                <input name="_method" type="hidden" value="delete"/>
-                <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                <input name="expense_rule_id" type="hidden" value="<%=rule.id%>">
-              </form>
-              <% end %>
 
               <div style="margin-bottom: 15px" class="row">
                 <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
                 <span class="col-md-10"><%= rule_in_words rule%></span>
 
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                <i onclick="$('form#expense_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy), :html => { :method => :delete, :remote => true } do |f| %>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                    <input name="expense_rule_id" type="hidden" value="<%=rule.id%>">
+                    <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
+                      <i class="fa fa-times" role="button"></i>
+                    <% end %>
+                  <% end %>  
                 <% end %>
+
+
+
+
+                
 
               </div>
         <% end %>
@@ -61,22 +63,17 @@
       <% @result.policy.expense_rules.each do |rule| %>
           <% if rule.rule_type_id == 2 %>
               <!-- deleting a particular rule or warning -->
-
-              <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-              <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="expense_rule<%= rule.id %>"
-                    action="<%= policy_remove_rule_path(@result.policy) %>" method="post">
-
-                <input name="_method" type="hidden" value="delete"/>
-                <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                <input name="expense_rule_id" type="hidden" value="<%=rule.id%>">
-              </form>
-              <% end %>
-
               <div style="margin-bottom: 15px" class="row">
                 <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
                 <span class="col-md-10"><%= rule_in_words rule%></span>
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                <i onclick="$('form#expense_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy), :html => { :method => :delete, :remote => true } do |f| %>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                    <input name="expense_rule_id" type="hidden" value="<%=rule.id%>">
+                    <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
+                      <i class="fa fa-times" role="button"></i>
+                    <% end %>
+                  <% end %>  
                 <% end %>
               </div>
           <% end %>

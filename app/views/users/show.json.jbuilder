@@ -7,6 +7,12 @@ json.role do
   json.admin @result.roles[:admin]
   json.manager @result.roles[:manager]
   json.finance_manager @result.roles[:finance_manager]
+  json.editable do
+    admin = @result.user.company_admin?
+    json.admin admin
+    json.manager (admin or @result.user.manager?)
+    json.finance_manager (admin or @result.user.finance_manager?)
+  end
 end
 json.mapping @result.mapping.each do |mapping|
   json.company_default mapping[:company_default]
