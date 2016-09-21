@@ -32,7 +32,7 @@ class Report::MarkAsReimbursed < Report::Base
 
   def post_process
     if success?
-      report.comments.create user: user, report_comment_action_id: ReportCommentAction.report_reimbursed_id
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reimbursed)
     end
   end
 end

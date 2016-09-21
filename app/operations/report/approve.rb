@@ -72,9 +72,9 @@ class Report::Approve < Report::Base
   def post_process
     if success?
       if auto_approve
-        comment = report.comments.build report_comment_action_id: ReportCommentAction.report_auto_approve_id
+        comment = report.comments.build report_comment_action_id: ReportCommentAction.id_for(:report_auto_approve)
       else
-        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_approve_id
+        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_approve)
       end
       comment.save
 
@@ -86,14 +86,14 @@ class Report::Approve < Report::Base
       # if report is closed, add the relevant comment
       if report.closed?
         # Add comments stating report has been closed as no reimbursements required
-        comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.report_closed_id
+        comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.id_for(:report_closed)
         comment.save
       end
       # Send notifications
       # todo - top level constant error here
       Event::EReport::Approve.(self.user, report: self.report)
 
-      messages[:success] << "Report approved!"
+      messages[:success] << 'Report approved!'
     end
   end
 

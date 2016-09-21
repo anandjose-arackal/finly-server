@@ -36,7 +36,7 @@ class Report::TakeControl < Report::Base
 
   def post_process
     if success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_take_control_id, content: params[:memo]
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_take_control), content: params[:memo]
       comment.save
     end
     Event::EReport::TakeControl.(self.user, report: self.report)

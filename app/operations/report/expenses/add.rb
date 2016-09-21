@@ -72,7 +72,7 @@ class Report::Expenses::Add < Report::Base
     if success?
       if report.retracted?
         expenses.each do |expense|
-          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_add_id, expense_id: expense.id
+          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense_id: expense.id
           comment.save
         end
       end
