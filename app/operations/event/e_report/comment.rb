@@ -1,4 +1,4 @@
-class Event::Report::Comment < Event::Report::Base
+class Event::EReport::EComment < Event::EReport::Base
   attr_accessor :comment
 
   def init

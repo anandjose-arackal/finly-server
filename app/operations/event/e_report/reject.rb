@@ -1,4 +1,4 @@
-class Event::Report::Reject < Event::Report::Base
+class Event::EReport::Reject < Event::EReport::Base
   attr_accessor :rejecting_user
 
   def init

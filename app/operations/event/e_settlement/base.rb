@@ -1,4 +1,4 @@
-class Event::Settlement::Base < Event::SetNotification
+class Event::ESettlement::Base < Event::SetNotification
   attr_accessor :payment
 
   def pre_validate
@@ -26,7 +26,7 @@ class Event::Settlement::Base < Event::SetNotification
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
     return unless subject.present? and body.present?
-    SettlementMailer.send_mail Event::Settlement::Base::MailerPresenter.new(user, payment, subject, body, button_name)
+    SettlementMailer.send_mail Event::ESettlement::Base::MailerPresenter.new(user, payment, subject, body, button_name)
   end
 
   def mailer_subject(user)
@@ -38,7 +38,7 @@ class Event::Settlement::Base < Event::SetNotification
   def mailer_button_name(user)
   end
 
-  class Event::Settlement::Base::MailerPresenter < Event::SetNotification::MailerPresenter
+  class Event::ESettlement::Base::MailerPresenter < Event::SetNotification::MailerPresenter
     attr_accessor :payment, :user, :body_val, :subject_val, :button_val
 
     def initialize(user, payment, subject, body, button_name)

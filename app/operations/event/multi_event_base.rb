@@ -19,7 +19,7 @@ class Event::MultiEventBase < Event::Base
 
   # Pass the class names of the events to be triggered
   def events
-    # [Event::Report::Submit::SetNotification, Event::Report::Submit::Logger]
+    # [Event::EReport::Submit::SetNotification, Event::EReport::Submit::Logger]
   end
 
 end

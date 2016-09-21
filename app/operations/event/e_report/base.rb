@@ -1,4 +1,4 @@
-class Event::Report::Base < Event::SetNotification
+class Event::EReport::Base < Event::SetNotification
   attr_accessor :report
 
   def pre_validate
@@ -28,7 +28,7 @@ class Event::Report::Base < Event::SetNotification
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
     return unless subject.present? and body.present?
-    ReportMailer.send_mail(Event::Report::Base::MailerPresenter.new(user, report, subject, body, button_name))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(user, report, subject, body, button_name))
   end
 
   def mailer_subject(user)
@@ -46,7 +46,7 @@ class Event::Report::Base < Event::SetNotification
     end
   end
 
-  class Event::Report::Base::MailerPresenter < Event::SetNotification::MailerPresenter
+  class Event::EReport::Base::MailerPresenter < Event::SetNotification::MailerPresenter
     attr_accessor :report, :user, :body_val, :subject_val, :button_val
 
     def initialize(user, report, subject, body, button_name)
