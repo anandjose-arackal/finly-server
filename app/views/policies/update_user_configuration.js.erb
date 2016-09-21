@@ -1,3 +1,2 @@
-<%= render 'shared/flash_message' %>
 $('#policyMemberSettings').modal('hide');
-$('#policyMembersDiv').replaceWith("<%= j render partial: 'policy_members' %>");
+$('#policyMembersDiv').html("<%= j render partial: 'policy_members' %>");
