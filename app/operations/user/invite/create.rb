@@ -9,16 +9,21 @@
 
 class User::Invite::Create < User::Invite::Base
 
-  attr_accessor :invited_user
+  attr_accessor :invited_user, :emails
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "No user or param passed."
+      messages[:error] << 'No user or param passed'
     end
   end
 
   def init
     self.invite_params = create_invite_params
+    self.emails = invite_params[:email].split(',').collect(&:strip) rescue nil
+    if self.emails.present?
+      self.emails.compact!
+      self.emails.uniq!
+    end
   end
 
   def validate
@@ -32,13 +37,26 @@ class User::Invite::Create < User::Invite::Base
       return false
     end
 
-    if invite_params[:email].blank?
+    if self.emails.blank?
       messages[:error] << 'User email is required for inviting users'
       return false
     end
 
-    if User.find_by_email(invite_params[:email]).present?
-      messages[:error] << 'Cannot invite an existing user'
+    violating_emails = []
+    self.emails.each do |email|
+      if (email =~ Constants::VALID_EMAIL_FORMAT).nil?
+        messages[:error] = "#{email} is not a valid email format"
+        return false
+      end
+      if User.find_by_email(email).present?
+        violating_emails << email
+      end
+    end
+    if violating_emails.present?
+      messages[:error] << "User already invited: #{violating_emails.to_sentence}"
+      return false
+    end
+    if has_errors?
       return false
     end
 
@@ -129,11 +147,15 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def process
-    self.invited_user = User.invite!(invite_params, self.user) do |u|
-      # u.skip_invitation = true
+    emails.each do |email|
+      invite_params[:email] = email
+      self.invited_user = User.invite!(invite_params, self.user) do |u|
+        # u.skip_invitation = true
+      end
     end
+
     unless invited_user
-      messages[:error] << "Invite failed. Try again!"
+      messages[:error] << 'Invite failed. Try again!'
     end
   end
 
@@ -143,11 +165,11 @@ class User::Invite::Create < User::Invite::Base
       @policy = Policy.find_by(id: @policy_id)
       if @policy
         unless Policy::Users::AddUser.new(user, {policy_id: @policy.id, added_user_id: invited_user.id})
-          messages[:error] << "User could not be added to policy."
+          messages[:error] << 'User could not be added to policy'
           return false
         end
       end
-      messages[:success] << "User successdully invited."
+      messages[:success] << 'User successfully invited'
     end
   end
 
