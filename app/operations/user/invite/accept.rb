@@ -12,7 +12,7 @@ class User::Invite::Accept < User::Invite::Base
     super(nil, params)
   end
 
-  def initialize(params)
+  def initialize(user, params)
     super(nil, params)
   end
 

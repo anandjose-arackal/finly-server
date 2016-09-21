@@ -9,7 +9,7 @@
 
 class User::Invite::Create < User::Invite::Base
 
-  attr_accessor :new_user
+  attr_accessor :invited_user
 
   def pre_validate
     if params.blank? or user.blank?
@@ -129,10 +129,10 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def process
-    self.new_user = User.invite!(invite_params, self.user) do |u|
+    self.invited_user = User.invite!(invite_params, self.user) do |u|
       # u.skip_invitation = true
     end
-    unless new_user
+    unless invited_user
       messages[:error] << "Invite failed. Try again!"
     end
   end
@@ -142,7 +142,7 @@ class User::Invite::Create < User::Invite::Base
     if success?
       @policy = Policy.find_by(id: @policy_id)
       if @policy
-        unless Policy::Users::AddUser.new(user, {policy_id: @policy.id, added_user_id: new_user.id})
+        unless Policy::Users::AddUser.new(user, {policy_id: @policy.id, added_user_id: invited_user.id})
           messages[:error] << "User could not be added to policy."
           return false
         end

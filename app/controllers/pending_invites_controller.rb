@@ -2,6 +2,12 @@ class PendingInvitesController < ApplicationController
 
   before_action :authenticate_user!
 
+
+  def edit
+    @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+  end
+
+
   def create
     @result = User::Invite::Create.(current_user, params)
     if @result.present? and @result.success?

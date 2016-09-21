@@ -3,6 +3,7 @@
 #                              Prefix Verb   URI Pattern                                                 Controller#Action
 # api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
 #       api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                    api/v1/configuration#category
+#                     email_processor POST   /email/incoming(.:format)                                   griddler/emails#create
 #                           oauth_new GET    /oauth/new(.:format)                                        oauth/auth#new
 #                     oauth_authorize POST   /oauth/authorize(.:format)                                  opro/oauth/auth#create
 #                         oauth_token POST   /oauth/token(.:format)                                      oauth/token#create {:format=>"json"}
@@ -85,6 +86,7 @@
 #                      api_v1_receipt PATCH  /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
 #                                     PUT    /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
 #                                     DELETE /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
+#             api_v1_receipt_add_note POST   /api/v1/receipts/:receipt_id/add_note(.:format)             api/v1/receipts#add_note
 # api_v1_receipt_expense_from_receipt POST   /api/v1/receipts/:receipt_id/expense_from_receipt(.:format) api/v1/receipts#expense_from_receipt
 #                                     GET    /api/v1/receipts(.:format)                                  api/v1/receipts#index
 #                                     POST   /api/v1/receipts(.:format)                                  api/v1/receipts#create
@@ -195,21 +197,27 @@
 #                                     DELETE /receipts/:id(.:format)                                     receipts#destroy
 #                expense_from_receipt POST   /expense_from_receipt(.:format)                             receipts#expense_from_receipt
 #                  users_get_managers GET    /users/get_managers(.:format)                               users#get_managers
+#                               users GET    /users(.:format)                                            users#index
+#                                     POST   /users(.:format)                                            users#create
+#                                user GET    /users/:id(.:format)                                        users#show
+#                                     PATCH  /users/:id(.:format)                                        users#update
+#                                     PUT    /users/:id(.:format)                                        users#update
+#                                     DELETE /users/:id(.:format)                                        users#destroy
 #                        user_details POST   /users/:user_id/user_details(.:format)                      users#user_details
 #                    user_update_team PATCH  /users/:user_id/update_user_team(.:format)                  users#update_team
 #                    user_update_role PATCH  /users/:user_id/update_role(.:format)                       users#update_user_role
 #                        user_profile GET    /users/:user_id/profile(.:format)                           users#profile
 #                user_update_password POST   /users/:user_id/update_password(.:format)                   users#update_password
-#                    user_mass_import GET    /users/:user_id/mass_import(.:format)                       users#mass_import
-#                         user_import POST   /users/:user_id/import(.:format)                            users#import
-#                               users GET    /users(.:format)                                            users#index
+#                                     GET    /users(.:format)                                            users#index
 #                                     POST   /users(.:format)                                            users#create
 #                            new_user GET    /users/new(.:format)                                        users#new
 #                           edit_user GET    /users/:id/edit(.:format)                                   users#edit
-#                                user GET    /users/:id(.:format)                                        users#show
+#                                     GET    /users/:id(.:format)                                        users#show
 #                                     PATCH  /users/:id(.:format)                                        users#update
 #                                     PUT    /users/:id(.:format)                                        users#update
 #                                     DELETE /users/:id(.:format)                                        users#destroy
+#                         mass_import GET    /mass_import(.:format)                                      users#mass_import
+#                         user_import POST   /import(.:format)                                           users#import
 #                     pending_invites POST   /pending_invites(.:format)                                  pending_invites#create
 #                      pending_invite PATCH  /pending_invites/:id(.:format)                              pending_invites#update
 #                                     PUT    /pending_invites/:id(.:format)                              pending_invites#update
