@@ -95,13 +95,13 @@
     <div class="item-receipt item-attr-edit text-center">
       <label for="expense-receipt-upload">
         {{#if item.receipts}}
-          <img class="preview-image img-responsive" id="preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+          <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         {{else}}
-          <img class="preview-image img-responsive" id="preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+          <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         {{/if}}
 
       </label>
-      <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .pdf, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
+      <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .pdf, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('edit-preview-image').src = window.URL.createObjectURL(this.files[0])" />
     </div>
     
   </div>

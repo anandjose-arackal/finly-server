@@ -8,7 +8,7 @@ admin:
       - Company Reports: reports
     cog:
       - Organization Account: '/organization_account?view=admin'
-      - Policies: '/policies'
+      # - Policies: '/policies'
       # - My Account: '/users/'
       # - Expense Policies: '/policies?view=admin'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'

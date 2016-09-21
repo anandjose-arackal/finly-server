@@ -98,11 +98,13 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       $(@el).find('.load-more').css('display', 'inline')
 
   processItems: ->
+    _this = @
     #Append all the reports
     @dump = @collection.models.slice()
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
-    @collection.each(@appendItems, @)
+    # @collection.each(@appendItems, @)
+    _.each(_this.collection.models, _this.appendItems, _this)
 
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
@@ -110,9 +112,11 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       $(spinner).removeClass("fa-spin")
 
   appendItems: (item) ->
+    # console.log "appending"
     #Creating view for each report and appending them
     view_item = new FinlyF.Views.Report({ model: item })
     $(@el).find("#items").append(view_item.render().el)
+    # console.log view_item.el
 
   refetchCollection: (e) ->
     #REFRESH
@@ -127,6 +131,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        console.log _this.collection.models[0].toJSON()
         _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
@@ -197,6 +202,8 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     if (typeof attr != typeof undefined && attr != false)
       # alert("Data refresh is true")
       # @filter()
+      # @collection.reset()
+
       @refetchCollection()
       $(target).removeAttr('data-refresh-true') 
     
@@ -261,7 +268,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       # 'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      'filter_user': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
