@@ -55,7 +55,7 @@ class UserManagerMapping < ActiveRecord::Base
     else
       item = joins(:greater_than_amount).where('value <= ? AND currency_id = ?', value, currency_id).order('value DESC').limit(1)
       if item.present?
-        item.first
+        item
       else
         self.default
       end

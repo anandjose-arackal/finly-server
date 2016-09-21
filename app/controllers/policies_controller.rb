@@ -26,7 +26,6 @@ class PoliciesController < ApplicationController
   def destroy
     destroy_op = Policy::Destroy.new(current_user, params)
     @result = destroy_op.run
-    debugger
     if @result.success?
       flash.now[:success] = "Policy destroyed."
       respond_to do |format|
