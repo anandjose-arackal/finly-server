@@ -27,8 +27,13 @@ class PolicyUserService < BaseService
 
     # Add user configuration
     user.team_mapping.policy(nil).each do |item|
-      cloned_item = item.dup
+      cloned_item = item.deep_clone
       cloned_item.policy_id = self.policy.id
+      if cloned_item.greater_than_amount.present?
+        amount = cloned_item.greater_than_amount.deep_clone
+        amount.save
+        cloned_item.greater_than_amount = amount
+      end
       cloned_item.save
     end
     true
@@ -51,10 +56,10 @@ class PolicyUserService < BaseService
 
       # Add user configuration
       user.team_mapping.policy(nil).each do |item|
-        cloned_item = item.dup
+        cloned_item = item.deep_clone
         cloned_item.policy_id = self.policy.id
         if cloned_item.greater_than_amount.present?
-          amount = cloned_item.greater_than_amount.dup
+          amount = cloned_item.greater_than_amount.deep_clone
           amount.save
           cloned_item.greater_than_amount = amount
         end
