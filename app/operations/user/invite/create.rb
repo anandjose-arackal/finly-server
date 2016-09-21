@@ -45,7 +45,7 @@ class User::Invite::Create < User::Invite::Base
     violating_emails = []
     self.emails.each do |email|
       if (email =~ Constants::VALID_EMAIL_FORMAT).nil?
-        messages[:error] = "#{email} is not a valid email format"
+        messages[:error] << "#{email} is not a valid email format"
         return false
       end
       if User.find_by_email(email).present?
