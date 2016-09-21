@@ -106,12 +106,11 @@
       </div>
       <div class="modal-body" style="padding: 0 35px 35px 35px">
 
-        <form data-turboboost name="submitNewRuleForm" action="<%= policy_add_rule_path(@result.policy, view: params[:view]) %>" method="post">
+        <form data-remote="true" name="submitNewRuleForm" action="<%= policy_add_rule_path(@result.policy, view: params[:view]) %>" method="post">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-          <h5>Set budget...</h5>
 
-          <h5>For the Category... <span>[OPTIONAL]</span></h5>
+          <h5>For the Category:</h5>
 
           <div id="categoriesBudget">
             <input type="radio" name="budget_rule[category_id]" value="">All <br>
@@ -120,14 +119,14 @@
               <% end %>
           </div>
 
-          <h5>Budget Amount is... <span>[OPTIONAL]</span></h5>
+          <h5>Budget Amount is:</h5>
 
           <input name="budget_rule[amount_attributes[value]]" type="text" placeholder="0.00">
 
           <input name="budget_rule[amount_attributes[currency_id]]" value="1" type="hidden" placeholder="0.00">
 
           <div id="newRulePeriod">
-            <h5>Per... <span>[OPTIONAL]</span></h5>
+            <h5>Per:</h5>
             <input type="radio" name="budget_rule[budget_period_id]" value="1">Day <br>
             <input type="radio" name="budget_rule[budget_period_id]" value="2">Week<br>
             <input type="radio" name="budget_rule[budget_period_id]" value="3">Month<br>

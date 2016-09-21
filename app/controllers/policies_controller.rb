@@ -61,7 +61,10 @@ class PoliciesController < ApplicationController
     add_user_op = Policy::Users::AddUser.new(current_user, params)
     if add_user_op.run
       flash[:success] = "User successfully addded"
-      redirect_to request.referrer
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:danger] = add_user_op.messages[:error]
       # render error message
@@ -72,7 +75,10 @@ class PoliciesController < ApplicationController
     remove_user_op = Policy::Users::RemoveUser.new(current_user, params)
     if remove_user_op.run
       flash[:success] = "User successfully removed"
-      redirect_to request.referrer
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:danger] = remove_user_op.messages[:error]
       # render error message
