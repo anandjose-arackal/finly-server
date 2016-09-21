@@ -14,4 +14,4 @@ end
 
 json.violations @result.violation
 
-json.editable (@result.expense.report_id.present? and @result.expense.report.editable?)
+json.editable (@result.expense.report_id.blank? or @result.expense.report.editable?)

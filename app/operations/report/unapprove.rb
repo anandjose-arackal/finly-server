@@ -51,7 +51,7 @@ class Report::Unapprove < Report::Base
   end
 
   def post_process
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.report_unapprove_id
+    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_unapprove)
     # Recalculate settlement when report is unapproved from an approved/closed state
     if prev_status.approved? or prev_status.closed?
       Settlement::Report::Unapproved.(user, report: report)

@@ -1,7 +1,7 @@
 # updating the expense from user's expenses view.
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
-class Expense::Card::Update < Expense::Card::Base
+class Expense::ExCard::Update < Expense::ExCard::Base
   attr_accessor :updated_expense_params
 
   def pre_validate

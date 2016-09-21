@@ -48,10 +48,11 @@ class Report::Retract < Report::Base
 
   def post_process
     if success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.report_retract_id
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
       comment.save
       # mailers here
     end
+    messages[:success] << 'Report retracted!'
   end
 
 end

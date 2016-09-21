@@ -41,7 +41,7 @@ class API::CardTransaction::Create < CardTransaction::Base
 
   # calling the card expense class to create a card expense based on these details
   def post_process
-    card_expense_create = Expense::Card::Create.new(card_transaction, card)
+    card_expense_create = Expense::ExCard::Create.new(card_transaction, card)
     unless card_expense_create.run
       messages[:error] << "Card expense not created."
     end

@@ -1,4 +1,4 @@
-class Event::Report::TakeControl < Event::Report::Base
+class Event::EReport::TakeControl < Event::EReport::Base
 
   def event_id
     Event.report_take_control_id

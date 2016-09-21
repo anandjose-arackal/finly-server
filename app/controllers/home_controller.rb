@@ -8,6 +8,9 @@ class HomeController < ApplicationController
   end
 
   def welcome
+    if logged_in?
+      redirect_to root_path
+    end
   end
 
   def about

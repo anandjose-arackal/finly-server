@@ -1,4 +1,4 @@
-class Event::Report::Submit < Event::Report::Base
+class Event::EReport::Submit < Event::EReport::Base
 
   def event_id
     Event.report_submit_id

@@ -1,4 +1,4 @@
-class Event::Settlement::AddAdvance < Event::Settlement::Base
+class Event::ESettlement::AddAdvance < Event::ESettlement::Base
 
   def event_id
     Event.settlement_add_advance_id

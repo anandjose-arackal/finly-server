@@ -1,4 +1,4 @@
-class Event::Report::Approve < Event::Report::Base
+class Event::EReport::Approve < Event::EReport::Base
   attr_accessor :approved, :approving_user
 
   def init
