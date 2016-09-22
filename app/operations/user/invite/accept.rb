@@ -35,7 +35,7 @@ class User::Invite::Accept < User::Invite::Base
     name = accept_params[:name]
     mobile_number = accept_params[:mobile_number]
     password = accept_params[:password]
-    password_confirmation = accept_params[:password]
+    password_confirmation = accept_params[:password_confirmation]
     if invitation_token.blank?
       messages[:error] << 'Invite not found'
       return
