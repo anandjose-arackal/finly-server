@@ -46,7 +46,6 @@ class PendingInvitesController < ApplicationController
 
   def accept
     @result = User::Invite::Accept.(params)
-    debugger
     if @result.present? and @result.success?
       # sign_in @result.accepted_user, :bypass => true
       bypass_sign_in(@result.accepted_user)
