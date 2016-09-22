@@ -31,21 +31,21 @@ class User::Team::GetManagers < User::Team::Base
     self.team = User::Team::Index.new(user, params).run
     self.team_admins = []
     if role_id == UserRole.manager_id
-      self.team_managers = team.with_roles.only_managers
+      self.team_managers = team.signed_up.with_roles.only_managers
       self.team_managers << user
       self.team_policies = user.admin_policies
     else
-      self.team_managers = company.managers
+      self.team_managers = company.managers.signed_up
     end
     if role_id == UserRole.finance_manager_id
-      self.team_finance_managers = team.with_roles.only_finance_managers
+      self.team_finance_managers = team.signed_up.with_roles.only_finance_managers
       self.team_finance_managers << user
       self.team_policies = user.admin_policies
     else
-      self.team_finance_managers = company.finance_managers
+      self.team_finance_managers = company.finance_managers.signed_up
     end
     if role_id == UserRole.admin_id
-      self.team_admins = company.admins
+      self.team_admins = company.admins.signed_up
       self.team_policies = company.policies
     end
   end
