@@ -259,8 +259,17 @@ GEM
     responders (2.2.0)
       railties (>= 4.2.0, < 5.1)
     rmagick (2.16.0)
+    roo (2.5.1)
+      nokogiri (~> 1)
+      rubyzip (~> 1.1, < 2.0.0)
+    roo-xls (1.0.0)
+      nokogiri
+      roo (>= 2.0.0beta1, < 3)
+      spreadsheet (> 0.9.0)
     ruby-graphviz (1.2.2)
+    ruby-ole (1.2.12)
     ruby_http_client (3.0.0)
+    rubyzip (1.2.0)
     sass (3.4.22)
     sass-rails (5.0.6)
       railties (>= 4.0.0, < 6)
@@ -282,6 +291,8 @@ GEM
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
+    spreadsheet (1.1.3)
+      ruby-ole (>= 1.0)
     sprockets (3.7.0)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -362,6 +373,8 @@ DEPENDENCIES
   remotipart (~> 1.0)
   require_all
   rmagick
+  roo
+  roo-xls
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   sendgrid-ruby
