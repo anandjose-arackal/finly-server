@@ -3,9 +3,6 @@ class PoliciesController < ApplicationController
 
   before_action :authenticate_user!
 
-  has_scope :filter_name
-  has_scope :filter_email
-
   def create
     create_policy_op = Policy::Create.new(current_user, params)
     @result = create_policy_op.run

@@ -219,6 +219,14 @@ class User < ActiveRecord::Base
     !self.invitation_token
   end
 
+  def active_for_authentication?
+    super && self.active # i.e. super && self.is_active
+  end
+
+  def inactive_message
+    "Sorry, this account has been deactivated."
+  end
+
   # activates the user in devise
   def activate
     self.confirm

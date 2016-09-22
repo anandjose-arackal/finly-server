@@ -74,6 +74,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       next if map.blank?
       id = map[:mapping_id]
       updated_params = map[:mapping]
+      updated_params[:policy_id] = params[:policy_id]
       if id.present?
         updating_map = self.mappings.with_id(id).first rescue nil
         if updating_map.blank?

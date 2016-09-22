@@ -38,5 +38,4 @@ class Superadmin::CompaniesController < ApplicationController
     @companies = Company.all
   end
 
-
 end

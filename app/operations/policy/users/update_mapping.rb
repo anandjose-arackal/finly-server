@@ -75,34 +75,34 @@ class Policy::Users::UpdateMapping < Policy::Base
   end
 
   private
+
   def set_update_parameters
     self.user_manager_mappings = {}
     user_manager_mappings[:default] = {}
     user_manager_mappings[:default][:mapping] = policy_params[:default].except(:mapping_id)
     user_manager_mappings[:default][:mapping_id] = policy_params[:default][:mapping_id]
-    if policy_params[:conditional_manager]
+    if policy_params[:conditional_manager] and policy_params[:conditional_manager][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_manager] = {}
       user_manager_mappings[:conditional_manager][:mapping] = policy_params[:conditional_manager].except(:mapping_id)
       user_manager_mappings[:conditional_manager][:mapping_id] = policy_params[:conditional_manager][:mapping_id]
     end
-    if policy_params[:conditional_finance_manager]
+    if policy_params[:conditional_finance_manager] and policy_params[:conditional_finance_manager][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_finance_manager] = {}
       user_manager_mappings[:conditional_finance_manager][:mapping] = policy_params[:conditional_finance_manager].except(:mapping_id)
       user_manager_mappings[:conditional_finance_manager][:mapping_id] = policy_params[:conditional_finance_manager][:mapping_id]
     end
-    if policy_params[:conditional_approves_to]
+    if policy_params[:conditional_approves_to] and policy_params[:conditional_approves_to][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_approves_to] = {}
       user_manager_mappings[:conditional_approves_to][:mapping] = policy_params[:conditional_approves_to].except(:mapping_id)
       user_manager_mappings[:conditional_approves_to][:mapping_id] = policy_params[:conditional_approves_to][:mapping_id]
     end
-    if policy_params[:conditional_approves_finance_to]
+    if policy_params[:conditional_approves_finance_to] and policy_params[:conditional_approves_finance_to][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_approves_finance_to] = {}
       user_manager_mappings[:conditional_approves_finance_to][:mapping] = policy_params[:conditional_approves_finance_to].except(:mapping_id)
       user_manager_mappings[:conditional_approves_finance_to][:mapping_id] = policy_params[:conditional_approves_finance_to][:mapping_id]
     end
     params[:user_manager_mapping] = user_manager_mappings
     params[:user_id] = policy_params[:user_id]
-
   end
 
 end
