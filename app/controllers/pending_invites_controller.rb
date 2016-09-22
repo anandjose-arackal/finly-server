@@ -5,6 +5,9 @@ class PendingInvitesController < ApplicationController
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+    if @pending_user.blank?
+      redirect_to root_url
+    end
   end
 
 
