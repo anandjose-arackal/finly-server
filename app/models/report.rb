@@ -38,7 +38,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
 
-  default_scope { order(report_status_id: :asc,created_at: :desc) }
+  default_scope { order(report_status_id: :asc,submitted_at: :desc,created_at: :desc) }
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
