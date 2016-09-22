@@ -1,6 +1,6 @@
 json.extract! @result.money_request, :id, :name, :note, :status_name, :note, :status_id, :required_by_date
 json.user_name @result.money_request.user.name
-json.user_initial @result.money_request.user.name.split(' ').first[0] + (@result.money_request.user.name.split(' ')[1][0] || @result.money_request.user.name.split(' ').first[1])
+json.user_initial @result.money_request.user.name.split(' ').first[0] + ((@result.money_request.user.name.split(' ')[1][0] rescue nil) || @result.money_request.user.name.split(' ').first[1])
 json.status @result.status
 json.manager_name @result.manager.name rescue nil
 json.finance_manager_name @result.finance_manager.name rescue nil
@@ -29,7 +29,7 @@ json.comments @result.comments do |comment|
   if comment.user.respond_to?(:id, :name)
     json.comment_user_id comment.user.id
     json.comment_user_name comment.user.name
-    json.comment_user_initial comment.user.name.split(' ').first[0] + (comment.user.name.split(' ')[1][0] || comment.user.name.split(' ').first[1])
+    json.comment_user_initial comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) || comment.user.name.split(' ').first[1])
   end
 end
 

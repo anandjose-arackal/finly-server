@@ -1,10 +1,11 @@
 {{!-- item = report --}}
 <div class="col-md-4">
-  <div class="col-sm-2">
-    <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
-  </div>
+  {{!-- <div class="col-sm-2">
+  </div> --}}
+  
+  <input class="select-item" type="hidden" data-item-id="{{item.id}}" />
   <div class="col-sm-5">{{item.date}}</div>
-  <div class="col-sm-5">{{item.name}}</div>
+  <div class="col-sm-7">{{item.name}}</div>
 </div>
 
 <div class="col-md-8">

@@ -1,6 +1,6 @@
 json.extract! @report, :id, :name, :memo, :status_name, :memo
 json.user_name @report.user.name
-json.user_initial @report.user.name.split(' ').first[0] + (@report.user.name.split(' ')[1][0] || @report.user.name.split(' ').first[1])
+json.user_initial @report.user.name.split(' ').first[0] + ((@report.user.name.split(' ')[1][0] rescue nil) || @report.user.name.split(' ').first[1])
 
 
 if @report.policy
