@@ -19,7 +19,7 @@ class Superadmin::CompaniesController < ApplicationController
     else
       flash[:error] = "Failed. Try again"
     end
-    redirect_to request.referrer
+    redirect_to superadmin_companies_path
   end
 
   def add_admin
@@ -31,7 +31,7 @@ class Superadmin::CompaniesController < ApplicationController
     else
       flash[:error] = "Failed. Try again"
     end
-    redirect_to request.referrer
+    redirect_to superadmin_companies_path
   end
 
   def index

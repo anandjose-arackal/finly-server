@@ -5,7 +5,7 @@
     <h3>Company: <%=@company.name%></h3>
     <h3>Add a new admin</h3>
 
-      <form data-remote="true" data-turboboost="true" accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_new_admin_path(@company) %>" method="post">
+      <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_new_admin_path(@company) %>" method="post">
         <input name="utf8" type="hidden" value="&#x2713;"/>
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 

@@ -25,6 +25,7 @@ class Company::Create < Company::Base
   def process
     self.company = Company.create!(company_params)
     self.admin = company.users.build(admin_params)
+    admin.skip_confirmation_notification!
     if company.save && admin.save
       admin.activate
       messages[:success] << "Company created!"

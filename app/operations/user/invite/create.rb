@@ -9,7 +9,7 @@
 
 class User::Invite::Create < User::Invite::Base
 
-  attr_accessor :invited_user, :emails
+  attr_accessor :invited_user, :emails, :policy, :policy_id
 
   def pre_validate
     if params.blank? or user.blank?
@@ -146,7 +146,7 @@ class User::Invite::Create < User::Invite::Base
   def pre_process
     # if the user has a policy during invite, temporarily storing that user's policy to add it separately later
     if invite_params[:policy_id]
-      @policy_id = invite_params[:policy_id]
+      self.policy_id = invite_params[:policy_id]
       invite_params.delete(:policy_id)
     end
   end
@@ -167,9 +167,9 @@ class User::Invite::Create < User::Invite::Base
   def post_process
     # adding the user to the policy after he has been successfully invited
     if success?
-      @policy = Policy.find_by(id: @policy_id)
-      if @policy
-        unless Policy::Users::AddUser.new(user, {policy_id: @policy.id, added_user_id: invited_user.id})
+      self.policy = Policy.find_by(id: policy_id)
+      if policy
+        unless Policy::Users::AddUser.new(user, {policy_id: policy.id, added_user_id: invited_user.id})
           messages[:error] << 'User could not be added to policy'
           return false
         end
