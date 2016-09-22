@@ -1,6 +1,5 @@
-<body style="background-color: #465c8b;padding: 30px 0 30px 0">
 
-<form id="newUserRegistration" action="<%= pending_invite_accept_path(pending_invite_id: @pending_user.id, format: :json) %>" method="post">
+<form id="newUserRegistration" action="<%= pending_invite_accept_path(pending_invite_id: @pending_user.id) %>" method="post" data-remote='true'>
 
   <input name="_method" type="hidden" value="patch">
   <input name="authenticity_token" value="<%= form_authenticity_token%>" type="hidden">
@@ -47,8 +46,6 @@
 
 </form>
 
-</body>
-
 <style>
   label {
     margin-top: 20px;
@@ -78,16 +75,89 @@
     border: 1px solid transparent;
 
   }
-  input[type=password] {
+  input[type=password]{
     height: 32px;
     width: 80%;
     padding: 10px;
   }
 
-
   .topbarContainer{
     display: none;
   }
 
-
 </style>
+
+<script type="text/javascript">
+  snapNotify = function(obj) {
+    var color, container, message, messages, results, type;
+    console.log(obj);
+    results = [];
+    for (type in obj) {
+      messages = obj[type];
+      switch (type) {
+        case 'error':
+          color = 'red';
+          container = 'ohsnap-priority';
+          break;
+        case 'success':
+          color = 'green';
+          container = 'ohsnap';
+          break;
+        case 'failure':
+          ({
+            color: 'orange'
+          });
+          container = 'ohsnap-priority';
+          break;
+        case 'message':
+          ({
+            color: 'blue'
+          });
+          container = 'ohsnap';
+          break;
+        case 'notice':
+          ({
+            color: 'blue'
+          });
+          container = 'ohsnap';
+          break;
+        default:
+          ({
+            color: 'blue'
+          });
+          container = 'ohsnap';
+      }
+      if (messages.length) {
+        results.push((function() {
+          var i, len, results1;
+          results1 = [];
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            results1.push(ohSnap(message, {
+              color: color,
+              'duration': '6000'
+              // 'container-id': container
+            }));
+          }
+          return results1;
+        })());
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  };
+
+  $('#newUserRegistration').submit(function(){
+    $.ajax({
+      url: $('#newUserRegistration').attr('action'),
+      type: 'PATCH',
+      data: $('#newUserRegistration').serialize(),
+      success: function(res){
+        console.log('form submitted.', res);
+        snapNotify(res.messages);
+      }
+    });
+    return false;
+  });
+</script>
