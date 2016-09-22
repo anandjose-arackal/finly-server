@@ -22,7 +22,7 @@ class RulesController < ApplicationController
     if @result.success?
       show_op = Policy::Show.new(current_user, params)
       @result = show_op.run
-      flash[:success] = "Rule destroyed."
+      flash[:success] = "Rule destroyed"
       respond_to do |format|
         format.js {}
       end
@@ -31,7 +31,5 @@ class RulesController < ApplicationController
     end
     # redirect_to request.referrer
   end
-
-
 
 end

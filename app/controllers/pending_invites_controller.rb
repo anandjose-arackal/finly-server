@@ -1,10 +1,10 @@
 class PendingInvitesController < ApplicationController
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:edit, :accept]
 
 
   def edit
-    @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+    @pending_user = User.find_by_invitation_token(params[:id], true)
   end
 
 
@@ -39,6 +39,16 @@ class PendingInvitesController < ApplicationController
     @result = User::Invite::Destroy.(current_user, params)
     if @result.present? and @result.success?
       respond(response: :success)
+    else
+      respond
+    end
+  end
+
+  def accept
+    @result = User::Invite::Accept.(params)
+    if @result.present? and @result.success?
+      sign_in @result.accepted_user, :bypass => true
+      redirect_to root_url
     else
       respond
     end
