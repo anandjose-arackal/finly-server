@@ -41,7 +41,7 @@ class User::Invite::Resend < User::Invite::Base
 
   def process
     unless invited_user.invite!
-      self.messages = self.invited_user.errors.full_messages
+      self.messages[:error] = self.invited_user.errors.full_messages
     end
   end
 

@@ -19,7 +19,7 @@ class DeviseMailer < Devise::Mailer
   end
 
   def invitation_instructions(record, token, opts={})
-
+    UserMailer.invite(record, token)
   end
 
 end

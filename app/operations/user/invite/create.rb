@@ -85,22 +85,23 @@ class User::Invite::Create < User::Invite::Base
 
   def authorize
     # checking if role mapping attributes are compatible
+    admin = user.company_admin?
+    manager = user.manager?
+    finance_manager = user.finance_manager?
     role_mapping = invite_params[:role_mapping_attributes]
-    if user.manager?
-      role_mapping.each do |role|
-        rid = role[:user_role_id]
-        unless rid.present? and (rid == UserRole.manager_id or rid == UserRole.employee_id)
-          messages[:error] << "#{self.user.name} can only invite the user as an employee or manager"
-          return false
-        end
+    role_mapping.each do |role|
+      rid = role[:user_role_id]
+      if rid == UserRole.admin_id and not admin
+        messages[:error] << "#{self.user.name} cannot invite a user as an admin"
+        return false
       end
-    elsif user.finance_manager?
-      role_mapping.each do |role|
-        rid = role[:user_role_id]
-        unless rid.present? and (rid == UserRole.finance_manager_id or rid == UserRole.employee_id)
-          messages[:error] << "#{self.user.name} can only invite the user as an employee or finance manager"
-          return false
-        end
+      if rid == UserRole.manager_id and not (manager or admin)
+        messages[:error] << "#{self.user.name} cannot invite the user as an manager"
+        return false
+      end
+      if rid == UserRole.finance_manager_id and not (finance_manager or admin)
+        messages[:error] << "#{self.user.name} cannot invite the user as an manager"
+        return false
       end
     end
 
@@ -108,9 +109,11 @@ class User::Invite::Create < User::Invite::Base
     team_mapping = invite_params[:team_mapping_attributes]
     if self.user.manager? or self.user.finance_manager?
 
-      default_present = false
-      valid = false
-      if self.user.manager?
+      default_present = admin
+      valid = admin
+
+      if not admin and manager
+        valid = false
         team_mapping.each do |mapping|
           if mapping[:default]
             default_present = true
@@ -120,7 +123,9 @@ class User::Invite::Create < User::Invite::Base
             break
           end
         end
-      elsif self.user.finance_manager?
+      end
+      if not admin and finance_manager
+        valid = false
         team_mapping.each do |mapping|
           if mapping[:default]
             default_present = true

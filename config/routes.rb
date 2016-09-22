@@ -387,7 +387,7 @@ Rails.application.routes.draw do
 
 
 
-  resources :pending_invites, only: [:create, :destroy, :update]
+  resources :pending_invites, only: [:create, :destroy, :update, :edit]
 
 
   get 'settlements/summary' => 'settlements#summary'

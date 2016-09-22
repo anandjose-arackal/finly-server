@@ -35,7 +35,7 @@ class User::Role::Update < BaseOperation
     roles_to_add = new_role_ids - existing_role_ids
     roles_to_add.each do |role_id|
       unless user.role_mapping.create(user_role_id: role_id)
-        messages[:error] << user.role_mapping.errors.full_messages
+        messages[:error] = user.role_mapping.errors.full_messages
         return false
       end
     end

@@ -4,7 +4,7 @@ class PendingInvitesController < ApplicationController
 
 
   def edit
-    @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+    @pending_user = User.find_by_invitation_token(params[:id], true)
   end
 
 
