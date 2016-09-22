@@ -7,29 +7,27 @@ class Superadmin::CompaniesController < ApplicationController
   end
 
   def show
-    @result = Company::Show.new(current_user, params).run
+    @result = Company::Show.(current_user, params)
   end
 
   def create
-    create_op = Company::Create.new(current_user, params)
-    @result = create_op.run
+    @result = Company::Create.(current_user, params)
     # temporary rendering for html testing.
     if @result.success?
-      flash[:success] = "Company created"
+      flash[:success] = 'Company created'
     else
-      flash[:error] = "Failed. Try again"
+      flash[:error] = 'Failed. Try again'
     end
-    redirect_to request.referrer
+    redirect_to superadmin_companies_path
   end
 
   def add_admin
-    add_admin_op = Company::Create.new(current_user, params)
-    @result = add_admin_op.run
+    @result = Company::Create.(current_user, params)
     # temporary rendering for html testing.
     if @result.success?
-      flash[:success] = "Company created"
+      flash[:success] = 'Company created'
     else
-      flash[:error] = "Failed. Try again"
+      flash[:error] = 'Failed. Try again'
     end
     redirect_to request.referrer
   end
