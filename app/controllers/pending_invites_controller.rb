@@ -49,7 +49,7 @@ class PendingInvitesController < ApplicationController
     if @result.present? and @result.success?
       # sign_in @result.accepted_user, :bypass => true
       bypass_sign_in(@result.accepted_user)
-      # redirect_to root_url
+      redirect_to root_url
       # respond
       # respond_to do |format|
       #   format.js {}

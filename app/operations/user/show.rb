@@ -18,24 +18,26 @@ class User::Show < User::Base
         self.selected_user = result.with_id(id).first rescue nil
         messages[:error] << 'User not found' if self.selected_user.blank?
       else
-        messages[:error] << operation.errors
+        messages[:error] = operation.messages[:error]
       end
     end
   end
 
   def success
-    User::Show::Presenter.new(selected_user, params, messages)
+    params[:selected_user] = selected_user
+    User::Show::Presenter.new(user, params, messages)
   end
 
   class User::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
-                  :team_members_presenter
+                  :team_members_presenter, :selected_user
 
     def init
-      self.roles = {admin: self.user.company_admin?, manager: self.user.manager?,
-                    finance_manager: self.user.finance_manager?}
+      self.selected_user = params[:selected_user]
+      self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
+                    finance_manager: self.selected_user.finance_manager?}
       self.team_mapping = self.user.team_mapping
       self.mapping = [retrieve_mapping(nil)]
       self.policies = user.policies
