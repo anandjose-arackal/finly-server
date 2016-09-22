@@ -9,8 +9,8 @@ class User::Team::GetManagers < User::Team::Base
     def init
       self.team = params[:team]
       self.team_admins = params[:team_admins] || []
-      self.team_managers = params[:team_managers] + team_admins
-      self.team_finance_managers = params[:team_finance_managers] + team_admins
+      self.team_managers = params[:team_managers]
+      self.team_finance_managers = params[:team_finance_managers]
       self.team_policies = user.admin_policies || []
     end
   end
