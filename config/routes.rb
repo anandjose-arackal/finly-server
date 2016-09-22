@@ -426,6 +426,7 @@ Rails.application.routes.draw do
   # get 'features', to: 'static_pages#features'
 
   get 'external/reports/:id' => 'external_url#report', as: :external_url_report
+  get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
