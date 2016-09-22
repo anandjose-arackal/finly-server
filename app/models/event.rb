@@ -60,7 +60,7 @@ class Event < ActiveRecord::Base
   self.class.instance_eval do
     ACTIONS.each do |item|
       define_method "#{item[:key]}_id" do
-        ACTIONS.find_index(item)
+        ACTIONS.find_index(item) + 1
       end
     end
   end

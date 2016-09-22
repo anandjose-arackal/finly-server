@@ -192,6 +192,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         if res.success == true
           $("#modal-new").modal('hide')
           _this.refetchCollection()
+          _this.toggleReceiptSelectOptions()
         else
           $(button).html('Add Receipt')
       error: (err) ->
@@ -202,27 +203,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       processData: false
     })
 
-
-    # _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-    #   values[ input.name ] = input.value
-    # )
-    # # console.log values
-    # model = new FinlyF.Models.Receipt()
-    # # console.log("Putting data")
-    # response = model.save(values,{
-    #   iframe: true,
-    #   files: this.$('form :file'),
-    #   data: values
-    #   success: (model, res) ->
-    #     console.log "Success", model, res
-    #     $("#modal-new").modal('hide')
-    #     _this.filter()
-    #   error: (err, model) ->
-    #     console.log "Err", err, model
-    # })
-
-
-
   resetFilters: ->
     params = {}
     params.view = @params.view
@@ -231,13 +211,9 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   filter: ->
     sidebar = $(@el).find(".sidebar")
     params = {
-      # 'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
-      # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
-
 
     FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
@@ -253,7 +229,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     FinlyF.changeView(e)
 
   receiptSelectOptions: ->
-    console.log "receipt"
     items = $(@el).find('#items .item')
     flag = false
     for item in items
@@ -266,18 +241,24 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
 
+  toggleReceiptSelectOptions: (flag) ->
+    if typeof flag != 'undefined'
+      if flag == true
+        $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'inline')
+        $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'inline')
+      else
+        $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
+        $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
+    else
+      $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
+      $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
+
+
   newExpense: ->
-    # console.log 'hey'
     items = $(@el).find("#items .item")
-    # console.log items.length
-     # "report"=>{"expense_id"=>"15,36,39"}}
-    # items = $(@el).find('#items .item')
-    # receipt= []
-    # flag = false
     for item in items
       selected_item = $(item).find('.select-item')
       if $(selected_item).prop('checked')
-        # receipt = 
         receipt_id = $(selected_item).attr('data-item-id')
         break
     
@@ -297,8 +278,6 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $("#modal-new").modal('show')
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
-    # console.log selected_receipt.toJSON()
-
     $("#modal-new .modal-body #preview-image").attr('src', selected_receipt.get('url'))
     $("#modal-new .modal-body textarea[name=expense\\[note\\]]").val(selected_receipt.get('note'))
 
@@ -306,14 +285,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     _this =   @
     values = {}
 
-    # if(event){ event.preventDefault(); }
-
     _.each($("#modal-new form#new-item").serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
-    console.log values
     model = new FinlyF.Models.Expense()
-    # console.log("Putting data")
     response = model.save(values, {
       iframe: true,
       # files: this.$('form :file'),
@@ -321,10 +296,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        # console.log "Success", model, res
         if res.success == true
           $(_this.el).find("#modal-new").modal('hide')
           _this.refetchCollection()
+          _this.toggleReceiptSelectOptions()
       error: (err) ->
         console.log "Error", err
     })
@@ -356,11 +331,10 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       type: "DELETE",
       dataType: 'JSON',
       success: (res) ->
-        console.log "deleted", res
         FinlyF.snapNotify(res.messages)
         if res.success == true
           _this.refetchCollection()
-          console.log "deleted", res
+          _this.toggleReceiptSelectOptions()
       error: (err) ->
         console.log "Error", err
       })

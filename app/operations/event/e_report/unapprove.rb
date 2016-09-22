@@ -1,4 +1,4 @@
-class Event::Report::Unapprove < Event::Report::Base
+class Event::EReport::Unapprove < Event::EReport::Base
 
   def event_id
     Event.report_unapprove_id

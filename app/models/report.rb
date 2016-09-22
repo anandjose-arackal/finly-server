@@ -160,7 +160,7 @@ class Report < ActiveRecord::Base
   end
 
   def editable?
-    open? or retracted?
+    open? or retracted? or rejected?
   end
 
   def reimbursement_pending?

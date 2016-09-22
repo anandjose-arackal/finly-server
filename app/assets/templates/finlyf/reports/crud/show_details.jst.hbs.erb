@@ -35,6 +35,10 @@
         {{#if item.actions.reject}}
           <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
         {{/if}}
+
+        {{#if item.actions.reimbursement_confirm}}
+          <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reimbursement_confirm}}">Confirm Reimbursement</button>
+        {{/if}}
         
       </div>
     </div>
@@ -125,30 +129,22 @@
     <div class="row no-margin violations">
       <h4>Report Violations</h4>
       <div class="col-sm-12">
-        {{#each item.violations.items}}
-          {{#each this.expense_warning}}
-            {{#if this.message}}
-              <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
-            {{/if}}
-          {{/each}}
-          {{#each this.budget_warning}}
-            {{#if this.message}}
-              <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
-            {{/if}}
-          {{/each}}
+        {{#each item.violations.warning_messages}}
+          {{#if this.message}}
+            <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
+          {{/if}}
         {{/each}}
-        <div class="col-sm-10"><hr /></div>
-        {{#each item.violations.items}}
-          {{#each this.expense_blocking}}
-            {{#if this.message}}
-              <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
-            {{/if}}
-          {{/each}}
-          {{#each this.budget_blocking}}
-            {{#if this.message}}
-              <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
-            {{/if}}
-          {{/each}}
+
+        {{#if item.violations.blocking_present}}
+        <div class="col-sm-10 no-padding col-sm-offset-1">
+          <hr style="margin: 8px auto;" />
+        </div>
+        {{/if}}
+
+        {{#each item.violations.blocking_messages}}
+          {{#if this.message}}
+            <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+          {{/if}}
         {{/each}}
       </div>
       <hr />
@@ -187,10 +183,10 @@
           <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
         {{else}}
           {{#ifCond this.violations.warning_present '||' this.violations.blocking_present}}
-            {{#if this.violations.warning_present}}
-              <div class="row" style="padding: 3px 10px; background: #FCF8E3;">
-            {{else}}
+            {{#if ../this.violations.blocking_present}}
               <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
+            {{else}}
+              <div class="row" style="padding: 3px 10px; background: #FCF8E3;">
             {{/if}}
           {{else}}
             <div class="row" style="padding: 3px 10px;">
@@ -204,12 +200,12 @@
 
 
           <div class="col-sm-3 no-padding text-right">
-            <button data-item-id="{{this.id}}" class="btn btn-view-sub-item btn-xs btn-warning">Details</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn btn-view-sub-item btn-xs btn-warning">Details</button>
           {{#if ../../item.actions.editable}}
-            <button data-item-id="{{this.id}}" class="btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
           {{/if}}
           {{#if ../../item.actions.reject}}
-            <button data-item-id="{{this.id}}" class="btn-reject-sub-item btn btn-xs btn-danger">Reject</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn-reject-sub-item btn btn-xs btn-danger">Reject</button>
           {{/if}}
           </div>
 

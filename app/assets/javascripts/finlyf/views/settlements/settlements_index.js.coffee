@@ -1,11 +1,6 @@
 class FinlyF.Views.SettlementsIndex extends Backbone.View
-  # templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
   templateSkeleton: HandlebarsTemplates['finlyf/settlements/skeleton']
   templateSkeletonAdmin: HandlebarsTemplates['finlyf/settlements/skeletonAdmin']
-
-  #navbar
-  # templateNavbarSidebar: HandlebarsTemplates['finlyf/settlements/navbar/navbar_sidebar']
-  # templateNavbarMainAdmin: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main_admin']
 
   #sidebar
   templateSidebarAdmin: HandlebarsTemplates['finlyf/settlements/sidebar/sidebar_admin']
@@ -13,9 +8,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   #main
 
   templateSummary: HandlebarsTemplates['finlyf/settlements/summary']
+  templateSummaryAdmin: HandlebarsTemplates['finlyf/settlements/summaryAdmin']
   templateMain: HandlebarsTemplates['finlyf/settlements/crud/index']
   templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/indexPayments']
-  # templateNew: HandlebarsTemplates['finlyf/receipts/crud/new']
 
   #settlements
   templateAddPayment: HandlebarsTemplates['finlyf/settlements/admin/addPayment']
@@ -157,7 +152,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       },
       success: (res) ->
         # console.log "res", res
-        $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
+        if _this.view == 'personal'
+          $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
+        else
+          $(_this.el).find(".summary").html(_this.templateSummaryAdmin({item: res}))
       error: (err) ->
         console.log err
 

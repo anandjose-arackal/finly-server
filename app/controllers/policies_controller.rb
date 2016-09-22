@@ -11,10 +11,16 @@ class PoliciesController < ApplicationController
     @result = create_policy_op.run
     if @result.success?
       flash.now[:success] = 'Policy Created'
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash.now[:failure] = create_policy_op.messages[:error]
     end
-    redirect_to request.referrer
+    respond_to do |format|
+      format.js {}
+    end
+    # redirect_to request.referrer
   end
 
   def destroy
@@ -22,10 +28,13 @@ class PoliciesController < ApplicationController
     @result = destroy_op.run
     if @result.success?
       flash.now[:success] = "Policy destroyed."
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:danger] = destroy_op.messages[:error]
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
   end
 
   def index
@@ -48,23 +57,29 @@ class PoliciesController < ApplicationController
   end
 
   def add_users
-    add_user_op = Policy::Users::AddUser.new(current_user, params)
-    if add_user_op.run
-      flash[:success] = "User successfully addded"
-      redirect_to request.referrer
+    @result = Policy::Users::AddUser.(current_user, params)
+    if @result.success?
+      flash[:success] = 'User successfully addded'
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.js {}
+      end
     else
-      flash[:danger] = add_user_op.messages[:error]
+      flash[:danger] = @result.messages[:error]
       # render error message
     end
   end
 
   def remove_users
-    remove_user_op = Policy::Users::RemoveUser.new(current_user, params)
-    if remove_user_op.run
-      flash[:success] = "User successfully removed"
-      redirect_to request.referrer
+    @result = Policy::Users::RemoveUser.(current_user, params)
+    if @result.success?
+      flash[:success] = 'User successfully removed'
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.js {}
+      end
     else
-      flash[:danger] = remove_user_op.messages[:error]
+      flash[:danger] = @result.messages[:error]
       # render error message
     end
   end
@@ -76,7 +91,10 @@ class PoliciesController < ApplicationController
     if @result.success?
       @result = Policy::Show.new(current_user, params).run
       flash[:success] = "Configuration updated"
-      redirect_to request.referrer
+      # redirect_to request.referrer
+      respond_to do |format|
+        format.js {}
+      end
     else
       flash[:danger] = update_configuration_op.messages[:error]
       # render flash message

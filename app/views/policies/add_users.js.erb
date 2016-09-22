@@ -1,4 +1,4 @@
 $('#assignExistingUsersToPolicy').modal('hide');
 //$('.modal-backdrop').remove();
 //$('body').removeClass('modal-open');
-$('#policyMembersDiv').replaceWith('<%= j render 'policy_members' %>');
+$('#policyMembersDiv').html("<%= j render 'policy_members' %>");

@@ -1,6 +1,6 @@
 <body id="organization_account">
 
-<div class="inner" style=" border-bottom: 1px solid #e6e6e6;margin-bottom: 20px;">
+<div class="inner" style=" border-bottom: 1px solid #e6e6e6;margin-top: -17px;">
   <ul class="innerul">
     <li style="padding: 20px; background: beige">
       Company Profile
@@ -47,7 +47,9 @@
 
       <h3 id="divsection_heading">Categories</h3>
 
-      <%= render 'category_list' %>
+      <div id="categoriesList" style="width: 80%">
+        <%= render 'category_list' %>
+      </div>
 
       <hr style="margin-top: 20px">
 
@@ -66,7 +68,9 @@
 
       <h3 id="divsection_heading">Policies</h3>
 
-      <%= render 'policy_list' %>
+      <div id="policyListAdmin">
+        <%= render 'policy_list' %>
+      </div>
 
     </div>
 

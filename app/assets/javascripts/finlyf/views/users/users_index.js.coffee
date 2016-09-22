@@ -188,6 +188,19 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
     values = {}
 
+    manager = $(form).find('input[name=manager]:checked')
+    finance_manager  = $(form).find('input[name=finance_manager]:checked')
+    if $(manager).val() == 0
+      $(manager).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
+
+    if $(finance_manager).val() == 0
+      $(finance_manager).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
+
+    # console.log manager, finance_manager
+    # return
+
+    $(form).find(':disabled').removeAttr('disabled');
+
     _.each((form).serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
@@ -242,6 +255,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       $(target).closest('.conditional-container').find('.conditional-managers').slideDown('fast')
     else
       $(target).closest('.conditional-container').find('.conditional-managers').slideUp('fast')
+      unless $(target).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').prop('disabled')
+        $(target).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
 
   resetPageCount: (options) ->
     if options.target

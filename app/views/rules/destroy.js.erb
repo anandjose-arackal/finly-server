@@ -1,0 +1,5 @@
+<% if params[:expense_rule_id] %>
+  $("#expense-rules").html("<%= j render partial: 'policies/expense_rules' %>")
+<% elsif params[:budget_rule_id] %>
+  $("#budget-rules").html("<%= j render partial: 'policies/budget_rules' %>")
+<% end %>

@@ -3,7 +3,7 @@
 # in the Expenses table
 # will be initialized with the transaction object and card object that will be passed
 
-class Expense::Card::Create < Expense::Card::Base
+class Expense::ExCard::Create < Expense::ExCard::Base
   attr_accessor :expense_params
 
   # overriding initialize because the only info available will be the transaction and card

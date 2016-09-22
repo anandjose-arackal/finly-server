@@ -1,4 +1,4 @@
-class Event::Report::Retract < Event::Report::Base
+class Event::EReport::Retract < Event::EReport::Base
 
   def event_id
     Event.report_retract_id

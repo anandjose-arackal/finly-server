@@ -3,10 +3,11 @@
 # Table name: money_requests
 #
 #  id                      :integer          not null, primary key
+#  name                    :string(255)
 #  user_id                 :integer          not null
 #  policy_id               :integer
 #  payment_mode_id         :integer          not null
-#  payment_id              :integer          not null
+#  payment_id              :integer
 #  required_by_date        :date
 #  status_id               :integer          not null
 #  controlling_user_id     :integer
@@ -15,6 +16,7 @@
 #  loaded_at               :datetime
 #  submitted_at            :datetime
 #  note                    :string(255)
+#  accounted               :boolean          default(FALSE), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #

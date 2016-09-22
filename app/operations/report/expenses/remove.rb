@@ -69,7 +69,7 @@ class Report::Expenses::Remove < Report::Base
     if success?
       if retracted
         expenses.each do |expense|
-          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.expense_remove_id, expense_id: expense.id
+          comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_remove), expense_id: expense.id
           comment.save
         end
       end

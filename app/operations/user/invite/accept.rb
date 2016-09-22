@@ -12,7 +12,7 @@ class User::Invite::Accept < User::Invite::Base
     super(nil, params)
   end
 
-  def initialize(params)
+  def initialize(user, params)
     super(nil, params)
   end
 
@@ -60,13 +60,16 @@ class User::Invite::Accept < User::Invite::Base
   def process
     self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present?
-      messages[:error] << invited_user.errors.full_messages
-      true
+      messages[:error] = invited_user.errors.full_messages
     end
   end
 
   def post_process
     # send welcome mail
+  end
+
+  def success
+    User::Invite::Base::InvitePresenter.new(user, {accepted_user: invited_user}, messages)
   end
 
 end

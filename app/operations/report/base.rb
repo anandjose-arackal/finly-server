@@ -54,8 +54,8 @@ class Report::Base < BaseOperation
       self.actions = load_actions
       self.policies = report.user.policies
       self.selected_policy = report.versioned_policy
-      self.manager = User::Team::Approver.(report.user, type: :manager)
-      self.finance_manager = User::Team::Approver.(report.user, type: :finance_manager)
+      self.manager = User::Team::Approver.(report.user, report: report, type: :manager)
+      self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
     end
 
@@ -115,6 +115,58 @@ class Report::Base < BaseOperation
         end
       end
       actions
+    end
+
+    def has_blocking?
+      return false unless self.violations.present?
+      self.violations.each do |key, violation|
+        if violation[:expense_blocking].present? or violation[:budget_blocking].present? or
+            violation['expense_blocking'].present? or violation['budget_blocking'].present?
+          return true
+        end
+      end
+      false
+    end
+
+    def has_warning?
+      return false unless self.violations.present?
+      self.violations.each do |key, violation|
+        if violation[:expense_warning].present? or violation[:budget_warning].present? or
+            violation['expense_warning'].present? or violation['budget_warning'].present?
+          return true
+        end
+      end
+      false
+    end
+
+    def blocking_array
+      blocking_messages = []
+      self.violations.each do |key, violation|
+        blocking_messages.concat violation[:expense_blocking] if violation[:expense_blocking].present?
+        blocking_messages.concat violation[:budget_blocking] if violation[:budget_blocking].present?
+        blocking_messages.concat violation['expense_blocking'] if violation['expense_blocking'].present?
+        blocking_messages.concat violation['budget_blocking'] if violation['budget_blocking'].present?
+      end
+      if blocking_messages.size > 0
+        blocking_messages.uniq!
+        Formatter.remove_blanks blocking_messages
+      end
+      blocking_messages
+    end
+
+    def warning_array
+      warning_messages = []
+      self.violations.each do |key, violation|
+        warning_messages.concat violation[:expense_warning] if violation[:expense_warning].present?
+        warning_messages.concat violation[:budget_warning] if violation[:budget_warning].present?
+        warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
+        warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
+      end
+      if warning_messages.size > 0
+        warning_messages.uniq!
+        Formatter.remove_blanks warning_messages
+      end
+      warning_messages
     end
   end
 end

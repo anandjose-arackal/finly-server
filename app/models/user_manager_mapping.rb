@@ -19,11 +19,11 @@ class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 
   belongs_to :user
-  belongs_to :manager, class_name: "User"
-  belongs_to :finance_manager, class_name: "User"
-  belongs_to :approves_to, class_name: "User"
-  belongs_to :approves_finance_to, class_name: "User"
-  belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
+  belongs_to :manager, class_name: 'User'
+  belongs_to :finance_manager, class_name: 'User'
+  belongs_to :approves_to, class_name: 'User'
+  belongs_to :approves_finance_to, class_name: 'User'
+  belongs_to :greater_than_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :policy
   accepts_nested_attributes_for :greater_than_amount
 
@@ -34,6 +34,7 @@ class UserManagerMapping < ActiveRecord::Base
   validate :valid_non_default
 
   scope :with_id, ->(id) { where id: id }
+  scope :without_id, ->(id) { where.not id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
   scope :default, -> { where default: true }
   scope :non_default, -> { where.not default: true }
@@ -54,7 +55,7 @@ class UserManagerMapping < ActiveRecord::Base
     else
       item = joins(:greater_than_amount).where('value <= ? AND currency_id = ?', value, currency_id).order('value DESC').limit(1)
       if item.present?
-        item.first
+        item
       else
         self.default
       end

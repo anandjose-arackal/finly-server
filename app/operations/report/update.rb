@@ -4,9 +4,6 @@ class Report::Update < Report::Base
 
   def pre_validate
     super
-    if params[:name].blank? and params[:policy_id].blank?
-      messages[:error] << 'Nothing to update'
-    end
   end
 
   def pre_authorize
@@ -48,7 +45,7 @@ class Report::Update < Report::Base
 
   def process
     return unless update_param.present?
-    unless report.update(update_param)
+    unless report.update_attributes(update_param)
       messages[:error] << report.errors.full_messages
       false
     end
@@ -71,13 +68,13 @@ class Report::Update < Report::Base
       next unless value.present? and key.present?
       case key
         when :name
-          query << {user: user, report_comment_action_id: ReportCommentAction.report_update_id,
+          query << {user: user, report_comment_action_id: ReportCommentAction.id_for(:report_update),
                     updated_field: 'name', updated_from: value[0], updated_to: value[1]}
         when :policy_id
           from = to = nil
           from = Policy.with_id(value[0]).first.name rescue nil if value[0].present?
           to = Policy.with_id(value[1]).first.name rescue nil if value[1].present?
-          query << {user: user, report_comment_action_id: ReportCommentAction.report_update_id,
+          query << {user: user, report_comment_action_id: ReportCommentAction.id_for(:report_update_id),
                     updated_field: 'policy', updated_from: from, updated_to: to}
         else
       end

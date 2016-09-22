@@ -1,4 +1,4 @@
-class Event::Report::Expense::Reject < Event::Report::Base
+class Event::EReport::EExpense::Reject < Event::EReport::Base
   attr_accessor :rejected_expense
 
   def init

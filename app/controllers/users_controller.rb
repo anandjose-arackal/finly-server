@@ -11,6 +11,8 @@ class UsersController < ApplicationController
 
   # this would call the respective private method to update the respective attributes
   def update
+    ap params
+    
     update_handler(params[:type])
   end
 
@@ -24,7 +26,7 @@ class UsersController < ApplicationController
   end
 
   # For destroying user manager mapping
-  # params= { user_id: 22, mapping_id: 43 }
+  # params= { id: 22, mapping_id: 43 }
   def destroy
     @result = User::Team::Mappings::Destroy.(current_user, params)
     respond(response: :success)

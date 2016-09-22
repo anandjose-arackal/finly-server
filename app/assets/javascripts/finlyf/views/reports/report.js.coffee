@@ -192,10 +192,10 @@ class FinlyF.Views.Report extends Backbone.View
       success: (res)->
         FinlyF.snapNotify(res.messages)
         if res.success == true
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-          # $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           $(modal).modal('hide')
+          $(modal).html("")
           _this.model.fetch({ data: {view: _this.current_view}})
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
         console.log "Error", err
     })
@@ -352,6 +352,7 @@ class FinlyF.Views.Report extends Backbone.View
       success: (res)->
         FinlyF.snapNotify(res.messages)
         _this.model.fetch({ data: {view: _this.current_view}})
+        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
         console.log "Error", err
     })

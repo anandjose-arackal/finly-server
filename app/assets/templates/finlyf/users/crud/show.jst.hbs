@@ -188,7 +188,7 @@
               </label>{{!-- Manager 0 --}}
               <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
                 <option value="">None</option>
-                {{#each ../item.company_managers}}
+                {{#each ../item.team_managers}}
                   <option value="{{this.id}}">{{this.name}}</option>
                 {{/each}}
               </select>
@@ -232,7 +232,7 @@
                 </label>{{!-- (Conditional Manager 1) --}}
                 <select class="form-control item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" data-default-value="{{this.manager.id}}">
                   <option value="">None</option>
-                  {{#each ../../item.company_managers}}
+                  {{#each ../../item.team_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
                   {{/each}}
                 </select>
@@ -246,7 +246,7 @@
 
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="manager">Add Condition</button>
+              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="manager">Add Condition</button>
             </div>
           </div><!-- .col-sm-12 -->
           <hr />
@@ -263,7 +263,7 @@
               </label>{{!-- (Finance Manager 0) --}}
               <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
                 <option value="">None</option>
-                {{#each ../item.company_finance_managers}}
+                {{#each ../item.team_finance_managers}}
                   <option value="{{this.id}}">{{this.name}}</option>
                 {{/each}}
               </select>
@@ -309,7 +309,7 @@
                 </label>{{!-- (Conditional Manager 2) --}}
                 <select class="form-control item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" data-default-value="{{this.finance_manager.id}}">
                   <option value="">None</option>
-                  {{#each ../../item.company_finance_managers}}
+                  {{#each ../../item.team_finance_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
                   {{/each}}
                 </select>
@@ -321,7 +321,7 @@
             </div><!-- .conditional -->
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="finance_manager">Add Condition</button>
+              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="finance_manager">Add Condition</button>
             </div>
           </div><!-- .col-sm-12 -->
         </div><!-- .row -->
@@ -341,7 +341,7 @@
 
               <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
                 <option value="">None</option>
-                {{#each ../item.company_managers}}
+                {{#each ../item.team_managers}}
                   <option value="{{this.id}}">{{this.name}}</option>
                 {{/each}}
               </select>
@@ -386,7 +386,7 @@
 
                 <select class="form-control item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" data-default-value="{{this.approves_to.id}}">
                   <option value="">None</option>
-                  {{#each ../../item.company_managers}}
+                  {{#each ../../item.team_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
                   {{/each}}
                 </select>
@@ -396,7 +396,7 @@
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_to">Add Condition</button>
+              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="approves_to">Add Condition</button>
             </div>
           </div><!-- .col-sm-12 -->
           {{/if}}
@@ -417,7 +417,7 @@
 
               <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
                 <option value="">None</option>
-                {{#each ../item.company_finance_managers}}
+                {{#each ../item.team_finance_managers}}
                   <option value="{{this.id}}">{{this.name}}</option>
                 {{/each}}
               </select>
@@ -461,7 +461,7 @@
                 </label>{{!-- (Conditional approves to 4) --}}
                 <select class="form-control item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" data-default-value="{{this.approves_finance_to.id}}">
                   <option value="">None</option>
-                  {{#each ../../item.company_finance_managers}}
+                  {{#each ../../item.team_finance_managers}}
                     <option value="{{this.id}}">{{this.name}}</option>
                   {{/each}}
                 </select>
@@ -471,7 +471,7 @@
             </div>
             {{/each}}
             <div class="col-sm-12 add-condition">
-              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{../item.policy.id}}" data-manager-type="approves_finance_to">Add Condition</button>
+              <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="approves_finance_to">Add Condition</button>
             </div>
 
           </div><!-- .col-sm-12 -->

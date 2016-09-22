@@ -286,8 +286,13 @@ class UserTeamService < BaseService
     end
     self.user.team_mapping.policy(@policy_id).destroy_all
     self.user.team_mapping.policy(nil).each do |item|
-      clone = item.dup
+      clone = item.deep_clone
       clone.policy_id = @policy_id
+      if clone.greater_than_amount.present?
+        amount = clone.greater_than_amount.deep_clone
+        amount.save
+        clone.greater_than_amount = amount
+      end
       errors << clone.errors.full_messages unless clone.save
     end
     errors.blank?
