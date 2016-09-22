@@ -388,6 +388,9 @@ Rails.application.routes.draw do
 
 
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
+  resources :pending_invites do
+    patch 'accept', to: 'pending_invites#accept', as: :accept
+  end
 
 
   get 'settlements/summary' => 'settlements#summary'
