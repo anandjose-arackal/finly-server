@@ -52,9 +52,9 @@ class PendingInvitesController < ApplicationController
       bypass_sign_in(@result.accepted_user)
       # redirect_to root_url
       # respond
-      # respond_to do |format|
-      #   format.js {}
-      # end
+      respond_to do |format|
+        format.js { render js: "window.location = '#{root_url}';"}
+      end
     else
       respond
       # respond_to do |format|

@@ -336,6 +336,7 @@ class FinlyF.Views.Report extends Backbone.View
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh-true")
       @model.fetch({ data: {view: _this.current_view }})
+      $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
     # console.log "Closed Bootstrap modal"
 
   deleteSub: (e) ->

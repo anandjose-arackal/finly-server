@@ -35,6 +35,9 @@ class User::Role::Set < BaseOperation
           params[:user_roles][:finance_manager].to_s == '1'
     end
     new_role_ids = [new_role_ids] unless new_role_ids.is_a?(Array)
+    # To ensure all users have a personal view
+    new_role_ids << UserRole.id_for(:employee)
+    new_role_ids.uniq!
     self.roles_to_add = new_role_ids - existing_role_ids
     self.roles_to_remove = existing_role_ids - new_role_ids
   end

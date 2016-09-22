@@ -71,20 +71,42 @@
       <div class="col-sm-9">
         <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
 
-        {{#if item.role.admin}}
-          <label class="item-attr-edit">
-            <input class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-          </label>
-          <label class="item-attr-edit">
-            <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
-          </label>
+        {{#if item.role.editable.admin}}
+
+          {{#if item.role.admin}}
+            <label class="item-attr-edit">
+              <input class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+              <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+            </label>
+          {{else}}
+            <label class="item-attr-edit">
+              <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+              <input class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
+            </label>
+          {{/if}}
+
         {{else}}
-          <label class="item-attr-edit">
-            <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
-          </label>
-          <label class="item-attr-edit">
-            <input class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
-          </label>
+
+          {{#if item.role.admin}}
+            <label class="item-attr-edit">
+              <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+              <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+            </label>
+          {{else}}
+            <label class="item-attr-edit">
+              <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+              <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
+            </label>
+          {{/if}}
+
         {{/if}}
 
         
@@ -96,20 +118,43 @@
       <div class="col-sm-3">Manager?</div>
       <div class="col-sm-9">
         <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
-        {{#if item.role.manager}}
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-          </label>
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
-          </label>
+
+
+        {{#if item.role.editable.manager}}
+          {{#if item.role.manager}}
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+            </label>
+          {{else}}
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+            </label>
+          {{/if}}
+
         {{else}}
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
-          </label>
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-          </label>
+
+          {{#if item.role.manager}}
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+            </label>
+          {{else}}
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+            </label>
+          {{/if}}
+
         {{/if}}
         
       </div>
@@ -119,20 +164,43 @@
       <div class="col-sm-3">Finance Manager?</div>
       <div class="col-sm-9">
         <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
-        {{#if item.role.finance_manager}}
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-          </label>
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
-          </label>
+
+        {{#if item.role.editable.finance_manager}}
+
+          {{#if item.role.finance_manager}}
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+            </label>
+          {{else}}
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+            </label>
+          {{/if}}
+
         {{else}}
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
-          </label>
-          <label class="item-attr-edit">
-             <input class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-          </label>
+
+          {{#if item.role.finance_manager}}
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+            </label>
+          {{else}}
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+            </label>
+            <label class="item-attr-edit">
+               <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+            </label>
+          {{/if}}
+
         {{/if}}
         
       </div>
