@@ -18,10 +18,10 @@ class Policy::Index < Policy::Base
       if user.company_admin?
         self.policies = user.company.policies.non_default
       else
-        self.policies = user.admin_policies
+        self.policies = user.admin_policies.non_default
       end
     else
-      self.policies = user.policies.non_default if user.policies
+      self.policies = user.policies.non_default rescue nil
     end
   end
 

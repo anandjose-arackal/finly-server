@@ -19,7 +19,9 @@ class Company::Create < Company::Base
   end
 
   def validate
-
+    if User.find_by_email(admin_params[:email]).present?
+      messages[:error] << 'User is already registered to company'
+    end
   end
 
   def process
@@ -28,10 +30,9 @@ class Company::Create < Company::Base
     admin.skip_confirmation_notification!
     if company.save && admin.save
       admin.activate
-      messages[:success] << "Company created!"
+      messages[:success] << 'Company created!'
     else
-      messages[:error] << "Failed, Try again."
-      return false
+      messages[:error] << 'Failed, Try again'
     end
   end
 
