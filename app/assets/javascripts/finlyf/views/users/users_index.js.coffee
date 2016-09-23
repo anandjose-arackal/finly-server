@@ -115,7 +115,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       $(target).find("i").addClass("fa-spin")
 
     # @params.page = 1
-    console.log @params
+    # console.log @params
     @collection.fetch({
       reset: true,
       data: _this.params,
@@ -146,7 +146,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     if @view == 'personal'
       FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
     else
-      console.log @collection.url
+      # console.log @collection.url
       @collection.fetch({
         data: {
           view_to_load: view_to_load

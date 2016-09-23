@@ -178,9 +178,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     })
 
   toggleLoadMore: (collection) ->
-    console.log "Loading", collection.models.length
+    # console.log "Loading", collection.models.length
     if collection.models.length < 30
-      console.log "Should hide"
+      # console.log "Should hide"
       $(@el).find('.load-more').css('display', 'none')
     else
       $(@el).find('.load-more').css('display', 'inline')
@@ -258,7 +258,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       type: "POST",
       data: formData,
       success: (res) ->
-        console.log res.messages
+        # console.log res.messages
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $("#modal-new").modal('hide')
@@ -387,7 +387,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           data: params,
           success: ->
             _this.toggleLoadMore(_this.collection)
-            console.log "Fetched all the data"
+            # console.log "Fetched all the data"
           error: ->
             console.log "Couldn't fetch Successfully."
         })
@@ -437,7 +437,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
             console.log err
         })
       select: (event, ui) ->
-        console.log "Selected."
+        # console.log "Selected."
     })
 
   itemDeleted: (e) ->

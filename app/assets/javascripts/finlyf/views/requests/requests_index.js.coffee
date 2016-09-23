@@ -37,7 +37,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     else
       @params = {}
     @params.page = 1
-    console.log "Params from view", @params
+    # console.log "Params from view", @params
     # console.log "Step x. Init View"
     _this = @
     @dump = []
@@ -46,20 +46,17 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
-
+        _this.toggleLoadMore(_this.collection)
       error: ->
         console.log "Couldn't fetch Successfully."
     })
     @collection.on('reset', @processItems, @)
-    @on('item:destroyed', @filter, @)
+    @on('item:destroyed', @itemDeleted, @)
 
   render: ->
-    # console.log "Step 3. Rendering."
-    #Appending Partials to Skeleton
-
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
-    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
     
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
@@ -79,6 +76,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       data: _this.params,
       reset: false,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
         $(target).find('span').text('Load More')
         _this.resetPageCount({target: target, page: _this.params.page })
@@ -91,12 +89,22 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
+  toggleLoadMore: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 30
+      # console.log "Should hide"
+      $(@el).find('.load-more').css('display', 'none')
+    else
+      $(@el).find('.load-more').css('display', 'inline')
+
   processItems: ->
+    _this = @
     #Append all the reports
     @dump = @collection.models.slice()
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
-    @collection.each(@appendItems, @)
+    # @collection.each(@appendItems, @)
+    _.each(_this.collection.models, _this.appendItems, _this)
 
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
@@ -104,9 +112,11 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       $(spinner).removeClass("fa-spin")
 
   appendItems: (item) ->
+    # console.log "appending"
     #Creating view for each report and appending them
     view_item = new FinlyF.Views.Report({ model: item })
     $(@el).find("#items").append(view_item.render().el)
+    # console.log view_item.el
 
   refetchCollection: (e) ->
     #REFRESH
@@ -121,6 +131,8 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        # console.log _this.collection.models[0].toJSON()
+        _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
@@ -165,6 +177,22 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
 
+  showReport: (report_id) ->
+    # model = @collection.get(report_id)
+    # console.log model.toJSON()
+    main = $(@el).find(".main")
+    unless $(main).hasClass("preview")
+      $(main).addClass("preview")
+
+    preview_view = new FinlyF.Views.Report({
+      model_id: report_id
+      preview: true
+      parent: @
+      current_view: @params.view || 'personal'
+    })
+
+    $(@el).find("#item-details-main").html(preview_view.render().el)
+
   closeDetails: (e)->
     # console.log "Closing", e, e.currentTarget
     e.preventDefault()
@@ -174,6 +202,8 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     if (typeof attr != typeof undefined && attr != false)
       # alert("Data refresh is true")
       # @filter()
+      # @collection.reset()
+
       @refetchCollection()
       $(target).removeAttr('data-refresh-true') 
     
@@ -206,6 +236,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     })
 
   filterStatus: (e) ->
+    # console.log "hit filter"
     e.preventDefault()
 
     target = $(e.currentTarget)
@@ -220,11 +251,14 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     if @params.view
       params.view = @params.view
 
+    # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   resetFilters: ->
     params = {}
     params.view = @params.view
+    
+    # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
@@ -234,7 +268,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       # 'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      'filter_user': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
@@ -250,6 +284,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     if @params.view
       params.view = @params.view
 
+    # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
@@ -283,6 +318,23 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
         $(event.target).attr('data-item-id', ui.item.value)
         return false
 
+    })
+
+  itemDeleted: (e) ->
+    # console.log "item destoryed"
+    _this = @
+    main = $(@el).find(".main")
+    $(main).removeClass("preview")
+
+    @params.page = 1
+    @collection.fetch({
+      data: @params
+      reset: true
+      success: ->
+        _this.toggleLoadMore(_this.collection)
+        _this.dump.length = 0
+        _this.dump = _this.collection.models.slice()
+        _this.resetPageCount({selector: '.main .load-more', page: 1})
     })
 
   resetPageCount: (options) ->

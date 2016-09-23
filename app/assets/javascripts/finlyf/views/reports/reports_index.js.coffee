@@ -131,7 +131,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
-        console.log _this.collection.models[0].toJSON()
+        # console.log _this.collection.models[0].toJSON()
         _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()

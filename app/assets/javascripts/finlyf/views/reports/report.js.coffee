@@ -150,7 +150,7 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   showExpenseSelectOption: ->
-    console.log "Here we are"
+    # console.log "Here we are"
 
     modal_header = $(@el).find("#modal-mp .modal-content .modal-header")
     container = $(@el).find("#modal-mp .modal-content .modal-body")
@@ -297,7 +297,7 @@ class FinlyF.Views.Report extends Backbone.View
   delete: (e) ->
     _this = @
     # @model.set('authenticity_token', $("#authenticity_token").val())
-    console.log $("#authenticity_token").val()
+    # console.log $("#authenticity_token").val()
     @model.destroy({
       data: {
         'authenticity_token': $("#authenticity_token").val()
@@ -340,7 +340,7 @@ class FinlyF.Views.Report extends Backbone.View
     # console.log "Closed Bootstrap modal"
 
   deleteSub: (e) ->
-    console.log "deleteing sub"
+    # console.log "deleteing sub"
     _this = @
     expense_id = $(e.currentTarget).attr('data-item-id')
     $.ajax({
@@ -381,7 +381,7 @@ class FinlyF.Views.Report extends Backbone.View
     _this = @
     target = e.currentTarget
     expense_id = $(target).attr('data-item-id')
-    console.log "Expense_id", expense_id
+    # console.log "Expense_id", expense_id
     $.ajax({
       url: '/reports/' + _this.model.get('id') + '/reject_expense'
       method: 'PATCH'
@@ -426,7 +426,7 @@ class FinlyF.Views.Report extends Backbone.View
       type: 'PATCH',
       success: (res) ->
         FinlyF.snapNotify(messages)
-        console.log res
+        # console.log res
         _this.model.fetch({
           data: {
             view: _this.current_view
