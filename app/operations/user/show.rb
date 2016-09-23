@@ -73,10 +73,10 @@ class User::Show < User::Base
         actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
         actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
       else
-        # If user has signed up
-        if self.selected_user.active
+        # If user has signed up and is not viewing themselves
+        if self.selected_user.active and selected_user.id != user.id
           actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
-        else
+        elsif !selected_user.active and selected_user.id != user.id
           actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         end
       end

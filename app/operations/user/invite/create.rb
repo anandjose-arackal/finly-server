@@ -169,7 +169,7 @@ class User::Invite::Create < User::Invite::Base
     if success?
       self.policy = Policy.find_by(id: policy_id)
       if policy
-        unless Policy::Users::AddUser.new(user, {policy_id: policy.id, added_user_id: invited_user.id})
+        unless Policy::Users::AddUser.new(user, {policy_id: policy.id, user_id: "#{invited_user.id}"}).run.success?
           messages[:error] << 'User could not be added to policy'
           return false
         end

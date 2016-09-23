@@ -24,6 +24,12 @@ class User::Configuration::UpdateState < BaseOperation
     end
   end
 
+  def validate
+    if to_user.id == user.id
+      messages[:error] = "You cannot deactivate yourself!"
+    end
+  end
+
   def process
     unless to_user.update(state_params)
       messages[:error] << to_user.errors.full_messages

@@ -91,7 +91,7 @@ class Report::Approve < Report::Base
       end
       # Send notifications
       # todo - top level constant error here
-      Event::EReport::Approve.(self.user, report: self.report)
+      Event::Report::Approve.(self.user, report: self.report)
 
       messages[:success] << 'Report approved!'
     end

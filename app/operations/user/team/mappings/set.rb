@@ -55,7 +55,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       v = self.mappings.policy(policy_id).exact_amount(currency_id, amount_value)
       v = v.without_id(mapping_id) if mapping_id.present?
       present= false
-      {manager: :manager_id, finance_manager: :finance_manager_id, approved_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
+      {manager: :manager_id, finance_manager: :finance_manager_id, approves_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
         if updated_params[item].present? and v.send(key).present?
           present = true
         end
