@@ -23,6 +23,8 @@ class Category < ActiveRecord::Base
     self.name
   end
 
-  scope :active, -> {where active: true}
-  scope :with_id, ->(id){where id: id}
+  scope :active, -> { where active: true }
+  scope :with_id, ->(id) { where id: id }
+  scope :with_name, ->(name) { where name: name }
+
 end
