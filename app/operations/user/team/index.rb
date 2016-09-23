@@ -64,11 +64,11 @@ class User::Team::Index < User::Team::Base
         approves_to_association = :has_approves_to
     end
     return if manager_association.blank? or approves_to_association.blank?
-    user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:id)
-    approves_to_ids = UserManagerMapping.send(approves_to_association, user.id).pluck(:id)
+    user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:user_id)
+    approves_to_ids = UserManagerMapping.send(approves_to_association, user.id).pluck(:user_id)
     while indirect_associations and approves_to_ids.present?
-      user_ids += UserManagerMapping.send(manager_association, approves_to_ids).pluck(:id)
-      approves_to_ids = UserManagerMapping.send(approves_to_association, approves_to_ids).pluck(:id)
+      user_ids += UserManagerMapping.send(manager_association, approves_to_ids).pluck(:user_id)
+      approves_to_ids = UserManagerMapping.send(approves_to_association, approves_to_ids).pluck(:user_id)
     end
     # adding members invited by this particular user
     user_ids += user.company.users.where(invited_by_id: user.id)
