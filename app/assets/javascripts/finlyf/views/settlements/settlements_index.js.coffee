@@ -96,18 +96,22 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     if @view == 'personal'
       # if @params.view == 'personal'
       $(@el).html(@templateSkeleton({item: @params}))
+      if @params
+        if @params.view_to_load == "payments"
+          $(@el).find(".settlements-index").html(@templateMainPayments())
+        else
+          $(@el).find(".settlements-index").html(@templateMain())
+      else
+        $(@el).find(".settlements-index").html(@templateMainPayments())
     else
       $(@el).html(@templateSkeletonAdmin({item: @params}))
+      $(@el).find('.filter-status li a[data-view=payments]').parent().addClass('active')
+      $(@el).find(".settlements-index").html(@templateMainPayments())
+
     # $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     # $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     # $(@el).find(".sidebar").html(@templateSidebar())
-    if @params
-      if @params.view_to_load == "payments"
-        $(@el).find(".settlements-index").html(@templateMainPayments())
-      else
-        $(@el).find(".settlements-index").html(@templateMain())
-    else
-      $(@el).find(".settlements-index").html(@templateMainPayments())
+    
     
     FinlyF.structureActions(@el, @params)
 
@@ -317,20 +321,22 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     _this = @
     e.preventDefault()
     target = $(e.currentTarget).closest('.modal-body')
+
     data = {
       authenticity_token: $("#authenticity_token").val()
       payment: {
         amount: $(target).find('input[name=payment\\[amount\\]]').val()
         date: $(target).find('input[name=payment\\[date\\]]').val()
         note: $(target).find('textarea[name=payment\\[note\\]]').val()
-        payment_type: $("input[name=payment\\[payment_type\\]]:checked").val()
+        # payment_type: parseInt($(target).find("input[name=payment\\[payment_type\\]]:checked").val())
       }
+      payment_type: parseInt($(target).find("input[name=payment_type]:checked").val())
     }
 
     console.log data
 
     $.ajax({
-      url: "settlements?payment_type=1&view=admin&id=" + @user_id
+      url: "settlements?view=admin&id=" + @user_id
       type: "POST",
       data: data,
       success: (res) ->
@@ -338,7 +344,18 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         if res.success == true
           $(_this.el).find("#modal-settlements").modal('hide')
         #refresh data
-        _this.populateSummary(_this.user_id)
+        #update  summary and reports list
+        _this.params.view_to_load = $(_this.el).find('.filter-status li.active a').attr('data-view') 
+        _this.collection.fetch({
+          data: _this.params
+          reset: true,
+          # data: _this.params
+          success: ->
+            _this.populateSummary(_this.user_id)
+
+          error: ->
+            console.log "Couldn't fetch Successfully."
+        })
     })
 
   initDebt: (e) ->
@@ -429,7 +446,19 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(_this.el).find("#modal-settlements").modal('hide')
-          _this.populateSummary(_this.user_id)
+
+          #update  summary and reports list
+          _this.params.view_to_load = $(_this.el).find('.filter-status li.active a').attr('data-view') 
+          _this.collection.fetch({
+            data: _this.params
+            reset: true,
+            # data: _this.params
+            success: ->
+              _this.populateSummary(_this.user_id)
+
+            error: ->
+              console.log "Couldn't fetch Successfully."
+          })
       error: (err) ->
         console.log "err", err
     })

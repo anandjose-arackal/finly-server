@@ -65,6 +65,13 @@
           </div>
         </div>
         <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Memo</label></div>
+          <div class="col-sm-6">
+            <label class="control-label item-attr-preview">{{item.memo}}</label>
+            <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
+          </div>
+        </div>
+        <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">Status</label></div>
           <div class="col-sm-6">
             {{#switch item.status}}

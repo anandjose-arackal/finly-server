@@ -1,7 +1,13 @@
 <div class="row sidebar-element">
   <ul class="nav nav-pills nav-stacked filter-status">
     <li class="{{#if item.filter_status}}{{else}}active{{/if}}"><a href="#" data-status-id="">All</a></li>
-    <li class="{{#if_eq item.filter_status 1}}active{{/if_eq}}"><a href="#" data-status-id="1">Unsubmitted</a></li>
+    {{#if item.view}}
+      {{#if_eq item.view 'personal'}}
+        <li class="{{#if_eq item.filter_status 1}}active{{/if_eq}}"><a href="#" data-status-id="1">Unsubmitted</a></li>
+      {{/if_eq}}
+    {{else}}
+      <li class="{{#if_eq item.filter_status 1}}active{{/if_eq}}"><a href="#" data-status-id="1">Unsubmitted</a></li>
+    {{/if}}
     <li class="{{#if_eq item.filter_status 2}}active{{/if_eq}}"><a href="#" data-status-id="2">Processing</a></li>
     <li class="{{#if_eq item.filter_status 5}}active{{/if_eq}}"><a href="#" data-status-id="5">Approved</a></li>
     <li class="{{#if_eq item.filter_status 4}}active{{/if_eq}}"><a href="#" data-status-id="4">Rejected</a></li>

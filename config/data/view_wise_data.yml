@@ -3,8 +3,8 @@ admin:
     primary_navbar:
       # - Company Expenses: expenses
       # - Analytics: analytics
-      - Settlements: settlements
-      - Employees: employees
+      - Company Settlements: settlements
+      - Company Employees: employees
       - Company Reports: reports
     cog:
       - Organization Account: '/organization_account?view=admin'

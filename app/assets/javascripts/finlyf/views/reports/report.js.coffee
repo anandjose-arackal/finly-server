@@ -237,10 +237,12 @@ class FinlyF.Views.Report extends Backbone.View
 
     policy_id = $(@el).find('select.item-policy-edit').val()
     name = $(@el).find('input.item-name-edit').val()
+    memo = $(@el).find('textarea.item-memo-edit').val()
     
     data = {
       name: name,
-      policy_id: policy_id
+      policy_id: policy_id,
+      memo: memo
     }
     model = new FinlyF.Models.Report({id: @model.get('id')})
     model.save(data, {

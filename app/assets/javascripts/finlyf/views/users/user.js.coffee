@@ -130,13 +130,26 @@ class FinlyF.Views.User extends Backbone.View
       data: values,
       processData: true
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
         if res.success == true
-          FinlyF.snapNotify(res.messages)
-          _this.model.fetch({
-            data: {
-              view: _this.params.view
-            }
-          })
+          if parseInt($("#current_user_id").val()) == parseInt(_this.model.get('id'))
+            #REFRESH THE ENTIRE PAGE IF CURRENT USER MODIFIED HIS ROLES
+            flag = confirm("You have changed your roles. You need to reload the page.")
+            if flag
+              window.location.reload()
+            else
+              alert("Some functionality might not work unless page has been completely reloaded.")
+              _this.model.fetch({
+                data: {
+                  view: _this.params.view
+                }
+              })
+          else 
+            _this.model.fetch({
+              data: {
+                view: _this.params.view
+              }
+            })
       error: (err) ->
         console.log "Err", err
     })
