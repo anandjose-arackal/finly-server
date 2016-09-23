@@ -1,6 +1,10 @@
 class User::Team::Mappings::Set < User::Team::Mappings::Base
   attr_accessor :updating_mapping, :policy
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def pre_validate
     super
     unless params[:user_manager_mapping].present?
@@ -10,30 +14,31 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
 
   def pre_authorize
     user_id = (params[:id] or params[:user_id])
-    if user.company_admin?
-      self.updating_user = user.company.users.with_id(user_id).first rescue nil
-    elsif user.policy_admin?
-      if params[:user_manager_mapping].present?
-        admin_policy_id = user.admin_policies.pluck(:id)
-        params[:user_manager_mapping].each do |key, mapping|
-          unless admin_policy_id.include?(mapping[:mapping_id])
-            messages[:error] << 'You do not have the permission to make the following update'
-            raise_unauthorized_exception
-          end
-        end
-      end
-      team = User::Team::Index.(user, view: 'admin')
-      self.updating_user = team.with_id(user_id).first rescue nil
-    # elsif user.manager?
-    #   team = User::Team::Index.(user, view: 'manager')
+    self.updating_user = user.company.users.find_by(id: user_id)
+    # if user.company_admin?
+    #   self.updating_user = user.company.users.with_id(user_id).first rescue nil
+    # elsif user.policy_admin?
+    #   if params[:user_manager_mapping].present?
+    #     admin_policy_id = user.admin_policies.pluck(:id)
+    #     params[:user_manager_mapping].each do |key, mapping|
+    #       unless admin_policy_id.include?(mapping[:mapping_id])
+    #         messages[:error] << 'You do not have the permission to make the following update'
+    #         raise_unauthorized_exception
+    #       end
+    #     end
+    #   end
+    #   team = User::Team::Index.(user, view: 'admin')
     #   self.updating_user = team.with_id(user_id).first rescue nil
-    # elsif user.finance_manager?
-    #   team = User::Team::Index.(user, view: 'finance_manager')
-    #   self.updating_user = team.with_id(user_id).first rescue nil
-    end
-    # unless updating_user
-    #   messages[:error] << "Cannot find user to update mapping."
+    # # elsif user.manager?
+    # #   team = User::Team::Index.(user, view: 'manager')
+    # #   self.updating_user = team.with_id(user_id).first rescue nil
+    # # elsif user.finance_manager?
+    # #   team = User::Team::Index.(user, view: 'finance_manager')
+    # #   self.updating_user = team.with_id(user_id).first rescue nil
     # end
+    # # unless updating_user
+    # #   messages[:error] << "Cannot find user to update mapping."
+    # # end
   end
 
   def init
@@ -118,7 +123,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   end
 
   def post_process
-    messages[:success] << 'Updated!'
+    messages[:success] << 'Mapping Updated!'
   end
 
   private
