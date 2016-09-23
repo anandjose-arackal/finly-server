@@ -40,7 +40,7 @@ class User::Show < User::Base
                     finance_manager: self.selected_user.finance_manager?}
       self.team_mapping = self.selected_user.team_mapping
       self.mapping = [retrieve_mapping(nil)]
-      self.policies = user.policies
+      self.policies = selected_user.policies
       self.policies.each do |policy|
         self.mapping << retrieve_mapping(policy)
       end
