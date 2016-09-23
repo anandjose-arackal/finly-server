@@ -30,8 +30,8 @@ class Expense::Index < Expense::Base
     if role_id.blank? or role_id == UserRole.employee_id
       self.expenses = user.expenses.includes(:manual_expense)
     else
-      user_ids = User::Team::Index.(user, params).pluck(:id)
-      self.expenses = Expense.where(user_id: user_ids).submitted.includes(:manual_expense)
+      report_ids = Report::Index.(user, params).reports.pluck(:id)
+      self.expenses = Expense.where(report_id: report_ids).includes(:manual_expense)
     end
   end
 
