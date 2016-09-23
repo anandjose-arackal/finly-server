@@ -1,5 +1,5 @@
 class User::Team::Mappings::Set < User::Team::Mappings::Base
-  attr_accessor :updating_mapping, :policy
+  attr_accessor :updating_mapping, :policy, :updating_records, :records_marked_for_destroy
 
   def pre_validate
     super
@@ -24,12 +24,12 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       end
       team = User::Team::Index.(user, view: 'admin')
       self.updating_user = team.with_id(user_id).first rescue nil
-    # elsif user.manager?
-    #   team = User::Team::Index.(user, view: 'manager')
-    #   self.updating_user = team.with_id(user_id).first rescue nil
-    # elsif user.finance_manager?
-    #   team = User::Team::Index.(user, view: 'finance_manager')
-    #   self.updating_user = team.with_id(user_id).first rescue nil
+      # elsif user.manager?
+      #   team = User::Team::Index.(user, view: 'manager')
+      #   self.updating_user = team.with_id(user_id).first rescue nil
+      # elsif user.finance_manager?
+      #   team = User::Team::Index.(user, view: 'finance_manager')
+      #   self.updating_user = team.with_id(user_id).first rescue nil
     end
     # unless updating_user
     #   messages[:error] << "Cannot find user to update mapping."
@@ -39,45 +39,10 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def init
     self.mappings = updating_user.team_mapping
     self.updating_mapping = params[:user_manager_mapping]
-  end
+    self.updating_records = []
+    self.records_marked_for_destroy = []
 
-  def validate
     currency_id = Currency.first.id
-    self.updating_mapping.each do |key, map|
-      # Formatter.remove_blanks map
-      next if map.blank? or map[:mapping].blank?
-      mapping_id = map[:mapping_id]
-      if mapping_id.present?
-        updating_map = self.mappings.with_id(mapping_id).first rescue nil
-        next if updating_map.present? and updating_map.default
-      end
-      updated_params = map[:mapping]
-      amount_value = updated_params['greater_than_amount_attributes']['value'] rescue nil
-      # mind = blown - this was causing the same amount multiple times error
-      policy_id = nil if updated_params[:policy_id].blank?
-      if amount_value.blank? or amount_value.to_f <= 0
-        messages[:error] << 'Error setting configuration. Amount value cannot be 0'
-        next
-      end
-      if updated_params[:manager_id].blank? and updated_params[:finance_manager_id].blank? and updated_params[:approves_to_id].blank? and updated_params[:approves_finance_to_id].blank?
-        messages[:error] << 'Error setting configuration. Manager cannot be blank'
-      end
-      v = self.mappings.policy(policy_id).exact_amount(currency_id, amount_value)
-      v = v.without_id(mapping_id) if mapping_id.present?
-      present= false
-      {manager: :manager_id, finance_manager: :finance_manager_id, approves_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
-        if updated_params[item].present? and v.send(key).present?
-          present = true
-        end
-      end
-      if present
-        messages[:error] << 'A configuration for the given amount has already been defined!'
-        break
-      end
-    end
-  end
-
-  def process
     self.updating_mapping.each do |key, map|
       # to remove all empty values
       # Formatter.remove_blanks map
@@ -97,24 +62,154 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
           if updated_params[:greater_than_amount_attributes].present? and updating_map.greater_than_amount_id.present?
             updated_params[:greater_than_amount_attributes][:id] = updating_map.greater_than_amount_id
           end
-          updating_map.update_attributes(update_params(updated_params))
+          updating_map.assign_attributes(update_params(updated_params))
+          self.updating_records << updating_map
         else
           # Default mapping cannot be destroyed
           if updating_map.default
-            updating_map.update_attributes(manager_id: nil, finance_manager_id: nil, approves_to_id: nil, approves_finance_to_id: nil)
+            updating_map.assign_attributes(manager_id: nil, finance_manager_id: nil, approves_to_id: nil, approves_finance_to_id: nil)
+            self.updating_records << updating_map
           else
-            updating_map.destroy
+            self.records_marked_for_destroy << updating_map
           end
         end
       else
         # If ID is not present, create new user mapping
         if updated_params.present?
           updated_params[:user_id] = updating_user.id
-          updated_params['greater_than_amount_attributes']['currency_id'] = 1
-          self.mappings.create(update_params(updated_params))
+          updated_params['greater_than_amount_attributes']['currency_id'] = currency_id
+          self.updating_records << self.mappings.build(update_params(updated_params))
         end
       end
     end
+  end
+
+  def validate
+    self.updating_records.each do |record|
+      self.updating_records.each do |record2|
+        next if record == record2
+        next unless record.policy_id == record2.policy_id
+        {manager: :manager_id, finance_manager: :finance_manager_id, approves_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
+          if record.send(item).present? and record2.send(item).present?
+            if record.default and record2.default
+              messages[:error] << 'Error assigning configuration'
+              return
+            elsif record.default or record2.default
+              next
+            elsif record.greater_than_amount.blank? or record2.greater_than_amount.blank?
+              messages[:error] << 'Error setting configuration. Amount value cannot be 0'
+              return
+            elsif record.greater_than_amount.value == record2.greater_than_amount.value and not self.records_marked_for_destroy.include?(record) and not self.records_marked_for_destroy.include?(record2)
+              messages[:error] << 'You cannot assign two configurations with the same amount value'
+              return
+            end
+          end
+        end
+      end
+    end
+    #
+    # self.updating_mapping.each do |key, map|
+    #   # Formatter.remove_blanks map
+    #   ##
+    #   # Check if existing mapping exists for the given Currency ID
+    #   next if map.blank? or map[:mapping].blank?
+    #   mapping_id = map[:mapping_id]
+    #   if mapping_id.present?
+    #     updating_map = self.mappings.with_id(mapping_id).first rescue nil
+    #     next if updating_map.present? and updating_map.default
+    #   end
+    #   updated_params = map[:mapping]
+    #   amount_value = updated_params['greater_than_amount_attributes']['value'] rescue nil
+    #   # mind = blown - this was causing the same amount multiple times error
+    #   policy_id = nil
+    #   policy_id = updated_params[:policy_id] if updated_params[:policy_id].present?
+    #   if amount_value.blank? or amount_value.to_f <= 0
+    #     messages[:error] << 'Error setting configuration. Amount value cannot be 0'
+    #     next
+    #   end
+    #   if updated_params[:manager_id].blank? and updated_params[:finance_manager_id].blank? and updated_params[:approves_to_id].blank? and updated_params[:approves_finance_to_id].blank?
+    #     messages[:error] << 'Error setting configuration. Manager cannot be blank'
+    #   end
+    #   v = self.mappings.policy(policy_id).exact_amount(currency_id, amount_value)
+    #   v = v.without_id(mapping_id) if mapping_id.present?
+    #   present= false
+    #   {manager: :manager_id, finance_manager: :finance_manager_id, approves_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
+    #     if updated_params[item].present? and v.send(key).present?
+    #       present = true
+    #     end
+    #   end
+    #   if present
+    #     messages[:error] << 'A configuration for the given amount has already been defined!'
+    #     return
+    #   end
+    # 
+    #   ##
+    #   # Check if two mappings are added with the same amount for the same role
+    #   self.updating_mapping.each do |k, m|
+    #     next if k == key
+    #     updated_params2 = m[:mapping]
+    #     amount_value2 = updated_params2['greater_than_amount_attributes']['value'] rescue nil
+    #     # mind = blown - this was causing the same amount multiple times error
+    #     policy_id2 = nil
+    #     policy_id2 = updated_params2[:policy_id] unless policy_id2.blank?
+    #     if policy_id == policy_id2 and amount_value == amount_value2
+    #       updated_params2.each do |k2, v2|
+    #         updated_params.each do |k3, v3|
+    #           if k2 == k3
+    #             messages[:error] << 'Multiple configurations cannot be defined for the same amount value!'
+    #             return
+    #           end
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
+  end
+
+  def process
+    self.updating_records.each do |record|
+      record.save
+    end
+    self.records_marked_for_destroy.each do |record|
+      record.destroy
+    end
+    # self.updating_mapping.each do |key, map|
+    #   # to remove all empty values
+    #   # Formatter.remove_blanks map
+    #   next if map.blank?
+    #   id = map[:mapping_id]
+    #   updated_params = map[:mapping]
+    #   # this is only when the policy user mappings are being updated
+    #   updated_params[:policy_id] = params[:policy_id] if params[:policy_id]
+    #   if id.present?
+    #     updating_map = self.mappings.with_id(id).first rescue nil
+    #     if updating_map.blank?
+    #       messages[:error] << 'Error updating configuration'
+    #       return
+    #     end
+    #     if updated_params.present?
+    #       # Remove if greater than amount ID has to be passed from the client
+    #       if updated_params[:greater_than_amount_attributes].present? and updating_map.greater_than_amount_id.present?
+    #         updated_params[:greater_than_amount_attributes][:id] = updating_map.greater_than_amount_id
+    #       end
+    #       updating_map.update_attributes(update_params(updated_params))
+    #     else
+    #       # Default mapping cannot be destroyed
+    #       if updating_map.default
+    #         updating_map.update_attributes(manager_id: nil, finance_manager_id: nil, approves_to_id: nil, approves_finance_to_id: nil)
+    #       else
+    #         updating_map.destroy
+    #       end
+    #     end
+    #   else
+    #     # If ID is not present, create new user mapping
+    #     if updated_params.present?
+    #       updated_params[:user_id] = updating_user.id
+    #       updated_params['greater_than_amount_attributes']['currency_id'] = 1
+    #       self.mappings.create(update_params(updated_params))
+    #     end
+    #   end
+    # end
   end
 
   def post_process
