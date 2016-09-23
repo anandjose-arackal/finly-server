@@ -112,7 +112,12 @@ class FinlyF.Views.Expense extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           if $(target).closest('.modal-content')
+            #Adding refresh trigger in reprots#show
             $(target).closest('.modal-content').attr('data-refresh-true', true)
+
+            #Adding refresh trigger in expense#index
+            if _this.parent
+              $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
           _this.model.fetch()
           # if _this.report_preview
           # $("#modal-new").modal('hide')
