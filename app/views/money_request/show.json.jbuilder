@@ -33,7 +33,7 @@ json.comments @result.comments do |comment|
   end
 end
 
-json.items @result.items do |item|
+json.request_items @result.items do |item|
   json.category do
     json.name item.category.name
     json.id item.category.id

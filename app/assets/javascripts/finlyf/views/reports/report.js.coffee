@@ -34,6 +34,7 @@ class FinlyF.Views.Report extends Backbone.View
     'click .confirm-add-existing-expense': 'addExistingExpenses'
 
   initialize: (options) ->
+    console.log "we're here in report show"
     @parent = options.parent
     _this = @
     @preview = options.preview

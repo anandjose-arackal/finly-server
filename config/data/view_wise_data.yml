@@ -17,7 +17,7 @@ personal:
   links:
     primary_navbar:
       - Settlements: settlements
-      - Request: request
+      - Money Requests: requests
       - Reports: reports
       - Receipts: receipts
       - Expenses: expenses
@@ -45,8 +45,8 @@ finance_manager:
       # - Company Expenses: expenses
       # - Analytics: analytics
       - Settlements: settlements
-      - Employees: employees
-      - Company Reports: reports
+      - Team Members: employees
+      - Team Reports: reports
 
     cog:
       # - My Account: '/users/'

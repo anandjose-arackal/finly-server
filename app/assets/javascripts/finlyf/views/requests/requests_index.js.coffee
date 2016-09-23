@@ -2,11 +2,11 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
 
   #navbar
-  templateNavbarSidebar: HandlebarsTemplates['finlyf/reports/navbar/navbar_sidebar']
-  templateNavbarMain: HandlebarsTemplates['finlyf/reports/navbar/navbar_main']
+  templateNavbarSidebar: HandlebarsTemplates['finlyf/requests/navbar/navbar_sidebar']
+  templateNavbarMain: HandlebarsTemplates['finlyf/requests/navbar/navbar_main']
 
   #sidebar
-  templateSidebar: HandlebarsTemplates['finlyf/reports/sidebar/sidebar']
+  templateSidebar: HandlebarsTemplates['finlyf/requests/sidebar/sidebar']
 
   #main
   templateMain: HandlebarsTemplates['finlyf/reports/crud/main']
@@ -32,6 +32,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     'click .btn-filter': 'filter'
 
   initialize: (options) ->
+    console.log "here in requests"
     if options
       @params = options.params || {}
     else
@@ -41,7 +42,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     # console.log "Step x. Init View"
     _this = @
     @dump = []
-    @collection = new FinlyF.Collections.Reports()
+    @collection = new FinlyF.Collections.Requests()
     @collection.fetch({
       reset: true,
       data: _this.params,
@@ -114,7 +115,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
   appendItems: (item) ->
     # console.log "appending"
     #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Report({ model: item })
+    view_item = new FinlyF.Views.Request({ model: item })
     $(@el).find("#items").append(view_item.render().el)
     # console.log view_item.el
 
@@ -168,7 +169,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
     model = @collection.get(model_id)
 
-    preview_view = new FinlyF.Views.Report({
+    preview_view = new FinlyF.Views.Request({
       model_id: model.get('id')
       preview: true
       parent: @
@@ -177,21 +178,6 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
 
-  showReport: (report_id) ->
-    # model = @collection.get(report_id)
-    # console.log model.toJSON()
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
-
-    preview_view = new FinlyF.Views.Report({
-      model_id: report_id
-      preview: true
-      parent: @
-      current_view: @params.view || 'personal'
-    })
-
-    $(@el).find("#item-details-main").html(preview_view.render().el)
 
   closeDetails: (e)->
     # console.log "Closing", e, e.currentTarget
@@ -217,14 +203,14 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       $(main).addClass("preview")
     $(@el).find("#item-details-main").html("")
 
-    model = new FinlyF.Models.Report()
+    model = new FinlyF.Models.Request()
     data = {
       authenticity_token: $("#authenticity_token").val()
     }
     model.save(data, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        preview_view = new FinlyF.Views.Report({
+        preview_view = new FinlyF.Views.Request({
           model_id: model.get('id')
           preview: true
           parent: _this
@@ -252,14 +238,14 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       params.view = @params.view
 
     # console.log "will navigate"
-    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+    FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
 
   resetFilters: ->
     params = {}
     params.view = @params.view
     
     # console.log "will navigate"
-    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+    FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
 
   filter: ->
     # console.log "Filtering"
@@ -285,7 +271,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       params.view = @params.view
 
     # console.log "will navigate"
-    FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+    FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
     target = $(e.currentTarget)
