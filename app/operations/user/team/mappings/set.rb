@@ -24,7 +24,16 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       end
       team = User::Team::Index.(user, view: 'admin')
       self.updating_user = team.with_id(user_id).first rescue nil
+    # elsif user.manager?
+    #   team = User::Team::Index.(user, view: 'manager')
+    #   self.updating_user = team.with_id(user_id).first rescue nil
+    # elsif user.finance_manager?
+    #   team = User::Team::Index.(user, view: 'finance_manager')
+    #   self.updating_user = team.with_id(user_id).first rescue nil
     end
+    # unless updating_user
+    #   messages[:error] << "Cannot find user to update mapping."
+    # end
   end
 
   def init
@@ -44,7 +53,8 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       end
       updated_params = map[:mapping]
       amount_value = updated_params['greater_than_amount_attributes']['value'] rescue nil
-      policy_id = updated_params[:policy_id] rescue nil
+      # mind = blown - this was causing the same amount multiple times error
+      policy_id = nil if updated_params[:policy_id].blank?
       if amount_value.blank? or amount_value.to_f <= 0
         messages[:error] << 'Error setting configuration. Amount value cannot be 0'
         next

@@ -87,7 +87,6 @@ class PoliciesController < ApplicationController
   def update_user_configuration
     update_configuration_op = Policy::Users::UpdateMapping.new(current_user, params)
     @result = update_configuration_op.run
-    debugger
     if @result.success?
       @result = Policy::Show.new(current_user, params).run
       flash[:success] = "Configuration updated"

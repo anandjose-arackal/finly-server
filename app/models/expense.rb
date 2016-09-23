@@ -108,11 +108,12 @@ class Expense < ActiveRecord::Base
   scope :filter_search, -> (value) { joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant like ? OR note like ?', "%#{value}%", "%#{value}%") }
 
   scope :filter_receipt, -> (value) do
+    expense_ids = Receipt.where(parent_type: Expense).uniq.pluck(:parent_id)
     case value
       when 'present'
-        where("id IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
+        where(id: expense_ids)
       when 'absent'
-        where("id NOT IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
+        where.not(id: expense_ids)
     end
   end
 
