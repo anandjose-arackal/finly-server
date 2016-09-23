@@ -53,7 +53,7 @@ class User::Role::Set < BaseOperation
   end
 
   def post_process
-    messages[:success] << 'User roles updated'
+    messages[:success] << 'Role updated!'
   end
 
 end

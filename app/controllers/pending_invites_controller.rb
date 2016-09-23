@@ -5,6 +5,10 @@ class PendingInvitesController < ApplicationController
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+    # i.e. if user has already signed in, redirect to login page
+    unless @pending_user.invitation_token
+      redirect_to new_user_session_path
+    end
   end
 
 
@@ -55,10 +59,7 @@ class PendingInvitesController < ApplicationController
         format.js { render js: "window.location = '#{root_url}';"}
       end
     else
-      respond
-      # respond_to do |format|
-      #   format.js {}
-      # end
+      respond response: :failure, message: @result.messages[:error]
     end
   end
 

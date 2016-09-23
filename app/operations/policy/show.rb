@@ -10,11 +10,11 @@ class Policy::Show < Policy::Base
     end
 
     def company_managers
-      policy.company.managers
+      policy.company.managers.signed_up
     end
 
     def company_finance_managers
-      policy.company.finance_managers
+      policy.company.finance_managers.signed_up
     end
 
     def categories

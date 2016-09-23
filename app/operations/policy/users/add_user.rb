@@ -73,7 +73,7 @@ class Policy::Users::AddUser < Policy::Base
   end
 
   def success
-    Policy::Show.(user, params)
+    Policy::Base::PolicyPresenter.new(user, {policy: policy}, messages)
   end
 
 end

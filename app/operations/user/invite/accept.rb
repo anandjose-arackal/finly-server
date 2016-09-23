@@ -57,6 +57,10 @@ class User::Invite::Accept < User::Invite::Base
     unless password == password_confirmation
       messages[:error] << 'Confirmation password is not matching the given password'
     end
+    # manually adding here because devise isn't throwing an error during sign up. todo - investigate
+    if password.length < 8
+      messages[:error] << "Password length must be at least 8 characters"
+    end
   end
 
   def authorize

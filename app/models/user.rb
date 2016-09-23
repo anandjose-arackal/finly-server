@@ -102,6 +102,7 @@ class User < ActiveRecord::Base
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
+  validates :mobile_number, length: {is: 10}
 
   # validate :valid_role
 
@@ -118,7 +119,7 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
 
   # scopes for filters
-  scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
+  scope :filter_search, -> (term, user_ids = []) { where(id: user_ids).where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
   scope :filter_state, -> (state) do
     case (state)
       when '1', 1
@@ -217,6 +218,14 @@ class User < ActiveRecord::Base
 
   def invite_accepted?
     !self.invitation_token
+  end
+
+  def active_for_authentication?
+    super && self.active # i.e. super && self.is_active
+  end
+
+  def inactive_message
+    "Sorry, this account has been deactivated."
   end
 
   # activates the user in devise

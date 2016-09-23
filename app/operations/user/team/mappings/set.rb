@@ -55,7 +55,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       v = self.mappings.policy(policy_id).exact_amount(currency_id, amount_value)
       v = v.without_id(mapping_id) if mapping_id.present?
       present= false
-      {manager: :manager_id, finance_manager: :finance_manager_id, approved_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
+      {manager: :manager_id, finance_manager: :finance_manager_id, approves_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
         if updated_params[item].present? and v.send(key).present?
           present = true
         end
@@ -74,6 +74,8 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       next if map.blank?
       id = map[:mapping_id]
       updated_params = map[:mapping]
+      # this is only when the policy user mappings are being updated
+      updated_params[:policy_id] = params[:policy_id] if params[:policy_id]
       if id.present?
         updating_map = self.mappings.with_id(id).first rescue nil
         if updating_map.blank?

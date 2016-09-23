@@ -10,10 +10,10 @@ class CategoriesController < ApplicationController
       respond_to do |format|
         format.js {}
       end
-      # render partial: 'organization_account/category_list', replace: "#categoriesList"
     else
       flash[:error] = @result.messages[:error]
     end
+    # todo - render error messages
   end
 
   def destroy

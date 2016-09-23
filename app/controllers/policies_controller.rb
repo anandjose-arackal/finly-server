@@ -3,9 +3,6 @@ class PoliciesController < ApplicationController
 
   before_action :authenticate_user!
 
-  has_scope :filter_name
-  has_scope :filter_email
-
   def create
     create_policy_op = Policy::Create.new(current_user, params)
     @result = create_policy_op.run
@@ -59,6 +56,7 @@ class PoliciesController < ApplicationController
   def add_users
     @result = Policy::Users::AddUser.(current_user, params)
     if @result.success?
+      @result = Policy::Show.(current_user, params)
       flash[:success] = 'User successfully addded'
       # redirect_to request.referrer
       respond_to do |format|
@@ -73,6 +71,7 @@ class PoliciesController < ApplicationController
   def remove_users
     @result = Policy::Users::RemoveUser.(current_user, params)
     if @result.success?
+      @result = Policy::Show.(current_user, params)
       flash[:success] = 'User successfully removed'
       # redirect_to request.referrer
       respond_to do |format|
@@ -88,6 +87,7 @@ class PoliciesController < ApplicationController
   def update_user_configuration
     update_configuration_op = Policy::Users::UpdateMapping.new(current_user, params)
     @result = update_configuration_op.run
+    debugger
     if @result.success?
       @result = Policy::Show.new(current_user, params).run
       flash[:success] = "Configuration updated"
@@ -96,7 +96,7 @@ class PoliciesController < ApplicationController
         format.js {}
       end
     else
-      flash[:danger] = update_configuration_op.messages[:error]
+      flash[:danger] = @result.messages[:error]
       # render flash message
     end
   end

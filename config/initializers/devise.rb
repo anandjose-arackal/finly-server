@@ -16,7 +16,7 @@ Devise.setup do |config|
   config.mailer_sender = 'noreply@finly.io'
 
   # Configure the class responsible to send e-mails.
-  config.mailer = 'DeviseMailer'
+  # config.mailer = 'DeviseMailer'
 
   # Configure the parent class responsible to send e-mails.
   config.parent_mailer = 'ActionMailer::Base'
@@ -197,7 +197,7 @@ Devise.setup do |config|
 
   # ==> Configuration for :validatable
   # Range for password length.
-  config.password_length = 6..128
+  # config.password_length = 6..128
 
   # Email regex used to validate email formats. It simply asserts that
   # one (and only one) @ exists in the given string. This is mainly

@@ -126,5 +126,4 @@ class Policy::Users::UpdateConfiguration < Policy::Base
       params[:conditional_approves_finance_to][:policy_id] = policy.id
     end
   end
-
 end
