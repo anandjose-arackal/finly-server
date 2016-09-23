@@ -16,7 +16,7 @@ class Report::Update < Report::Base
   def init
     super
     self.update_param = {}
-    self.update_param = self.params.permit(:name, :policy_id)
+    self.update_param = self.params.permit(:name, :policy_id, :memo)
     if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
       self.update_param[:policy_id] = nil
     end
