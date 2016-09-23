@@ -32,7 +32,8 @@
 
 class Policy::Users::UpdateMapping < Policy::Base
 
-  attr_accessor :user_manager_mappings, :being_updated_user, :policy, :policy_params
+  attr_accessor :user_manager_mappings, :being_updated_user, :policy, :policy_params,
+                :admin
 
   def authorized_user_types
     [:admin, :policy_admin]
@@ -61,12 +62,27 @@ class Policy::Users::UpdateMapping < Policy::Base
 
   end
 
+  # if the user is being added as policy admin, record that change here
+  def pre_process
+    if params[:policy][:admin] == "1"
+      self.admin = true
+    end
+  end
+
   def process
-    result = User::Team::Mappings::Set.new(user, params).run
+    result = Policy::Mappings::Set.new(user, params).run
     if result.success?
       messages[:success] = "User mapping updated"
     else
       messages[:error] = result.messages[:error]
+    end
+  end
+
+  # making the user a policy admin here
+  def post_process
+    if admin
+      user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
+      user_policy_mapping.update_attributes(admin: true)
     end
   end
 
