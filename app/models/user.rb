@@ -233,6 +233,7 @@ class User < ActiveRecord::Base
     self.confirm
   end
 
+  # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == Date.today
@@ -245,7 +246,9 @@ class User < ActiveRecord::Base
     expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
     pending_reimbursement = reports.with_amount.without_payment.sum(:value)
     value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
-    Amount.new(value: value, currency: cash.currency)
+    # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
+    min_value = [cash, value].min
+    Amount.new(value: min_value, currency: cash.currency)
   end
 
   alias_method :manager_name, :user_name
