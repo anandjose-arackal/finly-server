@@ -2,7 +2,8 @@ json.user do
   json.name @result.selected_user.name
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number
-  json.current_user_id current_user.id
+  json.current_user_id @result.user.id
+  json.editable @result.user.company_admin?
 end
 json.role do
   json.admin @result.roles[:admin]
