@@ -41,7 +41,7 @@ class Report::Expenses::Remove < Report::Base
     end
 
     # checking state of the report
-    unless report.open? or report.retracted?
+    unless report.open? or report.retracted? or report.rejected?
       messages[:error] << 'Cannot remove expenses from report unless report is in open or retracted state'
       return false
     end

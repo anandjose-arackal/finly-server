@@ -51,7 +51,7 @@ class BalanceSheet < ActiveRecord::Base
   end
 
   def subtract_cash_in_hand(value, currency=nil)
-    if value.present? and value.to_f <= 0
+    if value.blank? or value.to_f <= 0
       return
     end
     value = value.to_f

@@ -59,7 +59,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     value = param[:amount].to_f if param[:amount].present?
     cash_in_hand_on_date = cash_in_hand to_user, param[:date].to_date
     unless value.present? and value <= cash_in_hand_on_date.value
-      messages[:error] << 'Settlement amount cannot be greater than the cash in hand amount'
+      messages[:error] << "User does not have sufficient cash in hand on date #{param[:date]} to perform the settlement"
       return false
     end
 

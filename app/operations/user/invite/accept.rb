@@ -44,8 +44,8 @@ class User::Invite::Accept < User::Invite::Base
       messages[:error] << 'Name can\'t be blank'
       return
     end
-    if mobile_number.blank?
-      messages[:error] << 'Mobile number can\'t be blank'
+    if mobile_number.blank? or mobile_number.length != 10
+      messages[:error] << 'Mobile number has to be 10 digits'
       return
     end
     if password.blank?
@@ -70,7 +70,7 @@ class User::Invite::Accept < User::Invite::Base
   def process
     self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present?
-      messages[:error] = invited_user.errors.full_messages
+      messages[:error] << invited_user.errors.full_messages
     end
   end
 

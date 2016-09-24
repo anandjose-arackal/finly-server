@@ -4,6 +4,10 @@ class User::Configuration::UpdateDetails < BaseOperation
 
   attr_accessor :details_params, :being_updated_user
 
+  def authorized_user_types
+    [:employee]
+  end
+
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "No user or params passed."

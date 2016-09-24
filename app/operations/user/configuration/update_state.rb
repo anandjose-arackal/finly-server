@@ -6,6 +6,10 @@
 class User::Configuration::UpdateState < BaseOperation
   attr_accessor :to_user
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "User or params not passed."

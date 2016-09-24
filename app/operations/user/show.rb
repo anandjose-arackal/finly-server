@@ -32,7 +32,7 @@ class User::Show < User::Base
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
-                  :team_members_presenter, :selected_user
+                  :team_members_presenter, :selected_user, :mapping_editable
 
     def init
       self.selected_user = params[:selected_user]
@@ -40,11 +40,12 @@ class User::Show < User::Base
                     finance_manager: self.selected_user.finance_manager?}
       self.team_mapping = self.selected_user.team_mapping
       self.mapping = [retrieve_mapping(nil)]
-      self.policies = user.policies
+      self.policies = selected_user.policies
       self.policies.each do |policy|
         self.mapping << retrieve_mapping(policy)
       end
       self.actions = load_actions
+      self.mapping_editable = user.company_admin?
     end
 
     private
