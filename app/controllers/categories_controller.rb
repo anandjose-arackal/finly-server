@@ -3,31 +3,23 @@ class CategoriesController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    create_op = Company::Configuration::Category::Create.new(current_user, params)
-    @result = create_op.run
+    @result = Company::Configuration::Category::Create.(current_user, params)
+    messages = @result.messages
     if @result.success?
-      @result = Company::Configuration::Show.new(current_user, params).run
-      respond_to do |format|
-        format.js {}
-      end
-    else
-      flash[:error] = @result.messages[:error]
+      @result = Company::Configuration::Show.(current_user, params)
+      @result.messages = messages
     end
-    # todo - render error messages
+    respond
   end
 
   def destroy
-    destroy_op = Company::Configuration::Category::Destroy.new(current_user, params)
-    @result = destroy_op.run
+    @result = Company::Configuration::Category::Destroy.(current_user, params)
+    messages = @result.messages
     if @result.success?
-      @result = Company::Configuration::Show.new(current_user, params).run
-      respond_to do |format|
-        format.js {}
-      end
-      # render partial: 'organization_account/category_list', replace: "#categoriesList"
-    else
-      flash[:error] = @result.messages[:error]
+      @result = Company::Configuration::Show.(current_user, params)
+      @result.messages = messages
     end
+    respond
   end
 
 end
