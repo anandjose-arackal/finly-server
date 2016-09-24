@@ -259,7 +259,7 @@ module ApplicationHelper
   end
 
   def full_title(page_title = '')
-    base_title = "Expense Management"
+    base_title = 'Finly'
     if page_title.empty?
       base_title
     else
