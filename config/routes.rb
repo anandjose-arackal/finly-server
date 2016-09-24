@@ -3,7 +3,6 @@
 #                              Prefix Verb   URI Pattern                                                 Controller#Action
 # api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
 #       api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                    api/v1/configuration#category
-#                     email_processor POST   /email/incoming(.:format)                                   griddler/emails#create
 #                           oauth_new GET    /oauth/new(.:format)                                        oauth/auth#new
 #                     oauth_authorize POST   /oauth/authorize(.:format)                                  opro/oauth/auth#create
 #                         oauth_token POST   /oauth/token(.:format)                                      oauth/token#create {:format=>"json"}
@@ -86,7 +85,6 @@
 #                      api_v1_receipt PATCH  /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
 #                                     PUT    /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
 #                                     DELETE /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
-#             api_v1_receipt_add_note POST   /api/v1/receipts/:receipt_id/add_note(.:format)             api/v1/receipts#add_note
 # api_v1_receipt_expense_from_receipt POST   /api/v1/receipts/:receipt_id/expense_from_receipt(.:format) api/v1/receipts#expense_from_receipt
 #                                     GET    /api/v1/receipts(.:format)                                  api/v1/receipts#index
 #                                     POST   /api/v1/receipts(.:format)                                  api/v1/receipts#create
@@ -109,6 +107,7 @@
 #                    policy_add_users POST   /policies/:policy_id/add_users(.:format)                    policies#add_users
 #                 policy_remove_users POST   /policies/:policy_id/remove_users(.:format)                 policies#remove_users
 #    policy_update_user_configuration PATCH  /policies/:policy_id/update_users_configuration(.:format)   policies#update_user_configuration
+#              policy_destroy_mapping DELETE /policies/:policy_id/remove_mapping/:mapping_id(.:format)   policies#destrot_mapping
 #                     policy_add_rule POST   /policies/:policy_id/add_rule(.:format)                     rules#create
 #                  policy_remove_rule DELETE /policies/:policy_id/remove_rule(.:format)                  rules#destroy
 #                                     GET    /policies(.:format)                                         policies#index
@@ -219,7 +218,17 @@
 #                         mass_import GET    /mass_import(.:format)                                      users#mass_import
 #                         user_import POST   /import(.:format)                                           users#import
 #                     pending_invites POST   /pending_invites(.:format)                                  pending_invites#create
+#                 edit_pending_invite GET    /pending_invites/:id/edit(.:format)                         pending_invites#edit
 #                      pending_invite PATCH  /pending_invites/:id(.:format)                              pending_invites#update
+#                                     PUT    /pending_invites/:id(.:format)                              pending_invites#update
+#                                     DELETE /pending_invites/:id(.:format)                              pending_invites#destroy
+#               pending_invite_accept PATCH  /pending_invites/:pending_invite_id/accept(.:format)        pending_invites#accept
+#                                     GET    /pending_invites(.:format)                                  pending_invites#index
+#                                     POST   /pending_invites(.:format)                                  pending_invites#create
+#                  new_pending_invite GET    /pending_invites/new(.:format)                              pending_invites#new
+#                                     GET    /pending_invites/:id/edit(.:format)                         pending_invites#edit
+#                                     GET    /pending_invites/:id(.:format)                              pending_invites#show
+#                                     PATCH  /pending_invites/:id(.:format)                              pending_invites#update
 #                                     PUT    /pending_invites/:id(.:format)                              pending_invites#update
 #                                     DELETE /pending_invites/:id(.:format)                              pending_invites#destroy
 #                 settlements_summary GET    /settlements/summary(.:format)                              settlements#summary
@@ -255,6 +264,7 @@
 #               autocomplete_merchant GET    /autocomplete/merchant(.:format)                            autocomplete#merchant
 #                   autocomplete_user GET    /autocomplete/user(.:format)                                autocomplete#user
 #                 external_url_report GET    /external/reports/:id(.:format)                             external_url#report
+#             external_url_settlement GET    /external/settlements/:id(.:format)                         external_url#payment
 #
 
 Rails.application.routes.draw do
@@ -321,6 +331,7 @@ Rails.application.routes.draw do
     post 'add_users' => 'policies#add_users', as: :add_users
     post 'remove_users' => 'policies#remove_users', as: :remove_users
     patch 'update_users_configuration' => 'policies#update_user_configuration', as: :update_user_configuration
+    delete 'remove_mapping/:mapping_id' => 'policies#destrot_mapping', as: :destroy_mapping
     post 'add_rule', to: 'rules#create', as: :add_rule
     delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
   end

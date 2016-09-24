@@ -11,6 +11,7 @@ class UsersController < ApplicationController
 
   # this would call the respective private method to update the respective attributes
   def update
+    ap params
     update_handler(params[:type])
   end
 

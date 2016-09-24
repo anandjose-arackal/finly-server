@@ -14,7 +14,6 @@
 #  parent_id          :integer
 #  parent_type        :string(255)
 #  note               :text(65535)
-#  receipt_email_id   :integer
 #
 
 require 'test_helper'
