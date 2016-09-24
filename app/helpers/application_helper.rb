@@ -233,6 +233,10 @@ module ApplicationHelper
 
   end
 
+  def color_for(item)
+    Constants::FLASH_COLORS[item]
+  end
+
   private
   def get_type(type)
     type = 'information' if type == 'info' or type == 'notice'
