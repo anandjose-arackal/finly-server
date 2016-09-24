@@ -33,8 +33,7 @@ class SettlementsController < ApplicationController
 
   def show
     # @view_to_load = params[:view_to_load] unless params[:view_to_load] == 'payments' else
-    operation = Settlement::Show.new(current_user, params)
-    @result = operation.run
+    @result = Settlement::Show.(current_user, params)
     respond
   end
 
