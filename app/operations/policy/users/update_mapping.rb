@@ -32,7 +32,8 @@
 
 class Policy::Users::UpdateMapping < Policy::Base
 
-  attr_accessor :user_manager_mappings, :being_updated_user, :policy, :policy_params
+  attr_accessor :user_manager_mappings, :being_updated_user, :policy, :policy_params,
+                :admin
 
   def authorized_user_types
     [:admin, :policy_admin]
@@ -61,8 +62,17 @@ class Policy::Users::UpdateMapping < Policy::Base
 
   end
 
+  # if the user is being added as policy admin, record that change here
+  def pre_process
+    if params[:policy][:admin] == "1"
+      self.admin = true
+    else
+      self.admin = false
+    end
+  end
+
   def process
-    result = User::Team::Mappings::Set.new(user, params).run
+    result = Policy::Mappings::Set.new(user, params).run
     if result.success?
       messages[:success] = "User mapping updated"
     else
@@ -70,39 +80,45 @@ class Policy::Users::UpdateMapping < Policy::Base
     end
   end
 
+  # making the user a policy admin here
+  def post_process
+    user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
+    user_policy_mapping.update_attributes(admin: admin)
+  end
+
   def success
     Policy::Base::PolicyPresenter.new(user, {policy: policy})
   end
 
   private
+
   def set_update_parameters
     self.user_manager_mappings = {}
     user_manager_mappings[:default] = {}
     user_manager_mappings[:default][:mapping] = policy_params[:default].except(:mapping_id)
     user_manager_mappings[:default][:mapping_id] = policy_params[:default][:mapping_id]
-    if policy_params[:conditional_manager]
+    if policy_params[:conditional_manager] and policy_params[:conditional_manager][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_manager] = {}
       user_manager_mappings[:conditional_manager][:mapping] = policy_params[:conditional_manager].except(:mapping_id)
       user_manager_mappings[:conditional_manager][:mapping_id] = policy_params[:conditional_manager][:mapping_id]
     end
-    if policy_params[:conditional_finance_manager]
+    if policy_params[:conditional_finance_manager] and policy_params[:conditional_finance_manager][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_finance_manager] = {}
       user_manager_mappings[:conditional_finance_manager][:mapping] = policy_params[:conditional_finance_manager].except(:mapping_id)
       user_manager_mappings[:conditional_finance_manager][:mapping_id] = policy_params[:conditional_finance_manager][:mapping_id]
     end
-    if policy_params[:conditional_approves_to]
+    if policy_params[:conditional_approves_to] and policy_params[:conditional_approves_to][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_approves_to] = {}
       user_manager_mappings[:conditional_approves_to][:mapping] = policy_params[:conditional_approves_to].except(:mapping_id)
       user_manager_mappings[:conditional_approves_to][:mapping_id] = policy_params[:conditional_approves_to][:mapping_id]
     end
-    if policy_params[:conditional_approves_finance_to]
+    if policy_params[:conditional_approves_finance_to] and policy_params[:conditional_approves_finance_to][:greater_than_amount_attributes][:value].present?
       user_manager_mappings[:conditional_approves_finance_to] = {}
       user_manager_mappings[:conditional_approves_finance_to][:mapping] = policy_params[:conditional_approves_finance_to].except(:mapping_id)
       user_manager_mappings[:conditional_approves_finance_to][:mapping_id] = policy_params[:conditional_approves_finance_to][:mapping_id]
     end
     params[:user_manager_mapping] = user_manager_mappings
     params[:user_id] = policy_params[:user_id]
-
   end
 
 end

@@ -24,7 +24,7 @@ json.total @result.money_request.total_amount
 json.date @result.money_request.created_at.strftime("%d %b")
 
 json.comments @result.comments do |comment|
-  json.content comment.generate
+  json.content comment.generate @result.user
   json.created_at comment.created_at.strftime("%d %b %y")
   if comment.user.respond_to?(:id, :name)
     json.comment_user_id comment.user.id
@@ -33,7 +33,7 @@ json.comments @result.comments do |comment|
   end
 end
 
-json.items @result.items do |item|
+json.request_items @result.items do |item|
   json.category do
     json.name item.category.name
     json.id item.category.id

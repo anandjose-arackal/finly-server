@@ -15,7 +15,7 @@ class Settlement::Index < Settlement::Base
       self.messages[:error] = operation.messages[:error]
       return
     end
-    self.users = user_team.with_balance_sheet.with_roles.only_employees
+    self.users = user_team.signed_up.with_balance_sheet.with_roles.only_employees
     if self.users.nil?
       messages[:error] << 'Users not found'
     end

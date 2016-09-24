@@ -18,6 +18,7 @@
 //= require jquery.remotipart
 //= require bootbox
 //= require handlebars.runtime
+//= require ohsnap.min
 //// require_tree .
 
 // NProgress.configure({

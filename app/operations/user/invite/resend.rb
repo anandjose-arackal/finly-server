@@ -46,7 +46,7 @@ class User::Invite::Resend < User::Invite::Base
   end
 
   def post_process
-    messages[:success] << "Resending invite successful."
+    messages[:success] << "Invite resent!"
   end
 
 end

@@ -47,7 +47,7 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} commented : #{content}"
       when ReportCommentAction.id_for(:report_retract)
         # Report retract
-        comment = "#{name} has retracted the report"
+        comment = "#{name} retracted the report"
       when ReportCommentAction.id_for(:report_submit)
         # Report submit
         comment = "#{name} submitted the report"
@@ -65,38 +65,38 @@ class ReportComment < ActiveRecord::Base
         end
       when ReportCommentAction.id_for(:report_unapprove)
         # Report unapprove
-        comment = "#{name} has unapproved the report"
+        comment = "#{name} unapproved the report"
       when ReportCommentAction.id_for(:report_take_control)
         # Report take control
         comment = "#{name} took control of the report"
       when ReportCommentAction.id_for(:report_update)
         # Report update
-        comment = "#{name} has updated #{updated_field} from #{updated_from} to #{updated_to}"
+        comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
       when ReportCommentAction.id_for(:report_reimbursed)
         # Report reimbursed
         payment_id = payment.id rescue nil
-        comment = "#{name} has reimbursed the report with Payment ID : #{payment_id}"
+        comment = "#{name} reimbursed the report with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , note : #{payment.note}"
         end
       when ReportCommentAction.id_for(:report_reimbursement_confirmed)
         # Report reimbursement confirmed
-        comment = "#{name} has confirmed that the reimbursement is received"
+        comment = "#{name} confirmed that the reimbursement is received"
       when ReportCommentAction.id_for(:report_closed)
         # Report closed
         comment = "Report is marked as closed"
       when ReportCommentAction.id_for(:report_attach_receipt)
         # Report attach receipt
-        comment = "#{name} has attached the report"
+        comment = "#{name} attached a receipt to the report"
       when ReportCommentAction.id_for(:report_detach_receipt)
         # Report detach receipt
-        comment = "#{name} has detacted the report"
+        comment = "#{name} detacted a receipt from the report"
       when ReportCommentAction.id_for(:expense_add)
         # Expense add
-        comment = "#{name} has added expense at : #{expense.merchant_name} to the report"
+        comment = "#{name} added an expense at : #{expense.merchant_name} to the report"
       when ReportCommentAction.id_for(:expense_remove)
         # Expense remove
-        comment = "#{name} has remove expense at : #{expense.merchant_name} to the report"
+        comment = "#{name} removed the expense at : #{expense.merchant_name} to the report"
       when ReportCommentAction.id_for(:expense_reject)
         # Expense reject
         comment = "#{name} rejected the expense at : #{expense.merchant_name}"

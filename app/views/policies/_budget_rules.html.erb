@@ -35,13 +35,13 @@
       <% end %>
 
 
-      <p id="warningPara" onclick="warningDescToggle()" style="color: #6664c7;
+      <p id="budgetWarningPara" onclick="budgetWarningDescToggle()" style="color: #6664c7;
           font-weight: 500;
           font-size: 13px;
           border-top: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
           padding-top: 10px ;"> What is a warning rule?</p>
-      <p id="warningParaDesc" style="color: #666;
+      <p id="budgetWarningParaDesc" style="color: #666;
           font-size: 13px;
           padding-top: 6px ;display: none">Expenses that violate warning rules can be added to the report, but you
         probably
@@ -76,14 +76,14 @@
         <% end %>
       <% end %>
 
-      <p id="blockingPara" onclick="blockingDescToggle()" style="color: #6664c7;
+      <p id="budgetBlockingPara" onclick="budgetBlockingDescToggle()" style="color: #6664c7;
           font-weight: 500;
           font-size: 13px;
           border-top: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
           padding-top: 10px; "> What is a blocking rule?</p>
 
-      <p id="blockingParaDesc" style="color: #666;
+      <p id="budgetBlockingParaDesc" style="color: #666;
           font-size: 13px;
           padding-top: 6px ;display: none">You can’t submit reports with expenses that violate blocking rules. The
         blocks will be displayed in the report.</p>
@@ -156,12 +156,12 @@
 //    $('form#usersPolicyList').submit();
   });
 
-  function warningDescToggle() {
-    $('#warningParaDesc').toggle();
+  function budgetWarningDescToggle() {
+    $('#budgetWarningParaDesc').toggle();
   }
 
-  function blockingDescToggle() {
-    $('#blockingParaDesc').toggle();
+  function budgetBlockingDescToggle() {
+    $('#budgetBlockingParaDesc').toggle();
   }
 
 

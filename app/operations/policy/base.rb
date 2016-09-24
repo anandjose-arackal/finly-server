@@ -19,7 +19,7 @@ class Policy::Base < BaseOperation
   end
 
   def success
-    policy
+    Policy::Base::PolicyPresenter.new(user, {policy: policy}, messages)
   end
 
   def validate

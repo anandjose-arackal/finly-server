@@ -1,6 +1,10 @@
 class User::Configuration::UpdatePassword < BaseOperation
   include Devise::Controllers::SignInOut
 
+  def authorized_user_types
+    [:employee]
+  end
+
   def pre_validate
     unless user.present?
       messages[:error] << 'User not found'
@@ -24,7 +28,7 @@ class User::Configuration::UpdatePassword < BaseOperation
 
   def process
     if user.update_with_password(password_params)
-      sign_in @user, :bypass => true
+      sign_in user, :bypass => true
     else
       messages[:error] << user.errors.full_messages
     end

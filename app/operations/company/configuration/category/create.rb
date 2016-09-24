@@ -1,5 +1,5 @@
 class Company::Configuration::Category::Create < Company::Configuration::Category::Base
-  attr_accessor :category, :category_params
+  attr_accessor :category
 
   def pre_validate
     unless params[:category][:name].present?
@@ -9,8 +9,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
 
   def init
     super
-    id = (params[:id] or params[:category_id])
-    self.category = self.categories.with_id(id).first rescue nil if id.present?
+    self.category = self.categories.with_name(category_params[:name]).first rescue nil
   end
 
   def process
@@ -20,7 +19,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
       self.category = self.categories.build(company_id: user.company_id, name: category_params[:name])
     end
     unless category.save
-      messages[:error] << category.errors.full_messages
+      messages[:error] = category.errors.full_messages
     end
   end
 

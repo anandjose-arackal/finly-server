@@ -18,31 +18,34 @@ class User::Show < User::Base
         self.selected_user = result.with_id(id).first rescue nil
         messages[:error] << 'User not found' if self.selected_user.blank?
       else
-        messages[:error] << operation.errors
+        messages[:error] = operation.messages[:error]
       end
     end
   end
 
   def success
-    User::Show::Presenter.new(selected_user, params, messages)
+    params[:selected_user] = selected_user
+    User::Show::Presenter.new(user, params, messages)
   end
 
   class User::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
-                  :team_members_presenter
+                  :team_members_presenter, :selected_user, :mapping_editable
 
     def init
-      self.roles = {admin: self.user.company_admin?, manager: self.user.manager?,
-                    finance_manager: self.user.finance_manager?}
-      self.team_mapping = self.user.team_mapping
+      self.selected_user = params[:selected_user]
+      self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
+                    finance_manager: self.selected_user.finance_manager?}
+      self.team_mapping = self.selected_user.team_mapping
       self.mapping = [retrieve_mapping(nil)]
-      self.policies = user.policies
+      self.policies = selected_user.policies
       self.policies.each do |policy|
         self.mapping << retrieve_mapping(policy)
       end
       self.actions = load_actions
+      self.mapping_editable = user.company_admin?
     end
 
     private
@@ -67,15 +70,15 @@ class User::Show < User::Base
     def load_actions
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
-      if self.user.invitation_token.present? and self.user.invitation_accepted_at.blank?
-        actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.user.id)
-        actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.user.id)
+      if self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?
+        actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
+        actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
       else
-        # If user has signed up
-        if self.user.active
-          actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.user.id)
-        else
-          actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.user.id)
+        # If user has signed up and is not viewing themselves
+        if self.selected_user.active and selected_user.id != user.id
+          actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+        elsif !selected_user.active and selected_user.id != user.id
+          actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         end
       end
       actions

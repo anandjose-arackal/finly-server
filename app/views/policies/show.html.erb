@@ -82,7 +82,7 @@
 
 
 <div class="modal fade" id="assignExistingUsersToPolicy" role="dialog" style="margin-top: 5%; ">
-  <div class="modal-dialog modal-md" style="width: 70%;">
+  <div class="modal-dialog modal-md" style="width: 60%;">
     <div class="modal-content" style="border-radius: 1px">
       <div class="modal-header" style="background-color: #e9e9e9 ; height: 60px">
         <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
@@ -92,11 +92,12 @@
           <input id="addUserToPolicyIds" name="users_id" type="text">
         </form>
 
-        <button id="addUsersToPolicyButton" onclick="addUsersToPolicyFromList()" type="button" style="float: right;
+        <button class="btn" id="addUsersToPolicyButton" onclick="addUsersToPolicyFromList()" type="button" style="float: right;
             background: #465c8b;
             margin-right: 20px;
+            margin-top: 0px;
             color: white;
-            font-size: 10px;outline: none;
+            font-size: 11px;outline: none;
             padding: 5px;
             letter-spacing: 1px;display: none">INVITE
         </button>
@@ -106,9 +107,9 @@
       </div>
       <div class="modal-body" style="padding: 0">
 
-        <form data-remote data-turboboost  id="usersPolicyList" action="<%= policy_invitable_users_path(load_params policy_id: @result.policy.id) %>" method="post" style="float: left;width: 25%;">
+        <form data-remote data-turboboost  id="usersPolicyList" action="<%= policy_invitable_users_path(load_params policy_id: @result.policy.id) %>" method="post" style="float: left;width: 25%; display: none;">
           <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-          <section id="filterSection">
+          <!-- <section id="filterSection">
             <div style="font-size: 18px;
                 margin-left: 20px;
                 margin-top: 10px;
@@ -129,10 +130,10 @@
                   <% end %>
               <% end %>
             </select>
-          </section>
+          </section> -->
         </form>
-        <section id="addUsersSection" style="background-color: white;margin-left: 25%; min-height: 250px;
-            width: 75%; border-left: 1px solid #d8d8d8">
+        <section id="addUsersSection" style="background-color: white; min-height: 250px;
+            width: 100%; border-left: 1px solid #d8d8d8">
           <div class="row" style="margin: 0;font-size: 12px; font-weight: bold; text-align: left; padding: 10px 0 10px 0;height: 30px;border-bottom: 1px solid #d8d8d8;">
             <div class="col-md-1"><input type="checkbox" id="checkAll" style="margin-right: 4px"></div>
             <div class="col-md-3" style="padding-left: 20px">User Name</div>
@@ -439,7 +440,7 @@
             <% end %>
           </select>
 
-          <p>This is the default manager to whom mary jain will submit her reports to.</p>
+          <p>This is the default manager to whom <span id="policyMemberName"></span> will submit their reports to.</p>
 
           <label>If Report Total is Over:</label>
           <input id="policyMemberManagerConditionalAmount" form="updateUserPolicyConfiguration"
@@ -455,7 +456,7 @@
               <% end %>
             </select>
           </div>
-          <p>If the report exceeds the amount above, who does mary.jain@spidey.com submit those reports to?</p>
+          <p>If the report exceeds the amount above, who does <span id="policyMemberName2"></span> submit those reports to?</p>
 
           <hr>
           <label>Finance Manager:</label>
@@ -468,7 +469,7 @@
             <% end %>
           </select>
 
-          <p>This is the default finance manager whom mary jain will have her finances approved by.</p>
+          <p>This is the default finance manager whom <span id="policyMemberName3"></span> will have her finances approved by.</p>
 
           <label>If Report Total is Over:</label>
           <input id="policyMemberFinanceManagerConditionalAmount" form="updateUserPolicyConfiguration"
@@ -484,7 +485,7 @@
               <% end %>
             </select>
           </div>
-          <p>If the finance exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
+          <p>If the finance exceeds the amount above, who does <span id="policyMemberName4"></span> get the finances approved by?</p>
         </div>
 
         <hr>
@@ -498,7 +499,7 @@
             <% end %>
           </select>
 
-          <p>Does MaryJain@spidey.com have reports to approve? If so, who do they forward these approved reports to?
+          <p>Does <span id="policyMemberName5"></span> have reports to approve? If so, who do they forward these approved reports to?
             (This
             is usually to someone in accounting or finance)</p>
 
@@ -516,7 +517,7 @@
               <% end %>
             </select>
           </div>
-          <p>If the report exceeds the amount above, who does mary.jain@spidey.com forward those approved reports
+          <p>If the report exceeds the amount above, who does <span id="policyMemberName6"></span> forward those approved reports
             to?</p>
           <hr>
         </div>
@@ -533,7 +534,7 @@
             <% end %>
           </select>
 
-          <p>Does MaryJain@spidey.com have finances to approve? If so, who do they forward these approved finances
+          <p>Does <span id="policyMemberName7"></span> have finances to approve? If so, who do they forward these approved finances
             to? </p>
 
           <label>If Report Total is Over:</label>
@@ -550,7 +551,7 @@
               <% end %>
             </select>
           </div>
-          <p>If the report exceeds the amount above, who does mary.jain@spidey.com get the finances approved by?</p>
+          <p>If the report exceeds the amount above, who does <span id="policyMemberName8"></span> get the finances approved by?</p>
           <hr>
         </div>
 
@@ -807,6 +808,15 @@
     var conditional_approves_finance_to_mapping_id = $('#policy_member_' + id + '_conditional_approves_finance_to_mapping_id').val();
 
     document.getElementById("policyMemberEmailId").textContent = email_id;
+    document.getElementById("policyMemberName").textContent = name;
+    document.getElementById("policyMemberName2").textContent = name;
+    document.getElementById("policyMemberName3").textContent = name;
+    document.getElementById("policyMemberName4").textContent = name;
+    document.getElementById("policyMemberName5").textContent = name;
+    document.getElementById("policyMemberName6").textContent = name;
+    document.getElementById("policyMemberName7").textContent = name;
+    document.getElementById("policyMemberName8").textContent = name;
+
     $('#policyMemberSettingsUserId').val(id);
     $('#policyMemberManagerSelector').val(manager_id);
     $('#policyMemberManagerConditionalAmount').val(conditional_manager_amount);
