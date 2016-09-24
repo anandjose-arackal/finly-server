@@ -28,7 +28,7 @@ class Settlement::Report::Approved < Report::Base
   end
 
   def process
-    balance_sheet = user.balance_sheet
+    balance_sheet = report.user.balance_sheet
     total_amount = report.total_amount
     currency = Currency.first # todo - temporary until currency is implemented
     latest_date = nil
@@ -38,9 +38,10 @@ class Settlement::Report::Approved < Report::Base
     new_cash_in_hand_value = cash_in_hand.value - total_amount
     if new_cash_in_hand_value < 0
       pending_reimbursement = total_amount - cash_in_hand.value
+      new_cash_in_hand_value = 0
     end
-    user.balance_sheet.subtract_cash_in_hand total_amount, currency
-    user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
+    report.user.balance_sheet.subtract_cash_in_hand (total_amount - pending_reimbursement), currency
+    report.user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
       unless report_amount.save
