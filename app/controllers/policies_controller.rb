@@ -83,6 +83,21 @@ class PoliciesController < ApplicationController
     end
   end
 
+  def destroy_mapping
+    destroy_mapping_op = Policy::Mappings::Destroy.new(current_user, params)
+    @result = destroy_mapping_op.run
+    if @result.success?
+      @result = Policy::Show.new(current_user, params).run
+      flash[:success] = "POlicy mapping destroyed."
+      respond_to do |format|
+        format.js {}
+      end
+    else
+      flash[:danger] = @result.messages[:error]
+      # render flash message
+    end
+  end
+
 
   def update_user_configuration
     update_configuration_op = Policy::Users::UpdateMapping.new(current_user, params)
