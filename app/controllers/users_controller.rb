@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    @managers = User::Team::GetManagers.new(current_user, params).run
+    @managers = User::Team::GetManagers.(current_user, params)
     respond
   end
 
@@ -20,7 +20,7 @@ class UsersController < ApplicationController
     @result = User::Index.(current_user, params)
 
     respond_to do |format|
-      format.json {render json: @result.team.as_json}
+      format.json { render json: @result.team.as_json }
     end
   end
 
@@ -47,7 +47,7 @@ class UsersController < ApplicationController
     import_op = User::Invite::Import.new(current_user, params)
     @result = import_op.run
     respond_to do |format|
-      format.csv {send_data @result}
+      format.csv { send_data @result }
     end
   end
 
