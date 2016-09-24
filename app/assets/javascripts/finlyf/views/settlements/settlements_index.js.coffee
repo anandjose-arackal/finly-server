@@ -42,6 +42,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-settlement-action': 'processSettlementAction'
     'click .confirm-report-action': 'confirmReportAction'
     'keyup .search-user': 'prepareSearch'
+    'submit .navbar-form': 'cancelEvents'
 
   initialize: (options) ->
     # console.log options
@@ -268,7 +269,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   prepareSearch: (e) ->
     # console.log _.debounce(@searchUser(e), 500, true)
-    if $(e.currentTarget).val().length > 2
+    if $(e.currentTarget).val().length > 2 || $(e.currentTarget).val().length == 0
       @searchUser(e)
 
   searchUser: (e) ->
@@ -282,6 +283,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     }) 
 
     # console.log query
+
+  cancelEvents: (e) ->
+    e.preventDefault()
 
   userSettlements: (e) ->
     $(@el).find('.settlements-content').css('display', 'block')
