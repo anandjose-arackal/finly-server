@@ -11,7 +11,8 @@ class User::Team::GetManagers < User::Team::Base
     # the role under which the user is inviting employees
     self.role_id = UserRole::VALUES[params[:view].to_sym]
     self.company = user.company
-    self.for_user = User::Team::Index.(user, params).with_id(params[:for_user_id]) rescue nil if params[:for_user_id].present?
+    for_user_id = (params[:for_user_id] or params[:id] or params[:user_id])
+    self.for_user = User::Team::Index.(user, params).with_id(for_user_id) rescue nil if for_user_id.present?
   end
 
   def process
@@ -55,8 +56,8 @@ class User::Team::GetManagers < User::Team::Base
       self.team_finance_managers = params[:team_finance_managers]
       self.team_policies = user.admin_policies || []
       if for_user.present?
-        self.team_managers = self.team_managers.without_id(user.id) rescue nil if self.team_managers.present?
-        self.team_finance_managers = self.team_finance_managers.without_id(user.id) rescue nil if self.team_finance_managers.present?
+        self.team_managers = self.team_managers.without_id(for_user.id) rescue nil if self.team_managers.present?
+        self.team_finance_managers = self.team_finance_managers.without_id(for_user.id) rescue nil if self.team_finance_managers.present?
       end
     end
   end
