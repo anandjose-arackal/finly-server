@@ -28,7 +28,7 @@ class Event::EReport::Base < Event::SetNotification
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
     return unless subject.present? and body.present?
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(user, report, subject, body, button_name))
+    ReportMailer.delay.send_mail(Event::EReport::Base::MailerPresenter.new(user, report, subject, body, button_name))
   end
 
   def mailer_subject(user)

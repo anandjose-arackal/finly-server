@@ -27,6 +27,7 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-view-sub-item': 'viewSub'
     'click .btn-reject-sub-item': 'rejectSub'
     'hidden.bs.modal #modal-mp': 'refreshData'
+    'keypress .comment-content': 'postCommentByEnter'
 
 
     #reports
@@ -296,6 +297,12 @@ class FinlyF.Views.Report extends Backbone.View
         $(e.currentTarget).text('Post')
     })
     # console.log report_id
+
+  postCommentByEnter: (e) ->
+    if e.keyCode == 13
+      $(e.currentTarget).closest('.form-new-comment').find('.btn-post-comment').click()
+      return false
+
 
   delete: (e) ->
     _this = @
