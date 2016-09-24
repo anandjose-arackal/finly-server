@@ -128,33 +128,37 @@ end
 
 if User.count == 0
   a = User.create(company: Company.first, name: "Finly Admin", email: "admin@finlytest.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-                                                                                                                           {user_role_id: UserRole.employee_id}])
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                  role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+                                            {user_role_id: UserRole.employee_id}])
+
   User.create(company: Company.first, name: "Finly King", email: "king@finlytest.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
-              role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}])
-  User.create(company: Company.first, name: "Vivek", email: "vivek.a@finly.io",
-              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
-              role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}])
+              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+              role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
+                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}])
+
   fm = []
   4.times do |pos|
     fm << User.create(company: Company.first, name: "Finly Finance Manager #{pos}", email: "finance#{pos}@finlytest.io",
-                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 2},
-                                                                                                                               {user_role_id: UserRole.employee_id}])
+                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                      role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
+                                                {user_role_id: UserRole.employee_id}])
+
   end
   m = []
   6.times do |pos|
     m << User.create(company: Company.first, name: "Finly Manager #{pos}", email: "manager#{pos}@finlytest.io",
-                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 3},
-                                                                                                                              {user_role_id: UserRole.employee_id}])
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                     role_mapping_attributes: [{user_role_id: 3},
+                                               {user_role_id: UserRole.employee_id}])
   end
+
   u = []
   10.times do |pos|
-    u << User.create(company: Company.first, name: "Finly Employee #{pos}", email: "user#{pos}@finlytest.io",
-                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, role_mapping_attributes: [{user_role_id: 4},
-                                                                                                                              {user_role_id: UserRole.employee_id}],
+    u << User.create(company: Company.first, name: Faker::Name.name, email: "#{Faker::Internet.user_name}@finlytest.io",
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                     role_mapping_attributes: [{user_role_id: 4},
+                                               {user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
   end
 

@@ -40,14 +40,14 @@ class Policy::InvitableUsers < Policy::Base
 
 
   def process
-    # filtering my manager happens manually, because the particular manager's team needs to be filtered out
-    self.invitable_users = policy.company.users.without_id(policy.users.pluck(:id)).sort_by_name
+    # filtering by manager happens manually, because the particular manager's team needs to be filtered out
+    self.invitable_users = policy.company.users.signed_up.without_id(policy.users.pluck(:id)).sort_by_name
     manager_id = params[:filter_manager_id]
     if manager_id.present?
       manager = policy.company.users.find_by_id(manager_id)
       manager_team = User::Team::Index.(manager, role_id: UserRole.manager_id)
       if manager_team.present?
-        self.invitable_users = manager_team
+        self.invitable_users = manager_team.signed_up
       end
     end
   end

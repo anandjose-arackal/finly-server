@@ -6,6 +6,10 @@
 class User::Configuration::UpdateState < BaseOperation
   attr_accessor :to_user
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "User or params not passed."
@@ -21,6 +25,12 @@ class User::Configuration::UpdateState < BaseOperation
   def authorize
     if to_user.blank?
       raise_unauthorized_exception
+    end
+  end
+
+  def validate
+    if to_user.id == user.id
+      messages[:error] = "You cannot deactivate yourself!"
     end
   end
 

@@ -54,7 +54,7 @@ class Report::Expenses::Add < Report::Base
 
   def validate
     # checking state of the report
-    unless report.open? or report.retracted?
+    unless report.open? or report.retracted? or report.rejected?
       messages[:error] << 'Cannot add expenses to report unless report is in open or retracted state'
       return false
     end

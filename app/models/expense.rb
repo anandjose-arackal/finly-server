@@ -108,11 +108,12 @@ class Expense < ActiveRecord::Base
   scope :filter_search, -> (value) { joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant like ? OR note like ?', "%#{value}%", "%#{value}%") }
 
   scope :filter_receipt, -> (value) do
+    expense_ids = Receipt.where(parent_type: Expense).uniq.pluck(:parent_id)
     case value
       when 'present'
-        where("id IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
+        where(id: expense_ids)
       when 'absent'
-        where("id NOT IN (SELECT DISTINCT `receipts`.`parent_id` FROM `receipts` WHERE `receipts`.`parent_type` = 'Expense')")
+        where.not(id: expense_ids)
     end
   end
 
@@ -124,6 +125,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
+  scope :admin_viewable, -> {where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id]}
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
@@ -193,7 +195,7 @@ class Expense < ActiveRecord::Base
   def report_status
     if self.report_id
       report = self.report
-      unless report.open? or report.retracted?
+      unless report.open? or report.retracted? or report.rejected?
         errors.add(:report, ' cannot be edited in this state.')
       end
     end

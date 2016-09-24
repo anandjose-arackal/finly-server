@@ -115,7 +115,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       $(target).find("i").addClass("fa-spin")
 
     # @params.page = 1
-    console.log @params
+    # console.log @params
     @collection.fetch({
       reset: true,
       data: _this.params,
@@ -146,7 +146,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     if @view == 'personal'
       FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
     else
-      console.log @collection.url
+      # console.log @collection.url
       @collection.fetch({
         data: {
           view_to_load: view_to_load
@@ -184,6 +184,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   inviteEmployee: (e) ->
     e.preventDefault()
+    _this = @
     modal = $(e.currentTarget).closest('#modal-mp')
     form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
     values = {}
@@ -215,6 +216,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
+          if parseInt(_this.params.filter_state) == 2
+            _this.refetchCollection()
+
         # console.log res
       error: (err) ->
         console.log "Err", err

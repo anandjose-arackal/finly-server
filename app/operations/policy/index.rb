@@ -16,12 +16,12 @@ class Policy::Index < Policy::Base
   def process
     if admin_view?
       if user.company_admin?
-        self.policies = user.company.policies
+        self.policies = user.company.policies.non_default
       else
-        self.policies = user.admin_policies
+        self.policies = user.admin_policies.non_default
       end
     else
-      self.policies = user.policies if user.policies
+      self.policies = user.policies.non_default rescue nil
     end
   end
 

@@ -131,7 +131,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
-        console.log _this.collection.models[0].toJSON()
+        # console.log _this.collection.models[0].toJSON()
         _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
@@ -178,8 +178,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     $(@el).find("#item-details-main").html(preview_view.render().el)
 
   showReport: (report_id) ->
-    # model = @collection.get(report_id)
-    # console.log model.toJSON()
+    #BEING USED FROM ROUTER
     main = $(@el).find(".main")
     unless $(main).hasClass("preview")
       $(main).addClass("preview")

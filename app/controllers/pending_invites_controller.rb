@@ -1,12 +1,11 @@
 class PendingInvitesController < ApplicationController
-
   before_action :authenticate_user!, except: [:edit, :accept]
-
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
-    if @pending_user.blank?
-      redirect_to root_url
+    # i.e. if user has already signed in, redirect to login page
+    unless @pending_user and @pending_user.invitation_token
+      redirect_to new_user_session_path
     end
   end
 
@@ -51,9 +50,14 @@ class PendingInvitesController < ApplicationController
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?
       sign_in @result.accepted_user, :bypass => true
-      redirect_to root_url
+      # bypass_sign_in(@result.accepted_user)
+      # redirect_to root_url
+      # respond
+      respond_to do |format|
+        format.js { render js: "window.location = '#{root_url}';"}
+      end
     else
-      respond
+      respond response: :failure, message: @result.messages[:error]
     end
   end
 

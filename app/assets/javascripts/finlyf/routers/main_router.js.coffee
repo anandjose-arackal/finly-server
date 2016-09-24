@@ -67,6 +67,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#primary-navbar a[href=receipts]").parent().addClass('active')
 
   requests: (query) ->
+    console.log "routerd to request"
     if typeof query != 'undefined'
       params = JSON.parse(query)
     else

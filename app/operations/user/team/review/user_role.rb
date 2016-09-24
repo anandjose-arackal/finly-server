@@ -12,6 +12,8 @@ class User::Team::Review::UserRole < BaseOperation
 
     if user.id == obj.user.id
       return UserRole.id_for(:employee)
+    elsif obj.controlling_for_user.present? and user.admin?
+      UserRole.id_for(:admin)
     else
       param = {}
       param[obj_type] = obj

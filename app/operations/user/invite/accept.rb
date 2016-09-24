@@ -36,6 +36,7 @@ class User::Invite::Accept < User::Invite::Base
     name = accept_params[:name]
     mobile_number = accept_params[:mobile_number]
     password = accept_params[:password]
+    password_confirmation = accept_params[:password_confirmation]
     if invitation_token.blank?
       messages[:error] << 'Invite not found'
       return
@@ -44,13 +45,22 @@ class User::Invite::Accept < User::Invite::Base
       messages[:error] << 'Name can\'t be blank'
       return
     end
-    if mobile_number.blank?
-      messages[:error] << 'Mobile number can\'t be blank'
+    if mobile_number.blank? or mobile_number.length != 10
+      messages[:error] << 'Mobile number has to be 10 digits'
       return
     end
     if password.blank?
       messages[:error] << 'Password can\'t be blank'
-      return
+    end
+    if password_confirmation.blank?
+      messages[:error] << 'Password can\'t be blank'
+    end
+    unless password == password_confirmation
+      messages[:error] << 'Confirmation password is not matching the given password'
+    end
+    # manually adding here because devise isn't throwing an error during sign up. todo - investigate
+    if password.length < 8
+      messages[:error] << "Password length must be at least 8 characters"
     end
   end
 
@@ -61,7 +71,7 @@ class User::Invite::Accept < User::Invite::Base
   def process
     self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present?
-      messages[:error] = invited_user.errors.full_messages
+      messages[:error] << invited_user.errors.full_messages
     end
   end
 

@@ -2,7 +2,7 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
 
-    <form data-remote="true" data-turboboost="true" accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_companies_path %>" method="post">
+    <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_companies_path %>" method="post">
       <input name="utf8" type="hidden" value="&#x2713;"/>
       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
