@@ -69,7 +69,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  default_scope { order('expenses.created_at DESC') }
+  default_scope { where(deleted: false).order('expenses.created_at DESC') }
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -125,7 +125,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
-  scope :admin_viewable, -> {where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id]}
+  scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id] }
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }

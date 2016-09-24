@@ -167,10 +167,6 @@ class BaseOperation
       false
     end
 
-    def color_for(item)
-      Constants::FLASH_COLORS[item]
-    end
-
     class BaseOperation::BasePresenter::SuccessPresenter < BaseOperation::BasePresenter
       def success?
         true
