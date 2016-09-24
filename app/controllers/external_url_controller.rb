@@ -28,6 +28,7 @@ class ExternalUrlController < ApplicationController
     end
     if report.present?
       redirect_to "#{root_url}#reports/params={\"view\":\"#{params[:view]}\"}"
+      # redirect_to "#{root_url}#reports/params={\"view\":\"#{params[:view]}, report_id:#{report.id}\"}"
     else
       redirect_to root_path
     end
