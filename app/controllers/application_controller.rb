@@ -119,10 +119,12 @@ class ApplicationController < ActionController::Base
     end
     if @result.present? and @result.success?
       respond_to do |format|
+        format.js {render 'layouts/application'}
         format.json {}
       end
     else
       respond_to do |format|
+        format.js {}
         format.json { render 'layouts/application' }
       end
     end
