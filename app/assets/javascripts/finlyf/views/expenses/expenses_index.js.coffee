@@ -71,7 +71,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
     unless @indexOnly
-      $(@el).html(@templateSkeleton())
+      $(@el).html(@templateSkeleton({item: @params}))
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
 
       $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))

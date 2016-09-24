@@ -15,8 +15,11 @@ window.FinlyF =
     views = $("#menu-nav-views-dropdown li")
     # console.log "menus", params
     dropdown = $(el).find('#primary-navbar .menu-nav-views-dropdown')
-    for view in views
-      $(dropdown).append($(view).clone())
+    if views.length == 1
+      $(dropdown).parent().hide()
+    else
+      for view in views
+        $(dropdown).append($(view).clone())
 
     navbar_right = $(el).find("#primary-navbar .navbar-right")
     switch params.view
