@@ -6,7 +6,7 @@ class PendingInvitesController < ApplicationController
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
     # i.e. if user has already signed in, redirect to login page
-    unless @pending_user.invitation_token
+    unless @pending_user and @pending_user.invitation_token
       redirect_to new_user_session_path
     end
   end

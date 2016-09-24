@@ -66,6 +66,8 @@ class Policy::Users::UpdateMapping < Policy::Base
   def pre_process
     if params[:policy][:admin] == "1"
       self.admin = true
+    else
+      self.admin = false
     end
   end
 
@@ -80,10 +82,8 @@ class Policy::Users::UpdateMapping < Policy::Base
 
   # making the user a policy admin here
   def post_process
-    if admin
-      user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
-      user_policy_mapping.update_attributes(admin: true)
-    end
+    user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
+    user_policy_mapping.update_attributes(admin: admin)
   end
 
   def success

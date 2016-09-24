@@ -34,7 +34,7 @@ class Report::Update < Report::Base
   end
 
   def validate
-    unless report.retracted? or report.open?
+    unless report.retracted? or report.open? or report.rejected?
       messages[:error] << 'Cannot update report unless retracted'
     end
   end
