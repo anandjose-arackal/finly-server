@@ -137,6 +137,12 @@ if User.count == 0
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}])
 
+  User.create(company: Company.first, name: "Vivek", email: "vivek.a@finly.io", mobile_number: random_string_of_numbers(10),
+              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
+              role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
+                                        {user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}])
+
+
   fm = []
   4.times do |pos|
     fm << User.create(company: Company.first, name: "Finly Finance Manager #{pos}", email: "finance#{pos}@finlytest.io",
