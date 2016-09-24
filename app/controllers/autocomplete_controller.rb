@@ -10,7 +10,6 @@ class AutocompleteController < ApplicationController
   end
 
   def user
-    params[:view] = 'admin' # todo - remove this once it's added to front end
     team = User::Team::Index.(current_user, params)
     # scoping the search to within the particular user's team
     @users = team.filter_search(params[:query]).select(:id, :name)
