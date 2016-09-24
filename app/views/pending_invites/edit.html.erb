@@ -13,29 +13,32 @@
       </div>
       <label style="margin-top: 20px; font-weight: 500">Name: </label>
       <div>
-        <input type="text" style="background-color: white" name="user[name]">
+        <input type="text" class="form-control" style="background-color: white" name="user[name]">
       </div>
 
 
       <label style="font-weight: 500">Company Name: </label>
       <div>
-        <input type="text" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
+        <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
       </div>
       <label style="font-weight: 500">Email: </label>
       <div>
-        <input type="text" name="user[email]" value="<%= @pending_user.email %>" readonly>
+        <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" readonly>
       </div>
       <label style="font-weight: 500">Password: </label>
       <div>
-        <input type="password" name="user[password]">
+        <input type="password" class="form-control" name="user[password]">
       </div>
       <label style="font-weight: 500">Confirm Password: </label>
       <div>
-        <input type="password" name="user[password_confirmation]">
+        <input type="password" class="form-control" name="user[password_confirmation]">
       </div>
-      <label style="font-weight: 500">Mobile Number : </label>
+      <label style="font-weight: 500">Mobile Number: </label>
       <div>
-        <input type="number" name="user[mobile_number]">
+        <div class="input-group" style="width: 80%;">
+          <span class="input-group-addon" id="basic-addon1">+91</span>
+          <input type="number" class="form-control" name="user[mobile_number]">
+        </div>
       </div>
 
       <div>
@@ -51,10 +54,10 @@
     margin-top: 20px;
   }
 
-  input {
+  input.form-control {
     padding: 5px;
     width: 80%;
-    background-color: #eff8f3;
+    /*background-color: #eff8f3;*/
     outline: 1px solid transparent;
   }
 

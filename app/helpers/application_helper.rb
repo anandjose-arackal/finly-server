@@ -234,7 +234,15 @@ module ApplicationHelper
   end
 
   def color_for(item)
-    Constants::FLASH_COLORS[item]
+    Constants::FLASH_COLORS[item.to_sym] rescue 'red'
+  end
+
+  def notification_container_for(item)
+    color = color_for(item)
+    if color == 'red'
+      return 'ohsnap-priority'
+    end
+    return 'ohsnap'
   end
 
   private

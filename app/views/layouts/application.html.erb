@@ -24,5 +24,21 @@
   <%= yield %>
 
   <div id="ohsnap"></div>
+  <div id="ohsnap-priority"></div>
+
+  <script type="text/javascript">
+    <% if @result.present? and @result.messages.present? %>
+      <% @result.messages.each do |key, value| %>
+        <% value.each do |message| %>
+          ohSnap("<%= message %>", {color: '<%= color_for(key) %>', 'duration': '6000', 'container-id': '<%= notification_container_for(key) %>'});
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% flash.each do |key, message| %>
+      console.log('<%= key %>');
+      ohSnap("<%= message %>", {color: '<%= color_for(key) %>', 'duration': '6000', 'container-id': '<%= notification_container_for(key) %>'});
+    <% end %>
+  </script>
 </body>
 </html>
