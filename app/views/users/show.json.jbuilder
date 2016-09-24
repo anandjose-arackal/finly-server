@@ -72,7 +72,9 @@ json.mapping @result.mapping.each do |mapping|
   end
 end
 [:team_managers, :team_finance_managers].each do |key|
-  json.set! key, @managers.send(key).each do |manager|
+  managers = @managers.send(key)
+  next if managers.blank?
+  json.set! key, managers do |manager|
     json.id manager.id
     json.name manager.name
     json.email manager.email
