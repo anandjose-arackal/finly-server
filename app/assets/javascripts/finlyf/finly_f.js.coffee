@@ -88,6 +88,7 @@ window.FinlyF =
 
   snapNotify: (obj) ->
     # console.log obj
+    ohSnapX()
     for type, messages of obj
       switch type
         when 'error'
