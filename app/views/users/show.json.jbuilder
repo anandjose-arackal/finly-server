@@ -11,7 +11,7 @@ json.role do
   json.finance_manager @result.roles[:finance_manager]
   json.editable do
     admin = @result.user.company_admin?
-    json.admin admin
+    json.admin (admin and not @result.selected_user == @result.user)
     json.manager (admin or @result.user.manager?)
     json.finance_manager (admin or @result.user.finance_manager?)
   end

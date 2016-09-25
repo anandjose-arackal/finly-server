@@ -3,7 +3,7 @@ class User::Team::GetManagers < User::Team::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] = "User or params not found."
+      messages[:error] = 'User or params not found'
     end
   end
 
