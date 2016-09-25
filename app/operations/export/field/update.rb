@@ -32,7 +32,7 @@ class Export::Field::Update < Export::Base
   end
 
   def post_process
-    messages[:success] << "Export Field updated."
+    messages[:success] << 'Configuration saved!'
   end
 
   def success

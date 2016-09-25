@@ -21,7 +21,7 @@ class Export::Field::Destroy < Export::Base
   end
 
   def post_process
-    messages[:success] << "Export Field destroyed."
+    messages[:success] << 'Configuration saved!'
   end
 
   def success

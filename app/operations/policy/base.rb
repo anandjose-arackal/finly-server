@@ -8,7 +8,7 @@ class Policy::Base < BaseOperation
 
     def init
       self.policy = params[:policy]
-      self.policies = Policy::Index.new(user, view: params[:view]).policies
+      self.policies = Policy::Index.(user, view: params[:view]).policies
     end
   end
 
