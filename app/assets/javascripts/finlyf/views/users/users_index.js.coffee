@@ -11,6 +11,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   events:
     #Filter by state
     'click .filter-state': 'filterState'
+    'click .navbar-view-type': 'changeView'
 
 
     'click .navbar-menu-li': 'navigate'

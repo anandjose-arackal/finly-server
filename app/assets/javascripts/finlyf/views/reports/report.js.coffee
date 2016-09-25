@@ -328,7 +328,7 @@ class FinlyF.Views.Report extends Backbone.View
     $.ajax({
       url: url,
       type: 'patch',
-      datatype: 'json',
+      dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
