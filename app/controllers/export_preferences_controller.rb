@@ -8,11 +8,10 @@ class ExportPreferencesController < ApplicationController
     if @result.success?
       @result = Company::Configuration::Show.new(current_user, params).run
       # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
-      respond_to do |format|
-        format.js {}
-      end
+      respond
     else
       flash[:error] = @result.messages[:error]
+      respond
     end
   end
 
