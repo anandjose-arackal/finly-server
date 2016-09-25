@@ -3,6 +3,7 @@
 <% if @result.present? and @result.messages.present? %>
   <% @result.messages.each do |key, value| %>
     <% value.each do |message| %>
+      ohSnapX()
       ohSnap("<%= message %>", {color: '<%= color_for(key) %>', 'duration': '6000'});
     <% end %>
   <% end %>
