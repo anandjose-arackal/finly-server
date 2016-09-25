@@ -90,7 +90,6 @@ class Report::Approve < Report::Base
         comment.save
       end
       # Send notifications
-      # todo - top level constant error here
       Event::EReport::Approve.(self.user, report: self.report)
 
       messages[:success] << 'Report approved!'

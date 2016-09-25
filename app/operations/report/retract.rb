@@ -52,6 +52,9 @@ class Report::Retract < Report::Base
       comment.save
       # mailers here
     end
+
+    Event::EReport::Retract.(user, report: report)
+
     messages[:success] << 'Report retracted!'
   end
 

@@ -89,7 +89,6 @@ class Report::Submit < Report::Base
     # adding comment regarding the change in status of this report
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
 
-    # todo - top level constant error
     Event::EReport::Submit.(user, report: report)
 
     messages[:success] << "Report Submitted."

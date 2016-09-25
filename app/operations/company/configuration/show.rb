@@ -4,11 +4,10 @@ class Company::Configuration::Show < Company::Base
     [:company_admin]
   end
 
-  class Company::Configuration::Show::ShowPresenter < Company::Configuration::Show
-
+  class Company::Configuration::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :categories, :export_fields, :export_preferences, :policies
 
-    def initialize(user)
+    def init
       self.categories = user.company.categories.active
       self.export_fields = ExportField.all
       self.export_preferences = user.company.export_preferences

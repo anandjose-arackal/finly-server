@@ -6,7 +6,7 @@ class Event::EReport::Retract < Event::EReport::Base
 
   def affected_users
     tracks = self.report.tracks
-    manager = tracks[-2].user rescue nil
+    manager = tracks[-2].action_user rescue nil
     [self.user, manager]
   end
 
