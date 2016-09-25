@@ -12,7 +12,7 @@ class Company::Configuration::Show < Company::Base
       self.categories = user.company.categories.active
       self.export_fields = ExportField.all
       self.export_preferences = user.company.export_preferences
-      self.policies = user.company.policies.non_default
+      self.policies = user.company.policies.non_default.exclude_deleted
     end
   end
 

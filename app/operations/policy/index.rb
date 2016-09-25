@@ -25,6 +25,10 @@ class Policy::Index < Policy::Base
     end
   end
 
+  def post_process
+    self.policies = self.policies.exclude_deleted rescue self.policies
+  end
+
   def success
     Policy::Index::IndexPresenter.new(user, {policies: policies}, messages)
   end
