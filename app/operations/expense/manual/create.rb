@@ -45,7 +45,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         self.receipt.save
       end
     else
-      messages[:error] << self.expense.errors.full_messages
+      messages[:error] = self.expense.errors.full_messages
     end
   end
 
@@ -54,7 +54,7 @@ class Expense::Manual::Create < Expense::Manual::Base
     if self.expense.report_id.present? and self.expense.report.open?
       comment = self.expense.report.comments.build report: self.expense.report, user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
       unless comment.save
-        messages[:error] << comment.errors.full_messages
+        messages[:error] = comment.errors.full_messages
       end
     end
     messages[:success] << "Expense created."

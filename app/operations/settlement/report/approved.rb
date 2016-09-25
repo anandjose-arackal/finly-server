@@ -45,7 +45,7 @@ class Settlement::Report::Approved < Report::Base
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
       unless report_amount.save
-        messages[:error] << report_amount.errors.full_messages
+        messages[:error] = report_amount.errors.full_messages
         return
       end
       report.reimbursement_amount = report_amount
@@ -54,13 +54,13 @@ class Settlement::Report::Approved < Report::Base
       report_amount.value = pending_reimbursement
       report_amount.currency = currency
       unless report_amount.save
-        messages[:error] << report_amount.errors.full_messages
+        messages[:error] = report_amount.errors.full_messages
         return
       end
     end
     report.accounted = true
     unless report.save
-      messages[:error] << report.errors.full_messages
+      messages[:error] = report.errors.full_messages
     end
   end
 

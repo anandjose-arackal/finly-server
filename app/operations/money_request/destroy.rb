@@ -26,7 +26,7 @@ class MoneyRequest::Destroy < MoneyRequest::Base
 
   def process
     unless money_request.destroy
-      messages[:error] << money_request.errors.full_messages
+      messages[:error] = money_request.errors.full_messages
     end
   end
 

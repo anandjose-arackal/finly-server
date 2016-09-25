@@ -16,12 +16,12 @@ Rails.application.configure do
   # Don't care if the mailer can't send.
   # config.action_mailer.raise_delivery_errors = false
   #################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.default_url_options = { host: 'localhost:3000' }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
       address:              'smtp.sendgrid.net',
       port:                 587,
-      domain:               'www.localhost:3000',
+      domain:               'localhost:3000',
       user_name:            'vivekagb',
       password:             'idAr5APhk61X',
       # ssl:                  true,

@@ -93,7 +93,7 @@ class ApplicationController < ActionController::Base
         end
         respond_to do |format|
           format.json { render 'shared/success' }
-          format.js {}
+          format.html {}
         end
         return
       elsif type[:response] == :failure
@@ -104,32 +104,42 @@ class ApplicationController < ActionController::Base
         end
         respond_to do |format|
           format.json { render 'layouts/application' }
-          format.js {}
+          format.html {}
         end
         return
       elsif type[:render].present?
         respond_to do |format|
           format.json { render type[:render] }
-          format.js {}
+          format.html {}
         end
         return
       elsif type[:view].present? and type[:view] == false
         respond_to do |format|
           format.json { render 'layouts/application' }
-          format.js {}
+          format.html {}
         end
         return
       end
     end
-    if @result.present? and @result.success?
-      respond_to do |format|
-        format.js {}
-        format.json {}
+    if @result.present?
+      if @result.success?
+        respond_to do |format|
+          format.js {}
+          format.json {}
+          format.html {}
+        end
+      else
+        respond_to do |format|
+          format.js { render 'layouts/application' }
+          format.json { render 'layouts/application' }
+          format.html {}
+        end
       end
     else
       respond_to do |format|
-        format.js { render 'layouts/application' }
+        format.js {}
         format.json { render 'layouts/application' }
+        format.html {}
       end
     end
   end

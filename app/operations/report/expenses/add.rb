@@ -63,7 +63,7 @@ class Report::Expenses::Add < Report::Base
   def process
     expenses.each do |expense|
       unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
-        messages[:error] << expense.errors.full_messages
+        messages[:error] = expense.errors.full_messages
       end
     end
   end

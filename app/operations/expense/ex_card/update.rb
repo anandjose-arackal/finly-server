@@ -44,7 +44,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def process
     unless expense.update(updated_expense_params)
-      messages[:error] << self.expense.errors.full_messages
+      messages[:error] = self.expense.errors.full_messages
       return false
     end
     success

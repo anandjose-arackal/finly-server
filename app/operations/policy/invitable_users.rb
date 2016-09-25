@@ -2,7 +2,7 @@ class Policy::InvitableUsers < Policy::Base
 
   attr_accessor :invitable_users
 
-  class Policy::InvitableUsers::InvitableUsersPresenter < Policy::Base::BasePresenter
+  class Policy::InvitableUsers::InvitableUsersPresenter < Policy::Base::PolicyPresenter
 
     attr_accessor :invitable_users, :policy
 

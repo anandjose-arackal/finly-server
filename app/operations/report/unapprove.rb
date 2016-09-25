@@ -47,7 +47,7 @@ class Report::Unapprove < Report::Base
       report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.unapprove_id, report_status_id: ReportStatus.processing_id
       return
     end
-    messages[:error] << report.errors.full_messages
+    messages[:error] = report.errors.full_messages
   end
 
   def post_process
