@@ -56,7 +56,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
       end
       return true
     end
-    messages[:error] << money_request.errors.full_messages
+    messages[:error] = money_request.errors.full_messages
   end
 
   def post_process

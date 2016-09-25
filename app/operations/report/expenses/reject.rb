@@ -48,7 +48,7 @@ class Report::Expenses::Reject < Report::Base
     expenses.each do |expense|
       unless expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.rejected_id,
                                    manager_memo: params[:memo], rejecting_manager: user)
-        messages[:error] << expense.errors.full_messages
+        messages[:error] = expense.errors.full_messages
       end
     end
   end

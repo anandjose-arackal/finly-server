@@ -42,7 +42,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def process
     unless money_request.update_attributes(self.update_param)
-      messages[:error] << money_request.errors.full_messages
+      messages[:error] = money_request.errors.full_messages
     end
   end
 

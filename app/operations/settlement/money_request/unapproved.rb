@@ -33,7 +33,7 @@ class Settlement::MoneyRequest::Unapproved < MoneyRequest::Base
     currency = Currency.first
     user.balance_sheet.subtract_pending_advance total_amount, currency
     unless money_request.update_attribute(:accounted, false)
-      messages[:error] << money_request.errors.full_messages
+      messages[:error] = money_request.errors.full_messages
     end
   end
 

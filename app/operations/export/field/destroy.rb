@@ -16,7 +16,7 @@ class Export::Field::Destroy < Export::Base
 
   def process
     unless preference.destroy
-      messages[:error] << preference.errors.full_messages
+      messages[:error] = preference.errors.full_messages
     end
   end
 

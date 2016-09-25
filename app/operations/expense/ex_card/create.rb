@@ -36,7 +36,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
   def process
     self.expense = user.expenses.build(expense_params)
     unless self.expense.save
-      messages[:error] << self.expense.errors.full_messages
+      messages[:error] = self.expense.errors.full_messages
       return false
     end
     success

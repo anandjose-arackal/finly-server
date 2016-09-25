@@ -34,7 +34,7 @@ class User::Configuration::UpdateDetails < BaseOperation
 
   def process
     unless user.update(details_params)
-      messages[:error] << user.errors.full_messages
+      messages[:error] = user.errors.full_messages
     end
   end
 

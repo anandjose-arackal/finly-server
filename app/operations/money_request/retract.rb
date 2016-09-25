@@ -42,7 +42,7 @@ class MoneyRequest::Retract < MoneyRequest::Base
                                       status_id: MoneyRequestStatus.id_for(:retracted), user_request_role_id: UserRole.id_for(:employee)
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)
     else
-      messages[:error] << money_request.errors.full_messages
+      messages[:error] = money_request.errors.full_messages
     end
   end
 end

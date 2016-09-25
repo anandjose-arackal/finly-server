@@ -60,7 +60,7 @@ class Report::Expenses::Remove < Report::Base
   def process
     expenses.each do |expense|
       unless expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.unreported_id, manager_memo: nil, rejecting_manager: nil)
-        messages[:error] << expense.errors.full_messages
+        messages[:error] = expense.errors.full_messages
       end
     end
   end

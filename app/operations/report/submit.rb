@@ -82,7 +82,7 @@ class Report::Submit < Report::Base
       end
       return true
     end
-    messages[:error] << report.errors.full_messages
+    messages[:error] = report.errors.full_messages
   end
 
   def post_process
