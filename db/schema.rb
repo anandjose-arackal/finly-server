@@ -495,6 +495,7 @@ ActiveRecord::Schema.define(version: 20160924144425) do
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.boolean  "default",                default: false, null: false
+    t.boolean  "is_deleted",             default: false, null: false
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
