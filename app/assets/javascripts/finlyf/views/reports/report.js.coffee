@@ -324,13 +324,13 @@ class FinlyF.Views.Report extends Backbone.View
 
   reportAction: (e) ->
     _this = @
-    url = $(e.currenttarget).attr('data-url')
+    url = $(e.currentTarget).attr('data-url')
     $.ajax({
       url: url,
       type: 'patch',
       datatype: 'json',
       success: (res) ->
-        finlyf.snapnotify(res.messages)
+        FinlyF.snapNotify(res.messages)
         if res.success == true
           _this.model.fetch({
             data: {view: _this.current_view}
