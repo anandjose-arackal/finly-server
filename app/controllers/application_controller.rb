@@ -93,6 +93,7 @@ class ApplicationController < ActionController::Base
         end
         respond_to do |format|
           format.json { render 'shared/success' }
+          format.html {}
         end
         return
       elsif type[:response] == :failure
@@ -103,16 +104,19 @@ class ApplicationController < ActionController::Base
         end
         respond_to do |format|
           format.json { render 'layouts/application' }
+          format.html {}
         end
         return
       elsif type[:render].present?
         respond_to do |format|
           format.json { render type[:render] }
+          format.html {}
         end
         return
       elsif type[:view].present? and type[:view] == false
         respond_to do |format|
           format.json { render 'layouts/application' }
+          format.html {}
         end
         return
       end
@@ -122,17 +126,20 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           format.js {}
           format.json {}
+          format.html {}
         end
       else
         respond_to do |format|
           format.js { render 'layouts/application' }
           format.json { render 'layouts/application' }
+          format.html {}
         end
       end
     else
       respond_to do |format|
         format.js {}
         format.json { render 'layouts/application' }
+        format.html {}
       end
     end
   end

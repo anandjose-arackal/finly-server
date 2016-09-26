@@ -27,7 +27,7 @@ class Export::Field::Create < Export::Base
   end
 
   def post_process
-    messages[:success] << "Export Field added."
+    messages[:success] << 'Configuration saved!'
   end
 
   def success

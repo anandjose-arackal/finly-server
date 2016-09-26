@@ -24,7 +24,7 @@ class Receipt::Update < Receipt::Base
 
   def process
     unless receipt.update_attributes(update_params)
-      messages[:error] << receipt.errors.full_messages
+      messages[:error] = receipt.errors.full_messages
     end
   end
 

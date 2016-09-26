@@ -21,7 +21,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
 
   def process
     unless self.category.update_attributes(active: false)
-      messages[:error] << self.category.errors.full_messages
+      messages[:error] = self.category.errors.full_messages
     end
   end
 

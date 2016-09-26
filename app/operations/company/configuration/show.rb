@@ -1,7 +1,7 @@
 class Company::Configuration::Show < Company::Base
 
   def authorized_user_types
-    [:company_admin]
+    [:admin]
   end
 
   class Company::Configuration::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -11,12 +11,12 @@ class Company::Configuration::Show < Company::Base
       self.categories = user.company.categories.active
       self.export_fields = ExportField.all
       self.export_preferences = user.company.export_preferences
-      self.policies = user.company.policies.non_default.exclude_deleted
+      self.policies = Policy::Index.(user, params).policies rescue nil
     end
   end
 
 
   def success
-    Company::Configuration::Show::ShowPresenter.new(user)
+    Company::Configuration::Show::ShowPresenter.new(user, params)
   end
 end

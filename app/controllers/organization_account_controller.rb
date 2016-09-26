@@ -3,7 +3,7 @@ class OrganizationAccountController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    @result = Company::Configuration::Show.new(current_user, params).run
+    @result = Company::Configuration::Show.(current_user, params)
 
     respond_to do |format|
       format.html {render 'organization_account/show'}

@@ -57,7 +57,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
                                          status_id: MoneyRequestStatus.id_for(:processing), memo: memo
       return true
     end
-    messages[:error] << money_request.errors.full_messages
+    messages[:error] = money_request.errors.full_messages
   end
 
   def post_process

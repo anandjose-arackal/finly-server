@@ -36,7 +36,7 @@ class User::Configuration::UpdateState < BaseOperation
 
   def process
     unless to_user.update(state_params)
-      messages[:error] << to_user.errors.full_messages
+      messages[:error] = to_user.errors.full_messages
     end
   end
 

@@ -19,7 +19,10 @@ class CategoriesController < ApplicationController
       @result = Company::Configuration::Show.(current_user, params)
       @result.messages = messages
     end
-    respond
+    # respond
+    respond do |format|
+      format.js {}
+    end
   end
 
 end

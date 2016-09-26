@@ -35,7 +35,7 @@ class Expense::Manual::Destroy < Expense::Manual::Base
 
   def process
     unless expense.destroy
-      messages[:error] << expense.errors.full_messages
+      messages[:error] = expense.errors.full_messages
       return false
     end
     return true
