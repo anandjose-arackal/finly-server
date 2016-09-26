@@ -25,7 +25,7 @@ class Policy::Rules::Destroy < Policy::Rules::Base
 
   def process
     unless rule.destroy
-      messages[:error] << rule.errors.full_messages
+      messages[:error] = rule.errors.full_messages
     end
   end
 

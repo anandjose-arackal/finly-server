@@ -15,8 +15,11 @@ window.FinlyF =
     views = $("#menu-nav-views-dropdown li")
     # console.log "menus", params
     dropdown = $(el).find('#primary-navbar .menu-nav-views-dropdown')
-    for view in views
-      $(dropdown).append($(view).clone())
+    if views.length == 1
+      $(dropdown).parent().hide()
+    else
+      for view in views
+        $(dropdown).append($(view).clone())
 
     navbar_right = $(el).find("#primary-navbar .navbar-right")
     switch params.view
@@ -85,6 +88,7 @@ window.FinlyF =
 
   snapNotify: (obj) ->
     # console.log obj
+    ohSnapX()
     for type, messages of obj
       switch type
         when 'error'
@@ -107,8 +111,8 @@ window.FinlyF =
           container = 'ohsnap'
       if messages.length
         for message in messages
-          console.log "Message ", message, "Color:", color, "container", container
-          ohSnap(message, {color: color, 'duration': '6000', 'container-id': container})
+          # console.log "Message ", message, "Color:", color, "container", container
+          ohSnap(message, {color: color, 'duration': '9000', 'container-id': container})
 
 $(document).ready ->
   FinlyF.initialize()

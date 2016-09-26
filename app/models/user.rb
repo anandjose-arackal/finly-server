@@ -118,6 +118,7 @@ class User < ActiveRecord::Base
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :active, -> { where active: true }
+  scope :invited_by, ->(id) { where invited_by_id: id }
 
   # scopes for filters
   scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }

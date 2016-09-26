@@ -30,7 +30,7 @@ class User::Configuration::UpdatePassword < BaseOperation
     if user.update_with_password(password_params)
       sign_in user, :bypass => true
     else
-      messages[:error] << user.errors.full_messages
+      messages[:error] = user.errors.full_messages
     end
   end
 

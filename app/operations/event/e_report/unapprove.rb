@@ -5,8 +5,11 @@ class Event::EReport::Unapprove < Event::EReport::Base
   end
 
   def affected_users
-    prev_user = self.report.tracks[-2].user rescue nil
-    [self.report.controlling_user, prev_user]
+    # prev_user = params[:from_user]
+    # users = [self.report.controlling_user]
+    # users << prev_user if prev_user.present?
+    # users
+    [self.report.controlling_user]
   end
 
   def send_push_notification(user)

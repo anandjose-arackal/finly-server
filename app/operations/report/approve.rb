@@ -66,7 +66,7 @@ class Report::Approve < Report::Base
       end
       return true
     end
-    messages[:error] << report.errors.full_messages
+    messages[:error] = report.errors.full_messages
   end
 
   def post_process
@@ -90,7 +90,6 @@ class Report::Approve < Report::Base
         comment.save
       end
       # Send notifications
-      # todo - top level constant error here
       Event::EReport::Approve.(self.user, report: self.report)
 
       messages[:success] << 'Report approved!'

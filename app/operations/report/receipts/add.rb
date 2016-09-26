@@ -31,7 +31,7 @@ class Report::Receipts::Add < Report::Base
     if receipt.save
       self.response = receipt
     else
-      messages[:error] << receipt.errors.full_messages
+      messages[:error] = receipt.errors.full_messages
     end
   end
 end

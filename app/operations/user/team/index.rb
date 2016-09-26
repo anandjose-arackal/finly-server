@@ -71,11 +71,11 @@ class User::Team::Index < User::Team::Base
       approves_to_ids = UserManagerMapping.send(approves_to_association, approves_to_ids).pluck(:user_id)
     end
     # adding members invited by this particular user
-    user_ids += user.company.users.where(invited_by_id: user.id)
+    user_ids += user.company.users.invited_by(user.id)
     user_ids.uniq! if user_ids.present?
-    if user_ids.present?
+    # if user_ids.present?
       self.response = user.company.users.with_id(user_ids)
-    end
+    # end
   end
 
   def retrieve

@@ -57,6 +57,12 @@ class Report::Index < Report::Base
     end
   end
 
+  def post_process
+    if self.reports.present?
+      self.reports = self.reports.exclude_deleted rescue self.reports
+    end
+  end
+
   def success
     params[:reports] = reports
     Report::Index::Presenter.new(user, params, messages)

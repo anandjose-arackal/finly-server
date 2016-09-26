@@ -69,7 +69,7 @@ class Policy::Users::AddUser < Policy::Base
   end
 
   def post_process
-    messages[:success] = "Users added to policy."
+    messages[:success] << 'Users added to policy'
   end
 
   def success

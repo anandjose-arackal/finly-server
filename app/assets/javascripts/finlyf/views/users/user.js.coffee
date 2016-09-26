@@ -115,7 +115,7 @@ class FinlyF.Views.User extends Backbone.View
     target = $(e.currentTarget)
     form = $(target).closest('section').find('form')
     values = {}
-
+    $(form).find(':disabled').removeAttr('disabled');
     # _.each($(container).find('form').serializeArray(), (input) ->
     _.each($(form).serializeArray(), (input) ->
       values[ input.name ] = input.value

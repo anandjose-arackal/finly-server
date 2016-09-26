@@ -71,7 +71,7 @@ class User::Invite::Accept < User::Invite::Base
   def process
     self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present?
-      messages[:error] << invited_user.errors.full_messages
+      messages[:error] = invited_user.errors.full_messages
     end
   end
 

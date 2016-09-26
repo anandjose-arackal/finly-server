@@ -4,6 +4,7 @@ json.company do
   json.current_user_id @result.user.id
   json.roles do
     json.admin @result.user.company_admin?
+    json.company_admin @result.user.company_admin?
     json.manager @result.user.manager?
     json.finance_manager @result.user.finance_manager?
   end

@@ -40,7 +40,7 @@ class Settlement::Report::Unapproved < Report::Base
     report.user.balance_sheet.subtract_pending_reimbursement pending_reimbursement, currency
     report.reimbursement_amount.update(value: 0) if report.reimbursement_amount.present?
     unless report.update_attributes(accounted: false)
-      messages[:error] << report.errors.full_messages
+      messages[:error] = report.errors.full_messages
     end
   end
 

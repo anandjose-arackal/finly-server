@@ -20,6 +20,7 @@
 #
 class Report < ActiveRecord::Base
   include MathUtil
+  include SoftDeletable
 
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id

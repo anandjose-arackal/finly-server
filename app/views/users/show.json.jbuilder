@@ -11,7 +11,7 @@ json.role do
   json.finance_manager @result.roles[:finance_manager]
   json.editable do
     admin = @result.user.company_admin?
-    json.admin admin
+    json.admin (admin and not @result.selected_user == @result.user)
     json.manager (admin or @result.user.manager?)
     json.finance_manager (admin or @result.user.finance_manager?)
   end
@@ -72,7 +72,9 @@ json.mapping @result.mapping.each do |mapping|
   end
 end
 [:team_managers, :team_finance_managers].each do |key|
-  json.set! key, @managers.send(key).each do |manager|
+  managers = @managers.send(key)
+  next if managers.blank?
+  json.set! key, managers do |manager|
     json.id manager.id
     json.name manager.name
     json.email manager.email

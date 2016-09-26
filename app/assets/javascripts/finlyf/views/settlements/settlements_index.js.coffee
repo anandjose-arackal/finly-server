@@ -335,12 +335,13 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         # payment_type: parseInt($(target).find("input[name=payment\\[payment_type\\]]:checked").val())
       }
       payment_type: parseInt($(target).find("input[name=payment_type]:checked").val())
+      view: _this.params.view
     }
 
-    console.log data
+    # console.log data
 
     $.ajax({
-      url: "settlements?view=admin&id=" + @user_id
+      url: "settlements?id=" + @user_id
       type: "POST",
       data: data,
       success: (res) ->
@@ -504,6 +505,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   selectedReportsTotal: ->
     total = _.reduce(@selectedReports, ((memo, value) ->
-      memo + value.get('total_amount')
+      memo + value.get('reimbursement_amount')
     ), 0)
     return total

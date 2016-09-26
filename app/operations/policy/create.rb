@@ -37,8 +37,7 @@ class Policy::Create < Policy::Base
       self.policy = cloned_policy
       return true
     end
-    messages[:error] << cloned_policy.errors.full_messages
-    return false
+    messages[:error] = cloned_policy.errors.full_messages
   end
 
   def post_process

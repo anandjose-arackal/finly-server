@@ -327,7 +327,7 @@ class FinlyF.Views.Report extends Backbone.View
     url = $(e.currentTarget).attr('data-url')
     $.ajax({
       url: url,
-      type: 'PATCH',
+      type: 'patch',
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
@@ -338,7 +338,7 @@ class FinlyF.Views.Report extends Backbone.View
           $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           
       error: (err) ->
-        console.log "Error", err
+        console.log "error", err
     })
 
   refreshData: (e)->

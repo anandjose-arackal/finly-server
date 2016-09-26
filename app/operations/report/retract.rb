@@ -3,6 +3,7 @@
 # report_id: id of the report that is being retracted
 
 class Report::Retract < Report::Base
+  attr_accessor :from_user
 
   def authorized_user_types
     :employee
@@ -19,6 +20,9 @@ class Report::Retract < Report::Base
   def init
     id = (params[:id] or params[:report_id])
     self.report = user.reports.with_id(id).first rescue nil
+    if self.report.present?
+      self.from_user = report.controlling_user
+    end
   end
 
   def authorize
@@ -43,15 +47,14 @@ class Report::Retract < Report::Base
       end
       return
     end
-    messages[:error] << report.errors.full_messages
+    messages[:error] = report.errors.full_messages
   end
 
   def post_process
-    if success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
-      comment.save
-      # mailers here
-    end
+    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
+
+    Event::EReport::Retract.(user, report: report, from_user: from_user)
+
     messages[:success] << 'Report retracted!'
   end
 

@@ -3,20 +3,22 @@
     <div class="col-sm-6">
       <h4>User Info</h4>
     </div>
-    <div class="col-sm-6 text-right">
-      {{#if item.actions.delete_invite}}
-        <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
-      {{/if}}
-      {{#if item.actions.resend_invite}}
-        <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
-      {{/if}}
-      {{#if item.actions.deactivate}}
-        <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
-      {{/if}}
-      {{#if item.actions.activate}}
-        <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
-      {{/if}}
-    </div>
+    {{#if item.user.editable}}
+      <div class="col-sm-6 text-right">
+        {{#if item.actions.delete_invite}}
+          <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
+        {{/if}}
+        {{#if item.actions.resend_invite}}
+          <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
+        {{/if}}
+        {{#if item.actions.deactivate}}
+          <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
+        {{/if}}
+        {{#if item.actions.activate}}
+          <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
+        {{/if}}
+      </div>
+    {{/if}}
   </div>
   <form class="form-user-info">
     <div class="row">
@@ -60,7 +62,9 @@
       <h4>User Roles</h4>
     </div>
     <div class="col-sm-6 text-right">
+    {{#if item.user.editable}}
       <button class="btn btn-sm btn-warning btn-edit-user"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+    {{/if}}
     </div>
   </div> 
   <form class="form-user-roles">
@@ -235,7 +239,10 @@
       </div>
 
       <div class="col-sm-6 text-right">
+
+      {{#if ../item.user.editable}}
         <button class="btn btn-sm btn-warning btn-edit-policy"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+      {{/if}}
       </div>
     </div>
 
@@ -263,8 +270,7 @@
               {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" value="{{this.default.manager.id}}"> --}}
             </div>
             
-            {{!-- <h1>{{this.conditional_manager.length}}</h1>
-            <h2>{{add this.blah.length 5 2}}</h2> --}}
+            
             {{#each this.conditional_manager}}
             <div class="row x conditional no-margin" data-condition-serial="{{add @index 1}}">
 
