@@ -108,23 +108,22 @@ class FinlyF.Views.Report extends Backbone.View
     )
 
   createExpense: (e) ->
-    _this =   @
-    values = {}
+    # console.log "Creating expense"
+    # if e
+    #   console.log "event", e
+    #   e.preventDefault()
 
-    # if(event){ event.preventDefault(); }
 
-    _.each($("#modal-new form#new-item").serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    # console.log values
-    model = new FinlyF.Models.Expense()
-    # console.log("Putting data")
-    response = model.save(values, {
-      iframe: true,
-      files: this.$('form :file'),
-      data: values
-      processData: true
-      success: (model, res) ->
+    # e.preventDefault()
+    
+    _this = @
+    formData = new FormData($('#modal-new form#new-item')[0])
+    $.ajax({
+      url: '/expenses'
+      type: "POST",
+      data: formData,
+      success: (res) ->
+        # console.log res.messages
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
@@ -135,10 +134,13 @@ class FinlyF.Views.Report extends Backbone.View
             }
           })
       error: (err) ->
-        console.log "Error", err
+        console.log "Error", err 
+      cache: false,
+      contentType: false,
+      processData: false
     })
 
-    # console.log response
+
 
   existingExpense: (e) ->
     report_id = $(e.currentTarget).attr('data-item-id')
