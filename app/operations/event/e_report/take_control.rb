@@ -5,7 +5,8 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def affected_users
-    [self.report.controlling_user, self.report.controlling_for_user]
+    # [self.report.controlling_user, self.report.controlling_for_user]
+    [self.report.controlling_user]
   end
 
   def send_push_notification(user)

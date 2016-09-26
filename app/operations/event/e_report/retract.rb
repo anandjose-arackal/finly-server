@@ -5,8 +5,11 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def affected_users
-    manager = params[:from_user]
-    [self.user, manager]
+    # manager = params[:from_user]
+    # users = [self.user]
+    # users << manager if manager.present?
+    # users
+    [self.user]
   end
 
   def send_push_notification(user)
