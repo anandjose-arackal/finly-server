@@ -24,7 +24,7 @@ Rails.application.configure do
   # Apache or NGINX already handles this.
   # config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
   config.serve_static_files = true
-  config.serve_static_assets = true
+  # config.serve_static_assets = true
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -69,27 +69,27 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   #################### SETTINGS FOR SENDGRID ##########################
-  # config.action_mailer.default_url_options = { host: "www.finly.io" }
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.smtp_settings = {
-  #     address:              'smtp.sendgrid.net',
-  #     port:                 587,
-  #     domain:               'www.finly.io',
-  #     user_name:            'vivekagb',
-  #     password:             'idAr5APhk61X',
-  #     # ssl:                  true,
-  #     # tls:                  true,
-  #     authentication:       :plain,
-  #     enable_starttls_auto: true,
-  #     :openssl_verify_mode  => 'none'
-  # }
+  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+      address:              'smtp.sendgrid.net',
+      port:                 587,
+      domain:               'www.finly.io',
+      user_name:            'vivekagb',
+      password:             'idAr5APhk61X',
+      # ssl:                  true,
+      # tls:                  true,
+      authentication:       :plain,
+      enable_starttls_auto: true,
+      :openssl_verify_mode  => 'none'
+  }
 
   ######################################################################
 
-  # temporary config for mailers
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :test
-  config.action_mailer.default_url_options = { host: 'localhost:3000'}
+  # # temporary config for mailers
+  # config.action_mailer.raise_delivery_errors = true
+  # config.action_mailer.delivery_method = :test
+  # config.action_mailer.default_url_options = { host: 'localhost:3000'}
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
