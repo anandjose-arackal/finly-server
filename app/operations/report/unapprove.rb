@@ -3,7 +3,7 @@
 # report_id: id of the report to be unapproved
 
 class Report::Unapprove < Report::Base
-  attr_accessor :prev_status
+  attr_accessor :prev_status, :from_user
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -18,6 +18,9 @@ class Report::Unapprove < Report::Base
   def init
     id = (params[:report_id] or params[:id])
     self.report = Report.find_by(id: id)
+    if report.present?
+      self.from_user = self.report.controlling_user
+    end
   end
 
   def authorize
@@ -54,7 +57,7 @@ class Report::Unapprove < Report::Base
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_unapprove)
     # Recalculate settlement when report is unapproved from an approved/closed state
     if prev_status.approved? or prev_status.closed?
-      Settlement::Report::Unapproved.(user, report: report)
+      Settlement::Report::Unapproved.(user, report: report, from_user: self.from_user)
     end
 
     messages[:success] << "Report unapproved."
