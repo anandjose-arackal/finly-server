@@ -27,9 +27,7 @@ class User::Configuration::UpdatePassword < BaseOperation
   end
 
   def process
-    if user.update_with_password(password_params)
-      sign_in user, :bypass => true
-    else
+    unless user.update_with_password(password_params)
       messages[:error] = user.errors.full_messages
     end
   end

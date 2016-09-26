@@ -1,4 +1,4 @@
-<% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
+<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
 <button id="createNewRule" data-toggle="modal" data-target="#createNewBudgetRuleModal">Create New Rule
 </button>
 <% end %>
@@ -93,7 +93,7 @@
 
 </div>
 
-<% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
+<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
 
 <div class="modal fade" id="createNewBudgetRuleModal" role="dialog">
   <div class="modal-dialog modal-md">

@@ -6,7 +6,7 @@
     <li class="active" data-switch="#rules"><a href="#" data-turbolinks="false">Rules
       <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
     </li>
-    <% if current_user.policy_admin?(@result.policy) or current_user.admin? %>
+    <% if (current_user.policy_admin?(@result.policy) or current_user.admin?) and params[:view] == 'admin'%>
     <li data-switch="#policy_members"><a href="#" data-turbolinks="false">Policy Members
       <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
     </li>

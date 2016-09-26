@@ -50,5 +50,4 @@ class Company::AddAdmin < Company::Base
                                   :mobile_number, team_mapping_attributes: [:default], role_mapping_attributes: [:user_role_id])
   end
 
-
 end
