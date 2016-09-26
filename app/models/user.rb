@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
-  validates :mobile_number, length: {is: 10}
+  validates :mobile_number, presence: true, uniqueness: true, length: {is: 10}
 
   # validate :valid_role
 
