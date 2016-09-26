@@ -18,6 +18,43 @@ def random_string_of_numbers(length)
   (0...length).map { (48 + rand(10)).chr }.join
 end
 
+ballzy_employees = [{"name"=>"Rajesh","email"=>"rajesh@abc.com"},
+                    {"name"=>"Sachin","email"=>"sachin@abc.com"},
+                    {"name"=>"Rinju","email"=>"rinju@abc.com"},
+                    {"name"=>"Prateek","email"=>"prateek@abc.com"},
+                    {"name"=>"Jothi","email"=>"jothi@abc.com"},
+                    {"name"=>"Angeline","email"=>"angeline@abc.com"},
+                    {"name"=>"Dipti","email"=>"Dipti@abc.com"},
+                    {"name"=>"Ani","email"=>"Ani@abc.com"},
+                    {"name"=>"Telecaller 1 ","email"=>"tele1@abc.com"},
+                    {"name"=>"Telecaller 2","email"=>"tele2@abc.com"},
+                    {"name"=>"Telecaller 3","email"=>"tele3@abc.com"},
+                    {"name"=>"Telecaller 4","email"=>"tele4@abc.com"},
+                    {"name"=>"Zonal1","email"=>"zonal1@abc.com"},
+                    {"name"=>"Zonal2","email"=>"zonal2@abc.com"},
+                    {"name"=>"MumTl1","email"=>"mumtl1@abc.com"},
+                    {"name"=>"MumTl2","email"=>"mumtl2@abc.com"},
+                    {"name"=>"DelTl","email"=>"deltl@abc.com"},
+                    {"name"=>"HydTl","email"=>"hydtl@abc.com"},
+                    {"name"=>"BlrTl","email"=>"blrtl@abc.com"},
+                    {"name"=>"F1","email"=>"f1@abc.com"},
+                    {"name"=>"F2","email"=>"f2@abc.com"},
+                    {"name"=>"F3","email"=>"f3@abc.com"},
+                    {"name"=>"F4","email"=>"f4@abc.com"},
+                    {"name"=>"F5","email"=>"f5@abc.com"},
+                    {"name"=>"F6","email"=>"f6@abc.com"},
+                    {"name"=>"F7","email"=>"f7@abc.com"},
+                    {"name"=>"F8","email"=>"f8@abc.com"},
+                    {"name"=>"F9","email"=>"f9@abc.com"},
+                    {"name"=>"F10","email"=>"f10@abc.com"},
+                    {"name"=>"Nav","email"=>"nav@abc.com"},
+                    {"name"=>"Rupali","email"=>"rupali@abc.com"},
+                    {"name"=>"Jaya","email"=>"jaya@abc.com"},
+                    {"name"=>"Malavika","email"=>"mala@abc.com"},
+                    {"name"=>"csr1","email"=>"csr1@abc.com"},
+                    {"name"=>"csr2","email"=>"csr2@abc.com"},
+                    {"name"=>"csr3","email"=>"csr3@abc.com"}]
+
 if ExportField.count == 0
   ExportField.create(id: 1, name: 'Employee Name')
   ExportField.create(id: 2, name: 'Employee ID')
@@ -116,6 +153,9 @@ end
 if Company.count == 0
   c = Company.create(name: 'Finly')
   c.reload
+
+  ballzy = Company.create(name: 'Ballzy Co.')
+  ballzy.reload
 else
   c = Company.first
 end
@@ -175,6 +215,25 @@ if User.count == 0
   fm[0].team_mapping.default.first.update_attributes(approves_finance_to: fm[1])
   fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
+
+  # creating ballzy admin
+  bala = User.create(name: "Balakumar Rajaraman", email: "balakumar.rajaram@gmail.com",
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: ballzy.id, mobile_number: random_string_of_numbers(10),
+                     role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+                                               {user_role_id: UserRole.employee_id}])
+
+
+  # creating ballzy employees
+  ballzy_users = []
+  ballzy_employees.each do |employee|
+    employee[:password] = employee[:password_confirmation] = "hapitoe007"
+    employee[:company_id] = ballzy.id
+    employee[:mobile_number] = random_string_of_numbers(10)
+    employee[:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},
+                                          {user_role_id: UserRole.employee_id}]
+    ballzy_users << User.create(employee)
+  end
+
 
   User.all.each do |user|
     user.confirm
@@ -278,7 +337,7 @@ if PaymentType.count == 0
 end
 
 if Report.count == 0
-  User.all.each do |user|
+  c.users.all.each do |user|
     3.times.each do
       report = ReportService.new(user: user).create
       report_service = ReportService.new(user: user, report: report)
