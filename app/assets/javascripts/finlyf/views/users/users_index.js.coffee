@@ -11,6 +11,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   events:
     #Filter by state
     'click .filter-state': 'filterState'
+    'click .navbar-view-type': 'changeView'
 
 
     'click .navbar-menu-li': 'navigate'
@@ -171,14 +172,20 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       dataType: 'json'
       data: @params
       success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        $(modal).html(_this.templateInviteEmployee({item: res}))
-        if _this.params.view == 'manager'
-          $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
-        else if _this.params.view == 'finance_manager'
-          $(modal).find('.invitee-finance-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
+        unless res.company.roles.company_admin == true
+          $(modal).modal('hide')
+          ohSnap('You do not have appropriate permission to invite!', 'color': 'red', 'duration': 6000, 'container-id': 'ohsnap-priority')
+        else
+          FinlyF.snapNotify(res.messages)
+          $(modal).html(_this.templateInviteEmployee({item: res}))
+          if _this.params.view == 'manager'
+            $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
+          else if _this.params.view == 'finance_manager'
+            $(modal).find('.invitee-finance-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
         
       error: (err) ->
+        FinlyF.snapNotify(err.messages)
+        $(modal).modal('hide')
         console.log "Err", err
     })
 

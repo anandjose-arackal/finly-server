@@ -32,7 +32,7 @@ class Report::Destroy < Report::Base
 
   def process
     unless report.destroy
-      messages[:error] << report.errors.full_messages
+      messages[:error] = report.errors.full_messages
       return false
     end
   end

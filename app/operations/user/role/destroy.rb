@@ -34,7 +34,7 @@ class User::Role::Destroy < BaseOperation
 
   def process
     unless user.role_mapping.role(roles_to_remove).destroy_all
-      messages[:error] << user.role_mapping.errors.full_messages
+      messages[:error] = user.role_mapping.errors.full_messages
       return false
     end
   end

@@ -41,7 +41,7 @@ class Report::Policies::Assign < Report::Base
 
   def process
     unless report.update_attribute(:policy_id, params[:policy_id], submitted_at: nil)
-      messages[:error] << report.errors.full_messages
+      messages[:error] = report.errors.full_messages
     end
   end
 

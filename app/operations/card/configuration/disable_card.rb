@@ -62,16 +62,16 @@ class Card::Configuration::DisableCard < Card::Base
   def process
     if user.admin?
       unless card.update_attributes(active: false, disabled_by_role_id: UserRole.admin_id)
-        messages[:error] << card.errors.full_messages
+        messages[:error] = card.errors.full_messages
       end
     # if manager view, user must be employee's manager
     elsif user.manager?
       unless card.update_attributes(active: false, disabled_by_role_id: UserRole.manager_id)
-        messages[:error] << card.errors.full_messages
+        messages[:error] = card.errors.full_messages
       end
     elsif user.employee? and params[:self]
       unless card.update_attributes(active: false, disabled_by_role_id: UserRole.employee_id)
-        messages[:error] << card.errors.full_messages
+        messages[:error] = card.errors.full_messages
       end
     end
     success

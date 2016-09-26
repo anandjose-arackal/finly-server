@@ -35,6 +35,12 @@ class Expense::Index < Expense::Base
     end
   end
 
+  def post_process
+    if self.expenses.present?
+      self.expenses = self.expenses.exclude_deleted rescue self.expenses
+    end
+  end
+
   def success
     params[:expenses] = self.expenses
     Expense::Index::ListPresenter.new(user, params, messages)

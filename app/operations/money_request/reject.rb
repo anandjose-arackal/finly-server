@@ -58,6 +58,6 @@ class MoneyRequest::Reject < MoneyRequest::Base
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:reject), rejected_to_id: reject_to_user.id, content: note
       return
     end
-    messages[:error] << money_request.errors.full_messages
+    messages[:error] = money_request.errors.full_messages
   end
 end

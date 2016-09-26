@@ -22,12 +22,12 @@ class Export::Field::Create < Export::Base
   def process
     self.preference = company.export_preferences.build(create_params)
     unless preference.save
-      messages[:error] << preference.errors.full_messages
+      messages[:error] = preference.errors.full_messages
     end
   end
 
   def post_process
-    messages[:success] << "Export Field added."
+    messages[:success] << 'Configuration saved!'
   end
 
   def success

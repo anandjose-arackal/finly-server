@@ -150,6 +150,26 @@ $header-grey: #efefef;
   font-size: 14px;
 }
 
+
+#primary-navbar.navbar-inverse .navbar-nav > li > a {
+  color: #ccc;
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 3px solid transparent;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: Roboto;
+}
+
+#primary-navbar.navbar-inverse .navbar-nav > li.dropdown > a {
+  color: #fff;
+}
+
+#primary-navbar.navbar-inverse .navbar-nav > li.active > a, #primary-navbar.navbar-inverse .navbar-nav > li > a:hover{
+  color: #fff;
+  border-bottom-color: #F4F560;
+}
+
+
 body {
   padding: 70px 0 0 0;
   background-color: #f5f6f9 !important;

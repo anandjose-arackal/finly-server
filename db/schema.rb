@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160912042748) do
+ActiveRecord::Schema.define(version: 20160924144425) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -271,12 +271,13 @@ ActiveRecord::Schema.define(version: 20160912042748) do
     t.date     "date"
     t.integer  "user_id",              limit: 4
     t.integer  "expense_type_id",      limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.text     "manager_memo",         limit: 65535
     t.integer  "rejecting_manager_id", limit: 4
     t.integer  "report_id",            limit: 4
     t.integer  "category_id",          limit: 4
+    t.boolean  "is_deleted",                         default: false, null: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -494,6 +495,7 @@ ActiveRecord::Schema.define(version: 20160912042748) do
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.boolean  "default",                default: false, null: false
+    t.boolean  "is_deleted",             default: false, null: false
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -647,6 +649,7 @@ ActiveRecord::Schema.define(version: 20160912042748) do
     t.integer  "reimbursement_amount_id", limit: 4
     t.boolean  "accounted",                                         default: false, null: false
     t.boolean  "archived",                                          default: false, null: false
+    t.boolean  "is_deleted",                                        default: false, null: false
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

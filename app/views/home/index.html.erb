@@ -67,7 +67,7 @@
     <% if current_user.admin?%>
       <% views["admin"]["links"]["primary_navbar"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href='#<%= value %>/params={"view":"admin"}'><%= key %></a></li>
         <% end %>
       <% end %>
     <% end %>
@@ -78,9 +78,9 @@
       <% views["personal"]["links"]["primary_navbar"].each do |item| %>
         <% item.select do |key, value| %>
           <% unless value == 'settlements' %>
-            <li><a class="navbar-menu-li" data-path="<%= value %>"  href="<%= value %>"><%= key %></a></li>
+            <li><a class="navbar-menu-li" data-path="<%= value %>"  href='#<%= value %>/params={"view":"personal"}'><%= key %></a></li>
           <% else %>
-            <li><a class="navbar-menu-li" data-path="<%= value + '/' + current_user.id.to_s %>"  href="<%= value %>"><%= key %></a></li>
+            <li><a class="navbar-menu-li" data-path="<%= value + '/' + current_user.id.to_s %>"  href='#<%= value + "/" + current_user.id.to_s %>'><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
@@ -91,7 +91,7 @@
     <% if current_user.manager? %>
       <% views["manager"]["links"]["primary_navbar"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href='#<%= value %>/params={"view":"manager"}'><%= key %></a></li>
         <% end %>
       <% end %>
     <% end %>   
@@ -101,7 +101,7 @@
     <% if current_user.finance_manager? %>
       <% views["finance_manager"]["links"]["primary_navbar"].each do |item| %>
         <% item.select do |key, value| %>
-          <li><a class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+          <li><a class="navbar-menu-li" data-path="<%= value %>" href='#<%= value %>/params={"view":"finance_manager"}'><%= key %></a></li>
         <% end %>
       <% end %>
     <% end %>   

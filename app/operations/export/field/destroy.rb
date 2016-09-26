@@ -16,12 +16,12 @@ class Export::Field::Destroy < Export::Base
 
   def process
     unless preference.destroy
-      messages[:error] << preference.errors.full_messages
+      messages[:error] = preference.errors.full_messages
     end
   end
 
   def post_process
-    messages[:success] << "Export Field destroyed."
+    messages[:success] << 'Configuration saved!'
   end
 
   def success

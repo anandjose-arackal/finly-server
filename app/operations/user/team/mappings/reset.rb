@@ -25,7 +25,7 @@ class User::Team::Mappings::Reset < User::Team::Mappings::Base
         amount.save
         clone.greater_than_amount = amount
       end
-      messages[:error] << clone.errors.full_messages unless clone.save
+      messages[:error] = clone.errors.full_messages unless clone.save
     end
   end
 

@@ -27,12 +27,12 @@ class Export::Field::Update < Export::Base
 
   def process
     unless preference.update(update_params)
-      messages[:error] << preference.errors.full_messages
+      messages[:error] = preference.errors.full_messages
     end
   end
 
   def post_process
-    messages[:success] << "Export Field updated."
+    messages[:success] << 'Configuration saved!'
   end
 
   def success
