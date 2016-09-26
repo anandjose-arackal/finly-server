@@ -229,8 +229,8 @@ if User.count == 0
     employee[:password] = employee[:password_confirmation] = "hapitoe007"
     employee[:company_id] = ballzy.id
     employee[:mobile_number] = random_string_of_numbers(10)
-    employee[:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},
-                                          {user_role_id: UserRole.employee_id}]
+    employee[:role_mapping_attributes] = [{user_role_id: UserRole.employee_id}]
+
     ballzy_users << User.create(employee)
   end
 
