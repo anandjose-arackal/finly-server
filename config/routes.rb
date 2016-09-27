@@ -367,6 +367,9 @@ Rails.application.routes.draw do
   end
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
+  resouces :money_request do
+    post 'comment' => 'money_request#comment', as: :comment
+  end
 
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
