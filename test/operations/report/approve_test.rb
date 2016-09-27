@@ -116,7 +116,7 @@ class ApproveTest < ActiveSupport::TestCase
   #   assert @report
   #   assert_equal 12, @report.expenses.count
   #   assert_equal ReportStatus.open_id, @report.status_id
-  #   submit_op = Report::Submit.new(@user, report_id: @report.id)
+  #   submit_op = Report::SubmitT.new(@user, report_id: @report.id)
   #   assert_difference '@user.reports.processing.count', 1 do
   #     @report = submit_op.run
   #     assert @report

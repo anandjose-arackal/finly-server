@@ -1,7 +1,7 @@
-<div class="col-sm-6 user-name" data-item-id="{{item.id}}">
-  {{item.name}}
-</div>
-
-<div class="col-sm-6">
-  Pending:
+<div class="col-sm-12 user-name" data-item-id="{{item.id}}">
+  {{#if item.name}}
+    {{item.name}}
+  {{else}}
+    {{item.email}}
+  {{/if}}
 </div>

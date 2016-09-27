@@ -4,7 +4,13 @@
 </div>
 
 <div class="col-md-7">
-  <div class="col-sm-6">{{item.final_approver}}</div>
-  <div class="col-sm-3">{{item.reimbursement_amoutn}}</div>
+  <div class="col-sm-6">
+    {{#if item.final_approver}}
+      {{item.final_approver}}
+    {{else}}
+      Auto-Approved
+    {{/if}}
+  </div>
+  <div class="col-sm-3">{{item.reimbursement_amount}}</div>
   <div class="col-sm-3">{{item.total_amount}}</div>
 </div>

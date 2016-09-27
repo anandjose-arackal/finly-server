@@ -14,9 +14,26 @@ Rails.application.configure do
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # config.action_mailer.raise_delivery_errors = false
+  # #################### SETTINGS FOR SENDGRID ##########################
+  # config.action_mailer.default_url_options = { host: 'localhost:3000' }
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #     address:              'smtp.sendgrid.net',
+  #     port:                 587,
+  #     domain:               'localhost:3000',
+  #     user_name:            'vivekagb',
+  #     password:             'idAr5APhk61X',
+  #     # ssl:                  true,
+  #     # tls:                  true,
+  #     authentication:       :plain,
+  #     enable_starttls_auto: true,
+  #     :openssl_verify_mode  => 'none'
+  # }
 
-  # Do care if the application_mailer can't send.
+  ######################################################################
+
+  # # Do care if the application_mailer can't send.
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: 'localhost:3000'}
@@ -27,8 +44,8 @@ Rails.application.configure do
   #     address:              'smtp.sendgrid.net',
   #     port:                 587,
   #     domain:               'www.finly.io',
-  #     user_name:            'sreeramnr',
-  #     password:             'assHOLE5',
+  #     user_name:            'vivekagb',
+  #     password:             'idAr5APhk61X',
   #     # ssl:                  true,
   #     # tls:                  true,
   #     authentication:       :plain,

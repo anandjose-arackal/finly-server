@@ -12,7 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-// require jquery-ui
+//= require jquery-ui
 //= require customized/jquery-ui.min
 //= require bootstrap
 // require turbolinks
@@ -23,6 +23,7 @@
 // require nprogress-turbolinks
 //= require handlebars.runtime
 //= require finlyf/application_finlyf
+//= require ohsnap.min
 
 // NProgress.configure({
 //   showSpinner: false,

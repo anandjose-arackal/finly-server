@@ -2,12 +2,14 @@
 #
 # Table name: events
 #
-#  id                :integer          not null, primary key
-#  name              :string(255)      not null
-#  push_notification :boolean
-#  mailer            :boolean
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
+#  id                             :integer          not null, primary key
+#  name                           :string(255)      not null
+#  has_push_notification          :boolean          not null
+#  has_mailer                     :boolean          not null
+#  configurable_push_notification :boolean          not null
+#  configurable_mailer            :boolean          not null
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
 #
 
 class Event < ActiveRecord::Base
@@ -40,7 +42,7 @@ class Event < ActiveRecord::Base
               configurable_push_notification: false, configurable_mailer: true},
              {key: :user_role_updated, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
-             {key: :user_manager_updated, has_push_notification: false, has_masiler: true,
+             {key: :user_manager_updated, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :user_policy_added, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
@@ -58,7 +60,7 @@ class Event < ActiveRecord::Base
   self.class.instance_eval do
     ACTIONS.each do |item|
       define_method "#{item[:key]}_id" do
-        ACTIONS.find_index(item)
+        ACTIONS.find_index(item) + 1
       end
     end
   end

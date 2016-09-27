@@ -7,15 +7,19 @@ class DeviseMailer < Devise::Mailer
   end
 
   def reset_password_instructions(record, token, opts={})
-    UserMailer.password_reset_instructions record, token
+    UserMailer.delay.password_reset_instructions(record, token)
   end
 
   def unlock_instructions(record, token, opts={})
-    UserMailer.account_unlock_instructions record, token
+    UserMailer.delay.account_unlock_instructions(record, token)
   end
 
   def password_change(record, opts={})
-    UserMailer.password_changed record
+    UserMailer.delay.password_changed(record)
+  end
+
+  def invitation_instructions(record, token, opts={})
+    UserMailer.delay.invite(record, token)
   end
 
 end

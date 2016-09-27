@@ -1,43 +1,43 @@
 <% if logged_in? %>
     <% if is_admin_view %>
         <li class="<%= 'active' if current_page?(reports_path(view: 'admin')) %>">
-          <a href="<%= reports_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
+          <a href="<%= root_path + "#reports/params={\"view\":\"admin\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
             Reports</a>
         </li>
         <li class="<%= 'active' if current_page?(users_path(view: 'admin')) %>">
-          <a href="<%= users_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
+          <a href="<%= root_path + "#employees/params={\"view\":\"admin\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
             Employees</a>
         </li>
         <li class="<%= 'active' if current_page?(settlements_path(view: 'admin')) %>">
-          <a href="<%= settlements_path(view: 'admin') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
+          <a href="<%= root_path + "#settlements/params={\"view\":\"admin\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Company
             Settlements</a>
         </li>
     <% elsif is_finance_view %>
         <li class="<%= 'active' if current_page?(reports_path(view: 'finance')) %>">
-          <a href="<%= reports_path(view: 'finance') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+          <a href="<%= root_path + "#reports/params={\"view\":\"finance_manager\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
         </li>
         <li class="<%= 'active' if current_page?(users_path(view: 'finance')) %>">
-          <a href="<%= users_path(view: 'finance') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
+          <a href="<%= root_path + "#employees/params={\"view\":\"finance_manager\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
         </li>
         <li class="<%= 'active' if current_page?(settlements_path(view: 'finance')) %>">
-          <a href="<%= settlements_path(view: 'finance') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+          <a href="<%= root_path + "#settlements/params={\"view\":\"finance_manager\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
         </li>
     <% elsif is_manager_view %>
         <li class="<%= 'active' if current_page?(reports_path(view: 'manager')) %>">
-          <a href="<%= reports_path(view: 'manager') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+          <a href="<%= root_path + "#reports/params={\"view\":\"manager\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
         </li>
         <li class="<%= 'active' if current_page?(users_path(view: 'manager')) %>">
-          <a href="<%= users_path(view: 'manager') %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
+          <a href="<%= root_path + "#employees/params={\"view\":\"manager\"}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Employees</a>
         </li>
     <% elsif is_personal_view %>
         <li class="<%= 'active' if current_page?(expenses_path) %>">
-          <a href="<%= expenses_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
+          <a href="<%= root_path + "#expenses" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
         </li>
         <li class="<%= 'active' if current_page?(reports_path) %>">
-          <a href="<%= reports_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+          <a href="<%= root_path + "#reports/" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
         </li>
         <li class="<%= 'active' if current_page?(receipts_path) %>">
-          <a href="<%= receipts_path %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
+          <a href="<%= root_path + "#receipts" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
         </li>
          <li class="<%= 'active' if current_page?(settlements_path(id: current_user.id)) %>">
           <a href="<%= settlement_path(id: current_user.id) %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
@@ -46,9 +46,6 @@
 <% else %>
       <li class="<%= 'active' if current_page?(root_path) %>">
         <a href="<%= root_path %>" style="">Home</a>
-      </li>
-      <li class="">
-        <a onclick="scrollToFeatures()" style="">Features</a>
       </li>
       <li class="<%= 'active' if current_page?(about_path) %>">
         <a href="<%= about_path %>" style="">About</a>

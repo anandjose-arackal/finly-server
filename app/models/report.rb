@@ -18,10 +18,9 @@
 #  accounted               :boolean          default(FALSE), not null
 #  archived                :boolean          default(FALSE), not null
 #
-
 class Report < ActiveRecord::Base
-
   include MathUtil
+  include SoftDeletable
 
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
@@ -40,7 +39,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
 
-  default_scope { order(created_at: :desc,report_status_id: :asc ) }
+  default_scope { order(report_status_id: :asc,submitted_at: :desc,created_at: :desc) }
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
@@ -162,7 +161,7 @@ class Report < ActiveRecord::Base
   end
 
   def editable?
-    open? or retracted?
+    open? or retracted? or rejected?
   end
 
   def reimbursement_pending?
@@ -212,6 +211,7 @@ class Report < ActiveRecord::Base
   end
 
   def controlling_user?(user)
+    return false if self.controlling_user_id.blank?
     self.controlling_user.id == user.id
   end
 

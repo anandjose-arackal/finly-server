@@ -1,5 +1,5 @@
 require 'test_helper'
-require "#{Rails.root}/operations/user/team/mappings/update"
+require "#{Rails.root}/app/operations/user/team/mappings/update"
 
 class UpdateConfigurationTest < ActiveSupport::TestCase
 

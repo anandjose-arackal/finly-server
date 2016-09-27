@@ -5,23 +5,40 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   templateNavbarSidebar: HandlebarsTemplates['finlyf/users/navbar/navbar_sidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/users/navbar/navbar_main']
 
+  #Employees
+  templateInviteEmployee: HandlebarsTemplates['finlyf/users/inviteEmployee']
+
   events:
+    #Filter by state
+    'click .filter-state': 'filterState'
+    'click .navbar-view-type': 'changeView'
+
+
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
+    'click .btn-invite-employee': 'processEmployeeInvitation'
+    'click .btn-confirm-invite-employee': 'inviteEmployee'
+
+    'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
+
+    'keyup .search-user': 'prepareSearch'
+    'submit .navbar-form': 'cancelEvents' 
 
   initialize: (options) ->
     @params = options.params
+    unless @params.filter_state
+      @params.filter_state = 1
     @collection = new FinlyF.Collections.Users()
     @collection.fetch({
       reset: true,
       data: @params
     })
     @collection.on('reset', @processUsers, @)
-    
+    @on('refresh', @refetchCollection, @)
 
   render: ->
     $(@el).html(@templateSkeleton())
-    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
     FinlyF.structureActions(@el, @params) 
     @
@@ -48,7 +65,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
-
   processUsers: ->
     # console.log "processing users"
     @dump = @collection.models.slice()
@@ -73,7 +89,6 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
 
-
   showDetails: (e) ->
     $(e.currentTarget).siblings().removeClass('active')
     $(e.currentTarget).addClass('active')
@@ -82,9 +97,10 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.User({
-      model: model,
+      model_id: model.get('id'),
       page: 'user'
       params: @params
+      parent: @
       # preview: true
       # parent: @
     })
@@ -95,17 +111,21 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     # @params.page = 1
+    # console.log @params
     @collection.fetch({
       reset: true,
-      # data: _this.params,
+      data: _this.params,
       success: ->
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
+
+        $(_this.el).find("#user-details").html("<div class='col-sm-10 col-sm-offset-1'><h2>Please Select an Employee from the list on the left to view/edit their details, policies, roles etc.</h2></div>")
 
       error: ->
         console.log "Couldn't fetch successfully."
@@ -127,7 +147,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     if @view == 'personal'
       FinlyF.primary_router.navigate(@collection.url + '/params=' + JSON.stringify(params), {trigger: true})
     else
-      console.log @collection.url
+      # console.log @collection.url
       @collection.fetch({
         data: {
           view_to_load: view_to_load
@@ -141,6 +161,113 @@ class FinlyF.Views.UsersIndex extends Backbone.View
           console.log "Couldn't fetch Successfully."
       })
 
+  processEmployeeInvitation: ->
+    _this = @
+
+    modal = $(@el).find("#modal-mp")
+    $(modal).modal('show')
+
+    $.ajax({
+      url: '/users/get_managers'
+      dataType: 'json'
+      data: @params
+      success: (res) ->
+        unless res.company.roles.company_admin == true
+          $(modal).modal('hide')
+          ohSnap('You do not have appropriate permission to invite!', 'color': 'red', 'duration': 6000, 'container-id': 'ohsnap-priority')
+        else
+          FinlyF.snapNotify(res.messages)
+          $(modal).html(_this.templateInviteEmployee({item: res}))
+          if _this.params.view == 'manager'
+            $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
+          else if _this.params.view == 'finance_manager'
+            $(modal).find('.invitee-finance-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
+        
+      error: (err) ->
+        FinlyF.snapNotify(err.messages)
+        $(modal).modal('hide')
+        console.log "Err", err
+    })
+
+  inviteEmployee: (e) ->
+    e.preventDefault()
+    _this = @
+    modal = $(e.currentTarget).closest('#modal-mp')
+    form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
+    values = {}
+
+    manager = $(form).find('input[name=manager]:checked')
+    finance_manager  = $(form).find('input[name=finance_manager]:checked')
+    if $(manager).val() == 0
+      $(manager).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
+
+    if $(finance_manager).val() == 0
+      $(finance_manager).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
+
+    # console.log manager, finance_manager
+    # return
+
+    $(form).find(':disabled').removeAttr('disabled');
+
+    _.each((form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    
+    # console.log values
+    $.ajax({
+      url: "/pending_invites"
+      type: "POST",
+      dataType: 'json'
+      data: values
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          if parseInt(_this.params.filter_state) == 2
+            _this.refetchCollection()
+
+        # console.log res
+      error: (err) ->
+        console.log "Err", err
+    })
+
+  filterState: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    @params.filter_state = parseInt($(target).attr('data-filter-state'))
+
+    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(@params), {trigger: true})
+
+  cancelEvents: (e) ->
+    e.preventDefault()
+
+  prepareSearch: (e) ->
+    # console.log "abinash"
+    # console.log _.debounce(@searchUser(e), 500, true)
+    if $(e.currentTarget).val().length > 2 || $(e.currentTarget).val().length == 0
+      @searchUser(e)
+
+  searchUser: (e) ->
+    query = $(e.currentTarget).val()
+    @collection.fetch({
+      reset: true,
+      data: {
+        view: @params.view
+        filter_state: @params.filter_state
+        filter_search: query
+      }
+    }) 
+
+  ##Funactionalities
+  showOptionalManagers: (e) ->
+    target = $(e.currentTarget)
+    if parseInt($(target).val()) == 1
+      $(target).closest('.conditional-container').find('.conditional-managers').slideDown('fast')
+    else
+      $(target).closest('.conditional-container').find('.conditional-managers').slideUp('fast')
+      unless $(target).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').prop('disabled')
+        $(target).closest('.conditional-container').find('.conditional-managers .select-conditional-manager').val("")
 
   resetPageCount: (options) ->
     if options.target
@@ -150,17 +277,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     else
       $('.main .load-more').attr('data-page', options.page)
 
-
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
-
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
-
-
-
-
-

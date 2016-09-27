@@ -244,14 +244,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#" style="color: white; font-family: 'Bree Serif', serif; font-weight: 800;font-size: 30px;" href="<%= root_path %>" data-turbolinks="false">Finly
+          <a class="navbar-brand" href="#" style="color: white; font-family: 'Bree Serif', serif; font-weight: 300;font-size: 30px;" href="<%= root_path %>" data-turbolinks="false">Finly
           </a>
         </div>
       </div>
 
       <div class="col-md-10">
         <div class="navbar-header">
-          <a class="navbar-brand company-name" href="#" style="color: white; font-family: 'Bree Serif', serif; font-weight: 300;font-size: 30px;" href="#" data-turbolinks="false">
+          <a class="navbar-brand company-name" href="#" style="color: white; font-size: 24px;" href="#" data-turbolinks="false">
           </a>
         </div>    
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -266,7 +266,13 @@
           
           <ul class="nav navbar-nav navbar-right">
             
-            <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></a>
+              <ul class="navbar-cog dropdown-menu">
+
+                <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+              </ul>
+            </li>
           </ul>
         </div><!-- /.navbar-collapse -->     
       </div>
@@ -282,7 +288,7 @@
     <div class="row no-margin">
       <form class="navbar-form" role="search">
         <div class="input-group" style="width: 100%;">
-          <input type="text" class="input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
+          <input type="text" class="search-user input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
           <div class="input-group-btn">
             <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
           </div>
@@ -311,8 +317,7 @@
           <li class="{{#if_eq item.view_to_load 'reimbursed'}}active{{/if_eq}}"><a href="#" data-view="reimbursed">Reimbursed Reports</a></li>
           <li class="{{#if_eq item.view_to_load 'closed'}}active{{/if_eq}}"><a href="#" data-view="closed">Closed Reports</a></li>
         </ul>
-
-        </div>
+      </div>
 
       <div class="settlements-index" style="height: 100%; overflow-y: scroll;"></div>
     </div>

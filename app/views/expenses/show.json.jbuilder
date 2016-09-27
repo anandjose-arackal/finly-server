@@ -11,3 +11,7 @@ json.receipts @result.expense.receipts do |receipt|
   # json.image_url url_for(receipt.image_file_name)
   json.image_url receipt.image.url
 end
+
+json.violations @result.violation
+
+json.editable (@result.expense.report_id.blank? or @result.expense.report.editable?)

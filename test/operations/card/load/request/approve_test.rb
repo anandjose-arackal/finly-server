@@ -5,7 +5,7 @@ class ApproveTest < ActiveSupport::TestCase
   def setup
     @user= User.find_by_email('user0@finlytest.io')
     @c = Card.create(ending_number: '1234', proxy: '1234', user: @user)
-    @request = Card::Load::Request::Create.(@user, {id: @c.id, card_load_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).card_load_request
+    @request = MoneyRequest::Create.(@user, {id: @c.id, money_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).money_request
   end
 
   test 'successful approve' do
@@ -14,8 +14,8 @@ class ApproveTest < ActiveSupport::TestCase
     assert @request.processing?
     user = @request.controlling_user
     next_user = User::Team::Review::NextReviewer.(@request)
-    assert_difference 'CardLoadRequestTrack.count', 1 do
-      assert Card::Load::Request::Approve.(user, id: @request.id).present?
+    assert_difference 'MoneyRequestTrack.count', 1 do
+      assert MoneyRequest::Approve.(user, id: @request.id).present?
     end
     assert @request.reload.processing?
     assert_equal @request.controlling_user, next_user
@@ -26,9 +26,9 @@ class ApproveTest < ActiveSupport::TestCase
     user = User.find_by_email('manager1@finlytest.io')
     assert_not_equal user.email, 'manager0@finlytest.io'
     rescued = false
-    assert_no_difference 'CardLoadRequestTrack.count' do
+    assert_no_difference 'MoneyRequestTrack.count' do
       begin
-        assert_not Card::Load::Request::Approve.(user, id: @request.id).present?
+        assert_not MoneyRequest::Approve.(user, id: @request.id).present?
       rescue
         rescued = true
       end

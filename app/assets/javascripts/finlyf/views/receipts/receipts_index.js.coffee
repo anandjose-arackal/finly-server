@@ -22,7 +22,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     'click .item': 'selectCurrent'
     'click .close-details': 'closeDetails'
     'click .btn-new': 'new'
-    'click .btn-create': 'create'
+    # 'click .btn-create': 'create'
+    'submit form#new-item': 'create'
     'click .load-more': 'loadMore'
     'click .filter-status li a': 'filterStatus'
     'click .navbar-menu-li': 'navigate'
@@ -32,6 +33,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #receipt
     'click .btn-new-expense': 'newExpense'
     'click .btn-create-expense': 'createExpense'
+    'click .btn-delete-receipt': 'delete'
+    # 'click .btn-delete-receipt': 'delete'
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
@@ -119,8 +122,9 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #REFRESH
     #Spin refresh-spinner
     _this = @
-    target = e.currentTarget
-    $(target).find("i").addClass("fa-spin")
+    if e
+      target = e.currentTarget
+      $(target).find("i").addClass("fa-spin")
 
     @params.page = 1
     @collection.fetch({
@@ -148,76 +152,56 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         $(item).find(".select-item").prop("checked", false)
 
   selectCurrent: (e) ->
-    console.log "hi"
+    # if $(e.currentTarget).hasClass('fa-trash')
+    #   @delete(e)
+    #   return
+    # console.log "hi"
     items = $(@el).find("#items .item")
     for item in items
       $(item).find('.select-item').prop('checked', false)
+      $(item).removeClass('selected')
 
     $(e.currentTarget).find('.select-item').prop('checked', true)
+    $(e.currentTarget).closest('.item').addClass('selected')
     @receiptSelectOptions()
-
-
-    #Returns if clicked on the checkbox
-    # if $(e.target).hasClass("select-item")
-    #   return
-      
-    # main = $(@el).find(".main")
-    # unless $(main).hasClass("preview")
-    #   $(main).addClass("preview")
-
-    # model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
-    # model = @collection.get(model_id)
-
-    # preview_view = new FinlyF.Views.Report({
-    #   model: model
-    #   preview: true
-    # })
-
-    # $(@el).find("#item-details-main").html(preview_view.render().el)
-    
-  # closeDetails: ->
-  #   main = $(@el).find(".main")
-  #   $(main).removeClass("preview")
 
   new: ->
     $("#modal-new .modal-body").html(@templateNew)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
+    $("#modal-new").attr('data-backdrop', false)
     $("#modal-new").modal('show')
 
-  create: ->
-    values = {};
+  create: (e)->
+    target = e.currentTarget
+    button = $(target).find("button[type=submit]")
+    $(button).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;")
 
-    # if(event){ event.preventDefault(); }
+    # $(target).text("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;")
+    _this = @
+    e.preventDefault()
+    formData = new FormData(e.currentTarget)
 
-    _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    console.log values
-    model = new FinlyF.Models.Receipt()
-    # console.log("Putting data")
-    console.log(model.save(values, { iframe: true, files: this.$('form :file'), data: values }))
-
-
-
-
-
-
-    # _this = @
-    # form = $(@el).find('#new-report')
-    # data = {
-    #   amount: $(form).find('input[name="report[amount]"]').val()
-    #   merchant: $(form).find('input[name="report[merchant]"]').val()
-    #   date: $(form).find('input[name="report[date]"]').val()
-    #   category_id: $(form).find('select[name="report[category_id]"]').val()
-    # }
-
-    # model = new FinlyF.Models.report(data)
-    # console.log model.toJSON()
-    # model.save({
-    #   success: ->
-    #     @collection.fetch({reset: true})
-    # })
-
+    $.ajax({
+      url: '/receipts'
+      type: 'POST',
+      data: formData,
+      async: true,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        # console.log(data)
+        if res.success == true
+          $("#modal-new").modal('hide')
+          _this.refetchCollection()
+          _this.toggleReceiptSelectOptions()
+        else
+          $(button).html('Add Receipt')
+      error: (err) ->
+        console.log "Err", err
+        $(button).html('Add Receipt')
+      cache: false,
+      contentType: false,
+      processData: false
+    })
 
   resetFilters: ->
     params = {}
@@ -227,83 +211,54 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   filter: ->
     sidebar = $(@el).find(".sidebar")
     params = {
-      # 'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
-      # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
-
 
     FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
-  # autoComplete: (e) ->
-  #   target = $(e.currentTarget)
-  #   query = $(target).val()
-
-  #   $(target).autocomplete({
-  #     minLength: 2,
-  #     source: (request, response) ->
-  #       $.ajax({
-  #         dataType: "json"
-  #         type : 'get'
-  #         url: '/autocomplete/merchant'
-  #         data: 
-  #           remote: "true"
-  #           query: query
-  #           # area: 'central'
-  #         success: (data) ->
-  #           response(data)
-  #         error: (err) ->
-  #           console.log err
-  #       })
-  #     select: (event, ui) ->
-  #       console.log "Selected."
-  #   })
-
-  # resetPageCount: (options) ->
-  #   if options.target
-  #     $(options.target).attr('data-page', options.page)
-  #   else if options.selector
-  #     $(options.selector).attr('data-page', options.page)
-  #   else
-  #     $('.main .load-more').attr('data-page', options.page)
-
-
-
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
-
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
 
   receiptSelectOptions: ->
-    console.log "receipt"
     items = $(@el).find('#items .item')
     flag = false
     for item in items
       if $(item).find('.select-item').prop('checked')
         flag = true
     if flag == true
+      $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'inline')
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'inline')
     else
+      $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
 
+  toggleReceiptSelectOptions: (flag) ->
+    if typeof flag != 'undefined'
+      if flag == true
+        $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'inline')
+        $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'inline')
+      else
+        $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
+        $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
+    else
+      $(@el).find('.secondary-navbar .btn-delete-receipt').css('display', 'none')
+      $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
+
+
   newExpense: ->
-    console.log 'hey'
     items = $(@el).find("#items .item")
-    console.log items.length
-     # "report"=>{"expense_id"=>"15,36,39"}}
-    # items = $(@el).find('#items .item')
-    # receipt= []
-    # flag = false
     for item in items
       selected_item = $(item).find('.select-item')
       if $(selected_item).prop('checked')
-        # receipt = 
         receipt_id = $(selected_item).attr('data-item-id')
         break
     
@@ -311,54 +266,75 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
     $("#modal-new .modal-body").html(@templateNewExpense({receipt: {id: selected_receipt.get('id')}}))
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
-    $("#modal-new").modal('show')
 
-    # console.log selected_receipt.toJSON()
+    category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
+    options = $("#newExpenseCategory option")
+    for option in options
+      $('<option/>', {
+        value: $(option).attr('value')
+        text: $(option).text()
+      }).appendTo(category_select)
+    $("#modal-new").attr('data-backdrop', false)
+    $("#modal-new").modal('show')
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
     $("#modal-new .modal-body #preview-image").attr('src', selected_receipt.get('url'))
-
+    $("#modal-new .modal-body textarea[name=expense\\[note\\]]").val(selected_receipt.get('note'))
 
   createExpense: (e) ->
     _this =   @
     values = {}
 
-    # if(event){ event.preventDefault(); }
-
     _.each($("#modal-new form#new-item").serializeArray(), (input) ->
       values[ input.name ] = input.value
     )
-    console.log values
     model = new FinlyF.Models.Expense()
-    # console.log("Putting data")
     response = model.save(values, {
       iframe: true,
-      files: this.$('form :file'),
-      # data: values
+      # files: this.$('form :file'),
+      data: values
       processData: true
       success: (model, res) ->
-        $("#modal-new").modal('hide')
-        # _this.model.fetch({
-        #   data: _this.current_view
-        # })
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(_this.el).find("#modal-new").modal('hide')
+          _this.refetchCollection()
+          _this.toggleReceiptSelectOptions()
       error: (err) ->
         console.log "Error", err
     })
 
-    console.log response
+  delete: (e) ->
+    _this = @
+    items = $(@el).find("#items .item")
+    for item in items
+      selected_item = $(item).find('.select-item')
+      if $(selected_item).prop('checked')
+        receipt_id = $(selected_item).attr('data-item-id')
+        break
+    
+    selected_receipt = @collection.get(parseInt(receipt_id))
 
-    # # console.log expenses
-    # model_report = new FinlyF.Models.Report({
-    #   "report": {
-    #     "expense_id": expenses.join(","),
-    #   },
-    #   "authenticity_token": $("#authenticity_token").val()
-    #   "utf8": $("#form_utf8").val()
-    # })
-    # # console.log "Model", model_report.toJSON()
-    # model_report.save(null, {
-    #   success: (model, res) ->
-    #     if res.status == "success"
-    #       FinlyF.primary_router.navigate('reports', {trigger: true})
+    # selected_receipt.destroy({
+    #   silent: true
+    #   success: (res) ->
+    #     console.log "deleted", res
+    #     FinlyF.snapNotify(res.messages)
+    #     if res.success == true
+    #       _this.filter()
+    #       console.log "deleted", res
     #   error: (err) ->
     #     console.log "Error", err
     # })
+    $.ajax({
+      url: selected_receipt.urlRoot + '/' + selected_receipt.get('id')
+      type: "DELETE",
+      dataType: 'JSON',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.refetchCollection()
+          _this.toggleReceiptSelectOptions()
+      error: (err) ->
+        console.log "Error", err
+      })

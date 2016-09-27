@@ -8,6 +8,10 @@ gem 'wkhtmltopdf-binary'
 gem 'figaro'
 gem 'puma'
 
+# gem to import from excel
+gem 'roo'
+gem 'roo-xls'
+
 # Gem pundit for permission check in actions etc.
 gem 'pundit'
 
@@ -37,7 +41,7 @@ gem 'coffee-rails', '~> 4.1.0'
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-gem 'turbolinks'
+# gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
@@ -70,11 +74,13 @@ gem 'faker'
 
 gem 'paper_trail', '~> 5.1.1'
 
-gem 'turboboost'
+# gem 'turboboost'
 
 gem 'remotipart', '~> 1.0'
 
 gem 'bootbox-rails', '~>0.4'
+
+gem 'sidekiq'
 
 # gem for font awesome
 gem 'font-awesome-rails'
@@ -102,6 +108,9 @@ gem 'has_scope'
 
 gem 'hooks'
 
+# todo - temporary, will be removed during final deployment.
+gem 'awesome_print'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
@@ -111,7 +120,7 @@ group :development, :test do
   gem 'capistrano-bundler', require: false
   gem 'capistrano-rvm'
   gem 'hirb'
-  gem 'awesome_print'
+
 end
 
 group :development do
@@ -128,4 +137,4 @@ gem 'animate-rails'
 
 gem 'rails-erd'
 
-gem 'nprogress-rails'
+# gem 'nprogress-rails'

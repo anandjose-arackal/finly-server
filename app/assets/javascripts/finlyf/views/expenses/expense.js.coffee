@@ -14,16 +14,22 @@ class FinlyF.Views.Expense extends Backbone.View
   initialize: (options) ->
     _this = @
     @preview = options.preview
+
+    #is being previewed from a report
+    if options.report
+      @report_preview = options.report
     # if options.report
     #   @preview_in_report = true
     if options.parent
       @parent = options.parent
     if @preview
-      view = options.view
+      @view = options.view
       # console.log "Preview is passed true"
       $(@el).removeClass("item")
+      @model = new FinlyF.Models.Expense({id: options.model_id})
       @model.fetch({
         data: {
+          view: _this.view
           authenticity_token: $("#authenticity_token").val()
         }
       })
@@ -37,14 +43,6 @@ class FinlyF.Views.Expense extends Backbone.View
       $(@el).html(@templateShow())
     @
 
-  updateModel: (e) ->
-    # _this = @
-    field = $(e.target).attr('data-field')
-    value = e.target.innerText
-    @model.set(field, value);
-
-  
-
   toggleSelect: (e) ->
     if $(e.currentTarget).prop('checked')
       $(@el).addClass('selected')
@@ -54,6 +52,9 @@ class FinlyF.Views.Expense extends Backbone.View
     @parent.trigger('item:selected')
 
   populateDetails: ->
+    if @report_preview
+      @model.set('report_preview', true)
+      @model.set('view', @view)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
   showSaveOption: ->
@@ -67,6 +68,8 @@ class FinlyF.Views.Expense extends Backbone.View
       },
       processData: true,
       success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        # console.log "suc", res
         $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
         _this.parent.trigger('item:destroyed')
       error: (err) ->
@@ -74,7 +77,7 @@ class FinlyF.Views.Expense extends Backbone.View
     })
 
   edit: (e) ->
-    $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-expense').addClass('btn-update-expense')
+    $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-expense btn-warning').addClass('btn-update-expense btn-success')
     $(@el).find(".item-attr-preview").css("display", "none")
     $(@el).find(".item-attr-edit").css("display", "block")
 
@@ -95,44 +98,81 @@ class FinlyF.Views.Expense extends Backbone.View
 
   update: (e) ->
     target = e.currentTarget
-    $(target).html("<i class='fa fa-edit'></i>&nbsp;&nbsp;Edit").removeClass('btn-update-expense').addClass('btn-edit-expense')
+    $(target).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;").removeClass('btn-update-expense')
 
     _this = @
+    e.preventDefault()
+    formData = new FormData($(@el).find('form#form-update-item')[0])
+
+    $.ajax({
+      url: '/expenses/' + _this.model.get('id')
+      type: "PUT",
+      data: formData,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          if $(target).closest('.modal-content')
+            #Adding refresh trigger in reprots#show
+            $(target).closest('.modal-content').attr('data-refresh-true', true)
+
+            #Adding refresh trigger in expense#index
+            if _this.parent
+              $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+          _this.model.fetch()
+          # if _this.report_preview
+          # $("#modal-new").modal('hide')
+          # _this.refetchCollection()
+        else
+          $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").addClass('btn-update-expense')
+
+      error: (err) ->
+        $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").addClass('btn-update-expense')
+        console.log "Error", err 
+      cache: false,
+      contentType: false,
+      processData: false
+    })
+
+
+
     values = {}
 
     # if(event){ event.preventDefault(); }
 
-    _.each($(@el).find('form#form-update-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    values.authenticity_token = $("#authenticity_token").val()
-    model = new FinlyF.Models.Expense({
-      id: @model.get('id')
-    })
-    # # console.log("Putting data")
-    response = model.save(values, {
-      patch: true,
-      iframe: true,
-      files: this.$('form :file'),
-      data: values,
-      processData: true
-      success: (model, res) ->
-        #Refresh expense index if data changed. Refresh is done - expense_index.js.coffee.closeDetails
-        $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+    # _.each($(@el).find('form#form-update-item').serializeArray(), (input) ->
+    #   values[ input.name ] = input.value
+    # )
+    # values.authenticity_token = $("#authenticity_token").val()
+    # model = new FinlyF.Models.Expense({
+    #   id: @model.get('id')
+    # })
+    # console.log "Putting data", values, model.toJSON()
+    # response = model.save(values, {
+      
+    #   iframe: true,
+    #   files: this.$('form :file'),
+    #   data: values,
+    #   patch: true,
+    #   put: true,
+    #   processData: true
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     #Refresh expense index if data changed. Refresh is done - expense_index.js.coffee.closeDetails
+    #     $("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
 
-        #Refresh report if data changed, refresh is done in - report.js.coffee.refreshData
-        if $(target).closest("#modal-mp")
-          $(target).closest("#modal-mp").find(".modal-content").attr("data-refresh", true)
-        _this.model.fetch()
-        # console.log "Success"
-        # console.log model, res
-        # if res.status == "success"
-        #   $("#modal-new").modal('hide')
-        #   _this.refetchCollection()
-      error: (err) ->
-        console.log "Error", err
+    #     #Refresh report if data changed, refresh is done in - report.js.coffee.refreshData
+    #     if $(target).closest("#modal-mp")
+    #       $(target).closest("#modal-mp").find(".modal-content").attr("data-refresh", true)
+    #     _this.model.fetch()
+    #     # console.log "Success"
+    #     # console.log model, res
+    #     # if res.status == "success"
+    #     #   $("#modal-new").modal('hide')
+    #     #   _this.refetchCollection()
+    #   error: (err) ->
+    #     console.log "Error", err
 
-    })
+    # })
     
 
 

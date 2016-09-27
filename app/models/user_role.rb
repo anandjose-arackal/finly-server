@@ -11,11 +11,11 @@
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 
-  scope :admin, -> { where(id: UserRole.admin_id) }
-  scope :finance_manager, -> { where(id: UserRole.finance_manager_id) }
-  scope :manager, -> { where(id: UserRole.manager_id) }
-  scope :employee, -> { where(id: UserRole.employee_id) }
-  scope :auditor, -> { where(id: UserRole.auditor_id) }
+  scope :admin, -> { where(id: UserRole.id_for(:admin)) }
+  scope :finance_manager, -> { where(id: UserRole.id_for(:finance_manager)) }
+  scope :manager, -> { where(id: UserRole.id_for(:manager)) }
+  scope :employee, -> { where(id: UserRole.id_for(:employee)) }
+  scope :auditor, -> { where(id: UserRole.id_for(:auditor)) }
 
   VALUES = {admin: 1, finance_manager: 2, manager: 3, employee: 4, auditor: 5}
 
@@ -25,6 +25,11 @@ class UserRole < ActiveRecord::Base
         value
       end
     end
+  end
+
+  def self.id_for(role)
+    role == :finance_manager if role == :finance
+    VALUES[role]
   end
 
 end

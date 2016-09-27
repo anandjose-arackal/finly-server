@@ -19,23 +19,13 @@
 
 <p class="profile_values"><%= current_user.email %></p>
 
+
+<h4 class="profile_subheading">Phone Number:</h4>
+
+<p class="profile_values"><%= current_user.mobile_number %></p>
+
 <!--<h4 id="profile_subheading">Mobile:</h4>-->
 <!--<input class="profile_values form-control" name="user[number]" value="">-->
 
 <!--<input type="submit" class="abaButton" id="save_button" value="Update">-->
 
-<% if @manager %>
-
-<h4 class="profile_subheading">Reporting manager:</h4>
-
-<p class="profile_values"><%= @manager.name %></p>
-
-<% else %>
-
-<h4 class="profile_subheading">Reporting manager:</h4>
-
-<p class="profile_values"> No Reporting Manager. [ Submitted reports will be auto-approved ] </p>
-
-<% end %>
-
-<hr style="margin-top: 20px">

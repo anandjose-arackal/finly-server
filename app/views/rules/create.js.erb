@@ -1,0 +1,12 @@
+<% if params[:expense_rule] %>
+  $("#createNewExpenseRuleModal").modal('hide');
+  $('body').removeClass('modal-open');
+  $('.modal-backdrop').remove();
+  $("#expense-rules").html("<%= j render partial: 'policies/expense_rules' %>")
+<% elsif params[:budget_rule] %>
+  $("#createNewBudgetRuleModal").modal('hide');
+  $('body').removeClass('modal-open');
+  $('.modal-backdrop').remove();
+  $("#budget-rules").html("<%= j render partial: 'policies/budget_rules' %>");
+<% end %>
+

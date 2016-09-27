@@ -1,10 +1,10 @@
-<body style="background-color: #465c8b;padding: 30px 0 30px 0">
 
-<form id="newUserRegistration" action="<%= pending_invite_accept_path(@pending_user) %>" method="post">
+<form id="newUserRegistration" action="<%= pending_invite_accept_path(pending_invite_id: @pending_user.id) %>" method="post" data-remote='true'>
 
   <input name="_method" type="hidden" value="patch">
   <input name="authenticity_token" value="<%= form_authenticity_token%>" type="hidden">
   <input name="user[invitation_token]" type="hidden" value="<%=params[:invitation_token]%>">
+  <input name="type" type="hidden" value="accept">
 
     <div style="width: 600px;padding: 20px 40px 40px 80px; background-color: white; margin:30px auto;border: 1px solid #d8d8d8">
 
@@ -13,29 +13,32 @@
       </div>
       <label style="margin-top: 20px; font-weight: 500">Name: </label>
       <div>
-        <input type="text" style="background-color: white" name="user[name]">
+        <input type="text" class="form-control" style="background-color: white" name="user[name]">
       </div>
 
 
       <label style="font-weight: 500">Company Name: </label>
       <div>
-        <input type="text" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
+        <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
       </div>
       <label style="font-weight: 500">Email: </label>
       <div>
-        <input type="text" name="user[email]" value="<%= @pending_user.email %>" readonly>
+        <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" readonly>
       </div>
       <label style="font-weight: 500">Password: </label>
       <div>
-        <input type="password" name="user[password]">
+        <input type="password" class="form-control" name="user[password]">
       </div>
       <label style="font-weight: 500">Confirm Password: </label>
       <div>
-        <input type="password" name="user[password_confirmation]">
+        <input type="password" class="form-control" name="user[password_confirmation]">
       </div>
-      <label style="font-weight: 500">Mobile Number : </label>
+      <label style="font-weight: 500">Mobile Number: </label>
       <div>
-        <input type="number" name="user[mobile_number]">
+        <div class="input-group" style="width: 80%;">
+          <span class="input-group-addon" id="basic-addon1">+91</span>
+          <input type="number" class="form-control" name="user[mobile_number]">
+        </div>
       </div>
 
       <div>
@@ -46,17 +49,15 @@
 
 </form>
 
-</body>
-
 <style>
   label {
     margin-top: 20px;
   }
 
-  input {
+  input.form-control {
     padding: 5px;
     width: 80%;
-    background-color: #eff8f3;
+    /*background-color: #eff8f3;*/
     outline: 1px solid transparent;
   }
 
@@ -77,16 +78,89 @@
     border: 1px solid transparent;
 
   }
-  input[type=password] {
+  input[type=password]{
     height: 32px;
     width: 80%;
     padding: 10px;
   }
 
-
   .topbarContainer{
     display: none;
   }
 
-
 </style>
+
+<script type="text/javascript">
+  snapNotify = function(obj) {
+    var color, container, message, messages, results, type;
+    console.log(obj);
+    results = [];
+    for (type in obj) {
+      messages = obj[type];
+      switch (type) {
+        case 'error':
+          color = 'red';
+          container = 'ohsnap-priority';
+          break;
+        case 'success':
+          color = 'green';
+          container = 'ohsnap';
+          break;
+        case 'failure':
+          ({
+            color: 'orange'
+          });
+          container = 'ohsnap-priority';
+          break;
+        case 'message':
+          ({
+            color: 'blue'
+          });
+          container = 'ohsnap';
+          break;
+        case 'notice':
+          ({
+            color: 'blue'
+          });
+          container = 'ohsnap';
+          break;
+        default:
+          ({
+            color: 'blue'
+          });
+          container = 'ohsnap';
+      }
+      if (messages.length) {
+        results.push((function() {
+          var i, len, results1;
+          results1 = [];
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            results1.push(ohSnap(message, {
+              color: color,
+              'duration': '6000'
+              // 'container-id': container
+            }));
+          }
+          return results1;
+        })());
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  };
+
+  $('#newUserRegistration').submit(function(){
+    $.ajax({
+      url: $('#newUserRegistration').attr('action'),
+      type: 'PATCH',
+      data: $('#newUserRegistration').serialize(),
+      success: function(res){
+        console.log('form submitted.', res);
+        snapNotify(res.messages);
+      }
+    });
+    return false;
+  });
+</script>

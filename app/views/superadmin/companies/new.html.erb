@@ -1,0 +1,38 @@
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
+
+    <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_companies_path %>" method="post">
+      <input name="utf8" type="hidden" value="&#x2713;"/>
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+      <h3>Company Details</h3>
+
+      <p>Company Name: </p>
+      <input type="text" name="company[name]" placeholder="Name" title="Company name">
+
+      <hr class="listDivider">
+
+      <h3>Admin Details</h3>
+
+      <p>Admin Name: </p>
+      <input type="text" name="admin[name]" placeholder="Name" title="Admin name">
+
+      <p>Admin Email: </p>
+      <input id="email" type="text" name="admin[email]" placeholder="Email" title="Admin Email Address">
+
+      <p>Admin password: </p>
+      <input id="password" type="password" name="admin[password]" placeholder="Password" title="Enter Password">
+
+      <p>Retype password: </p>
+      <input id="passwordConfirmation" type="password" name="admin[password]" placeholder="Repeat Password">
+
+      <p>Number: </p>
+      <input type="text" name="admin[mobile_number]" placeholder="XXX" title="Admin number">
+
+      <input type="submit" class="abaButton" id="addCompanyButton" value="Submit">
+
+    </form>
+
+  </div>
+</div>

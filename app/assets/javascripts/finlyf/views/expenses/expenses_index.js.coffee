@@ -32,7 +32,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'submit .navbar-form': 'globalSearch'
     'click .input-search-icon': 'clearGlobalSearch'
     'click .btn-reset-filters': 'resetFilters'
-
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter-expenses': 'filter'
@@ -60,18 +59,19 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       data: _this.params,
       success: ->
 
+        _this.toggleLoadMore(_this.collection)
       error: ->
         console.log "Couldn't fetch Successfully."
     })
     @collection.on('reset', @processItems, @)
     @on('item:selected', @expenseSelectOptions, @)
-    @on('item:destroyed', @filter, @)
+    @on('item:destroyed', @itemDeleted, @)
 
   render: ->
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
     unless @indexOnly
-      $(@el).html(@templateSkeleton())
+      $(@el).html(@templateSkeleton({item: @params}))
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
 
       $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
@@ -106,7 +106,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(@el).find('.main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
-  
   processItems: ->
     #Append all the expenses
     @dump = @collection.models.slice()
@@ -119,8 +118,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
 
-
-
   appendItems: (item) ->
     #Creating view for each expense and appending them
     view_item = new FinlyF.Views.Expense({
@@ -132,8 +129,11 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   refetchCollection: (e) ->
     #REFRESH
     #Spin refresh-spinner
-    console.log "Hi"
+    # console.log "Hi"
     _this = @
+
+    main = $(@el).find(".main")
+    $(main).removeClass("preview")
 
     if e
       target = e.currentTarget
@@ -144,6 +144,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
@@ -151,7 +152,6 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch successfully."
     })
-
 
   loadMore: (e) ->
     _this = @
@@ -164,6 +164,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       data: _this.params,
       reset: false,
       success: ->
+        _this.toggleLoadMore(_this.collection)
         $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
         $(target).find('span').text('Load More')
         _this.resetPageCount({target: target, page: _this.params.page })
@@ -175,6 +176,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch Successfully."
     })
+
+  toggleLoadMore: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 30
+      # console.log "Should hide"
+      $(@el).find('.load-more').css('display', 'none')
+    else
+      $(@el).find('.load-more').css('display', 'inline')
 
   toggleSelectAll: (e) ->
     target = e.currentTarget
@@ -203,13 +212,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.Expense({
-      model: model
+      model_id: model.get('id')
       preview: true
       parent: @
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
-    
+
   closeDetails: (e)->
     if e
       e.preventDefault()
@@ -237,34 +246,59 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       }).appendTo(category_select) 
     
     $("#modal-new").modal('show')
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
-  create: ->
+  create: (e)->
     _this = @
-    values = {}
+    e.preventDefault()
+    formData = new FormData($(@el).find('form#new-item')[0])
 
-    # if(event){ event.preventDefault(); }
-
-    _.each($(@el).find('form#new-item').serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
-    # console.log values
-    model = new FinlyF.Models.Expense()
-    # console.log("Putting data")
-    response = model.save(values, {
-      iframe: true,
-      files: this.$('form :file'),
-      data: values,
-      success: (model, res) ->
-        if res.status == "success"
+    $.ajax({
+      url: '/expenses'
+      type: "POST",
+      data: formData,
+      success: (res) ->
+        # console.log res.messages
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
           $("#modal-new").modal('hide')
           _this.refetchCollection()
       error: (err) ->
-        console.log "Error", err
-
+        console.log "Error", err 
+      cache: false,
+      contentType: false,
+      processData: false
     })
 
+
+
+    # values = {}
+
+    # # if(event){ event.preventDefault(); }
+
+    # _.each($(@el).find('form#new-item').serializeArray(), (input) ->
+    #   values[ input.name ] = input.value
+    # )
+    # # console.log values
+    # model = new FinlyF.Models.Expense()
+    # # console.log("Putting data")
+    # response = model.save(values, {
+    #   iframe: true,
+    #   files: this.$('form :file'),
+    #   data: values,
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     if res.status == "success"
+    #       $("#modal-new").modal('hide')
+    #       _this.refetchCollection()
+    #   error: (err) ->
+    #     console.log "Error", err
+
+    # })
+
+    # console.log "Response", response
+
     # if response.responseJSON.status = "success"
-      
 
   createReport: ->
     #  "report"=>{"expense_id"=>"15,36,39"}}
@@ -286,8 +320,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Model", model_report.toJSON()
     model_report.save(null, {
       success: (model, res) ->
-        if res.status == "success"
-          FinlyF.primary_router.navigate('reports', {trigger: true})
+        if res.success == true
+          # console.log "Report Created", model, res
+          report_id = model.get('id')
+          params = {
+            report_id: report_id
+          }
+          FinlyF.snapNotify(res.messages)
+          FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
       error: (err) ->
         console.log "Error", err
     })
@@ -312,8 +352,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   filter: (e) ->
-    e.preventDefault()
-    target = $(e.currentTarget)
+    if e
+      e.preventDefault()
+      target = $(e.currentTarget)
 
     sidebar = $(@el).find(".sidebar")
     params = {
@@ -336,7 +377,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       params.view = @params.view
 
     if $(target).attr('data-navigate')
-      if $(target).attr('data-navigate') == true
+      if $.parseJSON($(target).attr('data-navigate')) == true
         #Filters by navigating to a Backbone route
         FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})  
       else
@@ -345,11 +386,11 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           reset: true,
           data: params,
           success: ->
-            console.log "Fetched all the data"
+            _this.toggleLoadMore(_this.collection)
+            # console.log "Fetched all the data"
           error: ->
             console.log "Couldn't fetch Successfully."
         })
-    
 
   globalSearch: (e) ->
     e.preventDefault()
@@ -396,8 +437,25 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
             console.log err
         })
       select: (event, ui) ->
-        console.log "Selected."
+        # console.log "Selected."
     })
+
+  itemDeleted: (e) ->
+    _this = @
+    main = $(@el).find(".main")
+    $(main).removeClass("preview")
+
+    @params.page = 1
+    @collection.fetch({
+      data: @params
+      reset: true
+      success: ->
+        _this.toggleLoadMore(_this.collection)
+        _this.dump.length = 0
+        _this.dump = _this.collection.models.slice()
+        _this.resetPageCount({selector: '.main .load-more', page: 1})
+    })
+
 
   resetPageCount: (options) ->
     if options.target
@@ -408,8 +466,11 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $('.main .load-more').attr('data-page', options.page)
 
   navigate: (e) ->
-    e.preventDefault()
-    FinlyF.navigate(e, @params)
+    unless $(e.currentTarget).hasClass('non-backbone-link')
+      e.preventDefault()
+      FinlyF.navigate(e, @params)
+    else
+      return
 
   changeView: (e) ->
     e.preventDefault()

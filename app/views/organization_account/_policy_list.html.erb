@@ -1,9 +1,3 @@
-
-
-<body style="background-color: #f5f6f9;">
-
-<div id="policyListAdmin">
-
 <div style="margin-top: 20px;background: white;
     padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
   <p style="font-size: 24px;
@@ -12,7 +6,7 @@
 
   <hr>
 
-  <% unless @policies.present? %>
+  <% unless @result.policies.present? %>
       <div>
         <p> No Policies to Display.</p>
       </div>
@@ -20,33 +14,28 @@
 
 
   <div id="policyListTable">
-
-    <% @policies.each do |policy| %>
-
-    <table>
-      <thead>
-      <tr>
-        <th style="width: 50%;"><%= link_to policy.name, policy %></th>
-        <th style="width:  50%;"></th>
-      </tr>
-      </thead>
-
-
-          <!-- deleting a particular policy -->
-          <form data-remote data-turboboost method="post" action="<%= %>" id="deletePolicy<%=policy.id%>"></form>
-            <input name="_method" type="hidden" value="delete"/>
-            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-
-          <tr>
-            <td style="width: 30%;"> <% link_to policy.name, policy %></td>
-            <td style="width: 40%;">
-              <a id="showReportsButton" class="btn btn-primary green-button" href="<%=reports_path(filter_policy: policy.id, view: params[:view])%>">View Reports</a>
-              <i class="fa fa-trash-o"></i></td>
-          </tr>
-
-    </table>
-
-    <% end %>
+    <ul style="list-style-type: none; padding-left: 0;">
+      <% @result.policies.each do |policy| %>
+        <li class="policy">
+          <div class="row no-margin">
+            <div class="col-sm-8" style="font-size: 21px;line-height: 42px;">
+              <%= link_to policy.name, policy_path(id: policy.id, view: params[:view]) %>
+            </div>
+            <div class="col-sm-3">
+              <a id="showReportsButton" class="btn btn-primary btn-md" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>
+            </div>
+            <div class="col-sm-1">
+              <%= form_for(policy, :html => { :method => :delete, :remote => true }) do |f| %>
+                <%= button_tag( :class => "btn btn-sm btn-danger") do %>
+                  <i class="fa fa-trash-o" role="button"></i>
+                <% end %>
+              <% end %>  
+            </div>
+            
+          </div>
+        </li>
+      <% end %>  
+    </ul>
   </div>
 
 
@@ -57,7 +46,7 @@
       font-weight: 600;
       font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Add new policy</p>
   <hr>
-  <form data-remote data-turboboost id="policyCreate"  action="<%= policies_path(view: 'admin') %>" method="post">
+  <form data-turboboost id="policyCreate"  action="<%= policies_path(view: 'admin') %>" method="post" data-remote="true">
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
     <input type="text" id="policyName" name="name" style="height: 40px;
@@ -72,12 +61,6 @@
   </form>
 </div>
 
-</div>
-
-</body>
-
-
-
 <script>
 
   function validate(){
@@ -87,7 +70,6 @@
       alert("Enter a Policy Name");
       return false;
     }
-    $('form#policyCreate').submit();
   }
 
   function getPolicyReportsPath(policyId) {
@@ -99,4 +81,19 @@
   }
 
 </script>
+
+<style type="text/css">
+  .policy{
+    margin-bottom: 10px;
+    border: 1px solid #efefef;
+    padding: 10px;
+    padding-right: 20px;
+    background: honeydew;
+    font-family: Roboto Condensed;
+  }
+
+  .policy:hover{
+    /*box-shadow: 0px 0 6px -1px rgba(0, 0, 0, 0.5);*/
+  }
+</style>
 

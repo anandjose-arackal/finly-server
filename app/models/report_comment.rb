@@ -42,67 +42,68 @@ class ReportComment < ActiveRecord::Base
       name = self.user.name
     end
     case report_comment_action_id
-      when ReportCommentAction.report_comment_id
+      when ReportCommentAction.id_for(:report_comment)
         # Report comment
         comment = "#{name} commented : #{content}"
-      when ReportCommentAction.report_retract_id
+      when ReportCommentAction.id_for(:report_retract)
         # Report retract
-        comment = "#{name} has retracted the report"
-      when ReportCommentAction.report_submit_id
+        comment = "#{name} retracted the report"
+      when ReportCommentAction.id_for(:report_submit)
         # Report submit
         comment = "#{name} submitted the report"
-      when ReportCommentAction.report_approve_id
+      when ReportCommentAction.id_for(:report_approve)
         # Report approve
         comment = "#{name} approved the report"
-      when ReportCommentAction.report_auto_approve_id
+      when ReportCommentAction.id_for(:report_auto_approve)
         # Report auto_approve
         comment = "Report auto-approved as no manager is assigned to the user"
-      when ReportCommentAction.report_reject_id
+      when ReportCommentAction.id_for(:report_reject)
         # Report reject
         comment = "#{name} rejected the report"
         if content.present?
           comment += " with a note : #{content}"
         end
-      when ReportCommentAction.report_unapprove_id
+      when ReportCommentAction.id_for(:report_unapprove)
         # Report unapprove
-        comment = "#{name} has unapproved the report"
-      when ReportCommentAction.report_take_control_id
+        comment = "#{name} unapproved the report"
+      when ReportCommentAction.id_for(:report_take_control)
         # Report take control
         comment = "#{name} took control of the report"
-      when ReportCommentAction.report_update_id
+      when ReportCommentAction.id_for(:report_update)
         # Report update
-        comment = "#{name} has updated #{updated_field} from #{updated_from} to #{updated_to}"
-      when ReportCommentAction.report_reimbursed_id
+        comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
+      when ReportCommentAction.id_for(:report_reimbursed)
         # Report reimbursed
-        comment = "#{name} has reimbursed the report with Payment ID : #{payment.id}"
+        payment_id = payment.id rescue nil
+        comment = "#{name} reimbursed the report with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , note : #{payment.note}"
         end
-      when ReportCommentAction.report_reimbursement_confirmed_id
+      when ReportCommentAction.id_for(:report_reimbursement_confirmed)
         # Report reimbursement confirmed
-        comment = "#{name} has confirmed that the reimbursement is received"
-      when ReportCommentAction.report_closed_id
+        comment = "#{name} confirmed that the reimbursement is received"
+      when ReportCommentAction.id_for(:report_closed)
         # Report closed
         comment = "Report is marked as closed"
-      when ReportCommentAction.report_attach_receipt_id
+      when ReportCommentAction.id_for(:report_attach_receipt)
         # Report attach receipt
-        comment = "#{name} has attached the report"
-      when ReportCommentAction.report_detach_receipt_id
+        comment = "#{name} attached a receipt to the report"
+      when ReportCommentAction.id_for(:report_detach_receipt)
         # Report detach receipt
-        comment = "#{name} has detacted the report"
-      when ReportCommentAction.expense_add_id
+        comment = "#{name} detacted a receipt from the report"
+      when ReportCommentAction.id_for(:expense_add)
         # Expense add
-        comment = "#{name} has added expense at : #{expense.merchant_name} to the report"
-      when ReportCommentAction.expense_remove_id
+        comment = "#{name} added an expense at : #{expense.merchant_name} to the report"
+      when ReportCommentAction.id_for(:expense_remove)
         # Expense remove
-        comment = "#{name} has remove expense at : #{expense.merchant_name} to the report"
-      when ReportCommentAction.expense_reject_id
+        comment = "#{name} removed the expense at : #{expense.merchant_name} to the report"
+      when ReportCommentAction.id_for(:expense_reject)
         # Expense reject
         comment = "#{name} rejected the expense at : #{expense.merchant_name}"
         if expense.note.present?
           comment += " with a note : #{content}"
         end
-      when ReportCommentAction.expense_update_id
+      when ReportCommentAction.id_for(:expense_update)
         # Expense update
         comment = "#{name} updated the expense at : #{expense.merchant_name}. #{updated_field} from #{updated_from} to #{updated_to}"
     end
@@ -112,23 +113,23 @@ class ReportComment < ActiveRecord::Base
   private
   def associations
     case report_comment_action_id
-      when ReportCommentAction.report_comment_id
+      when ReportCommentAction.id_for(:report_comment)
         validate_attributes [:user_id, :content]
-      when ReportCommentAction.report_retract_id, ReportCommentAction.report_submit_id, ReportCommentAction.report_approve_id,
-          ReportCommentAction.report_reject_id, ReportCommentAction.report_unapprove_id, ReportCommentAction.report_take_control_id,
-          ReportCommentAction.report_reimbursement_confirmed_id
+      when ReportCommentAction.id_for(:report_retract), ReportCommentAction.id_for(:report_submit), ReportCommentAction.id_for(:report_approve),
+          ReportCommentAction.id_for(:report_reject), ReportCommentAction.id_for(:report_unapprove), ReportCommentAction.id_for(:report_take_control),
+          ReportCommentAction.id_for(:report_reimbursement_confirmed)
         validate_attributes [:user_id]
-      when ReportCommentAction.report_update_id
+      when ReportCommentAction.id_for(:report_update)
         validate_attributes [:user_id, :updated_field]
-      when ReportCommentAction.report_reimbursed_id
+      when ReportCommentAction.id_for(:report_reimbursed)
         validate_attributes [:user_id, :payment]
-      when ReportCommentAction.report_attach_receipt_id
+      when ReportCommentAction.id_for(:report_attach_receipt)
         # todo pending
-      when ReportCommentAction.report_detach_receipt_id
+      when ReportCommentAction.id_for(:report_detach_receipt)
         # todo pending
-      when ReportCommentAction.expense_add_id, ReportCommentAction.expense_remove_id, ReportCommentAction.expense_reject_id
+      when ReportCommentAction.id_for(:expense_add), ReportCommentAction.id_for(:expense_remove), ReportCommentAction.id_for(:expense_reject)
         validate_attributes [:user_id, :expense_id]
-      when ReportCommentAction.expense_update_id
+      when ReportCommentAction.id_for(:expense_update)
         validate_attributes [:user_id, :expense_id, :updated_field]
       else
 

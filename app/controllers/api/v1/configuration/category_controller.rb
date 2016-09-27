@@ -1,4 +1,4 @@
-require "#{Rails.root}/operations/company/configuration/category/index"
+require "#{Rails.root}/app/operations/company/configuration/category/index"
 class Api::V1::Configuration::CategoryController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
@@ -9,5 +9,7 @@ class Api::V1::Configuration::CategoryController < Api::V1::BaseApiController
 
   def index
     @result = Company::Configuration::Category::Index.(current_user, params)
+    respond
   end
+
 end

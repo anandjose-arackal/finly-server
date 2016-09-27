@@ -1,4 +1,4 @@
-require "#{Rails.root}/operations/expense/manual/create"
+require "#{Rails.root}/app/operations/expense/manual/create"
 class Api::V1::ReceiptsController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
@@ -7,39 +7,23 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
 
   def create
     RequestFormatter.parse_receipt(current_user, params)
-    operation = Receipt::Create.new(current_user, params)
-    operation.run
-    if operation.is_success?
-      render 'api/v1/shared/success'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Receipt::Create.(current_user, params)
+    respond view: false
   end
 
   def index
     @result = Receipt::Index.(current_user, params)
+    respond
   end
 
   def destroy
-    operation = Receipt::Destroy.new(current_user, params)
-    if operation.run
-      render 'api/v1/shared/success'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Receipt::Destroy.(current_user, params)
+    respond view: false
   end
 
   def update
-    operation = Receipt::Update.new(current_user, params)
-    operation.run
-    if operation.is_success?
-      render 'api/v1/shared/success'
-    else
-      @errors = operation.errors
-      render 'api/v1/shared/failure'
-    end
+    @result = Receipt::Update.(current_user, params)
+    respond view: false
   end
 
 end

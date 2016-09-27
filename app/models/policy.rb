@@ -12,6 +12,8 @@
 #
 
 class Policy < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :company
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
@@ -19,10 +21,10 @@ class Policy < ActiveRecord::Base
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
 
   has_many :reports
-  has_many :card_load_requests
+  has_many :money_requests
 
-  has_many :expense_rules
-  has_many :budget_rules
+  has_many :expense_rules, dependent: :destroy
+  has_many :budget_rules, dependent: :destroy
 
   scope :default, -> { where default: true }
   scope :non_default, -> { where default: false }
@@ -60,14 +62,14 @@ class Policy < ActiveRecord::Base
     count = 0
     count += self.expense_rules.count
     count += self.budget_rules.count
-    return count
+    count
   end
 
   private
   def valid_name
     errors.add(:name, 'cannot be blank') if name.blank? and not default
     if company_id.present? and name.present?
-      errors.add(:name, 'has to be unique') if Policy.company(company_id).non_default.by_name(name).present?
+      errors.add(:name, 'has to be unique') if Policy.company(company_id).non_default.exclude_deleted.by_name(name).present?
     end
   end
 

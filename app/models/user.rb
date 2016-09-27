@@ -70,16 +70,23 @@ class User < ActiveRecord::Base
   has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :action_user_id
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
 
-  has_many :reviewed_reports, class_name: 'Report'
+  # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
 
   has_many :cards
-  has_many :card_load_requests
-  has_many :controlling_card_load_requests, class_name: 'CardLoadRequest', foreign_key: :controlling_user_id
   has_many :card_transactions
+
+  has_many :money_requests
+  has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
+  has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
+  has_many :interacted_money_requests, -> { distinct }, source: :money_request, through: :money_request_tracks
+  has_many :manager_money_request_tracks, -> { manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
+  has_many :manager_money_requests, -> { distinct }, source: :money_request, through: :manager_money_request_tracks
+  has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
+  has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
 
   has_many :event_configurations
 
@@ -96,6 +103,7 @@ class User < ActiveRecord::Base
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
+  validates :mobile_number, presence: true, uniqueness: true, length: {is: 10}
 
   # validate :valid_role
 
@@ -110,19 +118,25 @@ class User < ActiveRecord::Base
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
   scope :sort_by_name, -> { order(name: :asc) }
   scope :active, -> { where active: true }
+  scope :invited_by, ->(id) { where invited_by_id: id }
 
   # scopes for filters
   scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
-  scope :filter_state, -> (state) {
+  scope :filter_state, -> (state) do
     case (state)
-      when 1
-        where(active: true)
-      when 2
-        where(active: false)
-      when 3
-        where.not(invitation_token: nil)
+      when '1', 1
+        # Active
+        # Name nil is to ensure user has signed up
+        where(active: true).where.not(name: nil)
+      when '2', 2
+        # Pending
+        self.invitation_not_accepted
+      when '3', 3
+        # Inactive
+        # Name nil is to ensure user has signed up
+        where(active: false).where.not(name: nil)
     end
-  }
+  end
 
   scope :filter_role, -> (role) {
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
@@ -205,9 +219,23 @@ class User < ActiveRecord::Base
   end
 
   def invite_accepted?
-    self.invitation_token
+    !self.invitation_token
   end
 
+  def active_for_authentication?
+    super && self.active # i.e. super && self.is_active
+  end
+
+  def inactive_message
+    "Sorry, this account has been deactivated."
+  end
+
+  # activates the user in devise
+  def activate
+    self.confirm
+  end
+
+  # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == Date.today
@@ -220,7 +248,9 @@ class User < ActiveRecord::Base
     expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
     pending_reimbursement = reports.with_amount.without_payment.sum(:value)
     value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
-    Amount.new(value: value, currency: cash.currency)
+    # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
+    min_value = [cash, value].min
+    Amount.new(value: min_value, currency: cash.currency)
   end
 
   alias_method :manager_name, :user_name

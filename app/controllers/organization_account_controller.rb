@@ -3,12 +3,12 @@ class OrganizationAccountController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    @categories = current_company.categories.active
-    @export_fields = ExportField.all
-    @export_preferences = current_company.export_preferences
-    @policies = current_company.policies
-  end
+    @result = Company::Configuration::Show.(current_user, params)
 
-  private
+    respond_to do |format|
+      format.html {render 'organization_account/show'}
+      format.json {render 'organization_account/show'}
+    end
+  end
 
 end

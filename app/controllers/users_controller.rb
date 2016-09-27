@@ -5,16 +5,13 @@ class UsersController < ApplicationController
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    ap @result.user
-    respond_to do |format|
-      format.json {}
-    end
+    @managers = User::Team::GetManagers.(current_user, params)
+    respond
   end
 
   # this would call the respective private method to update the respective attributes
   def update
     ap params
-    # fail
     update_handler(params[:type])
   end
 
@@ -23,42 +20,86 @@ class UsersController < ApplicationController
     @result = User::Index.(current_user, params)
 
     respond_to do |format|
-      format.json {render json: @result.team.as_json}
+      format.json { render json: @result.team.as_json }
+    end
+  end
+
+  # For destroying user manager mapping
+  # params= { id: 22, mapping_id: 43 }
+  def destroy
+    @result = User::Team::Mappings::Destroy.(current_user, params)
+    respond(response: :success)
+  end
+
+  def get_managers
+    # params[:id] = current_user.id
+    @result = User::Team::GetManagers.new(current_user, params).run
+    respond
+  end
+
+  # placeholder action for importing file
+  def mass_import
+
+  end
+
+  def profile
+    profile_op = User::Profile.new(current_user, params)
+    @result = profile_op.run
+  end
+
+  def update_password
+    update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
+    @result = update_password_op.run
+    if @result.success?
+      sign_in @result.user, :bypass => true
+      flash[:success] = @result.messages[:success]
+    else
+      flash[:error] = @result.messages[:error]
+    end
+    redirect_to request.referrer
+  end
+
+  # action that imports from a CSV or Excel file for mass invitations
+  def import
+    import_op = User::Invite::Import.new(current_user, params)
+    @result = import_op.run
+    respond_to do |format|
+      format.csv { send_data @result }
     end
   end
 
   private
   def update_handler(type = nil)
     unless type
-      flash.now[:error] = "Invalid data."
-      # display error
+      respond(response: :failure, message: 'Error while updating data')
       return
     end
     operation = nil
     success_message = nil
     case type
       when 'password'
-        operation = User::Configuration::UpdatePassword.new(user, params)
+        operation = User::Configuration::UpdatePassword.new(current_user, params)
         success_message = 'Password updated'
       when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
         success_message = 'User team updated.'
       when 'role'
         operation = User::Role::Set.new(current_user, params)
-        success_message = "Role updated"
+        success_message = 'Role updated'
+      when 'details'
+        operation = User::Configuration::UpdateDetails.new(current_user, params)
+        success_message = 'Details updated'
+      when 'state'
+        operation = User::Configuration::UpdateState.new(current_user, params)
+        success_message = 'State updated'
       else
         # do nothing, ha!
     end
     unless operation.present?
-      flash.now[:error] = 'Unknown error'
+      respond(response: :failure, message: 'Error while updating data')
       return
     end
     @result = operation.run
-    if operation.is_success?
-      flash.now[:success] = success_message if success_message.present?
-    else
-      flash.now[:errors] = operation.errors
-    end
+    respond(response: :success, message: success_message)
   end
-
 end

@@ -1,69 +1,69 @@
 class PendingInvitesController < ApplicationController
-
-  before_action :authenticate_user!
-
-  def create
-    invite_op = User::Invite::Create.new(current_user, params)
-    if invite_op.run
-      flash[:success] = "User invited!"
-    else
-      flash[:error] = invite_op.errors
-    end
-    redirect_to request.referer
-  end
+  before_action :authenticate_user!, except: [:edit, :accept]
 
   def edit
-    @pending_user = User.find_by(email: params[:email])
-  end
-
-  # def update
-  #   if @user_invite_service.accept_invitation(user_params)
-  #     flash[:success] = "Registration done!"
-  #     redirect_to root_url
-  #   else
-  #     flash[:error] = @user_invite_service.errors
-  #     render_flash_message
-  #   end
-  # end
-
-  def accept
-    accept_op = User::Invite::Accept.new(params)
-    if accept_op.run
-      redirect_to root_url
-    else
-      flash[:error] = accept_op.errors
-      # render the flash message
+    @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+    # i.e. if user has already signed in, redirect to login page
+    unless @pending_user and @pending_user.invitation_token
+      redirect_to new_user_session_path
     end
   end
 
-  def update_invite
-    update_invite_op = User::Invite::Update.new(current_user, params)
-    if update_invite_op.run
-      flash[:success] = "Invite updated!"
-      redirect_to request.referrer
+
+  def create
+    @result = User::Invite::Create.(current_user, params)
+    if @result.present? and @result.success?
+      respond(response: :success)
     else
-      flash[:error] = update_invite_op.errors
-      # render the flash message
+      respond
     end
   end
 
+  def update
+    if params[:type].present?
+      case params[:type].to_sym
+        when :accept
+          @result = User::Invite::Accept.(params)
+        when :resend
+          @result = User::Invite::Resend.(current_user, params)
+        when :update
+          @result = User::Invite::Update.(current_user, params)
+      end
+    end
+    if @result.present? and @result.success?
+      respond(response: :success)
+    else
+      respond
+    end
+  end
 
   def destroy
-    destroy_op = User::Invite::Destroy.new(current_user, params)
-    if destroy_op.run
-      flash[:success] = "Invite deleted!"
-      redirect_to request.referrer
+    @result = User::Invite::Destroy.(current_user, params)
+    if @result.present? and @result.success?
+      respond(response: :success)
     else
-      flash[:error] = destroy_op.errors
-      # render flash
+      respond
+    end
+  end
+
+  def accept
+    @result = User::Invite::Accept.(params)
+    if @result.present? and @result.success?
+      sign_in @result.accepted_user, :bypass => true
+      # bypass_sign_in(@result.accepted_user)
+      # redirect_to root_url
+      # respond
+      respond_to do |format|
+        format.js { render js: "window.location = '#{root_url}';"}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
     end
   end
 
   private
-
   def updated_user_invite_params
     params.require(:pending_invite).permit(:email, :company_id, :finance_manager, :manager, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :team_mapping_id)
   end
-
 
 end

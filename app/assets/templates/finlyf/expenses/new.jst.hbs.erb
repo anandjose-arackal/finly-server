@@ -9,7 +9,7 @@
           <label class="control-label">Amount</label>
         </div>
         <div class="col-sm-7">
-          <input type="text" name="expense[amount_attributes][value]" class="form-control" />
+          <input type="number" name="expense[amount_attributes][value]" class="form-control" />
           <input type="hidden" name="expense[amount_attributes][currency_id]" class="form-control" value="1" />
         </div>
       </div>
@@ -28,7 +28,7 @@
           <label class="control-label">Date</label>
         </div>
         <div class="col-sm-7">
-          <input type="text" name="expense[date]" class="form-control" />
+          <input type="text" name="expense[date]" class="form-control datepicker" />
         </div>
       </div>
 
@@ -66,14 +66,16 @@
     {{/if}}
 
       
-    <div class="col-sm-4 no-padding">
+    <div class="col-sm-4 no-padding text-center">
+      <label class="text-center control-label">Receipt</label><br />
+
       <label for="expense-receipt-upload">
-        <img class="preview-image img-responsive" id="preview-image" src="#" alt="Click to upload image"/>
+        <img class="preview-image img-responsive" id="preview-image" src="<%= image_url('receipt-placeholder.png') %>" alt="Click to upload image" style="max-width: 200px;max-height: 200px;"/>
       </label>
       {{#if receipt}}
         <input type="number" id="expense-receipt-upload" name="receipt_id" class="form-control input-upload-image" value="{{receipt.id}}"/>
       {{else}}
-        <input type="file" id="expense-receipt-upload" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
+        <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .pdf, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
       {{/if}}
     </div>
   </div>

@@ -1,4 +1,4 @@
-<% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
+<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
 <button id="createNewRule" data-toggle="modal" data-target="#createNewBudgetRuleModal">Create New Rule
 </button>
 <% end %>
@@ -17,35 +17,31 @@
 
               <!-- deleting a particular rule or warning -->
 
-              <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-              <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="budget_rule<%= rule.id %>"
-                    action="<%= policy_remove_rule_path(@result.policy) %>" method="post">
-
-                <input name="_method" type="hidden" value="delete"/>
-                <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
-              </form>
-
-              <% end %>
-
               <div style="margin-bottom: 15px" class="row">
                 <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
                 <span class="col-md-10"><%= rule_in_words rule%></span>
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                <i onclick="$('form#budget_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
-                 <% end %>
+                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy, view: params[:view]), :html => { :method => :delete, :remote => true } do |f| %>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                    <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
+                    <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
+                      <i class="fa fa-times" role="button"></i>
+                    <% end %>
+                  <% end %>
+
+                <% end %>
               </div>
         <% end %>
       <% end %>
 
 
-      <p id="warningPara" onclick="warningDescToggle()" style="color: #6664c7;
+      <p id="budgetWarningPara" onclick="budgetWarningDescToggle()" style="color: #6664c7;
           font-weight: 500;
           font-size: 13px;
           border-top: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
           padding-top: 10px ;"> What is a warning rule?</p>
-      <p id="warningParaDesc" style="color: #666;
+      <p id="budgetWarningParaDesc" style="color: #666;
           font-size: 13px;
           padding-top: 6px ;display: none">Expenses that violate warning rules can be added to the report, but you
         probably
@@ -64,34 +60,30 @@
         <% if rule.rule_type_id == 2 %>
               <!-- deleting a particular rule or warning -->
 
-              <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-              <form data-remote data-turboboost data-confirm="Are you sure you want to remove this rule?"  id="budget_rule<%= rule.id %>"
-                    action="<%= policy_remove_rule_path(@result.policy) %>" method="post">
-
-                <input name="_method" type="hidden" value="delete"/>
-                <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
-              </form>
-              <% end %>
-
               <div style="margin-bottom: 15px" class="row">
                 <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
                 <span class="col-md-10"><%= rule_in_words rule%></span>
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                <i onclick="$('form#budget_rule<%= rule.id %>').submit();" style="font-size: 18px;color:indianred" class="fa fa-remove col-md-1"></i>
+                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy, view: params[:view]), :html => { :method => :delete, :remote => true } do |f| %>
+                    <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+                    <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
+                    <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
+                      <i class="fa fa-times" role="button"></i>
+                    <% end %>
+                  <% end %>
                 <% end %>
               </div>
         <% end %>
       <% end %>
 
-      <p id="blockingPara" onclick="blockingDescToggle()" style="color: #6664c7;
+      <p id="budgetBlockingPara" onclick="budgetBlockingDescToggle()" style="color: #6664c7;
           font-weight: 500;
           font-size: 13px;
           border-top: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
           padding-top: 10px; "> What is a blocking rule?</p>
 
-      <p id="blockingParaDesc" style="color: #666;
+      <p id="budgetBlockingParaDesc" style="color: #666;
           font-size: 13px;
           padding-top: 6px ;display: none">You can’t submit reports with expenses that violate blocking rules. The
         blocks will be displayed in the report.</p>
@@ -101,7 +93,7 @@
 
 </div>
 
-<% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
+<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
 
 <div class="modal fade" id="createNewBudgetRuleModal" role="dialog">
   <div class="modal-dialog modal-md">
@@ -114,12 +106,11 @@
       </div>
       <div class="modal-body" style="padding: 0 35px 35px 35px">
 
-        <form data-remote data-turboboost name="submitNewRuleForm"  action="<%= policy_add_rule_path(@result.policy) %>" method="post">
+        <form data-remote="true" name="submitNewRuleForm" action="<%= policy_add_rule_path(@result.policy, view: params[:view]) %>" method="post">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-          <h5>Set budget...</h5>
 
-          <h5>For the Category... <span>[OPTIONAL]</span></h5>
+          <h5>For the Category:</h5>
 
           <div id="categoriesBudget">
             <input type="radio" name="budget_rule[category_id]" value="">All <br>
@@ -128,14 +119,14 @@
               <% end %>
           </div>
 
-          <h5>Budget Amount is... <span>[OPTIONAL]</span></h5>
+          <h5>Budget Amount is:</h5>
 
           <input name="budget_rule[amount_attributes[value]]" type="text" placeholder="0.00">
 
           <input name="budget_rule[amount_attributes[currency_id]]" value="1" type="hidden" placeholder="0.00">
 
           <div id="newRulePeriod">
-            <h5>Per... <span>[OPTIONAL]</span></h5>
+            <h5>Per:</h5>
             <input type="radio" name="budget_rule[budget_period_id]" value="1">Day <br>
             <input type="radio" name="budget_rule[budget_period_id]" value="2">Week<br>
             <input type="radio" name="budget_rule[budget_period_id]" value="3">Month<br>
@@ -148,7 +139,7 @@
             <input type="radio" name="budget_rule[rule_type_id]" value="1">Warning<br>
           </div>
 
-          <button type="submit" id="createPolicy"> Create</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="createPolicy"> Create</button>
 
         </form>
       </div>
@@ -157,7 +148,6 @@
 </div>
 <% end %>
 
-</div>
 
 
 <script>
@@ -166,12 +156,12 @@
 //    $('form#usersPolicyList').submit();
   });
 
-  function warningDescToggle() {
-    $('#warningParaDesc').toggle();
+  function budgetWarningDescToggle() {
+    $('#budgetWarningParaDesc').toggle();
   }
 
-  function blockingDescToggle() {
-    $('#blockingParaDesc').toggle();
+  function budgetBlockingDescToggle() {
+    $('#budgetBlockingParaDesc').toggle();
   }
 
 

@@ -75,13 +75,13 @@ class UserTeamService < BaseService
         return true if m.id == managing_user.id
         m = UserTeamService.new(m).approves_to(report: report)
       end
-    elsif obj.is_a?(CardLoadRequest)
-      card_load_request = obj
-      emp = card_load_request.user
-      m = UserTeamService.new(emp).manager(card_load_request: card_load_request)
+    elsif obj.is_a?(MoneyRequest)
+      money_request = obj
+      emp = money_request.user
+      m = UserTeamService.new(emp).manager(money_request: money_request)
       while m.present?
         return true if m.id == managing_user.id
-        m = UserTeamService.new(m).approves_to(card_load_request: card_load_request)
+        m = UserTeamService.new(m).approves_to(money_request: money_request)
       end
     elsif obj.is_a?(User)
       for_user = obj
@@ -125,13 +125,13 @@ class UserTeamService < BaseService
         return true if m.id == managing_user.id
         m = UserTeamService.new(m).approves_finance_to(report)
       end
-    elsif obj.is_a?(CardLoadRequest)
-      card_load_request = obj
-      emp = card_load_request.user
-      m = UserTeamService.new(emp).finance_manager(card_load_request)
+    elsif obj.is_a?(MoneyRequest)
+      money_request = obj
+      emp = money_request.user
+      m = UserTeamService.new(emp).finance_manager(money_request)
       while m.present?
         return true if m.id == managing_user.id
-        m = UserTeamService.new(m).approves_finance_to(card_load_request)
+        m = UserTeamService.new(m).approves_finance_to(money_request)
       end
     elsif obj.is_a?(User)
       for_user = obj
@@ -286,8 +286,13 @@ class UserTeamService < BaseService
     end
     self.user.team_mapping.policy(@policy_id).destroy_all
     self.user.team_mapping.policy(nil).each do |item|
-      clone = item.dup
+      clone = item.deep_clone
       clone.policy_id = @policy_id
+      if clone.greater_than_amount.present?
+        amount = clone.greater_than_amount.deep_clone
+        amount.save
+        clone.greater_than_amount = amount
+      end
       errors << clone.errors.full_messages unless clone.save
     end
     errors.blank?
@@ -359,15 +364,15 @@ class UserTeamService < BaseService
       rds = ReportDetailService.new(report)
       @currency_id = rds.currency
       @amount = rds.total_amount
-    elsif params[:card_load_request].present?
-      card_load_request = params[:card_load_request]
-      if card_load_request.policy_id.present? and user.policies.with_id(card_load_request.policy_id).present?
-        @policy_id = card_load_request.policy_id
+    elsif params[:money_request].present?
+      money_request = params[:money_request]
+      if money_request.policy_id.present? and user.policies.with_id(money_request.policy_id).present?
+        @policy_id = money_request.policy_id
       else
         @policy_id = nil
       end
-      @currency_id = card_load_request.amount.currency
-      @amount = card_load_request.amount.value
+      @currency_id = money_request.amount.currency
+      @amount = money_request.amount.value
     end
 
     load_view params

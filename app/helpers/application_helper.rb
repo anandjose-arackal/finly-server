@@ -24,7 +24,7 @@ module ApplicationHelper
 
   def is_finance_view
     view = params[:view]
-    if view == 'finance'
+    if view == 'finance' or view == 'finance_manager'
       return true
     end
     false
@@ -233,6 +233,18 @@ module ApplicationHelper
 
   end
 
+  def color_for(item)
+    Constants::FLASH_COLORS[item.to_sym] rescue 'red'
+  end
+
+  def notification_container_for(item)
+    color = color_for(item)
+    if color == 'red'
+      return 'ohsnap-priority'
+    end
+    return 'ohsnap'
+  end
+
   private
   def get_type(type)
     type = 'information' if type == 'info' or type == 'notice'
@@ -247,7 +259,7 @@ module ApplicationHelper
   end
 
   def full_title(page_title = '')
-    base_title = "Expense Management"
+    base_title = 'Finly'
     if page_title.empty?
       base_title
     else

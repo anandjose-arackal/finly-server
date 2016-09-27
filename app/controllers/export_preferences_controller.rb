@@ -1,52 +1,52 @@
 class ExportPreferencesController < ApplicationController
 
   before_action :authenticate_user!
-  before_action :load_service_objects
 
   def create
-    authorize ExportPreference
-    if @export_service.add_export_field(export_params)
-      flash[:success] = "Field added."
+    create_op = Export::Field::Create.new(current_user, params)
+    @result = create_op.run
+    if @result.success?
+      messages = @result.messages
+      @result = Company::Configuration::Show.(current_user, params)
+      @result.messages = messages
+      # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      respond
     else
-      flash[:error] = @export_service.errors
+      flash[:error] = @result.messages[:error]
+      respond
     end
-    @export_preferences = current_company.export_preferences
-    @export_fields = ExportField.all
-    render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
   end
 
   def destroy
-    authorize ExportPreference
-    if @export_service.remove_export_field(id: params[:export_field_id])
-      flash[:success] = "Field deleted."
+    destroy_op = Export::Field::Destroy.new(current_user, params)
+    @result = destroy_op.run
+    if @result.success?
+      messages = @result.messages
+      @result = Company::Configuration::Show.(current_user, params)
+      @result.messages = messages
+      # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      respond_to do |format|
+        format.js {}
+      end
     else
-      flash[:error] = @export_service.errors
+      flash[:error] = @result.messages[:error]
     end
-    @export_preferences = current_company.export_preferences
-    @export_fields = ExportField.all
-    render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
   end
 
   def update
-    authorize ExportPreference
-    if @export_service.update_export_field(params[:id], export_params)
-      flash[:success] = "Field updated."
+    destroy_op = Export::Field::Update.new(current_user, params)
+    @result = destroy_op.run
+    if @result.success?
+      messages = @result.messages
+      @result = Company::Configuration::Show.(current_user, params)
+      @result.messages = messages
+      # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
+      respond_to do |format|
+        format.js {}
+      end
     else
-      flash[:error] = @export_service.errors
+      flash[:error] = @result.messages[:error]
     end
-    @export_preferences = current_company.export_preferences
-    @export_fields = ExportField.all
-    render_flash_message
-  end
-
-  private
-
-  def export_params
-    params.require(:export).permit(:export_field_id, :name)
-  end
-
-  def load_service_objects
-    @export_service = ExportService.new(current_company)
   end
 
 end

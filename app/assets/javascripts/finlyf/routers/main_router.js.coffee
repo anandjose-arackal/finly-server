@@ -10,6 +10,8 @@ class FinlyF.Routers.Main extends Backbone.Router
     # 'reports/action=:action': 'reportsAction'
     'receipts': 'receipts'
     'receipts/params=:query': 'receipts'
+    'requests': 'requests'
+    'requests/params=:query': 'requests'
     'settlements': 'settlements'
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
@@ -32,7 +34,10 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
+    $("#primary-navbar a[href^='\\#expenses']").parent().addClass('active')
+
   reports: (query, action) ->
+    console.log "hit router"
     # if typeof action != 'undefined'
     #   actions = JSON.parse(query)
 
@@ -45,6 +50,10 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href^='\\#reports']").parent().addClass('active')
+
+    if params.report_id
+      view.showReport(params.report_id)
 
   receipts:(query) ->
     if typeof query != 'undefined'
@@ -55,6 +64,20 @@ class FinlyF.Routers.Main extends Backbone.Router
     view = new FinlyF.Views.ReceiptsIndex({ params: params })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href^='\\#receipts']").parent().addClass('active')
+
+  requests: (query) ->
+    console.log "routerd to request"
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+    view = new FinlyF.Views.RequestsIndex({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
+    $("#primary-navbar a[href^='\\#requests']").parent().addClass('active')
 
   settlements: (query) ->
     # Admin & Finance view
@@ -67,10 +90,12 @@ class FinlyF.Routers.Main extends Backbone.Router
       params: params
     })
     $("#backbone-container").html(view.render().el)
+    @features()
+    $("#primary-navbar a[href^='\\#settlements']").parent().addClass('active')
 
   settlements_show: (user, query) ->
-    console.log "settlements show"
-    console.log user, query
+    # console.log "settlements show"
+    # console.log user, query
     if typeof query != 'undefined'
       # console.log "we're here"
       if query != null
@@ -90,6 +115,8 @@ class FinlyF.Routers.Main extends Backbone.Router
       params: params
     })
     $("#backbone-container").html(view.render().el)
+    @features()
+    $("#primary-navbar a[href^='\\#settlements']").parent().addClass('active')
 
   users: (query)->
     # Admin & Finance view
@@ -102,6 +129,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a[href^='\\#employees']").parent().addClass('active')
 
   features: ->
     $(".datepicker").datepicker({

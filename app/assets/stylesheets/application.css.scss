@@ -11,8 +11,6 @@
  * file per style scope.
  *
 
- *= require nprogress
- *= require nprogress-bootstrap
  *= require font-awesome
  *= require jquery-ui
  *= require animate
@@ -20,14 +18,93 @@
  *= require_tree .
 */
 
-$nprogress-color: #FFEB3B;
-$nprogress-height: 3px;
-$nprogress-zindex: 10100;
-@import 'nprogress';
-@import 'nprogress-bootstrap';
-
 @import "bootstrap";
 @import "bootstrap-sprockets";
+
+
+// Oh snap codes
+
+.alert-red {
+  color: white;
+  background-color: #DA4453;
+}
+#ohsnap .alert-green {
+  color: white;
+  background-color: #37BC9B;
+}
+#ohsnap .alert-blue {
+  color: white;
+  background-color: #4A89DC;
+}
+
+#ohsnap .alert-yellow {
+  color: white;
+  background-color: #F6BB42;
+}
+.alert-orange {
+  color:white;
+  background-color: #E9573F;
+}
+
+#ohsnap{
+  bottom: 0;
+  left: auto;
+  margin-top: 60px;
+  position: absolute;
+  z-index: 1051;
+  width: 33%;
+  margin-right: auto;
+  margin-left: auto;
+  right: 10px;
+}
+
+
+#ohsnap .alert {
+  cursor: pointer;
+  text-align: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  // position: absolute;
+  bottom: 0px;
+  right: 21px;
+  /* Each alert has its own width */
+  float: right;
+  clear: right;
+  z-index: 1051;//Above modal's z index
+}
+
+#ohsnap-priority{
+  margin-top: 60px; 
+  position: absolute;
+  z-index: 1051;//Above modal's z index
+  width: 33%;
+  margin-right: auto;
+  margin-left: auto;
+  right: auto;
+  left: 33%;
+  top: 0px;
+}
+
+#ohsnap-priority .alert {
+  cursor: pointer;
+  text-align: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #eed3d7;
+  border-radius: 4px;
+  // position: absolute;
+  left: auto;
+  right: auto;
+  // bottom: 0px;
+  // right: 21px;
+  /* Each alert has its own width */
+  // float: right;
+  // clear: right;
+  // background-color: white;
+  // z-index: 15;
+}
+//Oh snap codes end
 
 $background-blue: #f5f6f9;
 $button-green: #93c178;

@@ -25,17 +25,17 @@
     <span class="fa fa-search input-icon"></span> 
   </div>
 </div>
-
+{{!-- {{item.filter_amount_type}} --}}
 <div class="row sidebar-element">
   <div class="col-sm-12">Amount</div>
   <div class="col-sm-12">
     <select style="width: 100%;" class="filter-amount-type">
-      <option value="lteq" selected="{{#if_eq item.filter_amount_type 'lteq'}}selected{{/if_eq}}">Less Than</option>
-      <option value="eq" selected="{{#if_eq item.filter_amount_type 'eq'}}selected{{/if_eq}}">Equal To</option>
-      <option value="gteq" selected="{{#if_eq item.filter_amount_type 'gteq'}}selected{{/if_eq}}">Greater Than</option>
+      <option value="lteq">Less Than</option>
+      <option value="eq">Equal To</option>
+      <option value="gteq">Greater Than</option>
     </select>
   </div>
-  <div class="col-sm-12"><input type="text" style="width: 100%;" class="filter-amount-value" placeholder="Amount" value="{{item.filter_amount_value}}" /></div>
+  <div class="col-sm-12"><input type="number" style="width: 100%;" class="filter-amount-value" placeholder="Amount" value="{{item.filter_amount_value}}" /></div>
 </div>
 
 <div class="row sidebar-element">
@@ -49,7 +49,6 @@
 
 <div class="row sidebar-element">
   <div class="col-sm-4">Receipt</div>
-  {{item.filter_receipt}}
   <div class="col-sm-8">
     <select style="width: 100%;" class="filter-receipt">
       <option value="select">Select</option>
@@ -62,15 +61,13 @@
 {{#unless item.indexOnly}}
 <div class="row sidebar-element">
   <div class="col-sm-12 text-center">
-    <button class="navbar-btn btn btn-sm btn-filter-expenses" data-navigate="true">Apply Filter</button>
+    <button class="btn btn-sm btn-warning btn-filter-expenses" data-navigate="true">Apply Filter</button>
   </div>
 </div>
 {{else}}
 <div class="row sidebar-element">
   <div class="col-sm-12 text-center">
-    <button class="navbar-btn btn btn-sm btn-filter-expenses" data-navigate="false">Apply Filter</button>
+    <button class="btn-warning btn btn-sm btn-filter-expenses" data-navigate="false">Apply Filter</button>
   </div>
 </div>
 {{/unless}}
-
-<script type="text/javascript"></script>
