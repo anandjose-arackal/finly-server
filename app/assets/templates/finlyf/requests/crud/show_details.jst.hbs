@@ -63,6 +63,13 @@
             </div>
           </div>
           <div class="row no-margin">
+            <div class="col-sm-6"><label class="control-label">Memo</label></div>
+            <div class="col-sm-6">
+              <label class="control-label item-attr-preview">{{item.memo}}</label>
+              <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
+            </div>
+          </div>
+          <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Status</label></div>
             <div class="col-sm-6">
               {{#switch item.status}}
@@ -71,9 +78,7 @@
                 {{#case 'Rejected'}}<span class="label label-danger">{{item.status}}</span>{{/case}}
                 {{#case 'Retracted'}}<span class="label label-default">{{item.status}}</span>{{/case}}
                 {{#case 'Processing'}}<span class="label label-primary">{{item.status}}</span>{{/case}}
-                {{#case 'Reimbursed'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
-                {{#case 'Reimbursement Confirmed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
-                {{#case 'Closed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+                {{#case 'Credited'}}<span class="label label-success">{{item.status}}</span>{{/case}}
               {{/switch}}
             </div>
           </div>
