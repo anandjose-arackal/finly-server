@@ -107,32 +107,35 @@ class FinlyF.Views.Request extends Backbone.View
     _this =   @
     values = {}
 
+    _this = @
+    formData = new FormData($('form#edit-money-request')[0])
+
     # if(event){ event.preventDefault(); }
 
-    _.each($("#modal-new form#new-item").serializeArray(), (input) ->
-      values[ input.name ] = input.value
-    )
+    # _.each($("#modal-new form#new-item").serializeArray(), (input) ->
+    #   values[ input.name ] = input.value
+    # )
     # console.log values
-    model = new FinlyF.Models.Expense()
-    # console.log("Putting data")
-    response = model.save(values, {
-      iframe: true,
-      files: this.$('form :file'),
-      data: values
-      processData: true
-      success: (model, res) ->
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-          $("#modal-new").modal('hide')
-          _this.model.fetch({
-            data: {
-              view: _this.current_view
-            }
-          })
-      error: (err) ->
-        console.log "Error", err
-    })
+    # model = new FinlyF.Models.Expense()
+    # # console.log("Putting data")
+    # response = model.save(values, {
+    #   iframe: true,
+    #   files: this.$('form :file'),
+    #   data: values
+    #   processData: true
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     if res.success == true
+    #       $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+    #       $("#modal-new").modal('hide')
+    #       _this.model.fetch({
+    #         data: {
+    #           view: _this.current_view
+    #         }
+    #       })
+    #   error: (err) ->
+    #     console.log "Error", err
+    # })
 
     # console.log response
 
@@ -229,26 +232,67 @@ class FinlyF.Views.Request extends Backbone.View
     # $(target_select).html(select)
 
   update: (e) ->
-    $(e.currentTarget).html("<i class='fa fa-circle-o-notch fa-spin'></i>")
+    ##{
+    #   money_request: {
+    #     name: "Mumbai",
+    #     required_by_date: date
+    #     policy_id: 1
+    #     memo: "Need it for to meet the client"
+    #     items_attributes[
+    #       {
+    #         category_id: 1
+    #         amount_attributes: {
+    #           value: 50
+    #           currency_id: 1
+    #         }
+    #       }
+    #     ]
+    #   }
+    # }
     _this = @
-
-    policy_id = $(@el).find('select.item-policy-edit').val()
-    name = $(@el).find('input.item-name-edit').val()
-    
-    data = {
-      name: name,
-      policy_id: policy_id
-    }
-    model = new FinlyF.Models.Report({id: @model.get('id')})
-    model.save(data, {
-      success: (model, res) ->
+    formData = new FormData($('form#edit-money-request')[0])
+    $.ajax({
+      url: '/money_request'
+      type: "POST",
+      data: formData,
+      success: (res) ->
+        # console.log res.messages
         FinlyF.snapNotify(res.messages)
-        $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        _this.model.fetch()
+        if res.success == true
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          $("#modal-new").modal('hide')
+          _this.model.fetch({
+            data: {
+              view: _this.current_view
+            }
+          })
       error: (err) ->
-        FinlyF.snapNotify(err.messages)
-        console.log "Err", err
+        console.log "Error", err 
+      cache: false,
+      contentType: false,
+      processData: false
     })
+
+    # $(e.currentTarget).html("<i class='fa fa-circle-o-notch fa-spin'></i>")
+    # _this = @
+
+    # policy_id = $(@el).find('select.item-policy-edit').val()
+    # name = $(@el).find('input.item-name-edit').val()
+    
+    # data = {
+    #   name: name,
+    #   policy_id: policy_id
+    # }
+    # model = new FinlyF.Models.Report({id: @model.get('id')})
+    # model.save(data, {
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+    #     _this.model.fetch()
+    #   error: (err) ->
+    #     FinlyF.snapNotify(err.messages)
+    #     console.log "Err", err
+    # })
     # @model.save({report: {name: name}}, {
     #   success: (model, res) ->
     #     console.log model, res
@@ -262,6 +306,24 @@ class FinlyF.Views.Request extends Backbone.View
     # $(@el).find(".item-name .item-name-edit").val(_this.model.get('name'))
     # $(e.currentTarget).addClass('btn-edit-item btn-warning').removeClass('btn-update-item btn-success').html("Edit  <i class='fa fa-edit'></i>")
 
+
+    ##{
+    #   money_request: {
+    #     name: "Mumbai",
+    #     required_by_date: date
+    #     policy_id: 1
+    #     memo: "Need it for to meet the client"
+    #     items_attributes[
+    #       {
+    #         category_id: 1
+    #         amount_attributes: {
+    #           value: 50
+    #           currency_id: 1
+    #         }
+    #       }
+    #     ]
+    #   }
+    # }
   postComment: (e) ->
     $(e.currentTarget).text('Posting...')
     _this = @
