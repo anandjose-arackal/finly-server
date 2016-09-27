@@ -1,11 +1,12 @@
 <div class="row" style="height: 100%;">
   <div class="col-sm-8 show-details-panel">
     <form id="edit-money-request">
+      <input type="hidden" name="type" value="update" />
       <div class="row item-title">
         <div class="col-sm-6">
           <h4 class="item-name">
             <label class="item-attr-preview">{{item.name}}</label>
-            <input type="text" class="form-control item-name-edit item-attr-edit" value="{{item.name}}" style="max-width: 300px;">
+            <input type="text" name="money_request[name]" class="form-control item-name-edit item-attr-edit" value="{{item.name}}" style="max-width: 300px;">
           </h4>
         </div>
         <div class="col-sm-6 text-right">
@@ -53,7 +54,7 @@
                   None
                 {{/if}}
               </label>
-              <select class="item-attr-edit item-policy item-policy-edit form-control" name="item-policy" data-default-value="{{item.policy_id}}">
+              <select name="money_request[policy_id]" class="item-attr-edit item-policy item-policy-edit form-control" name="item-policy" data-default-value="{{item.policy_id}}">
                 <option value="">None</option>
                 {{#each item.policies}}
                   <option value="{{this.id}}">{{this.name}}</option>
@@ -156,38 +157,16 @@
               <h4>{{this.category.name}}</h4>
             </div>
             <div class="col-sm-4">
+
+              <input type="hidden" name="money_request[item_attributes][][category_id]" value="{{this.category.id}}">
               <label class="control-label item-attr-preview">{{this.amount.value}}</label>
-              <input type="number" class="item-attr-edit form-control" name="" value="{{this.amount.value}}" />
+              <input name="money_request[item_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control" value="{{this.amount.value}}" />
+              <input name="money_request[item_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
             </div>
           </div>
         {{/each}}
       </div>
 
-      {{#if item.receipts}}
-      <div class="row no-margin"><h4>Receipt Thumbnails</h4></div>
-      <div class="row no-margin receipts">
-      {{#each item.receipts}}
-        <div class="receipt col-sm-4 no-padding">
-          <div class="receipt-container">
-            <div class="receipt-image">
-              <img class="img-responsive" src="{{this.url}}" style=""/>
-            </div>
-            <div class="row no-margin receipt-details">
-              <div class="col-sm-12">
-                <h6>{{this.merchant_name}}</h6>
-              </div>
-              <div class="col-sm-12">
-                {{this.date}}
-              </div>
-              <div class="col-sm-12">
-                {{this.value}}
-              </div>
-            </div>
-          </div>  
-        </div>
-      {{/each}}
-      </div>
-      {{/if}}
     </form>
   </div><!-- col-sm-8 -->
 

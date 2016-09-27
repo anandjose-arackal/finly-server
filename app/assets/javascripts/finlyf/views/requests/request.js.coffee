@@ -203,6 +203,7 @@ class FinlyF.Views.Request extends Backbone.View
 
 
   edit: (e) ->
+    e.preventDefault()
     #Warning!!! Dirty codes ahead!
     $(e.currentTarget).addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
 
@@ -232,6 +233,7 @@ class FinlyF.Views.Request extends Backbone.View
     # $(target_select).html(select)
 
   update: (e) ->
+    e.preventDefault()
     ##{
     #   money_request: {
     #     name: "Mumbai",
@@ -252,8 +254,8 @@ class FinlyF.Views.Request extends Backbone.View
     _this = @
     formData = new FormData($('form#edit-money-request')[0])
     $.ajax({
-      url: '/money_request'
-      type: "POST",
+      url: '/money_request/' + _this.model.get('id')
+      type: "PUT",
       data: formData,
       success: (res) ->
         # console.log res.messages
