@@ -14,8 +14,9 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'api/v1/reports/show'
+    else
+      respond response: :failure
     end
-    respond
   end
 
   def index
@@ -25,12 +26,38 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   end
 
   def update
-    @result = Report::Update.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
+    action = (params[:action] or :update)
+    @result = nil
+    case action.to_sym
+      when :submit
+        @result = Report::Submit.(current_user, params)
+      when :retract
+        @result = Report::Retract.(current_user, params)
+      when :approve
+        @result = Report::Approve.(current_user, params)
+      when :reject
+        @result = Report::Reject.(current_user, params)
+      when :unapprove
+        @result = Report::Unapprove.(current_user, params)
+      when :add_expenses
+        @result = Report::Expenses::Add.(current_user, params)
+      when :remove_expenses
+        @result = Report::Expenses::Remove.(current_user, params)
+      when :reimbursement_confirm
+        @result = Report::ReimburseConfirm.(current_user, params)
+      when :reject_expense
+        @result = Report::Expenses::Reject.(current_user, params)
+      else
+        @result = Report::Update.(current_user, params)
     end
-    respond
+    if @result.present?
+      @result.config[:mobile_api] = true
+      if @result.success?
+        respond render: 'api/v1/reports/show'
+        return
+      end
+    end
+    respond response: :failure
   end
 
   def show
@@ -42,110 +69,10 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   def destroy
     @result = Report::Destroy.(current_user, params)
     @result.config[:mobile_api] = true
-    # if @result.success?
-    #   flash.now[:success] = 'Report Deleted'
-    #   render 'api/v1/shared/success'
-    # end
-    respond view: false
-  end
-
-  def add_expenses
-    @result = Report::Expenses::Add.(current_user, params)
-    @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v1/reports/show'
+      respond response: :success
     else
-      respond
-    end
-  end
-
-  def remove_expenses
-    @result = Report::Expenses::Remove.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def reject_expense
-    @result = Report::Expenses::Reject.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def submit
-    @result = Report::Submit.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def retract
-    @result = Report::Retract.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def approve
-    @result = Report::Approve.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def reject
-    @result = Report::Reject.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def unapprove
-    @result = Report::Unapprove.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def take_control
-    @result = Report::Submit.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
-    end
-  end
-
-  def reimbursement_confirm
-    @result = Report::ReimburseConfirm.(current_user, params)
-    @result.config[:mobile_api] = true
-    if @result.success?
-      respond render: 'api/v1/reports/show'
-    else
-      respond
+      respond response: :failure
     end
   end
 
@@ -155,7 +82,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if @result.success?
       respond render: 'api/v1/reports/show'
     else
-      respond
+      respond response: :failure
     end
   end
 
