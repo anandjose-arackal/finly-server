@@ -32,9 +32,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     end
     self.payment_param = payment_params
     if user.admin? and admin_view?
-      self.role = UserRole.admin_id
+      self.role = UserRole.id_for(:admin)
     else
-      self.role = UserRole.finance_manager_id
+      self.role = UserRole.id_for(:finance_manager)
     end
   end
 
