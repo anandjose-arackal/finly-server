@@ -9,4 +9,6 @@ module Constants
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
   WHITELISTED_EMAILS = []
+
+  ITZCASH_MODULE = 'Finly'
 end
