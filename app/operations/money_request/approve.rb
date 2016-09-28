@@ -6,7 +6,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
   end
 
   def pre_validate
-    if params[:id].blank?
+    if params[:id].blank? and params[:money_request_id].blank?
       messages[:error] << 'Request not found'
     end
     if user.blank?

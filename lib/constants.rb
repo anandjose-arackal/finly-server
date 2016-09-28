@@ -6,5 +6,7 @@ module Constants
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
 
-  FLASH_COLORS ={alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
+  FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
+
+  WHITELISTED_EMAILS = []
 end
