@@ -10,5 +10,10 @@ module Constants
 
   WHITELISTED_EMAILS = []
 
-  ITZCASH_MODULE = 'Finly'
+
+  class Constants::ItzCash
+
+    MODULE = 'Finly'
+
+  end
 end

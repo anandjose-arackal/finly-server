@@ -1,5 +1,5 @@
 class BaseHandler
-  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout
+  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout, :parsed_response
 
   def self.call(user, params={})
     self.new(user, params).run
@@ -8,7 +8,7 @@ class BaseHandler
   def initialize(user, params={})
     self.timeout = false
     self.user = user
-    self.params = params
+    self.params = (params or {})
     clear_messages
   end
 
@@ -86,7 +86,7 @@ class BaseHandler
     return unless p.present?
     begin
       self.response = self.connection.post p, param
-    rescue Faraday::TimeoutError
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
     end
   end
@@ -97,7 +97,7 @@ class BaseHandler
   end
 
   def parse
-
+    self.parsed_response = self.response.body.split(',') rescue []
   end
 
   # This would be sent as a return value
@@ -118,7 +118,7 @@ class BaseHandler
   end
 
   def success?
-    self.process_complete and not has_errors? and not self.timeout
+    self.process_complete and not has_errors? and not self.timeout and self.response.status == 200
   end
 
   def failure?
