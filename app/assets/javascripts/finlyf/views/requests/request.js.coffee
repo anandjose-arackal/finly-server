@@ -2,6 +2,7 @@ class FinlyF.Views.Request extends Backbone.View
   template: HandlebarsTemplates['finlyf/requests/crud/request']
   templateShow: HandlebarsTemplates['finlyf/requests/crud/show']
   templateShowDetails: HandlebarsTemplates['finlyf/requests/crud/show_details']
+  templateAddCategory: HandlebarsTemplates['finlyf/requests/crud/addRequestCategory']
 
   className: 'item col-sm-12'
 
@@ -24,7 +25,8 @@ class FinlyF.Views.Request extends Backbone.View
     'click .btn-view-sub-item': 'viewSub'
     'click .btn-reject-sub-item': 'rejectSub'
     'hidden.bs.modal #modal-mp': 'refreshData'
-
+    'click .btn-add-request-category': 'addRequestCategory'
+    'click .btn-remove-request-category': 'removeRequestCategory'
 
     #reports
     'click .btn-report-action': 'reportAction'
@@ -72,7 +74,50 @@ class FinlyF.Views.Request extends Backbone.View
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
   showSaveOption: ->
-    $(".btn-update-item").css("display", "inline");
+    $(".btn-update-item").css("display", "inline")
+
+  addRequestCategory: (e) ->
+    
+    e.preventDefault()
+
+
+
+
+
+    target = e.currentTarget
+
+    container = $(target).closest('.add-request-category')
+
+    data = {
+      category: {
+        name: $(container).find('select[name=category] option:selected').text()
+        id: $(container).find('select[name=category]').val()
+      }        
+      amount: {
+        value: $(container).find('input[name=amount_value]').val()
+      }
+    }
+
+
+    # console.log data
+    $(@el).find('.request-categories').append(@templateAddCategory({item: data}))
+
+    $(container).find('select[name=category] option:selected').remove()
+
+    $(@el).find('.btn-edit-item').addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
+
+    _this = @
+
+    target_select = $(@el).find(".item-policy-edit")
+    $(target_select).val($(target_select).attr('data-default-value'))
+
+    $(@el).find('.item-attr-edit').css("display", "inline")
+    $(@el).find('.item-attr-preview').css('display', 'none')
+
+  removeRequestCategory: (e) ->
+    e.preventDefault()
+
+
 
 
   edit: (e) ->
@@ -134,6 +179,7 @@ class FinlyF.Views.Request extends Backbone.View
     })
 
   postComment: (e) ->
+    e.preventDefault()
     $(e.currentTarget).text('Posting...')
     _this = @
     target = $(e.currentTarget)
@@ -164,6 +210,7 @@ class FinlyF.Views.Request extends Backbone.View
     # console.log report_id
 
   delete: (e) ->
+    e.preventDefault()
     _this = @
     # @model.set('authenticity_token', $("#authenticity_token").val())
     # console.log $("#authenticity_token").val()
@@ -182,12 +229,17 @@ class FinlyF.Views.Request extends Backbone.View
     })
 
   reportAction: (e) ->
+    console.log "hi"
+    e.preventDefault()
     _this = @
     url = $(e.currentTarget).attr('data-url')
     $.ajax({
       url: url,
       type: 'PATCH',
       dataType: 'json',
+      data: {
+        type: $(e.currentTarget).attr('data-action-type')
+      }
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
@@ -209,54 +261,56 @@ class FinlyF.Views.Request extends Backbone.View
     # console.log "Closed Bootstrap modal"
 
 
-  submit: (e) ->
-    _this = @
-    report_id = @model.get('id')
+  # submit: (e) ->
+  #   e.preventDefault()
+  #   _this = @
+  #   request_id = @model.get('id')
 
-    $.ajax({
-      url: "/money_request/" + report_id + "/submit",
-      dataType: 'json',
-      data: {
-        report_id: report_id,
-        authenticity_token: $("#authenticity_token").val()
-      },
-      type: 'PATCH',
-      success: (res) ->
-        FinlyF.snapNotify(messages)
-        # console.log res
-        _this.model.fetch({
-          data: {
-            view: _this.current_view
-          }
-        })
-      error: (err) ->
-        console.log err
-    })
+  #   $.ajax({
+  #     url: "/money_request/" + request_id + "/submit",
+  #     dataType: 'json',
+  #     data: {
+  #       money_request_id: money_request_id,
+  #       authenticity_token: $("#authenticity_token").val()
+  #       type: 'submit'
+  #     },
+  #     type: 'PATCH',
+  #     success: (res) ->
+  #       FinlyF.snapNotify(messages)
+  #       # console.log res
+  #       _this.model.fetch({
+  #         data: {
+  #           view: _this.current_view
+  #         }
+  #       })
+  #     error: (err) ->
+  #       console.log err
+  #   })
 
-  retract: (e) ->
-    e.preventDefault()
-    _this = @
-    report_id = @model.get('id')
+  # retract: (e) ->
+  #   e.preventDefault()
+  #   _this = @
+  #   report_id = @model.get('id')
 
-    $.ajax({
-      url: "/money_request/" + report_id + "/retract",
-      dataType: 'json',
-      data: {
-        report_id: report_id,
-        authenticity_token: $("#authenticity_token").val()
-      },
-      type: 'PATCH',
-      success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        # console.log res
-        _this.model.fetch({
-          data: {
-            view: _this.current_view
-          }
-        })
-      error: (err) ->
-        console.log err
-    })
+  #   $.ajax({
+  #     url: "/money_request/" + report_id + "/retract",
+  #     dataType: 'json',
+  #     data: {
+  #       report_id: report_id,
+  #       authenticity_token: $("#authenticity_token").val()
+  #     },
+  #     type: 'PATCH',
+  #     success: (res) ->
+  #       FinlyF.snapNotify(res.messages)
+  #       # console.log res
+  #       _this.model.fetch({
+  #         data: {
+  #           view: _this.current_view
+  #         }
+  #       })
+  #     error: (err) ->
+  #       console.log err
+  #   })
 
 
 

@@ -214,6 +214,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
           model_id: model.get('id')
           preview: true
           parent: _this
+          current_view: _this.params.view || 'personal'
         })
         $(_this.el).find("#item-details-main").html(preview_view.render().el)
         $(_this.el).find('.close-details').attr('data-refresh-true', true)
