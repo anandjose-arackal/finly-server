@@ -29,6 +29,9 @@
     {{#if item.actions.settle}}
       <button class="btn btn-sm btn-warning btn-process-debt btn-report-summary-action" data-url="{{item.actions.settle}}">Settle Debt</button>
     {{/if}}
+    {{#if item.actions.credit_money_request}}
+      <button class="btn btn-sm btn-success btn-process-money-request btn-report-summary-action" data-url="{{item.actions.credit_money_request}}">Credit Money Request</button>
+    {{/if}}
   </div>
 </div>
 <style type="text/css">

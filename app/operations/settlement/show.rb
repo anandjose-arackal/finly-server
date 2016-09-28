@@ -85,7 +85,7 @@ class Settlement::Show < Settlement::Base
       self.reports = self.selected_user.reports
     else
       self.reports = self.selected_user.reports
-      self.report = self.reports.send(self.view_to_load) if self.reports.present?
+      self.reports = self.reports.send(self.view_to_load) if self.reports.present?
     end
   end
 
