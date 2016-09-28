@@ -198,14 +198,14 @@ class FinlyF.Views.Request extends Backbone.View
     $(e.currentTarget).text('Posting...')
     _this = @
     target = $(e.currentTarget)
-    report_id = $(target).attr('data-item-id')
+    money_request_id = $(target).attr('data-item-id')
     data = {
       comment: $(target).closest('.form-new-comment').find('.comment-content').val()
     }
 
     # @model.set('comment', comment)
     model = new FinlyF.Models.Report(data)
-    model.urlRoot = '/reports/' + report_id + '/comment'
+    model.urlRoot = '/money_request/' + money_request_id + '/comment'
     # console.log _this.parent.params.view
     model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
@@ -244,7 +244,7 @@ class FinlyF.Views.Request extends Backbone.View
     })
 
   reportAction: (e) ->
-    console.log "hi"
+    # console.log "hi"
     e.preventDefault()
     _this = @
     url = $(e.currentTarget).attr('data-url')

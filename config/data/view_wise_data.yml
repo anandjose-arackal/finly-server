@@ -35,7 +35,7 @@ manager:
       # - Team Analytics: analytics
       - Team Members: employees
       - Team Reports: reports
-      # - Money Requests: requests
+      - Money Requests: requests
     cog:
       # - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -49,7 +49,7 @@ finance_manager:
       - Settlements: settlements
       - Team Members: employees
       - Team Reports: reports
-      - Money Requests: requests
+      # - Money Requests: requests
 
     cog:
       # - My Account: '/users/'
