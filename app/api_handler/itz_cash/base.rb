@@ -8,11 +8,16 @@ class ItzCash::Base < BaseHandler
 
   def parse
     super
-    self.response_code = parsed_response[0]
+    self.response_code = parsed_response[0] if self.parsed_response.present?
   end
 
   def success?
-    super and self.response_code >= 200 and self.response_code <= 200
+    super and self.response_code.present? and self.response_code.to_f >= 200 and self.response_code.to_f <= 200
+  end
+
+  def failure
+    add_message :error, self.parsed_response.last if self.parsed_response.present?
+    super
   end
 
 end
