@@ -116,6 +116,21 @@ class FinlyF.Views.Request extends Backbone.View
 
   removeRequestCategory: (e) ->
     e.preventDefault()
+    target = e.currentTarget
+
+    requset_category_dropdown = $(@el).find('.request-category-dropdown')
+    container = $(target).closest('.request-category')
+
+    option = $('<option />', {
+      text: $(container).find('.request-category-name').text()
+      value: $(container).find('.request-category-id').val()
+    }).appendTo(requset_category_dropdown)
+
+    # console.log $(container).find('.request-category-name').text(), $(container).find('.request-category-id').val()
+
+    $(container).find('.request-category-amount-value').val(0)
+
+    $(container).hide()
 
 
 
