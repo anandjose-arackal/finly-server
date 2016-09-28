@@ -84,7 +84,8 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.reports = self.selected_user.reports
     else
-      self.reports = self.selected_user.reports.send(self.view_to_load)
+      self.reports = self.selected_user.reports
+      self.report = self.reports.send(self.view_to_load) if self.reports.present?
     end
   end
 
@@ -96,7 +97,8 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.money_requests = selected_user.money_requests
     else
-      self.money_requests = self.selected_user.money_requests.send(self.view_to_load)
+      self.money_requests = self.selected_user.money_requests
+      self.money_requests = self.money_requests.send(self.view_to_load) if self.money_requests.present?
     end
   end
 
