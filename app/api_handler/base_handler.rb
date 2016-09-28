@@ -1,11 +1,12 @@
 class BaseHandler
-  attr_accessor :params, :messages, :connection, :process_complete, :response, :user
+  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout
 
   def self.call(user, params={})
     self.new(user, params).run
   end
 
   def initialize(user, params={})
+    self.timeout = false
     self.user = user
     self.params = params
     clear_messages
@@ -75,11 +76,19 @@ class BaseHandler
 
   end
 
+  def pre_process
+
+  end
+
   def process
     p = self.path
     param = self.post_params
     return unless p.present?
-    self.response = self.connection.post p, param
+    begin
+      self.response = self.connection.post p, param
+    rescue Faraday::TimeoutError
+      self.timeout = true
+    end
   end
 
   # Any post process based events such as notifications, mailers is created here
@@ -109,7 +118,7 @@ class BaseHandler
   end
 
   def success?
-    self.process_complete and not has_errors?
+    self.process_complete and not has_errors? and not self.timeout
   end
 
   def failure?
@@ -119,13 +128,14 @@ class BaseHandler
   # Used to present the data to the UI
   class BaseHandler::BasePresenter
     include MathUtil, HasScope
-    attr_accessor :user, :params, :messages, :config
+    attr_accessor :user, :params, :messages, :config, :timeout
 
     def initialize(user, params={}, messages={})
       self.config = {}
       self.user = user
       self.params = params
       self.messages = messages
+      self.timeout = params[:timeout]
       init
     end
 
@@ -193,6 +203,7 @@ class BaseHandler
   end
 
   def failure
+    self.params[:timeout] = self.timeout
     BaseHandler::BasePresenter::FailurePresenter.new(self.user, self.params, self.messages)
   end
 
