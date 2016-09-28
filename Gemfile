@@ -94,6 +94,8 @@ gem 'devise_invitable'
 
 gem 'has_scope'
 
+gem 'faraday'
+
 gem 'hooks'
 
 group :development, :test do
