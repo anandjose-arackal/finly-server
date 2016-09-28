@@ -463,13 +463,18 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     data = {
       view: _this.params.view
-      report_ids: @selected.slice()
       payment: {
         note: $(container).find('textarea[name=payment\\[note\\]]').val()
         date: $(container).find('input[name=payment\\[date\\]]').val()
         amount: parseFloat(_this.selectedReportsTotal())
       }
     }
+
+
+    if $(target).attr('data-action-type') == 'credit-money-request'
+      data.money_request_ids = @selected.slice()
+    else
+      data.report_ids = @selected.slice()
 
     if $(target).attr('data-action-type') == 'reimburse'
       url = $(@el).find('.summary .btn-process-reimburse').attr('data-url')
