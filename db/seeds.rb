@@ -269,7 +269,6 @@ if PaymentType.count == 0
   PaymentType.create(id: 2, name: 'Debt Clearance')
   PaymentType.create(id: 3, name: 'Reimbursement')
   PaymentType.create(id: 4, name: 'Settlement')
-  PaymentType.create(id: 5, name: 'Credit Money Request')
 end
 
 if Report.count == 0
