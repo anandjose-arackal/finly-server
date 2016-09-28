@@ -1,13 +1,13 @@
 class ItzCash::AccountDetails < ItzCash::Base
 
   def pre_validate
-    # unless user.present?
-    #   add_message :error, 'User not found'
-    #   return
-    # end
-    # unless user.cards.present?
-    #   add_message :error, 'A card has not been assigned to the user'
-    # end
+    unless user.present?
+      add_message :error, 'User not found'
+      return
+    end
+    unless user.cards.present?
+      add_message :error, 'A card has not been assigned to the user'
+    end
   end
 
   def base_url
@@ -19,8 +19,8 @@ class ItzCash::AccountDetails < ItzCash::Base
   end
 
   def post_params
-    # {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
-    { serialid: 'S00017740090', itzmodule: Constants::ItzCash::MODULE }
+    {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
+    # { serialid: 'S00017740090', itzmodule: Constants::ItzCash::MODULE }
   end
 
   def success
