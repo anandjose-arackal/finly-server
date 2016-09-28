@@ -5,8 +5,8 @@ class Api::V1::Configuration::GcmController <  Api::V1::BaseApiController
   before_action :authenticate_user!
 
   def create
-    operation = Gcm::Register.new(current_user, params)
-    if operation.run
+    @result = Gcm::Register.(current_user, params)
+    if @result.success?
       render 'api/v1/shared/success'
     else
       render 'api/v1/shared/failure'
@@ -14,8 +14,8 @@ class Api::V1::Configuration::GcmController <  Api::V1::BaseApiController
   end
 
   def delete
-    operation = Gcm::Unregister.new(current_user, params)
-    if operation.run
+    @result = Gcm::Unregister.(current_user, params)
+    if @result.success?
       render 'api/v1/shared/success'
     else
       render 'api/v1/shared/failure'
