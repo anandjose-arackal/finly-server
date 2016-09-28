@@ -46,7 +46,7 @@ class Settlement::Show < Settlement::Base
 
     def init
       self.selected_user = params[:selected_user]
-      self.items = (params[:reports] or params[:payments])
+      self.items = (params[:reports] or params[:payments] or params[:money_requests])
       self.actions = params[:actions]
       self.type = params[:type]
     end
