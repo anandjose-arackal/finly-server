@@ -110,7 +110,7 @@ class Settlement::Show < Settlement::Base
     self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.settlement_id)}
     self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.debt_clearance_id)}
     self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
-    self.actions[:credit_money_request] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.credit_money_request_id)}
+    self.actions[:credit_money_request] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
   end
 
 end
