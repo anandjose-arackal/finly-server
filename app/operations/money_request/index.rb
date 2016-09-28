@@ -81,12 +81,12 @@ class MoneyRequest::Index < MoneyRequest::Base
     def get_counts
       type_counts = money_requests.group(:status_id)
       self.counts = {}
-      counts[:open] = (type_counts[MoneyRequestStatus.open_id] or 0)
-      counts[:processing] = (type_counts[MoneyRequestStatus.processing_id] or 0)
-      counts[:retracted] = (type_counts[MoneyRequestStatus.retracted_id] or 0)
-      counts[:rejected] = (type_counts[MoneyRequestStatus.rejected_id] or 0)
-      counts[:approved] = (type_counts[MoneyRequestStatus.approved_id] or 0)
-      counts[:credited] = (type_counts[MoneyRequestStatus.credited_id] or 0)
+      counts[:open] = (type_counts[MoneyRequestStatus.id_for(:open)] or 0)
+      counts[:processing] = (type_counts[MoneyRequestStatus.id_for(:processing)] or 0)
+      counts[:retracted] = (type_counts[MoneyRequestStatus.id_for(:retracted)] or 0)
+      counts[:rejected] = (type_counts[MoneyRequestStatus.id_for(:rejected)] or 0)
+      counts[:approved] = (type_counts[MoneyRequestStatus.id_for(:approved)] or 0)
+      counts[:credited] = (type_counts[MoneyRequestStatus.id_for(:credited)] or 0)
     end
 
 
