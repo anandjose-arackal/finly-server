@@ -153,15 +153,15 @@
       <div class="row no-margin request-categories">
         {{#each item.request_items}}
           {{#if this.amount.value}}
-            <div class="row no-margin">
+            <div class="row no-margin request-category">
               <div class="col-sm-6">
-                <h4>{{this.category.name}}</h4>
+                <h4 class="request-category-name">{{this.category.name}}</h4>
               </div>
               <div class="col-sm-4">
 
-                <input type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
+                <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
                 <label class="control-label item-attr-preview">{{this.amount.value}}</label>
-                <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control" value="{{this.amount.value}}" />
+                <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" />
                 <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
               </div>
               <div class="col-sm-2">
@@ -174,7 +174,7 @@
       <div class="row no-margin">
         <div class="row no-margin add-request-category">
           <div class="col-sm-6">
-            <select name="category" class="form-control">
+            <select name="category" class="form-control request-category-dropdown">
               <option value=""></option>
               {{#each item.request_items}}
                 {{#unless this.amount.value}}

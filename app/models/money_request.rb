@@ -45,6 +45,8 @@ class MoneyRequest < ActiveRecord::Base
   scope :open, -> {where status_id: MoneyRequestStatus.id_for(:open) }
   scope :approved, -> { where status_id: MoneyRequestStatus.id_for(:approved) }
   scope :credited, -> { where status_id: MoneyRequestStatus.id_for(:credited) }
+  scope :credited_money_request, -> { where status_id: MoneyRequestStatus.id_for(:credited) }
+  scope :approved_money_request, -> { where status_id: MoneyRequestStatus.id_for(:approved) }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :processing, -> {where status_id: MoneyRequestStatus.id_for(:processing) }
   scope :owner, ->(user_id) { where user_id: user_id }

@@ -116,6 +116,21 @@ class FinlyF.Views.Request extends Backbone.View
 
   removeRequestCategory: (e) ->
     e.preventDefault()
+    target = e.currentTarget
+
+    requset_category_dropdown = $(@el).find('.request-category-dropdown')
+    container = $(target).closest('.request-category')
+
+    option = $('<option />', {
+      text: $(container).find('.request-category-name').text()
+      value: $(container).find('.request-category-id').val()
+    }).appendTo(requset_category_dropdown)
+
+    # console.log $(container).find('.request-category-name').text(), $(container).find('.request-category-id').val()
+
+    $(container).find('.request-category-amount-value').val(0)
+
+    $(container).hide()
 
 
 
@@ -183,14 +198,14 @@ class FinlyF.Views.Request extends Backbone.View
     $(e.currentTarget).text('Posting...')
     _this = @
     target = $(e.currentTarget)
-    report_id = $(target).attr('data-item-id')
+    money_request_id = $(target).attr('data-item-id')
     data = {
       comment: $(target).closest('.form-new-comment').find('.comment-content').val()
     }
 
     # @model.set('comment', comment)
     model = new FinlyF.Models.Report(data)
-    model.urlRoot = '/reports/' + report_id + '/comment'
+    model.urlRoot = '/money_request/' + money_request_id + '/comment'
     # console.log _this.parent.params.view
     model.save({view: _this.parent.params.view}, {
       success: (model, res) ->
@@ -229,7 +244,7 @@ class FinlyF.Views.Request extends Backbone.View
     })
 
   reportAction: (e) ->
-    console.log "hi"
+    # console.log "hi"
     e.preventDefault()
     _this = @
     url = $(e.currentTarget).attr('data-url')

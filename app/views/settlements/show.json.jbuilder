@@ -24,6 +24,12 @@ json.array! @result.items do |item|
     json.payment_amount item.amount.value
     json.initiating_user item.initiating_user.name
     json.payment_type item.payment_type.name
+  elsif item.is_a?(MoneyRequest)
+    json.type 'money_request'
+    if item.final_approver
+      json.final_approver item.final_approver.name
+    end
+    json.request_amount item.total_amount.value
   end
 
 #   json.merge! report.attributes
