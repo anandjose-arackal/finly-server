@@ -58,5 +58,4 @@ class MoneyRequestController < ApplicationController
       super(item)
     end
   end
-
 end

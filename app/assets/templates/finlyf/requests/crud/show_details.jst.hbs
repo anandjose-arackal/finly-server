@@ -12,30 +12,30 @@
         <div class="col-sm-6 text-right">
 
           {{#if item.actions.take_control}}
-            <button class="btn btn-warning btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+            <button class="btn btn-warning btn-sm btn-report-action" data-action-type="take_control" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
           {{/if}}
 
           {{#if item.actions.submit}}
             {{#if item.actions.editable}}
               <button class="btn bnt-warning btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
             {{/if}}
-            <button class="btn btn-sm btn-report-action btn-success" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+            <button class="btn btn-sm btn-report-action btn-success" data-action-type="submit" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
           {{/if}}
 
           {{#if item.actions.retract}}
-            <button class="btn btn-sm btn-report-action btn-danger" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+            <button class="btn btn-sm btn-report-action btn-danger" data-action-type="retract" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
           {{/if}}
 
           {{#if item.actions.approve}}
-            <button class="btn btn-sm btn-success btn-report-action" data-url="{{item.actions.approve}}">Approve</button>
+            <button class="btn btn-sm btn-success btn-report-action" data-action-type="approve" data-url="{{item.actions.approve}}">Approve</button>
           {{/if}}
 
           {{#if item.actions.unapprove}}
-            <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.unapprove}}">Unapprove</button>
+            <button class="btn btn-sm btn-danger btn-report-action" data-action-type="unapprove" data-url="{{item.actions.unapprove}}">Unapprove</button>
           {{/if}}
 
           {{#if item.actions.reject}}
-            <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
+            <button class="btn btn-sm btn-danger btn-report-action" data-action-type="reject" data-url="{{item.actions.reject}}">Reject</button>
           {{/if}}
 
           
@@ -63,6 +63,13 @@
             </div>
           </div>
           <div class="row no-margin">
+            <div class="col-sm-6"><label class="control-label">Memo</label></div>
+            <div class="col-sm-6">
+              <label class="control-label item-attr-preview">{{item.memo}}</label>
+              <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
+            </div>
+          </div>
+          <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Status</label></div>
             <div class="col-sm-6">
               {{#switch item.status}}
@@ -71,9 +78,7 @@
                 {{#case 'Rejected'}}<span class="label label-danger">{{item.status}}</span>{{/case}}
                 {{#case 'Retracted'}}<span class="label label-default">{{item.status}}</span>{{/case}}
                 {{#case 'Processing'}}<span class="label label-primary">{{item.status}}</span>{{/case}}
-                {{#case 'Reimbursed'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
-                {{#case 'Reimbursement Confirmed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
-                {{#case 'Closed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+                {{#case 'Credited'}}<span class="label label-success">{{item.status}}</span>{{/case}}
               {{/switch}}
             </div>
           </div>
@@ -144,28 +149,49 @@
         <div class="col-sm-6 no-padding">
           <h4>Categories</h4>
         </div>
-        <div class="col-sm-6 no-padding text-right">
-          {{#if item.actions.editable}}
-            <button class="add-new-expense btn btn-success btn-navbar" data-item-id="{{item.id}}">Update</button>
-          {{/if}}
-        </div>
       </div>
-      <div class="row no-margin">
+      <div class="row no-margin request-categories">
         {{#each item.request_items}}
-          <div class="row no-margin">
-            <div class="col-sm-8">
-              <h4>{{this.category.name}}</h4>
-            </div>
-            <div class="col-sm-4">
+          {{#if this.amount.value}}
+            <div class="row no-margin">
+              <div class="col-sm-6">
+                <h4>{{this.category.name}}</h4>
+              </div>
+              <div class="col-sm-4">
 
-              <input type="hidden" name="money_request[item_attributes][][category_id]" value="{{this.category.id}}">
-              <label class="control-label item-attr-preview">{{this.amount.value}}</label>
-              <input name="money_request[item_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control" value="{{this.amount.value}}" />
-              <input name="money_request[item_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+                <input type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
+                <label class="control-label item-attr-preview">{{this.amount.value}}</label>
+                <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control" value="{{this.amount.value}}" />
+                <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+              </div>
+              <div class="col-sm-2">
+                <button class="btn btn-danger btn-sm btn-remove-request-category item-attr-edit">Remove</button>
+              </div>
             </div>
-          </div>
+          {{/if}}
         {{/each}}
       </div>
+      <div class="row no-margin">
+        <div class="row no-margin add-request-category">
+          <div class="col-sm-6">
+            <select name="category" class="form-control">
+              <option value=""></option>
+              {{#each item.request_items}}
+                {{#unless this.amount.value}}
+                <option value="{{this.category.id}}">{{this.category.name}}</option>
+                {{/unless}}
+              {{/each}}
+            </select>
+          </div>
+          <div class="col-sm-4">
+            <input class="form-control" type="number" name="amount_value" value="0">
+          </div>
+          <div class="col-sm-2">
+            <button class="btn btn-sm btn-add-request-category">Add</button>
+          </div>
+        </div>
+      </div>
+      
 
     </form>
   </div><!-- col-sm-8 -->
