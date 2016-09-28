@@ -1,5 +1,13 @@
-json.extract! report, :id, :name, :report_status_id, :status_name, :user_id, :policy_id, :submitted_at
-policy_name = report.policy.name if report.policy.present?
-json.policy_name policy_name
-json.user_name report.user.name
-json.company_id report.user.company_id
+json.extract! report, :id, :name, :submitted_at
+json.status do
+  json.id report.report_status_id
+  json.name report.status_name
+end
+json.user do
+  json.id report.user_id
+  json.name report.user.name
+end
+json.policy do
+  json.id report.policy_id
+  json.name report.policy.name rescue nil
+end

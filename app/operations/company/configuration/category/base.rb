@@ -13,6 +13,7 @@ class Company::Configuration::Category::Base < BaseOperation
 
   def init
     self.categories = user.company.categories
+    self.categories = self.categories.active if self.categories.present?
   end
 
   def success

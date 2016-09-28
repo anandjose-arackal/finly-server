@@ -1,12 +1,13 @@
-manager_name = @result.manager.name rescue nil
-finance_manager_name = @result.finance_manager.name rescue nil
-json.manager_name manager_name
-json.finance_manager_name finance_manager_name
-json.total @result.total
-json.date @result.dates
-json.report do
-  json.partial! '/api/v1/reports/report', report: @result.report
+json.partial! '/api/v1/reports/report', report: @result.report
+json.manager_name @result.manager.name rescue nil
+json.finance_manager_name @result.finance_manager.name rescue nil
+json.total do
+  json.value @result.total
+  json.currency do
+    json.extract! Currency.first, :id, :country, :country_code, :symbol
+  end
 end
+json.date @result.dates
 json.actions do
   json.take_control @result.actions[:take_control].present?
   json.review @result.actions[:approve].present?
@@ -19,8 +20,9 @@ json.actions do
   json.editable @result.actions[:editable].present?
   json.submit @result.actions[:submit].present?
 end
-json.expenses_group @result.expenses_category_sorted do |item|
-  json.extract! item, :section_name, :section_total
+json.sections @result.expenses_category_sorted do |item|
+  json.name item[:section_name]
+  json.total item[:section_total]
   json.expenses item[:expenses] do |expense_item|
     json.partial! '/api/v1/expenses/expense', expense: expense_item
   end
@@ -28,9 +30,7 @@ end
 json.comments @result.comments do |comment|
   json.extract! comment, :id, :user_id, :report_id, :report_comment_action_id, :created_at
   json.content comment.generate
-  name = nil
-  name = comment.user.name if comment.user_id.present?
-  json.user_name name
+  json.user_name comment.user.name rescue nil
 end
 json.policies @result.policies, :id, :name
 json.violations @result.violations
