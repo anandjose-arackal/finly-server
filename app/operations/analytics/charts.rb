@@ -24,7 +24,7 @@ class Analytics::Charts < BaseOperation
   has_scope :filter_status_id
   has_scope :filter_date, using: [:from, :to], type: :hash
 
-  attr_accessor :team_users, :user_ids, :fields, :charts, :expenses
+  attr_accessor :team_users, :user_ids, :fields, :charts, :expenses, :role
 
   def pre_validate
     if user.blank? or params.blank?
@@ -33,7 +33,12 @@ class Analytics::Charts < BaseOperation
   end
 
   def init
-    self.team_users = User::Team::Index.new(user, params).run
+    self.role = params[:view]
+    if role.nil? or role == 'personal'
+      self.team_users = [user]
+    else
+      self.team_users = User::Team::Index.new(user, params).run
+    end
     self.charts = []
   end
 
@@ -49,15 +54,19 @@ class Analytics::Charts < BaseOperation
     # applying filters for user_id
     self.team_users = team_users.where(id: params[:filter_user_id].to_i) if params[:filter_user_id]
     # extracting the id of the user whose expense breakdown needs to be shown
-    self.user_ids = team_users.pluck(:id)
-    self.expenses = Expense.admin_viewable.where(user_id: user_ids)
+    if role.nil? or role == 'personal'
+      self.user_ids = user.id
+      self.expenses = Expense.where(user_id: user_ids)
+    else
+      self.user_ids = team_users.pluck(:id)
+      self.expenses = Expense.admin_viewable.where(user_id: user_ids)
+    end
     # applying the filters for which expenses are to be considered
     apply_filters
   end
 
   def process
     generate_charts
-    self.response = charts
   end
 
   def success
