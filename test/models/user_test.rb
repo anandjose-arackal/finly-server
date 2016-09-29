@@ -23,7 +23,6 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  company_id             :integer          not null
-#  name                   :string(255)
 #  mobile_number          :string(255)
 #  active                 :boolean          default(TRUE), not null
 #  invitation_token       :string(255)
@@ -36,9 +35,11 @@
 #  invitations_count      :integer          default(0)
 #  otp                    :string(255)
 #  otp_sent_at            :datetime
-#  opt_verified_at        :datetime
+#  otp_verified_at        :datetime
 #  otp_verified           :boolean          default(FALSE), not null
-#  opt_count              :integer          default(0), not null
+#  otp_count              :integer          default(0), not null
+#  first_name             :string(255)      not null
+#  last_name              :string(255)      not null
 #
 
 require 'test_helper'

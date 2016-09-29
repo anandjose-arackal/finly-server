@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160929200556) do
+ActiveRecord::Schema.define(version: 20160929210330) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -637,6 +637,13 @@ ActiveRecord::Schema.define(version: 20160929200556) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "states", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.string   "code",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "manager_id",             limit: 4
@@ -669,9 +676,15 @@ ActiveRecord::Schema.define(version: 20160929200556) do
     t.integer  "employee_id",         limit: 4
     t.integer  "payroll_id",          limit: 4
     t.integer  "default_currency_id", limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.boolean  "mobile_verified",                 default: true, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.date     "date_of_birth",                   null: false
+    t.string   "gender",              limit: 255, null: false
+    t.string   "address_1",           limit: 255, null: false
+    t.string   "address_2",           limit: 255, null: false
+    t.string   "city",                limit: 255, null: false
+    t.integer  "state_id",            limit: 4,   null: false
+    t.string   "pin_code",            limit: 255, null: false
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
@@ -724,7 +737,6 @@ ActiveRecord::Schema.define(version: 20160929200556) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.integer  "company_id",             limit: 4,                   null: false
-    t.string   "name",                   limit: 255
     t.string   "mobile_number",          limit: 255
     t.boolean  "active",                             default: true,  null: false
     t.string   "invitation_token",       limit: 255
@@ -740,6 +752,9 @@ ActiveRecord::Schema.define(version: 20160929200556) do
     t.datetime "otp_verified_at"
     t.boolean  "otp_verified",                       default: false, null: false
     t.integer  "otp_count",              limit: 4,   default: 0,     null: false
+    t.string   "first_name",             limit: 255,                 null: false
+    t.string   "maiden_name",            limit: 255
+    t.string   "last_name",              limit: 255,                 null: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

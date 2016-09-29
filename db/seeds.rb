@@ -101,6 +101,12 @@ if PaymentMode.count == 0
   end
 end
 
+if State.count == 0
+  State::VALUES.each do |item|
+    State.create code: item[:code], name: item[:name]
+  end
+end
+
 if Event.count == 0
   Event::ACTIONS.each do |item|
     Event.create id: (Event::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
@@ -132,39 +138,49 @@ if c.categories.count ==
 end
 
 if User.count == 0
-  a = User.create(company: Company.first, name: "Finly Admin", email: "admin@finlytest.io",
+  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finlytest.io",
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-                                            {user_role_id: UserRole.employee_id}])
+                                            {user_role_id: UserRole.employee_id}],
+                  profile_attributes: {date_of_birth:Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                  address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  User.create(company: Company.first, name: "Finly King", email: "king@finlytest.io",
+  User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}])
+                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
+              profile_attributes: {date_of_birth:Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+              address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   fm = []
   4.times do |pos|
-    fm << User.create(company: Company.first, name: "Finly Finance Manager #{pos}", email: "finance#{pos}@finlytest.io",
+    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlytest.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
-                                                {user_role_id: UserRole.employee_id}])
+                                                {user_role_id: UserRole.employee_id}],
+                      profile_attributes: {date_of_birth:Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   end
   m = []
   6.times do |pos|
-    m << User.create(company: Company.first, name: "Finly Manager #{pos}", email: "manager#{pos}@finlytest.io",
+    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 3},
-                                               {user_role_id: UserRole.employee_id}])
+                                               {user_role_id: UserRole.employee_id}],
+                     profile_attributes: {date_of_birth:Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                     address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
   u = []
   10.times do |pos|
-    u << User.create(company: Company.first, name: Faker::Name.name, email: "#{Faker::Internet.user_name}@finlytest.io",
+    u << User.create(company: Company.first, first_name: Faker::Name.first_name,last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
                                                {user_role_id: UserRole.employee_id}],
-                     team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
+                     team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+                     profile_attributes: {date_of_birth:Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                     address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])

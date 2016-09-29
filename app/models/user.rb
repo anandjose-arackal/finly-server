@@ -23,7 +23,6 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  company_id             :integer          not null
-#  name                   :string(255)
 #  mobile_number          :string(255)
 #  active                 :boolean          default(TRUE), not null
 #  invitation_token       :string(255)
@@ -36,9 +35,11 @@
 #  invitations_count      :integer          default(0)
 #  otp                    :string(255)
 #  otp_sent_at            :datetime
-#  opt_verified_at        :datetime
+#  otp_verified_at        :datetime
 #  otp_verified           :boolean          default(FALSE), not null
-#  opt_count              :integer          default(0), not null
+#  otp_count              :integer          default(0), not null
+#  first_name             :string(255)      not null
+#  last_name              :string(255)      not null
 #
 
 class User < ActiveRecord::Base
@@ -106,8 +107,10 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
-  validates :name, presence: true
-  validates :mobile_number, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
+  validates :first_name, presence: true, format: { with: /\A[a-zA-Z0-9]+\Z/ }, length: {maximum: 30}
+  validates :maiden_name, length: {maximum: 30}
+  validates :last_name, presence: true, format: { with: /\A[a-zA-Z0-9]+\Z/ }, length: {maximum: 30}
+  validates :mobile_number, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
 
   # validate :valid_role
 
@@ -158,13 +161,12 @@ class User < ActiveRecord::Base
     self.build_balance_sheet.save if self.balance_sheet.blank?
   end
 
+  def name
+    "#{first_name} #{last_name}"
+  end
+
   def name_shortened
-    abbr = name[0]
-    parts = name.split
-    if parts.size >= 2
-      abbr += parts.second[0]
-    end
-    abbr.upcase
+    "#{first_name[0]}#{last_name[0]}".upcase
   end
 
   def roles
