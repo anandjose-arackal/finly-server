@@ -296,6 +296,33 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :api do
+    namespace :v0 do
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:create, :index, :show, :update, :destroy]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+        patch 'retract' => 'reports#retract', as: :retract
+        patch 'submit' => 'reports#submit', as: :submit
+        patch 'approve' => 'reports#approve', as: :approve
+        patch 'unapprove' => 'reports#unapprove', as: :unapprove
+        patch 'reject' => 'reports#reject', as: :reject
+        patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+        patch 'take_control' => 'reports#take_control', as: :take_control
+        post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
+        delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+        patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
+        post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
+      end
+      resources :receipts, only: [:create, :index, :destroy, :update]
+      resources :receipts do
+        post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+      namespace :configuration do
+        get 'categories' => 'category#index', as: :categories
+        post 'gcm/register', to: 'gcm#create'
+        post 'gcm/unregister', to: 'gcm#delete'
+      end
+    end
     namespace :v1 do
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :index, :show, :update, :destroy]
@@ -387,7 +414,6 @@ Rails.application.routes.draw do
   # routes for testing import
   get 'mass_import', to: 'users#mass_import', as: :mass_import
   post 'import', to: 'users#import', as: :user_import
-
 
 
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
