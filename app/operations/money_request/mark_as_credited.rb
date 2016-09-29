@@ -26,7 +26,7 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
 
   def post_process
     if success?
-      money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:credited)
+      money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:credited)
     end
   end
 end

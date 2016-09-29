@@ -26,4 +26,5 @@ class PaymentType < ActiveRecord::Base
   def self.settlement_id
     4
   end
+
 end

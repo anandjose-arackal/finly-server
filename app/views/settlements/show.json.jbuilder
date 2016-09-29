@@ -29,7 +29,7 @@ json.array! @result.items do |item|
     if item.final_approver
       json.final_approver item.final_approver.name
     end
-    json.request_amount item.total_amount.value
+    json.request_amount item.total_amount
   end
 
 #   json.merge! report.attributes

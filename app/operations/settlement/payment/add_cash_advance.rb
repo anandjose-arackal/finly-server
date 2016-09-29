@@ -8,7 +8,7 @@
 # date: date of the payment
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
-  attr_accessor :money_requests, :payment_param
+  attr_accessor :money_requests, :payment_param, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -16,7 +16,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
+    if params[:payment][:amount].blank? or params[:payment][:amount].to_f < 0
       messages[:error] << 'Amount being added blank or negative'
     end
   end
@@ -31,6 +31,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       self.money_requests = to_user.money_requests.with_id(money_request_id) if to_user.present?
     end
     self.payment_param = payment_params
+    if user.admin? and admin_view?
+      self.role = UserRole.id_for(:admin)
+    else
+      self.role = UserRole.id_for(:finance_manager)
+    end
   end
 
   def authorize
@@ -48,7 +53,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       money_requests.each do |request|
         total_amount += request.total_amount
       end
-      unless total_amount <= payment_param[:amount]
+      unless total_amount <= payment_param[:amount].to_f
         errors << 'Payment amount cannot be less than the money requests total amount'
       end
     end
