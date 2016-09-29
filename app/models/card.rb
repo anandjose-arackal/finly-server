@@ -25,4 +25,9 @@ class Card < ActiveRecord::Base
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
+
+  def serial_id
+    self.proxy
+  end
+
 end
