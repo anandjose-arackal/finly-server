@@ -53,6 +53,8 @@ class Expense < ActiveRecord::Base
   validate :no_future_date
   validate :created_by
   validate :report_status
+  validate :valid_expense_type
+  validate :valid_amount_value
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
@@ -127,7 +129,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
-  scope :admin_viewable, -> {where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id]}
+  scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id] }
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
@@ -189,7 +191,7 @@ class Expense < ActiveRecord::Base
   # cannot add an expense with future date
   def no_future_date
     if date.present? and date > Date.today
-      errors.add(:date, "cannot be in the future!")
+      errors.add(:date, 'cannot be in the future!')
     end
   end
 
@@ -198,10 +200,32 @@ class Expense < ActiveRecord::Base
     if self.report_id
       report = self.report
       unless report.open? or report.retracted? or report.rejected?
-        errors.add(:report, ' cannot be edited in this state.')
+        errors.add(:report, 'cannot be edited in this state')
       end
     end
   end
 
+  def valid_expense_type
+    case expense_type_id
+      when ExpenseType.manual_expense_id
+        if self.manual_expense.blank?
+          errors.add(:merchant, "can't be blank")
+        end
+      when ExpenseType.card_expense_id
+        if self.card_expense.blank?
+          errors.add(:card, 'expense details not found')
+        end
+      else
+        errors.add(:expense, 'type not allowed')
+    end
+  end
+
+  def valid_amount_value
+    if self.amount.blank? or self.amount.value.blank?
+      errors.add(:amount, "can't be blank")
+    elsif self.amount.value <= 0
+      errors.add(:amount, "can't be less than or equal to 0")
+    end
+  end
 
 end

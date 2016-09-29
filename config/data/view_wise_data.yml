@@ -6,6 +6,7 @@ admin:
       - Company Settlements: settlements
       - Company Employees: employees
       - Company Reports: reports
+      - Money Requests: requests
     cog:
       - Organization Account: '/organization_account?view=admin'
       # - Policies: '/policies'
@@ -34,6 +35,7 @@ manager:
       # - Team Analytics: analytics
       - Team Members: employees
       - Team Reports: reports
+      - Money Requests: requests
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -47,6 +49,7 @@ finance_manager:
       - Settlements: settlements
       - Team Members: employees
       - Team Reports: reports
+      # - Money Requests: requests
 
     cog:
       - My Account: '/users/'

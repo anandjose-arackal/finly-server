@@ -305,17 +305,6 @@ Rails.application.routes.draw do
       resources :reports, only: [:create, :index, :show, :update, :destroy]
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
-        patch 'retract' => 'reports#retract', as: :retract
-        patch 'submit' => 'reports#submit', as: :submit
-        patch 'approve' => 'reports#approve', as: :approve
-        patch 'unapprove' => 'reports#unapprove', as: :unapprove
-        patch 'reject' => 'reports#reject', as: :reject
-        patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
-        patch 'take_control' => 'reports#take_control', as: :take_control
-        post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
-        delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
-        patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
-        post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
       end
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
@@ -372,6 +361,9 @@ Rails.application.routes.draw do
   end
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
+  resources :money_request do
+    post 'comment' => 'money_request#comment', as: :comment
+  end
 
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'

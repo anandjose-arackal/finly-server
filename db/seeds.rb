@@ -128,7 +128,7 @@ if MoneyRequestStatus.count == 0
 end
 
 if PaymentMode.count == 0
-  PaymentMode::MODES.each do |key,value|
+  PaymentMode::MODES.each do |key, value|
     PaymentMode.create id: value, name: key
   end
 end
@@ -143,7 +143,7 @@ if Event.count == 0
 end
 
 if Currency.count == 0
-  Currency.create(id: 1, country: 'India', country_code: 'INR')
+  Currency.create(id: 1, country: 'India', country_code: 'INR', symbol: '₹')
 end
 
 if Amount.count == 0

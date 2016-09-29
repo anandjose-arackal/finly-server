@@ -38,9 +38,9 @@ class MoneyRequest::Submit < MoneyRequest::Base
     # If no manager assigned, auto approve the money_request
     if manager.blank?
       # call the approve class with the right parameters
-      approve_op = MoneyRequest::Approve.new(user, {money_request_id: money_request.id, auto_approve: true})
-      unless approve_op.run
-        self.messages[:error] = messages[:error].merge approve_op.errors
+      approve_op = MoneyRequest::Approve.(user, {money_request_id: money_request.id, auto_approve: true})
+      unless approve_op.success?
+        self.messages[:error] = messages[:error].merge approve_op.messages[:error]
         # self.messages[:error] << "Error auto-approving money_request. Please try again."
         return
       end

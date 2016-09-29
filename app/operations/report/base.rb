@@ -160,7 +160,7 @@ class Report::Base < BaseOperation
         warning_messages.concat violation[:expense_warning] if violation[:expense_warning].present?
         warning_messages.concat violation[:budget_warning] if violation[:budget_warning].present?
         warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
-        warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
+        warning_messages.concat violation['budget_warning'] if violation['budget_warning'].present?
       end
       if warning_messages.size > 0
         warning_messages.uniq!

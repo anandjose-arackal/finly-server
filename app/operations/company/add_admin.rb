@@ -30,7 +30,7 @@ class Company::AddAdmin < Company::Base
     admin.skip_confirmation_notification!
     if admin.save
       admin.activate
-      messages[:success] << "Company created!"
+      messages[:success] << "New admin created!"
     else
       messages[:error] = admin.errors.full_messages
     end
