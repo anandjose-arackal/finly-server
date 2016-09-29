@@ -3,7 +3,7 @@ class Receipt::Create < Receipt::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "No user or parameters present."
+      messages[:error] << 'No user or parameters present'
     end
   end
 
@@ -20,7 +20,7 @@ class Receipt::Create < Receipt::Base
   end
 
   def post_process
-    messages[:success] << "Receipt added."
+    messages[:success] << 'Receipt added'
   end
 
   def success
@@ -37,7 +37,9 @@ class Receipt::Create < Receipt::Base
 
   private
   def create_params
-    params.require(:receipt).permit(:image, :note)
+    p = params.require(:receipt).permit(:image, :note)
+    p[:image] = params[:receipt][:image] rescue nil
+    p.permit!
   end
 
 end
