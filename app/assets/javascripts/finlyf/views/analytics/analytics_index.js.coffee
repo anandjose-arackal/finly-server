@@ -26,6 +26,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       @params = options.params || {}
     else
       @params = {}
+    @params.view = @params.view || 'personal'
     _this = @
     @dump = []
     @collection = new FinlyF.Collections.Analytics()

@@ -454,6 +454,8 @@ Rails.application.routes.draw do
   get 'external/reports/:id' => 'external_url#report', as: :external_url_report
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
 
+  get 'analytics' => 'analytics#show'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
