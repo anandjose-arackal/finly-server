@@ -7,6 +7,15 @@ class Analytics::Charts < BaseOperation
 
   include HasScope
 
+  class Analytics::Charts::ChartsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :charts
+
+    def init
+      self.charts = params[:charts]
+    end
+  end
+
   has_scope :filter_category_id
   has_scope :filter_merchant
   has_scope :filter_receipt
@@ -29,57 +38,44 @@ class Analytics::Charts < BaseOperation
   end
 
   def authorize
-    if user.admin? or user.manager? or user.finance_manager?
-      self.fields = [:user, :merchant, :category]
-    else
-      self.fields = [:merchant, :category]
-    end
+    # if user.admin? or user.manager? or user.finance_manager?
+    #   self.fields = [:user, :merchant, :category]
+    # else
+    #   self.fields = [:merchant, :category]
+    # end
   end
 
   def pre_process
     # applying filters for user_id
-    self.team_users = team_users.where(id: params[:filter_user_id])
+    self.team_users = team_users.where(id: params[:filter_user_id].to_i) if params[:filter_user_id]
+    # extracting the id of the user whose expense breakdown needs to be shown
     self.user_ids = team_users.pluck(:id)
-    self.expenses = Expense.where(user_id: user_ids)
+    self.expenses = Expense.admin_viewable.where(user_id: user_ids)
     # applying the filters for which expenses are to be considered
     apply_filters
   end
 
   def process
-    fields.each do |field|
-      generate_charts(field)
-    end
+    generate_charts
     self.response = charts
+  end
+
+  def success
+    Analytics::Charts::ChartsPresenter.new(user, {charts: charts}, messages)
   end
 
 
   private
 
-  def generate_charts(field, options = {})
-    case field
-      when :user
-        charts[:user] = {}
-        expense_sums = expenses.joins(:amount).group(:user_id).sum(:value)
-        user_ids.each do |id|
-          user_name = User.find_by(id: id).name
-          charts[:user][user_name] = expense_sums[id]
-        end
-      when :merchant
-        # this already returns a hash with merchant name and total
-        set = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
-        charts[:merchant] = set
-      when :category
-        charts[:category]
-        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
-        set.each do |key, value|
-          charts[:category][Category.find(key).name] = value
-        end
-      else
-        # do nothing
+  def generate_charts(options = {})
+
+    set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
+    set.each do |key, value|
+      charts[Category.find(key).name] = value
     end
   end
 
   def apply_filters
-    self.expenses = apply_scopes(expenses)
+    self.expenses = apply_scopes(expenses, params)
   end
 end
