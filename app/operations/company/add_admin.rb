@@ -30,7 +30,7 @@ class Company::AddAdmin < Company::Base
     admin.skip_confirmation_notification!
     if admin.save
       admin.activate
-      messages[:success] << "Company created!"
+      messages[:success] << "New admin created!"
     else
       messages[:error] << "Failed, Try again."
     end
@@ -49,6 +49,5 @@ class Company::AddAdmin < Company::Base
     params.require(:admin).permit(:name, :email, :password, :password_confirmation,
                                   :mobile_number, team_mapping_attributes: [:default], role_mapping_attributes: [:user_role_id])
   end
-
 
 end
