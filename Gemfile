@@ -106,6 +106,8 @@ gem 'devise_invitable'
 
 gem 'has_scope'
 
+gem 'faraday'
+
 gem 'hooks'
 
 # todo - temporary, will be removed during final deployment.

@@ -9,4 +9,11 @@ module Constants
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
   WHITELISTED_EMAILS = []
+
+
+  class Constants::ItzCash
+
+    MODULE = 'Finly'
+
+  end
 end

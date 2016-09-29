@@ -84,7 +84,8 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.reports = self.selected_user.reports
     else
-      self.reports = self.selected_user.reports.send(self.view_to_load)
+      self.reports = self.selected_user.reports
+      self.reports = self.reports.send(self.view_to_load) if self.reports.present?
     end
   end
 
@@ -96,7 +97,8 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.money_requests = selected_user.money_requests
     else
-      self.money_requests = self.selected_user.money_requests.send(self.view_to_load)
+      self.money_requests = self.selected_user.money_requests
+      self.money_requests = self.money_requests.send(self.view_to_load) if self.money_requests.present?
     end
   end
 
@@ -108,6 +110,7 @@ class Settlement::Show < Settlement::Base
     self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.settlement_id)}
     self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.debt_clearance_id)}
     self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
+    self.actions[:credit_money_request] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
   end
 
 end

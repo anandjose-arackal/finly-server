@@ -1,6 +1,7 @@
 class FinlyF.Views.Settlement extends Backbone.View
   template: HandlebarsTemplates['finlyf/settlements/crud/settlement']
   templateReport: HandlebarsTemplates['finlyf/settlements/crud/settlementReport']
+  templateRequest: HandlebarsTemplates['finlyf/settlements/crud/settlementRequest']#money request
   templatePayments: HandlebarsTemplates['finlyf/settlements/crud/payment']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
@@ -21,6 +22,9 @@ class FinlyF.Views.Settlement extends Backbone.View
       if @page == 'reimburse' || @page == 'settle_debt'
         $(@el).removeClass('item').addClass('settlement-report')
         $(@el).html(@templateReport({ item: @model.toJSON() }))
+      else if @page == 'money_request'
+        $(@el).removeClass('item').addClass('settlement-report')
+        $(@el).html(@templateRequest({item: @model.toJSON() }))
       else
         if @model.get('type') == 'payment'
           $(@el).html(@templatePayments({item: @model.toJSON()}))
