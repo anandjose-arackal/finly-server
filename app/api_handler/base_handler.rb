@@ -1,5 +1,5 @@
 class BaseHandler
-  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout, :parsed_response
+  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout
 
   def self.call(user, params={})
     self.new(user, params).run
@@ -97,7 +97,7 @@ class BaseHandler
   end
 
   def parse
-    self.parsed_response = self.response.body.split(',') rescue []
+
   end
 
   # This would be sent as a return value

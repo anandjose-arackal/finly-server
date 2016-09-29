@@ -34,6 +34,11 @@
 #  invited_by_id          :integer
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
+#  otp                    :string(255)
+#  otp_sent_at            :datetime
+#  opt_verified_at        :datetime
+#  otp_verified           :boolean          default(FALSE), not null
+#  opt_count              :integer          default(0), not null
 #
 
 class User < ActiveRecord::Base
@@ -102,7 +107,7 @@ class User < ActiveRecord::Base
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
   validates :name, presence: true
-  validates :mobile_number, length: {is: 10}
+  validates :mobile_number, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
 
   # validate :valid_role
 

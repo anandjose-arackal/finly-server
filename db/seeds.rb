@@ -18,6 +18,11 @@ def random_string_of_numbers(length)
   (0...length).map { (48 + rand(10)).chr }.join
 end
 
+def random_mobile_number
+  pattern = '[789]\d{9}'
+  StringRandom.random_regex(pattern)
+end
+
 if ExportField.count == 0
   ExportField.create(id: 1, name: 'Employee Name')
   ExportField.create(id: 2, name: 'Employee ID')
@@ -128,19 +133,19 @@ end
 
 if User.count == 0
   a = User.create(company: Company.first, name: "Finly Admin", email: "admin@finlytest.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                             {user_role_id: UserRole.employee_id}])
 
   User.create(company: Company.first, name: "Finly King", email: "king@finlytest.io",
-              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}])
 
   fm = []
   4.times do |pos|
     fm << User.create(company: Company.first, name: "Finly Finance Manager #{pos}", email: "finance#{pos}@finlytest.io",
-                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                 {user_role_id: UserRole.employee_id}])
 
@@ -148,7 +153,7 @@ if User.count == 0
   m = []
   6.times do |pos|
     m << User.create(company: Company.first, name: "Finly Manager #{pos}", email: "manager#{pos}@finlytest.io",
-                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 3},
                                                {user_role_id: UserRole.employee_id}])
   end
@@ -156,7 +161,7 @@ if User.count == 0
   u = []
   10.times do |pos|
     u << User.create(company: Company.first, name: Faker::Name.name, email: "#{Faker::Internet.user_name}@finlytest.io",
-                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_string_of_numbers(10),
+                     password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
                                                {user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}])
@@ -338,20 +343,20 @@ end
 if Card.count == 0
   Company.all.each do |company|
     5.times do
-      number = random_string_of_numbers(10)
+      number = random_mobile_number
       c = company.cards.create(proxy: number, ending_number: number[6..9], description: "Unassigned company card.",
                                card_type_id: random_integer(1, 3))
     end
   end
 
   User.all.each do |user|
-    number = random_string_of_numbers(10)
+    number = random_mobile_number
     c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test physical card for user #{user.id}",
                           card_type_id: 1, company_id: user.company.id, active: true)
-    number = random_string_of_numbers(10)
+    number = random_mobile_number
     c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test virtual card for user #{user.id}",
                           card_type_id: 2, company_id: user.company.id, active: true)
-    number = random_string_of_numbers(10)
+    number = random_mobile_number
     c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test reimbursement card for user #{user.id}",
                           card_type_id: 3, company_id: user.company.id, active: true)
   end

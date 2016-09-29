@@ -34,6 +34,11 @@
 #  invited_by_id          :integer
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
+#  otp                    :string(255)
+#  otp_sent_at            :datetime
+#  opt_verified_at        :datetime
+#  otp_verified           :boolean          default(FALSE), not null
+#  opt_count              :integer          default(0), not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
