@@ -34,7 +34,7 @@ class Analytics::Charts < BaseOperation
 
   def init
     self.team_users = User::Team::Index.new(user, params).run
-    self.charts = {}
+    self.charts = []
   end
 
   def authorize
@@ -71,7 +71,8 @@ class Analytics::Charts < BaseOperation
 
     set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
     set.each do |key, value|
-      charts[Category.find(key).name] = value
+      cat_name = Category.find(key).name
+      charts << {cat_name => value}
     end
   end
 
