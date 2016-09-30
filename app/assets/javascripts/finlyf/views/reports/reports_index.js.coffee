@@ -269,6 +269,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_name': $(".sidebar .filter-user").val() || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }

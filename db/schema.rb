@@ -331,6 +331,7 @@ ActiveRecord::Schema.define(version: 20160929112158) do
     t.integer  "comment_action_id", limit: 4,     null: false
     t.integer  "user_id",           limit: 4
     t.integer  "expense_id",        limit: 4
+    t.integer  "payment_id",        limit: 4
     t.string   "updated_field",     limit: 255
     t.text     "updated_from",      limit: 65535
     t.text     "updated_to",        limit: 65535
@@ -343,6 +344,7 @@ ActiveRecord::Schema.define(version: 20160929112158) do
   add_index "money_request_comments", ["comment_action_id"], name: "index_money_request_comments_on_comment_action_id", using: :btree
   add_index "money_request_comments", ["expense_id"], name: "index_money_request_comments_on_expense_id", using: :btree
   add_index "money_request_comments", ["money_request_id"], name: "index_money_request_comments_on_money_request_id", using: :btree
+  add_index "money_request_comments", ["payment_id"], name: "index_money_request_comments_on_payment_id", using: :btree
   add_index "money_request_comments", ["rejected_to_id"], name: "index_money_request_comments_on_rejected_to_id", using: :btree
   add_index "money_request_comments", ["user_id"], name: "index_money_request_comments_on_user_id", using: :btree
 
@@ -830,6 +832,7 @@ ActiveRecord::Schema.define(version: 20160929112158) do
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "money_request_comments", "expenses"
   add_foreign_key "money_request_comments", "money_requests"
+  add_foreign_key "money_request_comments", "payments"
   add_foreign_key "money_request_comments", "users"
   add_foreign_key "money_request_items", "amounts"
   add_foreign_key "money_request_items", "categories"
