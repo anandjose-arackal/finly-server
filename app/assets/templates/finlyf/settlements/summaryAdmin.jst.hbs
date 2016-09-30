@@ -19,7 +19,7 @@
     <input type="hidden" name="pending_money_request" value="{{item.pending_money_request}}">
   </div>
 
-  <div class="col-sm-3 text-center">
+  <div class="col-sm-3 text-center summary-actions">
     {{#if item.actions.add_cash_advance}}
       <button class="btn btn-sm btn-success btn-process-payment btn-report-summary-action">Add Cash</button>
     {{/if}}
@@ -35,8 +35,13 @@
   </div>
 </div>
 <style type="text/css">
+
+.summary-actions{
+  margin-top: -15px;
+}
 .btn-report-summary-action{
   width: 150px;
+  margin-top: 5px;
   margin-bottom: 5px;
   display: block;
 }

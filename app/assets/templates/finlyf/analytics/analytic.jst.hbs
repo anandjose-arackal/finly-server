@@ -1,11 +1,14 @@
 <div class="col-sm-3">
-  <h4>{{item.category}}</h4>
+  <label class="control-label analytics-type">{{item.category}}</label>
 </div>
 
-<div class="col-sm-9">
+<div class="col-sm-7">
   <div class="progress">
     <div class="progress-bar" role="progressbar" aria-valuenow="{{percentage item.total item.max_total}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{percentage item.total item.max_total}}%;">
-      {{item.total}} 
     </div>
   </div>
+</div>
+
+<div class="col-sm-2 text-right">
+  <label class="control-label analytics-total">&#8377;&nbsp;{{item.total}}</label>
 </div>
