@@ -8,7 +8,7 @@ module Constants
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
-  WHITELISTED_EMAILS = []
+  WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io']
 
 
   class Constants::ItzCash

@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
-  # before_filter :whitelisted_emails
+  before_action :whitelisted_emails
 
   # to add custom parameters to the user hash being taken as input
   before_action :configure_permitted_parameters if :devise_controller?
@@ -182,11 +182,12 @@ class ApplicationController < ActionController::Base
     root_url
   end
 
-  # def whitelisted_emails
-  #   if params[:user] and Constants::WHITELISTED_EMAILS.include?(params[:user][:email])
-  #     if request.format == :html
-  #       redirect_to root_url
-  #     end
-  #   end
-  # end
+  def whitelisted_emails
+    if params[:user] and Constants::WHITELISTED_EMAILS.include?(params[:user][:email])
+      if request.format == :html
+        sign_out current_user
+        redirect_to root_url
+      end
+    end
+  end
 end
