@@ -1,5 +1,5 @@
 # basic analytics for the admins, managers, and finance_managers
-# 4 types of charts : user wise expenses (personal and team), merchant wise expenses, category wise expenses, manager wise expenses
+# 4 types of charts : user wise expenses (only for managers), merchant wise expenses, category wise expenses
 # user wise:
 
 
@@ -53,7 +53,7 @@ class Analytics::Charts < BaseOperation
 
   def pre_process
     # applying filters for user_id
-    self.team_users = team_users.where(id: params[:filter_user_id].to_i) if params[:filter_user_id]
+    self.team_users = team_users.where(id: params[:filter_user_id].to_i) if params[:filter_user_id].present?
     # extracting the id of the user whose expense breakdown needs to be shown
     if role.nil? or role == 'personal'
       self.user_ids = user.id
@@ -84,24 +84,30 @@ class Analytics::Charts < BaseOperation
         set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
         set.each do |key, value|
           cat_name = Category.find(key).name
-          charts << {cat_name => value}
+          charts << {item: cat_name, total: precision_value(value)}
         end
       when 'merchant'
         # this already returns a hash with merchant name and total
-        self.charts = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
+        items = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
+        items.each do |key, value|
+          self.charts << {item: key, total: precision_value(value)}
+        end
       when 'user'
         expense_sums = expenses.joins(:amount).group(:user_id).sum(:value)
         user_ids.each do |id|
           user_name = User.find_by(id: id).name
-          charts << {user_name => expense_sums[id]}
+          charts << {item: user_name, total: precision_value(expense_sums[id])}
         end
       else
         set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
         set.each do |key, value|
           cat_name = Category.find(key).name
-          charts << {cat_name => value}
+          charts << {item: cat_name, total: precision_value(value)}
         end
     end
+    # sorting the charts in descending order of total
+    charts.sort_by! { |item| item[:total]}
+    charts.reverse!
   end
 
   def apply_filters
