@@ -47,36 +47,10 @@
   </div>
 </div>
 
-<div class="row sidebar-element">
-  <div class="col-sm-12">Category</div>
-  <div class="col-sm-12">
-    <select style="width: 100%;" class="filter-category-id">
-      <option value="">Select</option>
-    </select>
-  </div>
-</div>
 
-<div class="row sidebar-element">
-  <div class="col-sm-4">Receipt</div>
-  <div class="col-sm-8">
-    <select style="width: 100%;" class="filter-receipt">
-      <option value="select">Select</option>
-      <option value="present">Has Receipt</option>
-      <option value="absent">No Receipt</option>
-    </select>
-  </div>
-</div>
-{{!-- REF==2O --}}
-{{#unless item.indexOnly}}
+
 <div class="row sidebar-element">
   <div class="col-sm-12 text-center">
     <button class="btn btn-sm btn-warning btn-filter-expenses" data-navigate="true">Apply Filter</button>
   </div>
 </div>
-{{else}}
-<div class="row sidebar-element">
-  <div class="col-sm-12 text-center">
-    <button class="btn-warning btn btn-sm btn-filter-expenses" data-navigate="false">Apply Filter</button>
-  </div>
-</div>
-{{/unless}}

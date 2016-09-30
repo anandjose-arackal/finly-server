@@ -2,15 +2,15 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
 
   #navbar
-  templateNavbarSidebar: HandlebarsTemplates['finlyf/expenses/navbar/navbar_sidebar']
-  templateNavbarMain: HandlebarsTemplates['finlyf/expenses/navbar/navbar_main']
+  templateNavbarSidebar: HandlebarsTemplates['finlyf/analytics/navbar/navbar_sidebar']
+  templateNavbarMain: HandlebarsTemplates['finlyf/analytics/navbar/navbar_main']
 
   #sidebar
-  templateSidebar: HandlebarsTemplates['finlyf/expenses/sidebar/sidebar']
+  templateSidebar: HandlebarsTemplates['finlyf/analytics/sidebar/sidebar']
 
 
   #main
-  templateMain: HandlebarsTemplates['finlyf/expenses/crud/main']
+  templateMain: HandlebarsTemplates['finlyf/analytics/crud/main']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -44,9 +44,13 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
 
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
+    @params.filter_date_from = @params['filter_date[from]']
+    @params.filter_date_to = @params['filter_date[to]']
+    @params.indexOnly = false#REF==2I
 
 
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
+    $(@el).find('.main').html(@templateMain())
     # category_select = $(@el).find(".filter-category-id")
     # options = $("#newExpenseCategory option")
     # for option in options
@@ -61,6 +65,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     #Append all the expenses
     # @dump = @collection.models.slice()
     # # console.log "Models - ", @collection.models.length
+    arr = @collection.pluck('total')
+    @max_total = Math.max.apply(Math,arr)
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
@@ -70,6 +76,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       $(spinner).removeClass("fa-spin")
 
   appendItems: (item) ->
+    item.set('max_total', @max_total)
     #Creating view for each expense and appending them
     view_item = new FinlyF.Views.Analytic({
       model: item
@@ -116,35 +123,15 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      'filter_category_id': $(".sidebar .filter-category-id").val() || ""
-      'filter_receipt': $(".sidebar .filter-receipt").val() || ""
+      'filter_user_id': $(".sidebar .filter-user-id").val() || ""
     }
-
-    filter_amount_value = $(".sidebar .filter-amount-value").val()
-    filter_receipt = $(".sidebar .filter-receipt").val()
-
-    if filter_amount_value
-      params["filter_amount[value]"] = filter_amount_value
-      params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
 
     # console.log "Will navigate now."
     if @params.view
       params.view = @params.view
 
-    if $(target).attr('data-navigate')
-      if $.parseJSON($(target).attr('data-navigate')) == true
-        #Filters by navigating to a Backbone route
-        FinlyF.primary_router.navigate('analytics/params=' + JSON.stringify(params), {trigger: true})  
-      else
-        #Navigates by refetching & resetting collection with params
-        @collection.fetch({
-          reset: true,
-          data: params,
-          success: ->
-            # console.log "Fetched all the data"
-          error: ->
-            console.log "Couldn't fetch Successfully."
-        })
+    FinlyF.primary_router.navigate('analytics/params=' + JSON.stringify(params), {trigger: true})  
+   
 
 
 
