@@ -17,7 +17,9 @@
 #  reimbursement_amount_id :integer
 #  accounted               :boolean          default(FALSE), not null
 #  archived                :boolean          default(FALSE), not null
+#  is_deleted              :boolean          default(FALSE), not null
 #
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable

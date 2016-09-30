@@ -20,19 +20,22 @@ class Report::MarkAsReimbursed < Report::Base
     unless report.reimbursement_pending?
       messages[:error] << 'Report cannot be reimbursed at this stage'
     end
+    unless payment.present?
+      messages[:error] << 'Payment not found'
+    end
   end
 
   def process
     if report.update_attributes controlling_user: nil, controlling_for_user: nil,
-                                report_status_id: ReportStatus.reimbursed_id, memo: nil
+                                report_status_id: ReportStatus.reimbursed_id, memo: nil, reimbursement: payment
       report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id,
-                                  report_status_id: ReportStatus.reimbursed_id
+                                  report_status_id: ReportStatus.reimbursed_id, payment: self.payment
     end
   end
 
   def post_process
     if success?
-      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reimbursed)
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reimbursed), payment: self.payment
     end
   end
 end
