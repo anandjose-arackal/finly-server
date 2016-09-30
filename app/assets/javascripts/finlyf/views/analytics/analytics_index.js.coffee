@@ -20,7 +20,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     #Filters
     'change .select-show-for': 'showForOptions' 
     'keyup .filter-field': 'autoComplete'
-    'keyup .filter-merchant': 'autoComplete'
+    # 'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter-expenses': 'filter'
     'click .filter-data-type': 'filterDataType'
 

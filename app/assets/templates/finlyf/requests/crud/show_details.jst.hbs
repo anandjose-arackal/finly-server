@@ -2,7 +2,7 @@
   <div class="col-sm-8 show-details-panel">
     <form id="edit-money-request">
       <input type="hidden" name="type" value="update" />
-      <div class="row item-title">
+      <div class="row item-title show-details-title">
         <div class="col-sm-6">
           <h4 class="item-name">
             <label class="item-attr-preview">{{item.name}}</label>
@@ -197,7 +197,8 @@
   </div><!-- col-sm-8 -->
 
   <div class="col-sm-4 timeline show-details-panel">
-    <div class="row no-margin"><h4>Timeline</h4></div>
+    <div class="row show-details-title"></div>
+    <div class="row no-margin" style="margin-top: 60px;"><h4>Timeline</h4></div>
     <div class="row no-margin">
       <div class="col-sm-2 no-padding">
         <span class="roundCircle">{{item.user_initial}}</span>
@@ -234,6 +235,26 @@
 </div><!-- .row -->
 
 <style type="text/css">
+  .show-details-title{
+    position: fixed;
+    max-height: 50px;
+    min-height: 50px;
+    background: aliceblue;
+    z-index: 2;
+    /*box-shadow: 0 0 9px 0px rgba(0, 0, 0, 0.2)*/
+    /*box-shadow: 0 2px 9px -4px #777;*/
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.46)
+  }
+  .col-sm-8 .show-details-title{
+    width: 66.666%;
+    margin-top: -60px;
+  }
+
+  .col-sm-4 .show-details-title{
+    width: 33.333%;
+    box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.46);
+
+  }
 
   .violation{
     margin-top: 0;
@@ -249,7 +270,7 @@
   }
 
   .item-body{
-    margin-top: 50px;
+    margin-top: 60px;
   }
 
 

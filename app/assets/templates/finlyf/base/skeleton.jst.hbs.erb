@@ -224,6 +224,77 @@
   padding: 5px;
   margin-bottom: 5px;
 }
+
+.secondary-navbar{
+  z-index: 4;
+}
+/*
+.sidebar{
+  z-index: 3;
+}
+.main{
+  z-index: 5;
+}
+*/
+.bg-white{
+  background: #fff;
+}
+.close-item-details{
+  min-height: 50px;
+  padding-left: 25px;
+  line-height: 36px;
+  background: rgb(255, 112, 78);
+  z-index: 10;
+  color: white;
+  left: auto;
+  right: 0;
+}
+
+.close-item-details i{
+  left: -4px;
+  position: relative;
+}
+
+.main.preview #item-details {
+    left: auto;
+    right: auto;
+    left: 0;
+    z-index: 1000;
+    bottom: 0;
+}
+#item-details {
+    height: calc(100% - 53px);
+    left: 0;
+    z-index: 110;
+    bottom: calc(100% - 53px);
+    /*background: white;*/
+    background: rgba(0, 0, 0, 0.5);
+    /*box-shadow: 0 0 30px 0 rgba(0,0,0,.1);*/
+    transition: all 0.5s;
+    position: fixed;
+    margin-top: -60px;
+    display: block;
+    width: 100%;
+    /*padding: 0 40px 40px 40px;*/
+}
+
+#item-details-main{
+  height: 100%;
+  background: #fff;
+}
+
+#item-details-main .col-sm-12{
+  height: 100%;
+}
+
+#item-details-main .item-details{
+  height: 100%;
+}
+
+
+#item-details-main .item-details #item-show-details{
+  height: 100%;
+}
 </style>
 
 
@@ -296,6 +367,11 @@
   </div>
 
   <div class="col-sm-10 col-sm-offset-2 main">
+  </div>
+
+  <div class="row no-margin" id="item-details">
+    <div class="close-item-details"><i class="fa fa-times close-details"></i></div>
+    <div id="item-details-main"></div> 
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">

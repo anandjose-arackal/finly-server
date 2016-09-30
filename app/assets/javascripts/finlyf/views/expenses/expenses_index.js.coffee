@@ -1,5 +1,5 @@
 class FinlyF.Views.ExpensesIndex extends Backbone.View
-  templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
+  templateSkeleton: HandlebarsTemplates['finlyf/expenses/skeleton']
   templateSkeletonIndexOnly: HandlebarsTemplates['finlyf/base/skeletonIndexOnly']
 
   #navbar
