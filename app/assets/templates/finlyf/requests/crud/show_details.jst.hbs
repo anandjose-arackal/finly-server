@@ -66,7 +66,7 @@
             <div class="col-sm-6"><label class="control-label">Memo</label></div>
             <div class="col-sm-6">
               <label class="control-label item-attr-preview">{{item.memo}}</label>
-              <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
+              <textarea class="item-attr-edit form-control item-memo-edit" name="money_request[memo]">{{item.memo}}</textarea>
             </div>
           </div>
           <div class="row no-margin">
@@ -82,19 +82,20 @@
               {{/switch}}
             </div>
           </div>
-          <div class="row no-margin">
-            <div class="col-sm-6"><label class="control-label">Manager</label></div>
-            <div class="col-sm-6">{{item.manager_name}}</div>
-          </div>
-
-          <div class="row no-margin">
-            <div class="col-sm-6"><label class="control-label">Finance Manager</label></div>
-            <div class="col-sm-6">{{item.finance_manager_name}}</div>
-          </div>
 
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">From</label></div>
             <div class="col-sm-6">{{item.user_name}}</div>   
+          </div>
+
+          <div class="row no-margin">
+            <div class="col-sm-6"><label class="control-label">To Manager</label></div>
+            <div class="col-sm-6">{{item.manager_name}}</div>
+          </div>
+
+          <div class="row no-margin">
+            <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
+            <div class="col-sm-6">{{item.finance_manager_name}}</div>
           </div>
 
           <div class="row no-margin">
@@ -171,11 +172,11 @@
           {{/if}}
         {{/each}}
       </div>
+      {{#if item.actions.editable}}
       <div class="row no-margin">
         <div class="row no-margin add-request-category">
           <div class="col-sm-6">
             <select name="category" class="form-control request-category-dropdown">
-              <option value=""></option>
               {{#each item.request_items}}
                 {{#unless this.amount.value}}
                 <option value="{{this.category.id}}">{{this.category.name}}</option>
@@ -191,6 +192,7 @@
           </div>
         </div>
       </div>
+      {{/if}}
       
 
     </form>
