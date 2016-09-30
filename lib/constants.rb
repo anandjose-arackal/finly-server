@@ -17,6 +17,13 @@ module Constants
   class Constants::ItzCash
 
     MODULE = 'Finly'
+    MERCHANT_TYPE_KEY = 'DEFAULT_ITIL'
+    PRODUCT_CODE = 'NGPRHD'
+    CHARGE_CODE = 'GPRESC'
+    TRANSACTION_TYPE_CREDIT = 1
+    TRANSACTION_TYPE_DEBIT = 2
+
+    DUMMY_DCODE = 'D000000360'
 
   end
 end
