@@ -15,7 +15,9 @@
 #  rejecting_manager_id :integer
 #  report_id            :integer
 #  category_id          :integer
+#  is_deleted           :boolean          default(FALSE), not null
 #
+
 include MathUtil
 
 class Expense < ActiveRecord::Base

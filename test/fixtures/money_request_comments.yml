@@ -7,6 +7,7 @@
 #  comment_action_id :integer          not null
 #  user_id           :integer
 #  expense_id        :integer
+#  payment_id        :integer
 #  updated_field     :string(255)
 #  updated_from      :text(65535)
 #  updated_to        :text(65535)

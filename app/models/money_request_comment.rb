@@ -7,6 +7,7 @@
 #  comment_action_id :integer          not null
 #  user_id           :integer
 #  expense_id        :integer
+#  payment_id        :integer
 #  updated_field     :string(255)
 #  updated_from      :text(65535)
 #  updated_to        :text(65535)
@@ -18,11 +19,14 @@
 
 class MoneyRequestComment < ActiveRecord::Base
 
+  default_scope {order(created_at: :desc)}
+
   belongs_to :money_request
   belongs_to :comment_action, class_name: 'MoneyRequestCommentAction'
   belongs_to :user
   belongs_to :expense
   belongs_to :rejected_to, class_name: 'User'
+  belongs_to :payment
 
   ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
              take_control: 8, comment: 9, update: 10, credited: 11}
