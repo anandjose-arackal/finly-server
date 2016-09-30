@@ -6,7 +6,8 @@ class FinlyF.Views.Analytic extends Backbone.View
   # events:
 
   initialize: (options) ->
+    console.log "We're here"
 
   render: ->
-    $(@el).html(@template())
+    $(@el).html(@template({item: @model.toJSON()}))
     @

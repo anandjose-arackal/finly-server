@@ -89,3 +89,17 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 Handlebars.registerHelper('setVar', function(varName, varValue, options){
   options.data.root[varName] = varValue;
 });
+
+
+//Find percentage
+Handlebars.registerHelper('percentage', function(a, b){
+  return parseInt(parseFloat(a) / parseFloat(b) * 100);
+})
+
+
+
+
+
+
+
+

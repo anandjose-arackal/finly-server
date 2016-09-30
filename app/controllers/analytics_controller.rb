@@ -5,6 +5,7 @@ class AnalyticsController < ApplicationController
     unless @result.success?
       @result.charts = {}
     end
+    # debugger
     respond
   end
 

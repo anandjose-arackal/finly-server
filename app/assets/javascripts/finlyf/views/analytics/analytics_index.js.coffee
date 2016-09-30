@@ -2,15 +2,15 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
 
   #navbar
-  templateNavbarSidebar: HandlebarsTemplates['finlyf/expenses/navbar/navbar_sidebar']
-  templateNavbarMain: HandlebarsTemplates['finlyf/expenses/navbar/navbar_main']
+  templateNavbarSidebar: HandlebarsTemplates['finlyf/analytics/navbar/navbar_sidebar']
+  templateNavbarMain: HandlebarsTemplates['finlyf/analytics/navbar/navbar_main']
 
   #sidebar
-  templateSidebar: HandlebarsTemplates['finlyf/expenses/sidebar/sidebar']
+  templateSidebar: HandlebarsTemplates['finlyf/analytics/sidebar/sidebar']
 
 
   #main
-  templateMain: HandlebarsTemplates['finlyf/expenses/crud/main']
+  templateMain: HandlebarsTemplates['finlyf/analytics/crud/main']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -18,8 +18,11 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     'click .navbar-view-type': 'changeView'
     'click .btn-reset-filters': 'resetFilters'
     #Filters
+    'change .select-show-for': 'showForOptions' 
+    'keyup .filter-field': 'autoComplete'
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter-expenses': 'filter'
+    'click .filter-data-type': 'filterDataType'
 
   initialize: (options) ->
     if options
@@ -44,9 +47,14 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
 
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
+    @params.filter_date_from = @params['filter_date[from]']
+    @params.filter_date_to = @params['filter_date[to]']
+    @params.indexOnly = false#REF==2I
 
 
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
+    $(@el).find(".sidebar .select-show-for").val(@params.filter_show_for)
+    $(@el).find('.main').html(@templateMain())
     # category_select = $(@el).find(".filter-category-id")
     # options = $("#newExpenseCategory option")
     # for option in options
@@ -61,6 +69,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     #Append all the expenses
     # @dump = @collection.models.slice()
     # # console.log "Models - ", @collection.models.length
+    arr = @collection.pluck('total')
+    @max_total = Math.max.apply(Math,arr)
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
@@ -70,6 +80,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       $(spinner).removeClass("fa-spin")
 
   appendItems: (item) ->
+    item.set('max_total', @max_total)
     #Creating view for each expense and appending them
     view_item = new FinlyF.Views.Analytic({
       model: item
@@ -112,45 +123,35 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       target = $(e.currentTarget)
 
     sidebar = $(@el).find(".sidebar")
+    navbar_main = $(@el).find(".navbar-main")
     params = {
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
-      'filter_category_id': $(".sidebar .filter-category-id").val() || ""
-      'filter_receipt': $(".sidebar .filter-receipt").val() || ""
+      'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_name': $(".sidebar .filter-user").val() || ""
+      'filter_show_for': $(".sidebar .select-show-for").val() || ""
+      'filter_analytics_type': $(navbar_main).find('li.filter-data-type.active').attr('data-show-type') || "category"
     }
 
-    filter_amount_value = $(".sidebar .filter-amount-value").val()
-    filter_receipt = $(".sidebar .filter-receipt").val()
-
-    if filter_amount_value
-      params["filter_amount[value]"] = filter_amount_value
-      params["filter_amount[type]"] = $(".sidebar .filter-amount-type").val()
-
-    # console.log "Will navigate now."
+    console.log "Will navigate now.", params
     if @params.view
       params.view = @params.view
 
-    if $(target).attr('data-navigate')
-      if $.parseJSON($(target).attr('data-navigate')) == true
-        #Filters by navigating to a Backbone route
-        FinlyF.primary_router.navigate('analytics/params=' + JSON.stringify(params), {trigger: true})  
-      else
-        #Navigates by refetching & resetting collection with params
-        @collection.fetch({
-          reset: true,
-          data: params,
-          success: ->
-            # console.log "Fetched all the data"
-          error: ->
-            console.log "Couldn't fetch Successfully."
-        })
-
+    FinlyF.primary_router.navigate('analytics/params=' + JSON.stringify(params), {trigger: true})  
+   
+  filterDataType: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    $(target).addClass('active').siblings().removeClass('active')
+    @filter()
 
 
   autoComplete: (e) ->
+    _this = @
     target = $(e.currentTarget)
     query = $(target).val()
+    field = $(target).attr('data-field')
 
     $(target).autocomplete({
       minLength: 2,
@@ -158,19 +159,38 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
         $.ajax({
           dataType: "json"
           type : 'get'
-          url: '/autocomplete/merchant'
-          data: 
+          url: '/autocomplete/' + field
+          data:
+            view: _this.params.view
             remote: "true"
             query: query
-            # area: 'central'
           success: (data) ->
             response(data)
           error: (err) ->
             console.log err
         })
+
+      focus: (event, ui) ->
+        $(event.target).val(ui.item.label)
+        $(event.target).attr('data-item-id', ui.item.value)
+        return false
+
       select: (event, ui) ->
-        # console.log "Selected."
+        $(event.target).val(ui.item.label)
+        $(event.target).attr('data-item-id', ui.item.value)
+        return false
+
     })
+
+  showForOptions: (e) ->
+    target = e.currentTarget
+    # console.log target
+    sidebar = $(target).closest('.sidebar')
+    show_for = $(target).val()
+    if show_for == 'user'
+      $(sidebar).find('.search_by_user').slideDown()
+    else
+      $(sidebar).find('.search_by_user').slideUp()
 
 
   navigate: (e) ->

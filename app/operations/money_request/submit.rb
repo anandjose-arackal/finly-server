@@ -17,7 +17,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
     end
     # checking if the money_request has expenses
     unless money_request.total_amount> 0
-      messages[:error] << 'Cannot submit an empty money_request'
+      messages[:error] << 'Cannot submit an empty advance request'
     end
   end
 
