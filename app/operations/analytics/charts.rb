@@ -24,7 +24,7 @@ class Analytics::Charts < BaseOperation
   has_scope :filter_status_id
   has_scope :filter_date, using: [:from, :to], type: :hash
 
-  attr_accessor :team_users, :user_ids, :fields, :charts, :expenses, :role
+  attr_accessor :team_users, :user_ids, :field, :charts, :expenses, :role
 
   def pre_validate
     if user.blank? or params.blank?
@@ -34,6 +34,7 @@ class Analytics::Charts < BaseOperation
 
   def init
     self.role = params[:view]
+    self.field = params[:filter_analytics_type]
     if role.nil? or role == 'personal'
       self.team_users = [user]
     else
@@ -66,7 +67,7 @@ class Analytics::Charts < BaseOperation
   end
 
   def process
-    generate_charts
+    generate_charts(field)
   end
 
   def success
@@ -76,12 +77,30 @@ class Analytics::Charts < BaseOperation
 
   private
 
-  def generate_charts(options = {})
+  def generate_charts(field)
 
-    set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
-    set.each do |key, value|
-      cat_name = Category.find(key).name
-      charts << {cat_name => value}
+    case field
+      when 'category'
+        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
+        set.each do |key, value|
+          cat_name = Category.find(key).name
+          charts << {cat_name => value}
+        end
+      when 'merchant'
+        # this already returns a hash with merchant name and total
+        self.charts = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
+      when 'user'
+        expense_sums = expenses.joins(:amount).group(:user_id).sum(:value)
+        user_ids.each do |id|
+          user_name = User.find_by(id: id).name
+          charts << {user_name => expense_sums[id]}
+        end
+      else
+        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
+        set.each do |key, value|
+          cat_name = Category.find(key).name
+          charts << {cat_name => value}
+        end
     end
   end
 
