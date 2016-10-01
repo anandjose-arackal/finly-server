@@ -8,6 +8,7 @@
 # date: date of the payment
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
+  include MathUtil
   attr_accessor :money_requests, :payment_param, :role
 
   def authorized_user_types
@@ -54,7 +55,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         total_amount += request.total_amount
       end
       unless total_amount <= payment_param[:amount].to_f
-        errors << 'Payment amount cannot be less than the money requests total amount'
+        messages[:error] << 'Payment amount cannot be less than the money requests total amount'
       end
     end
   end
@@ -64,7 +65,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
                                           amount_attributes: {value: payment_param[:amount], currency_id: payment_param[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(payment_param[:amount], payment_param[:currency_id])
+      # balance_sheet.subtract_pending_reimbursement
       if money_requests.present?
+        ids = money_requests.pluck(:id)
+        total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
+        balance_sheet.subtract_pending_advance(total_amount)
         money_requests.each do |money_request|
           MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role})
         end
