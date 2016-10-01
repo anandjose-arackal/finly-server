@@ -1,5 +1,6 @@
 class FinlyF.Views.Expense extends Backbone.View
   template: HandlebarsTemplates['finlyf/expenses/expense']
+  templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   templateShow: HandlebarsTemplates['finlyf/expenses/show']
   templateShowDetails: HandlebarsTemplates['finlyf/expenses/show_details']
   className: 'item col-md-12'
@@ -41,6 +42,7 @@ class FinlyF.Views.Expense extends Backbone.View
       $(@el).html(@template({ item: @model.toJSON() }))
     else
       $(@el).html(@templateShow())
+      $(@el).find("#item-show-details").html(@templateLoadingAnimation())
     @
 
   toggleSelect: (e) ->

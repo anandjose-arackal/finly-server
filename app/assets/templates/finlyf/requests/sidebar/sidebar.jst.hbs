@@ -1,7 +1,13 @@
 <div class="row sidebar-element">
   <ul class="nav nav-pills nav-stacked filter-status">
     <li class="{{#if item.filter_status}}{{else}}active{{/if}}"><a href="#" data-status-id="">All</a></li>
-    <li class="{{#if_eq item.filter_status 1}}active{{/if_eq}}"><a href="#" data-status-id="1">Open</a></li>
+    {{#if item.view}}
+      {{#if_eq item.view 'personal'}}
+        <li class="{{#if_eq item.filter_status 1}}active{{/if_eq}}"><a href="#" data-status-id="1">Open</a></li>
+      {{/if_eq}}
+    {{else}}
+      <li class="{{#if_eq item.filter_status 1}}active{{/if_eq}}"><a href="#" data-status-id="1">Open</a></li>
+    {{/if}}
     <li class="{{#if_eq item.filter_status 2}}active{{/if_eq}}"><a href="#" data-status-id="2">Processing</a></li>
     <li class="{{#if_eq item.filter_status 5}}active{{/if_eq}}"><a href="#" data-status-id="5">Approved</a></li>
     <li class="{{#if_eq item.filter_status 4}}active{{/if_eq}}"><a href="#" data-status-id="4">Rejected</a></li>
@@ -16,7 +22,7 @@
     From
   </div>
   <div class="col-sm-9">
-    <input type="text" class="datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}"/>
+    <input type="text" class="form-control datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}"/>
     <span class="fa fa-calendar input-icon "></span> 
 
   </div>
@@ -26,7 +32,7 @@
     To
   </div>
   <div class="col-sm-9">
-    <input type="text" class="datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
+    <input type="text" class="form-control datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
     <span class="fa fa-calendar input-icon "></span> 
   </div>
 </div>
@@ -38,7 +44,7 @@
       Search by User
     </div>
     <div class="col-sm-12">
-      <input type="text" class="filter-field filter-user" style="width: 100%;" data-field="user" />
+      <input type="text" class="form-control filter-field filter-user" style="width: 100%;" data-field="user" />
       <span class="fa fa-search input-icon"></span> 
     </div>
   </div>
