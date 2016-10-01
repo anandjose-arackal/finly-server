@@ -44,7 +44,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
     manager_id = manager.id rescue nil
     user_role = User::Team::Review::UserRole.((money_request.controlling_for_user or money_request.controlling_user), self.money_request)
 
-    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, note: self.params[:note]
+    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, note: self.params[:memo]
       if auto_approve
         money_request.tracks.create action_user: nil, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
                                     status_id: status

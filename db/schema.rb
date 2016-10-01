@@ -405,7 +405,7 @@ ActiveRecord::Schema.define(version: 20160924144425) do
     t.integer  "loaded_by",               limit: 4
     t.datetime "loaded_at"
     t.datetime "submitted_at",                        precision: 6
-    t.string   "note",                    limit: 255
+    t.string   "memo",                    limit: 255
     t.boolean  "accounted",                                         default: false, null: false
     t.datetime "created_at",                                                        null: false
     t.datetime "updated_at",                                                        null: false

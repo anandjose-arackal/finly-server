@@ -62,12 +62,12 @@ class MoneyRequest::Update < MoneyRequest::Base
       case key
         when :name
           self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
-                                     updated_field: 'name', updated_from: money_request.name_was,
-                                     updated_to: money_request.name
+                                             updated_field: 'name', updated_from: money_request.name_was,
+                                             updated_to: money_request.name
         when :policy_id
           self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
-                                     updated_field: 'policy', updated_from: money_request.policy_id_was,
-                                     updated_to: money_request.policy_id
+                                             updated_field: 'policy', updated_from: money_request.policy_id_was,
+                                             updated_to: money_request.policy_id
         when :items_attributes
           value.each do |updating_mapping|
             # todo test it out and add comments
@@ -78,7 +78,7 @@ class MoneyRequest::Update < MoneyRequest::Base
   end
 
   def update_params
-    params.require(:money_request).permit(:name, :required_by_date, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end
