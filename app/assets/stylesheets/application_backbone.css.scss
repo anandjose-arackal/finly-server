@@ -26,6 +26,46 @@
   display: inline-block;
 }
 
+//Loading animation
+.loading-animations {
+  margin: 100px auto;
+  width: 50px;
+  height: 24px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.loading-animation {
+  /* border-radius: 6px; */
+  background-color: #594da8;
+  height: 80%;
+  width: 6px;
+  margin-right: 1px;
+  display: inline-block;
+  -webkit-animation: animSlaceY 1.2s infinite ease-out;
+  animation: animScaleY 1.2s infinite ease-out;
+}
+.loading-animations {
+  text-align: center;
+  font-size: 10px;
+}
+
+@keyframes animScaleY{
+  0.001%, 100%, 40% {
+  -webkit-transform: scaleY(.5);
+  -moz-transform: scaleY(.5);
+  transform: scaleY(.5);
+  background-color: #594da8;
+  }
+  20% {
+    -webkit-transform: scaleY(1);
+    -moz-transform: scaleY(1);
+    transform: scaleY(1);
+    background-color: #A9A0DD;
+  }
+}
+
+
 
 // Oh snap codes
 
@@ -116,6 +156,40 @@
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
+//Customization over bootstrap
+.form-control{
+  border-radius: 2px;
+}
+
+#primary-navbar{
+  box-shadow: 5px -2px 4px rgba(0, 0, 0, 0.46);
+}
+
+.secondary-navbar{
+  box-shadow: 0 0 2px -1px rgba(0, 0, 0, 0.5);
+
+  .col-sm-10{
+    background: #F8F8F8;
+  }
+
+  .col-sm-2{
+    background: #F3F3F3;
+  }
+}
+
+.container-main{
+  background: #E7E7E7;
+
+  .main{
+    background: #EEE;
+  }
+
+  .sidebar{
+    background: #E7E7E7;
+    color: #565656;
+  }
+}
+
 
 $background-blue: #f5f6f9;
 $button-green: #93c178;
@@ -172,7 +246,7 @@ $header-grey: #efefef;
 
 body {
   padding: 70px 0 0 0;
-  background-color: #f5f6f9 !important;
+  background-color: #E7E7E7;
 }
 
 .no-padding{

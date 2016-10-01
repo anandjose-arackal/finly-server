@@ -1,6 +1,6 @@
 class FinlyF.Views.RequestsIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
-
+  templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   #navbar
   templateNavbarSidebar: HandlebarsTemplates['finlyf/requests/navbar/navbar_sidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/requests/navbar/navbar_main']

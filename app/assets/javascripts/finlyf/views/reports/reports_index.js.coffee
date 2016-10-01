@@ -180,9 +180,11 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
   showReport: (report_id) ->
     #BEING USED FROM ROUTER
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
+    # main = $(@el).find(".main")
+    # unless $(main).hasClass("preview")
+    #   $(main).addClass("preview")
+    
+    $(@el).find('#item-details').css('bottom', 0)
 
     preview_view = new FinlyF.Views.Report({
       model_id: report_id

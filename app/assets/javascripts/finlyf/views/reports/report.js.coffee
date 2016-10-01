@@ -1,5 +1,6 @@
 class FinlyF.Views.Report extends Backbone.View
   template: HandlebarsTemplates['finlyf/reports/crud/report']
+  templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
 
@@ -57,6 +58,7 @@ class FinlyF.Views.Report extends Backbone.View
       $(@el).html(@template({ item: @model.toJSON() }))
     else
       $(@el).html(@templateShow())
+      $(@el).find("#item-show-details").html(@templateLoadingAnimation())
     @
 
   updateModel: (e) ->
