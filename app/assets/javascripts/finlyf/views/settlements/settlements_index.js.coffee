@@ -11,6 +11,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   templateSummaryAdmin: HandlebarsTemplates['finlyf/settlements/summaryAdmin']
   templateMain: HandlebarsTemplates['finlyf/settlements/crud/index']
   templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/indexPayments']
+  templateMainRequests: HandlebarsTemplates['finlyf/settlements/crud/indexRequests']
 
   #settlements
   templateAddPayment: HandlebarsTemplates['finlyf/settlements/admin/addPayment']
@@ -102,6 +103,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       if @params
         if @params.view_to_load == "payments"
           $(@el).find(".settlements-index").html(@templateMainPayments())
+        else if @params.view_to_load == "credited_money_request" || @params.view_to_load == "approved_money_request"
+          $(@el).find(".settlements-index").html(@templateMainRequests({item: @params}))
         else
           $(@el).find(".settlements-index").html(@templateMain())
       else
@@ -235,6 +238,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(target).parent().addClass('active')
       if view_to_load == 'payments'
         $(@el).find(".settlements-index").html(@templateMainPayments())
+      else if view_to_load == "approved_money_request" || view_to_load == "credited_money_request"
+        $(@el).find(".settlements-index").html(@templateMainRequests({item: {view_to_load: view_to_load}}))
       else
         $(@el).find(".settlements-index").html(@templateMain())
       # console.log @collection.url
