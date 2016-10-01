@@ -351,29 +351,29 @@ if Report.count == 0
 end
 
 if CardType.count == 0
-  CardType.create(name: "Physical")
-  CardType.create(name: "Virtual")
-  CardType.create(name: "Reimbursement")
+  CardType.create(name: 'Physical')
+  CardType.create(name: 'Virtual')
+  CardType.create(name: 'Reimbursement')
 end
 
 if Card.count == 0
   Company.all.each do |company|
     5.times do
       number = random_mobile_number
-      c = company.cards.create(proxy: number, ending_number: number[6..9], description: "Unassigned company card.",
+      company.cards.create(proxy: number, description: 'Unassigned company card',
                                card_type_id: random_integer(1, 3))
     end
   end
 
   User.all.each do |user|
     number = random_mobile_number
-    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test physical card for user #{user.id}",
+    c = user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
                           card_type_id: 1, company_id: user.company.id, active: true)
     number = random_mobile_number
-    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test virtual card for user #{user.id}",
+    c = user.cards.create(proxy: number, description: "Test virtual card for user #{user.id}",
                           card_type_id: 2, company_id: user.company.id, active: true)
     number = random_mobile_number
-    c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test reimbursement card for user #{user.id}",
+    c = user.cards.create(proxy: number, description: "Test reimbursement card for user #{user.id}",
                           card_type_id: 3, company_id: user.company.id, active: true)
   end
 end
