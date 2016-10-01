@@ -74,6 +74,7 @@ class FinlyF.Views.Request extends Backbone.View
   populateDetails: ->
     @model.set('current_view', @current_view)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    $(@el).find("#item-show-details .datepicker").datepicker({ dateFormat: "yy-mm-dd" })
 
   showSaveOption: ->
     $(".btn-update-item").css("display", "inline")

@@ -99,8 +99,11 @@
           </div>
 
           <div class="row no-margin">
-            <div class="col-sm-6"><label class="control-label">Date</label></div>
-            <div class="col-sm-6">{{item.date}}</div>   
+            <div class="col-sm-6"><label class="control-label">Require By Date</label></div>
+            <div class="col-sm-6">
+              <label class="control-label item-attr-preview">{{item.require_by_date}}</label>
+              <input class="item-attr-edit datepicker form-control" type="text" name="money_request[require_by_date]" value="{{item.require_by_date}}" />
+            </div>   
           </div>
 
           <div class="row no-margin">
@@ -153,6 +156,22 @@
       </div>
       <div class="row no-margin request-categories">
         {{#each item.request_items}}
+          <div class="row no-margin request-category">
+            <div class="col-sm-6">
+              <h4 class="request-category-name">{{this.category.name}}</h4>
+            </div>
+            <div class="col-sm-4">
+
+              <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
+              <label class="control-label item-attr-preview">{{this.amount.value}}</label>
+              <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" />
+              <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+            </div>
+          </div>
+        {{/each}}
+      </div>
+      {{!-- <div class="row no-margin request-categories">
+        {{#each item.request_items}}
           {{#if this.amount.value}}
             <div class="row no-margin request-category">
               <div class="col-sm-6">
@@ -171,8 +190,8 @@
             </div>
           {{/if}}
         {{/each}}
-      </div>
-      {{#if item.actions.editable}}
+      </div> --}}
+      {{!-- {{#if item.actions.editable}}
       <div class="row no-margin">
         <div class="row no-margin add-request-category">
           <div class="col-sm-6">
@@ -192,7 +211,7 @@
           </div>
         </div>
       </div>
-      {{/if}}
+      {{/if}} --}}
       
 
     </form>
