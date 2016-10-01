@@ -155,6 +155,7 @@ class User::Invite::Create < User::Invite::Base
     emails.each do |email|
       invite_params[:email] = email
       self.invited_user = User.invite!(invite_params, self.user) do |u|
+        u.invitation_note = params[:pending_invite][:note]
         # u.skip_invitation = true
       end
     end
@@ -174,6 +175,7 @@ class User::Invite::Create < User::Invite::Base
           return false
         end
       end
+      # adding the invitation note to the user
       messages[:success] << 'User successfully invited'
     end
   end

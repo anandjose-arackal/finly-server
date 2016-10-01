@@ -21,4 +21,5 @@ class ManualExpense < ActiveRecord::Base
   def merchant_name
     self.merchant
   end
+
 end
