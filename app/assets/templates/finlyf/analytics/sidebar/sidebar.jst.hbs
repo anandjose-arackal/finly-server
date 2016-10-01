@@ -1,0 +1,62 @@
+<div class="row sidebar-element">
+  <div class="col-sm-3">
+    From
+  </div>
+  <div class="col-sm-9">
+    <input type="text" class="datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}" />
+    <span class="fa fa-calendar input-icon "></span> 
+
+  </div>
+</div>
+<div class="row sidebar-element">
+  <div class="col-sm-3">
+    To
+  </div>
+  <div class="col-sm-9">
+    <input type="text" class="datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
+    <span class="fa fa-calendar input-icon "></span> 
+  </div>
+</div>
+
+<div class="row sidebar-element">
+
+  <div class="col-sm-12">
+    <input type="text" class="filter-merchant filter-field" style="width: 100%;" placeholder="Merchant" data-field="merchant" value="{{item.filter_merchant}}" />
+    <span class="fa fa-search input-icon"></span> 
+  </div>
+</div>
+
+{{#if item.view}}
+  {{#if_not_eq item.view 'personal'}}
+    <div class="row sidebar-element">
+      <div class="col-sm-12">
+        Show for:
+      </div>
+      <div class="col-sm-12">
+        <select class="form-control select-show-for">
+          <option>All</option>
+          {{!-- <option>Team</option> --}}
+          <option value="user">User</option>
+        </select>
+      </div> 
+    </div>
+
+    <div class="row sidebar-element search_by_user" style="display: {{#if item.filter_show_for}}block{{else}}none{{/if}};">
+      <div class="col-sm-12">
+        Search by User
+      </div>
+      <div class="col-sm-12">
+        <input type="text" class="filter-field filter-user" style="width: 100%;" data-item-id="{{item.filter_user_id}}" data-field="user" value="{{item.filter_user_name}}" />
+        <span class="fa fa-search input-icon"></span> 
+      </div>
+    </div>
+  {{/if_not_eq}}
+{{/if}}
+{{!-- {{item.filter_amount_type}} --}}
+
+
+<div class="row sidebar-element">
+  <div class="col-sm-12 text-center">
+    <button class="btn btn-sm btn-warning btn-filter-expenses" data-navigate="true">Apply Filter</button>
+  </div>
+</div>

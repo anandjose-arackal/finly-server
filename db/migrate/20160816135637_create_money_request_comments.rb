@@ -7,9 +7,10 @@ class CreateMoneyRequestComments < ActiveRecord::Migration
     end
     create_table :money_request_comments do |t|
       t.references :money_request, index: true, foreign_key: true, null: false
-      t.integer :comment_action_id, references: 'MoneyRequestCommentAction',index: true, foreign_key: true, null: false
+      t.integer :comment_action_id, references: 'MoneyRequestCommentAction', index: true, foreign_key: true, null: false
       t.references :user, index: true, foreign_key: true
       t.references :expense, index: true, foreign_key: true
+      t.references :payment, index: true, foreign_key: true
       t.string :updated_field
       t.text :updated_from
       t.text :updated_to

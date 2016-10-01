@@ -1,4 +1,4 @@
-class CreateMoneyRequests < ActiveRecord::Migration
+class CreateMoneyRequests < ActiveRecord::Migrationpayment_id
   def change
     create_table :payment_modes do |t|
       t.string :name

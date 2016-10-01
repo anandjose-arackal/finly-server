@@ -1,5 +1,5 @@
 class FinlyF.Views.ExpensesIndex extends Backbone.View
-  templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
+  templateSkeleton: HandlebarsTemplates['finlyf/expenses/skeleton']
   templateSkeletonIndexOnly: HandlebarsTemplates['finlyf/base/skeletonIndexOnly']
 
   #navbar
@@ -251,6 +251,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   create: (e)->
     _this = @
     e.preventDefault()
+    target = e.currentTarget
+
+    $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;")
     formData = new FormData($(@el).find('form#new-item')[0])
 
     $.ajax({
