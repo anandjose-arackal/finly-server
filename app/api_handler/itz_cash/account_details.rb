@@ -19,22 +19,22 @@ class ItzCash::AccountDetails < ItzCash::Base
   end
 
   def post_params
-    {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
-    # { serialid: 'S00017740090', itzmodule: Constants::ItzCash::MODULE }
+    # {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
+    { serialid: 'S00017740090', itzmodule: Constants::ItzCash::MODULE }
   end
 
   def success
-    params[:response_code] = parsed_response[1]
-    params[:serial_id] = parsed_response[2]
-    params[:balance] = parsed_response[3]
-    params[:status] = parsed_response[4]
-    params[:suspended_status] = parsed_response[5]
-    params[:rate_group_id] = parsed_response[6]
-    params[:distributor_id] = parsed_response[7]
-    params[:charge_code] = parsed_response[8]
-    params[:product_code] = parsed_response[9]
-    params[:description] = parsed_response[10]
-    BaseHandler::BasePresenter::SuccessPresenter.new(self.user, self.params, self.messages)
+    # params[:response_code] = parsed_response[1]
+    params[:serial_id] = parsed_response[1]
+    params[:balance] = parsed_response[2]
+    params[:status] = parsed_response[3]
+    params[:suspended_status] = parsed_response[4]
+    params[:rate_group_id] = parsed_response[5]
+    params[:distributor_id] = parsed_response[6]
+    params[:charge_code] = parsed_response[7]
+    params[:product_code] = parsed_response[8]
+    params[:description] = parsed_response[9]
+    ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
   end
 
   class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter

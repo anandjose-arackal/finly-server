@@ -13,10 +13,9 @@ module Constants
 
   WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io']
 
-
   class Constants::ItzCash
 
-    MODULE = 'Finly'
+    MODULE = 'FINLY'
     MERCHANT_TYPE_KEY = 'DEFAULT_ITIL'
     PRODUCT_CODE = 'NGPRHD'
     CHARGE_CODE = 'GPRESC'

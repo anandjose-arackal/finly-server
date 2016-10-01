@@ -209,6 +209,7 @@ class BaseHandler
 
   def load_connection(url = base_url)
     self.connection = Faraday.new(:url => url) do |faraday|
+      # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger # log requests to STDOUT
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP

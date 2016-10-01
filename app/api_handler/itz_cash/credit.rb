@@ -48,7 +48,7 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def parse
-    debugger
+
   end
 
 end
