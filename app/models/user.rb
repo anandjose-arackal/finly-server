@@ -107,23 +107,23 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
-  validates :first_name, presence: true, format: { with: /\A[a-zA-Z0-9]+\Z/ }, length: {maximum: 30}
+  validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :maiden_name, length: {maximum: 30}
-  validates :last_name, presence: true, format: { with: /\A[a-zA-Z0-9]+\Z/ }, length: {maximum: 30}
+  validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :mobile_number, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
 
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
-  scope :filter_name, -> (name) { where("name like ?", "%#{name}%") }
+  scope :filter_name, -> (name) { where("first_name like ? OR maiden_name like ? OR last_name like ?", "%#{name}%", "%#{name}%", "%#{name}%") }
   scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
   scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
   scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
   scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
   scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
-  scope :sort_by_name, -> { order(name: :asc) }
+  scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
 
@@ -134,14 +134,14 @@ class User < ActiveRecord::Base
       when '1', 1
         # Active
         # Name nil is to ensure user has signed up
-        where(active: true).where.not(name: nil)
+        where(active: true).where.not(first_name: nil)
       when '2', 2
         # Pending
         self.invitation_not_accepted
       when '3', 3
         # Inactive
         # Name nil is to ensure user has signed up
-        where(active: false).where.not(name: nil)
+        where(active: false).where.not(first_name: nil)
     end
   end
 
@@ -152,7 +152,7 @@ class User < ActiveRecord::Base
   scope :signed_up, -> { where invitation_token: nil }
   scope :pending, -> { where.not(invitation_token: nil) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
-  scope :sort_by_name, -> { order(name: :asc) }
+  scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 
   after_create do
@@ -162,7 +162,9 @@ class User < ActiveRecord::Base
   end
 
   def name
-    "#{first_name} #{last_name}"
+    name = first_name
+    name += " #{maiden_name}" if maiden_name.present?
+    "#{name} #{last_name}"
   end
 
   def name_shortened
@@ -264,6 +266,12 @@ class User < ActiveRecord::Base
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
 
+
+  def as_json(options = {})
+    json = super(options)
+    json[:name] = self.name
+    json
+  end
 
   private
   # def valid_role
