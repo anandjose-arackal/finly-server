@@ -13,10 +13,16 @@ json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
 
+# if @result.money_request.policy
+policy_name = ''
+policy_id = ''
 if @result.money_request.policy
-  json.policy @result.money_request.policy.name
-  json.policy_id @result.money_request.policy.id
+  policy_name = @result.money_request.policy.name
+  policy_id = @result.money_request.policy.id
 end
+json.policy policy_name
+json.policy_id policy_id
+# end
 
 json.policies @result.money_request.user.policies do |policy|
   json.extract! policy, :id, :name

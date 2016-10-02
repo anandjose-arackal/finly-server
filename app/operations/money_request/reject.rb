@@ -12,7 +12,7 @@ class MoneyRequest::Reject < MoneyRequest::Base
       messages[:error] << 'Request not found'
     end
   end
-  
+
   def init
     id = (params[:id] or params[:money_request_id])
     self.money_request = user.controlling_money_requests.with_id(id).first rescue nil
@@ -51,7 +51,7 @@ class MoneyRequest::Reject < MoneyRequest::Base
 
   def process
     user_role = User::Team::Review::UserRole.(user, self.money_request)
-    note= (params[:note] or params[:memo])
+    note= (params[:note] or params[:memo] or money_request.memo)
     if money_request.update_attributes status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, memo: note
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject), status_id: status, memo: note,
                                   user_request_role_id: user_role

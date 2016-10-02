@@ -47,7 +47,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
       money_request.reload
       return
     end
-    memo = (params[:note] or params[:memo])
+    memo = (params[:note] or params[:memo] or money_request.memo)
     submitted_at = DateTime.now
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
                                        controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo,
