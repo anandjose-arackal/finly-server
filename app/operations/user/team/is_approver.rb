@@ -50,6 +50,10 @@ class User::Team::IsApprover < User::Team::Base
     self.response = false
   end
 
+  def retrieve
+    self.response
+  end
+
   private
 
   def process_for_user
