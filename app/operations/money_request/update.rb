@@ -78,7 +78,7 @@ class MoneyRequest::Update < MoneyRequest::Base
   end
 
   def update_params
-    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params.require(:money_request).permit(:name, :required_by_date, :note, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end
