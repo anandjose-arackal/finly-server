@@ -15,7 +15,7 @@
 #  loaded_by               :integer
 #  loaded_at               :datetime
 #  submitted_at            :datetime
-#  note                    :string(255)
+#  memo                    :string(255)
 #  accounted               :boolean          default(FALSE), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null

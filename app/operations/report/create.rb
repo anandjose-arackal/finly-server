@@ -24,10 +24,15 @@ class Report::Create < Report::Base
   end
 
   def process
-    self.report = user.reports.build report_status_id: ReportStatus.open_id, controlling_user: user, name: params[:name]
+    role_id  = UserRole.id_for(:employee)
+    self.report = user.reports.build report_status_id: ReportStatus.open_id, controlling_user: user, controlling_user_role_id:role_id,
+                                     name: params[:name]
     if report.save
-      report_track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.create_id, report_status_id: ReportStatus.open_id
+      report_track = report.tracks.build action_user: user, modified_user: user, modified_user_role_id: role_id,
+                                         report_tracking_action_id: ReportTrackingAction.create_id,
+                                         report_status_id: ReportStatus.open_id
       report_track.save
+      expense_ids = nil
       expense_ids = params[:expense_ids].split(',') if params[:expense_ids]
       if expense_ids.present?
         Report::Expenses::Add.(user, {report_id: report.id, expense_ids: expense_ids})

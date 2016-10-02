@@ -45,9 +45,22 @@ class Report::Unapprove < Report::Base
   end
 
   def process
+    prev_controlling_user = (report.controlling_for_user or report.controlling_user)
+    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
+    role_id = nil
+    if manager_view?
+      role_id = UserRole.id_for(:manager)
+    elsif finance_view?
+      role_id = UserRole.id_for(:finance_manager)
+    end
     self.prev_status = report.status
-    if report.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil, report_status_id: ReportStatus.processing_id
-      report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.unapprove_id, report_status_id: ReportStatus.processing_id
+    if report.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil,
+                                controlling_user_role_id: role_id, controlling_for_user_role_id: nil,
+                                memo: nil, report_status_id: ReportStatus.processing_id
+      report.tracks.create action_user: user, modified_user: prev_controlling_user,
+                           modified_user_role_id: prev_controlling_user_role,
+                           report_tracking_action_id: ReportTrackingAction.unapprove_id,
+                           report_status_id: ReportStatus.processing_id
       return
     end
     messages[:error] = report.errors.full_messages
