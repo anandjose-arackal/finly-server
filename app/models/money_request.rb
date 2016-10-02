@@ -29,7 +29,9 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :card
   belongs_to :loaded_by, class_name: 'User'
   belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
   belongs_to :payment_mode
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy

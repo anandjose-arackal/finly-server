@@ -82,9 +82,9 @@ class User < ActiveRecord::Base
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
   has_many :interacted_money_requests, -> { distinct }, source: :money_request, through: :money_request_tracks
-  has_many :manager_money_request_tracks, -> { manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
+  has_many :manager_money_request_tracks, -> { manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :manager_money_requests, -> { distinct }, source: :money_request, through: :manager_money_request_tracks
-  has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
+  has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
 
   has_many :event_configurations
