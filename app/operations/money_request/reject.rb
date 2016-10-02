@@ -52,7 +52,7 @@ class MoneyRequest::Reject < MoneyRequest::Base
   def process
     user_role = User::Team::Review::UserRole.(user, self.money_request)
     note= (params[:note] or params[:memo])
-    if money_request.update_attributes status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, note: note
+    if money_request.update_attributes status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, memo: note
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject), status_id: status, memo: note,
                                   user_request_role_id: user_role
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:reject), rejected_to_id: reject_to_user.id, content: note

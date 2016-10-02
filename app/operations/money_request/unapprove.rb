@@ -39,7 +39,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def process
     self.prev_status = money_request.status
-    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, note: nil,
+    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil,
                                        status_id: MoneyRequestStatus.id_for(:processing)
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:unapprove),
                                          status_id: MoneyRequestStatus.id_for(:processing)

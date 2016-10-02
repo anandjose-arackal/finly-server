@@ -22,7 +22,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
   
   def process
     note = (params[:note] or params[:memo])
-    if money_request.update_attributes controlling_user: user, controlling_for_user: money_request.controlling_user, note: note
+    if money_request.update_attributes controlling_user: user, controlling_for_user: money_request.controlling_user, memo: note
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control),
                                   status_id: money_request.status_id, memo: note
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:take_control),

@@ -50,7 +50,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
     memo = (params[:note] or params[:memo])
     submitted_at = DateTime.now
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
-                                       controlling_user_id: manager.id, controlling_for_user_id: nil, note: memo,
+                                       controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo,
                                        submitted_at: submitted_at
       money_request.tracks.create action_user: user,
                                          money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:submit),
