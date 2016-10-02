@@ -28,7 +28,7 @@ json.array! @result.items do |item|
       json.final_approver item.final_approver.name
     end
     if item.payment.present?
-      json.credited_date
+      json.credited_date item.payment.date
     end
     json.request_amount item.total_amount
   end
