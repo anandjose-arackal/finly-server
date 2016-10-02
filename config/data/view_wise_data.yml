@@ -35,7 +35,7 @@ manager:
       # - Team Expenses: expenses
       # - Team Analytics: analytics
       - Team Members: employees
-      # - Money Requests: requests
+      - Advance Requests: requests
       - Team Reports: reports
     cog:
       - My Account: '/users/'

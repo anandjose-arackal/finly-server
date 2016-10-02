@@ -8,10 +8,8 @@
 #   # json.pending_reimbursement current_user.balance_sheet.pending_reimbursement.value
 #   # json.cash_in_hand current_user.balance_sheet.cash_in_hand.value
 # end
-
 json.array! @result.items do |item|
   json.merge! item.attributes
-
   json.total_amount item.total_amount
   if item.is_a?(Report)
     json.type 'report'
@@ -28,6 +26,9 @@ json.array! @result.items do |item|
     json.type 'money_request'
     if item.final_approver
       json.final_approver item.final_approver.name
+    end
+    if item.payment.present?
+      json.credited_date
     end
     json.request_amount item.total_amount
   end

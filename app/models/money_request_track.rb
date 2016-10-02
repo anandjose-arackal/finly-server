@@ -27,7 +27,7 @@ class MoneyRequestTrack < ActiveRecord::Base
   default_scope { order('created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
-  scope :without_take_control_action, -> { wherAe.not money_request_tracking_action_id: MoneyRequestTrackingAction.take_control_id }
+  scope :without_take_control_action, -> { where.not money_request_tracking_action_id: MoneyRequestTrackingAction.take_control_id }
   scope :manager_role, -> { where user_request_role_id: UserRole.manager_id }
   scope :finance_manager_role, -> { where user_request_role_id: UserRole.finance_manager_id }
   scope :admin, -> { where user_request_role_id: UserRole.admin_id }
