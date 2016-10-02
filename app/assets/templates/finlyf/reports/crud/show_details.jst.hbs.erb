@@ -1,7 +1,6 @@
 <div class="row" style="height: 100%;">
   <div class="col-sm-8 show-details-panel">
-    {{!-- <div class="row item-title" style="position: fixed;width: 63%;z-index: 1;box-shadow: 0px 3px 6px -5px black;"> --}}
-    <div class="row item-title">
+    <div class="row item-title show-details-title">
       <div class="col-sm-6">
         <h4 class="item-name">
           <label class="item-attr-preview">{{item.name}}</label>
@@ -86,19 +85,20 @@
             {{/switch}}
           </div>
         </div>
-        <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Manager</label></div>
-          <div class="col-sm-6">{{item.manager_name}}</div>
-        </div>
-
-        <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Finance Manager</label></div>
-          <div class="col-sm-6">{{item.finance_manager_name}}</div>
-        </div>
 
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">From</label></div>
           <div class="col-sm-6">{{item.user_name}}</div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To Manager</label></div>
+          <div class="col-sm-6">{{item.manager_name}}</div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
+          <div class="col-sm-6">{{item.finance_manager_name}}</div>
         </div>
 
         <div class="row no-margin">
@@ -253,7 +253,10 @@
   </div><!-- col-sm-8 -->
 
   <div class="col-sm-4 timeline show-details-panel">
-    <div class="row no-margin"><h4>Timeline</h4></div>
+    <div class="row show-details-title">
+      <div class="col-sm-12 no-padding"></div>
+    </div>
+    <div class="row no-margin" style="margin-top: 60px;"><h4>Timeline</h4></div>
     <div class="row no-margin">
       <div class="col-sm-2 no-padding">
         <span class="roundCircle">{{item.user_initial}}</span>
@@ -290,6 +293,30 @@
 </div><!-- .row -->
 
 <style type="text/css">
+  .show-details-title{
+    position: fixed;
+    max-height: 50px;
+    min-height: 50px;
+    background: #fff;
+    z-index: 9;
+    /*box-shadow: 0 0 9px 0px rgba(0, 0, 0, 0.2)*/
+    /*box-shadow: 0 2px 9px -4px #777;*/
+    box-shadow: 0 1px 3px -3px rgba(0, 0, 0, 0.46);
+    border-bottom: 1px solid #eee;
+  }
+  .col-sm-8 .show-details-title{
+    width: 66.666%;
+  }
+
+  .col-sm-4 .show-details-title{
+    width: 33.333%;
+    box-shadow: 1px 1px 3px -3px rgba(0, 0, 0, 0.46);
+    background: rgba(255, 255, 255, 0.5);
+
+  }
+
+
+
 
   .violation{
     margin-top: 0;
@@ -300,12 +327,9 @@
     display: none;
   }
 
-  .item-title{
-    background: aliceblue;
-  }
 
   .item-body{
-    margin-top: 50px;
+    margin-top: 60px;
   }
 
 

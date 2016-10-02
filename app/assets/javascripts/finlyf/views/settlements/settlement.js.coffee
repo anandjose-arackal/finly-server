@@ -2,7 +2,8 @@ class FinlyF.Views.Settlement extends Backbone.View
   template: HandlebarsTemplates['finlyf/settlements/crud/settlement']
   templateReport: HandlebarsTemplates['finlyf/settlements/crud/settlementReport']
   templateRequest: HandlebarsTemplates['finlyf/settlements/crud/settlementRequest']#money request
-  templatePayments: HandlebarsTemplates['finlyf/settlements/crud/payment']
+  templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/payment']
+  templateMainRequest: HandlebarsTemplates['finlyf/settlements/crud/request']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
   className: 'item col-md-12'
@@ -27,12 +28,14 @@ class FinlyF.Views.Settlement extends Backbone.View
         $(@el).html(@templateRequest({item: @model.toJSON() }))
       else
         if @model.get('type') == 'payment'
-          $(@el).html(@templatePayments({item: @model.toJSON()}))
+          $(@el).html(@templateMainPayments({item: @model.toJSON()}))
         else
           $(@el).html(@template({item: @model.toJSON()}))
     else
       if @model.get('type') == 'payment'
-        $(@el).html(@templatePayments({item: @model.toJSON()}))
+        $(@el).html(@templateMainPayments({item: @model.toJSON()}))
+      else if @model.get('type') == 'money_request'
+        $(@el).html(@templateMainRequest({item: @model.toJSON()}))
       else
         $(@el).html(@template({item: @model.toJSON()}))
     @

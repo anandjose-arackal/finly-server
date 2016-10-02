@@ -47,8 +47,8 @@ class MoneyRequest::Base < BaseOperation
       self.actions = load_actions
       self.policies = money_request.user.policies
       self.selected_policy = money_request.policy
-      self.manager = User::Team::Approver.(money_request.user, type: :manager)
-      self.finance_manager = User::Team::Approver.(money_request.user, type: :finance_manager)
+      self.manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :manager)
+      self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
     end
 
 

@@ -5,7 +5,7 @@ admin:
       - Company Analytics: analytics
       - Company Settlements: settlements
       - Company Employees: employees
-      - Money Requests: requests
+      - Advance Requests: requests
       - Company Reports: reports
     cog:
       - Organization Account: '/organization_account?view=admin'
@@ -19,7 +19,7 @@ personal:
     primary_navbar:
       - Analytics: analytics
       - Settlements: settlements
-      - Money Requests: requests
+      - Advance Requests: requests
       - Reports: reports
       - Receipts: receipts
       - Expenses: expenses
@@ -35,7 +35,7 @@ manager:
       # - Team Expenses: expenses
       # - Team Analytics: analytics
       - Team Members: employees
-      - Money Requests: requests
+      # - Money Requests: requests
       - Team Reports: reports
     cog:
       - My Account: '/users/'
@@ -50,8 +50,8 @@ finance_manager:
       # - Analytics: analytics
       - Settlements: settlements
       - Team Members: employees
+      - Advance Requests: requests
       - Team Reports: reports
-      # - Money Requests: requests
 
     cog:
       - My Account: '/users/'

@@ -187,8 +187,8 @@
 /*Forms, Fiels, Labels*/
 .input-icon {
   float: right;
-  margin-right: 6px;
-  margin-top: -20px;
+  margin-right: 7px;
+  margin-top: -24px;
   position: relative;
   z-index: 1;
   color: #676767;
@@ -259,7 +259,7 @@
 </nav>
 
 
-<div class="container-fluid container-main" style="background: #fff;position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
+<div class="container-fluid container-main" style="position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
 
   <div class="col-sm-8 col-sm-offset-2 main">
 
@@ -284,12 +284,12 @@
           <li class="{{#if_eq item.view_to_load 'approved'}}active{{/if_eq}}"><a href="#" data-view="approved">Approved Reports</a></li>
           <li class="{{#if_eq item.view_to_load 'reimbursed'}}active{{/if_eq}}"><a href="#" data-view="reimbursed">Reimbursed Reports</a></li>
           <li class="{{#if_eq item.view_to_load 'closed'}}active{{/if_eq}}"><a href="#" data-view="closed">Closed Reports</a></li>
-          <li class="{{#if_eq item.view_to_load 'credited'}}active{{/if_eq}}"><a href="#" data-view="credited">Credited Money Requests</a></li>
-          <li class="{{#if_eq item.view_to_load 'money_request'}}active{{/if_eq}}"><a href="#" data-view="money_request">Money Requests</a></li>
+          <li class="{{#if_eq item.view_to_load 'credited_money_request'}}active{{/if_eq}}"><a href="#" data-view="credited_money_request">Credited Requests</a></li>
+          <li class="{{#if_eq item.view_to_load 'approved_money_request'}}active{{/if_eq}}"><a href="#" data-view="approved_money_request">Approved Requests</a></li>
 
         </ul>
 
-        </div>
+      </div>
 
       <div class="settlements-index" style="height: 100%; overflow-y: scroll;"></div>
     </div>
