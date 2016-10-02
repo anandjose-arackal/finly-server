@@ -42,8 +42,7 @@ class UsersController < ApplicationController
   end
 
   def profile
-    profile_op = User::Profile.new(current_user, params)
-    @result = profile_op.run
+    @result = User::Profile.(current_user, params)
   end
 
   def update_password
