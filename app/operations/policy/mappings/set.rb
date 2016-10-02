@@ -43,7 +43,7 @@ class Policy::Mappings::Set < Policy::Base
     self.mappings = updating_user.team_mapping
     self.updating_mapping = params[:user_manager_mapping]
     self.policy_id = params[:policy_id]
-    self.policy = user.admin_policies.find_by(id: policy_id)
+    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id])
   end
 
   def validate
