@@ -11,7 +11,7 @@ def random(low, high)
 end
 
 def random_integer(low, high)
-  random(low, high+1).to_i
+  random(low, 5).to_i
 end
 
 def random_string_of_numbers(length)
