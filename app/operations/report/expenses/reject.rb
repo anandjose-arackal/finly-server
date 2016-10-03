@@ -12,7 +12,7 @@ class Report::Expenses::Reject < Report::Base
   def pre_validate
     super()
     if params[:expense_ids].blank? and params[:expense_id].blank?
-      messages[:error] << "No expense ids passed."
+      messages[:error] << 'No expense ids passed'
     end
   end
 
@@ -26,11 +26,11 @@ class Report::Expenses::Reject < Report::Base
 
     # checking if the report is in processing state
     unless report.processing?
-      messages[:error] << "Cannot reject expenses in this state."
+      messages[:error] << 'Cannot reject expenses in this state'
     end
 
     if expenses.blank?
-      messages[:error] << "Expenses to reject not found"
+      messages[:error] << 'Expenses to reject not found'
     end
   end
 
@@ -40,7 +40,7 @@ class Report::Expenses::Reject < Report::Base
     end
 
     unless report.controlling_user_id == user.id
-      messages[:error] << "You cannot reject the expenses in this report."
+      messages[:error] << 'You cannot reject the expenses in this report'
     end
   end
 
@@ -60,6 +60,6 @@ class Report::Expenses::Reject < Report::Base
         comment.save
       end
     end
-    messages[:success] << "Expenses rejected. You can find it in your unreported expenses."
+    messages[:success] << 'Expenses rejected!'
   end
 end
