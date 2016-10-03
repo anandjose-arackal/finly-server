@@ -1,6 +1,6 @@
 class FinlyF.Views.RequestsIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
-
+  templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   #navbar
   templateNavbarSidebar: HandlebarsTemplates['finlyf/requests/navbar/navbar_sidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/requests/navbar/navbar_main']
@@ -10,7 +10,6 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
 
   #main
   templateMain: HandlebarsTemplates['finlyf/reports/crud/main']
-  templateNew: HandlebarsTemplates['finlyf/reports/crud/new']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -162,9 +161,10 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     if $(e.target).hasClass("select-item")
       return
       
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
+    # main = $(@el).find(".main")
+    # unless $(main).hasClass("preview")
+      # $(main).addClass("preview")
+    $(@el).find('#item-details').css('bottom', 0)
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
     model = @collection.get(model_id)
@@ -191,16 +191,20 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       # @collection.reset()
 
       @refetchCollection()
-      $(target).removeAttr('data-refresh-true') 
+      $(target).removeAttr('data-refresh-true')
+
+    $(@el).find('#item-details-main').html("")
+    $(@el).find('#item-details').css('bottom', '100%') 
     
-    main = $(@el).find(".main")
-    $(main).removeClass("preview")
+    # main = $(@el).find(".main")
+    # $(main).removeClass("preview")
 
   new: ->
     _this = @
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
+    $(@el).find('#item-details').css('bottom', 0)
+    # main = $(@el).find(".main")
+    # unless $(main).hasClass("preview")
+    #   $(main).addClass("preview")
     $(@el).find("#item-details-main").html("")
 
     model = new FinlyF.Models.Request()
@@ -214,6 +218,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
           model_id: model.get('id')
           preview: true
           parent: _this
+          current_view: _this.params.view || 'personal'
         })
         $(_this.el).find("#item-details-main").html(preview_view.render().el)
         $(_this.el).find('.close-details').attr('data-refresh-true', true)
@@ -309,8 +314,10 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
   itemDeleted: (e) ->
     # console.log "item destoryed"
     _this = @
-    main = $(@el).find(".main")
-    $(main).removeClass("preview")
+    # main = $(@el).find(".main")
+    # $(main).removeClass("preview")
+    $(@el).find('#item-details-main').html("")
+    $(@el).find('#item-details').css('bottom', '100%') 
 
     @params.page = 1
     @collection.fetch({

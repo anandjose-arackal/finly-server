@@ -40,7 +40,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     if reports.blank?
       raise_unauthorized_exception
     end
-    if user.admin?
+    if user.admin? and admin_view?
       self.role = UserRole.admin_id
     else
       self.role = UserRole.finance_manager_id

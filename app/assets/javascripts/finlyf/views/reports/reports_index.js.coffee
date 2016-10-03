@@ -10,9 +10,9 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
   #main
   templateMain: HandlebarsTemplates['finlyf/reports/crud/main']
-  templateNew: HandlebarsTemplates['finlyf/reports/crud/new']
 
   events:
+    # 'keyup': 'keyMappings'
     'click .navbar-btn-refresh': 'refetchCollection'
     'click .main-select-all:checkbox': 'toggleSelectAll'
     'click .item': 'showDetails'
@@ -161,9 +161,10 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     if $(e.target).hasClass("select-item")
       return
       
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
+    # main = $(@el).find(".main")
+    # unless $(main).hasClass("preview")
+    #   $(main).addClass("preview")
+    $(@el).find('#item-details').css('bottom', 0)
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
     model = @collection.get(model_id)
@@ -179,9 +180,11 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
 
   showReport: (report_id) ->
     #BEING USED FROM ROUTER
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
+    # main = $(@el).find(".main")
+    # unless $(main).hasClass("preview")
+    #   $(main).addClass("preview")
+    
+    $(@el).find('#item-details').css('bottom', 0)
 
     preview_view = new FinlyF.Views.Report({
       model_id: report_id
@@ -193,7 +196,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     $(@el).find("#item-details-main").html(preview_view.render().el)
 
   closeDetails: (e)->
-    # console.log "Closing", e, e.currentTarget
     e.preventDefault()
     target = $(e.currentTarget)
     attr = $(target).attr('data-refresh-true')
@@ -204,16 +206,19 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       # @collection.reset()
 
       @refetchCollection()
-      $(target).removeAttr('data-refresh-true') 
-    
-    main = $(@el).find(".main")
-    $(main).removeClass("preview")
+      $(target).removeAttr('data-refresh-true')
+    $(@el).find('#item-details-main').html("")
+    $(@el).find('#item-details').css('bottom', '100%') 
+    # main = $(@el).find(".main")
+    # $(main).removeClass("preview")
 
   new: ->
     _this = @
-    main = $(@el).find(".main")
-    unless $(main).hasClass("preview")
-      $(main).addClass("preview")
+
+    $(@el).find('#item-details').css('bottom', 0)
+    # main = $(@el).find(".main")
+    # unless $(main).hasClass("preview")
+    #   $(main).addClass("preview")
     $(@el).find("#item-details-main").html("")
 
     model = new FinlyF.Models.Report()
@@ -227,6 +232,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
           model_id: model.get('id')
           preview: true
           parent: _this
+          current_view: _this.params.view || 'personal'
         })
         $(_this.el).find("#item-details-main").html(preview_view.render().el)
         $(_this.el).find('.close-details').attr('data-refresh-true', true)
@@ -268,6 +274,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_name': $(".sidebar .filter-user").val() || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
@@ -324,8 +331,10 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   itemDeleted: (e) ->
     # console.log "item destoryed"
     _this = @
-    main = $(@el).find(".main")
-    $(main).removeClass("preview")
+    # main = $(@el).find(".main")
+    # $(main).removeClass("preview")
+    $(@el).find('#item-details-main').html("")
+    $(@el).find('#item-details').css('bottom', '100%') 
 
     @params.page = 1
     @collection.fetch({
@@ -356,3 +365,6 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  # keyMappings: (e) ->
+  #   console.log "Loggin keys", e.keyCode

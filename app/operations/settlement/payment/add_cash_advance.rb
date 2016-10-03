@@ -8,7 +8,8 @@
 # date: date of the payment
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
-  attr_accessor :money_requests, :payment_param
+  include MathUtil
+  attr_accessor :money_requests, :payment_param, :role
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -16,7 +17,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
+    if params[:payment][:amount].blank? or params[:payment][:amount].to_f < 0
       messages[:error] << 'Amount being added blank or negative'
     end
   end
@@ -31,6 +32,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       self.money_requests = to_user.money_requests.with_id(money_request_id) if to_user.present?
     end
     self.payment_param = payment_params
+    if user.admin? and admin_view?
+      self.role = UserRole.id_for(:admin)
+    else
+      self.role = UserRole.id_for(:finance_manager)
+    end
   end
 
   def authorize
@@ -48,8 +54,8 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       money_requests.each do |request|
         total_amount += request.total_amount
       end
-      unless total_amount <= payment_param[:amount]
-        errors << 'Payment amount cannot be less than the money requests total amount'
+      unless total_amount <= payment_param[:amount].to_f
+        messages[:error] << 'Payment amount cannot be less than the money requests total amount'
       end
     end
   end
@@ -59,7 +65,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
                                           amount_attributes: {value: payment_param[:amount], currency_id: payment_param[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(payment_param[:amount], payment_param[:currency_id])
+      # balance_sheet.subtract_pending_reimbursement
       if money_requests.present?
+        ids = money_requests.pluck(:id)
+        total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
+        balance_sheet.subtract_pending_advance(total_amount)
         money_requests.each do |money_request|
           MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role})
         end

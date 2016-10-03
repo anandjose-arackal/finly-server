@@ -18,6 +18,9 @@ class FinlyF.Routers.Main extends Backbone.Router
     'settlements/:user/params=:query': 'settlements_show'
     'employees/params=:query': 'users'
     'employees': 'users'
+    'analytics': 'analytics'
+    'analytics/params=:query': 'analytics'
+
 
   initialize: ->
     # console.log "Step 1. Main router initialized."
@@ -130,6 +133,20 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
     $("#primary-navbar a[href^='\\#employees']").parent().addClass('active')
+
+  analytics: (query) ->
+    # console.log 'Step 2.A. Route at /. Rending expenses.'
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+    view = new FinlyF.Views.AnalyticsIndex({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
+
+    $("#primary-navbar a[href^='\\#analytics']").parent().addClass('active')
 
   features: ->
     $(".datepicker").datepicker({

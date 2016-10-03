@@ -33,6 +33,7 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :payment_mode
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy
+  belongs_to :payment
 
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
@@ -42,17 +43,19 @@ class MoneyRequest < ActiveRecord::Base
   scope :without_id, ->(id) { where.not id: id }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :open, -> {where status_id: MoneyRequestStatus.id_for(:open) }
+  scope :open, -> { where status_id: MoneyRequestStatus.id_for(:open) }
   scope :approved, -> { where status_id: MoneyRequestStatus.id_for(:approved) }
   scope :credited, -> { where status_id: MoneyRequestStatus.id_for(:credited) }
+  scope :credited_money_request, -> { where status_id: MoneyRequestStatus.id_for(:credited) }
+  scope :approved_money_request, -> { where status_id: MoneyRequestStatus.id_for(:approved) }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
-  scope :processing, -> {where status_id: MoneyRequestStatus.id_for(:processing) }
+  scope :processing, -> { where status_id: MoneyRequestStatus.id_for(:processing) }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
   scope :not_open, -> { where.not status_id: MoneyRequestStatus.id_for(:open) }
   scope :include_user, -> { includes :user }
-  scope :with_payment, ->{ where.not payment_id: nil }
-  scope :without_payment, ->{ where payment_id: nil }
+  scope :with_payment, -> { where.not payment_id: nil }
+  scope :without_payment, -> { where payment_id: nil }
 
   scope :filter_status, ->(status_id) { where status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -75,12 +78,12 @@ class MoneyRequest < ActiveRecord::Base
       where(money_requests[:created_at].gteq(date_from).and(money_requests[:created_at].lteq(date_to)))
     end
   end
-  scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
+  scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   accepts_nested_attributes_for :items
   delegate :status_name, to: :status
 
-  default_scope { order(created_at: :desc,status_id: :asc ) }
+  default_scope { order(created_at: :desc, status_id: :asc) }
 
   before_save :handle_name
   before_create :create_items

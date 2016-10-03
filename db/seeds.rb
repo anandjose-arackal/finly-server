@@ -128,7 +128,7 @@ if MoneyRequestStatus.count == 0
 end
 
 if PaymentMode.count == 0
-  PaymentMode::MODES.each do |key,value|
+  PaymentMode::MODES.each do |key, value|
     PaymentMode.create id: value, name: key
   end
 end
@@ -143,7 +143,7 @@ if Event.count == 0
 end
 
 if Currency.count == 0
-  Currency.create(id: 1, country: 'India', country_code: 'INR')
+  Currency.create(id: 1, country: 'India', country_code: 'INR', symbol: '₹')
 end
 
 if Amount.count == 0
@@ -275,7 +275,7 @@ if Expense.count == 0
                    note: "#{Faker::Lorem.sentence}",
                    date: Faker::Date.between(20.days.ago, Date.today),
                    user_id: random_integer(1, 10),
-                   category_id: 1,
+                   category_id: random_integer(1, 10),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
 end
@@ -347,7 +347,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -363,7 +363,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -380,7 +380,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category: Category.first, expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: Date.today,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id

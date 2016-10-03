@@ -19,10 +19,15 @@ class Card < ActiveRecord::Base
   belongs_to :card_type
   belongs_to :user
   belongs_to :company
-  belongs_to :disabled_by_role, class_name: "UserRole"
+  belongs_to :disabled_by_role, class_name: 'UserRole'
 
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
+
+  def serial_id
+    self.proxy
+  end
+
 end

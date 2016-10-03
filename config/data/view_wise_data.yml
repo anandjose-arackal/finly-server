@@ -2,9 +2,10 @@ admin:
   links:
     primary_navbar:
       # - Company Expenses: expenses
-      # - Analytics: analytics
+      - Company Analytics: analytics
       - Company Settlements: settlements
       - Company Employees: employees
+      - Advance Requests: requests
       - Company Reports: reports
     cog:
       - Organization Account: '/organization_account?view=admin'
@@ -16,12 +17,12 @@ admin:
 personal:
   links:
     primary_navbar:
+      - Analytics: analytics
       - Settlements: settlements
-      - Money Requests: requests
+      - Advance Requests: requests
       - Reports: reports
       - Receipts: receipts
       - Expenses: expenses
-      # - Analytics: analytics
     cog:
       - My Account: '/users/'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -30,9 +31,11 @@ personal:
 manager:
   links:
     primary_navbar:
+      - Team Analytics: analytics
       # - Team Expenses: expenses
       # - Team Analytics: analytics
       - Team Members: employees
+      # - Money Requests: requests
       - Team Reports: reports
     cog:
       - My Account: '/users/'
@@ -42,10 +45,12 @@ manager:
 finance_manager:
   links:
     primary_navbar:
+      - Team Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
       - Settlements: settlements
       - Team Members: employees
+      - Advance Requests: requests
       - Team Reports: reports
 
     cog:

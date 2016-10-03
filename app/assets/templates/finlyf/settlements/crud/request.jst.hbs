@@ -1,0 +1,10 @@
+<div class="col-sm-3">{{item.name}}</div>
+<div class="col-sm-3">
+  {{#if item.final_approver}}
+    {{item.final_approver}}
+  {{else}}
+    Auto-Approved
+  {{/if}}
+</div>
+<div class="col-sm-3 text-right">{{item.required_by_date}}</div>
+<div class="col-sm-3 text-right">&#8377; {{item.request_amount}}</div>

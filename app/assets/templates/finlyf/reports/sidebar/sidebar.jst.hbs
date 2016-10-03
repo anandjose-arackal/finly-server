@@ -23,7 +23,7 @@
     From
   </div>
   <div class="col-sm-9">
-    <input type="text" class="datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}"/>
+    <input type="text" class="form-control datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}"/>
     <span class="fa fa-calendar input-icon "></span> 
 
   </div>
@@ -33,7 +33,7 @@
     To
   </div>
   <div class="col-sm-9">
-    <input type="text" class="datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
+    <input type="text" class="form-control datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
     <span class="fa fa-calendar input-icon "></span> 
   </div>
 </div>
@@ -45,7 +45,7 @@
       Search by User
     </div>
     <div class="col-sm-12">
-      <input type="text" class="filter-field filter-user" style="width: 100%;" data-field="user" />
+      <input type="text" class="form-control filter-field filter-user" style="width: 100%;" data-field="user" value="{{item.filter_user_name}}" data-item-id="{{item.filter_user_id}}"/>
       <span class="fa fa-search input-icon"></span> 
     </div>
   </div>

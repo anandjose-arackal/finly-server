@@ -1,6 +1,6 @@
 require "#{Rails.root}/app/operations/settlement/index"
 class Settlement::Show < Settlement::Base
-  attr_accessor :selected_user, :reports, :payments, :actions, :type, :view_to_load
+  attr_accessor :selected_user, :reports, :payments, :money_requests, :actions, :type, :view_to_load
 
   def pre_validate
     unless user.present?
@@ -21,6 +21,8 @@ class Settlement::Show < Settlement::Base
     return if has_errors?
     if self.view_to_load == 'payments'
       load_payments
+    elsif self.view_to_load.include?('money_request')
+      load_money_requests
     else
       load_reports
     end
@@ -33,6 +35,7 @@ class Settlement::Show < Settlement::Base
     params[:selected_user] = selected_user
     params[:reports] = reports
     params[:payments] = payments
+    params[:money_requests] = money_requests
     params[:actions] = actions
     params[:type] = type
     Settlement::Show::Presenter.new(user, params, messages)
@@ -43,7 +46,7 @@ class Settlement::Show < Settlement::Base
 
     def init
       self.selected_user = params[:selected_user]
-      self.items = (params[:reports] or params[:payments])
+      self.items = (params[:reports] or params[:payments] or params[:money_requests])
       self.actions = params[:actions]
       self.type = params[:type]
     end
@@ -81,12 +84,22 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.reports = self.selected_user.reports
     else
-      self.reports = self.selected_user.reports.send(self.view_to_load)
+      self.reports = self.selected_user.reports
+      self.reports = self.reports.send(self.view_to_load) if self.reports.present?
     end
   end
 
   def load_payments
     self.payments = self.selected_user.payments.with_details
+  end
+
+  def load_money_requests
+    if self.view_to_load.blank?
+      self.money_requests = selected_user.money_requests
+    else
+      self.money_requests = self.selected_user.money_requests
+      self.money_requests = self.money_requests.send(self.view_to_load) if self.money_requests.present?
+    end
   end
 
   def load_actions
@@ -97,6 +110,7 @@ class Settlement::Show < Settlement::Base
     self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.settlement_id)}
     self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.debt_clearance_id)}
     self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
+    self.actions[:credit_money_request] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
   end
 
 end

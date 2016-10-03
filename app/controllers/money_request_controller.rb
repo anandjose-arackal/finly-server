@@ -16,6 +16,7 @@ class MoneyRequestController < ApplicationController
   end
 
   def update
+    # fail
     if params[:type].blank?
       respond_failure 'Invalid update type'
       return
@@ -57,5 +58,4 @@ class MoneyRequestController < ApplicationController
       super(item)
     end
   end
-
 end

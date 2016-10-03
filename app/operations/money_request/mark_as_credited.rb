@@ -18,15 +18,15 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
 
   def process
     if money_request.update_attributes controlling_user: nil, controlling_for_user: nil,
-                                       status_id: MoneyRequestStatus.id_for(:credited), note: nil
+                                       status_id: MoneyRequestStatus.id_for(:credited), note: nil, payment: self.payment
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:credited),
-                                  status_id: MoneyRequestStatus.id_for(:credited)
+                                  status_id: MoneyRequestStatus.id_for(:credited), payment: self.payment
     end
   end
 
   def post_process
     if success?
-      money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:credited)
+      money_request.comments.create money_request_id: money_request.id, user: user, comment_action_id: MoneyRequestCommentAction.id_for(:credited), payment: self.payment
     end
   end
 end

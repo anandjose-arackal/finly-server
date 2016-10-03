@@ -298,7 +298,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :api do
-    namespace :v1 do
+    namespace :v0 do
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :index, :show, :update, :destroy]
       resources :reports do
@@ -318,6 +318,22 @@ Rails.application.routes.draw do
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
         post 'add_note', to: 'receipts#add_note', as: :add_note
+        post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+      namespace :configuration do
+        get 'categories' => 'category#index', as: :categories
+        post 'gcm/register', to: 'gcm#create'
+        post 'gcm/unregister', to: 'gcm#delete'
+      end
+    end
+    namespace :v1 do
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:create, :index, :show, :update, :destroy]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+      end
+      resources :receipts, only: [:create, :index, :destroy, :update]
+      resources :receipts do
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
       end
       namespace :configuration do
@@ -370,6 +386,9 @@ Rails.application.routes.draw do
   end
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
+  resources :money_request do
+    post 'comment' => 'money_request#comment', as: :comment
+  end
 
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
@@ -398,7 +417,6 @@ Rails.application.routes.draw do
   # routes for testing import
   get 'mass_import', to: 'users#mass_import', as: :mass_import
   post 'import', to: 'users#import', as: :user_import
-
 
 
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
@@ -438,6 +456,8 @@ Rails.application.routes.draw do
 
   get 'external/reports/:id' => 'external_url#report', as: :external_url_report
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
+
+  get 'analytics' => 'analytics#show'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

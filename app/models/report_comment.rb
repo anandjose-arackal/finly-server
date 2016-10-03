@@ -33,6 +33,7 @@ class ReportComment < ActiveRecord::Base
 
   default_scope { order created_at: :desc }
 
+
   def generate(u = nil)
     comment = nil
     name = nil
