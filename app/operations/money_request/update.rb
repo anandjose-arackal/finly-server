@@ -5,11 +5,18 @@ class MoneyRequest::Update < MoneyRequest::Base
     [:employee, :manager, :finance_manager, :admin]
   end
 
+  def pre_validate
+    required_by_date = params[:money_request][:required_by_date] rescue nil
+    if required_by_date.present? and Date.parse(required_by_date) < Date.today
+      messages[:error] << 'Invalid Required By Date'
+    end
+  end
+
   def init
     super
     self.update_param = {}
     self.update_param = update_params
-    if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
+    if self.update_param[:policy_id].blank? or self.update_param[:policy_id] == 'nil'
       self.update_param[:policy_id] = nil
     end
     # Assign IDs to existing mapping and its amount so duplicate entries are

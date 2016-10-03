@@ -3,7 +3,6 @@ class CreateAmounts < ActiveRecord::Migration
     create_table :currencies do |t|
       t.string :country
       t.string :country_code
-      t.string :symbol
       t.timestamps null: false
     end
     create_table :amounts do |t|

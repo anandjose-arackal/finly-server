@@ -29,10 +29,10 @@ class UserMailer < ApplicationMailer
     mail to: user.email, subject: 'Welcome to Finly!'
   end
 
-  def invite(user, token)
+  def invite(user, token, note)
     @user = user
     @token = token
-    # @note = pending_invite.note
+    @note = note
     mail to: user.email, subject: 'Invitation to use Finly!'
   end
 

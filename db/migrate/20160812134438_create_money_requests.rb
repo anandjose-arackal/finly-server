@@ -18,7 +18,7 @@ class CreateMoneyRequests < ActiveRecord::Migration
       t.integer :loaded_by, references: 'user', index: true, foreign_key: true
       t.datetime :loaded_at
       t.datetime :submitted_at, limit: 6
-      t.string :memo
+      t.string :note
       t.boolean :accounted, default: false, null: false
 
       t.timestamps null: false

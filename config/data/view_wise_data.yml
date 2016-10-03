@@ -31,11 +31,11 @@ personal:
 manager:
   links:
     primary_navbar:
-      - Team Analytics: analytics
+#      - Team Analytics: analytics
       # - Team Expenses: expenses
       # - Team Analytics: analytics
       - Team Members: employees
-      # - Money Requests: requests
+      - Team Advance Requests: requests
       - Team Reports: reports
     cog:
       - My Account: '/users/'
@@ -45,12 +45,12 @@ manager:
 finance_manager:
   links:
     primary_navbar:
-      - Team Analytics: analytics
+#      - Team Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
       - Settlements: settlements
       - Team Members: employees
-      - Advance Requests: requests
+      - Team Advance Requests: requests
       - Team Reports: reports
 
     cog:

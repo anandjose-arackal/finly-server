@@ -1,5 +1,5 @@
 json.extract! @result.money_request, :id, :name, :memo, :status_name, :status_id
-required_by_date = @result.money_request.required_by_date.strftime("%d %b %y") rescue nil
+required_by_date = @result.money_request.required_by_date.strftime("%d %b %Y") rescue nil
 json.required_by_date required_by_date
 json.user_name @result.money_request.user.name
 json.user_initial @result.money_request.user.name.split(' ').first[0] + ((@result.money_request.user.name.split(' ')[1][0] rescue nil) || @result.money_request.user.name.split(' ').first[1])
@@ -13,10 +13,16 @@ json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
 
+# if @result.money_request.policy
+policy_name = ''
+policy_id = ''
 if @result.money_request.policy
-  json.policy @result.money_request.policy.name
-  json.policy_id @result.money_request.policy.id
+  policy_name = @result.money_request.policy.name
+  policy_id = @result.money_request.policy.id
 end
+json.policy policy_name
+json.policy_id policy_id
+# end
 
 json.policies @result.money_request.user.policies do |policy|
   json.extract! policy, :id, :name

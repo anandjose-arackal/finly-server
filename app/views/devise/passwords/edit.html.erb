@@ -5,7 +5,7 @@
     <form name="myForm" method="post" action="/users/password" onsubmit="return validateForm()">
       <%= devise_error_messages! %>
       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-      <input name="user[reset_password_token]" value="<%= params[:reset_password_token]%>" type="hidden">
+      <input name="user[reset_password_token]" value=<%="#{resource.reset_password_token}"%> type="hidden">
 
       <input name="_method" value="patch" type="hidden">
       <!-- <input type="hidden" name="user[reset_password_token]" id="reset_password_token">

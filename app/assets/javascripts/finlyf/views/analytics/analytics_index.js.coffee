@@ -163,7 +163,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
           data:
             view: _this.params.view
             remote: "true"
-            query: query
+            filter_search: query
           success: (data) ->
             response(data)
           error: (err) ->

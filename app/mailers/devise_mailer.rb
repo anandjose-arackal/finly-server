@@ -7,7 +7,6 @@ class DeviseMailer < Devise::Mailer
   end
 
   def reset_password_instructions(record, token, opts={})
-    puts "Token", token
     UserMailer.delay.password_reset_instructions(record, token)
   end
 
@@ -20,7 +19,8 @@ class DeviseMailer < Devise::Mailer
   end
 
   def invitation_instructions(record, token, opts={})
-    UserMailer.delay.invite(record, token)
+    note = record.invitation_note
+    UserMailer.delay.invite(record, token, note)
   end
 
 end
