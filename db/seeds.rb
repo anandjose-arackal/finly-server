@@ -11,7 +11,7 @@ def random(low, high)
 end
 
 def random_integer(low, high)
-  random(low, 5).to_i
+  random(low, high).to_i
 end
 
 def random_string_of_numbers(length)
@@ -154,12 +154,6 @@ if User.count == 0
               profile_attributes: {date_of_birth:Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
               address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  User.create(company: Company.first, name: "Vivek", email: "vivek.a@finly.io", mobile_number: random_string_of_numbers(10),
-              password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id,
-              role_mapping_attributes: [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}])
-
-
   fm = []
   4.times do |pos|
     fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlytest.io",
@@ -239,7 +233,7 @@ if Expense.count == 0
                    note: "#{Faker::Lorem.sentence}",
                    date: Faker::Date.between(20.days.ago, Date.today),
                    user_id: random_integer(1, 10),
-                   category_id: random_integer(1, 10),
+                   category_id: random_integer(1, 5),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
 end
