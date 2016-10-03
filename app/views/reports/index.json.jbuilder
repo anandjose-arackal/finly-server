@@ -4,6 +4,6 @@ json.array!(@result.paginated_reports) do |report|
     json.policy report.policy.name
   end
   json.status report.status.name
-  json.total report.total_amount
+  json.total(('%.2f' % report.total_amount))
   json.date report.created_at.strftime("%d %b")
 end

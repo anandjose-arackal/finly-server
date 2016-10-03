@@ -4,8 +4,8 @@ json.required_by_date required_by_date
 json.user_name @result.money_request.user.name
 json.user_initial @result.money_request.user.name.split(' ').first[0] + ((@result.money_request.user.name.split(' ')[1][0] rescue nil) || @result.money_request.user.name.split(' ').first[1])
 json.status @result.status
-json.manager_name @result.manager.name rescue nil
-json.finance_manager_name @result.finance_manager.name rescue nil
+json.manager_name @result.manager.name rescue ''
+json.finance_manager_name @result.finance_manager.name rescue ''
 # json.export_csv export_money_request_path(money_request_id: @result.money_request.id, view: params[:view],:format => :csv)
 # json.export_xls export_money_request_path(money_request_id: @result.money_request.id, view: params[:view],:format => :xls)
 # json.export_pdf export_money_request_path(money_request_id: @result.money_request.id, view: params[:view],:format => :pdf)
