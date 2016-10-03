@@ -6,6 +6,10 @@
 class User::Team::Index < User::Team::Base
   attr_accessor :role_id
 
+  has_scope :filter_search
+  has_scope :filter_role
+  has_scope :filter_state
+
   def pre_validate
     unless user.present?
       messages[:error] << 'User not found'
@@ -79,7 +83,7 @@ class User::Team::Index < User::Team::Base
   end
 
   def retrieve
-    self.response
+    apply_scopes(self.response, params) if self.response.present?
   end
 
   # def success

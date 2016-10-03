@@ -292,7 +292,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
           url: '/autocomplete/' + field
           data: 
             remote: "true"
-            query: query
+            filter_search: query
           success: (data) ->
             response(data)
           error: (err) ->
