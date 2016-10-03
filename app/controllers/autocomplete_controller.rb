@@ -13,6 +13,8 @@ class AutocompleteController < ApplicationController
     @users = User::Team::Index.(current_user, params)
     # scoping the search to within the particular user's team
     #  = team.filter_search(params[:query]).select(:id, :name) rescue nil
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 end
