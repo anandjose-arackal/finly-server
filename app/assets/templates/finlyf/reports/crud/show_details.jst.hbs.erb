@@ -108,7 +108,7 @@
 
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">Expenditure</label></div>
-          <div class="col-sm-6">{{item.total}}</div>
+          <div class="col-sm-6"><label>&#8377;&nbsp;{{item.total}}</label></div>
         </div>
         
       </div>
@@ -203,7 +203,7 @@
           <div class="col-sm-1 no-padding">{{increment @index 1}}</div>
           <div class="col-sm-2 no-padding">{{this.date}}</div>
           <div class="col-sm-2 no-padding">{{this.merchant_name}}</div>
-          <div class="col-sm-3 no-padding">{{this.note}}</div>
+          <div class="col-sm-3 no-padding">{{#if this.note}}{{this.note}}{{else}}--{{/if}}</div>
           <div class="col-sm-1 no-padding text-right">&#8377;<span>{{amount_value}}</span></div>
 
 

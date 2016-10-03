@@ -143,7 +143,6 @@ class FinlyF.Views.Report extends Backbone.View
     })
 
 
-
   existingExpense: (e) ->
     report_id = $(e.currentTarget).attr('data-item-id')
     expense_view = new FinlyF.Views.ExpensesIndex({
@@ -340,7 +339,10 @@ class FinlyF.Views.Report extends Backbone.View
             data: {view: _this.current_view}
           })
           $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-          
+        else
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
       error: (err) ->
         console.log "error", err
     })

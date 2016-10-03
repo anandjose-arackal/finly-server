@@ -22,6 +22,6 @@
   {{/switch}}
   </div>
   <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
-  <div class="col-sm-3">{{item.policy}}</div>
-  <div class="col-sm-4">{{item.memo}}</div>
+  <div class="col-sm-3">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
+  <div class="col-sm-4">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
 </div>
