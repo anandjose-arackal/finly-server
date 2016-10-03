@@ -77,6 +77,7 @@ class User::Invite::Accept < User::Invite::Base
 
   def post_process
     # send welcome mail
+    User::Verification::Otp::Create.(current_user, params)
   end
 
   def success

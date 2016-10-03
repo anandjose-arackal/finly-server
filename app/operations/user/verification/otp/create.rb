@@ -28,8 +28,8 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
     end
   end
 
-  def success
-    true
-  end
+  # def success
+  #   true
+  # end
 
 end
