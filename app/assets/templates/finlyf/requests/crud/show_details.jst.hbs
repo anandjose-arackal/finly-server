@@ -65,7 +65,7 @@
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Memo</label></div>
             <div class="col-sm-6">
-              <label class="control-label item-attr-preview">{{#if item.memeo}}{{item.memo}}{{else}}--{{/if}}</label>
+              <label class="control-label item-attr-preview">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</label>
               <textarea class="item-attr-edit form-control item-memo-edit" name="money_request[memo]">{{item.memo}}</textarea>
             </div>
           </div>
@@ -108,7 +108,7 @@
 
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Total Amount:</label></div>
-            <div class="col-sm-6"><label>{{item.total}}</label></div>
+            <div class="col-sm-6"><label>&#8377;&nbsp;{{item.total}}</label></div>
           </div>
           
         </div>
@@ -155,7 +155,7 @@
         </div>
         <div class="col-sm-2 text-right"><h4 style="font-weight: bold;">Total</h4></div>
         <div class="col-sm-4">
-          <h4 style="font-weight: bold;">{{item.total}}</h4>
+          <h4 style="font-weight: bold;">&#8377;&nbsp;{{item.total}}</h4>
         </div>
       </div>
       <div class="row no-margin request-categories">
@@ -167,7 +167,7 @@
             <div class="col-sm-4" style="border-bottom: 1px solid #eee;">
 
               <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
-              <label class="control-label item-attr-preview" style="line-height: 35px; font-size: 18px;">{{this.amount.value}}</label>
+              <label class="control-label item-attr-preview" style="line-height: 35px; font-size: 18px;">&#8377;&nbsp;{{this.amount.value}}</label>
               <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" style="margin-bottom: 6px;" />
               <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
             </div>
