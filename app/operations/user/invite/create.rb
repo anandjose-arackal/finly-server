@@ -154,6 +154,8 @@ class User::Invite::Create < User::Invite::Base
   def process
     emails.each do |email|
       invite_params[:email] = email
+      invite_params[:first_name] = ''
+      invite_params[:last_name] = ''
       self.invited_user = User.invite!(invite_params, self.user) do |u|
         u.invitation_note = params[:pending_invite][:note]
         # u.skip_invitation = true
