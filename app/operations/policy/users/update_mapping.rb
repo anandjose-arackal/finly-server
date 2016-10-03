@@ -82,8 +82,16 @@ class Policy::Users::UpdateMapping < Policy::Base
 
   # making the user a policy admin here
   def post_process
-    user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
-    user_policy_mapping.update_attributes(admin: admin)
+    # ensure that there's at least one admin in the policy
+    if admin
+      user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
+      user_policy_mapping.update_attributes(admin: admin)
+    else
+      if PolicyUserMapping.with_policy(policy.id).admin.count > 1
+        user_policy_mapping = being_updated_user.policy_user_mappings.with_policy(policy.id).first rescue nil
+        user_policy_mapping.update_attributes(admin: admin)
+      end
+    end
   end
 
   def success

@@ -66,10 +66,13 @@ class Report::Submit < Report::Base
       approve_op = Report::Approve.new(user, {report_id: report.id, auto_approve: true})
       unless approve_op.run.success?
         self.messages[:error] = messages[:error].merge approve_op.errors
-        # self.messages[:error] << "Error auto-approving report. Please try again."
         return false
       end
       report.reload
+      # changing the status of the expenses in the auto approved report.
+      report.expenses.each do |expense|
+        expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
+      end
       return true
     end
     memo = params[:memo]
