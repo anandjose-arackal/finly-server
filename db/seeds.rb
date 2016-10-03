@@ -123,6 +123,8 @@ end
 
 if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
+    name = key.to_s
+    name[0] = name[0].capitalize
     MoneyRequestStatus.create id: value, name: key
   end
 end
