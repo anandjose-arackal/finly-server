@@ -254,6 +254,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     target = e.currentTarget
 
     $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;")
+    $(target).attr('disabled', 'disabled')
     formData = new FormData($(@el).find('form#new-item')[0])
 
     $.ajax({
@@ -266,8 +267,12 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         if res.success == true
           $("#modal-new").modal('hide')
           _this.refetchCollection()
+        else
+          $(target).html("Create")
+          $(target).attr('disabled', false)
       error: (err) ->
         console.log "Error", err 
+        $(target).attr('disabled', false)
       cache: false,
       contentType: false,
       processData: false

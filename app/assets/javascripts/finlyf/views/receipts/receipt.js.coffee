@@ -21,7 +21,7 @@ class FinlyF.Views.Receipt extends Backbone.View
     @model.on('change', @showSaveOption, @)
 
   render: ->
-    console.log "rendering receipt"
+    # console.log "rendering receipt"
     unless @preview
       $(@el).html(@template({ item: @model.toJSON() }))
     else

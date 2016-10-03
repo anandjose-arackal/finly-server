@@ -66,7 +66,7 @@
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">Memo</label></div>
           <div class="col-sm-6">
-            <label class="control-label item-attr-preview">{{item.memo}}</label>
+            <label class="control-label item-attr-preview">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</label>
             <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
           </div>
         </div>
@@ -93,12 +93,12 @@
 
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">To Manager</label></div>
-          <div class="col-sm-6">{{item.manager_name}}</div>
+          <div class="col-sm-6"><label>{{#if item.manager_name}}{{item.manager_name}}{{else}}--{{/if}}</label></div>
         </div>
 
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
-          <div class="col-sm-6">{{item.finance_manager_name}}</div>
+          <div class="col-sm-6"><label>{{#if item.finance_manager_name}}{{item.finance_manager_name}}{{else}}--{{/if}}</label></div>
         </div>
 
         <div class="row no-margin">
