@@ -1,5 +1,5 @@
 class Settlement::MoneyRequest::Approved < MoneyRequest::Base
-  attr_accessor :money_request
+  attr_accessor :money_request, :selected_user
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -13,6 +13,9 @@ class Settlement::MoneyRequest::Approved < MoneyRequest::Base
 
   def init
     self.money_request = params[:money_request]
+    if self.money_request
+      self.selected_user = money_request.user
+    end
   end
 
   def validate
@@ -22,15 +25,15 @@ class Settlement::MoneyRequest::Approved < MoneyRequest::Base
     unless money_request.approved?
       messages[:error] << 'Error while adding money to pending cash advance'
     end
+    if money_request.accounted
+      messages[:error] << 'Advance Request has already been accounted'
+    end
   end
 
   def process
-    if money_request.accounted
-      return
-    end
     total_amount = money_request.total_amount
     currency = Currency.first
-    user.balance_sheet.add_pending_advance total_amount, currency
+    selected_user.balance_sheet.add_pending_advance total_amount, currency
     unless money_request.update_attribute(:accounted, true)
       messages[:error] = money_request.errors.full_messages
     end

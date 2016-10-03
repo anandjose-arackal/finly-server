@@ -65,7 +65,7 @@
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Memo</label></div>
             <div class="col-sm-6">
-              <label class="control-label item-attr-preview">{{item.memo}}</label>
+              <label class="control-label item-attr-preview">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</label>
               <textarea class="item-attr-edit form-control item-memo-edit" name="money_request[memo]">{{item.memo}}</textarea>
             </div>
           </div>
@@ -90,25 +90,25 @@
 
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">To Manager</label></div>
-            <div class="col-sm-6">{{item.manager_name}}</div>
+            <div class="col-sm-6"><label>{{#if item.manager_name}}{{item.manager_name}}{{else}}--{{/if}}</label></div>
           </div>
 
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
-            <div class="col-sm-6">{{item.finance_manager_name}}</div>
+            <div class="col-sm-6"><label>{{#if item.finance_manager_name}}{{item.finance_manager_name}}{{else}}--{{/if}}</label></div>
           </div>
 
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Require By Date</label></div>
             <div class="col-sm-6">
-              <label class="control-label item-attr-preview">{{item.require_by_date}}</label>
-              <input class="item-attr-edit datepicker form-control" type="text" name="money_request[require_by_date]" value="{{item.require_by_date}}" />
+              <label class="control-label item-attr-preview">{{#if item.required_by_date}}{{item.required_by_date}}{{else}}Not Set{{/if}}</label>
+              <input class="item-attr-edit datepicker form-control" type="text" name="money_request[required_by_date]" value="{{item.required_by_date}}" />
             </div>   
           </div>
 
           <div class="row no-margin">
             <div class="col-sm-6"><label class="control-label">Total Amount:</label></div>
-            <div class="col-sm-6">{{item.total}}</div>
+            <div class="col-sm-6"><label>&#8377;&nbsp;{{item.total}}</label></div>
           </div>
           
         </div>
@@ -149,22 +149,26 @@
       </div><!-- .violations -->
       {{/ifCond}}
 
-      <div class="row no-margin">
-        <div class="col-sm-6 no-padding">
-          <h4>Categories</h4>
+      <div class="row no-margin" style="background: #B4AFD0;">
+        <div class="col-sm-3 no-padding" style="padding-left: 10px;">
+          <h4>CATEGORIES</h4>
+        </div>
+        <div class="col-sm-2 text-right"><h4 style="font-weight: bold;">Total</h4></div>
+        <div class="col-sm-4">
+          <h4 style="font-weight: bold;">&#8377;&nbsp;{{item.total}}</h4>
         </div>
       </div>
       <div class="row no-margin request-categories">
         {{#each item.request_items}}
-          <div class="row no-margin request-category">
-            <div class="col-sm-6">
+          <div class="row no-margin request-category" style="padding-top: 10px;">
+            <div class="col-sm-5" style="border-bottom: 1px solid #eee;">
               <h4 class="request-category-name">{{this.category.name}}</h4>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-4" style="border-bottom: 1px solid #eee;">
 
               <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
-              <label class="control-label item-attr-preview">{{this.amount.value}}</label>
-              <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" />
+              <label class="control-label item-attr-preview" style="line-height: 35px; font-size: 18px;">&#8377;&nbsp;{{this.amount.value}}</label>
+              <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" style="margin-bottom: 6px;" />
               <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
             </div>
           </div>

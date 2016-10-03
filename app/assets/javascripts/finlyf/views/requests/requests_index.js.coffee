@@ -260,6 +260,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_name': $(".sidebar .filter-user").val() || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
@@ -279,6 +280,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
+    _this = @
     target = $(e.currentTarget)
     query = $(target).val()
     field = $(target).attr('data-field')
@@ -290,9 +292,10 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
           dataType: "json"
           type : 'get'
           url: '/autocomplete/' + field
-          data: 
+          data:
+            view: _this.params.view
             remote: "true"
-            query: query
+            filter_search: query
           success: (data) ->
             response(data)
           error: (err) ->

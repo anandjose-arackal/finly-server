@@ -11,10 +11,10 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
     end
   end
 
-  def init
-    id = (params[:money_request_id] or params[:id])
-    self.money_request = MoneyRequest.find_by(id: id)
-  end
+  # def init
+  #   id = (params[:money_request_id] or params[:id])
+  #   self.money_request = MoneyRequest.find_by(id: id)
+  # end
 
   def authorize
     super
@@ -39,7 +39,8 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def process
     self.prev_status = money_request.status
-    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, note: nil,
+    memo = (params[:note] or params[:memo] or money_request.memo)
+    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil, memo: memo,
                                        status_id: MoneyRequestStatus.id_for(:processing)
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:unapprove),
                                          status_id: MoneyRequestStatus.id_for(:processing)
@@ -51,8 +52,10 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
   def post_process
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
     # Recalculate settlement when money_request is unapproved from an approved/closed state
+    Settlement::MoneyRequest::Unapproved.(user, money_request: money_request)
+
     if prev_status.id == MoneyRequestStatus.id_for(:approved)
-      Event::MoneyRequest::Unapprove.(self.user, money_request: self.money_request)
+      # Event::MoneyRequest::Unapprove.(self.user, money_request: self.money_request)
     end
   end
   

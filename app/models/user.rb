@@ -50,7 +50,7 @@ class User < ActiveRecord::Base
 
   devise :database_authenticatable, :validatable, password_length: 8..128
 
-  attr_accessor :view
+  attr_accessor :view, :invitation_note
 
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
@@ -60,6 +60,7 @@ class User < ActiveRecord::Base
   has_many :tags, class_name: 'UserTag', dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :receipts, dependent: :destroy
+  has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
@@ -107,10 +108,11 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
+  validates :name, presence: true
   validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :maiden_name, length: {maximum: 30}
   validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
+  validates :mobile_number,presence: true, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
 
   # validate :valid_role
 

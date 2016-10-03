@@ -1,5 +1,5 @@
 <div class="row sidebar-element">
-  <div class="col-sm-3">
+  <div class="col-sm-3 sidebar-label">
     From
   </div>
   <div class="col-sm-9">
@@ -9,7 +9,7 @@
   </div>
 </div>
 <div class="row sidebar-element">
-  <div class="col-sm-3">
+  <div class="col-sm-3 sidebar-label">
     To
   </div>
   <div class="col-sm-9">
@@ -28,21 +28,20 @@
 
 {{#if item.view}}
   {{#if_not_eq item.view 'personal'}}
-    <div class="row sidebar-element">
-      <div class="col-sm-12">
+    {{!-- <div class="row sidebar-element">
+      <div class="col-sm-12 sidebar-label">
         Show for:
       </div>
       <div class="col-sm-12">
         <select class="form-control select-show-for">
           <option>All</option>
-          {{!-- <option>Team</option> --}}
           <option value="user">User</option>
         </select>
       </div> 
-    </div>
+    </div> --}}
 
-    <div class="row sidebar-element search_by_user" style="display: {{#if item.filter_show_for}}block{{else}}none{{/if}};">
-      <div class="col-sm-12">
+    <div class="row sidebar-element search_by_user">
+      <div class="col-sm-12 sidebar-label">
         Search by User
       </div>
       <div class="col-sm-12">

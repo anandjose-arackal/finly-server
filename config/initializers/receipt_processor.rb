@@ -1,0 +1,1 @@
+require 'receipt_processor/base_converter'

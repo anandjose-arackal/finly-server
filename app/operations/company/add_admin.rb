@@ -9,7 +9,7 @@ class Company::AddAdmin < Company::Base
   end
 
   def init
-    self.company = Company.find_by(id: params[:id])
+    self.company = Company.find_by(id: params[:id] || params[:company_id])
   end
 
   def authorize
@@ -32,7 +32,7 @@ class Company::AddAdmin < Company::Base
       admin.activate
       messages[:success] << "New admin created!"
     else
-      messages[:error] << "Failed, Try again."
+      messages[:error] = admin.errors.full_messages
     end
   end
 

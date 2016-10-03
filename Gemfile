@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
+# puma web server
+gem 'figaro'
 gem 'puma'
 
 # gem to import from excel
@@ -85,6 +87,16 @@ gem 'font-awesome-rails'
 
 gem 'opro', github: 'opro/opro', branch: 'master'
 
+gem 'has_scope'
+
+gem 'sendgrid-ruby'
+gem 'griddler'
+gem 'griddler-sendgrid'
+gem 'rmagick'
+gem 'imgkit'
+gem 'wkhtmltoimage-binary'
+gem 'proselytism', git: 'git://github.com/ramanbedi1989/proselytism.git'
+
 gem 'require_all'
 
 # gem for devise authentication
@@ -98,11 +110,19 @@ gem 'faraday'
 
 gem 'hooks'
 
+# todo - temporary, will be removed during final deployment.
+gem 'awesome_print'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+  gem 'capistrano'
+  gem 'capistrano3-puma'
+  gem 'capistrano-rails', require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-rvm'
   gem 'hirb'
-  gem 'awesome_print'
+
 end
 
 group :development do

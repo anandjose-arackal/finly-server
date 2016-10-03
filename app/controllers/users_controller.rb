@@ -41,6 +41,22 @@ class UsersController < ApplicationController
 
   end
 
+  def profile
+    @result = User::Profile.(current_user, params)
+  end
+
+  def update_password
+    update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
+    @result = update_password_op.run
+    if @result.success?
+      sign_in @result.user, :bypass => true
+      flash[:success] = @result.messages[:success]
+    else
+      flash[:error] = @result.messages[:error]
+    end
+    redirect_to request.referrer
+  end
+
   # action that imports from a CSV or Excel file for mass invitations
   def import
     import_op = User::Invite::Import.new(current_user, params)

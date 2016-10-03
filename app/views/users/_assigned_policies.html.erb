@@ -8,11 +8,11 @@
       padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
     <p style="font-size: 24px;
         font-weight: 600;
-        font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Company Policy List</p>
+        font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">User Policy List</p>
 
     <hr>
 
-    <% unless @assigned_policies.present? %>
+    <% unless @result.assigned_policies.present? %>
         <div>
           <p> No Policies to Display.</p>
         </div>
@@ -21,7 +21,7 @@
 
     <div id="policyListTable">
 
-      <% @assigned_policies.each do |policy| %>
+      <% @result.assigned_policies.each do |policy| %>
 
           <table>
             <thead>
@@ -34,7 +34,7 @@
             <tr>
               <td style="width: 30%;"> <% link_to policy.name, policy %></td>
               <td style="width: 40%;">
-                <a id="showReportsButton" class="btn btn-primary green-button" href="<%=reports_path(filter_policy: policy.id, view: params[:view])%>">View Reports</a>
+                <a id="showReportsButton" class="btn btn-primary green-button" href="<%=root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '"}'%>">View Reports</a>
             </tr>
 
           </table>

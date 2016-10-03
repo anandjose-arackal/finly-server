@@ -16,18 +16,18 @@ class Superadmin::CompaniesController < ApplicationController
     if @result.success?
       flash[:success] = 'Company created'
     else
-      flash[:error] = 'Failed. Try again'
+      flash[:error] = @result.messages[:error]
     end
     redirect_to superadmin_companies_path
   end
 
   def add_admin
-    @result = Company::Create.(current_user, params)
+    @result = Company::AddAdmin.(current_user, params)
     # temporary rendering for html testing.
     if @result.success?
       flash[:success] = 'Company created'
     else
-      flash[:error] = 'Failed. Try again'
+      flash[:error] = @result.messages[:error]
     end
     redirect_to superadmin_companies_path
   end

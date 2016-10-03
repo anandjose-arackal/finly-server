@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
 
   before_action :whitelisted_emails
 
+  # before_action :superadmin_accounts if :superadmin_controller?
+
   # to add custom parameters to the user hash being taken as input
   before_action :configure_permitted_parameters if :devise_controller?
 
@@ -188,6 +190,12 @@ class ApplicationController < ActionController::Base
         sign_out current_user
         redirect_to root_url
       end
+    end
+  end
+
+  def superadmin_accounts
+    unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
+      redirect_to root_url
     end
   end
 end

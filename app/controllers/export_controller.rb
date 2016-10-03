@@ -6,11 +6,11 @@ class ExportController < ApplicationController
   def report
     respond_to do |format|
       format.csv {
-        @report = Export::AsCsv.new(current_user, params).run
+        @report = Export::AsCsv.(current_user, params)
         send_data @report.data
       }
       format.xls {
-        @report = Export::AsXml.new(current_user, params).run
+        @report = Export::AsXml.(current_user, params)
         @header = @report.header
         @data = @report.data
       }

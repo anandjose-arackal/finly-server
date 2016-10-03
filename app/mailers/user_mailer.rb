@@ -29,10 +29,10 @@ class UserMailer < ApplicationMailer
     mail to: user.email, subject: 'Welcome to Finly!'
   end
 
-  def invite(user, token)
+  def invite(user, token, note)
     @user = user
     @token = token
-    # @note = pending_invite.note
+    @note = note
     mail to: user.email, subject: 'Invitation to use Finly!'
   end
 
@@ -42,9 +42,10 @@ class UserMailer < ApplicationMailer
       @body = "As an admin, you have complete control over all the users and their expenses in the company, from reviewing expenses to setting rules to settlements"
     elsif user.manager?
       @title = "You are now a manager"
-      @body = "As a manager, you can approve or deny the expenses of people you manage."
+      @body = "As a manager, you can approve or deny the reports of people you manage."
     elsif user.finance?
-      # todo
+      @title = "You are now a finance manager"
+      @body = "As a finance manager, you can approve or deny the reports of people you manage."
     elsif user.employee?
       @title = "Your role has now been updated as an employee"
     end

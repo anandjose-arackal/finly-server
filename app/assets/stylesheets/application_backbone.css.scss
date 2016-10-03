@@ -156,13 +156,19 @@
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+  color: #fff;
+  background-color: #594da8;
+}
 //Customization over bootstrap
 .form-control{
   border-radius: 2px;
 }
 
 #primary-navbar{
-  box-shadow: 5px -2px 4px rgba(0, 0, 0, 0.46);
+  // box-shadow: 5px -2px 4px rgba(0, 0, 0, 0.46);
+  box-shadow: 0 0px 2px 1px rgba(0, 0, 0, 0.46);
 }
 
 .secondary-navbar{
@@ -187,6 +193,12 @@
   .sidebar{
     background: #E7E7E7;
     color: #565656;
+
+    .sidebar-element{
+      .sidebar-label{
+        line-height: 32px;
+      }
+    }
   }
 }
 
@@ -247,6 +259,7 @@ $header-grey: #efefef;
 body {
   padding: 70px 0 0 0;
   background-color: #E7E7E7;
+  font-family: Roboto, Helvetica, Open Sans;
 }
 
 .no-padding{

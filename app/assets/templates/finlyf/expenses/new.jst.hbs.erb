@@ -53,9 +53,9 @@
       </div>
 
       <div class="row no-margin form-group">
-        <div class="col-sm-7 col-sm-offset-5">
+        <div class="col-sm-7 col-sm-offset-5 text-center">
           
-          <buttun class="btn-create-expense btn btn-primary">Create</buttun>
+          <buttun class="btn-create-expense btn btn-primary" style="width: 100px;">Create</buttun>
         </div>
         
       </div>      
@@ -76,7 +76,7 @@
       {{#if receipt}}
         <input type="number" id="expense-receipt-upload" name="receipt_id" class="form-control input-upload-image" value="{{receipt.id}}"/>
       {{else}}
-        <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .pdf, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
+        <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
       {{/if}}
     </div>
   </div>

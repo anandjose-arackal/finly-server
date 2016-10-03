@@ -36,8 +36,9 @@ class MoneyRequest::Retract < MoneyRequest::Base
   end
 
   def process
+    memo = (params[:note] or params[:memo] or money_request.memo)
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:retracted), controlling_user_id: user.id,
-                                           controlling_for_user_id: nil, note: self.params[:note], submitted_at: nil
+                                           controlling_for_user_id: nil, memo: memo, submitted_at: nil
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:retract),
                                       status_id: MoneyRequestStatus.id_for(:retracted), user_request_role_id: UserRole.id_for(:employee)
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)

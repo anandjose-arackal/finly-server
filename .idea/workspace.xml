@@ -1,14 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/app/controllers/users_controller.rb" line="15" />
     <bookmark url="file://$PROJECT_DIR$/app/controllers/policies_controller.rb" line="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="API Implementation">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Finly.iml" afterPath="$PROJECT_DIR$/.idea/Finly.iml" />
+    <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="Merge remote-tracking branch 'origin/backboned_op'&#10;&#10;# Conflicts:&#10;#&#9;.idea/Finly.iml&#10;#&#9;.idea/workspace.xml&#10;#&#9;app/controllers/pending_invites_controller.rb&#10;#&#9;db/seeds.rb&#10;">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/crud/main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/assets/logo/finly_logo_font_large.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/assets/logo/finly_logo_font_medium.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/system/assets/logo/finly_logo_font_small.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/collections/requests.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/models/request.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/requests/request.js.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/crud/request.js.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/crud/show.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/crud/show_details.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/navbar/navbar_main.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/navbar/navbar_sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/requests/sidebar/sidebar.jst.hbs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/mappings/destroy.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/operations/policy/mappings/set.rb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/pending_invites/accept.js.coffee.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.generators" afterPath="$PROJECT_DIR$/.idea/.generators" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/application.js" afterPath="$PROJECT_DIR$/app/assets/javascripts/application.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/finly_f.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/finly_f.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/helpers/handlebars_helpers.js" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/helpers/handlebars_helpers.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/routers/main_router.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/routers/main_router.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/expenses/expense.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/expenses/expense.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/expenses/expenses_index.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/expenses/expenses_index.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/reports/report.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/reports/report.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/reports/reports_index.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/reports/reports_index.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/requests/requests_index.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/requests/requests_index.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/settlements/settlements_index.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/settlements/settlements_index.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/users/user.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/users/user.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/users/users_index.js.coffee" afterPath="$PROJECT_DIR$/app/assets/javascripts/finlyf/views/users/users_index.js.coffee" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/base/skeleton.jst.hbs.erb" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/base/skeleton.jst.hbs.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/expense.jst.hbs" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/expense.jst.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/show_details.jst.hbs.erb" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/expenses/show_details.jst.hbs.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/show_details.jst.hbs.erb" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/crud/show_details.jst.hbs.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/sidebar/sidebar.jst.hbs" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/reports/sidebar/sidebar.jst.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/admin/addPayment.jst.hbs" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/admin/addPayment.jst.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/indexPayments.jst.hbs" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/settlements/crud/indexPayments.jst.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/users/crud/show.jst.hbs" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/crud/show.jst.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/assets/templates/finlyf/users/inviteEmployee.jst.hbs" afterPath="$PROJECT_DIR$/app/assets/templates/finlyf/users/inviteEmployee.jst.hbs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/autocomplete_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/autocomplete_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/categories_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/categories_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/pending_invites_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/pending_invites_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/policies_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/policies_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/settlements_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/settlements_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/superadmin/companies_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/superadmin/companies_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/users_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/users_controller.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/mailers/devise_mailer.rb" afterPath="$PROJECT_DIR$/app/mailers/devise_mailer.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/balance_sheet.rb" afterPath="$PROJECT_DIR$/app/models/balance_sheet.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/category.rb" afterPath="$PROJECT_DIR$/app/models/category.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/expense.rb" afterPath="$PROJECT_DIR$/app/models/expense.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/receipt.rb" afterPath="$PROJECT_DIR$/app/models/receipt.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/report.rb" afterPath="$PROJECT_DIR$/app/models/report.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/report_comment.rb" afterPath="$PROJECT_DIR$/app/models/report_comment.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/user.rb" afterPath="$PROJECT_DIR$/app/models/user.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/company/add_admin.rb" afterPath="$PROJECT_DIR$/app/operations/company/add_admin.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/company/configuration/category/create.rb" afterPath="$PROJECT_DIR$/app/operations/company/configuration/category/create.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/company/create.rb" afterPath="$PROJECT_DIR$/app/operations/company/create.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/event/e_report/base.rb" afterPath="$PROJECT_DIR$/app/operations/event/e_report/base.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/event/e_settlement/base.rb" afterPath="$PROJECT_DIR$/app/operations/event/e_settlement/base.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/expense/index.rb" afterPath="$PROJECT_DIR$/app/operations/expense/index.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/base.rb" afterPath="$PROJECT_DIR$/app/operations/policy/base.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/index.rb" afterPath="$PROJECT_DIR$/app/operations/policy/index.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/invitable_users.rb" afterPath="$PROJECT_DIR$/app/operations/policy/invitable_users.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/show.rb" afterPath="$PROJECT_DIR$/app/operations/policy/show.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/users/add_user.rb" afterPath="$PROJECT_DIR$/app/operations/policy/users/add_user.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/users/remove_user.rb" afterPath="$PROJECT_DIR$/app/operations/policy/users/remove_user.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/users/update_configuration.rb" afterPath="$PROJECT_DIR$/app/operations/policy/users/update_configuration.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/policy/users/update_mapping.rb" afterPath="$PROJECT_DIR$/app/operations/policy/users/update_mapping.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/report/expenses/add.rb" afterPath="$PROJECT_DIR$/app/operations/report/expenses/add.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/report/expenses/remove.rb" afterPath="$PROJECT_DIR$/app/operations/report/expenses/remove.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/report/reject.rb" afterPath="$PROJECT_DIR$/app/operations/report/reject.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/report/update.rb" afterPath="$PROJECT_DIR$/app/operations/report/update.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/index.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/index.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/payment/add_debt_to_company_clearance.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/add_debt_to_company_clearance.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/payment/settle.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/settle.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/report/approved.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/report/approved.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/report/unapproved.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/report/unapproved.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/configuration/update_details.rb" afterPath="$PROJECT_DIR$/app/operations/user/configuration/update_details.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/configuration/update_password.rb" afterPath="$PROJECT_DIR$/app/operations/user/configuration/update_password.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/configuration/update_state.rb" afterPath="$PROJECT_DIR$/app/operations/user/configuration/update_state.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/invite/accept.rb" afterPath="$PROJECT_DIR$/app/operations/user/invite/accept.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/invite/base.rb" afterPath="$PROJECT_DIR$/app/operations/user/invite/base.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/invite/create.rb" afterPath="$PROJECT_DIR$/app/operations/user/invite/create.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/invite/resend.rb" afterPath="$PROJECT_DIR$/app/operations/user/invite/resend.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/role/set.rb" afterPath="$PROJECT_DIR$/app/operations/user/role/set.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/show.rb" afterPath="$PROJECT_DIR$/app/operations/user/show.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/team/get_managers.rb" afterPath="$PROJECT_DIR$/app/operations/user/team/get_managers.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/team/index.rb" afterPath="$PROJECT_DIR$/app/operations/user/team/index.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/team/mappings/set.rb" afterPath="$PROJECT_DIR$/app/operations/user/team/mappings/set.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/team/review/next_reviewer.rb" afterPath="$PROJECT_DIR$/app/operations/user/team/review/next_reviewer.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/team/review/user_role.rb" afterPath="$PROJECT_DIR$/app/operations/user/team/review/user_role.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/application_mailer/_body.html.erb" afterPath="$PROJECT_DIR$/app/views/application_mailer/_body.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/application_mailer/_header.html.erb" afterPath="$PROJECT_DIR$/app/views/application_mailer/_header.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/home/index.html.erb" afterPath="$PROJECT_DIR$/app/views/home/index.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/layouts/application.html.erb" afterPath="$PROJECT_DIR$/app/views/layouts/application.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/money_request/show.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/money_request/show.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/pending_invites/edit.html.erb" afterPath="$PROJECT_DIR$/app/views/pending_invites/edit.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/_budget_rules.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/_budget_rules.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/policies/show.html.erb" afterPath="$PROJECT_DIR$/app/views/policies/show.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/report_mailer/template.html.erb" afterPath="$PROJECT_DIR$/app/views/report_mailer/template.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/report_mailer/update.html.erb" afterPath="$PROJECT_DIR$/app/views/report_mailer/update.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/reports/show.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/reports/show.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/settlement_mailer/template.html.erb" afterPath="$PROJECT_DIR$/app/views/settlement_mailer/template.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/superadmin/companies/new.html.erb" afterPath="$PROJECT_DIR$/app/views/superadmin/companies/new.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/superadmin/companies/show.html.erb" afterPath="$PROJECT_DIR$/app/views/superadmin/companies/show.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/user_mailer/invite.html.erb" afterPath="$PROJECT_DIR$/app/views/user_mailer/invite.html.erb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/users/show.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/users/show.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/data/view_wise_data.yml" afterPath="$PROJECT_DIR$/config/data/view_wise_data.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/environments/development.rb" afterPath="$PROJECT_DIR$/config/environments/development.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/initializers/devise.rb" afterPath="$PROJECT_DIR$/config/initializers/devise.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/routes.rb" afterPath="$PROJECT_DIR$/config/routes.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/seeds.rb" afterPath="$PROJECT_DIR$/db/seeds.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/models/receipt_test.rb" afterPath="$PROJECT_DIR$/test/models/receipt_test.rb" />
     </list>
     <list id="7d878649-6630-420c-bf50-2b6db9b1c134" name="New changelist" comment="" />
     <ignored path="Finly.iws" />
@@ -40,12 +149,12 @@
     <favorites_list name="Finly" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="devise.rb" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config/initializers/devise.rb">
+    <leaf>
+      <file leaf-file-name="get_managers.rb" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/operations/user/team/get_managers.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+            <state relative-caret-position="288">
+              <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -54,59 +163,26 @@
       <file leaf-file-name="show.rb" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/operations/user/show.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="468">
-              <caret line="39" column="55" selection-start-line="39" selection-start-column="55" selection-end-line="39" selection-end-column="55" />
-              <folding />
+            <state relative-caret-position="774">
+              <caret line="43" column="35" selection-start-line="43" selection-start-column="35" selection-end-line="43" selection-end-column="35" />
+              <folding>
+                <marker date="1474724629727" expanded="true" signature="80:162" ph=" ... end" />
+                <marker date="1474724629727" expanded="true" signature="177:598" ph=" ... end" />
+                <marker date="1474724629727" expanded="true" signature="182:598" ph="if ... end" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="set.rb" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/operations/user/role/set.rb">
+      <file leaf-file-name="users_controller.rb" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/users_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="630">
-              <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="show.json.jbuilder" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/users/show.json.jbuilder">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="6" column="34" selection-start-line="6" selection-start-column="34" selection-end-line="6" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="report.rb" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/report.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="318">
-              <caret line="161" column="15" selection-start-line="161" selection-start-column="6" selection-end-line="161" selection-end-column="15" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pending_invites_controller.rb" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/controllers/pending_invites_controller.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="accept.rb" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/operations/user/invite/accept.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="58" column="7" selection-start-line="58" selection-start-column="7" selection-end-line="58" selection-end-column="7" />
-              <folding />
+            <state relative-caret-position="126">
+              <caret line="7" column="11" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="11" />
+              <folding>
+                <marker date="1474724629727" expanded="true" signature="224:313" ph=" ... end" />
+                <marker date="1474724629727" expanded="true" signature="1437:1438" ph="{ ... }" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -127,17 +203,20 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/db/seeds.rb" />
+        <option value="$PROJECT_DIR$/app/assets/stylesheets/static_pages.scss" />
+        <option value="$PROJECT_DIR$/app/assets/stylesheets/application.css" />
+        <option value="$PROJECT_DIR$/app/services/expense_service.rb" />
+        <option value="$PROJECT_DIR$/config/initializers/devise.rb" />
+        <option value="$USER_HOME$/.rvm/gems/ruby-2.3.0/gems/devise-4.2.0/app/controllers/devise/sessions_controller.rb" />
+        <option value="$PROJECT_DIR$/app/views/people/_all_people_template.html.erb" />
         <option value="$PROJECT_DIR$/app/views/user_profile/_my_profile.html.erb" />
         <option value="$PROJECT_DIR$/app/views/users/profile.html.erb" />
         <option value="$PROJECT_DIR$/app/helpers/application_helper.rb" />
         <option value="$PROJECT_DIR$/app/views/user_profile/_change_password.html.erb" />
-        <option value="$PROJECT_DIR$/app/models/user.rb" />
         <option value="$PROJECT_DIR$/app/models/company.rb" />
         <option value="$PROJECT_DIR$/app/views/users/_my_profile.html.erb" />
         <option value="$PROJECT_DIR$/app/views/users/_change_password.html.erb" />
         <option value="$PROJECT_DIR$/app/controllers/users_controller.rb" />
-        <option value="$PROJECT_DIR$/config/database.yml" />
         <option value="$PROJECT_DIR$/app/controllers/oauth/token_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/oauth/token/create.json.builder" />
         <option value="$PROJECT_DIR$/app/views/oauth/token/create.json.jbuilder" />
@@ -159,25 +238,22 @@
         <option value="$PROJECT_DIR$/app/views/api/v1/reports/index.json.jbuilder" />
         <option value="$PROJECT_DIR$/app/views/api/v1/receipts/index.json.jbuilder" />
         <option value="$PROJECT_DIR$/app/controllers/api/v1/receipts_controller.rb" />
-        <option value="$PROJECT_DIR$/config/routes.rb" />
         <option value="$PROJECT_DIR$/config/initializers/opro.rb" />
         <option value="$PROJECT_DIR$/app/controllers/api/v1/expenses_controller.rb" />
         <option value="$PROJECT_DIR$/log/development.log" />
+        <option value="$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb" />
         <option value="$PROJECT_DIR$/app/controllers/policies_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder" />
-        <option value="$PROJECT_DIR$/config/application.rb" />
-        <option value="$PROJECT_DIR$/app/controllers/api/v1/configuration/category_controller.rb" />
+        <option value="$PROJECT_DIR$/config/database.yml" />
         <option value="$PROJECT_DIR$/Gemfile" />
-        <option value="$PROJECT_DIR$/config/secrets.yml" />
-        <option value="$PROJECT_DIR$/app/controllers/application_controller.rb" />
-        <option value="$PROJECT_DIR$/lib/gcm_messenger.rb" />
-        <option value="$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb" />
-        <option value="$PROJECT_DIR$/operations/report/base.rb" />
-        <option value="$PROJECT_DIR$/app/operations/user/role/set.rb" />
-        <option value="$PROJECT_DIR$/app/views/users/show.json.jbuilder" />
-        <option value="$PROJECT_DIR$/app/operations/user/show.rb" />
-        <option value="$PROJECT_DIR$/app/controllers/pending_invites_controller.rb" />
-        <option value="$PROJECT_DIR$/app/operations/user/invite/accept.rb" />
+        <option value="$PROJECT_DIR$/db/migrate/20160820114906_create_receipt_email_attachments.rb" />
+        <option value="$PROJECT_DIR$/db/migrate/20160820114823_create_receipt_emails.rb" />
+        <option value="$PROJECT_DIR$/db/seeds.rb" />
+        <option value="$PROJECT_DIR$/app/models/receipt_email.rb" />
+        <option value="$PROJECT_DIR$/app/models/receipt_email_attachment.rb" />
+        <option value="$PROJECT_DIR$/app/models/user.rb" />
+        <option value="$PROJECT_DIR$/app/models/receipt.rb" />
+        <option value="$PROJECT_DIR$/config/routes.rb" />
       </list>
     </option>
   </component>
@@ -229,6 +305,10 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="RailsProjectView">
+        <subPane />
+      </pane>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -237,51 +317,8 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Finly" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="finly-server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Finly" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="finly-server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Finly" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="finly-server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="controllers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <PATH>
@@ -293,9 +330,6 @@
         </subPane>
         <subPane subId="Default" />
       </pane>
-      <pane id="RailsProjectView">
-        <subPane />
-      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -306,17 +340,17 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="SearchEverywhereHistoryKey" value="routes&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/config/routes.rb&#10;user&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/user.rb&#10;user_team&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/user_team_service.rb&#10;users&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/controllers/users_controller.rb&#10;seeds&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/db/seeds.rb&#10;people&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/views/people/people.html.erb&#10;sessions&#9;FILE&#9;file:///home/sreeram/.rvm/gems/ruby-2.3.0/gems/devise-4.2.0/app/controllers/devise/sessions_controller.rb&#10;schema&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/db/schema.rb&#10;database&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/config/database.yml&#10;userteam&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/user_team_service.rb&#10;expense&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/expense_service.rb&#10;gemfile&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/Gemfile&#10;report&#9;null&#9;null&#10;GEMFILE&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/Gemfile&#10;violation&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/services/violation_service.rb&#10;reportserv&#9;null&#9;null&#10;budget&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/budget_rule.rb&#10;policy&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/policy.rb&#10;category&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/category.rb&#10;expense_ru&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/expense_rule.rb&#10;receipt&#9;FILE&#9;file:///media/sreeram/New Volume/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/receipt.rb&#10;usermanager&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/user_manager_mapping.rb&#10;expenserule&#9;FILE&#9;file:///media/sreeram/889E84E89E84CFDC/Users/Sreeram/Dropbox/Hapitoe/Server side development/Ruby on Rails/finly-server/app/models/expense_rule.rb&#10;greater_than_amount&#9;null&#9;null" />
     <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/lib" />
+      <recent name="$PROJECT_DIR$/config" />
+      <recent name="$PROJECT_DIR$/config/initializers" />
       <recent name="$PROJECT_DIR$/app/views/api/v1/shared" />
-      <recent name="$PROJECT_DIR$/app/controllers/api/v1" />
-      <recent name="$PROJECT_DIR$/app/views/users" />
-      <recent name="$PROJECT_DIR$/app/views/devise" />
-      <recent name="G:\RubymineProjects\Finly\test\services" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
       <recent name="G:\RubymineProjects\Finly\lib" />
     </key>
   </component>
@@ -553,6 +587,11 @@
       <workItem from="1470981387861" duration="1322000" />
       <workItem from="1470988383323" duration="348000" />
       <workItem from="1471009913248" duration="2572000" />
+      <workItem from="1471593529225" duration="3297000" />
+      <workItem from="1471676409852" duration="702000" />
+      <workItem from="1471678597813" duration="2023000" />
+      <workItem from="1471685861506" duration="609000" />
+      <workItem from="1471690012063" duration="4308000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <created>1467012839750</created>
@@ -708,32 +747,11 @@
       <option name="project" value="LOCAL" />
       <updated>1471015387684</updated>
     </task>
-    <task id="LOCAL-00023" summary="Migrated  operations outside /app">
-      <created>1473401185602</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1473401185602</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Migrated  operations outside /app">
-      <created>1473402916002</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1473402916002</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Bug fixes">
-      <created>1474542233894</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1474542233894</updated>
-    </task>
-    <option name="localTasksCounter" value="26" />
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="78712000" />
+    <option name="totallyTimeSpent" value="77796000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -746,16 +764,16 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24012807" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24546425" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25304878" sideWeight="0.5170758" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30691057" sideWeight="0.5213447" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299763" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3262195" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25813007" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4593496" sideWeight="0.48292422" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30691057" sideWeight="0.47865528" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -773,12 +791,12 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25304878" sideWeight="0.5170758" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30691057" sideWeight="0.5213447" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25813007" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39126018" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4593496" sideWeight="0.48292422" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24012807" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30691057" sideWeight="0.47865528" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24546425" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299763" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3262195" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -819,10 +837,7 @@
     <MESSAGE value="implemented api for expenses" />
     <MESSAGE value="Implemented reports api for index and show" />
     <MESSAGE value="API Implementation" />
-    <MESSAGE value="Migrated  operations outside /app" />
-    <MESSAGE value="Bug fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fixes" />
-    <option name="PRESELECT_EXISTING_CHANGELIST" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="API Implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -838,21 +853,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/expense_status.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state relative-caret-position="0">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/base_api_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state relative-caret-position="0">
           <caret line="1" column="2" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/policies/expense_policy.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state relative-caret-position="0">
           <caret line="23" column="8" selection-start-line="23" selection-start-column="8" selection-end-line="23" selection-end-column="8" />
         </state>
       </provider>
@@ -860,70 +875,77 @@
     <entry file="file://$USER_HOME$/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/bundler/gems/opro-6e0fe4e3a097/lib/opro/controllers/application_controller_helper.rb" />
     <entry file="file://$PROJECT_DIR$/app/controllers/expenses_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="918">
+        <state relative-caret-position="0">
           <caret line="51" column="7" selection-start-line="51" selection-start-column="7" selection-end-line="51" selection-end-column="7" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/expense.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
+        <state relative-caret-position="0">
           <caret line="38" column="52" selection-start-line="38" selection-start-column="52" selection-end-line="38" selection-end-column="52" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/reports_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
+        <state relative-caret-position="0">
           <caret line="3" column="55" selection-start-line="3" selection-start-column="55" selection-end-line="3" selection-end-column="55" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/report_comment.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
+        <state relative-caret-position="0">
           <caret line="6" column="27" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="27" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/expenses/show.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state relative-caret-position="0">
           <caret line="1" column="12" selection-start-line="1" selection-start-column="12" selection-end-line="2" selection-end-column="44" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/expenses/_expense.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
+        <state relative-caret-position="0">
           <caret line="11" column="20" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/_report.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
+        <state relative-caret-position="0">
           <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/index.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state relative-caret-position="0">
           <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/expenses/index.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state relative-caret-position="0">
           <caret line="2" column="36" selection-start-line="2" selection-start-column="36" selection-end-line="2" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/report.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="9" column="15" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/shared/failure.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state relative-caret-position="0">
           <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
         </state>
       </provider>
@@ -931,49 +953,42 @@
     <entry file="file://$USER_HOME$/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/jbuilder-2.6.0/lib/jbuilder/jbuilder_template.rb" />
     <entry file="file://$PROJECT_DIR$/app/services/report_service.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1854">
+        <state relative-caret-position="0">
           <caret line="103" column="6" selection-start-line="103" selection-start-column="6" selection-end-line="103" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/receipts_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state relative-caret-position="0">
           <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="98" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/api/v1/receipts/index.json.jbuilder">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" column="3" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/receipt.rb">
-      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="10" column="3" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/services/receipt_service.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
+        <state relative-caret-position="0">
           <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/helpers/sessions_helper.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
+        <state relative-caret-position="0">
           <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/receipts_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
+        <state relative-caret-position="0">
           <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
         </state>
       </provider>
@@ -987,184 +1002,195 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/log/development.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9918">
+        <state relative-caret-position="0">
           <caret line="551" column="0" selection-start-line="551" selection-start-column="0" selection-end-line="551" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/services/expense_service.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
+        <state relative-caret-position="0">
           <caret line="53" column="6" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/expenses_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state relative-caret-position="0">
           <caret line="1" column="42" selection-start-line="0" selection-start-column="62" selection-end-line="1" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/initializers/opro.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
+        <state relative-caret-position="0">
           <caret line="25" column="3" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/report_status.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="965">
+        <state relative-caret-position="0">
           <caret line="85" column="5" selection-start-line="55" selection-start-column="2" selection-end-line="85" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/policies_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state relative-caret-position="0">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/routes.rb">
+    <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="461">
-          <caret line="227" column="54" selection-start-line="227" selection-start-column="54" selection-end-line="227" selection-end-column="54" />
+        <state relative-caret-position="0">
+          <caret line="61" column="5" selection-start-line="61" selection-start-column="5" selection-end-line="61" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/database.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="19" column="12" selection-start-line="19" selection-start-column="12" selection-end-line="19" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/proselytism.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/initializers/imgkit.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/receipt_processor/pdf_converter.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/system/receipts/images/000/000/991/original/1363397.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/migrate/20160820114906_create_receipt_email_attachments.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="8" column="59" selection-start-line="8" selection-start-column="59" selection-end-line="8" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/migrate/20160820114823_create_receipt_emails.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/db/seeds.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="341">
-          <caret line="304" column="9" selection-start-line="304" selection-start-column="9" selection-end-line="304" selection-end-column="9" />
+        <state relative-caret-position="0">
+          <caret line="104" column="3" selection-start-line="104" selection-start-column="3" selection-end-line="104" selection-end-column="3" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/configuration/category_controller.rb">
+    <entry file="file://$PROJECT_DIR$/app/models/receipt.rb">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="22" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
+          <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/secrets.yml">
+    <entry file="file://$PROJECT_DIR$/app/models/receipt_email.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="21" column="48" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="48" />
+        <state relative-caret-position="0">
+          <caret line="3" column="18" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/receipt_email_attachment.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/user.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="54" column="47" selection-start-line="54" selection-start-column="47" selection-end-line="54" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/email_processor.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="20" column="30" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sendgrid.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="33" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/routes.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="81" column="19" selection-start-line="81" selection-start-column="19" selection-end-line="81" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gemfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="81" column="16" selection-start-line="81" selection-start-column="16" selection-end-line="81" selection-end-column="16" />
+        <state relative-caret-position="0">
+          <caret line="75" column="19" selection-start-line="75" selection-start-column="19" selection-end-line="75" selection-end-column="19" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/application.rb">
+    <entry file="file://$PROJECT_DIR$/config/environments/production.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="19" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="19" />
+        <state relative-caret-position="270">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/application_controller.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="1" column="29" selection-start-line="1" selection-start-column="29" selection-end-line="1" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/home_controller.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/api/v1/reports/show.json.jbuilder">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" column="12" selection-start-line="6" selection-start-column="7" selection-end-line="6" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/gcm_messenger.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="24" column="5" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/api/v1/reports_controller.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="45" column="14" selection-start-line="45" selection-start-column="14" selection-end-line="45" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/operations/report/show.rb" />
-    <entry file="file://$PROJECT_DIR$/operations/report/index.rb" />
-    <entry file="file://$PROJECT_DIR$/operations/report/base.rb" />
-    <entry file="file://$PROJECT_DIR$/app/views/expenses/show.json.jbuilder">
+    <entry file="file://$PROJECT_DIR$/app/operations/user/team/get_managers.rb">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
-          <caret line="16" column="51" selection-start-line="16" selection-start-column="51" selection-end-line="16" selection-end-column="51" />
+          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/report.rb">
+    <entry file="file://$PROJECT_DIR$/test/mailers/previews/report_mailer_preview.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="161" column="15" selection-start-line="161" selection-start-column="6" selection-end-line="161" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/users/show.json.jbuilder">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" column="34" selection-start-line="6" selection-start-column="34" selection-end-line="6" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/operations/user/role/set.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/operations/user/show.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="39" column="55" selection-start-line="39" selection-start-column="55" selection-end-line="39" selection-end-column="55" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/pending_invites_controller.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/operations/user/invite/accept.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="58" column="7" selection-start-line="58" selection-start-column="7" selection-end-line="58" selection-end-column="7" />
+        <state relative-caret-position="90">
+          <caret line="5" column="60" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="60" />
           <folding />
         </state>
       </provider>

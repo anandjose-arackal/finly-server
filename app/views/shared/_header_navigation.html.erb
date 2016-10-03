@@ -34,13 +34,13 @@
           <a href="<%= root_path + "#expenses" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Expenses</a>
         </li>
         <li class="<%= 'active' if current_page?(reports_path) %>">
-          <a href="<%= root_path + "#reports/" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
+          <a href="<%= root_path + "#reports" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Reports</a>
         </li>
         <li class="<%= 'active' if current_page?(receipts_path) %>">
           <a href="<%= root_path + "#receipts" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Receipts</a>
         </li>
          <li class="<%= 'active' if current_page?(settlements_path(id: current_user.id)) %>">
-          <a href="<%= settlement_path(id: current_user.id) %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
+          <a href="<%= root_path + "#settlements/#{current_user.id}" %>" style="text-decoration: none; font-size: 12px;font-weight: 500;color: rgba(255,255,255,0.66)  ">Settlements</a>
         </li>
     <% end %>
 <% else %>

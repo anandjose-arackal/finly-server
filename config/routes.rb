@@ -3,6 +3,7 @@
 #                              Prefix Verb   URI Pattern                                                 Controller#Action
 # api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
 #       api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                    api/v1/configuration#category
+#                     email_processor POST   /email/incoming(.:format)                                   griddler/emails#create
 #                           oauth_new GET    /oauth/new(.:format)                                        oauth/auth#new
 #                     oauth_authorize POST   /oauth/authorize(.:format)                                  opro/oauth/auth#create
 #                         oauth_token POST   /oauth/token(.:format)                                      oauth/token#create {:format=>"json"}
@@ -85,6 +86,7 @@
 #                      api_v1_receipt PATCH  /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
 #                                     PUT    /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
 #                                     DELETE /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
+#             api_v1_receipt_add_note POST   /api/v1/receipts/:receipt_id/add_note(.:format)             api/v1/receipts#add_note
 # api_v1_receipt_expense_from_receipt POST   /api/v1/receipts/:receipt_id/expense_from_receipt(.:format) api/v1/receipts#expense_from_receipt
 #                                     GET    /api/v1/receipts(.:format)                                  api/v1/receipts#index
 #                                     POST   /api/v1/receipts(.:format)                                  api/v1/receipts#create
@@ -285,6 +287,8 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
+
+  mount_griddler('/email/incoming')
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
       oauth_token: 'oauth/token'
@@ -331,6 +335,7 @@ Rails.application.routes.draw do
       end
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
+        post 'add_note', to: 'receipts#add_note', as: :add_note
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
       end
       namespace :configuration do

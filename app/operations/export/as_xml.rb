@@ -11,7 +11,9 @@ class Export::AsXml < Export::Base
   end
 
   def init
-    self.reports = Report.where(id: params[:report_id])
+    report_presenter = Report::Index.(user, params)
+    id = (params[:report_id] or params[:report_ids])
+    self.reports = report_presenter.reports.with_id(id) rescue nil
     self.preferences = user.company.export_preferences
   end
 

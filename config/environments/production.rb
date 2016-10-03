@@ -24,7 +24,7 @@ Rails.application.configure do
   # Apache or NGINX already handles this.
   # config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
   config.serve_static_files = true
-  config.serve_static_assets = true
+  # config.serve_static_assets = true
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -74,7 +74,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
       address:              'smtp.sendgrid.net',
       port:                 587,
-      domain:               'www.localhost:3000',
+      domain:               'www.finly.io',
       user_name:            'vivekagb',
       password:             'idAr5APhk61X',
       # ssl:                  true,
@@ -86,7 +86,7 @@ Rails.application.configure do
 
   ######################################################################
 
-  # temporary config for mailers
+  # # # temporary config for mailers
   # config.action_mailer.raise_delivery_errors = true
   # config.action_mailer.delivery_method = :test
   # config.action_mailer.default_url_options = { host: 'localhost:3000'}

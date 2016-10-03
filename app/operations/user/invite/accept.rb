@@ -28,6 +28,7 @@ class User::Invite::Accept < User::Invite::Base
 
   def init
     self.accept_params = user_params
+    self.accept_params[:invitation_token] = params[:invitation_token] if accept_params[:invitation_token].blank?
   end
 
   def validate

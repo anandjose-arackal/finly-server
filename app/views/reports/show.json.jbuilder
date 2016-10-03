@@ -2,8 +2,8 @@ json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id
 json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status
-json.manager_name @result.manager.name rescue nil
-json.finance_manager_name @result.finance_manager.name rescue nil
+json.manager_name @result.manager.name rescue ''
+json.finance_manager_name @result.finance_manager.name rescue ''
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
@@ -25,18 +25,17 @@ end
 
 json.status @result.report.status.name
 json.total @result.report.total_amount
-json.date @result.report.created_at.strftime('%d %b')
+json.date @result.report.created_at.strftime('%d %b %Y')
 
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user
-  json.created_at comment.created_at.strftime('%d %b %y')
+  json.created_at comment.created_at.strftime('%d %b %Y')
   if comment.user.respond_to?(:id, :name)
     json.comment_user_id comment.user.id
     json.comment_user_name comment.user.name
     json.comment_user_initial comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
   end
 end
-
 categorized_expense = @result.expenses_category_sorted
 json.expense_sections categorized_expense do |category|
   json.extract! category, :section_name, :section_total
@@ -64,7 +63,7 @@ end
 json.receipts @result.expenses do |expense|
   unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
     json.url expense.receipts.first.image.url
-    json.date expense.date.strftime('%d %b %y')
+    json.date expense.date.strftime('%d %b %Y')
     json.merchant_name expense.merchant_name
     json.amount_value expense.amount.precision_value
   end

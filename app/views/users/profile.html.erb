@@ -7,28 +7,22 @@
 <ul class="innerul">
   <li class="active" data-switch="#my_profile"><a href="#" data-turbolinks="false">My Profile
     <i class="fa fa-angle-right fa-fw arrow " aria-hidden="true"></i></a>
-  <li data-switch="#policies_assigned"><a href="#" data-turbolinks="false">Policies Assigned
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  <!--<li data-switch="#policies_assigned"><a href="#" data-turbolinks="false">Policies Assigned-->
+    <!--<i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>-->
   </li>
 
-  <% if current_user.admin? or current_user.policy_admin? %>
-  <li data-switch="#administering_policies"><a href="#" data-turbolinks="false">Policies Administered
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <% end %>
-
-  <li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
-  <li data-switch="#bank_account"><a href="#" data-turbolinks="false">Bank Account
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
+  <!--<li data-switch="#cards_assigned"><a href="#" data-turbolinks="false">Cards Assigned-->
+    <!--<i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>-->
+  <!--</li>-->
+  <!--<li data-switch="#bank_account"><a href="#" data-turbolinks="false">Bank Account-->
+    <!--<i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>-->
+  <!--</li>-->
   <li data-switch="#change_password"><a href="#" data-turbolinks="false">Change Password
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
-  <li data-switch="#accounting"><a href="#" data-turbolinks="false">Accounting
-    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
-  </li>
+  <!--<li data-switch="#accounting"><a href="#" data-turbolinks="false">Accounting-->
+    <!--<i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>-->
+  <!--</li>-->
 </ul>
 
 <div id="page-2" class="innerdiv" style="background: white">
@@ -137,3 +131,8 @@
 
 
 </script>
+<style type="text/css">
+  body{
+    margin-top: -17px;
+  }
+</style>

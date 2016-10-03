@@ -10,16 +10,16 @@
 
 <div class="col-md-8">
   <div class="col-sm-3 text-center">
-  {{#switch item.status}}
-    {{#case 'Open'}}<span class="label label-default">{{item.status}}</span>{{/case}}
-    {{#case 'Approved'}}<span class="label label-success">{{item.status}}</span>{{/case}}
-    {{#case 'Rejected'}}<span class="label label-danger">{{item.status}}</span>{{/case}}
-    {{#case 'Retracted'}}<span class="label label-default">{{item.status}}</span>{{/case}}
-    {{#case 'Processing'}}<span class="label label-primary">{{item.status}}</span>{{/case}}
-    {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+  {{#switch item.status_name}}
+    {{#case 'Open'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+    {{#case 'Approved'}}<span class="label label-success">{{item.status_name}}</span>{{/case}}
+    {{#case 'Rejected'}}<span class="label label-danger">{{item.status_name}}</span>{{/case}}
+    {{#case 'Retracted'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+    {{#case 'Processing'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
+    {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status_name}}</span>{{/case}}
   {{/switch}}
   </div>
   <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
-  <div class="col-sm-3">{{item.policy}}</div>
-  <div class="col-sm-4">{{item.memo}}</div>
+  <div class="col-sm-3">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
+  <div class="col-sm-4">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
 </div>
