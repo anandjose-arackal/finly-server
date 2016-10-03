@@ -8,7 +8,7 @@
       <label for="receipt-image-upload">
         <img class="preview-image img-responsive" id="preview-image" src="<%= image_url('receipt-placeholder.png') %>" alt="Click to upload image"/>
       </label>
-      <input type="file" id="receipt-image-upload" accept=".png, .jpg, .pdf, .jpeg" name="receipt[image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
+      <input type="file" id="receipt-image-upload" accept=".png, .jpg, .jpeg" name="receipt[image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
         
       <textarea class="form-control" name="receipt[note]" placeholder="Add a Note. (Optional)" style="width: 50%;"></textarea>
 
