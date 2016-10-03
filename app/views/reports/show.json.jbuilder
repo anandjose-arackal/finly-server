@@ -36,7 +36,6 @@ json.comments @result.comments do |comment|
     json.comment_user_initial comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
   end
 end
-
 categorized_expense = @result.expenses_category_sorted
 json.expense_sections categorized_expense do |category|
   json.extract! category, :section_name, :section_total
