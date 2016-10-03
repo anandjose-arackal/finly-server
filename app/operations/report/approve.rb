@@ -51,7 +51,9 @@ class Report::Approve < Report::Base
     end
     manager_id = manager.id rescue nil
     user_role = User::Team::Review::UserRole.(user, self.report)
-    if report.update_attributes report_status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: nil, submitted_at: DateTime.now
+    update_attributes = {report_status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: nil}
+    update_attributes[:submitted_at] = DateTime.now if auto_approve
+    if report.update_attributes update_attributes
       if auto_approve
         track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
       else
