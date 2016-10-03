@@ -28,7 +28,7 @@ class Receipt < ActiveRecord::Base
 
   validate :validate_expense_user
 
-  has_attached_file :image
+  has_attached_file :image, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}, default_url: "/assets/:style/missing.png"
   validates_attachment :image, content_type: {
       content_type: [
           'image/jpg', 'image/jpeg', 'image/png', 'image/gif',
