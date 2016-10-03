@@ -371,6 +371,9 @@ Rails.application.routes.draw do
 
   get 'people' => 'people#people'
 
+  post 'otp/verify' => 'otp#verify', as: :verify_otp
+  post 'otp/resend' => 'otp#resend', as: :resend_otp
+
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
   resources :reports do
