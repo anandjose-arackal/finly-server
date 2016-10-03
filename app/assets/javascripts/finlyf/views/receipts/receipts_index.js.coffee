@@ -126,6 +126,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       target = e.currentTarget
       $(target).find("i").addClass("fa-spin")
 
+    @toggleReceiptSelectOptions()
+
     @params.page = 1
     @collection.fetch({
       reset: true,
@@ -175,6 +177,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     target = e.currentTarget
     button = $(target).find("button[type=submit]")
     $(button).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;")
+    $(button).attr('disabled', 'disabled')
 
     # $(target).text("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;")
     _this = @
@@ -195,9 +198,11 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
           _this.toggleReceiptSelectOptions()
         else
           $(button).html('Add Receipt')
+          $(button).attr('disabled', false)
       error: (err) ->
         console.log "Err", err
         $(button).html('Add Receipt')
+        $(button).attr('disabled', false)
       cache: false,
       contentType: false,
       processData: false

@@ -67,7 +67,6 @@ class MoneyRequest::Approve < MoneyRequest::Base
     end
 
     # todo sending notifications
-
-    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
+    # Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
   end
 end

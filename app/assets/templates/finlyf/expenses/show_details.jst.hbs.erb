@@ -46,7 +46,7 @@
 
       <div class="col-sm-8 item-amount-value item-attr-preview" style="font-size: 25px;line-height: 14px; color: #93C178;">{{item.amount_value}}</div>
       <div class="col-sm-8 item-amount-value item-attr-edit" style="font-size: 25px;line-height: 14px; color: #93C178;">
-        <input type="number" value="{{item.amount_value}}" name="expense[amount_attributes][value]"/>
+        <input class="form-control" type="number" value="{{item.amount_value}}" name="expense[amount_attributes][value]"/>
 
         <input type="hidden" name="expense[amount_attributes][currency_id]" class="form-control" value="1" />
       </div>
@@ -55,20 +55,20 @@
       <div class="col-sm-4 no-padding"><label class="control-label">Merchant:</label></div>
 
       <div class="col-sm-8 item-merchant-name item-attr-preview" style="font-size: 16px;line-height: 14px;">{{item.merchant_name}}</div>
-      <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" class="filter-merchant" name="expense[manual_expense_attributes][merchant]" value="{{item.merchant_name}}" /></div>
+      <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" class="form-control filter-merchant" name="expense[manual_expense_attributes][merchant]" value="{{item.merchant_name}}" /></div>
     </div>
 
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Date:</label></div>
       <div class="col-sm-8 item-date item-attr-preview">{{item.date}}</div>
-      <div class="col-sm-8 item-date item-attr-edit"><input type="text" class="datepicker" name="expense[date]" value="{{item.formatted_date}}"/></div>
+      <div class="col-sm-8 item-date item-attr-edit"><input type="text" class="form-control datepicker" name="expense[date]" value="{{item.formatted_date}}"/></div>
     </div>
 
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Category:</label></div>
       <div class="col-sm-8 item-attr-preview">{{item.category_name}}</div>
       <div class="col-sm-8 item-attr-edit">
-        <select name="expense[category_id]" class="editExpenseCategory">
+        <select name="expense[category_id]" class="form-control editExpenseCategory">
 
         </select>
       </div>
@@ -77,7 +77,7 @@
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Note:</label></div>
       <div class="col-sm-8 item-attr-preview">{{item.note}}</div>
-      <div class="col-sm-8 item-attr-edit"><textarea name="expense[note]">{{item.note}}</textarea> </div>
+      <div class="col-sm-8 item-attr-edit"><textarea class="form-control" name="expense[note]">{{item.note}}</textarea> </div>
     </div>
 
 

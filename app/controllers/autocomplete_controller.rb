@@ -10,12 +10,10 @@ class AutocompleteController < ApplicationController
   end
 
   def user
-    team = User::Team::Index.(current_user, params)
+    @users = User::Team::Index.(current_user, params)
     # scoping the search to within the particular user's team
-    @users = team.filter_search(params[:query]).select(:id, :name)
-
+    #  = team.filter_search(params[:query]).select(:id, :name) rescue nil
     respond_to do |format|
-      # format.json {render json: users.to_a.as_json }
       format.json {}
     end
   end

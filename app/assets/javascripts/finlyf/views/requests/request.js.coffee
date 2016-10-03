@@ -26,6 +26,7 @@ class FinlyF.Views.Request extends Backbone.View
     'click .btn-view-sub-item': 'viewSub'
     'click .btn-reject-sub-item': 'rejectSub'
     'hidden.bs.modal #modal-mp': 'refreshData'
+    'keypress .comment-content': 'postCommentByEnter'
     'click .btn-add-request-category': 'addRequestCategory'
     'click .btn-remove-request-category': 'removeRequestCategory'
 
@@ -195,6 +196,11 @@ class FinlyF.Views.Request extends Backbone.View
       contentType: false,
       processData: false
     })
+
+  postCommentByEnter: (e) ->
+    if e.keyCode == 13
+      $(e.currentTarget).closest('.form-new-comment').find('.btn-post-comment').click()
+      return false
 
   postComment: (e) ->
     e.preventDefault()

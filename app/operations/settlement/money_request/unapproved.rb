@@ -1,5 +1,5 @@
 class Settlement::MoneyRequest::Unapproved < MoneyRequest::Base
-  attr_accessor :money_request
+  attr_accessor :money_request, :selected_user
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -13,25 +13,27 @@ class Settlement::MoneyRequest::Unapproved < MoneyRequest::Base
 
   def init
     self.money_request = params[:money_request]
+    if self.money_request
+      self.selected_user = money_request.user
+    end
   end
 
   def validate
     if money_request.credited?
-      messages[:error] << 'Money Request has already been processed'
+      messages[:error] << 'Advance Request has already been processed'
     end
     unless money_request.processing?
       messages[:error] << 'Cannot reduce pending cash advance as the request in not in processing state'
     end
+    unless money_request.accounted
+      messages[:error] << 'Advance Request has not yet been accounted'
+    end
   end
 
   def process
-    unless money_request.accounted
-      return
-    end
-
     total_amount = money_request.total_amount
     currency = Currency.first
-    user.balance_sheet.subtract_pending_advance total_amount, currency
+    selected_user.balance_sheet.subtract_pending_advance total_amount, currency
     unless money_request.update_attribute(:accounted, false)
       messages[:error] = money_request.errors.full_messages
     end
