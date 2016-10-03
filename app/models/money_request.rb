@@ -22,7 +22,7 @@
 #
 
 class MoneyRequest < ActiveRecord::Base
-  include OperationCallbacks, MathUtil
+  include OperationCallbacks, MathUtil, SoftDeletable
 
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :user

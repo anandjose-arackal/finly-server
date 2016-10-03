@@ -28,7 +28,7 @@ class Report::Retract < Report::Base
   def authorize
     super
     unless report.user_id == user.id
-      messages[:error] << "You don't own this report."
+      messages[:error] << 'Only report owners can retract report'
     end
   end
 

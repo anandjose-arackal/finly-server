@@ -17,7 +17,8 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
   end
 
   def process
-    if money_request.update_attributes controlling_user: nil, controlling_for_user: nil,
+    if money_request.update_attributes controlling_user: nil, controlling_for_user: nil, controlling_user_role_id: nil,
+                                       controlling_for_user_role_id: nil,
                                        status_id: MoneyRequestStatus.id_for(:credited), payment: self.payment
       money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:credited),
                                   status_id: MoneyRequestStatus.id_for(:credited), payment: self.payment

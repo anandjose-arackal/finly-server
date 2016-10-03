@@ -26,15 +26,17 @@ class MoneyRequest::Submit < MoneyRequest::Base
       raise_unauthorized_exception
       return false
     end
-    
+
     # Only request owners can submit request
     unless money_request.user_id == user.id
       raise_unauthorized_exception
     end
   end
-  
+
   def process
-    manager = User::Team::Review::NextReviewer.(money_request)
+    presenter = User::Team::Review::NextReviewer.(money_request)
+    manager = presenter.user
+    manager_role_id = presenter.role_id
     # If no manager assigned, auto approve the money_request
     if manager.blank?
       # call the approve class with the right parameters
@@ -50,18 +52,22 @@ class MoneyRequest::Submit < MoneyRequest::Base
     memo = (params[:note] or params[:memo] or money_request.memo)
     submitted_at = DateTime.now
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
-                                       controlling_user_id: manager.id, controlling_for_user_id: nil, memo: memo,
+                                       controlling_user_id: manager.id,
+                                       controlling_for_user_id: nil,
+                                       controlling_user_role_id: manager_role_id, controlling_for_user_role_id: nil,
+                                       memo: memo,
                                        submitted_at: submitted_at
-      money_request.tracks.create action_user: user,
-                                         money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:submit),
-                                         status_id: MoneyRequestStatus.id_for(:processing), memo: memo
+      money_request.tracks.create action_user: user, modified_user_id: money_request.controlling_user_id,
+                                  modified_user_role_id: manager_role_id,
+                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:submit),
+                                  status_id: MoneyRequestStatus.id_for(:processing), memo: memo
       return true
     end
     messages[:error] = money_request.errors.full_messages
   end
 
   def post_process
-    # adding comment regarding the change in status of this report
+    # adding comment regarding the change in status of this money request
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
 
     messages[:success] << 'Money Request Submitted'

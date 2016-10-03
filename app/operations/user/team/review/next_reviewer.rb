@@ -59,9 +59,8 @@ class User::Team::Review::NextReviewer < BaseOperation
 
   private
   def next_reviewer(sym, obj)
-    user = obj.controlling_for_user
-    user = obj.controlling_user if user.blank?
-    user = obj.user if user.blank?
+    user = (obj.controlling_for_user or obj.controlling_user or obj.user)
+    role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id or UserRole.id_for(:employee))
     arg_hash={}
     arg_hash[sym] = obj
     if obj.user.id == user.id
@@ -83,7 +82,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       end
     end
     arg_hash[:type] = :manager
-    if user.manager? and User::Team::IsApprover.(user, arg_hash)
+    if user.manager? and role == UserRole.id_for(:manager)
       arg_hash[:type] = :approves_to
       manager = User::Team::Approver.(user, arg_hash)
       if manager.nil?
@@ -102,7 +101,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       end
     end
     arg_hash[:type] = :finance_manager
-    if user.finance_manager? and User::Team::IsApprover.(user, arg_hash)
+    if user.finance_manager? and role == UserRole.id_for(:manager)
       arg_hash[:type] = :approves_finance_to
       self.response = User::Team::Approver.(user, arg_hash)
       if self.response.present?

@@ -48,6 +48,7 @@ class Report::Unapprove < Report::Base
     prev_controlling_user = (report.controlling_for_user or report.controlling_user)
     prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
     role_id = nil
+    # Todo verify if the user has approved the report as manager / finance manager
     if manager_view?
       role_id = UserRole.id_for(:manager)
     elsif finance_view?
@@ -73,6 +74,6 @@ class Report::Unapprove < Report::Base
       Settlement::Report::Unapproved.(user, report: report, from_user: self.from_user)
     end
 
-    messages[:success] << "Report unapproved."
+    messages[:success] << 'Report unapproved'
   end
 end

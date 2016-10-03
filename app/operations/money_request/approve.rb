@@ -45,13 +45,15 @@ class MoneyRequest::Approve < MoneyRequest::Base
     end
     manager_id = manager.id rescue nil
     curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
-    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil,
-                                       controlling_user_role_id: to_user_role_id,controlling_for_user_role_id: nil,
-                                       memo: self.params[:memo]
+    update_attributes = {status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil,
+                         controlling_user_role_id: to_user_role_id,controlling_for_user_role_id: nil,
+                         memo: self.params[:memo]}
+    update_attributes[:submitted_at] = DateTime.now if auto_approve
+    if money_request.update_attributes update_attributes
       if auto_approve
         money_request.tracks.create action_user: nil,
                                     money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
-                                    status_id: status, modified_user: nil
+                                    status_id: status, modified_user: nil, modified_user_role_id: nil
         self.money_request.comments.create comment_action_id: MoneyRequestCommentAction.id_for(:auto_approve)
       else
         money_request.tracks.create action_user: user, modified_user_id: money_request.controlling_user_id,

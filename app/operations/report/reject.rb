@@ -74,7 +74,8 @@ class Report::Reject < Report::Base
 
   def post_process
     if success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reject), rejected_to_id: reject_to_user.id, content: params[:memo]
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reject),
+                                      rejected_to_id: reject_to_user.id, content: params[:memo]
       comment.save
     end
 
