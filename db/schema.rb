@@ -374,9 +374,11 @@ ActiveRecord::Schema.define(version: 20161002150824) do
   create_table "money_request_tracks", force: :cascade do |t|
     t.integer  "money_request_id",                 limit: 4,   null: false
     t.integer  "action_user_id",                   limit: 4
+    t.integer  "modified_user_id",                 limit: 4
     t.integer  "money_request_tracking_action_id", limit: 4
     t.integer  "status_id",                        limit: 4
     t.integer  "user_request_role_id",             limit: 4
+    t.integer  "modified_user_role_id",            limit: 4
     t.integer  "payment_id",                       limit: 4
     t.string   "memo",                             limit: 255
     t.datetime "created_at",                                   null: false
@@ -385,6 +387,8 @@ ActiveRecord::Schema.define(version: 20161002150824) do
   end
 
   add_index "money_request_tracks", ["action_user_id"], name: "index_money_request_tracks_on_action_user_id", using: :btree
+  add_index "money_request_tracks", ["modified_user_id"], name: "index_money_request_tracks_on_modified_user_id", using: :btree
+  add_index "money_request_tracks", ["modified_user_role_id"], name: "index_money_request_tracks_on_modified_user_role_id", using: :btree
   add_index "money_request_tracks", ["money_request_id"], name: "index_money_request_tracks_on_money_request_id", using: :btree
   add_index "money_request_tracks", ["money_request_tracking_action_id"], name: "index_money_request_tracks_on_money_request_tracking_action_id", using: :btree
   add_index "money_request_tracks", ["payment_id"], name: "index_money_request_tracks_on_payment_id", using: :btree
@@ -392,26 +396,30 @@ ActiveRecord::Schema.define(version: 20161002150824) do
   add_index "money_request_tracks", ["user_request_role_id"], name: "index_money_request_tracks_on_user_request_role_id", using: :btree
 
   create_table "money_requests", force: :cascade do |t|
-    t.string   "name",                    limit: 255
-    t.integer  "user_id",                 limit: 4,                                 null: false
-    t.integer  "policy_id",               limit: 4
-    t.integer  "payment_mode_id",         limit: 4,                                 null: false
-    t.integer  "payment_id",              limit: 4
+    t.string   "name",                         limit: 255
+    t.integer  "user_id",                      limit: 4,                                 null: false
+    t.integer  "policy_id",                    limit: 4
+    t.integer  "payment_mode_id",              limit: 4,                                 null: false
+    t.integer  "payment_id",                   limit: 4
     t.date     "required_by_date"
-    t.integer  "status_id",               limit: 4,                                 null: false
-    t.integer  "controlling_user_id",     limit: 4
-    t.integer  "controlling_for_user_id", limit: 4
-    t.integer  "loaded_by",               limit: 4
+    t.integer  "status_id",                    limit: 4,                                 null: false
+    t.integer  "controlling_user_id",          limit: 4
+    t.integer  "controlling_user_role_id",     limit: 4
+    t.integer  "controlling_for_user_id",      limit: 4
+    t.integer  "controlling_for_user_role_id", limit: 4
+    t.integer  "loaded_by",                    limit: 4
     t.datetime "loaded_at"
-    t.datetime "submitted_at",                        precision: 6
-    t.string   "memo",                    limit: 255
-    t.boolean  "accounted",                                         default: false, null: false
-    t.datetime "created_at",                                                        null: false
-    t.datetime "updated_at",                                                        null: false
+    t.datetime "submitted_at",                             precision: 6
+    t.string   "memo",                         limit: 255
+    t.boolean  "accounted",                                              default: false, null: false
+    t.datetime "created_at",                                                             null: false
+    t.datetime "updated_at",                                                             null: false
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
+  add_index "money_requests", ["controlling_for_user_role_id"], name: "index_money_requests_on_controlling_for_user_role_id", using: :btree
   add_index "money_requests", ["controlling_user_id"], name: "index_money_requests_on_controlling_user_id", using: :btree
+  add_index "money_requests", ["controlling_user_role_id"], name: "index_money_requests_on_controlling_user_role_id", using: :btree
   add_index "money_requests", ["loaded_by"], name: "index_money_requests_on_loaded_by", using: :btree
   add_index "money_requests", ["payment_id"], name: "index_money_requests_on_payment_id", using: :btree
   add_index "money_requests", ["payment_mode_id"], name: "index_money_requests_on_payment_mode_id", using: :btree
@@ -621,9 +629,11 @@ ActiveRecord::Schema.define(version: 20161002150824) do
   create_table "report_tracks", force: :cascade do |t|
     t.integer  "report_id",                 limit: 4,   null: false
     t.integer  "action_user_id",            limit: 4
+    t.integer  "modified_user_id",          limit: 4
     t.integer  "report_tracking_action_id", limit: 4
     t.integer  "report_status_id",          limit: 4,   null: false
     t.integer  "user_report_role_id",       limit: 4
+    t.integer  "modified_user_role_id",     limit: 4
     t.string   "memo",                      limit: 255
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
@@ -631,31 +641,37 @@ ActiveRecord::Schema.define(version: 20161002150824) do
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
+  add_index "report_tracks", ["modified_user_id"], name: "index_report_tracks_on_modified_user_id", using: :btree
+  add_index "report_tracks", ["modified_user_role_id"], name: "index_report_tracks_on_modified_user_role_id", using: :btree
   add_index "report_tracks", ["report_id"], name: "index_report_tracks_on_report_id", using: :btree
   add_index "report_tracks", ["report_status_id"], name: "index_report_tracks_on_report_status_id", using: :btree
   add_index "report_tracks", ["report_tracking_action_id"], name: "index_report_tracks_on_report_tracking_action_id", using: :btree
   add_index "report_tracks", ["user_report_role_id"], name: "index_report_tracks_on_user_report_role_id", using: :btree
 
   create_table "reports", force: :cascade do |t|
-    t.string   "name",                    limit: 255,                               null: false
-    t.integer  "user_id",                 limit: 4,                                 null: false
-    t.integer  "report_status_id",        limit: 4,                                 null: false
-    t.integer  "policy_id",               limit: 4
-    t.datetime "submitted_at",                        precision: 6
-    t.integer  "controlling_user_id",     limit: 4
-    t.integer  "controlling_for_user_id", limit: 4
-    t.string   "memo",                    limit: 255
-    t.datetime "created_at",                                                        null: false
-    t.datetime "updated_at",                                                        null: false
-    t.integer  "reimbursement_id",        limit: 4
-    t.integer  "reimbursement_amount_id", limit: 4
-    t.boolean  "accounted",                                         default: false, null: false
-    t.boolean  "archived",                                          default: false, null: false
-    t.boolean  "is_deleted",                                        default: false, null: false
+    t.string   "name",                         limit: 255,                               null: false
+    t.integer  "user_id",                      limit: 4,                                 null: false
+    t.integer  "report_status_id",             limit: 4,                                 null: false
+    t.integer  "policy_id",                    limit: 4
+    t.datetime "submitted_at",                             precision: 6
+    t.integer  "controlling_user_id",          limit: 4
+    t.integer  "controlling_user_role_id",     limit: 4
+    t.integer  "controlling_for_user_id",      limit: 4
+    t.integer  "controlling_for_user_role_id", limit: 4
+    t.string   "memo",                         limit: 255
+    t.datetime "created_at",                                                             null: false
+    t.datetime "updated_at",                                                             null: false
+    t.integer  "reimbursement_id",             limit: 4
+    t.integer  "reimbursement_amount_id",      limit: 4
+    t.boolean  "accounted",                                              default: false, null: false
+    t.boolean  "archived",                                               default: false, null: false
+    t.boolean  "is_deleted",                                             default: false, null: false
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
+  add_index "reports", ["controlling_for_user_role_id"], name: "index_reports_on_controlling_for_user_role_id", using: :btree
   add_index "reports", ["controlling_user_id"], name: "index_reports_on_controlling_user_id", using: :btree
+  add_index "reports", ["controlling_user_role_id"], name: "index_reports_on_controlling_user_role_id", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree

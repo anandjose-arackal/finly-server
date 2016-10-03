@@ -26,7 +26,8 @@ class Report::MarkAsReimbursed < Report::Base
   end
 
   def process
-    if report.update_attributes controlling_user: nil, controlling_for_user: nil,
+    if report.update_attributes controlling_user: nil, controlling_for_user: nil, controlling_user_role_id: nil,
+                                controlling_for_user_role_id: nil,
                                 report_status_id: ReportStatus.reimbursed_id, memo: nil, reimbursement: payment
       report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id,
                                   report_status_id: ReportStatus.reimbursed_id, payment: self.payment

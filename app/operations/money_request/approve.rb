@@ -36,22 +36,28 @@ class MoneyRequest::Approve < MoneyRequest::Base
   end
 
   def process
-    manager = User::Team::Review::NextReviewer.(money_request)
+    presenter = User::Team::Review::NextReviewer.(money_request)
+    manager = presenter.user
+    to_user_role_id = presenter.role_id
     status = MoneyRequestStatus.id_for(:processing)
     if auto_approve or manager.blank?
       status = MoneyRequestStatus.id_for(:approved)
     end
     manager_id = manager.id rescue nil
-    user_role = User::Team::Review::UserRole.((money_request.controlling_for_user or money_request.controlling_user), self.money_request)
-    memo = (params[:note] or params[:memo] or money_request.memo)
-    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: memo
+    curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
+    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil,
+                                       controlling_user_role_id: to_user_role_id,controlling_for_user_role_id: nil,
+                                       memo: self.params[:memo]
       if auto_approve
-        money_request.tracks.create action_user: nil, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
-                                    status_id: status
+        money_request.tracks.create action_user: nil,
+                                    money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
+                                    status_id: status, modified_user: nil
         self.money_request.comments.create comment_action_id: MoneyRequestCommentAction.id_for(:auto_approve)
       else
-        money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
-                                    status_id: status, user_request_role_id: user_role
+        money_request.tracks.create action_user: user, modified_user_id: money_request.controlling_user_id,
+                                    modified_user_role_id: to_user_role_id,
+                                    money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
+                                    status_id: status, user_request_role_id: curr_user_role
         self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
       end
       return true
@@ -67,6 +73,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
     end
 
     # todo sending notifications
-    # Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
+
+    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
   end
 end

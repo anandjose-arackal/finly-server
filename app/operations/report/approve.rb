@@ -41,7 +41,9 @@ class Report::Approve < Report::Base
   end
 
   def process
-    manager = User::Team::Review::NextReviewer.(report)
+    presenter = User::Team::Review::NextReviewer.(report)
+    manager = presenter.user
+    to_user_role_id = presenter.role_id
     status = ReportStatus.processing_id
     if auto_approve or manager.blank?
       status = ReportStatus.approved_id
@@ -49,21 +51,25 @@ class Report::Approve < Report::Base
         status = ReportStatus.closed_id
       end
     end
-    manager_id = manager.id rescue nil
-    user_role = User::Team::Review::UserRole.(user, self.report)
-    update_attributes = {report_status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: nil}
-    update_attributes[:submitted_at] = DateTime.now if auto_approve
-    if report.update_attributes update_attributes
+    curr_user_role = User::Team::Review::UserRole.(user, self.report)
+    if report.update_attributes report_status_id: status, controlling_user: manager, controlling_for_user_id: nil,
+                                controlling_user_role_id: to_user_role_id, controlling_for_user_role_id: nil, memo: nil
       if auto_approve
-        track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.auto_approve_id, report_status_id: status
+        track = report.tracks.build action_user: nil, modified_user: nil,
+                                    report_tracking_action_id: ReportTrackingAction.auto_approve_id,
+                                    report_status_id: status
       else
-        track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status,
-                                    user_report_role_id: user_role
+        track = report.tracks.build action_user: user, modified_user_id: report.controlling_user_id,
+                                    modified_user_role_id: to_user_role_id,
+                                    report_tracking_action_id: ReportTrackingAction.approve_id, report_status_id: status,
+                                    user_report_role_id: curr_user_role
       end
       track.save
 
       if report.closed?
-        track = report.tracks.build action_user: nil, report_tracking_action_id: ReportTrackingAction.closed_id, report_status_id: ReportStatus.closed_id
+        track = report.tracks.build action_user: nil, modified_user: nil,
+                                    report_tracking_action_id: ReportTrackingAction.closed_id,
+                                    report_status_id: ReportStatus.closed_id
         track.save
       end
       return true
