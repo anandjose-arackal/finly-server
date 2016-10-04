@@ -94,7 +94,7 @@
 
       <label style="font-weight: 500">State:</label>
       <div>
-        <select class="form-control" name="user[profile_attributes][state]">
+        <select class="form-control" name="user[profile_attributes][state_id]">
           <% @states.each do |state| %>
             <option value="<%= state.id %>"><%= state.name %></option>
           <% end %>
