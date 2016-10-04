@@ -15,12 +15,13 @@ class CardsController < ApplicationController
     case action_type
       when 1
         #Credit
+        params[:user_id] = current_user.id
         @result = User::PrepaidCard::Credit.(current_user, params)
       when 2
         #Debit
         @result = User::PrepaidCard::Debit.(current_user, params)
     end
-    respond
+    respond response: :success
   end
 
   def update_status
