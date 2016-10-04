@@ -34,7 +34,7 @@ class User::Team::GetManagers < User::Team::Base
     end
     if role_id == UserRole.admin_id
       self.team_admins = company.admins.signed_up
-      self.team_policies = company.policies
+      self.team_policies = company.policies.non_default
     end
   end
 
@@ -54,7 +54,7 @@ class User::Team::GetManagers < User::Team::Base
       self.team_admins = params[:team_admins] || []
       self.team_managers = params[:team_managers]
       self.team_finance_managers = params[:team_finance_managers]
-      self.team_policies = user.admin_policies || []
+      self.team_policies = params[:team_policies]
       if for_user.present?
         self.team_managers = self.team_managers.without_id(for_user.id) rescue nil if self.team_managers.present?
         self.team_finance_managers = self.team_finance_managers.without_id(for_user.id) rescue nil if self.team_finance_managers.present?

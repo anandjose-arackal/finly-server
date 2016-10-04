@@ -32,6 +32,7 @@ class Settlement::Base < BaseOperation
       messages[:error] << 'Date cannot be later than the current date'
       return false
     end
+
     return true
   end
 
