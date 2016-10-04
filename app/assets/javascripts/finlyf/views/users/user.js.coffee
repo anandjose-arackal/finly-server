@@ -5,6 +5,7 @@ class FinlyF.Views.User extends Backbone.View
   templateAddCondition: HandlebarsTemplates['finlyf/users/crud/addCondition']
   templateLoadFunds: HandlebarsTemplates['finlyf/users/card/modalLoadFunds']
   templateUnloadFunds: HandlebarsTemplates['finlyf/users/card/modalUnloadFunds']
+  templateCardStatus: HandlebarsTemplates['finlyf/users/card/modalConfirmCardStatus']
   # templateShowDetails: HandlebarsTemplates['finlyf/users/crud/showDetails']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
@@ -21,6 +22,9 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-card-request-balance': 'requestCardBalance'
     'click .btn-card-action': 'prepareCardAction'
     'click .btn-confirm-card-action': 'cardAction'
+
+    'click .btn-card-update-status': 'prepareCardStatus'
+    'click .btn-confirm-card-status': 'cardStatus'
 
   initialize: (options) ->
     @params = options.params
@@ -331,6 +335,7 @@ class FinlyF.Views.User extends Backbone.View
       data: {
         view: _this.params.view
         authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
         amount: amount
         password: password
         action_type: action_type
@@ -347,6 +352,51 @@ class FinlyF.Views.User extends Backbone.View
 
     })
 
+  prepareCardStatus: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    _this = @
+
+    modal = $("#modal-sub-mp")
+    status = $(target).attr('data-card-status-type')
+
+    $(modal).modal('show')
+    $(modal).html(@templateCardStatus({status: status}))
+
+  cardStatus: (e) ->
+    e.preventDefault()
+    _this = @
+    target = e.currentTarget
+
+    status_type = $(target).attr('data-card-status-type')
+    modal = $(@el).find('#modal-sub-mp')
+    form = $(target).closest('.modal-body')
+
+
+    password = $(modal).find("input[name=password]").val()
+
+    $.ajax({
+      url: '/cards/update_status'
+      type: "POST",
+      dataType: 'json',
+      data: {
+        view: _this.params.view
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        password: password
+        status_type: status_type
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          $(modal).html("")
+        else
+          console.log res
+      error: (err) ->
+        console.log "Error", err
+
+    })
 
   requestCardBalance: (e) ->
     _this = @
