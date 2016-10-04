@@ -5,8 +5,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   attr_accessor :updated_expense_params
 
   def pre_validate
-    super
-    if params.blank?
+    if user.blank? or params.blank?
       messages[:error] << "Parameters not present."
     end
     if params[:expense_id].blank? or params[:id].blank?
@@ -16,7 +15,8 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
 
   def init
-    super
+    id = params[:expense_id] or params[:id]
+    self.expense = user.expenses.find_by(id: id)
     # setting up the expense params for updation
     self.updated_expense_params = update_card_expense_params
     if expense.card_expense.present? and params[:expense][:merchant]
@@ -29,15 +29,16 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
 
   def validate
-    unless expense
-      messages[:error] << "Cannot find expense to edit. "
-    end
+
   end
 
 
   def authorize
+    unless expense
+      raise_unauthorized_exception
+    end
     unless expense.user_id == user.id
-      messages[:error] << "You do not own this expense."
+      raise_unauthorized_exception
     end
   end
 
@@ -47,7 +48,10 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       messages[:error] = self.expense.errors.full_messages
       return false
     end
-    success
+  end
+
+  def success
+
   end
 
   def post_process
