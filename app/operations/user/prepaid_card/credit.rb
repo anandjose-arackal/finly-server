@@ -37,6 +37,10 @@ class User::PrepaidCard::Credit < User::PrepaidCard::Base
     end
   end
 
+  def post_process
+    messages[:success] << "Successfully credited the card with ₹#{credit_presenter.amount}"
+  end
+
   def success
     self.credit_presenter
   end

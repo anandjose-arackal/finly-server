@@ -7,4 +7,8 @@ class User::PrepaidCard::Debit < User::PrepaidCard::Credit
     end
   end
 
+  def post_process
+    messages[:success] << "Successfully debited the card with ₹#{credit_presenter.amount}"
+  end
+
 end
