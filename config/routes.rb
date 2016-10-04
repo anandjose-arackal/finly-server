@@ -376,6 +376,7 @@ Rails.application.routes.draw do
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
   post 'card/details' => 'card#details', as: :card_details
+  post 'cards/update_balance' => 'cards#update_balance', as: :update_card_balance
 
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
