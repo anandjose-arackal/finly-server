@@ -50,7 +50,7 @@
         <input type="text" class="form-control" name="user[first_name]" value="">
       </div>
 
-      <label style="font-weight: 500">Middle Name: </label>
+      <label style="font-weight: 500">Middle Name(Optional): </label>
       <div>
         <input type="text" class="form-control" name="user[maiden_name]" value="">
       </div>
@@ -70,10 +70,10 @@
       <label style="font-weight: 500">Gender:</label>
       <div>
         <label style="margin-right: 20px; margin-top: 0;">
-          <input type="radio" name="user[profile_attributes][gender]" value="male" style="display: inline;">&nbsp;Male
+          <input type="radio" name="user[profile_attributes][gender]" value="m" style="display: inline;">&nbsp;Male
         </label>
         <label style="margin-top: 0;">
-          <input type="radio" name="user[profile_attributes][gender]" value="female" style="display: inline;">&nbsp;Female
+          <input type="radio" name="user[profile_attributes][gender]" value="f" style="display: inline;">&nbsp;Female
         </label>
       </div>
 
@@ -94,16 +94,16 @@
 
       <label style="font-weight: 500">State:</label>
       <div>
-        <input type="text" class="form-control" name="user[profile_attributes][state]">
+        <select class="form-control" name="user[profile_attributes][state]">
+          <% @states.each do |state| %>
+            <option value="<%= state.id %>"><%= state.name %></option>
+          <% end %>
+        </select>
       </div>
 
       <label style="font-weight: 500">Pin Code:</label>
       <div>
         <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
-      </div>
-
-      <div>
-        <label style="color: red;">All Fields Except "Middle Name" are required.</label>
       </div>
 
       <div>
@@ -119,7 +119,7 @@
     margin-top: 20px;
   }
 
-  input.form-control {
+  input.form-control , select.form-control{
     padding: 5px;
     width: 80%;
     /*background-color: #eff8f3;*/
@@ -156,6 +156,10 @@
 </style>
 
 <script type="text/javascript">
+  $(document).ready(function(){
+    $(".datepicker").datepicker({dateFormat: "yy-mm-dd"});
+  })
+
   snapNotify = function(obj) {
     var color, container, message, messages, results, type;
     console.log(obj);
