@@ -165,6 +165,7 @@ class User < ActiveRecord::Base
   end
 
   def name
+    return nil if first_name.blank? and maiden_name.blank? and last_name.blank?
     name = first_name
     name += " #{maiden_name}" if maiden_name.present?
     "#{name} #{last_name}"
