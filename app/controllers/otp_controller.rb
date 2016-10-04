@@ -4,10 +4,7 @@ class OtpController < ApplicationController
   # params = {user: {mobile_number}}
   def update
     @result = User::Configuration::UpdateMobileNumber.(current_user, params)
-    respond_to do |format|
-      format.json {render {}}
-    end
-
+    respond
   end
 
   def resend
