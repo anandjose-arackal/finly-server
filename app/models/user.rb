@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 
   after_create do
-    self.build_profile.save if self.profile.blank?
+    # self.build_profile.save if self.profile.blank?
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
     self.build_balance_sheet.save if self.balance_sheet.blank?
   end

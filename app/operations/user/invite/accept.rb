@@ -33,16 +33,15 @@ class User::Invite::Accept < User::Invite::Base
 
   def validate
     invitation_token = accept_params[:invitation_token]
-    name = accept_params[:name]
+    first_name = accept_params[:first_name]
+    last_name = accept_params[:last_name]
     mobile_number = accept_params[:mobile_number]
     password = accept_params[:password]
     password_confirmation = accept_params[:password_confirmation]
+    date_of_birth = accept_params[:date_of_birth]
+
     if invitation_token.blank?
       messages[:error] << 'Invite not found'
-      return
-    end
-    if name.blank?
-      messages[:error] << 'Name can\'t be blank'
       return
     end
     if mobile_number.blank? or mobile_number.length != 10
@@ -60,7 +59,7 @@ class User::Invite::Accept < User::Invite::Base
     end
     # manually adding here because devise isn't throwing an error during sign up. todo - investigate
     if password.length < 8
-      messages[:error] << "Password length must be at least 8 characters"
+      messages[:error] << 'Password length must be at least 8 characters'
     end
   end
 
@@ -83,5 +82,13 @@ class User::Invite::Accept < User::Invite::Base
   def success
     User::Invite::Base::InvitePresenter.new(user, {accepted_user: invited_user}, messages)
   end
+
+  def user_params
+    params.require(:user).permit(:password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
+                                 :maiden_name, :last_name,
+                                 profile_attributes: [:date_of_birth, :gender, :address_1,
+                                                      :address_2, :city, :state, :pin_code])
+  end
+
 
 end
