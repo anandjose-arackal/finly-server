@@ -23,7 +23,7 @@ class ItzCash::AccountDetails < ItzCash::Base
   end
 
   def success
-    # params[:response_code] = parsed_response[1]
+    params[:response_code] = parsed_response[0]
     params[:serial_id] = parsed_response[1]
     params[:balance] = parsed_response[2]
     params[:status] = parsed_response[3]

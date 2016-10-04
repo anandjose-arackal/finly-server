@@ -72,7 +72,6 @@ class User::Invite::Accept < User::Invite::Base
     unless invited_user.present? and invited_user.id.present?
       messages[:error] = invited_user.errors.full_messages
     end
-    debugger
   end
 
   def post_process

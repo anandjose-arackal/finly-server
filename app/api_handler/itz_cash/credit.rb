@@ -1,6 +1,20 @@
 class ItzCash::Credit < ItzCash::Base
   attr_accessor :amount
 
+  def pre_validate
+    if user.blank?
+      add_message :error, 'User not found'
+      return
+    end
+    if user.cards.blank?
+      add_message :error, 'A card has not been assigned to the user'
+      return
+    end
+    if params.blank? or params[:amount].blank?
+      add_message :error, 'Amount cannot be blank'
+    end
+  end
+
   def path
     '/user/servlet/NaradaCreditDebitServlet'
   end
@@ -18,23 +32,11 @@ class ItzCash::Credit < ItzCash::Base
     Constants::ItzCash::TRANSACTION_TYPE_CREDIT
   end
 
-  def pre_validate
-    if user.blank?
-      add_message :error, 'User not found'
-      return
-    end
-    if user.cards.blank?
-      add_message :error, 'A card has not been assigned to the user'
-      return
-    end
-    if params.blank? or params[:amount].blank?
-      add_message :error, 'Amount cannot be blank'
-    end
-  end
-
   def init
     super
     self.amount = params[:amount].to_i rescue nil
+    # Convert amount value in paise
+    self.amount = (self.amount * 100) if self.amount
   end
 
   def validate
@@ -47,7 +49,31 @@ class ItzCash::Credit < ItzCash::Base
     end
   end
 
-  def parse
+  def post_process
+    # todo record the credit in our database
+  end
+
+  def success
+    # ResponseCode,SerialID,Amount,TransactionID,Message
+    params[:response_code] = parsed_response[0]
+    params[:serial_id] = parsed_response[1]
+    params[:amount]=parsed_response[2]
+    params[:transaction_id]= parsed_response[3]
+    params[:message]= parsed_response[4]
+    ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
+  end
+
+
+  class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
+    attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
+
+    def init
+      self.response_code = params[:response_code]
+      self.serial_id = params[:serial_id]
+      self.amount = params[:amount]
+      self.transaction_id = params[:transaction_id]
+      self.message = params[:message]
+    end
 
   end
 
