@@ -1,8 +1,7 @@
 # action to update a particular user's details.
 
 class User::Configuration::UpdateDetails < BaseOperation
-
-  attr_accessor :details_params, :being_updated_user
+  attr_accessor :details_params, :being_updated_user, :changes
 
   def authorized_user_types
     [:employee]
@@ -31,6 +30,9 @@ class User::Configuration::UpdateDetails < BaseOperation
     end
   end
 
+  def subscribe
+    before_save self.user, &method(:regenerate_otp)
+  end
 
   def process
     unless user.update(details_params)
@@ -39,12 +41,23 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def post_process
+    handle_otp
     messages[:success] << 'Details updated'
   end
 
   private
+  def regenerate_otp(model)
+    self.changes = model.changes
+  end
 
   def details_params
     params.require(:user).permit(:name, :mobile_number)
   end
+
+  def handle_otp
+    return if self.changes.blank? or self.changes[:mobile_number].blank? or self.changes[:mobile_number] == user.mobile_number_was
+    user.update_attributes(otp: nil, otp_sent_at: nil, otp_verified_at: nil, otp_verified: false)
+    User::Verification::Otp::Create.(current_user, params)
+  end
+
 end

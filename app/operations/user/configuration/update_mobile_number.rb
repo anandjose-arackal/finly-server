@@ -4,7 +4,7 @@ class User::Configuration::UpdateMobileNumber < User::Configuration::UpdateDetai
 
   def pre_validate
     super
-    if params.present? and params[:mobile_number].blank?
+    if params.present? and params[:user][:mobile_number].blank?
       messages[:error] << 'Mobile number cannot be empty'
     end
   end

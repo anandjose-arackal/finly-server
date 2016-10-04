@@ -1,7 +1,7 @@
 class OtpController < ApplicationController
   before_action :authenticate_user!
 
-  # params = {user: {mobile_number}}
+  # params = {user: {mobile_number: '129349182'}}
   def update
     @result = User::Configuration::UpdateMobileNumber.(current_user, params)
     respond
