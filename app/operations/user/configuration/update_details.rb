@@ -1,7 +1,7 @@
 # action to update a particular user's details.
 
 class User::Configuration::UpdateDetails < BaseOperation
-  attr_accessor :details_params, :being_updated_user, :changes
+  attr_accessor :details_params, :changes
 
   def authorized_user_types
     [:employee]
@@ -13,20 +13,10 @@ class User::Configuration::UpdateDetails < BaseOperation
     end
   end
 
-  def init
-    self.being_updated_user = user.company.users.find_by(id: params[:id])
-  end
-
-  def authorize
-    unless user.id == being_updated_user.id
-      messages[:error] << 'You are not authorized to change these details.'
-    end
-  end
-
   def validate
-    if details_params[:name].blank?
-      messages[:error] << 'Name cannot be blank'
-      return false
+    if details_params[:name].blank? and details_params[:mobile_number].blank?
+      messages[:error] << 'Nothing to update'
+      # return false
     end
   end
 

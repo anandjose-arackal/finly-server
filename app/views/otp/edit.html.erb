@@ -100,6 +100,10 @@
     }
 
     Timer.initialize();
+
+    $(".resend-otp").on('click', function(e){
+      // $.ajax()
+    });
     
 
     $(".edit-mobile-number").on('click', function(e){
@@ -128,6 +132,11 @@
           },
           success: function(res){
             console.log("Success", res);
+            if(res.success === true){
+              console.log("Success is tru")
+              // new_mobile_number = res.mobile_number
+              window.location.reload()
+            }
           },
           error: function(err){
             console.log("Error", err);

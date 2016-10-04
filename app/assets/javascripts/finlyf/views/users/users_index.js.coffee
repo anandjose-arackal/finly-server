@@ -178,6 +178,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         else
           FinlyF.snapNotify(res.messages)
           $(modal).html(_this.templateInviteEmployee({item: res}))
+          $(modal).find('input[name=authenticity_token]').val($("#authenticity_token"))
           if _this.params.view == 'manager'
             $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
           else if _this.params.view == 'finance_manager'
