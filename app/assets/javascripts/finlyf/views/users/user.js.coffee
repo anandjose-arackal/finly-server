@@ -3,6 +3,8 @@ class FinlyF.Views.User extends Backbone.View
   template: HandlebarsTemplates['finlyf/users/crud/userSettlements']
   templateShow: HandlebarsTemplates['finlyf/users/crud/show']
   templateAddCondition: HandlebarsTemplates['finlyf/users/crud/addCondition']
+  templateLoadFunds: HandlebarsTemplates['finlyf/users/card/modalLoadFunds']
+  templateUnloadFunds: HandlebarsTemplates['finlyf/users/card/modalUnloadFunds']
   # templateShowDetails: HandlebarsTemplates['finlyf/users/crud/showDetails']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
@@ -16,6 +18,8 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-add-condition': 'newCondition'
     'click .btn-remove-condition': 'removeCondition'
     'click .btn-user-action': 'userAction'
+    'click .btn-card-request-balance': 'requestCardBalance'
+    'click .btn-card-action': 'prepareCardAction'
 
   initialize: (options) ->
     @params = options.params
@@ -270,6 +274,29 @@ class FinlyF.Views.User extends Backbone.View
     #   error: (err) ->
     #     console.log "Err", err
     # })
+
+  prepareCardAction: (e) ->
+    e.preventDefault()
+
+    target = e.currentTarget
+    action_type = $(target).attr('data-card-action-type')
+    modal = ("#modal-mp")
+
+    $(modal).modal('show')
+
+    if action_type == 'load'
+      $(modal).html(@templateLoadFunds())
+    else if action_type == 'unload'
+      $(modal).html(@templateUnloadFunds())
+
+
+    # $.ajax
+
+  requestCardBalance: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
 
 
 #Features

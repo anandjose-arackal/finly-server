@@ -51,6 +51,30 @@
       </div>
     </div>
 
+    <div class="row">
+      <div class="col-sm-3">Gender</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">
+          {{#if item.user.gender}}
+            {{#if_eq item.user.gender 'm'}}Male{{else}}Female{{/if_eq}}
+          {{/if}}
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-3">Address</div>
+      <div class="col-sm-9">
+        <label class="item-attr-preview">
+          {{#if item.user.address}}
+            {{item.user.address}}
+          {{else}}
+            --
+          {{/if}}
+        </label>
+      </div>
+    </div>
+
     <input type="hidden" name="type" value="details">
   </form>
 </section>
@@ -212,7 +236,45 @@
 
     <input type="hidden" name="type" value="role">
   </form>
+</section>
 
+
+<section class="user-cards">
+  <div class="row">
+    <div class="col-sm-6"><h4>Assigned Cards</h4></div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card text-center">
+        <div class="card-number">
+          <span class="first-four">XXXX</span>
+          <span class="second-four">XXXX</span>
+          <span class="third-four">XXXX</span>
+          <span class="fourth-four">6819</span>
+        </div>
+
+        <div class="card-balance text-center">
+          <label class="balance">&nbsp;</label>
+          <button class="btn btn-ghost btn-card-request-balance">Request Balance</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 card-actions">
+      <div class="row no-margin">
+        <label class="control-label">Status:</label>
+        <label class="control-label">Active</label>
+      </div>
+      <div class="row no-margin">
+        <button class="btn btn-sm btn-success btn-card-action" data-card-action-type="load">Load Funds</button>
+      </div>
+      <div class="row no-margin">
+        <button class="btn btn-sm btn-danger btn-card-action" data-card-action-type="unload">Unload Funds</button>
+      </div>
+
+    </div>
+  </div>
 </section>
 {{!-- ====================== --}}
 
@@ -557,6 +619,8 @@
   {{/each}}
 </section>
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-sub-mp">
+</div><!-- /.modal -->
 
 <style type="text/css">
   .policy{
@@ -594,6 +658,48 @@
   .hideme{
     background: yellow;
     display: none;
+  }
+
+
+
+
+
+  /*Unique Styles to be moved to main css file*/
+  .card{
+    width: 400px;
+    /*background: papayawhip;*/
+    background: #594da8;
+    color: white;
+    padding: 20px;
+    height: 235px;
+    border-radius: 14px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .card-number{
+    font-size: 28px;
+    margin-top: 29px;
+    font-family: monospace;
+  }
+
+  .card-balance{
+    margin-top: 30px;
+  }
+
+  .card-balance label.balance{
+    display: block;
+    font-size: 30px;
+  }
+  .btn-ghost{
+    width: 150px;
+    background: transparent;
+  }
+
+  .btn-ghost:hover{
+    background: transparent;
+    border: 1px solid #F4F560;
+    color: white;
   }
 </style>
 
