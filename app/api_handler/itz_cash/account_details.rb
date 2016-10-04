@@ -20,7 +20,6 @@ class ItzCash::AccountDetails < ItzCash::Base
 
   def post_params
     {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
-    # { serialid: 'S00017740090', itzmodule: Constants::ItzCash::MODULE }
   end
 
   def success
@@ -38,20 +37,27 @@ class ItzCash::AccountDetails < ItzCash::Base
   end
 
   class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
-    attr_accessor :response_code, :serial_id, :balance, :status, :suspended_status, :rate_group_id,
+    attr_accessor :response_code, :serial_id, :balance, :status_code, :suspended_status, :rate_group_id,
                   :distributor_id, :charge_code, :product_code, :description
 
     def init
       self.response_code =params[:response_code]
       self.serial_id = params[:serial_id]
       self.balance = params[:balance]
-      self.status = params[:status]
+      self.status_code = params[:status]
       self.suspended_status = params[:suspended_status]
       self.rate_group_id = params[:rate_group_id]
       self.distributor_id = params[:distributor_id]
       self.charge_code = params[:charge_code]
       self.product_code = params[:product_code]
       self.description = params[:description]
+    end
+
+    def status
+      if self.status_code.present?
+        return Constants::ItzCash::CARD_STATUS_CODE[self.status_code.to_sym]
+      end
+      nil
     end
 
   end

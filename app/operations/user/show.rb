@@ -8,17 +8,16 @@ class User::Show < User::Base
   end
 
   def process
-    if personal_view? or params[:id] == user.id
+    id = (params[:id] or params[:user_id])
+    if personal_view? or id == user.id
       self.selected_user = user
     else
-      id = (params[:id] or params[:user_id])
-      operation = User::Team::Index.new(user, params)
-      result = operation.run
-      if operation.success?
+      result = User::Team::Index.(user, params)
+      if result.success?
         self.selected_user = result.with_id(id).first rescue nil
         messages[:error] << 'User not found' if self.selected_user.blank?
       else
-        messages[:error] = operation.messages[:error]
+        messages[:error] = result.messages[:error]
       end
     end
   end
