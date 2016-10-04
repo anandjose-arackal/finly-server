@@ -295,7 +295,7 @@ class FinlyF.Views.User extends Backbone.View
 
     #Getting the card balance in modal
     $.ajax({
-      url: '/card/details',
+      url: '/cards/details',
       dataType: 'json',
       type: "POST",
       data: {
@@ -313,6 +313,7 @@ class FinlyF.Views.User extends Backbone.View
 
   cardAction: (e) ->
     e.preventDefault()
+    _this = @
     target = e.currentTarget
 
     action_type = $(target).attr('data-card-action-type')
@@ -329,7 +330,7 @@ class FinlyF.Views.User extends Backbone.View
       dataType: 'json',
       data: {
         view: _this.params.view
-        authenticity_token: $("#authenticity_token")
+        authenticity_token: $("#authenticity_token").val()
         amount: amount
         password: password
         action_type: action_type
@@ -355,7 +356,7 @@ class FinlyF.Views.User extends Backbone.View
     $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
 
     $.ajax({
-      url: '/card/details',
+      url: '/cards/details',
       dataType: 'json',
       type: "POST",
       data: {
