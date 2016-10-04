@@ -25,7 +25,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def process
-    unless user.update(details_params)
+    unless user.update_attributes(details_params)
       messages[:error] = user.errors.full_messages
     end
   end
@@ -47,7 +47,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   def handle_otp
     return if self.changes.blank? or self.changes[:mobile_number].blank? or self.changes[:mobile_number] == user.mobile_number_was
     user.update_attributes(otp: nil, otp_sent_at: nil, otp_verified_at: nil, otp_verified: false)
-    User::Verification::Otp::Create.(current_user, params)
+    User::Verification::Otp::Create.(user, params)
   end
 
 end
