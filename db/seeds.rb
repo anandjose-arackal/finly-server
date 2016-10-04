@@ -353,30 +353,23 @@ if Report.count == 0
 end
 
 if CardType.count == 0
-  CardType.create(name: 'Physical')
-  CardType.create(name: 'Virtual')
-  CardType.create(name: 'Reimbursement')
+  CardType.create(id: 1, name: 'Physical')
+  CardType.create(id: 2, name: 'Virtual')
 end
 
 if Card.count == 0
   Company.all.each do |company|
     5.times do
       number = random_mobile_number
-      company.cards.create(proxy: number, description: 'Unassigned company card',
+      company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
                                card_type_id: random_integer(1, 3))
     end
   end
 
   User.all.each do |user|
-    number = random_mobile_number
-    c = user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
-                          card_type_id: 1, company_id: user.company.id, active: true)
-    number = random_mobile_number
-    c = user.cards.create(proxy: number, description: "Test virtual card for user #{user.id}",
-                          card_type_id: 2, company_id: user.company.id, active: true)
-    number = random_mobile_number
-    c = user.cards.create(proxy: number, description: "Test reimbursement card for user #{user.id}",
-                          card_type_id: 3, company_id: user.company.id, active: true)
+    number = "S0001774009#{(user.id - 1)}"
+    user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
+                          card_type_id: 1, company_id: user.company.id, ending_number: '1234', active: true)
   end
 end
 
@@ -384,10 +377,10 @@ end
 if CardTransaction.count == 0
   User.all.each do |user|
     card = user.cards.first
-    c = CardTransaction.create(card_id: card.id, user_id: user.id,
+    CardTransaction.create(card_id: card.id, user_id: user.id,
                                transaction_amount_attributes: {value: 100, currency_id: 1},
                                date: Date.today,
-                               merchant_name: "Randomness.",
-                               transaction_currency_code: "INR")
+                               merchant_name: 'Randomness',
+                               transaction_currency_code: 'INR')
   end
 end

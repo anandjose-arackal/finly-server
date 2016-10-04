@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(version: 20161002150824) do
 
   create_table "cards", force: :cascade do |t|
     t.integer  "user_id",             limit: 4
+    t.string   "ending_number",       limit: 255,   null: false
     t.string   "proxy",               limit: 255,   null: false
     t.integer  "card_type_id",        limit: 4
     t.text     "description",         limit: 65535

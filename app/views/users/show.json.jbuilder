@@ -81,3 +81,11 @@ end
   end
 end
 json.actions @result.actions
+json.card do
+  assigned = @result.selected_user.cards.present?
+  json.assigned assigned
+  if assigned
+    card = @result.selected_user.cards.first
+    json.extract! card, :ending_number, :description, :active, :serial_id
+  end
+end
