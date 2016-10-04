@@ -10,7 +10,7 @@ class User::Configuration::UpdateDetails < BaseOperation
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "No user or params passed."
+      messages[:error] << 'No user or params passed'
     end
   end
 
@@ -20,13 +20,13 @@ class User::Configuration::UpdateDetails < BaseOperation
 
   def authorize
     unless user.id == being_updated_user.id
-      messages[:error] << "You are not authorized to change these details."
+      messages[:error] << 'You are not authorized to change these details.'
     end
   end
 
   def validate
     if details_params[:name].blank?
-      messages[:error] << "Name cannot be blank."
+      messages[:error] << 'Name cannot be blank'
       return false
     end
   end
@@ -39,7 +39,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def post_process
-    messages[:success] << "Details updated."
+    messages[:success] << 'Details updated'
   end
 
   private
