@@ -20,4 +20,8 @@ class CardsController < ApplicationController
     respond
   end
 
+  def update_status
+    
+  end
+
 end
