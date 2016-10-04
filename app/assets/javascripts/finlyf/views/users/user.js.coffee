@@ -20,6 +20,7 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-user-action': 'userAction'
     'click .btn-card-request-balance': 'requestCardBalance'
     'click .btn-card-action': 'prepareCardAction'
+    'click .btn-confirm-card-action': 'cardAction'
 
   initialize: (options) ->
     @params = options.params
@@ -277,10 +278,12 @@ class FinlyF.Views.User extends Backbone.View
 
   prepareCardAction: (e) ->
     e.preventDefault()
+    _this = @
 
     target = e.currentTarget
     action_type = $(target).attr('data-card-action-type')
-    modal = ("#modal-mp")
+    # modal = ("#modal-mp")
+    modal = ("#modal-sub-mp")
 
     $(modal).modal('show')
 
@@ -290,13 +293,84 @@ class FinlyF.Views.User extends Backbone.View
       $(modal).html(@templateUnloadFunds())
 
 
+    #Getting the card balance in modal
+    $.ajax({
+      url: '/card/details',
+      dataType: 'json',
+      type: "POST",
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        view: _this.params.view
+      }
+      success: (res) ->
+        $(modal).find('.card-balance').html("&#8377;&nbsp;&nbsp;" + res.balance)
+      error: (err) ->
+        console.log "Error", err
+    })
+
     # $.ajax
 
+  cardAction: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    action_type = $(target).attr('data-card-action-type')
+    modal = $(@el).find('#modal-sub-mp')
+    form = $(target).closest('.modal-body')
+
+
+    amount = $(modal).find("input[name=amount]").val()
+    password = $(modal).find("input[name=password]").val()
+
+    $.ajax({
+      url: '/cards/update_balance'
+      type: "POST",
+      dataType: 'json',
+      data: {
+        view: _this.params.view
+        authenticity_token: $("#authenticity_token")
+        amount: amount
+        password: password
+        action_type: action_type
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          $(modal).html("")
+        else
+          console.log res
+      error: (err) ->
+        console.log "Error", err
+
+    })
+
+
   requestCardBalance: (e) ->
+    _this = @
     e.preventDefault()
     target = e.currentTarget
 
     $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
+
+    $.ajax({
+      url: '/card/details',
+      dataType: 'json',
+      type: "POST",
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        view: _this.params.view
+      }
+      success: (res) ->
+        # console.log "Success", res
+        $(target).html("Request Balance")
+        $(target).closest(".card-balance").find(".balance").html("&#8377;&nbsp;&nbsp;" + res.balance)
+      error: (err) ->
+        console.log "Error", err
+        $(target).html("Request Balance")
+    })
 
 
 #Features

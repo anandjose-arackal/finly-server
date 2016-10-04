@@ -12,12 +12,13 @@ class User::Show < User::Base
     if personal_view? or id == user.id
       self.selected_user = user
     else
-      result = User::Team::Index.(user, params)
-      if result.success?
+      operation = User::Team::Index.new(user, params)
+      result = operation.run
+      if operation.success?
         self.selected_user = result.with_id(id).first rescue nil
         messages[:error] << 'User not found' if self.selected_user.blank?
       else
-        messages[:error] = result.messages[:error]
+        messages[:error] = operation.messages[:error]
       end
     end
   end
