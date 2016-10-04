@@ -21,10 +21,69 @@
       <div>
         <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
       </div>
+
+      <label style="font-weight: 500">First Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[first_name]" value="">
+      </div>
+
+      <label style="font-weight: 500">Maiden Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[maiden_name]" value="">
+      </div>
+
+      <label style="font-weight: 500">Last Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[last_name]" value="">
+      </div>
+
       <label style="font-weight: 500">Email: </label>
       <div>
         <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" readonly>
       </div>
+
+      <label style="font-weight: 500">Date of Birth:</label>
+      <div>
+        <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]">
+      </div>
+
+      <label style="font-weight: 500">Gender:</label>
+      <div>
+        <label>
+          <input type="radio" class="form-control" name="user[profile_attributes][gender]">
+          Male
+        </label>
+        <label>
+          <input type="radio" class="form-control" name="user[profile_attributes][gender]">
+          Female
+        </label>
+      </div>
+
+      <label style="font-weight: 500">Address Line 1:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][address_1]">
+      </div>
+
+      <label style="font-weight: 500">Address Line 2:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][address_2]">
+      </div>
+
+      <label style="font-weight: 500">City:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][city]">
+      </div>
+
+      <label style="font-weight: 500">State:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][state]">
+      </div>
+
+      <label style="font-weight: 500">Pin Code:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
+      </div>
+
       <label style="font-weight: 500">Password: </label>
       <div>
         <input type="password" class="form-control" name="user[password]">

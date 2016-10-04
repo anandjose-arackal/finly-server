@@ -1,0 +1,142 @@
+<div class="container">
+  <div class="row no-margin">
+    <div class="col-sm-6 col-sm-offset-3 main">
+      <form>
+        <div class="form-group">
+          <label class="control-label" style="display: block;">Mobile Number</label>
+          <input id="user_mobile_number" class="form-control otp" type="number" name="user[mobile_number]" style="width: 50%;" value="<%= current_user.mobile_number %>" readonly>
+          <button class="btn btn-warning edit-mobile-number"><i class="fa fa-edit"></i></button>
+        </div>
+
+        <div class="verification" disabled="disabled">
+          <div class="form-group">
+            <label class="control-label" style="display: block;">One Time Password:</label>
+            <input class="form-control otp" type="number" name="otp" style="width: 50%;">
+            <button class="btn btn-default resend-otp" disabled="disabled">Resend OTP In: <span>00:00</span></button>
+          </div>
+
+          <div class="form-group text-center">
+            <button class="button"></button>
+          </div>  
+
+        </div>
+        
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+  .main{
+    background: white;
+    padding-top: 20px;
+
+  }
+
+  input.otp{
+    display: inline;
+    width: 50%;
+    height: 45px;
+    font-size: 25px;
+    margin-top: 6px;
+  }
+
+  .resend-otp, .edit-mobile-number{
+    width: 200px;
+    margin-top: 0;
+    height: 45px;
+    margin-left: 36px;
+    margin-bottom: 9px;
+  }
+
+  .edit-mobile-number{
+    width: 60px;
+  }
+
+
+</style>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    Timer = {
+      initialize: function(){
+        this.button = $(".resend-otp");
+        this.time = 10;
+        this.startTimer();
+      },
+      
+
+      startTimer: function(){
+        _this = this;
+        this.timer = 10;
+        this.timer = setInterval(function(){
+          $(_this.button).attr('disabled', 'disabled');
+          // console.log("Time is", _this.time);
+          if(_this.time === 0){
+            _this.showResend();
+          }
+          if(_this.time.toString().length == 1){
+            $(_this.button).find('span').text("00:0" + _this.time.toString());
+          } else {
+            $(_this.button).find('span').text("00:" + _this.time.toString());
+          }
+          _this.time = _this.time - 1;
+        }, 1000);
+      },
+
+
+
+      showResend: function(){
+        _this = this;
+        $(_this.button).attr('disabled', false).html("Resend OTP").addClass('btn-success');
+        clearInterval(_this.timer);
+      },
+
+      disableVerification: function(){
+        // $("")
+      }
+    }
+
+    Timer.initialize();
+    
+
+    $(".edit-mobile-number").on('click', function(e){
+      e.preventDefault();
+      target = e.currentTarget;
+      $(target).html("<i class='fa fa-check-circle'></i>").removeClass("edit-mobile-number btn-warning").addClass("update-mobile-number btn-success");
+      $(target).closest('.form-group').find('input').attr('readonly', false);
+      $(this).unbind();
+      attachUpdateEvents();
+    });
+
+    function attachUpdateEvents(){
+      $(".update-mobile-number").on('click', function(e){
+        e.preventDefault();
+        target = e.currentTarget;
+        mobile_number = $("#user_mobile_number").val();
+
+        $.ajax({
+          url: '<%= update_mobile_number_path %>',
+          dataType: 'json',
+          type: "POST",
+          data: {
+            user: {
+              mobile_number: mobile_number
+            }
+          },
+          success: function(res){
+            console.log("Success", res);
+          },
+          error: function(err){
+            console.log("Error", err);
+          }
+        })
+
+      });
+    }
+
+    
+  });
+</script>
