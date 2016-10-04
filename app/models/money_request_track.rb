@@ -19,19 +19,21 @@ class MoneyRequestTrack < ActiveRecord::Base
 
   belongs_to :money_request
   belongs_to :action_user, class_name: 'User'
+  belongs_to :modified_user, class_name: 'User'
   belongs_to :money_request_action
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :user_request_role, class_name: 'UserRole'
+  belongs_to :modified_user_role, class_name: 'UserRole'
   belongs_to :payment
 
   default_scope { order('created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
   scope :without_take_control_action, -> { where.not money_request_tracking_action_id: MoneyRequestTrackingAction.take_control_id }
-  scope :manager_role, -> { where user_request_role_id: UserRole.manager_id }
-  scope :finance_manager_role, -> { where user_request_role_id: UserRole.finance_manager_id }
-  scope :admin, -> { where user_request_role_id: UserRole.admin_id }
-  scope :owner, -> { where user_request_role_id: UserRole.employee_id }
+  scope :manager_role, -> { where('modified_user_role_id = ? OR user_request_role_id = ?', "#{UserRole.id_for(:manager)}", "#{ UserRole.id_for(:manager) }") }
+  scope :finance_manager_role, -> { where('modified_user_role_id = ? OR user_request_role_id = ?', "#{UserRole.id_for(:finance_manager)}", "#{ UserRole.id_for(:finance_manager) }") }
+  scope :admin, -> { where('modified_user_role_id = ? OR user_request_role_id = ?', "#{UserRole.id_for(:admin)}", "#{ UserRole.id_for(:admin) }") }
+  scope :owner, -> { where('modified_user_role_id = ? OR user_request_role_id = ?', "#{UserRole.id_for(:employee)}", "#{ UserRole.id_for(:employee) }") }
   scope :with_action, ->(action_id) { where money_request_tracking_action_id: action_id }
   scope :with_action_user, ->(action_user_id) {where action_user_id: action_user_id}
 

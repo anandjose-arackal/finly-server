@@ -371,6 +371,7 @@ Rails.application.routes.draw do
 
   get 'people' => 'people#people'
 
+  post 'otp/update' => 'otp#update', as: :update_mobile_number
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
 

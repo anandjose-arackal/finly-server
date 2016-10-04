@@ -15,21 +15,23 @@
 #  loaded_by               :integer
 #  loaded_at               :datetime
 #  submitted_at            :datetime
-#  note                    :string(255)
+#  memo                    :string(255)
 #  accounted               :boolean          default(FALSE), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #
 
 class MoneyRequest < ActiveRecord::Base
-  include OperationCallbacks, MathUtil
+  include OperationCallbacks, MathUtil, SoftDeletable
 
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :user
   belongs_to :card
   belongs_to :loaded_by, class_name: 'User'
   belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
   belongs_to :payment_mode
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy

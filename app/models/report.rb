@@ -2,22 +2,24 @@
 #
 # Table name: reports
 #
-#  id                      :integer          not null, primary key
-#  name                    :string(255)      not null
-#  user_id                 :integer          not null
-#  report_status_id        :integer          not null
-#  policy_id               :integer
-#  submitted_at            :datetime
-#  controlling_user_id     :integer
-#  controlling_for_user_id :integer
-#  memo                    :string(255)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  reimbursement_id        :integer
-#  reimbursement_amount_id :integer
-#  accounted               :boolean          default(FALSE), not null
-#  archived                :boolean          default(FALSE), not null
-#  is_deleted              :boolean          default(FALSE), not null
+#  id                           :integer          not null, primary key
+#  name                         :string(255)      not null
+#  user_id                      :integer          not null
+#  report_status_id             :integer          not null
+#  policy_id                    :integer
+#  submitted_at                 :datetime
+#  controlling_user_id          :integer
+#  controlling_user_role_id     :integer
+#  controlling_for_user_id      :integer
+#  controlling_for_user_role_id :integer
+#  memo                         :string(255)
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  reimbursement_id             :integer
+#  reimbursement_amount_id      :integer
+#  accounted                    :boolean          default(FALSE), not null
+#  archived                     :boolean          default(FALSE), not null
+#  is_deleted                   :boolean          default(FALSE), not null
 #
 
 class Report < ActiveRecord::Base
@@ -28,7 +30,9 @@ class Report < ActiveRecord::Base
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
   belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
   has_many :tracks, class_name: 'ReportTrack', dependent: :destroy
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy

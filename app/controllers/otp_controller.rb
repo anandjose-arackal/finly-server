@@ -1,6 +1,12 @@
 class OtpController < ApplicationController
   before_action :authenticate_user!
 
+  # params = {user: {mobile_number}}
+  def update
+    @result = User::Configuration::UpdateMobileNumber.(current_user, params)
+    respond
+  end
+
   def resend
     @result = User::Verification::Otp::Create.(current_user, params)
     respond response: :success

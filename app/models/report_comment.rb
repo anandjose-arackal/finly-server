@@ -33,7 +33,6 @@ class ReportComment < ActiveRecord::Base
 
   default_scope { order created_at: :desc }
 
-
   def generate(u = nil)
     comment = nil
     name = nil
@@ -57,7 +56,7 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} approved the report"
       when ReportCommentAction.id_for(:report_auto_approve)
         # Report auto_approve
-        comment = "Report auto-approved as no manager is assigned to the user"
+        comment = 'Report auto-approved as no manager is assigned to the user'
       when ReportCommentAction.id_for(:report_reject)
         # Report reject
         comment = "#{name} rejected the report"

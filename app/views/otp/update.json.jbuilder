@@ -1,0 +1,1 @@
+json.mobile_number @result.user.mobile_number

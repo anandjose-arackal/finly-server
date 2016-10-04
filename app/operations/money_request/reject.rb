@@ -1,5 +1,5 @@
 class MoneyRequest::Reject < MoneyRequest::Base
-  attr_accessor :reject_to_user, :status
+  attr_accessor :reject_to_user, :reject_to_user_role_id, :status
 
   def authorized_user_types
     [:manager, :finance_manager, :admin]
@@ -22,12 +22,15 @@ class MoneyRequest::Reject < MoneyRequest::Base
       return if self.reject_to_user.blank?
       if money_request.user.id == self.reject_to_user.id
         self.status = MoneyRequestStatus.id_for(:rejected)
+        self.reject_to_user_role_id = UserRole.id_for(:employee)
       else
         self.status = MoneyRequestStatus.id_for(:processing)
+        self.reject_to_user_role_id =User::Team::Review::UserRole.(reject_to_user, self.money_request)
       end
     else
       self.reject_to_user = self.money_request.user
       self.status = MoneyRequestStatus.id_for(:rejected)
+      self.reject_to_user_role_id = UserRole.id_for(:employee)
     end
   end
 
@@ -51,11 +54,18 @@ class MoneyRequest::Reject < MoneyRequest::Base
 
   def process
     user_role = User::Team::Review::UserRole.(user, self.money_request)
-    note= (params[:note] or params[:memo] or money_request.memo)
-    if money_request.update_attributes status_id: status, controlling_user_id: reject_to_user.id, controlling_for_user_id: nil, memo: note
-      money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject), status_id: status, memo: note,
+    memo= (params[:note] or params[:memo] or money_request.memo)
+    if money_request.update_attributes status_id: status, controlling_user_id: reject_to_user.id,
+                                       controlling_for_user_id: nil,
+                                       controlling_user_role_id: reject_to_user_role_id,
+                                       controlling_for_user_role_id: nil, memo: memo
+      money_request.tracks.create action_user: user, modified_user_id: reject_to_user.id,
+                                  modified_user_role_id: reject_to_user_role_id,
+                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject),
+                                  status_id: status, memo: memo,
                                   user_request_role_id: user_role
-      money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:reject), rejected_to_id: reject_to_user.id, content: note
+      money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:reject),
+                                    rejected_to_id: reject_to_user.id, content: memo
       return
     end
     messages[:error] = money_request.errors.full_messages

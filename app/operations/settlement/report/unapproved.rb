@@ -11,10 +11,6 @@ class Settlement::Report::Unapproved < Report::Base
     [:employee]
   end
 
-  def self.call(user, params)
-    self.new(user, params).run
-  end
-
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "No user or params passed."

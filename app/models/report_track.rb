@@ -2,16 +2,18 @@
 #
 # Table name: report_tracks
 #
-#  id                        :integer          not null, primary key
-#  report_id                 :integer          not null
-#  action_user_id            :integer
-#  report_tracking_action_id :integer
-#  report_status_id          :integer          not null
-#  user_report_role_id       :integer
-#  memo                      :string(255)
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  payment_id                :integer
+#  id                           :integer          not null, primary key
+#  report_id                    :integer          not null
+#  action_user_id               :integer
+#  modified_user_id             :integer
+#  report_tracking_action_id    :integer
+#  report_status_id             :integer          not null
+#  user_report_role_id          :integer
+#  modified_user_role_id :integer
+#  memo                         :string(255)
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  payment_id                   :integer
 #
 
 class ReportTrack < ActiveRecord::Base
@@ -19,17 +21,20 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :report_status
   belongs_to :tracking_action, class_name: 'ReportTrackingAction'
   belongs_to :action_user, class_name: 'User'
+  belongs_to :modified_user, class_name: 'User'
   belongs_to :payment
   belongs_to :user_report_role, class_name: 'UserRole'
+  belongs_to :modified_user_role, class_name: 'UserRole'
 
   default_scope { order('created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
   scope :without_take_control_action, -> { where.not report_tracking_action_id: ReportTrackingAction.take_control_id }
-  scope :manager_role, -> { where user_report_role_id: UserRole.manager_id }
-  scope :finance_manager_role, -> { where user_report_role_id: UserRole.finance_manager_id }
-  scope :admin, -> { where user_report_role_id: UserRole.admin_id }
-  scope :owner, -> { where user_report_role_id: UserRole.employee_id }
+  scope :manager_role, -> { where('modified_user_role_id = ? OR user_report_role_id = ?', "#{UserRole.id_for(:manager)}", "#{ UserRole.id_for(:manager) }") }
+  scope :finance_manager_role, -> { where('modified_user_role_id = ? OR user_report_role_id = ?', "#{UserRole.id_for(:finance_manager)}", "#{ UserRole.id_for(:finance_manager) }") }
+  scope :admin, -> { where('modified_user_role_id = ? OR user_report_role_id = ?', "#{UserRole.id_for(:admin)}", "#{ UserRole.id_for(:admin) }") }
+  scope :owner, -> { where('modified_user_role_id = ? OR user_report_role_id = ?', "#{UserRole.id_for(:employee)}", "#{ UserRole.id_for(:employee) }") }
   scope :with_action, ->(action_id) { where report_tracking_action_id: action_id }
+  scope :with_action_user_role, ->(role_id) { where user_report_role_id: role_id }
 
 end

@@ -28,19 +28,28 @@ class Report::Retract < Report::Base
   def authorize
     super
     unless report.user_id == user.id
-      messages[:error] << "You don't own this report."
+      messages[:error] << 'Only report owners can retract report'
     end
   end
 
   def validate
     unless report.processing?
-      messages[:error] << 'Cannot retract report that is not in processing state'
+      messages[:error] << 'Cannot retract report which is not in processing state'
     end
   end
 
   def process
-    if report.update_attributes report_status_id: ReportStatus.retracted_id, controlling_user_id: user.id, controlling_for_user_id: nil, memo: nil, submitted_at: nil
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.retract_id, report_status_id: ReportStatus.retracted_id
+    prev_controlling_user = (report.controlling_for_user or report.controlling_user)
+    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
+    role_id = UserRole.id_for(:employee)
+    if report.update_attributes report_status_id: ReportStatus.retracted_id,
+                                controlling_user_id: user.id, controlling_for_user_id: nil,
+                                controlling_user_role_id: role_id, controlling_for_user_role_id: nil,
+                                memo: nil, submitted_at: nil
+      track = report.tracks.build action_user: user, modified_user: prev_controlling_user,
+                                  modified_user_role_id: prev_controlling_user_role,
+                                  report_tracking_action_id: ReportTrackingAction.retract_id,
+                                  report_status_id: ReportStatus.retracted_id
       track.save
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.unsubmitted_id)
