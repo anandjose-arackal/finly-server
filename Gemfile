@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
-gem 'nokogiri', '1.6.8'
+gem 'nokogiri'
 
 # puma web server
 gem 'figaro'
