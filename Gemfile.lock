@@ -61,7 +61,7 @@ GEM
       activerecord (>= 3.2, < 6.0)
       rake (>= 10.4, < 12.0)
     arel (6.0.3)
-    autoprefixer-rails (6.5.0.2)
+    autoprefixer-rails (6.5.0.1)
       execjs
     awesome_print (1.7.0)
     backbone-on-rails (1.2.0.0)
@@ -323,6 +323,7 @@ PLATFORMS
 DEPENDENCIES
   animate-rails
   annotate
+  autoprefixer-rails (= 6.5.0.1)
   awesome_print
   backbone-on-rails
   bootbox-rails (~> 0.4)
