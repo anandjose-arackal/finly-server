@@ -24,5 +24,15 @@ module Constants
 
     DUMMY_DCODE = 'D000000360'
 
+    # G = Assigned
+    # M = Material Inward
+    # F = Stock Transfer
+    # I = Invoiced (Activated)
+    # A = Active (In Use)
+    # B = Blocked
+    # X = Expired
+    # D = Damaged
+    CARD_STATUS_CODE = {G: 'Assigned', M: 'Pending', F: 'Issued', I: 'Activated', A: 'Active', B: 'Blocked',
+                        X: 'Expired', D: 'Damaged'}
   end
 end
