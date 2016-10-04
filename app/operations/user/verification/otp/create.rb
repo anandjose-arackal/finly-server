@@ -1,5 +1,7 @@
 class User::Verification::Otp::Create < User::Verification::Otp::Base
 
+  OTP_RESEND_TIMER = 60
+
   def pre_validate
     if user.blank?
       messages[:error] << 'User not found'
@@ -12,8 +14,8 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
     unless user.mobile_number.match(Constants::VALID_MOBILE_NUMBER).present?
       messages[:error] << 'Invalid Mobile Number'
     end
-    if user.otp.present? and user.otp_sent_at > 30.seconds.ago
-      seconds_remaining = ((user.otp_sent_at + 30.seconds) - DateTime.now).to_i
+    if user.otp.present? and user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
+      seconds_remaining = ((user.otp_sent_at + OTP_RESEND_TIMER.seconds) - DateTime.now).to_i
       messages[:error] << "You will have to wait for another #{seconds_remaining} seconds before requesting for another OTP"
     end
   end

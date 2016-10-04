@@ -72,11 +72,14 @@ class User::Invite::Accept < User::Invite::Base
     unless invited_user.present? and invited_user.id.present?
       messages[:error] = invited_user.errors.full_messages
     end
+    debugger
   end
 
   def post_process
     # send welcome mail
-    User::Verification::Otp::Create.(current_user, params)
+
+    # Send OTP Verification
+    User::Verification::Otp::Create.(invited_user, params)
   end
 
   def success
@@ -87,7 +90,7 @@ class User::Invite::Accept < User::Invite::Base
     params.require(:user).permit(:password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
                                  :maiden_name, :last_name,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
-                                                      :address_2, :city, :state, :pin_code])
+                                                      :address_2, :city, :state_id, :pin_code])
   end
 
 

@@ -201,7 +201,8 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_otp
-    if logged_in? and not current_user.otp_verified and not params[:controller] == 'otp' and not params[:controller].include?('devise')
+    if logged_in? and not current_user.otp_verified and not params[:controller] == 'otp' and not
+    params[:controller].include?('devise') and not params[:controller] == 'pending_invites'
       redirect_to verify_mobile_path
     end
   end
