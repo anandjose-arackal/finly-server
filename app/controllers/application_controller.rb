@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_paper_trail_whodunnit
 
   before_action :whitelisted_emails
+  before_action :verify_otp
 
   # before_action :superadmin_accounts if :superadmin_controller?
 
@@ -198,4 +199,11 @@ class ApplicationController < ActionController::Base
       redirect_to root_url
     end
   end
+
+  def verify_otp
+    if logged_in? and not current_user.otp_verified and params[:controller] != 'otp'
+      redirect_to verify_mobile_path
+    end
+  end
+
 end

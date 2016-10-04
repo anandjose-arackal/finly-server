@@ -371,6 +371,7 @@ Rails.application.routes.draw do
 
   get 'people' => 'people#people'
 
+  get 'users/verify' => 'otp#edit', as: :verify_mobile
   post 'otp/update' => 'otp#update', as: :update_mobile_number
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
@@ -464,8 +465,6 @@ Rails.application.routes.draw do
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
 
   get 'analytics' => 'analytics#show'
-
-  get 'verify_mobile' => 'otp#edit'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
