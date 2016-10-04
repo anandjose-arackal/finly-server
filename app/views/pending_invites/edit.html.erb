@@ -16,12 +16,12 @@
 
       <label style="font-weight: 500">Company Name: </label>
       <div>
-        <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
+        <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" disabled>
       </div>
 
       <label style="font-weight: 500">Email: </label>
       <div>
-        <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" readonly>
+        <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" disabled>
       </div>
 
       <label style="font-weight: 500">Password: </label>
@@ -50,7 +50,7 @@
         <input type="text" class="form-control" name="user[first_name]" value="">
       </div>
 
-      <label style="font-weight: 500">Maiden Name: </label>
+      <label style="font-weight: 500">Middle Name: </label>
       <div>
         <input type="text" class="form-control" name="user[maiden_name]" value="">
       </div>
@@ -102,7 +102,9 @@
         <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
       </div>
 
-      
+      <div>
+        <label style="color: red;">All Fields Except "Middle Name" are required.</label>
+      </div>
 
       <div>
         <button id="submitButton" style="border-radius: 1px; height: 40px"> SUBMIT</button>
