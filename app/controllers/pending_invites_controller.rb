@@ -54,6 +54,7 @@ class PendingInvitesController < ApplicationController
       # respond
       respond_to do |format|
         format.js { render js: "window.location = '#{root_url}';"}
+        # format.js { render js: "window.location = '#{root_url}';"}
       end
     else
       respond response: :failure, message: @result.messages[:error]
