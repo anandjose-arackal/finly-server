@@ -46,6 +46,8 @@ class PendingInvitesController < ApplicationController
   end
 
   def accept
+    ap params
+    # fail
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?
       sign_in @result.accepted_user, :bypass => true

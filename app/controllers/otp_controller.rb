@@ -10,6 +10,7 @@ class OtpController < ApplicationController
     respond
   end
 
+
   def resend
     @result = User::Verification::Otp::Create.(current_user, params)
     respond response: :success

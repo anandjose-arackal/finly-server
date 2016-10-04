@@ -2,21 +2,23 @@
   <div class="row no-margin">
     <div class="col-sm-6 col-sm-offset-3 main">
       <form>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
         <div class="form-group">
           <label class="control-label" style="display: block;">Mobile Number</label>
           <input id="user_mobile_number" class="form-control otp" type="number" name="user[mobile_number]" style="width: 50%;" value="<%= current_user.mobile_number %>" readonly>
-          <button class="btn btn-warning edit-mobile-number"><i class="fa fa-edit"></i></button>
+          <button class="btn btn-warning edit-mobile-number">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
         </div>
 
         <div class="verification" disabled="disabled">
           <div class="form-group">
             <label class="control-label" style="display: block;">One Time Password:</label>
-            <input class="form-control otp" type="number" name="otp" style="width: 50%;">
+            <input id="user_otp" class="form-control otp" type="number" name="otp" style="width: 50%;">
             <button class="btn btn-default resend-otp" disabled="disabled">Resend OTP In: <span>00:00</span></button>
           </div>
 
           <div class="form-group text-center">
-            <button class="button"></button>
+            <button class="btn btn-primary btn-verify">Verify</button>
           </div>  
 
         </div>
@@ -42,7 +44,7 @@
     margin-top: 6px;
   }
 
-  .resend-otp, .edit-mobile-number{
+  .resend-otp, .edit-mobile-number, .btn-verify, .update-mobile-number{
     width: 200px;
     margin-top: 0;
     height: 45px;
@@ -51,7 +53,7 @@
   }
 
   .edit-mobile-number{
-    width: 60px;
+    /*width: 60px;*/
   }
 
 
@@ -69,8 +71,9 @@
       
 
       startTimer: function(){
+        $(this.button).html("Resend OTP In: <span>00:00</span>").removeClass("btn-success").addClass('btn-default')
         _this = this;
-        this.timer = 10;
+        this.time = 60;
         this.timer = setInterval(function(){
           $(_this.button).attr('disabled', 'disabled');
           // console.log("Time is", _this.time);
@@ -102,14 +105,54 @@
     Timer.initialize();
 
     $(".resend-otp").on('click', function(e){
-      // $.ajax()
+      e.preventDefault();
+      $.ajax({
+        url: "<%= resend_otp_path %>",
+        dataType: "JSON",
+        type: "POST",
+        data: {
+          authenticity_token: $("#authenticity_token").val()
+        },
+        success: function(res){
+          console.log("Success", res);
+          Timer.startTimer();
+
+        },
+        error: function(err){
+          console.log("Error", err)
+        }
+      })
     });
+
+    $(".btn-verify").on('click', function(e){
+      e.preventDefault();
+      $.ajax({
+        url: "<%= verify_otp_path %>",
+        type: "POST",
+        dataType: "json",
+        data: {
+          authenticity_token: $("#authenticity_token").val(),
+          verification_code: $("#user_otp").val()
+        },
+        success: function(res){
+          console.log("Success", res);
+          if(res.success === true){
+            window.location = window.location.protocol + '//' + window.location.host;
+          } else {
+            console.log("Error");
+          }
+        },
+        error: function(err){
+          console.log("Err", err);
+        }
+      })
+    })
     
 
     $(".edit-mobile-number").on('click', function(e){
       e.preventDefault();
       target = e.currentTarget;
-      $(target).html("<i class='fa fa-check-circle'></i>").removeClass("edit-mobile-number btn-warning").addClass("update-mobile-number btn-success");
+      $(target).html("Update&nbsp;&nbsp;<i class='fa fa-check-circle'></i>").removeClass("edit-mobile-number btn-warning").addClass("update-mobile-number btn-success");
       $(target).closest('.form-group').find('input').attr('readonly', false);
       $(this).unbind();
       attachUpdateEvents();
@@ -126,6 +169,7 @@
           dataType: 'json',
           type: "POST",
           data: {
+            authenticity_token: $("#authenticity_token").val(),
             user: {
               mobile_number: mobile_number
             }
