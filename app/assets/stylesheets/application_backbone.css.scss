@@ -178,8 +178,9 @@
     background: #F8F8F8;
   }
 
-  .col-sm-2{
+  .col-sm-2, .col-sm-3{
     background: #F3F3F3;
+    box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset;
   }
 }
 
@@ -200,6 +201,12 @@
       }
     }
   }
+}
+
+
+//Buttons
+.btn-wd-100{
+  width: 100px;
 }
 
 

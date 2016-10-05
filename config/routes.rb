@@ -375,7 +375,8 @@ Rails.application.routes.draw do
   post 'otp/update' => 'otp#update', as: :update_mobile_number
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
-  post 'card/details' => 'card#details', as: :card_details
+
+  post 'cards/details' => 'cards#details', as: :card_details
   post 'cards/update_balance' => 'cards#update_balance', as: :update_card_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
 

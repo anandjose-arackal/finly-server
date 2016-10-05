@@ -20,8 +20,7 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_params
-    # serial_id = user.cards.first.serial_id
-    serial_id = 'S00017740090'
+    serial_id = user.cards.first.serial_id
     {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: Constants::ItzCash::DUMMY_DCODE,
      merchanttypekey: Constants::ItzCash::MERCHANT_TYPE_KEY,
      reftransid: Generator.new_transaction_id, productcode: Constants::ItzCash::PRODUCT_CODE, amount: amount,
@@ -50,7 +49,6 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_process
-    # todo record the credit in our database
   end
 
   def success

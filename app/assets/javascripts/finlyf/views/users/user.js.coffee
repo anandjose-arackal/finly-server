@@ -3,6 +3,9 @@ class FinlyF.Views.User extends Backbone.View
   template: HandlebarsTemplates['finlyf/users/crud/userSettlements']
   templateShow: HandlebarsTemplates['finlyf/users/crud/show']
   templateAddCondition: HandlebarsTemplates['finlyf/users/crud/addCondition']
+  templateLoadFunds: HandlebarsTemplates['finlyf/users/card/modalLoadFunds']
+  templateUnloadFunds: HandlebarsTemplates['finlyf/users/card/modalUnloadFunds']
+  templateCardStatus: HandlebarsTemplates['finlyf/users/card/modalConfirmCardStatus']
   # templateShowDetails: HandlebarsTemplates['finlyf/users/crud/showDetails']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
@@ -16,6 +19,12 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-add-condition': 'newCondition'
     'click .btn-remove-condition': 'removeCondition'
     'click .btn-user-action': 'userAction'
+    'click .btn-card-request-balance': 'requestCardBalance'
+    'click .btn-card-action': 'prepareCardAction'
+    'click .btn-confirm-card-action': 'cardAction'
+
+    'click .btn-card-update-status': 'prepareCardStatus'
+    'click .btn-confirm-card-status': 'cardStatus'
 
   initialize: (options) ->
     @params = options.params
@@ -270,6 +279,149 @@ class FinlyF.Views.User extends Backbone.View
     #   error: (err) ->
     #     console.log "Err", err
     # })
+
+  prepareCardAction: (e) ->
+    e.preventDefault()
+    _this = @
+
+    target = e.currentTarget
+    action_type = $(target).attr('data-card-action-type')
+    # modal = ("#modal-mp")
+    modal = ("#modal-sub-mp")
+
+    $(modal).modal('show')
+
+    if action_type == 'load'
+      $(modal).html(@templateLoadFunds())
+    else if action_type == 'unload'
+      $(modal).html(@templateUnloadFunds())
+
+
+    #Getting the card balance in modal
+    $.ajax({
+      url: '/cards/details',
+      dataType: 'json',
+      type: "POST",
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        view: _this.params.view
+      }
+      success: (res) ->
+        $(modal).find('.card-balance').html("&#8377;&nbsp;&nbsp;" + res.balance)
+      error: (err) ->
+        console.log "Error", err
+    })
+
+    # $.ajax
+
+  cardAction: (e) ->
+    e.preventDefault()
+    _this = @
+    target = e.currentTarget
+
+    action_type = $(target).attr('data-card-action-type')
+    modal = $(@el).find('#modal-sub-mp')
+    form = $(target).closest('.modal-body')
+
+
+    amount = $(modal).find("input[name=amount]").val()
+    password = $(modal).find("input[name=password]").val()
+
+    $.ajax({
+      url: '/cards/update_balance'
+      type: "POST",
+      dataType: 'json',
+      data: {
+        view: _this.params.view
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        amount: amount
+        password: password
+        action_type: action_type
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          $(modal).html("")
+        else
+          console.log res
+      error: (err) ->
+        console.log "Error", err
+
+    })
+
+  prepareCardStatus: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    _this = @
+
+    modal = $("#modal-sub-mp")
+    status = $(target).attr('data-card-status-type')
+
+    $(modal).modal('show')
+    $(modal).html(@templateCardStatus({status: status}))
+
+  cardStatus: (e) ->
+    e.preventDefault()
+    _this = @
+    target = e.currentTarget
+
+    status_type = $(target).attr('data-card-status-type')
+    modal = $(@el).find('#modal-sub-mp')
+    form = $(target).closest('.modal-body')
+
+
+    password = $(modal).find("input[name=password]").val()
+
+    $.ajax({
+      url: '/cards/update_status'
+      type: "POST",
+      dataType: 'json',
+      data: {
+        view: _this.params.view
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        password: password
+        status_type: status_type
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          $(modal).html("")
+        else
+          console.log res
+      error: (err) ->
+        console.log "Error", err
+
+    })
+
+  requestCardBalance: (e) ->
+    _this = @
+    e.preventDefault()
+    target = e.currentTarget
+
+    $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
+
+    $.ajax({
+      url: '/cards/details',
+      dataType: 'json',
+      type: "POST",
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        user_id: _this.model.get('id')
+        view: _this.params.view
+      }
+      success: (res) ->
+        # console.log "Success", res
+        $(target).html("Request Balance")
+        $(target).closest(".card-balance").find(".balance").html("&#8377;&nbsp;&nbsp;" + res.balance)
+      error: (err) ->
+        console.log "Error", err
+        $(target).html("Request Balance")
+    })
 
 
 #Features
