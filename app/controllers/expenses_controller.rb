@@ -18,7 +18,16 @@ class ExpensesController < ApplicationController
   end
 
   def update
-    @result = Expense::Manual::Update.(current_user, params)
+    case params[:type]
+      when '1'
+        @result = Expense::Manual::Update.(current_user, params)
+      when '2'
+        @result = Expense::ExCard::Update.(current_user, params)
+      else
+        # for testing
+        # @result = Expense::Manual::Update.(current_user, params)
+        @result = Expense::ExCard::Update.(current_user, params)
+    end
     respond response: :success
   end
 

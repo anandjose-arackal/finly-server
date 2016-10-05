@@ -28,10 +28,10 @@ class Expense::Index < Expense::Base
 
   def process
     if role_id.blank? or role_id == UserRole.employee_id
-      self.expenses = user.expenses.includes(:manual_expense)
+      self.expenses = user.expenses.includes(:manual_expense).includes(:card_expense)
     else
       report_ids = Report::Index.(user, params).reports.pluck(:id)
-      self.expenses = Expense.where(report_id: report_ids).includes(:manual_expense)
+      self.expenses = Expense.where(report_id: report_ids).includes(:manual_expense).includes(:card_expense)
     end
   end
 

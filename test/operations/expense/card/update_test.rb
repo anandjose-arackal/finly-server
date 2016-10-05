@@ -1,6 +1,6 @@
 require 'test_helper'
-require_relative '../../../../app/operations/expense/card/update'
-require_relative '../../../../app/operations/expense/card/create'
+require_relative '../../../../app/operations/expense/ex_card/update'
+require_relative '../../../../app/operations/expense/ex_card/create'
 
 class UpdateTest < ActiveSupport::TestCase
 
@@ -10,7 +10,7 @@ class UpdateTest < ActiveSupport::TestCase
     @transaction = @user.card_transactions.first
     @card = @transaction.card
     # creating a card expense first
-    @expense = Expense::ExCard::Create.new(@transaction, @card).run
+    @expense = Expense::ExCard::Create.new(@transaction, @card).run.expense
     @update_expense_params = {expense: {merchant: "Olacabs",
                                        receipt: @image},
                              expense_id: @expense.id
@@ -25,28 +25,31 @@ class UpdateTest < ActiveSupport::TestCase
   test 'update a a card expense' do
 
     # checking previous card expense values
-    assert_equal "Randomness.", @expense.card_expense.editable_merchant
+    merchant = @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
     amount = @expense.amount_value
     card_expense_op = Expense::ExCard::Update.new(@user, @update_expense_params)
-    @expense = card_expense_op.run
+    @result = card_expense_op.run
+    assert_not @result.success?
 
     # ensuring none of the original parameters have changed
     assert_equal amount, @expense.amount_value
-    assert_equal "Olacabs", @expense.card_expense.editable_merchant
-    assert_not @expense.receipts.blank?
+    assert_equal merchant, @expense.card_expense.editable_merchant
+    assert @expense.receipts.blank?
   end
 
   # immutable parameters: amount, currency, date
   test 'cannot update immutable parameters' do
     # checking previous card expense values
-    assert_equal "Randomness.", @expense.card_expense.editable_merchant
+    merchant = @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
 
+
     card_expense_op = Expense::ExCard::Update.new(@user, @invalid_update_params)
-    @expense = card_expense_op.run
+    @result = card_expense_op.run
+    assert_not @result.success?
     assert @expense
-    assert_equal "Randomness.", @expense.card_expense.editable_merchant
+    assert_equal merchant, @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
 
   end
