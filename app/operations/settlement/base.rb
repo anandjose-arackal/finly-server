@@ -32,11 +32,12 @@ class Settlement::Base < BaseOperation
       messages[:error] << 'Date cannot be later than the current date'
       return false
     end
+
     return true
   end
 
   def cash_in_hand(user, date=nil)
-    unless date.present? and date.is_a?(Date)
+    if date.present? and date.is_a?(Date)
       date = Date.parse(date)
     end
     cash = user.balance_sheet.cash_in_hand

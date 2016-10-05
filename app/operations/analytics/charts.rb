@@ -53,13 +53,13 @@ class Analytics::Charts < BaseOperation
 
   def pre_process
     # applying filters for user_id
-    self.team_users = team_users.where(id: params[:filter_user_id].to_i) if params[:filter_user_id].present?
+    self.team_users = team_users.signed_up.where(id: params[:filter_user_id].to_i) if params[:filter_user_id].present?
     # extracting the id of the user whose expense breakdown needs to be shown
     if role.nil? or role == 'personal'
       self.user_ids = user.id
       self.expenses = Expense.where(user_id: user_ids)
     else
-      self.user_ids = team_users.pluck(:id)
+      self.user_ids = team_users.signed_up.pluck(:id)
       self.expenses = Expense.admin_viewable.where(user_id: user_ids)
     end
     # applying the filters for which expenses are to be considered

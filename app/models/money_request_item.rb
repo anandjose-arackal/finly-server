@@ -16,6 +16,9 @@ class MoneyRequestItem < ActiveRecord::Base
   belongs_to :money_request
 
   scope :with_amount, -> { joins :amount }
+  scope :active_categories, -> do
+
+  end
   scope :with_category, ->(category_id){ where category_id: category_id }
   scope :with_money_request, ->(id){ where money_request_id: id }
 
