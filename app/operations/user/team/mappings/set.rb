@@ -90,10 +90,17 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   end
 
   def validate
+    updating_records.compact!
     self.updating_records.each do |record|
       self.updating_records.each do |record2|
         next if record == record2
         next unless record.policy_id == record2.policy_id
+        [record, record2].each do |item|
+          if not item.default and (item.greater_than_amount.blank? or item.greater_than_amount.value.blank? or item.greater_than_amount.value <= 0)
+            messages[:error] << 'Invalid amount value. Amount has to be greater than 0'
+            return
+          end
+        end
         {manager: :manager_id, finance_manager: :finance_manager_id, approves_to: :approves_to_id, approves_finance_to: :approves_finance_to_id}.each do |key, item|
           if record.send(item).present? and record2.send(item).present?
             if record.default and record2.default
