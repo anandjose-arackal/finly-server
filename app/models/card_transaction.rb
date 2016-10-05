@@ -24,6 +24,7 @@
 #  updated_at                :datetime         not null
 #
 
+
 class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card

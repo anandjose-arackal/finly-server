@@ -9,43 +9,26 @@ class ItzCash::Block < ItzCash::Base
       add_message :error, 'A card has not been assigned to the user'
       return
     end
-    if params.blank? or params[:amount].blank?
-      add_message :error, 'Amount cannot be blank'
-    end
+  end
+
+  def base_url
+    'http://demo.itzcash.com/'
   end
 
   def path
-    '/user/servlet/NaradaCreditDebitServlet'
+    'myaccount/servlet/ItzCashBlockUnBlockHotListServlet'
   end
 
   def post_params
-    # serial_id = user.cards.first.serial_id
-    serial_id = 'S00017740090'
-    {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: Constants::ItzCash::DUMMY_DCODE,
-     merchanttypekey: Constants::ItzCash::MERCHANT_TYPE_KEY,
-     reftransid: Generator.new_transaction_id, productcode: Constants::ItzCash::PRODUCT_CODE, amount: amount,
-     transactiontype: transaction_type}
+    serial_id = user.cards.first.serial_id
+    operation_type = operation_type
+    blocked_mode = 'I'
+    itzmodule = Constants::ItzCash::MODULE
+    { serial_id: serial_id, operation_type: operation_type, blocked_mode: blocked_mode, itzmodule: itzmodule }
   end
 
-  def transaction_type
-    Constants::ItzCash::TRANSACTION_TYPE_CREDIT
-  end
-
-  def init
-    super
-    self.amount = params[:amount].to_i rescue nil
-    # Convert amount value in paise
-    self.amount = (self.amount * 100) if self.amount
-  end
-
-  def validate
-    if self.amount.blank?
-      add_message :error, 'Amount cannot be blank'
-      return
-    end
-    if self.amount <= 0
-      add_message :error, 'Amount cannot be less than or equal to 0'
-    end
+  def operation_type
+    Constants::ItzCash::OPERATION_TYPE_BLOCK
   end
 
   def post_process
@@ -53,25 +36,21 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def success
-    # ResponseCode,SerialID,Amount,TransactionID,Message
+    # ResponseCode,SerialID,Description
     params[:response_code] = parsed_response[0]
     params[:serial_id] = parsed_response[1]
-    params[:amount]=parsed_response[2]
-    params[:transaction_id]= parsed_response[3]
-    params[:message]= parsed_response[4]
+    params[:description]=parsed_response[2]
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
   end
 
 
-  class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
-    attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
+  class ItzCash::Block::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
+    attr_accessor :response_code, :serial_id, :description
 
     def init
       self.response_code = params[:response_code]
       self.serial_id = params[:serial_id]
-      self.amount = params[:amount]
-      self.transaction_id = params[:transaction_id]
-      self.message = params[:message]
+      self.description = params[:description]
     end
 
   end

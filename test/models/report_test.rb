@@ -22,6 +22,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #
 
+
 require 'test_helper'
 require 'helpers/report_service_test_helper'
 

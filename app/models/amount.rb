@@ -9,6 +9,7 @@
 #  updated_at  :datetime         not null
 #
 
+
 class Amount < ActiveRecord::Base
   include MathUtil
   belongs_to :currency

@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class BudgetPeriod < ActiveRecord::Base
 
   def period

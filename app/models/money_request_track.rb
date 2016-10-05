@@ -17,6 +17,7 @@
 #  action_id                        :integer
 #
 
+
 class MoneyRequestTrack < ActiveRecord::Base
 
   belongs_to :money_request

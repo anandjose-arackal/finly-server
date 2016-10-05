@@ -24,6 +24,7 @@
 #  pin_code            :string(255)      not null
 #
 
+
 require 'test_helper'
 
 class UserProfileTest < ActiveSupport::TestCase

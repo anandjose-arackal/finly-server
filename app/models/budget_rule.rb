@@ -12,6 +12,7 @@
 #  rule_type_id     :integer
 #
 
+
 class BudgetRule < ActiveRecord::Base
   belongs_to :category
   belongs_to :amount

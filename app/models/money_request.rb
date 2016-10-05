@@ -24,6 +24,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 

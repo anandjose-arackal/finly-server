@@ -43,6 +43,7 @@
 #  last_name              :string(255)      not null
 #
 
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 # This model initially had no columns defined.  If you add columns to the

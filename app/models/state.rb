@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class State < ActiveRecord::Base
 
   VALUES = [{:code=>'S00',:name=>'Outside India'}, {:code=>'S01',:name=>'Maharashtra'}, {:code=>'S02',:name=>'Gujarat'}, {:code=>'S03',:name=>'Andhra Pradesh'},

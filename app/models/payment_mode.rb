@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class PaymentMode < ActiveRecord::Base
 
   MODES = {cash: 1, card: 2}

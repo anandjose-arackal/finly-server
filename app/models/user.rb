@@ -43,6 +43,7 @@
 #  last_name              :string(255)      not null
 #
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:

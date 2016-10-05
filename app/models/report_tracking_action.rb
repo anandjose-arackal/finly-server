@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class ReportTrackingAction < ActiveRecord::Base
 
   def self.create_id

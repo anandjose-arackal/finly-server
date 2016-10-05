@@ -43,6 +43,7 @@
 #  last_name              :string(255)      not null
 #
 
+
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase

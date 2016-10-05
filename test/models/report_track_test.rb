@@ -16,6 +16,7 @@
 #  payment_id                :integer
 #
 
+
 require 'test_helper'
 
 class ReportTrackTest < ActiveSupport::TestCase

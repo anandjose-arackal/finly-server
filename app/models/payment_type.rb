@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class PaymentType < ActiveRecord::Base
   has_many :payments
 
