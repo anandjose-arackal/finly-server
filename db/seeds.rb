@@ -407,7 +407,7 @@ if Card.count == 0
     5.times do
       number = random_string_of_numbers(10)
       c = company.cards.create(proxy: number, ending_number: number[6..9], description: "Unassigned company card.",
-                               card_type_id: random_integer(1, 3))
+                               card_type_id: random_integer(1, 2))
     end
   end
 
@@ -420,7 +420,7 @@ if Card.count == 0
                           card_type_id: 2, company_id: user.company.id, active: true)
     number = random_string_of_numbers(10)
     c = user.cards.create(proxy: number, ending_number: number[6..9], description: "Test reimbursement card for user #{user.id}",
-                          card_type_id: 3, company_id: user.company.id, active: true)
+                          card_type_id: 2, company_id: user.company.id, active: true)
   end
 end
 
