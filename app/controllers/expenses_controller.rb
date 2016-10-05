@@ -24,7 +24,7 @@ class ExpensesController < ApplicationController
       when '2'
         @result = Expense::ExCard::Update.(current_user, params)
       else
-        # for testing
+        # todo for testing - remove later.
         # @result = Expense::Manual::Update.(current_user, params)
         @result = Expense::ExCard::Update.(current_user, params)
     end
@@ -32,8 +32,12 @@ class ExpensesController < ApplicationController
   end
 
   def destroy
-    @result = Expense::Manual::Destroy.(current_user, params)
-    respond response: :success
+    @result = Expense::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond(response: :failure, message: @result.messages[:error])
+    end
   end
 
   def add_receipt

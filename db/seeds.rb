@@ -392,7 +392,7 @@ if CardTransaction.count == 0
       Expense.create(amount_attributes: {value: random_amount, currency_id: 1},
                        expense_status_id: 1,
                        expense_type_id: 2,
-                       note: "#{Faker::Lorem.sentence}",
+                       note: "This is a card expense, hello! #{trans.id}",
                        date: Faker::Date.between(20.days.ago, Date.today),
                        user_id: user.id,
                        category_id: random_integer(1, 5),
@@ -403,7 +403,7 @@ if CardTransaction.count == 0
   # creating expenses from the transactions
 end
 
-# # temporary otp verification all numbers in db
-# User.all.each do |user|
-#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-# end
+# temporary otp verification all numbers in db
+User.all.each do |user|
+  user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+end

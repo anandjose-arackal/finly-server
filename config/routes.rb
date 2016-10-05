@@ -49,6 +49,55 @@
 #                 new_user_invitation GET    /users/invitation/new(.:format)                             devise/invitations#new
 #                                     PATCH  /users/invitation(.:format)                                 devise/invitations#update
 #                                     PUT    /users/invitation(.:format)                                 devise/invitations#update
+#                     api_v0_expenses GET    /api/v0/expenses(.:format)                                  api/v0/expenses#index
+#                                     POST   /api/v0/expenses(.:format)                                  api/v0/expenses#create
+#                      api_v0_expense GET    /api/v0/expenses/:id(.:format)                              api/v0/expenses#show
+#                                     PATCH  /api/v0/expenses/:id(.:format)                              api/v0/expenses#update
+#                                     PUT    /api/v0/expenses/:id(.:format)                              api/v0/expenses#update
+#                                     DELETE /api/v0/expenses/:id(.:format)                              api/v0/expenses#destroy
+#                      api_v0_reports GET    /api/v0/reports(.:format)                                   api/v0/reports#index
+#                                     POST   /api/v0/reports(.:format)                                   api/v0/reports#create
+#                       api_v0_report GET    /api/v0/reports/:id(.:format)                               api/v0/reports#show
+#                                     PATCH  /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                     PUT    /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                     DELETE /api/v0/reports/:id(.:format)                               api/v0/reports#destroy
+#               api_v0_report_comment POST   /api/v0/reports/:report_id/comment(.:format)                api/v0/reports#comment
+#               api_v0_report_retract PATCH  /api/v0/reports/:report_id/retract(.:format)                api/v0/reports#retract
+#                api_v0_report_submit PATCH  /api/v0/reports/:report_id/submit(.:format)                 api/v0/reports#submit
+#               api_v0_report_approve PATCH  /api/v0/reports/:report_id/approve(.:format)                api/v0/reports#approve
+#             api_v0_report_unapprove PATCH  /api/v0/reports/:report_id/unapprove(.:format)              api/v0/reports#unapprove
+#                api_v0_report_reject PATCH  /api/v0/reports/:report_id/reject(.:format)                 api/v0/reports#reject
+# api_v0_report_reimbursement_confirm PATCH  /api/v0/reports/:report_id/reimbursement_confirm(.:format)  api/v0/reports#reimbursement_confirm
+#          api_v0_report_take_control PATCH  /api/v0/reports/:report_id/take_control(.:format)           api/v0/reports#take_control
+#          api_v0_report_add_expenses POST   /api/v0/reports/:report_id/add_expenses(.:format)           api/v0/reports#add_expenses
+#       api_v0_report_remove_expenses DELETE /api/v0/reports/:report_id/remove_expenses(.:format)        api/v0/reports#remove_expenses
+#        api_v0_report_reject_expense PATCH  /api/v0/reports/:report_id/reject_expense(.:format)         api/v0/reports#reject_expense
+#         api_v0_report_assign_policy POST   /api/v0/reports/:report_id/assign_policy(.:format)          api/v0/reports#assign_policy
+#                                     GET    /api/v0/reports(.:format)                                   api/v0/reports#index
+#                                     POST   /api/v0/reports(.:format)                                   api/v0/reports#create
+#                   new_api_v0_report GET    /api/v0/reports/new(.:format)                               api/v0/reports#new
+#                  edit_api_v0_report GET    /api/v0/reports/:id/edit(.:format)                          api/v0/reports#edit
+#                                     GET    /api/v0/reports/:id(.:format)                               api/v0/reports#show
+#                                     PATCH  /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                     PUT    /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                     DELETE /api/v0/reports/:id(.:format)                               api/v0/reports#destroy
+#                     api_v0_receipts GET    /api/v0/receipts(.:format)                                  api/v0/receipts#index
+#                                     POST   /api/v0/receipts(.:format)                                  api/v0/receipts#create
+#                      api_v0_receipt PATCH  /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                     PUT    /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                     DELETE /api/v0/receipts/:id(.:format)                              api/v0/receipts#destroy
+# api_v0_receipt_expense_from_receipt POST   /api/v0/receipts/:receipt_id/expense_from_receipt(.:format) api/v0/receipts#expense_from_receipt
+#                                     GET    /api/v0/receipts(.:format)                                  api/v0/receipts#index
+#                                     POST   /api/v0/receipts(.:format)                                  api/v0/receipts#create
+#                  new_api_v0_receipt GET    /api/v0/receipts/new(.:format)                              api/v0/receipts#new
+#                 edit_api_v0_receipt GET    /api/v0/receipts/:id/edit(.:format)                         api/v0/receipts#edit
+#                                     GET    /api/v0/receipts/:id(.:format)                              api/v0/receipts#show
+#                                     PATCH  /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                     PUT    /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                     DELETE /api/v0/receipts/:id(.:format)                              api/v0/receipts#destroy
+#     api_v0_configuration_categories GET    /api/v0/configuration/categories(.:format)                  api/v0/configuration/category#index
+#   api_v0_configuration_gcm_register POST   /api/v0/configuration/gcm/register(.:format)                api/v0/configuration/gcm#create
+# api_v0_configuration_gcm_unregister POST   /api/v0/configuration/gcm/unregister(.:format)              api/v0/configuration/gcm#delete
 #                     api_v1_expenses GET    /api/v1/expenses(.:format)                                  api/v1/expenses#index
 #                                     POST   /api/v1/expenses(.:format)                                  api/v1/expenses#create
 #                      api_v1_expense GET    /api/v1/expenses/:id(.:format)                              api/v1/expenses#show
@@ -62,17 +111,6 @@
 #                                     PUT    /api/v1/reports/:id(.:format)                               api/v1/reports#update
 #                                     DELETE /api/v1/reports/:id(.:format)                               api/v1/reports#destroy
 #               api_v1_report_comment POST   /api/v1/reports/:report_id/comment(.:format)                api/v1/reports#comment
-#               api_v1_report_retract PATCH  /api/v1/reports/:report_id/retract(.:format)                api/v1/reports#retract
-#                api_v1_report_submit PATCH  /api/v1/reports/:report_id/submit(.:format)                 api/v1/reports#submit
-#               api_v1_report_approve PATCH  /api/v1/reports/:report_id/approve(.:format)                api/v1/reports#approve
-#             api_v1_report_unapprove PATCH  /api/v1/reports/:report_id/unapprove(.:format)              api/v1/reports#unapprove
-#                api_v1_report_reject PATCH  /api/v1/reports/:report_id/reject(.:format)                 api/v1/reports#reject
-# api_v1_report_reimbursement_confirm PATCH  /api/v1/reports/:report_id/reimbursement_confirm(.:format)  api/v1/reports#reimbursement_confirm
-#          api_v1_report_take_control PATCH  /api/v1/reports/:report_id/take_control(.:format)           api/v1/reports#take_control
-#          api_v1_report_add_expenses POST   /api/v1/reports/:report_id/add_expenses(.:format)           api/v1/reports#add_expenses
-#       api_v1_report_remove_expenses DELETE /api/v1/reports/:report_id/remove_expenses(.:format)        api/v1/reports#remove_expenses
-#        api_v1_report_reject_expense PATCH  /api/v1/reports/:report_id/reject_expense(.:format)         api/v1/reports#reject_expense
-#         api_v1_report_assign_policy POST   /api/v1/reports/:report_id/assign_policy(.:format)          api/v1/reports#assign_policy
 #                                     GET    /api/v1/reports(.:format)                                   api/v1/reports#index
 #                                     POST   /api/v1/reports(.:format)                                   api/v1/reports#create
 #                   new_api_v1_report GET    /api/v1/reports/new(.:format)                               api/v1/reports#new
@@ -143,6 +181,13 @@
 #                    add_export_field POST   /add_export_field(.:format)                                 organization_account#add_export_column
 #                 delete_export_field DELETE /remove_export_field(.:format)                              organization_account#remove_export_column
 #                              people GET    /people(.:format)                                           people#people
+#                       verify_mobile GET    /users/verify(.:format)                                     otp#edit
+#                update_mobile_number POST   /otp/update(.:format)                                       otp#update
+#                          verify_otp POST   /otp/verify(.:format)                                       otp#verify
+#                          resend_otp POST   /otp/resend(.:format)                                       otp#resend
+#                        card_details POST   /cards/details(.:format)                                    cards#details
+#                 update_card_balance POST   /cards/update_balance(.:format)                             cards#update_balance
+#                  update_card_status POST   /cards/update_status(.:format)                              cards#update_status
 #                             reports GET    /reports(.:format)                                          reports#index
 #                                     POST   /reports(.:format)                                          reports#create
 #                              report GET    /reports/:id(.:format)                                      reports#show
@@ -172,6 +217,15 @@
 #                 money_request_index GET    /money_request(.:format)                                    money_request#index
 #                                     POST   /money_request(.:format)                                    money_request#create
 #                       money_request GET    /money_request/:id(.:format)                                money_request#show
+#                                     PATCH  /money_request/:id(.:format)                                money_request#update
+#                                     PUT    /money_request/:id(.:format)                                money_request#update
+#                                     DELETE /money_request/:id(.:format)                                money_request#destroy
+#               money_request_comment POST   /money_request/:money_request_id/comment(.:format)          money_request#comment
+#                                     GET    /money_request(.:format)                                    money_request#index
+#                                     POST   /money_request(.:format)                                    money_request#create
+#                   new_money_request GET    /money_request/new(.:format)                                money_request#new
+#                  edit_money_request GET    /money_request/:id/edit(.:format)                           money_request#edit
+#                                     GET    /money_request/:id(.:format)                                money_request#show
 #                                     PATCH  /money_request/:id(.:format)                                money_request#update
 #                                     PUT    /money_request/:id(.:format)                                money_request#update
 #                                     DELETE /money_request/:id(.:format)                                money_request#destroy
@@ -267,6 +321,7 @@
 #                   autocomplete_user GET    /autocomplete/user(.:format)                                autocomplete#user
 #                 external_url_report GET    /external/reports/:id(.:format)                             external_url#report
 #             external_url_settlement GET    /external/settlements/:id(.:format)                         external_url#payment
+#                           analytics GET    /analytics(.:format)                                        analytics#show
 #
 
 Rails.application.routes.draw do
