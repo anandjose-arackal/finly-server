@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+  source 'https://rubygems.org'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf'
