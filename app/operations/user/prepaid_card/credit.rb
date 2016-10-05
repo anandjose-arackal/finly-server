@@ -7,7 +7,8 @@ class User::PrepaidCard::Credit < User::PrepaidCard::Base
 
   def pre_validate
     super
-    if params.blank? or params[:amount].blank?
+    return if has_errors?
+    if params[:amount].blank?
       messages[:error] << 'Amount cannot be blank'
       return
     end

@@ -13,6 +13,7 @@
 #  designation      :string(255)
 #
 
+
 require 'test_helper'
 
 class ContactTest < ActiveSupport::TestCase

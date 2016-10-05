@@ -12,6 +12,7 @@
 #  updated_at                       :datetime         not null
 #
 
+
 class ReceiptEmailAttachment < ActiveRecord::Base
   PDF_CONTENT_TYPES = ['application/pdf'].freeze
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze

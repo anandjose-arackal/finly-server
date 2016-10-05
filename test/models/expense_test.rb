@@ -18,6 +18,7 @@
 #  is_deleted           :boolean          default(FALSE), not null
 #
 
+
 require 'test_helper'
 
 class ExpenseTest < ActiveSupport::TestCase

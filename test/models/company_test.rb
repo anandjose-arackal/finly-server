@@ -9,6 +9,7 @@
 #  active     :boolean          default(TRUE), not null
 #
 
+
 require 'test_helper'
 
 class CompanyTest < ActiveSupport::TestCase

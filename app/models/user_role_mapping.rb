@@ -9,6 +9,7 @@
 #  updated_at   :datetime         not null
 #
 
+
 class UserRoleMapping < ActiveRecord::Base
 
   belongs_to :user

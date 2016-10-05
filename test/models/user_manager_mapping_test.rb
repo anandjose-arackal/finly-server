@@ -15,6 +15,7 @@
 #  policy_id              :integer
 #
 
+
 require 'test_helper'
 
 class UserManagerMappingTest < ActiveSupport::TestCase

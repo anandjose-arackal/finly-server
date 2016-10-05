@@ -17,6 +17,7 @@
 #  updated_at        :datetime         not null
 #
 
+
 class MoneyRequestComment < ActiveRecord::Base
 
   default_scope {order(created_at: :desc)}

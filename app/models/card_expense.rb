@@ -10,6 +10,7 @@
 #  updated_at          :datetime         not null
 #
 
+
 class CardExpense < ActiveRecord::Base
   belongs_to :card_transaction
   belongs_to :expense # foreign key would be expense_id

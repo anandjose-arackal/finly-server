@@ -14,6 +14,7 @@
 #  updated_at        :datetime         not null
 #
 
+
 class CompanyConfiguration < ActiveRecord::Base
   belongs_to :company
 
