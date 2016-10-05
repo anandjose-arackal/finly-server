@@ -47,7 +47,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def validate
     unless validate_date payment_param[:date]
-      messages[:error] << 'Invalid date passed. Try again'
+      return false
     end
     if money_requests.present?
       total_amount = 0
