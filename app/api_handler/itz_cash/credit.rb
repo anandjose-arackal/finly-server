@@ -49,8 +49,6 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_process
-    # todo record the credit in our database
-    messages[:success] << ''
   end
 
   def success

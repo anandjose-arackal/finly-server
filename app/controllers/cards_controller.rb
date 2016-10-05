@@ -5,7 +5,7 @@ class CardsController < ApplicationController
     @result = User::PrepaidCard::Show.(current_user, params)
     # respond
     respond_to do |format|
-      format.json {render json: { balance: @result.balance }}
+      format.json { render json: {balance: @result.balance} }
     end
   end
 
@@ -21,7 +21,6 @@ class CardsController < ApplicationController
         #Debit
         @result = User::PrepaidCard::Debit.(current_user, params)
     end
-    respond response: :success
   end
 
   def update_status

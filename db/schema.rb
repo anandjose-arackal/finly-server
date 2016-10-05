@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161002150824) do
+ActiveRecord::Schema.define(version: 20161005094515) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -80,6 +80,22 @@ ActiveRecord::Schema.define(version: 20161002150824) do
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
   add_index "card_expenses", ["expense_id"], name: "index_card_expenses_on_expense_id", using: :btree
+
+  create_table "card_fund_transactions", force: :cascade do |t|
+    t.string   "transaction_id",  limit: 255,   null: false
+    t.text     "response",        limit: 65535, null: false
+    t.string   "action",          limit: 255,   null: false
+    t.integer  "requesting_user", limit: 4,     null: false
+    t.integer  "for_user",        limit: 4,     null: false
+    t.text     "post_params",     limit: 65535, null: false
+    t.text     "post_url",        limit: 65535, null: false
+    t.string   "amount_value",    limit: 255,   null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "card_fund_transactions", ["for_user"], name: "index_card_fund_transactions_on_for_user", using: :btree
+  add_index "card_fund_transactions", ["requesting_user"], name: "index_card_fund_transactions_on_requesting_user", using: :btree
 
   create_table "card_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
