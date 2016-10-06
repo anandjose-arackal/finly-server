@@ -17,7 +17,7 @@
 #  updated_at        :datetime         not null
 #
 
-
+# todo rename rejected_to_id to modified_user_id
 class MoneyRequestComment < ActiveRecord::Base
 
   default_scope {order(created_at: :desc)}

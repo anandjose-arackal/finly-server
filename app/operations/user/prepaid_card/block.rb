@@ -37,7 +37,7 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
   def post_process
     return unless success?
     update_params = {active: false, disabled_by_role_id: user_role_id, disable_note: params[:disable_note]}
-    selected_user.cards.first.update_attibute(update_params)
+    selected_user.cards.first.update_attributes(update_params)
     if self.block_presenter.present? and self.block_presenter.success?
       messages[:success] << "Successfully blocked the card!"
     end

@@ -34,7 +34,7 @@ class UserRole < ActiveRecord::Base
   end
 
   def self.name_for(role_id)
-    
+    VALUES.key(role_id)
   end
 
 end
