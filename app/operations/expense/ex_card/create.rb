@@ -1,6 +1,5 @@
-# this class will most likely be called from the API class that is consumed by the prepaid
-# card provider. The calling class will commit all the data to the Transactions table, and create this expense
-# in the Expenses table
+# this class will most likely be called from the transaction operation, which itself will be called from the
+# message queue job after a card transaction
 # will be initialized with the transaction object and card object that will be passed
 
 class Expense::ExCard::Create < Expense::ExCard::Base

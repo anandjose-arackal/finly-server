@@ -200,7 +200,14 @@
             <div class="row" style="padding: 3px 10px;">
           {{/ifCond}}
         {{/ifCond}}
-          <div class="col-sm-1 no-padding">{{increment @index 1}}</div>
+          <div class="col-sm-1 no-padding">
+            {{increment @index 1}}
+            {{#if_eq this.payment_type_id 2}}
+              <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
+            {{else}}
+              <i class="fa fa-money" style="margin-left: 30%;"></i>
+            {{/if_eq}}
+          </div>
           <div class="col-sm-2 no-padding">{{this.date}}</div>
           <div class="col-sm-2 no-padding">{{this.merchant_name}}</div>
           <div class="col-sm-3 no-padding">{{#if this.note}}{{this.note}}{{else}}--{{/if}}</div>

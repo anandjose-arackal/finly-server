@@ -46,6 +46,12 @@ Handlebars.registerHelper("case", function(value, options) {
     }
 });
 
+// Handlebars.registerHelper("default", function(options) {
+//     if (!this._switch_break_) {
+//         return options.fn(this);
+//     }
+// });
+
 Handlebars.registerHelper('if_all', function() {
   var args = [].slice.apply(arguments);
   var opts = args.pop();

@@ -5,39 +5,43 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   attr_accessor :updated_expense_params
 
   def pre_validate
-    super
-    if params.blank?
+    if user.blank? or params.blank?
       messages[:error] << "Parameters not present."
     end
-    if params[:expense_id].blank? or params[:id].blank?
+    if params[:expense_id].blank? and params[:id].blank?
       messages[:error] << "Expense ID missing!"
     end
   end
 
 
   def init
-    super
-    # setting up the expense params for updation
+    id = (params[:expense_id] or params[:id])
+    self.expense = user.expenses.find_by(id: id)
     self.updated_expense_params = update_card_expense_params
-    if expense.card_expense.present? and params[:expense][:merchant]
-      self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
+    if updated_expense_params[:receipts_attributes] == [nil]
+      updated_expense_params.delete(:receipts_attributes)
     end
-    if expense.receipts.present? and params[:expense][:receipt]
+    # todo - handle merchant name update for cards
+    # if expense.card_expense.present? and params[:expense][:merchant]
+    #   self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
+    # end
+    if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
       self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
     end
   end
 
 
   def validate
-    unless expense
-      messages[:error] << "Cannot find expense to edit. "
-    end
+
   end
 
 
   def authorize
+    unless expense
+      raise_unauthorized_exception
+    end
     unless expense.user_id == user.id
-      messages[:error] << "You do not own this expense."
+      raise_unauthorized_exception
     end
   end
 
@@ -47,7 +51,10 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       messages[:error] = self.expense.errors.full_messages
       return false
     end
-    success
+  end
+
+  def success
+    Expense::Base::Presenter.new(user, {expense: self.expense}, self.messages)
   end
 
   def post_process
@@ -55,11 +62,5 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   end
 
   private
-  # this will be called when the merchant, or receipt of the expense needs to be updated, from the user's view of expenses
-  def update_card_expense_params
-    params.require(:expense).permit(:note, :category_id,
-                                    card_expense_attributes: [:editable_merchant, :id],
-                                    receipts_attributes: [:image, :user_id, :id])
-  end
 
 end

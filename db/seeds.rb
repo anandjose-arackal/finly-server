@@ -223,9 +223,11 @@ if ExpenseStatus.count ==0
   ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
   ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
   ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
+  ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
 end
 
 if Expense.count == 0
+  # junk manual expenses
   200.times do |i|
     Expense.create(amount_attributes: {value: random(100, 1000), currency_id: 1},
                    expense_status_id: 1,
@@ -236,6 +238,8 @@ if Expense.count == 0
                    category_id: random_integer(1, 5),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
+
+
 end
 
 if Receipt.count == 0
@@ -373,14 +377,33 @@ if Card.count == 0
   end
 end
 
-# creating some junk transactions for testing
+# creating some junk transactions and card expenses for testing
 if CardTransaction.count == 0
   User.all.each do |user|
     card = user.cards.first
-    CardTransaction.create(card_id: card.id, user_id: user.id,
-                               transaction_amount_attributes: {value: 100, currency_id: 1},
-                               date: Date.today,
-                               merchant_name: 'Randomness',
-                               transaction_currency_code: 'INR')
+    10.times do
+      random_amount = random(10, 1000)
+      trans = CardTransaction.create(card_id: card.id, user_id: user.id,
+                                 transaction_amount_attributes: {value: random_amount, currency_id: 1},
+                                 date: Date.today,
+                                 merchant_name: 'Randomness',
+                                 transaction_currency_code: 'INR')
+      # junk card expense
+      Expense.create(amount_attributes: {value: random_amount, currency_id: 1},
+                       expense_status_id: 1,
+                       expense_type_id: 2,
+                       note: "This is a card expense, hello! #{trans.id}",
+                       date: Faker::Date.between(20.days.ago, Date.today),
+                       user_id: user.id,
+                       category_id: random_integer(1, 5),
+                       card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
+                                                 card_transaction_id: trans.id})
+    end
   end
+  # creating expenses from the transactions
+end
+
+# temporary otp verification all numbers in db
+User.all.each do |user|
+  user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end

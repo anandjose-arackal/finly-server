@@ -319,6 +319,7 @@ class FinlyF.Views.User extends Backbone.View
     e.preventDefault()
     _this = @
     target = e.currentTarget
+    $(target).html("<i class='fa fa-spinner fa-spin'></i>").attr("disabled", true)
 
     action_type = $(target).attr('data-card-action-type')
     modal = $(@el).find('#modal-sub-mp')
@@ -347,6 +348,7 @@ class FinlyF.Views.User extends Backbone.View
           $(modal).html("")
         else
           console.log res
+          $(target).attr("disabled", true)
       error: (err) ->
         console.log "Error", err
 
@@ -416,7 +418,7 @@ class FinlyF.Views.User extends Backbone.View
       }
       success: (res) ->
         # console.log "Success", res
-        $(target).html("Request Balance")
+        $(target).html("Update Balance")
         $(target).closest(".card-balance").find(".balance").html("&#8377;&nbsp;&nbsp;" + res.balance)
       error: (err) ->
         console.log "Error", err

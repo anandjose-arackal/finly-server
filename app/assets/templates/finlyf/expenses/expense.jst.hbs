@@ -3,6 +3,11 @@
     <div class="col-md-4">
       <div class="col-sm-2">
         <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+        {{#if_eq item.expense_type_id 2}}
+          <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
+        {{else}}
+          <i class="fa fa-money" style="margin-left: 30%;"></i>
+        {{/if_eq}}
       </div>
       <div class="col-sm-5">{{item.date}}</div>
       <div class="col-sm-5">{{item.merchant_name}}</div>
@@ -15,24 +20,34 @@
       <div class="col-sm-4">{{#if item.note}}{{item.note}}{{else}}--{{/if}}</div>
     </div>
   {{else}}
-    <div class="col-md-12">
-      <div class="col-sm-1"><input class="select-item" type="checkbox" data-item-id="{{item.id}}" /></div>
-      <div class="col-sm-2">{{item.date}}</div>
-      <div class="col-sm-3">{{item.merchant_name}}</div>
-
-      <div class="col-sm-2">&#8377;&nbsp;{{item.amount_value}}</div>
-      <div class="col-sm-2">{{item.category_name}}</div>
-      <div class="col-sm-2">{{#if item.note}}{{item.note}}{{else}}--{{/if}}</div>
+    <div class="col-sm-1 no-padding">
+      <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+      {{#if_eq item.expense_type_id 2}}
+        <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
+      {{else}}
+        <i class="fa fa-money" style="margin-left: 30%;"></i>
+      {{/if_eq}}
     </div>
-  {{/if_not_eq}}
-{{else}}
-  <div class="col-md-12">
-    <div class="col-sm-1"><input class="select-item" type="checkbox" data-item-id="{{item.id}}" /></div>
     <div class="col-sm-2">{{item.date}}</div>
     <div class="col-sm-3">{{item.merchant_name}}</div>
 
     <div class="col-sm-2">&#8377;&nbsp;{{item.amount_value}}</div>
     <div class="col-sm-2">{{item.category_name}}</div>
     <div class="col-sm-2">{{#if item.note}}{{item.note}}{{else}}--{{/if}}</div>
+  {{/if_not_eq}}
+{{else}}
+  <div class="col-sm-1 no-padding">
+    <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+      {{#if_eq item.expense_type_id 2}}
+        <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
+      {{else}}
+        <i class="fa fa-money" style="margin-left: 30%;"></i>
+      {{/if_eq}}
   </div>
+  <div class="col-sm-2">{{item.date}}</div>
+  <div class="col-sm-3">{{item.merchant_name}}</div>
+
+  <div class="col-sm-2">&#8377;&nbsp;{{item.amount_value}}</div>
+  <div class="col-sm-2">{{item.category_name}}</div>
+  <div class="col-sm-2">{{#if item.note}}{{item.note}}{{else}}--{{/if}}</div>
 {{/if}}

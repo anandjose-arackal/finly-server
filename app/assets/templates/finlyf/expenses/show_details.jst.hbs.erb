@@ -44,12 +44,16 @@
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Amount:</label></div>
 
-      <div class="col-sm-8 item-amount-value item-attr-preview" style="font-size: 25px;line-height: 14px; color: #93C178;">&#8377;&nbsp;{{item.amount_value}}</div>
-      <div class="col-sm-8 item-amount-value item-attr-edit" style="font-size: 25px;line-height: 14px; color: #93C178;">
-        <input class="form-control" type="number" value="{{item.amount_value}}" name="expense[amount_attributes][value]"/>
+      {{#if_eq item.expense_type_id 2}}
+        <div class="col-sm-8 item-amount-value" style="font-size: 25px;line-height: 14px; color: #93C178;">&#8377;&nbsp;{{item.amount_value}}</div>
+      {{else}}
+        <div class="col-sm-8 item-amount-value item-attr-preview" style="font-size: 25px;line-height: 14px; color: #93C178;">&#8377;&nbsp;{{item.amount_value}}</div>
+        <div class="col-sm-8 item-amount-value item-attr-edit" style="font-size: 25px;line-height: 14px; color: #93C178;">
+          <input class="form-control" type="number" value="{{item.amount_value}}" name="expense[amount_attributes][value]"/>
 
-        <input type="hidden" name="expense[amount_attributes][currency_id]" class="form-control" value="1" />
-      </div>
+          <input type="hidden" name="expense[amount_attributes][currency_id]" class="form-control" value="1" />
+        </div>
+      {{/if_eq}}
     </div>
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Merchant:</label></div>
@@ -60,8 +64,14 @@
 
     <div class="row no-margin item-attribute">
       <div class="col-sm-4 no-padding"><label class="control-label">Date:</label></div>
-      <div class="col-sm-8 item-date item-attr-preview">{{item.date}}</div>
-      <div class="col-sm-8 item-date item-attr-edit"><input type="text" class="form-control datepicker" name="expense[date]" value="{{item.formatted_date}}"/></div>
+
+      {{#if_eq item.expense_type_id 2}}
+        <div class="col-sm-8 item-date">{{item.date}}</div>
+      {{else}}
+        <div class="col-sm-8 item-date item-attr-preview">{{item.date}}</div>
+        <div class="col-sm-8 item-date item-attr-edit"><input type="text" class="form-control datepicker" name="expense[date]" value="{{item.formatted_date}}"/></div>
+      {{/if_eq}}
+      
     </div>
 
     <div class="row no-margin item-attribute">

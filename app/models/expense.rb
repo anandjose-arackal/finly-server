@@ -44,7 +44,6 @@ class Expense < ActiveRecord::Base
   delegate :amount_value, :currency, to: :amount
   delegate :expense_type, to: :expense_type
   delegate :expense_status_name, to: :expense_status
-  delegate :merchant_name, to: :manual_expense
   delegate :user_name, to: :user
 
   validates :date, presence: true
@@ -125,6 +124,9 @@ class Expense < ActiveRecord::Base
   scope :manual, -> { joins(:manual_expense) }
   scope :card, -> { joins(:card_expense) }
 
+  scope :only_card_expenses, -> {where(expense_type_id: 2)}
+  scope :only_manual_expenses, -> {where(expense_type_id: 1)}
+
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
@@ -138,6 +140,17 @@ class Expense < ActiveRecord::Base
 
   delegate :category_name, to: :category
 
+
+  def merchant_name
+    case self.expense_type_id
+      when 1
+        return self.manual_expense.merchant
+      when 2
+        return self.card_expense.editable_merchant
+      else
+        # do nothing
+    end
+  end
 
   # returns the number of receipts attached to this expense
   def receipts_count
