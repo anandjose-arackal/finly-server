@@ -39,6 +39,7 @@ class FinlyF.Views.Expense extends Backbone.View
 
   render: ->
     unless @preview
+      $(@el).addClass('no-padding')
       $(@el).html(@template({ item: @model.toJSON() }))
     else
       $(@el).html(@templateShow())
@@ -101,6 +102,7 @@ class FinlyF.Views.Expense extends Backbone.View
   update: (e) ->
     target = e.currentTarget
     $(target).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;").removeClass('btn-update-expense')
+    $(target).attr('disabled', true)      
 
     _this = @
     e.preventDefault()
@@ -126,10 +128,12 @@ class FinlyF.Views.Expense extends Backbone.View
           # _this.refetchCollection()
         else
           $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").addClass('btn-update-expense')
+          $(target).attr('disabled', false)
 
       error: (err) ->
         $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").addClass('btn-update-expense')
         console.log "Error", err 
+        $(target).attr('disabled', false)
       cache: false,
       contentType: false,
       processData: false

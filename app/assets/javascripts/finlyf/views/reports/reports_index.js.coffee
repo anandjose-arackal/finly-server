@@ -177,6 +177,8 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
+    
+    # $(@el).find(".show-detail-title").css("position", "fixed");
 
   showReport: (report_id) ->
     #BEING USED FROM ROUTER

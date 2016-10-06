@@ -58,6 +58,7 @@ window.FinlyF =
     $(el).find('.sidebar .filter-category-id').val(params.filter_category_id)
     $(el).find('.sidebar .filter-receipt').val(params.filter_receipt)
     $(el).find('.sidebar .filter-amount-type').val(params.filter_amount_type)
+    $(el).find('.sidebar .filter-expense-type-id').val(params.filter_expense_type_id)
 
   navigate: (e, attr)->
     target = e.currentTarget

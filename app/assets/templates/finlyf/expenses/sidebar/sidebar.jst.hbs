@@ -19,6 +19,35 @@
 </div>
 
 <div class="row sidebar-element">
+  <div class="col-sm-12 sidebar-label">Payment Type</div>
+
+  <div class="col-sm-12" style="margin-bottom: 5px;">
+    <select style="width: 100%;" class="form-control filter-expense-type-id">
+      <option value="">All</option>
+      <option value="2">Card</option>
+      <option value="1">Cash</option>
+    </select>
+  </div> 
+  {{!-- <div class="col-sm-12">
+    <div class="col-sm-4 no-padding text-center">
+      <label>
+        <input type="radio" class="filter-expense-type" name="filter-payment-type" value="all">&nbsp;All
+      </label>
+    </div>
+    <div class="col-sm-4 no-padding text-center">
+      <label>
+        <input type="radio" class="filter-expense-type" name="filter-payment-type" value="card">&nbsp;Cash
+      </label>
+    </div>
+    <div class="col-sm-4 no-padding text-center">
+      <label>
+        <input type="radio" class="filter-expense-type" name="filter-payment-type" value="card">&nbsp;Cash
+      </label>
+    </div>
+  </div> --}}
+</div>
+
+<div class="row sidebar-element">
 
   <div class="col-sm-12">
     <input type="text" class="form-control filter-merchant" style="width: 100%;" placeholder="Merchant" value="{{item.filter_merchant}}" />
