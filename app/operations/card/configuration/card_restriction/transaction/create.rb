@@ -2,6 +2,10 @@ class Card::Configuration::CardRestriction::Transaction::Create < Card::Configur
 
 	attr_accessor :rule, :transaction_rule_params
 
+	def authorized_user_types
+		[:company_admin]
+	end
+
 	def pre_validate
 		if user.blank? or params.blank?
 			messages[:error] << "Invalid parameters."
@@ -18,7 +22,7 @@ class Card::Configuration::CardRestriction::Transaction::Create < Card::Configur
 	end
 
 	def authorize
-		unless user.company_admin?
+		unless card 
 			raise_unauthorized_exception
 		end
 	end
