@@ -26,7 +26,7 @@
 
       <label style="font-weight: 500">Password: </label>
       <div>
-        <input type="password" class="form-control" name="user[password]">
+        <input type="password" class="form-control user-password" name="user[password]">
       </div>
       <label style="font-weight: 500">Confirm Password: </label>
       <div>
@@ -158,6 +158,8 @@
 <script type="text/javascript">
   $(document).ready(function(){
     $(".datepicker").datepicker({dateFormat: "yy-mm-dd"});
+
+    $(".user-password").popover({ trigger: 'focus', content: "Password should be 8 characters long." });
   })
 
   snapNotify = function(obj) {

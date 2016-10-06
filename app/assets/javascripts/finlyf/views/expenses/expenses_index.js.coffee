@@ -371,6 +371,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       'filter_receipt': $(".sidebar .filter-receipt").val() || ""
+      'filter_expense_type_id': $(".sidebar .filter-expense-type-id").val() || ""
     }
 
     filter_amount_value = $(".sidebar .filter-amount-value").val()

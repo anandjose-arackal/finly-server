@@ -36,7 +36,7 @@ class FinlyF.Views.Report extends Backbone.View
     'click .confirm-add-existing-expense': 'addExistingExpenses'
 
   initialize: (options) ->
-    console.log "we're here in report show"
+    # console.log "we're here in report show"
     @parent = options.parent
     _this = @
     @preview = options.preview
@@ -81,6 +81,8 @@ class FinlyF.Views.Report extends Backbone.View
   populateDetails: ->
     @model.set('current_view', @current_view)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    # $(@el).find(".show-detail-title").css("height", "49");
+    # $(@el).find(".show-detail-title").css("height", "50");
 
   showSaveOption: ->
     $(".btn-update-item").css("display", "inline");
@@ -115,8 +117,13 @@ class FinlyF.Views.Report extends Backbone.View
     #   console.log "event", e
     #   e.preventDefault()
 
+    # console.log "E is", e
 
     # e.preventDefault()
+    # target = e.currentTarget
+
+    $(e).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;")
+    $(e).attr('disabled', 'disabled')
     
     _this = @
     formData = new FormData($('#modal-new form#new-item')[0])
@@ -135,8 +142,13 @@ class FinlyF.Views.Report extends Backbone.View
               view: _this.current_view
             }
           })
+        else
+          $(e).html("Create")
+          $(e).attr('disabled', false) 
       error: (err) ->
         console.log "Error", err 
+        $(e).html("Create")
+        $(e).attr('disabled', false)
       cache: false,
       contentType: false,
       processData: false
