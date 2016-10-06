@@ -1,0 +1,30 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <h4 class="modal-title">Add Payment</h4>
+</div>
+<div class="modal-body">
+
+  <label style="margin-top: 8px">Amount</label>
+  <input name="payment[amount]" id="settlementAmount" class="form-control" style="margin-top: 4px; border-radius: 1px" type="text">
+  <label style="margin-top: 8px">Date</label>
+
+  <input name="payment[date]" id="settlementDate" class="form-control datepicker" min="'2000-01-01'" max="'2020-01-01'" style="margin-top: 4px;border-radius: 1px" type="text">
+  <label style="margin-top: 8px">Note</label>
+
+  <textarea id="settlementNote" name="payment[note]" class="form-control" placeholder="Write a note..." style="margin-top: 4px; border-radius: 1px;resize: vertical"></textarea>
+
+
+  <label class="radio-inline" style="">
+    <input name="payment_type" value="1" type="radio" checked="checked">Cash Advance
+  </label>
+
+  <label class="radio-inline">
+    <input name="payment_type" value="2" type="radio">Debt Clearance
+  </label>
+  <br />
+
+  <button class="green-button btn-add-payment" style="margin-top: 28px;margin-top: 28px;
+      background-color: #465c8b;padding: 10px;
+      width: 180px;" type="submit">Add New Payment
+  </button>
+</div>

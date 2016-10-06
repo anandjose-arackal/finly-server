@@ -1,0 +1,2 @@
+module Devise::PasswordsHelper
+end

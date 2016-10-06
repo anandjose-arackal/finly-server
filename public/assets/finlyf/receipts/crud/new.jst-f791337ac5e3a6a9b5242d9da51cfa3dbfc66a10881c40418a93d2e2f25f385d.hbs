@@ -1,0 +1,36 @@
+<form id="new-item" enctype="multipart/form-data">
+
+  <input name="utf8" type="hidden" value="&#x2713;"/>
+  <input type="hidden" name="authenticity_token" value="" />
+  <div class="row no-margin">
+    <div class="col-sm-7 no-padding">
+
+      <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">File</label>
+        </div>
+        <div class="col-sm-7">
+          <input type="file" name="receipt[image]" class="form-control" accept=".png, .jpg, .pdf, .jpeg" />
+        </div>
+      </div>
+
+{{!--       <div class="row no-margin">
+        <div class="col-sm-5 text-right">
+          <label class="control-label">Note</label>
+        </div>
+        <div class="col-sm-7">
+          <textarea name="receipt[note]" placeholder="Add a Note. (Optional)"></textarea>
+        </div>
+      </div> --}}
+
+      <div class="row no-margin">
+        <div class="col-sm-7 col-sm-offset-5">
+          
+          <buttun class="btn-create btn btn-primary">Create</buttun>
+        </div>
+        
+      </div>      
+    </div>
+  </div>
+</form>
+

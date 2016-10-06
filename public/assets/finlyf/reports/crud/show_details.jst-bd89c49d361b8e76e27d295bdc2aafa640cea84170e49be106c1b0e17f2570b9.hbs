@@ -1,0 +1,185 @@
+<div class="row" style="height: 100%;">
+  <div class="col-sm-8 show-details-panel">
+    <div class="row">
+      <div class="col-sm-6"><h4>{{item.name}}</h4></div>
+      <div class="col-sm-6 text-right">
+        <div class="dropdown" style="display: inline">
+          <button class="btn btn-default btn-sm dropdown-toggle navbar-btn" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Export
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="">
+            <li><a href="#">PDF</a></li>
+            <li><a href="#">CSV</a></li>
+            <li><a href="#">XLS</a></li>
+          </ul>
+        </div>
+
+        <div class="btn btn-navbar btn-sm btn-danger btn-delete-item"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-5">
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Status</label></div>
+          <div class="col-sm-6"><span class="label label-success">{{item.status}}</span></div>
+        </div>
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To</label></div>
+          <div class="col-sm-6">{{item.manager_name}}</div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">From</label></div>
+          <div class="col-sm-6">{{item.user_name}}</div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Date</label></div>
+          <div class="col-sm-6">{{item.date}}</div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Expenditure</label></div>
+          <div class="col-sm-6">{{item.total}}</div>
+        </div>
+        
+      </div>
+      <div class="col-sm-7">
+        <div class="row"></div>
+
+      </div>
+    </div>
+    <hr />
+    <div class="row no-margin">
+      <div class="col-sm-6 no-padding">
+        <h4>Expenses</h4>
+      </div>
+      <div class="col-sm-6 no-padding text-right">
+        <button class="add-new-expense btn btn-navbar" data-item-id="{{item.id}}">Add New Expense</button>
+        <button class="add-existing-expense btn btn-navbar" data-item-id="{{item.id}}">Add Existing Expense</button>
+      </div>
+    </div>
+    <div class="row no-margin">
+
+    {{#each item.expense_categories}}
+      <div class="col-sm-12">
+        <div class="row-no-margin"><h5>{{this.category_name}}</h5></div>
+        <div class="row no-margin">
+          <div class="col-sm-2 no-padding">Sl. No.</div>
+          <div class="col-sm-2 no-padding">Date</div>
+          <div class="col-sm-3 no-padding">Merchant</div>
+          <div class="col-sm-3 no-padding">Note</div>
+          <div class="col-sm-2 no-padding text-right">Total</div>
+        </div>
+
+        {{#each this.expenses}}
+          <div class="row no-margin">
+            <div class="col-sm-2 no-padding">{{@index}}</div>
+            <div class="col-sm-2 no-padding">{{this.date}}</div>
+            <div class="col-sm-3 no-padding">{{this.merchant_name}}</div>
+            <div class="col-sm-3 no-padding">{{this.note}}</div>
+            <div class="col-sm-2 no-padding text-right">$<span>{{amount_value}}</span></div>
+          </div>
+        {{/each}}
+      </div>
+    {{/each}}
+      
+    </div>
+
+    {{#if item.receipts}}
+      <div class="row no-margin"><h4>Receipt Thumbnails</h4></div>
+      <div class="row no-margin receipts">
+        {{#each item.receipts}}
+          <div class="receipt col-sm-4 no-padding">
+            <div class="receipt-container">
+              <div class="receipt-image">
+                <img class="img-responsive" src="{{this.url}}" style=""/>
+              </div>
+              <div class="row no-margin receipt-details">
+                <div class="col-sm-12">
+                  <h4>{{this.merchant_name}}</h4>
+                </div>
+                <div class="col-sm-12">
+                  {{this.date}}
+                </div>
+                <div class="col-sm-12">
+                  {{this.value}}
+                </div>
+              </div>
+            </div>  
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}
+  </div>
+
+  <div class="col-sm-4 timeline show-details-panel">
+    <div class="row no-margin"><h4>Timeline</h4></div>
+    <div class="row no-margin">
+      <div class="col-sm-2 no-padding">
+        <span class="roundCircle">{{item.user_initial}}</span>
+      </div>
+      <div class="col-sm-10 no-padding text-right form-new-comment">
+        <textarea class="form-control comment-content"></textarea>
+        <button class="btn btn-navbar btn-sm btn-warning btn-post-comment" data-item-id="{{item.id}}">Post</button>
+      </div>
+    </div>
+    <div class="comments">
+      {{#if item.comments}}
+        {{#each item.comments}}
+          <div class="row no-margin comment">
+            <div class="col-sm-2 no-padding">
+              <span class="roundCircle">{{this.comment_user_initial}}</span>
+            </div>
+            <div class="col-sm-10 no-padding">
+              <div class="row no-margin comment-content">
+                <div class="col-sm-12 no-padding">
+                  {{this.content}}
+                </div>
+              </div>
+              <div class="row no-margin comment-meta">
+                <div class="col-sm-12 no-padding">
+                  {{this.comment_user_name}} - {{this.created_at}}
+                </div>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      {{/if}}  
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+  .roundCircle{
+    border-radius: 50%;
+    line-height: 40px;
+    width: 40px;
+    /*height: 50px;*/
+    height: 40px;
+    background: #23fa8b;
+  }
+
+  .timeline{
+    background: #F7F9FB;
+  }
+
+  textarea.comment-content{
+    border-radius: 1.5px;
+    margin-bottom: 5px;
+  }
+
+  .comment{
+    /*background: #efefef;*/
+    padding: 10px 0;
+    /*margin-bottom: 10px;*/
+  }
+
+  .comment-meta{
+    color: #aaa;
+    font-size: 12px;
+  }
+</style>

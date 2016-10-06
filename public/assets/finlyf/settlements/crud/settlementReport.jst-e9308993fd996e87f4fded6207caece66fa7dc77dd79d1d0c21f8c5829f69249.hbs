@@ -1,0 +1,16 @@
+<div class="col-md-5">
+  <div class="col-sm-2"><input class="settlement-report-select" type="checkbox" data-item-id="{{item.id}}" /></div>
+  <div class="col-sm-10">{{item.name}}</div>
+</div>
+
+<div class="col-md-7">
+  <div class="col-sm-6">
+    {{#if item.final_approver}}
+      {{item.final_approver}}
+    {{else}}
+      Auto-Approved
+    {{/if}}
+  </div>
+  <div class="col-sm-3 text-right">{{item.reimbursement_amount}}</div>
+  <div class="col-sm-3 text-right">{{item.total_amount}}</div>
+</div>

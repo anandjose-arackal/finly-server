@@ -1,0 +1,59 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <h4 class="modal-title">Add Payment</h4>
+</div>
+<div class="modal-body">
+
+  <div class="process-screen">
+    <div class="row">
+      <div class="col-sm-4">
+        <h4>Reimbursement Pending</h4>
+        <h4 class="pending_reimbursement"></h4>
+      </div>
+
+      <div class="col-sm-4">
+        <h4>Selected Reports' Total / Reimbursing</h4>
+        <h4 class="selected_reports_total">0</h4>
+      </div>
+
+      <div class="col-sm-4">
+        <button class="btn btn-sm btn-success btn-settlement-action" disabled="disabled">Reimburse</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="col-md-5">
+          <div class="col-sm-2"><input class="main-select-all" type="checkbox" /></div>
+          <div class="col-sm-10">Name</div>
+        </div>
+
+        <div class="col-md-7">
+          <div class="col-sm-6">Final Approver</div>
+          <div class="col-sm-3">Reimbursement Amount</div>
+          <div class="col-sm-3">Total Amount</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="settlement-modal-reports"></div>
+  </div>
+
+  <div class="confirmation-screen" style="display: none;">
+    <label>Note</label>
+    <textarea name="payment[note]"></textarea>
+
+
+    <label>Date</label>
+    <input type="date" name="payment[date]">
+
+    <button class="confirm-report-action" data-action-type="reimburse">Reimburse</button>
+  </div>
+  
+
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+</div>

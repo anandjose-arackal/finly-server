@@ -1,0 +1,26 @@
+<div class="col-sm-10 col-sm-offset-1">
+  <div class="col-sm-4">
+    <h4>Pending Reimbursement</h4>
+    <h4 class="summary_pending_reimbursement">{{item.pending_reimbursement}}</h4>
+    <input type="hidden" name="pending_reimbursement" value="{{item.pending_reimbursement}}">
+    {{#if item.actions.add_reimbursement}}
+      <button class="btn btn-sm btn-process-reimburse" data-url="{{item.actions.add_reimbursement}}">Reimburse</button>
+    {{/if}}
+  </div>
+
+  <div class="col-sm-4">
+    <h4>Cash in Hand</h4>
+    <h4 class="summary_cash_id_hand">{{item.cash_in_hand}}</h4>
+    <input type="hidden" name="cash_in_hand" value="{{item.cash_in_hand}}">
+    {{#if item.actions.settle}}
+      <button class="btn btn-sm btn-process-debt" data-url="{{item.actions.settle}}">Settle Debt</button>
+    {{/if}}
+  </div>
+
+  <div class="col-sm-4">
+    {{#if item.actions.add_cash_advance}}
+      <button class="btn btn-sm btn-process-payment">Add Cash</button>
+    {{/if}}
+  </div>
+</div>
+
