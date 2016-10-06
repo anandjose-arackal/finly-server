@@ -1,0 +1,79 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <h4 class="modal-title">Select Reports to Settle Debts</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row no-margin">
+    <div class="process-screen col-sm-12">
+      <div class="row">
+        <div class="col-sm-4">
+          <h4>Reimbursement Pending</h4>
+          <h4 class="pending_reimbursement"></h4>
+        </div>
+
+        <div class="col-sm-4">
+          <h4>Selected Reports' Total / Reimbursing</h4>
+          <h4 class="selected_reports_total">0</h4>
+        </div>
+
+        <div class="col-sm-4">
+          <button class="btn btn-sm btn-success btn-settlement-action" disabled="disabled">Reimburse</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="col-md-5">
+            <div class="col-sm-2">{{!-- <input class="main-select-all" type="checkbox" /> --}}</div>
+            <div class="col-sm-10">Name</div>
+          </div>
+
+          <div class="col-md-7">
+            <div class="col-sm-5">Final Approver</div>
+            <div class="col-sm-4 text-right">Reimbursement Amount</div>
+            <div class="col-sm-3 text-right">Total Amount</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="settlement-modal-reports"></div>
+    </div>
+
+    <div class="confirmation-screen col-sm-6 col-sm-offset-3" style="display: none;">
+      <div class="row no-margin" style="margin-bottom: 10px">
+        <div class="col-sm-6">
+          <button class="btn btn-lg navbar-btn btn-cancel-confirmation"><i class="fa fa-backward"></i></button>
+        </div>
+      </div>
+      <div class="row no-margin" style="margin-bottom: 10px;">
+        <div class="col-sm-4 text-right">
+          <label class="control-label">Note</label>
+        </div>
+
+        <div class="col-sm-8">
+          <textarea class="form-control" name="payment[note]"></textarea>
+        </div>
+      </div>
+
+      <div class="row no-margin" style="margin-bottom: 10px;">
+        <div class="col-sm-4 text-right">
+          <label class="control-label">Date</label>
+        </div>
+
+        <div class="col-sm-8">
+          <input class="form-control datepicker" type="text" name="payment[date]">
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-8 col-sm-offset-5">
+          <button class="btn btn-sm btn-primary confirm-report-action" data-action-type="reimburse">Reimburse</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  
+</div>

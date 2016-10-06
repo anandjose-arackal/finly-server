@@ -1,0 +1,56 @@
+{{!-- REF==1O --}}
+{{#unless item.indexOnly}}
+  <div class="row no-margin" id="item-details">
+    <div class="close-item-details"><button class="btn btn-sm close-details">Close Details</button></div>
+    <div id="item-details-main"></div>
+  </div>
+{{/unless}}
+
+<div class="main-header row no-margin">
+  {{#if item.view}}
+    {{#if_not_eq item.view 'personal'}}
+      <div class="col-md-4">
+        <div class="col-sm-2"><input class="main-select-all" type="checkbox" /></div>
+        <div class="col-sm-5">Date</div>
+        <div class="col-sm-5">Merchant</div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="col-sm-3">User</div>
+        <div class="col-sm-2">Amount</div>
+        <div class="col-sm-3">Category</div>
+        <div class="col-sm-4">Note</div>
+      </div>
+    {{else}}
+      <div class="col-md-12">
+        <div class="col-sm-1"><input class="main-select-all" type="checkbox" /></div>
+        <div class="col-sm-2">Date</div>
+        <div class="col-sm-3">Merchant</div>
+
+        <div class="col-sm-2">Amount</div>
+        <div class="col-sm-2">Category</div>
+        <div class="col-sm-2">Note</div>
+      </div>
+    {{/if_not_eq}}
+  {{else}}
+    <div class="col-md-12">
+      <div class="col-sm-1"><input class="main-select-all" type="checkbox" /></div>
+      <div class="col-sm-2">Date</div>
+      <div class="col-sm-3">Merchant</div>
+
+      <div class="col-sm-2">Amount</div>
+      <div class="col-sm-2">Category</div>
+      <div class="col-sm-2">Note</div>
+    </div>
+  {{/if}}
+</div>
+
+<div id="items" class="row no-margin">
+  
+</div>
+
+<div class="row no-margin">
+  <div class="col-sm-12 text-center">
+    <button class="btn btn-sm load-more" data-page="1"><i class="fa fa-cloud-download"></i>&nbsp;&nbsp;<span>Load More</span></button>
+  </div>
+</div>

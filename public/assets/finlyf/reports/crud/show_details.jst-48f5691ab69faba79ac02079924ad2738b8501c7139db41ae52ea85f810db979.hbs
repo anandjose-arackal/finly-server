@@ -1,0 +1,374 @@
+<div class="row" style="height: 100%;">
+  <div class="col-sm-8 show-details-panel">
+    <div class="row item-title show-details-title">
+      <div class="col-sm-6">
+        <h4 class="item-name">
+          <label class="item-attr-preview">{{item.name}}</label>
+          <input type="text" class="item-name-edit item-attr-edit" value="{{item.name}}">
+        </h4>
+      </div>
+      <div class="col-sm-6 text-right">
+
+        {{#if item.actions.take_control}}
+          <button class="btn btn-warning btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+        {{/if}}
+
+        {{#if item.actions.submit}}
+          {{#if item.actions.editable}}
+            <button class="btn bnt-warning btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+          {{/if}}
+          <button class="btn btn-sm btn-report-action btn-success" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+        {{/if}}
+
+        {{#if item.actions.retract}}
+          <button class="btn btn-sm btn-report-action btn-danger" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+        {{/if}}
+
+        {{#if item.actions.approve}}
+          <button class="btn btn-sm btn-success btn-report-action" data-url="{{item.actions.approve}}">Approve</button>
+        {{/if}}
+
+        {{#if item.actions.unapprove}}
+          <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.unapprove}}">Unapprove</button>
+        {{/if}}
+
+        {{#if item.actions.reject}}
+          <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
+        {{/if}}
+
+        {{#if item.actions.reimbursement_confirm}}
+          <button class="btn btn-sm btn-success btn-report-action" data-url="{{item.actions.reimbursement_confirm}}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;Confirm Reimbursement</button>
+        {{/if}}
+        
+      </div>
+    </div>
+
+    <div class="row item-body">
+      <div class="col-sm-7">
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Policy</label></div>
+          <div class="col-sm-6 item-policy">
+            <label class="control-label item-attr-preview">
+              {{#if item.policy}}
+                {{item.policy}}
+              {{else}}
+                None
+              {{/if}}
+            </label>
+            <select class="item-attr-edit item-policy item-policy-edit form-control" name="item-policy" data-default-value="{{item.policy_id}}">
+              <option value="">None</option>
+              {{#each item.policies}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Memo</label></div>
+          <div class="col-sm-6">
+            <label class="control-label item-attr-preview">{{item.memo}}</label>
+            <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
+          </div>
+        </div>
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Status</label></div>
+          <div class="col-sm-6">
+            {{#switch item.status}}
+              {{#case 'Open'}}<span class="label label-default">{{item.status}}</span>{{/case}}
+              {{#case 'Approved'}}<span class="label label-success">{{item.status}}</span>{{/case}}
+              {{#case 'Rejected'}}<span class="label label-danger">{{item.status}}</span>{{/case}}
+              {{#case 'Retracted'}}<span class="label label-default">{{item.status}}</span>{{/case}}
+              {{#case 'Processing'}}<span class="label label-primary">{{item.status}}</span>{{/case}}
+              {{#case 'Reimbursed'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+              {{#case 'Reimbursement Confirmed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+              {{#case 'Closed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+            {{/switch}}
+          </div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">From</label></div>
+          <div class="col-sm-6">{{item.user_name}}</div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To Manager</label></div>
+          <div class="col-sm-6">{{item.manager_name}}</div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
+          <div class="col-sm-6">{{item.finance_manager_name}}</div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Date</label></div>
+          <div class="col-sm-6">{{item.date}}</div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Expenditure</label></div>
+          <div class="col-sm-6">{{item.total}}</div>
+        </div>
+        
+      </div>
+      <div class="col-sm-5">
+        <div class="row">
+
+          <div class="dropdown">
+            <button class="btn-primary btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">Export <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="{{item.export_pdf}}" target="_blank">PDF</a></li>
+              <li><a href="{{item.export_xls}}" target="_blank">XLS</a></li>
+              <li><a href="{{item.export_csv}}" target="_blank">CSV</a></li>
+            </ul>
+          </div>
+
+          {{#if item.actions.editable}}
+            <button class="btn btn-navbar btn-sm btn-danger btn-delete-item"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+          {{/if}}
+
+
+        </div><!-- .row-->
+      </div>
+    </div>
+    <hr />
+    {{#ifCond item.violations.blocking_present '||' item.violations.warning_present}}
+    <div class="row no-margin violations">
+      <h4>Report Violations</h4>
+      <div class="col-sm-12">
+        {{#each item.violations.warning_messages}}
+          {{#if this.message}}
+            <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
+          {{/if}}
+        {{/each}}
+
+        {{#if item.violations.blocking_present}}
+        <div class="col-sm-10 no-padding col-sm-offset-1">
+          <hr style="margin: 8px auto;" />
+        </div>
+        {{/if}}
+
+        {{#each item.violations.blocking_messages}}
+          {{#if this.message}}
+            <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+          {{/if}}
+        {{/each}}
+      </div>
+      <hr />
+    </div><!-- .violations -->
+    {{/ifCond}}
+
+    <div class="row no-margin">
+      <div class="col-sm-6 no-padding">
+        <h4>Expenses</h4>
+      </div>
+      <div class="col-sm-6 no-padding text-right">
+        {{#if item.actions.editable}}
+          <button class="add-new-expense btn btn-navbar" data-item-id="{{item.id}}">Add New Expense</button>
+          <button class="add-existing-expense btn btn-navbar" data-item-id="{{item.id}}">Add Existing Expense</button>
+        {{/if}}
+      </div>
+    </div>
+    <div class="row no-margin">
+      {{#each item.expense_sections}}
+      <div class="col-sm-12 expense-category">
+        <div class="row" style="padding: 0 10px; background: #B4AFD0;">
+          <div class="col-sm-6 no-padding"><h5>{{this.section_name}}</h5></div>
+          <div class="col-sm-6 no-padding"><h5 class="text-right">{{this.section_total}}</h5></div>
+        </div>
+        <div class="row" style="padding: 5px 10px; background: #DDDAEA;">
+          <div class="col-sm-1 no-padding">Sl. No.</div>
+          <div class="col-sm-2 no-padding">Date</div>
+          <div class="col-sm-2 no-padding">Merchant</div>
+          <div class="col-sm-3 no-padding">Note</div>
+          <div class="col-sm-1 no-padding text-right">Total</div>
+          <div class="col-sm-3 no-padding text-right">Actions</div>
+        </div>
+
+        {{#each this.expenses}}
+        {{#ifCond this.violations.warning_present '&&' this.violations.blocking_present}}
+          <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
+        {{else}}
+          {{#ifCond this.violations.warning_present '||' this.violations.blocking_present}}
+            {{#if this.violations.blocking_present}}
+              <div class="row" style="padding: 3px 10px; background: #F2DEDE;">
+            {{else}}
+              <div class="row" style="padding: 3px 10px; background: #FCF8E3;">
+            {{/if}}
+          {{else}}
+            <div class="row" style="padding: 3px 10px;">
+          {{/ifCond}}
+        {{/ifCond}}
+          <div class="col-sm-1 no-padding">{{increment @index 1}}</div>
+          <div class="col-sm-2 no-padding">{{this.date}}</div>
+          <div class="col-sm-2 no-padding">{{this.merchant_name}}</div>
+          <div class="col-sm-3 no-padding">{{this.note}}</div>
+          <div class="col-sm-1 no-padding text-right">&#8377;<span>{{amount_value}}</span></div>
+
+
+          <div class="col-sm-3 no-padding text-right">
+            <button data-item-id="{{this.id}}" class="no-margin btn btn-view-sub-item btn-xs btn-warning">Details</button>
+          {{#if ../../item.actions.editable}}
+            <button data-item-id="{{this.id}}" class="no-margin btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
+          {{/if}}
+          {{#if ../../item.actions.reject}}
+            <button data-item-id="{{this.id}}" class="no-margin btn-reject-sub-item btn btn-xs btn-danger">Reject</button>
+          {{/if}}
+          </div>
+
+        </div>
+        {{/each}}
+      </div>
+      <hr />
+      {{/each}}
+    </div>
+
+    {{#if item.receipts}}
+    <div class="row no-margin"><h4>Receipt Thumbnails</h4></div>
+    <div class="row no-margin receipts">
+    {{#each item.receipts}}
+      <div class="receipt col-sm-4 no-padding">
+        <div class="receipt-container">
+          <div class="receipt-image">
+            <img class="img-responsive" src="{{this.url}}" style=""/>
+          </div>
+          <div class="row no-margin receipt-details">
+            <div class="col-sm-12">
+              <h6>{{this.merchant_name}}</h6>
+            </div>
+            <div class="col-sm-12">
+              {{this.date}}
+            </div>
+            <div class="col-sm-12">
+              {{this.value}}
+            </div>
+          </div>
+        </div>  
+      </div>
+    {{/each}}
+    </div>
+    {{/if}}
+
+  </div><!-- col-sm-8 -->
+
+  <div class="col-sm-4 timeline show-details-panel">
+    <div class="row show-details-title">
+      <div class="col-sm-12 no-padding"></div>
+    </div>
+    <div class="row no-margin" style="margin-top: 60px;"><h4>Timeline</h4></div>
+    <div class="row no-margin">
+      <div class="col-sm-2 no-padding">
+        <span class="roundCircle">{{item.user_initial}}</span>
+      </div>
+      <div class="col-sm-10 no-padding text-right form-new-comment">
+        <textarea class="form-control comment-content"></textarea>
+        <button class="btn btn-navbar btn-sm btn-warning btn-post-comment" data-item-id="{{item.id}}">Post</button>
+      </div>
+    </div>
+    <div class="comments">
+    {{#if item.comments}}
+      {{#each item.comments}}
+      <div class="row no-margin comment">
+        <div class="col-sm-2 no-padding">
+          <span class="roundCircle">{{this.comment_user_initial}}</span>
+        </div>
+        <div class="col-sm-10 no-padding">
+          <div class="row no-margin comment-content">
+            <div class="col-sm-12 no-padding">
+              {{this.content}}
+            </div>
+          </div>
+          <div class="row no-margin comment-meta">
+            <div class="col-sm-12 no-padding">
+              {{this.comment_user_name}} - {{this.created_at}}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    {{/if}}  
+    </div>
+  </div><!-- col-sm-4 -->
+</div><!-- .row -->
+
+<style type="text/css">
+  .show-details-title{
+    position: fixed;
+    max-height: 50px;
+    min-height: 50px;
+    background: #fff;
+    z-index: 9;
+    /*box-shadow: 0 0 9px 0px rgba(0, 0, 0, 0.2)*/
+    /*box-shadow: 0 2px 9px -4px #777;*/
+    box-shadow: 0 1px 3px -3px rgba(0, 0, 0, 0.46);
+    border-bottom: 1px solid #eee;
+  }
+  .col-sm-8 .show-details-title{
+    width: 66.666%;
+  }
+
+  .col-sm-4 .show-details-title{
+    width: 33.333%;
+    box-shadow: 1px 1px 3px -3px rgba(0, 0, 0, 0.46);
+    background: rgba(255, 255, 255, 0.5);
+
+  }
+
+
+
+
+  .violation{
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .item-attr-edit{
+    display: none;
+  }
+
+
+  .item-body{
+    margin-top: 60px;
+  }
+
+
+  .roundCircle{
+    border-radius: 50%;
+    line-height: 40px;
+    width: 40px;
+    /*height: 50px;*/
+    height: 40px;
+    background: #23fa8b;
+  }
+
+  .timeline{
+    background: #F7F9FB;
+  }
+
+  textarea.comment-content{
+    border-radius: 1.5px;
+    margin-bottom: 5px;
+  }
+
+  .comment{
+    /*background: #efefef;*/
+    padding: 10px 0;
+    /*margin-bottom: 10px;*/
+  }
+
+  .comment-meta{
+    color: #aaa;
+    font-size: 12px;
+  }
+
+  .item-details .expense-category {
+    border: 1px solid #cdcdcd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+
+  .item-details .expense-category:last-child{
+    margin-bottom: 350px;
+  }
+</style>

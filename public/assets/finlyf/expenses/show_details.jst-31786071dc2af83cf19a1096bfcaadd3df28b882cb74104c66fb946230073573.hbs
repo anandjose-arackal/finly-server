@@ -1,0 +1,73 @@
+<form>
+  <input name="utf8" type="hidden" value="&#x2713;"/>
+  <input type="hidden" name="authenticity_token" value="" />
+<div class="row no-margin">
+  <div class="col-sm-11 col-sm-offset-1" style="height: 60px;padding-top: 20px; padding-left: 0;">
+    <div class="row no-margin">
+      <div class="col-sm-8 col-sm-offset-4 text-right no-padding">
+        <button class="btn-update-item navbar-btn btn btn-sm" style="display: none;margin-top: -5px; border-color: #3FD37D"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;Update</button>
+        <button class="btn-delete-item navbar-btn btn btn-sm btn-finly-danger" style="margin-top: -5px; border-color: #EA6153;"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+
+<div class="row no-margin item-details">
+  <div class="col-sm-7 no-padding" style="">
+    <div class="row no-margin">
+      <h4>&#8377; <span contenteditable="true" class="editable" data-field="amount_value">{{item.amount_value}}</span></h4>
+      at <strong contenteditable="true" class="editable" data-field="merchant_name">{{item.merchant_name}}</strong>
+    </div>
+    <hr />
+    <div class="row no-margin">
+      <div class="col-sm-3 no-padding">User</div>
+      <div class="col-sm-8">{{item.user_name}}</div>
+    </div>
+    <div class="row no-margin">
+      <div class="col-sm-3 no-padding">User</div>
+      <div class="col-sm-8" class="editable" contenteditable="true">{{item.user_name}}</div>
+    </div>
+    <div class="row no-margin">
+        <div class="col-sm-3 no-padding">Note</div>
+        <div class="col-sm-8" class="editable" contenteditable="true" data-field="note">{{item.note}}</div>
+      </div>
+    </div>
+
+  <div class="col-sm-5 text-center no-padding" style="height: 50%;">
+
+    {{#each item.receipts}}
+      <img src="{{this.image_url}}" class="receipt-image img-responsive" style="max-width: 100%; max-height: 100%;" />
+    {{else}}
+      <div class="receipt-placeholder text-center" style="">
+        <i class="fa fa-arrow-circle-up" style="display: block; font-size: 40px;"></i>
+        Upload a Receipt
+      </div>
+    {{/each}}
+    
+  </div>
+</div>
+
+</form>
+<style type="text/css">
+  .receipt-image{
+    border: 3px solid white;
+    box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .receipt-placeholder{
+    /*background: #efa*/
+    color: #999;
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border: 0.5px dashed #bbb;
+    height: 30%;
+  }
+
+  .item-details h4{
+    font-size: 20px;
+    color: #5B9E33;
+  }
+</style>

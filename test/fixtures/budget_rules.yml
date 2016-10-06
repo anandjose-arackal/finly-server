@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: budget_rules
+#
+#  id               :integer          not null, primary key
+#  category_id      :integer
+#  amount_id        :integer
+#  budget_period_id :integer
+#  policy_id        :integer
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  rule_type_id     :integer
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  category_id: 
+  amount_id: 
+  budget_period_id: 
+  policy_id: 
+
+two:
+  category_id: 
+  amount_id: 
+  budget_period_id: 
+  policy_id: 

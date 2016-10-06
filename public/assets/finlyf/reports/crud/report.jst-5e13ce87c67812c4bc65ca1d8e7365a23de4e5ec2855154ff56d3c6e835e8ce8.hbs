@@ -1,0 +1,15 @@
+{{!-- item = report --}}
+<div class="col-md-4">
+  <div class="col-sm-2">
+    <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+  </div>
+  <div class="col-sm-5">{{item.date}}</div>
+  <div class="col-sm-5">{{item.name}}</div>
+</div>
+
+<div class="col-md-8">
+  <div class="col-sm-3"><span class="label label-default">{{item.status}}</span></div>
+  <div class="col-sm-3">{{item.total}}</div>
+  <div class="col-sm-2">{{item.policy}}</div>
+  <div class="col-sm-4">{{item.memo}}</div>
+</div>
