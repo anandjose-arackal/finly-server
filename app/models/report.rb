@@ -22,6 +22,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable

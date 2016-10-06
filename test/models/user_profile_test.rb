@@ -15,15 +15,15 @@
 #  default_currency_id :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  mobile_verified     :boolean          default(TRUE), not null
 #  date_of_birth       :date             not null
 #  gender              :string(255)      not null
 #  address_1           :string(255)      not null
 #  address_2           :string(255)      not null
-#  city                :date             not null
-#  states_id           :integer          not null
+#  city                :string(255)      not null
+#  state_id            :integer          not null
 #  pin_code            :string(255)      not null
 #
+
 
 require 'test_helper'
 

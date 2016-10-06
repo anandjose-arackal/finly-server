@@ -7,7 +7,8 @@ class User::PrepaidCard::Credit < User::PrepaidCard::Base
 
   def pre_validate
     super
-    if params.blank? or params[:amount].blank?
+    return if has_errors?
+    if params[:amount].blank?
       messages[:error] << 'Amount cannot be blank'
       return
     end
@@ -38,10 +39,13 @@ class User::PrepaidCard::Credit < User::PrepaidCard::Base
   end
 
   def post_process
-    messages[:success] << "Successfully credited the card with ₹#{credit_presenter.amount}"
+    if self.credit_presenter.present? and self.credit_presenter.success?
+      messages[:success] << "Successfully credited the card with ₹#{amount}"
+    end
   end
 
   def success
+    self.credit_presenter.messages[:success] = messages[:success] if self.credit_presenter.present?
     self.credit_presenter
   end
 

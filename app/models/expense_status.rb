@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class ExpenseStatus < ActiveRecord::Base
 
   validates :name, presence: true

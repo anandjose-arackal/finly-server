@@ -15,6 +15,7 @@
 #  policy_id              :integer
 #
 
+
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 

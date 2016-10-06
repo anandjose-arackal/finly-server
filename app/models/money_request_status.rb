@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class MoneyRequestStatus < ActiveRecord::Base
 
   VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6}

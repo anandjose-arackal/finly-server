@@ -15,6 +15,7 @@
 #  updated_at              :datetime         not null
 #
 
+
 class PolicyConfiguration < ActiveRecord::Base
   include PolicyVersion
   belongs_to :policy

@@ -11,6 +11,7 @@
 #  updated_at         :datetime         not null
 #
 
+
 class NewCardRequest < ActiveRecord::Base
   belongs_to :company
   belongs_to :requesting_user, class_name: "User"

@@ -81,15 +81,19 @@ class Analytics::Charts < BaseOperation
 
     case field
       when 'category'
-        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
+        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:amount).group(:category_id).sum(:value)
         set.each do |key, value|
           cat_name = Category.find(key).name
           charts << {item: cat_name, total: precision_value(value)}
         end
       when 'merchant'
         # this already returns a hash with merchant name and total
-        items = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
-        items.each do |key, value|
+        manual_items = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
+        card_items = expenses.select('editable_merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:card_expense).joins(:amount).group(:editable_merchant).sum(:value)
+        manual_items.each do |key, value|
+          self.charts << {item: key, total: precision_value(value)}
+        end
+        card_items.each do |key, value|
           self.charts << {item: key, total: precision_value(value)}
         end
       when 'user'
@@ -99,7 +103,8 @@ class Analytics::Charts < BaseOperation
           charts << {item: user_name, total: precision_value(expense_sums[id])}
         end
       else
-        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:category_id).sum(:value)
+        # default will be category wise breakdown
+        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:amount).group(:category_id).sum(:value)
         set.each do |key, value|
           cat_name = Category.find(key).name
           charts << {item: cat_name, total: precision_value(value)}

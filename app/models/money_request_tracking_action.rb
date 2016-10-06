@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class MoneyRequestTrackingAction < ActiveRecord::Base
 
   ACTIONS={create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,

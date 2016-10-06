@@ -11,6 +11,7 @@
 #  updated_at              :datetime         not null
 #
 
+
 class EventConfiguration < ActiveRecord::Base
   belongs_to :user
   belongs_to :event

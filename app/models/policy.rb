@@ -12,6 +12,7 @@
 #  is_deleted :boolean          default(FALSE), not null
 #
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 

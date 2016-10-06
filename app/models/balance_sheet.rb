@@ -6,10 +6,11 @@
 #  user_id                  :integer
 #  cash_in_hand_id          :integer
 #  pending_reimbursement_id :integer
-#  pending_advance_id       :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  pending_advance_id       :integer
 #
+
 
 class BalanceSheet < ActiveRecord::Base
   belongs_to :user

@@ -10,6 +10,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
 

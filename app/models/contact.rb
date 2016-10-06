@@ -13,6 +13,7 @@
 #  designation      :string(255)
 #
 
+
 class Contact < ActiveRecord::Base
   belongs_to :contactable, polymorphic: true
 
