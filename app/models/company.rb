@@ -25,7 +25,7 @@ class Company < ActiveRecord::Base
 
   after_create :init_config_present
 
-  validates :name, presence: true
+  validates :name, presence: TRUE
 
   def default_policy
     self.policies.default
@@ -57,6 +57,7 @@ class Company < ActiveRecord::Base
   end
 
   private
+
   def init_config_present
     self.build_configuration.save unless self.configuration.present?
     self.policies.build(default: true).save unless self.policies.default.present?
@@ -66,3 +67,4 @@ class Company < ActiveRecord::Base
     end
   end
 end
+

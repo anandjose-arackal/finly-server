@@ -12,7 +12,7 @@
 class Amount < ActiveRecord::Base
   include MathUtil
   belongs_to :currency
-
+  
   # def self.get(currency_id, value, force_create: false)
   #   item = find_by(currency_id: currency_id, value: value)
   #   if item.blank? and force_create
@@ -21,6 +21,7 @@ class Amount < ActiveRecord::Base
   #   return item
   # end
 
+  
   validate :no_negative_amount
 
 
