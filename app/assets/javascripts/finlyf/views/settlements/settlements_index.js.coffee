@@ -409,7 +409,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     @params.view_to_load = 'approved_money_request'
     @params.id = @user_id
 
-    @params.payment_mode_id = 1
+    # @params.payment_mode_id = 1
     # collection = new FinlyF.Collections.Settlements()
     @collectionSettlementReports.url = "/settlements/" + @user_id
     @collectionSettlementReports.fetch({
@@ -418,9 +418,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       data: _this.params
       success: ->
         _this.collectionSettlementReports.each((item) ->
-          view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
-          $(target).append(view_item.render().el)
-          # console.log view_item.render
+          if parseInt(item.get('payment_mode_id')) == 1#hard coding for the first time to show cash requested
+            view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+            $(target).append(view_item.render().el)
         , @)
 
       error: ->
@@ -439,23 +439,33 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     @params.view_to_load = 'approved_money_request'
     @params.id = @user_id
-    @params.payment_mode_id = payment_mode_id
+    # @params.payment_mode_id = payment_mode_id
     # collection = new FinlyF.Collections.Settlements()
-    @collectionSettlementReports.url = "/settlements/" + @user_id
-    @collectionSettlementReports.fetch({
-      data: @params
-      reset: true,
-      data: _this.params
-      success: ->
-        _this.collectionSettlementReports.each((item) ->
-          view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
-          $(target).append(view_item.render().el)
-          # console.log view_item.render
-        , @)
+    @collectionSettlementReports.each((item) ->
+      if parseInt(item.get('payment_mode_id')) == parseInt(payment_mode_id)
+        view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+        $(target).append(view_item.render().el)
+        # console.log view_item.render
+    , @)
 
-      error: ->
-        console.log "Couldn't fetch Successfully."
-    })
+
+
+    # @collectionSettlementReports.url = "/settlements/" + @user_id
+    # @collectionSettlementReports.fetch({
+    #   data: @params
+    #   reset: true,
+    #   data: _this.params
+    #   success: ->
+    #     _this.collectionSettlementReports.each((item) ->
+    #       if parseInt(item.get('payment_mode_id')) == parseInt(payment_mode_id)
+    #         view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+    #         $(target).append(view_item.render().el)
+    #         # console.log view_item.render
+    #     , @)
+
+    #   error: ->
+    #     console.log "Couldn't fetch Successfully."
+    # })
 
 
   initDebt: (e) ->
