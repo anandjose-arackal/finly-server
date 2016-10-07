@@ -1,7 +1,11 @@
 
 class Card::Configuration::CardRestriction::Budget::Create < Card::Configuration::CardRestriction::Base
 
-	attr_accessor :rule
+	attr_accessor :restriction
+
+  def authorized_user_types
+  	[:company_admin]		
+  end	
 
   def pre_validate
  	if user.blank? or params.blank?
@@ -25,9 +29,9 @@ class Card::Configuration::CardRestriction::Budget::Create < Card::Configuration
   end
 
   def process
-  	self.rule = card.card_budget_restrictions.build(budget_params)
-  	unless rule.save
-  		messages[:error] = rule.errors.full_messages
+  	self.restriction = card.card_budget_restrictions.build(budget_params)
+  	unless restriction.save
+  		messages[:error] = restriciton.errors.full_messages
   	end		
   end
 
@@ -36,7 +40,7 @@ class Card::Configuration::CardRestriction::Budget::Create < Card::Configuration
   end
 
   def success
-  	Card::Configuration::CardRestriction::Base::BasePresenter.new(user, params, messages)
+  	Card::Configuration::CardRestriction::Base::RestrictionPresenter.new(user, {restriction: restriction}, messages)
   end
 
 

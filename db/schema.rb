@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161005165506) do
-
+ActiveRecord::Schema.define(version: 20161006131250) do
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
     t.integer  "currency_id", limit: 4,  null: false
@@ -357,6 +356,15 @@ ActiveRecord::Schema.define(version: 20161005165506) do
   end
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
+
+  create_table "mcc_category_mappings", force: :cascade do |t|
+    t.integer  "category_id", limit: 4
+    t.string   "mcc_code",    limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "mcc_category_mappings", ["category_id"], name: "index_mcc_category_mappings_on_category_id", using: :btree
 
   create_table "money_request_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -921,6 +929,7 @@ ActiveRecord::Schema.define(version: 20161005165506) do
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
   add_foreign_key "manual_expenses", "expenses"
+  add_foreign_key "mcc_category_mappings", "categories"
   add_foreign_key "money_request_comments", "expenses"
   add_foreign_key "money_request_comments", "money_requests"
   add_foreign_key "money_request_comments", "payments"
