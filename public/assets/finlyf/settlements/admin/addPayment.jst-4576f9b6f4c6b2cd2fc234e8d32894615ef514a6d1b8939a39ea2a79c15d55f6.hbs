@@ -14,13 +14,14 @@
   <textarea id="settlementNote" name="payment[note]" class="form-control" placeholder="Write a note..." style="margin-top: 4px; border-radius: 1px;resize: vertical"></textarea>
 
 
-  <label class="radio-inline" style="">
+  <input name="payment_type" value="{{payment_type}}" type="hidden" />
+  {{!-- <label class="radio-inline" style="">
     <input name="payment_type" value="1" type="radio" checked="checked">Cash Advance
   </label>
 
   <label class="radio-inline">
     <input name="payment_type" value="2" type="radio">Debt Clearance
-  </label>
+  </label> --}}
   <br />
 
   <button class="green-button btn-add-payment" style="margin-top: 28px;margin-top: 28px;

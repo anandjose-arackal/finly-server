@@ -34,6 +34,7 @@ class SettlementsController < ApplicationController
   def show
     # @view_to_load = params[:view_to_load] unless params[:view_to_load] == 'payments' else
     @result = Settlement::Show.(current_user, params)
+    # debugger
     respond
   end
 

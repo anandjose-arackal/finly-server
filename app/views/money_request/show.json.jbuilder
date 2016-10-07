@@ -1,4 +1,4 @@
-json.extract! @result.money_request, :id, :name, :memo, :status_name, :status_id
+json.extract! @result.money_request, :id, :name, :memo, :status_name, :status_id, :payment_mode_id
 required_by_date = @result.money_request.required_by_date.strftime("%d %b %Y") rescue nil
 json.required_by_date required_by_date
 json.user_name @result.money_request.user.name

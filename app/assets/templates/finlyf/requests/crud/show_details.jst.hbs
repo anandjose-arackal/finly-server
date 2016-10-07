@@ -74,8 +74,8 @@
             <div class="col-sm-6"><label class="control-label">Payment Mode</label></div>
             <div class="col-sm-6">
               <label class="control-label item-attr-preview">
-                {{#if item.payment_mode}}
-                  {{#switch item.payment_mode}}
+                {{#if item.payment_mode_id}}
+                  {{#switch item.payment_mode_id}}
                     {{#case 1}}Cash{{/case}}
                     {{#case 2}}Card{{/case}}
                   {{/switch}} 
@@ -83,10 +83,10 @@
                   --
                 {{/if}}
                 </label>
-              <select class="form-control item-attr-edit" name="money_request[payment_mode]">
+              <select class="form-control item-attr-edit" name="money_request[payment_mode_id]">
                 <option value="">Select</option>
-                <option value="1">Cash</option>
-                <option value="2">Card</option>
+                <option value="1" {{#if_eq item.payment_mode_id 1}}selected="selected"{{/if_eq}}>Cash</option>
+                <option value="2" {{#if_eq item.payment_mode_id 2}}selected="selected"{{/if_eq}}>Card</option>
               </select> 
             </div>
           </div>
