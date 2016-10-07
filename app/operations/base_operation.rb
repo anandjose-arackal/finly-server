@@ -213,6 +213,16 @@ class BaseOperation
     raise_unauthorized_exception
   end
 
+  def add_message(type, message)
+    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
+    clear_messages if self.messages.blank?
+    if message.is_a?(Array)
+      messages[type].concat message
+    elsif message.is_a?(String)
+      messages[type] << message
+    end
+  end
+
   def raise_unauthorized_exception
     raise NotAuthorizedException
   end
