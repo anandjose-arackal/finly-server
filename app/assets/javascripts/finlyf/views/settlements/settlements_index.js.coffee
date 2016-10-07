@@ -432,7 +432,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     # alert("You changed")
     payment_mode_id = $("input[type=radio][name=advance_request_type]:checked").val()
 
-    console.log payment_mode_id
+    $(@el).find('#modal-settlements .modal-content .selected_reports_total').text("0")
 
     target = $(@el).find('#modal-settlements .modal-content .settlement-modal-reports')
     $(target).html("")

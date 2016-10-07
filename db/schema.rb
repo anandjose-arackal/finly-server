@@ -12,6 +12,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20161006131250) do
+
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
     t.integer  "currency_id", limit: 4,  null: false

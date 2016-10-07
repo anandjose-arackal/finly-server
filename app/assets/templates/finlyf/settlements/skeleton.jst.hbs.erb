@@ -208,6 +208,11 @@
   border-radius: 0;
 }
 
+.settlement-summary-type, .settlement-summary-value{
+  font-size: 18px;
+}
+
+
 </style>
 
 
@@ -264,15 +269,46 @@
   <div class="col-sm-8 col-sm-offset-2 main">
 
     <div class="summary row no-margin" style="background: #DDDAEA;color: #555;; margin-bottom: 0px; height: 150px;padding-top: 20px;">
-      <div class="col-sm-10 col-sm-offset-1">
-        <div class="col-sm-6">
-          <h4 class="text-center">Pending Reimbursement</h4>
-          <h4 class="text-center">&#8377; 0</h4>
+      <div class="col-sm-12 no-padding" style="height: 100%; padding: 10px 0;">
+        <div class="col-sm-6" style="height: 100%;border-right: 1px solid #bbb;">
+          <div class="row no-margin" style="height: 35%;">
+            <div class="col-sm-8">
+              <span class="settlement-summary-type">Pending Reimbursement:</span>
+            </div>
+            <div class="col-sm-4">
+              <label class="settlement-summary-value">&#8377;&nbsp;0</label>
+            </div>
+          </div>
+
+          <div class="row no-margin" style="height: 35%;">
+            <div class="col-sm-8">
+              <span class="settlement-summary-type">Advance Request:</span>
+            </div>
+            <div class="col-sm-4">
+              <label class="settlement-summary-value">&#8377;&nbsp;0</label>
+            </div>
+          </div>
         </div>
 
-        <div class="col-sm-6">
-          <h4 class="text-center">Cash in Hand</h4>
-          <h4 class="text-center">&#8377; 0</h4>
+        <div class="col-sm-6" style="height: 100%;">
+          <div class="row no-margin" style="height: 35%;">
+            <div class="col-sm-8">
+              <span class="settlement-summary-type">Cash in Hand:</span>
+            </div>
+            <div class="col-sm-4">
+              <label class="settlement-summary-value">&#8377;&nbsp;0</label>
+
+            </div>
+          </div>
+
+          <div class="row no-margin" style="height: 35%;">
+            <div class="col-sm-8">
+              <span class="settlement-summary-type">Card Balance:</span>
+            </div>
+            <div class="col-sm-4">
+              <label class="settlement-summary-value">&#8377;&nbsp;0</label>
+            </div>
+          </div>
         </div>
       </div>
     </div>  
