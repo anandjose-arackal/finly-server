@@ -17,13 +17,13 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
   def validate
     super
     if forward_to_user.blank?
-      messages[:error] << 'Forward to user not found'
+      add_message :error, 'Forward to user not found'
     end
   end
 
   def validate_payment_mode
     unless money_request.payment_mode_id == PaymentMode.id_for(:card)
-      messages[:error] << 'Error approving and forwarding advance request. Use approve action'
+      add_message :error, 'Error approving and forwarding advance request. Use approve action'
     end
   end
 
@@ -61,7 +61,7 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
     Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:card)
-      messages[:success] << 'Successfully approved and forwarded the advance request'
+      add_message :success, 'Successfully approved and forwarded the advance request'
     end
   end
 
