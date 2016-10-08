@@ -97,7 +97,6 @@ class User::Team::Review::PendingApprovers < User::Team::Base
     self.pos += 1
     self.approvers = [] if self.approvers.blank?
     self.approvers << {approver: user, role_id: role_id, pos: self.pos, reviewer: reviewer}
-
     if approving_users.blank?
       approving_users = []
     end

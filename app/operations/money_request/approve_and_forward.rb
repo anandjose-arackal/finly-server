@@ -8,9 +8,9 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
     pending_approvers_presenter = User::Team::Review::PendingApprovers.(user, money_request: self.money_request)
     return if pending_approvers_presenter.blank? or pending_approvers_presenter.failure?
     if forward_to_user_id.present?
-      forward_to_user = pending_approvers_presenter.approver_with_id(forward_to_user_id)
+      self.forward_to_user = pending_approvers_presenter.approver_with_id(forward_to_user_id)
     else
-      forward_to_user = pending_approvers_presenter.next_approver
+      self.forward_to_user = pending_approvers_presenter.next_approver
     end
   end
 
@@ -28,7 +28,7 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
   end
 
   def process
-    curr_user_role =  User::Team::Review::UserRole.(user, self.money_request)
+    curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
 
     to_user = forward_to_user[:approver]
     to_user_role_id = forward_to_user[:role_id]

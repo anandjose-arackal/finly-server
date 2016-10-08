@@ -105,13 +105,13 @@
 
 
           <label class="radio-inline" style="margin-left: 36px">
-            <input type="radio" name="payment[payment_type]" value="<%= PaymentType.advance_id %>" checked="checked">Cash
+            <input type="radio" name="payment[payment_type]" value="<%= PaymentType.id_for(:advance) %>" checked="checked">Cash
             advance
           </label>
 
           <div style="margin-top: 16px">
             <label class="radio-inline">
-              <input type="radio" name="payment[payment_type]" value="<%= PaymentType.debt_clearance_id %>">Debt
+              <input type="radio" name="payment[payment_type]" value="<%= PaymentType.id_for(:debt_clearance) %>">Debt
               Clearance
             </label>
           </div>
@@ -193,7 +193,7 @@
       <form data-remote data-turboboost hidden="hidden"  id="addReimbursementForm" action="<%= settlement_add_payment_path(load_params id: params[:id]) %>" method="post">
         <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
         <input id="reimburseReportIds" name="payment[report_id]" type="text">
-        <input name="payment[payment_type]" value="<%= PaymentType.reimbursement_id %>" type="text">
+        <input name="payment[payment_type]" value="<%= PaymentType.id_for(:reimbursement) %>" type="text">
         <input name="payment[amount]" id="reimbursementAmount" type="text">
       </form>
       <div id="confirmReimbursement" style="display: none">
@@ -314,7 +314,7 @@
       <form data-remote data-turboboost hidden="hidden"  id="addSettlementForm" action="<%= settlement_add_payment_path(load_params id: params[:id]) %>" method="post">
         <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
         <input id="settleReportIds" name="payment[report_id]" type="text">
-        <input name="payment[payment_type]" value="<%= PaymentType.settlement_id %>" type="text">
+        <input name="payment[payment_type]" value="<%= PaymentType.id_for(:settlement) %>" type="text">
         <input name="payment[amount]" id="settlementAmount" type="text">
       </form>
       <div id="confirmSettlement" style="display: none">

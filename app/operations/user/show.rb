@@ -3,7 +3,7 @@ class User::Show < User::Base
 
   def pre_validate
     unless user.present?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
     end
   end
 
@@ -16,7 +16,7 @@ class User::Show < User::Base
       result = operation.run
       if operation.success?
         self.selected_user = result.with_id(id).first rescue nil
-        messages[:error] << 'User not found' if self.selected_user.blank?
+        add_message :error, 'User not found' if self.selected_user.blank?
       else
         messages[:error] = operation.messages[:error]
       end
@@ -57,7 +57,8 @@ class User::Show < User::Base
       conditional_finance_manager = company_default_mapping.non_default.finance_manager
       conditional_approves_to = company_default_mapping.non_default.approves_to
       conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
-      {company_default: policy.nil?, policy: policy, default: default_mapping, conditional_manager: conditional_manager,
+      {company_default: policy.nil?, policy: policy, default: default_mapping,
+       conditional_manager: conditional_manager,
        conditional_finance_manager: conditional_finance_manager,
        conditional_approves_to: conditional_approves_to,
        conditional_approves_finance_to: conditional_approves_finance_to}

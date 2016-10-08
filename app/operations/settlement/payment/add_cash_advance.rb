@@ -61,7 +61,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def process
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.advance_id, date: payment_param[:date], note: params[:note],
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.id_for(:advance), date: payment_param[:date], note: params[:note],
                                           amount_attributes: {value: payment_param[:amount], currency_id: payment_param[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(payment_param[:amount], payment_param[:currency_id])

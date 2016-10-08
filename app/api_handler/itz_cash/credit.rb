@@ -61,7 +61,6 @@ class ItzCash::Credit < ItzCash::Base
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
   end
 
-
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
 

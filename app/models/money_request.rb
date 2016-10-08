@@ -166,6 +166,14 @@ class MoneyRequest < ActiveRecord::Base
     processing?
   end
 
+  def payment_mode_card?
+    self.payment_mode_id == PaymentMode.id_for(:card)
+  end
+
+  def payment_mode_cash?
+    self.payment_mode_id == PaymentMode.id_for(:cash)
+  end
+
   def relative_status_name(user)
     if processing? and controlling_user? user
       return 'Pending Review'

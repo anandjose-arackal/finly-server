@@ -28,13 +28,13 @@ class Payment < ActiveRecord::Base
 
   default_scope {order date: :desc, created_at: :desc}
 
-  scope :advance, -> { where payment_type_id: PaymentType.advance_id }
-  scope :reimbursement, -> { where payment_type_id: PaymentType.reimbursement_id }
-  scope :debt_clearance, -> { where payment_type_id: PaymentType.debt_clearance_id }
-  scope :settlement, -> { where payment_type_id: PaymentType.settlement_id }
+  scope :advance, -> { where payment_type_id: PaymentType.id_for(:advance) }
+  scope :reimbursement, -> { where payment_type_id: PaymentType.id_for(:reimbursement) }
+  scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:debt_clearance) }
+  scope :settlement, -> { where payment_type_id: PaymentType.id_for(:settlement) }
   scope :received_by_user, ->(user_id) { where receiving_user: user_id }
   scope :initiated_by_user, ->(user_id) { where receiving_user: user_id }
-  scope :transferred_to_user, -> { where.not payment_type: PaymentType.debt_clearance_id }
+  scope :transferred_to_user, -> { where.not payment_type: PaymentType.id_for(:debt_clearance) }
   scope :with_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
@@ -46,19 +46,19 @@ class Payment < ActiveRecord::Base
   validates :receiving_user_id, presence: true
 
   def advance?
-    self.payment_type_id == PaymentType.advance_id
+    self.payment_type_id == PaymentType.id_for(:advance)
   end
 
   def reimbursement?
-    self.payment_type_id == PaymentType.reimbursement_id
+    self.payment_type_id == PaymentType.id_for(:reimbursement)
   end
 
   def debt_clearance?
-    self.payment_type_id == PaymentType.debt_clearance_id
+    self.payment_type_id == PaymentType.id_for(:debt_clearance)
   end
 
   def settlement?
-    self.payment_type_id == PaymentType.settlement_id
+    self.payment_type_id == PaymentType.id_for(:settlement)
   end
 
   def total_amount

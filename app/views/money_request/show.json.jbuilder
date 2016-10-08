@@ -13,6 +13,25 @@ json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
 
+json.forwardable_users do
+  forwardable_users = @result.forwardable_users
+  if forwardable_users.present?
+    json.array! forwardable_users.each do |item|
+      json.user do
+        user = item[:approver]
+        json.id = user.id
+        json.name = user.name
+        json.email = user.email
+      end
+      json.user_role do
+        json.id item[:role_id]
+        json.name UserRole.name_for(item[:role_id])
+      end
+      json.position item[:pos]
+      json.is_reviewer item[:reviewer]
+    end
+  end
+end
 # if @result.money_request.policy
 policy_name = ''
 policy_id = ''

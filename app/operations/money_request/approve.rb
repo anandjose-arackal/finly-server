@@ -53,21 +53,33 @@ class MoneyRequest::Approve < MoneyRequest::Base
     end
     manager_id = manager.id rescue nil
     curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
-    update_attributes = {status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil,
-                         controlling_user_role_id: to_user_role_id,controlling_for_user_role_id: nil,
-                         memo: self.params[:memo]}
+    update_attributes = {}
+    update_attributes[:status_id] = status
+    update_attributes[:controlling_user_id] = manager_id
+    update_attributes[:controlling_for_user_id] = nil
+    update_attributes[:controlling_user_role_id] = to_user_role_id
+    update_attributes[:controlling_for_user_role_id] = nil
+    update_attributes[:memo] = self.params[:memo]
     update_attributes[:submitted_at] = DateTime.now if auto_approve
     if money_request.update_attributes update_attributes
       if auto_approve
-        money_request.tracks.create action_user: nil,
-          money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
-          status_id: status, modified_user: nil, modified_user_role_id: nil
+        track_attributes = {}
+        track_attributes[:action_user] = nil
+        track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:auto_approve)
+        track_attributes[:status_id] = status
+        track_attributes[:modified_user] = nil
+        track_attributes[:modified_user_role_id] = nil
+        money_request.tracks.create track_attributes
         self.money_request.comments.create comment_action_id: MoneyRequestCommentAction.id_for(:auto_approve)
       else
-        money_request.tracks.create action_user: user, modified_user_id: money_request.controlling_user_id,
-          modified_user_role_id: to_user_role_id,
-          money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
-          status_id: status, user_request_role_id: curr_user_role
+        track_attributes = {}
+        track_attributes[:action_user] = user
+        track_attributes[:modified_user_id] = money_request.controlling_user_id
+        track_attributes[:modified_user_role_id] = to_user_role_id
+        track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:approve)
+        track_attributes[:status_id] = status
+        track_attributes[:user_request_role_id] = curr_user_role
+        money_request.tracks.create track_attributes
         self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
       end
       return true
@@ -76,18 +88,6 @@ class MoneyRequest::Approve < MoneyRequest::Base
   end
 
   def post_process
-    # # Handle for money requests which have payment mode as card
-    # result = nil
-    # if money_request.approved? and money_request.payment_mode_id == PaymentMode.id_for(:card)
-    #   result = MoneyRequest::Card::AutoCredit.(user, money_request: money_request)
-    #   if result.success?
-    #     messages[:success] = result.messages[:success]
-    #     return
-    #   else
-    #     messages[:error] = result.messages[:error]
-    #   end
-    # end
-
     # todo computing settlements
     unless money_request.processing?
       Settlement::MoneyRequest::Approved.(user, money_request: money_request)

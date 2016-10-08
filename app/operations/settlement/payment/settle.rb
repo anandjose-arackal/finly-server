@@ -72,7 +72,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
 
   def process
     param = payment_params
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.settlement_id,
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.id_for(:settlement),
                                   date: param[:date], note: param[:note],
                                   amount_attributes: {value: param[:amount], currency_id: param[:currency_id]})
     balance_sheet = to_user.balance_sheet
