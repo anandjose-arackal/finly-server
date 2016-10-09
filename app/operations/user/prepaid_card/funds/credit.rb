@@ -1,4 +1,4 @@
-class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Base
+class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
   attr_accessor :amount, :credit_presenter
 
   def authorized_user_types
@@ -43,7 +43,7 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Base
       payment_attributes[:payment_type_id] = PaymentType.id_for(:card_credit)
       payment_attributes[:date] = Date.today
       payment_attributes[:note] = params[:note]
-      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id }
+      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
       user.payments.create payment_attributes
     else
       add_message :error, credit_presenter.messages[:error]

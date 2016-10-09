@@ -19,11 +19,11 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   def pre_validate
     super()
     if params[:payment][:amount] and params[:payment][:amount].to_i < 0
-      messages[:error] << "Reimbursement amount cannot be negative."
+      messages[:error] << 'Reimbursement amount cannot be negative'
       return
     end
     if params[:report_ids].blank?
-      messages[:error] << "No reports to reimburse."
+      messages[:error] << 'No reports to reimburse'
     end
   end
 
@@ -58,7 +58,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     # is this really necessary
     total_amount = precision_value(reports.with_amount.sum(:value))
     unless total_amount == precision_value(payment_params[:amount]).to_f
-      messages[:error] << "Reimbursement amount does not match report totals."
+      add_message :error, 'Reimbursement amount does not match report totals'
     end
   end
 
@@ -72,11 +72,11 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
       end
       return true
     end
-    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
+    add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
   end
 
   def post_process
-    messages[:success] << "Reports reimbursed."
+    add_message :success, 'Reports reimbursed'
   end
 end

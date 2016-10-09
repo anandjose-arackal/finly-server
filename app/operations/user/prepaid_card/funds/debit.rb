@@ -1,4 +1,4 @@
-class User::PrepaidCard::Funds::Debit < User::PrepaidCard::Credit
+class User::PrepaidCard::Funds::Debit < User::PrepaidCard::Funds::Credit
 
   def process
     self.credit_presenter = ItzCash::Debit.(selected_user, params)
@@ -9,7 +9,7 @@ class User::PrepaidCard::Funds::Debit < User::PrepaidCard::Credit
       payment_attributes[:payment_type_id] = PaymentType.id_for(:card_debit)
       payment_attributes[:date] = Date.today
       payment_attributes[:note] = params[:note]
-      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id }
+      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
       selected_user.payments.create payment_attributes
     else
       add_message :error, credit_presenter.messages[:error]

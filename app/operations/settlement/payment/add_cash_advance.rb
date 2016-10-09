@@ -55,7 +55,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         total_amount += request.total_amount
       end
       unless total_amount <= payment_param[:amount].to_f
-        messages[:error] << 'Payment amount cannot be less than the money requests total amount'
+        add_message :error, 'Payment amount cannot be less than the money requests total amount'
       end
     end
   end
@@ -76,13 +76,13 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       end
       return true
     end
-    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
+    add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
     false
   end
 
   def post_process
-    messages[:success] << 'Cash advance added!'
+    add_message :success, 'Cash advance added!'
   end
 
 end

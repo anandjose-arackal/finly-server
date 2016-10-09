@@ -1,4 +1,4 @@
-class User::PrepaidCard::Funds::Withdraw < User::PrepaidCard::Base
+class User::PrepaidCard::Funds::Withdraw < User::PrepaidCard::Funds::Base
   attr_accessor :from_user, :amount
 
   def pre_validate
@@ -54,7 +54,7 @@ class User::PrepaidCard::Funds::Withdraw < User::PrepaidCard::Base
       payment_attributes[:payment_type_id] = PaymentType.id_for(:card_transfer_receiving_debit)
       payment_attributes[:date] = Date.today
       payment_attributes[:note] = params[:note]
-      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id }
+      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
       from_user.payments.create payment_attributes
 
       credit_presenter = ItzCash::Credit.(user, amount: self.amount)

@@ -1,4 +1,4 @@
-class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Base
+class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
   attr_accessor :to_user, :amount, :credit_payment
 
   def pre_validate
@@ -54,7 +54,7 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Base
       payment_attributes[:payment_type_id] = PaymentType.id_for(:card_transfer_initiating_debit)
       payment_attributes[:date] = Date.today
       payment_attributes[:note] = params[:note]
-      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id }
+      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
       selected_user.payments.create payment_attributes
 
       credit_presenter = ItzCash::Credit.(to_user, amount: self.amount)
@@ -64,7 +64,7 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Base
         payment_attributes[:payment_type_id] = PaymentType.id_for(:card_transfer_receiving_credit)
         credit_payment = to_user.payments.create payment_attributes
       else
-       add_message :error, credit_presenter.messages[:error]
+        add_message :error, credit_presenter.messages[:error]
       end
       return
     end

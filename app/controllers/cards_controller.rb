@@ -13,12 +13,18 @@ class CardsController < ApplicationController
   def update_balance
     action_type = params[:action_type].to_i rescue nil
     case action_type
-    when 1
-      #Credit
-      @result = User::PrepaidCard::Credit.(current_user, params)
-    when 2
-      #Debit
-      @result = User::PrepaidCard::Debit.(current_user, params)
+      when User::PrepaidCard::Funds::Base::ACTIONS[:credit]
+        # Credit from company credits
+        @result = User::PrepaidCard::Funds::Credit.(current_user, params)
+      when User::PrepaidCard::Funds::Base::ACTIONS[:debit]
+        # Debit from company credits
+        @result = User::PrepaidCard::Funds::Debit.(current_user, params)
+      when User::PrepaidCard::Funds::Base::ACTIONS[:transfer]
+        # Transfer from card to users card
+        @result = User::PrepaidCard::Funds::Transfer.(current_user, params)
+      when User::PrepaidCard::Funds::Base::ACTIONS[:withdraw]
+        # Withdraw from card to users card
+        @result = User::PrepaidCard::Funds::Withdraw.(current_user, params)
     end
   end
 

@@ -1,6 +1,8 @@
 class User::PrepaidCard::Funds::Base < User::PrepaidCard::Base
 attr_accessor :payment
 
+ACTIONS = {credit: 1, debit: 2, transfer: 3, withdraw: 4}
+
   def success
     User::PrepaidCard::Funds::Base::SuccessPresenter.(user, {payment: self.payment}, messages)
   end
