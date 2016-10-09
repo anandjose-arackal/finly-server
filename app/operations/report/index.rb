@@ -43,6 +43,19 @@ class Report::Index < Report::Base
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
         self.reports = Report.from(sql)
+
+        # todo jugaad, not required in itzcash_api_integration branch
+        if self.reports.present?
+          manager_ids = []
+          self.reports.each do |report|
+            if User::Team::IsApprover.(user, report: report, type: :manager)
+              manager_ids << report.id
+            end
+          end
+          self.reports = self.reports.with_id(manager_ids)
+        end
+      # todo jugaad end
+
       when UserRole.finance_manager_id
         controlling_report_query = user.controlling_reports.non_owner(user.id)
         interacted_reports_query = user.finance_reports
@@ -50,6 +63,19 @@ class Report::Index < Report::Base
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
         self.reports = Report.from(sql)
+
+        # todo jugaad, not required in itzcash_api_integration branch
+        if self.reports.present?
+          finance_ids = []
+          self.reports.each do |report|
+            if User::Team::IsApprover.(user, report: report, type: :finance_manager)
+              finance_ids << report.id
+            end
+          end
+          self.reports = self.reports.with_id(finance_ids)
+        end
+      # todo jugaad end
+
       when UserRole.auditor_id
         # todo auditor
       else
