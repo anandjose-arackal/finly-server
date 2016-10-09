@@ -19,9 +19,9 @@ json.forwardable_users do
     json.array! forwardable_users.each do |item|
       json.user do
         user = item[:approver]
-        json.id = user.id
-        json.name = user.name
-        json.email = user.email
+        json.id user.id
+        json.name user.name
+        json.email user.email
       end
       json.user_role do
         json.id item[:role_id]
