@@ -1,5 +1,9 @@
 class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
-  attr_accessor :to_user, :amount, :credit_payment
+  attr_accessor :to_user, :amount
+
+  def authorized_user_types
+    [:manager,:finance_manager, :admin]
+  end
 
   def pre_validate
     if user.blank?
@@ -7,10 +11,11 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
       return
     end
     if user.cards.blank?
-      add_message :error, 'Card is not assigned to the user to transfer the funds'
+      add_message :error, 'You have not been assigned a card to transfer the withdrawn funds'
+      return
     end
-    if params.blank? or params[:to_user_id].blank? or params[:to_user].blank?
-      add_message :error, 'Card is not assigned to the user to receive the funds'
+    if params.blank? or (params[:to_user_id].blank? and params[:to_user].blank?)
+      add_message :error, 'User not found to credit the funds'
       return
     end
     if params[:password].blank?
@@ -26,9 +31,10 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
 
   def init
     self.to_user = params[:to_user]
+    self.amount = params[:amount].to_i
     if to_user.blank? and params[:to_user_id].present?
       to_user_id = params[:to_user_id]
-      to_u = User.with_id(to_user_id).first rescue nil
+      to_u = User.with_company_id(user.company_id).with_id(to_user_id).first rescue nil
       if to_u.present? and to_u.company_id == user.company_id
         self.to_user = to_u
       end
@@ -42,6 +48,9 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
     end
     if to_user.cards.blank?
       add_message :error, 'Card is not assigned to the user to receive the funds'
+    end
+    if to_user.id == user.id
+      add_message :error, 'You cannot transfer funds to your own card'
     end
   end
 
@@ -62,7 +71,7 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
         payment_attributes[:initiating_user] = user
         payment_attributes[:receiving_user] = to_user
         payment_attributes[:payment_type_id] = PaymentType.id_for(:card_transfer_receiving_credit)
-        credit_payment = to_user.payments.create payment_attributes
+        self.payment = to_user.payments.create payment_attributes
       else
         add_message :error, credit_presenter.messages[:error]
       end

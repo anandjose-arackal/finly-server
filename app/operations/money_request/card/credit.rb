@@ -1,4 +1,4 @@
-class MoneyRequest::Card::Credit < MoneyRequest::Base
+class MoneyRequest::Card::Credit < MoneyRequest::Card::Transfer
 
   def authorized_user_types
     [:company_admin]
@@ -6,6 +6,6 @@ class MoneyRequest::Card::Credit < MoneyRequest::Base
 
   protected
   def transfer
-    Card::Funds::Credit.(user, to_user: self.to_user, amount: self.amount, password: params[:password])
+    User::PrepaidCard::Funds::Credit.(user, to_user: self.to_user, amount: self.amount, password: params[:password])
   end
 end

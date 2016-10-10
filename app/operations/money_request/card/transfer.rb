@@ -9,11 +9,7 @@ class MoneyRequest::Card::Transfer < MoneyRequest::Base
       add_message :error, 'Card is not assigned to the user to transfer the funds'
       return
     end
-    if params.blank? or params[:amount].blank? or params[:amount].to_i <= 0
-      add_message :error, 'Amount cannot be less than or equal to 0'
-      return
-    end
-    if params[:money_request_id].blank?
+    if params.blank? or params[:money_request_id].blank?
       add_message :error, 'Request not found to initiate the transfer'
     end
     if params[:password].blank?
@@ -28,13 +24,13 @@ class MoneyRequest::Card::Transfer < MoneyRequest::Base
     super
     return if self.money_request.blank?
     self.to_user = money_request.user
-    return if to_user.blank?
-    self.amount = params[:amount].to_i
+    return if to_user.blank? or money_request.blank?
+    self.amount = money_request.total_amount
   end
 
   def validate
     super
-    if money_request.controlling_user != user.id
+    if money_request.controlling_user.id != user.id
       add_message :error, 'You do not have the permission to transfer the funds'
     end
     unless money_request.processing?
@@ -44,6 +40,9 @@ class MoneyRequest::Card::Transfer < MoneyRequest::Base
       add_message :error, 'User not found to transfere the funds to!'
       return
     end
+    if self.amount.blank?
+      add_message :error, 'Amount cannot be less than 0'
+    end
     if to_user.cards.blank?
       add_message :error, 'Card is not assigned to the user to receive funds'
     end
@@ -51,7 +50,7 @@ class MoneyRequest::Card::Transfer < MoneyRequest::Base
 
   def process
     result = transfer
-    if result.success?
+    if  result.success?
       update_attributes = {}
       update_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
       update_attributes[:controlling_user_id] = nil
@@ -81,7 +80,7 @@ class MoneyRequest::Card::Transfer < MoneyRequest::Base
 
   protected
   def transfer
-    Card::Funds::Transfer.(user, to_user: self.to_user, amount: self.amount, password: params[:password])
+    User::PrepaidCard::Funds::Transfer.(user, to_user: self.to_user, amount: self.amount, password: params[:password])
   end
 
 end

@@ -120,6 +120,7 @@ class User < ActiveRecord::Base
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
+  scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) { where("first_name like ? OR maiden_name like ? OR last_name like ?", "%#{name}%", "%#{name}%", "%#{name}%") }
   scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
