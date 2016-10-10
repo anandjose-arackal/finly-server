@@ -100,8 +100,17 @@ class MoneyRequest::Base < BaseOperation
 
     def forwardable_users
       if self.actions.present? and self.actions[:approve_and_forward_to].present?
-        User::Team::Review::PendingApprovers.(user, money_request: self.money_request).approvers rescue nil
+        users = User::Team::Review::PendingApprovers.(user, money_request: self.money_request).approvers rescue nil
+        return nil if users.blank?
+        new_users = []
+        users.each do |item|
+          unless item[:approver].id == user.id
+            new_users  << item
+          end
+        end
+        return new_users
       end
+      nil
     end
 
   end
