@@ -1,12 +1,15 @@
 class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
-  attr_accessor :amount, :credit_presenter,:to_user
+  attr_accessor :amount, :credit_presenter, :to_user
 
   def authorized_user_types
     [:company_admin]
   end
 
   def pre_validate
-    super
+    if user.blank? or params.blank? or (params[:id].blank? and
+        params[:to_user_id].blank? and params[:to_user].blank?)
+      messages[:error] << 'User not found'
+    end
     return if has_errors?
     unless user.company_admin?
       add_message :error, 'You do not have the permission to perform this action'
@@ -26,7 +29,6 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
   end
 
   def init
-    super
     self.to_user = params[:to_user]
     self.amount = params[:amount].to_i
     if to_user.blank? and params[:to_user_id].present?
@@ -39,7 +41,6 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
   end
 
   def validate
-    super
     if to_user.blank?
       add_message :error, 'User not found'
     end
