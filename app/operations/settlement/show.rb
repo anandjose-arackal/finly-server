@@ -117,12 +117,13 @@ class Settlement::Show < Settlement::Base
       if manager_view? or finance_view? or admin_view?
         card_params = {}
         card_params[:user_id] = selected_user.id
-        card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:transfer]
         card_params[:view] = params[:view]
-        actions[:transfer] = {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
-
-        card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:withdraw]
-        actions[:withdraw] = {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+        unless selected_user.id == user.id
+          card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:transfer]
+          actions[:transfer] = {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+          card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:withdraw]
+          actions[:withdraw] = {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+        end
         if admin_view? and self.user.company_admin?
           card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:credit]
           actions[:credit]= {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}

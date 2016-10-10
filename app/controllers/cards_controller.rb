@@ -1,6 +1,6 @@
 class CardsController < ApplicationController
 
-  #params = {user_id: 1}
+  # params = {user_id: 1}
   def details
     @result = User::PrepaidCard::Show.(current_user, params)
     # respond

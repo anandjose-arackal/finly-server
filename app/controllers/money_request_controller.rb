@@ -35,9 +35,9 @@ class MoneyRequestController < ApplicationController
         @result = MoneyRequest::Reject.(current_user, params)
       when :unapprove
         @result = MoneyRequest::Unapprove.(current_user, params)
-      when :transfer_from_card
+      when :transfer
         @result = MoneyRequest::Card::Transfer.(current_user, params)
-      when :transfer_from_company_credits
+      when :credit
         @result = MoneyRequest::Card::Credit.(current_user, params)
       when :approve_and_forward_to
         @result = MoneyRequest::ApproveAndForward.(current_user, params)

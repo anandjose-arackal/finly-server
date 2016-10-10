@@ -22,7 +22,7 @@ class SettlementsController < ApplicationController
   end
 
   def index
-    @result = Settlement::Index.new(current_user, params)
+    @result = Settlement::Index.(current_user, params)
     respond
   end
 
