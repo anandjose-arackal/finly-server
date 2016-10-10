@@ -367,6 +367,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       }
       payment_type: parseInt($(target).find("input[name=payment_type]").val())
       view: _this.params.view
+      password: $(target).find('input[name=password]').val()
     }
 
     # console.log data

@@ -9,7 +9,9 @@
     <button class="btn btn-edit-expense btn-sm btn-warning"><i class='fa fa-edit'></i>&nbsp;&nbsp;Edit</button>
   {{/if}}
   {{#unless item.report_preview}} 
-    <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+    {{#if_not_eq item.expense_type_id 2}}
+      <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+    {{/if_not_eq}}
   {{/unless}}
 </div>
 
