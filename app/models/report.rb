@@ -46,7 +46,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
 
-  default_scope { order(report_status_id: :asc,submitted_at: :desc,created_at: :desc) }
+  default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
@@ -55,20 +55,21 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
-  scope :open, -> {where report_status_id: ReportStatus.open_id }
+  scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
-  scope :processing, -> {where report_status_id: ReportStatus.processing_id }
+  scope :processing, -> { where report_status_id: ReportStatus.processing_id }
   scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
+  scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
   scope :include_user, -> { includes :user }
-  scope :without_payment, ->{ where reimbursement_id: nil }
+  scope :without_payment, -> { where reimbursement_id: nil }
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -91,7 +92,7 @@ class Report < ActiveRecord::Base
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
     end
   end
-  scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
+  scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   delegate :status_name, to: :status
 
