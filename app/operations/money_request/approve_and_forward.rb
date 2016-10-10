@@ -29,7 +29,6 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
 
   def process
     curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
-
     to_user = forward_to_user[:approver]
     to_user_role_id = forward_to_user[:role_id]
     update_params = {}
@@ -49,10 +48,11 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
     self.money_request.tracks.create track_params
 
     # user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
+    # todo rename rejected_to to something broader as this is approve and forward
     comment_params = {}
     comment_params[:user] = self.user
     comment_params[:comment_action_id] = MoneyRequestCommentAction.id_for(:approve_and_forward)
-    comment_params[:rejected_to_user] = to_user
+    comment_params[:rejected_to] = to_user
     self.money_request.comments.create comment_params
   end
 
