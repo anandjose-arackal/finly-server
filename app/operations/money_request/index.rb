@@ -53,6 +53,7 @@ class MoneyRequest::Index < MoneyRequest::Base
       else
         self.money_requests = user.money_requests
     end
+    self.money_requests = self.money_requests.exclude_deleted if self.money_requests.present?
   end
 
   def success

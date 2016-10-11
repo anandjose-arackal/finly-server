@@ -7,7 +7,7 @@ class Policy::Create < Policy::Base
   attr_accessor :company, :cloned_policy
 
   def authorized_user_types
-    [:admin]
+    [:company_admin]
   end
 
   def pre_validate

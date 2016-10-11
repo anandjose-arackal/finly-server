@@ -12,20 +12,13 @@
 class PaymentType < ActiveRecord::Base
   has_many :payments
 
-  def self.advance_id
-    1
-  end
+  TYPES = {advance: 1, debt_clearance: 2, reimbursement: 3, settlement: 4,
+           card_transfer_initiating_credit: 5, card_transfer_initiating_debit: 6,
+           card_transfer_receiving_credit: 7, card_transfer_receiving_debit: 8,
+           card_credit: 9, card_debit: 10}
 
-  def self.debt_clearance_id
-    2
-  end
-
-  def self.reimbursement_id
-    3
-  end
-
-  def self.settlement_id
-    4
+  def self.id_for(key)
+    TYPES[key]
   end
 
 end

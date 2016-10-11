@@ -51,19 +51,37 @@ class MoneyRequest::Base < BaseOperation
       self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
     end
 
-
     def load_actions
       actions = {}
       if admin_view?
         if self.money_request.can_take_control? and not self.money_request.controlling_user?(user)
           actions[:take_control] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)
-          actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          if self.money_request.payment_mode_card?
+            if user.company_admin?
+              actions[:card_transfer] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+                                                                                                           view: params[:view])}
+              actions[:card_credit]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+                                                                                                                     view: params[:view])}
+            else
+              actions[:card_transfer] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+                                                                                                           view: params[:view])}
+            end
+            actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          else
+            actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          end
           actions[:reject] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
         end
       elsif finance_view? or manager_view?
         if self.money_request.processing? and self.money_request.controlling_user?(user)
-          actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          if self.money_request.payment_mode_card?
+            actions[:card_transfer] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+                                                                                                         view: params[:view])}
+            actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          else
+            actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          end
           actions[:reject] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
         elsif (self.money_request.can_unapprove?) and self.money_request.associated_users(self.money_request.controlling_user).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
@@ -79,6 +97,22 @@ class MoneyRequest::Base < BaseOperation
       end
       actions
     end
+
+    def forwardable_users
+      if self.actions.present? and self.actions[:approve_and_forward_to].present?
+        users = User::Team::Review::PendingApprovers.(user, money_request: self.money_request).approvers rescue nil
+        return nil if users.blank?
+        new_users = []
+        users.each do |item|
+          unless item[:approver].id == user.id
+            new_users  << item
+          end
+        end
+        return new_users
+      end
+      nil
+    end
+
   end
 
 end

@@ -22,6 +22,7 @@ class Amount < ActiveRecord::Base
   #   return item
   # end
 
+
   validate :no_negative_amount
 
 

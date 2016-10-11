@@ -9,7 +9,9 @@
     <button class="btn btn-edit-expense btn-sm btn-warning"><i class='fa fa-edit'></i>&nbsp;&nbsp;Edit</button>
   {{/if}}
   {{#unless item.report_preview}} 
-    <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+    {{#if_not_eq item.expense_type_id 2}}
+      <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+    {{/if_not_eq}}
   {{/unless}}
 </div>
 
@@ -59,7 +61,11 @@
       <div class="col-sm-4 no-padding"><label class="control-label">Merchant:</label></div>
 
       <div class="col-sm-8 item-merchant-name item-attr-preview" style="font-size: 16px;line-height: 14px;">{{item.merchant_name}}</div>
-      <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" class="form-control filter-merchant" name="expense[manual_expense_attributes][merchant]" value="{{item.merchant_name}}" /></div>
+      {{#if_eq item.expense_type_id 2}}
+        <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" class="form-control filter-merchant" name="expense[card_expense_attributes][editable_merchant]" value="{{item.merchant_name}}" /></div>
+      {{else}}
+        <div class="col-sm-8 item-merchant-name item-attr-edit" style="font-size: 16px;line-height: 14px;"><input type="text" class="form-control filter-merchant" name="expense[manual_expense_attributes][merchant]" value="{{item.merchant_name}}" /></div>
+      {{/if_eq}}
     </div>
 
     <div class="row no-margin item-attribute">

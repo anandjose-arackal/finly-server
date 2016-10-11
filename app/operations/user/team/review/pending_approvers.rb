@@ -97,7 +97,6 @@ class User::Team::Review::PendingApprovers < User::Team::Base
     self.pos += 1
     self.approvers = [] if self.approvers.blank?
     self.approvers << {approver: user, role_id: role_id, pos: self.pos, reviewer: reviewer}
-
     if approving_users.blank?
       approving_users = []
     end
@@ -112,12 +111,13 @@ class User::Team::Review::PendingApprovers < User::Team::Base
     end
 
     def approver_with_id(id)
-      return nil if self.approvers.blank?
+      return nil if self.approvers.blank? or id.blank?
       self.approvers.each do |item|
-        if item[:approver].id == id
+        if item[:approver].id.to_s == id.to_s
           return item
         end
       end
+      nil
     end
 
     def next_approver

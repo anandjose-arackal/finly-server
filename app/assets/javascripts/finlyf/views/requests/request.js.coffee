@@ -4,6 +4,7 @@ class FinlyF.Views.Request extends Backbone.View
   templateShow: HandlebarsTemplates['finlyf/requests/crud/show']
   templateShowDetails: HandlebarsTemplates['finlyf/requests/crud/show_details']
   templateAddCategory: HandlebarsTemplates['finlyf/requests/crud/addRequestCategory']
+  templateModalLoadFunds: HandlebarsTemplates['finlyf/requests/modalLoadFunds']
 
   className: 'item col-sm-12'
 
@@ -31,8 +32,15 @@ class FinlyF.Views.Request extends Backbone.View
     'click .btn-remove-request-category': 'removeRequestCategory'
 
     #reports
+    # 'click .dropdown .btn': 'showDropDown'
     'click .btn-report-action': 'reportAction'
     'click .confirm-add-existing-expense': 'addExistingExpenses'
+
+    #money requests actinos
+    'click .btn-transfer': 'prepareTransfer'
+    'click .btn-confirm-transfer': 'confirmTransfer'
+    'click .btn-approve-forward-to': 'approveForwardTo'
+
 
   initialize: (options) ->
     console.log "here in requests"
@@ -175,6 +183,9 @@ class FinlyF.Views.Request extends Backbone.View
     # }
     _this = @
     formData = new FormData($('form#edit-money-request')[0])
+    payment_mode_id = $("form#edit-money-request select[name=money_request\\[payment_mode_id\\]] option:selected").val()
+    console.log "payment_mode_id", payment_mode_id
+    formData.append('money_request[payment_mode_id]', payment_mode_id)
     $.ajax({
       url: '/money_request/' + _this.model.get('id')
       type: "PUT",
@@ -262,6 +273,7 @@ class FinlyF.Views.Request extends Backbone.View
       type: 'PATCH',
       dataType: 'json',
       data: {
+        authenticity_token: $("#authenticity_token").val()
         type: $(e.currentTarget).attr('data-action-type')
       }
       success: (res) ->
@@ -275,6 +287,84 @@ class FinlyF.Views.Request extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
+
+  prepareTransfer: (e) ->
+    _this = @
+    e.preventDefault()
+
+    target = e.currentTarget
+    item = {
+      url: $(target).attr("data-url")
+      action_type: $(target).attr("data-action-type")
+      amount: _this.model.get('total')
+    }
+    
+
+    modal = $(@el).find("#modal-mp")
+    $(modal).html(@templateModalLoadFunds({item: item}))
+    $(modal).modal('show')
+
+  confirmTransfer: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    container = $(target).closest(".modal")
+
+    url = $(target).attr("data-url")
+    action_type = $(target).attr("data-action-type")
+    password = $(container).find('input[name=password]').val()
+    amount = $(container).find('input[name=amount]').val()
+
+    $.ajax({
+      url: url,
+      type: "PATCH",
+      dataType: 'json',
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        type: action_type,
+        password: password,
+        amount: amount
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          
+      error: (err) ->
+        console.log "Error", err
+    })
+
+  approveForwardTo: (e) ->
+    e.preventDefault()
+
+    _this = @
+    target = e.currentTarget
+    url = $(target).attr('data-url')
+    forward_to_user_id = $(target).attr("data-forward-to")
+    $.ajax({
+      url: url,
+      type: "PATCH",
+      dataType: 'json',
+      data: {
+        authenticity_token: $("#authenticity_token").val()
+        type: $(target).attr("data-action-type")
+        forward_to_user_id: forward_to_user_id
+      }
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          
+      error: (err) ->
+        console.log "Error", err
+    })
+
+
 
   refreshData: (e)->
     _this = @
@@ -337,5 +427,8 @@ class FinlyF.Views.Request extends Backbone.View
   #   })
 
 
+  # showDropDown: (e) ->
+  #   e.preventDefault()
+  #   $(e.currentTarget).dropdown()
 
 

@@ -40,7 +40,7 @@ class SettlementService < BaseService
   def add_cash_advance(initiating_user, date, note, value, currency=nil)
     date = parse_date date
     return false unless validate_value value, currency and validate_initiating_user initiating_user and validate_date date
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.advance_id, date: date, note: note,
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.id_for(:advance), date: date, note: note,
                                   amount_attributes: {value: value, currency_id: currency})
     balance_sheet = user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(value, currency)
@@ -71,7 +71,7 @@ class SettlementService < BaseService
       errors << 'Reimbursed amount is not matching total pending reimbursement amount for the selected reports'
       return false
     end
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.reimbursement_id, date: date, note: note,
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.id_for(:reimbursement), date: date, note: note,
                                   amount_attributes: {value: value, currency_id: currency})
     balance_sheet = user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement value, currency
@@ -95,7 +95,7 @@ class SettlementService < BaseService
       errors << 'Debt clearance cannot be greater than the cash in hand amount on the date of debt clearance'
       return false
     end
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.debt_clearance_id, date: date, note: note,
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.id_for(:debt_clearance), date: date, note: note,
                                   amount_attributes: {value: value, currency_id: currency})
     if payment.save and balance_sheet.subtract_cash_in_hand(value, currency)
       return true
@@ -131,7 +131,7 @@ class SettlementService < BaseService
       errors << 'Settlement amount is not matching total pending reimbursement amount for the selected reports'
       return false
     end
-    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.settlement_id,
+    payment = user.payments.build(initiating_user: initiating_user, receiving_user: user, payment_type_id: PaymentType.id_for(:settlement),
                                   date: date, note: note,
                                   amount_attributes: {value: value, currency_id: currency})
     balance_sheet = user.balance_sheet

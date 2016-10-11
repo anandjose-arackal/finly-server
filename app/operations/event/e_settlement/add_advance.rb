@@ -15,13 +15,13 @@ class Event::ESettlement::AddAdvance < Event::ESettlement::Base
   def mailer_subject(user)
     "You have received a cash advance of #{payment.amount.value}"
     # case payment.payment_type
-    #   when PaymentType.advance_id
+    #   when PaymentType.id_for(:advance)
     #     return "You have received a cash advance of #{payment.amount.value}"
-    #   when PaymentType.debt_clearance_id
+    #   when PaymentType.id_for(:debt_clearance)
     #     return "Cash payment of #{payment.amount.value} to #{user.company.name} has been recorded"
-    #   when PaymentType.reimbursement_id
+    #   when PaymentType.id_for(:reimbursement)
     #     return 'Congratulations! You have been reimbursed'
-    #   when PaymentType.settlement_id
+    #   when PaymentType.id_for(:settlement)
     #     return 'A settlement has been initiated against your cash in hand'
     #   else
     #     return nil
@@ -31,17 +31,17 @@ class Event::ESettlement::AddAdvance < Event::ESettlement::Base
   def mailer_body(user)
     "This is to notify you that a cash advance of #{payment.amount.value} has been recorded."
     # case payment.payment_type
-    #   when PaymentType.advance_id
+    #   when PaymentType.id_for(:advance)
     #     return "This is to notify you that a cash advance of #{payment.amount.value} has been recorded."
-    #   when PaymentType.debt_clearance_id
+    #   when PaymentType.id_for(:debt_clearance)
     #     return "This is to notify you that we have recorded a payment of #{payment.amount.value} to #{user.company.name}"
-    #   when PaymentType.reimbursement_id
+    #   when PaymentType.id_for(:reimbursement)
     #     message = "Congratulations! #{payment.initiating_user} has reimbursed the reports:"
     #     payment.reports.each do |report|
     #       message += "<br><br>#{report.name}"
     #     end
     #     return message
-    #   when PaymentType.settlement_id
+    #   when PaymentType.id_for(:settlement)
     #     message = 'This is to notify you that the pending reimbursements for the following reports have been settled against cash advance given by the company.<br><br>Reports:'
     #     payment.reports.each do |report|
     #       message += "<br>#{report.name}"

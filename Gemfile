@@ -1,8 +1,11 @@
-source 'https://rubygems.org'
+  source 'https://rubygems.org'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+
+gem 'nokogiri', '1.6.8'
+gem 'autoprefixer-rails', '6.5.0.1'
 
 # puma web server
 gem 'figaro'

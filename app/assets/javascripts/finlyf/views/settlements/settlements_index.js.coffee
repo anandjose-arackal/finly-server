@@ -11,7 +11,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   templateSummaryAdmin: HandlebarsTemplates['finlyf/settlements/summaryAdmin']
   templateMain: HandlebarsTemplates['finlyf/settlements/crud/index']
   templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/indexPayments']
-  templateMainRequests: HandlebarsTemplates['finlyf/settlements/crud/indexRequests']
+  templateMainRequestsApproved: HandlebarsTemplates['finlyf/settlements/crud/indexRequestsApproved']
+  templateMainRequestsCredited: HandlebarsTemplates['finlyf/settlements/crud/indexRequestsCredited']
 
   #settlements
   templateAddPayment: HandlebarsTemplates['finlyf/settlements/admin/addPayment']
@@ -36,6 +37,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .btn-process-debt': 'initDebt'
     'click .btn-process-payment': 'initPayment'
     'click .btn-process-money-request': 'initCreditMoneyRequest'
+    'change input[type=radio][name=advance_request_type]': 'loadRequstedAdvanceList' 
 
     #settlements
     'click .btn-cancel-confirmation': 'cancelConfirmation'
@@ -103,8 +105,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       if @params
         if @params.view_to_load == "payments"
           $(@el).find(".settlements-index").html(@templateMainPayments())
-        else if @params.view_to_load == "credited_money_request" || @params.view_to_load == "approved_money_request"
-          $(@el).find(".settlements-index").html(@templateMainRequests({item: @params}))
+        else if @params.view_to_load == "credited_money_request"
+          $(@el).find(".settlements-index").html(@templateMainRequestsCredited({item: @params}))
+        else if @params.view_to_load == "approved_money_request"
+          $(@el).find(".settlements-index").html(@templateMainRequestsApproved({item: @params}))
         else
           $(@el).find(".settlements-index").html(@templateMain())
       else
@@ -197,7 +201,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   appendItems: (item) ->
     #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Settlement({ model: item })
+    view_item = new FinlyF.Views.Settlement({ model: item, params: @params })
     $(@el).find("#items").append(view_item.render().el)
 
   refetchCollection: (e) ->
@@ -238,8 +242,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(target).parent().addClass('active')
       if view_to_load == 'payments'
         $(@el).find(".settlements-index").html(@templateMainPayments())
-      else if view_to_load == "approved_money_request" || view_to_load == "credited_money_request"
-        $(@el).find(".settlements-index").html(@templateMainRequests({item: {view_to_load: view_to_load}}))
+      else if view_to_load == "approved_money_request"
+        $(@el).find(".settlements-index").html(@templateMainRequestsApproved({item: {view_to_load: view_to_load}}))
+      else if view_to_load == "credited_money_request"
+        $(@el).find(".settlements-index").html(@templateMainRequestsCredited({item: {view_to_load: view_to_load}}))
       else
         $(@el).find(".settlements-index").html(@templateMain())
       # console.log @collection.url
@@ -324,7 +330,25 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   initPayment: (e) ->
     # console.log "Process Cash"
-    $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment())
+    e.preventDefault()
+    target = e.currentTarget
+
+    payment_type = $(target).attr('data-payment-type')
+    if parseInt(payment_type) == 1
+      item = {
+        payment_type: 1
+        modal_title: "Add New Payment"
+        button_title: "Add Payment"
+      }
+    else if parseInt(payment_type) == 2
+      item = {
+        payment_type: 2
+        modal_title: "Clear Debts"
+        button_title: "Clear Debts"
+      }
+
+
+    $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment({item: item}))
     $(@el).find('#modal-settlements').modal('show')
     $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
@@ -341,8 +365,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         note: $(target).find('textarea[name=payment\\[note\\]]').val()
         # payment_type: parseInt($(target).find("input[name=payment\\[payment_type\\]]:checked").val())
       }
-      payment_type: parseInt($(target).find("input[name=payment_type]:checked").val())
+      payment_type: parseInt($(target).find("input[name=payment_type]").val())
       view: _this.params.view
+      password: $(target).find('input[name=password]').val()
     }
 
     # console.log data
@@ -384,6 +409,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     @params.view_to_load = 'approved_money_request'
     @params.id = @user_id
+
+    # @params.payment_mode_id = 1
     # collection = new FinlyF.Collections.Settlements()
     @collectionSettlementReports.url = "/settlements/" + @user_id
     @collectionSettlementReports.fetch({
@@ -392,14 +419,54 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       data: _this.params
       success: ->
         _this.collectionSettlementReports.each((item) ->
-          view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
-          $(target).append(view_item.render().el)
-          # console.log view_item.render
+          if parseInt(item.get('payment_mode_id')) == 1#hard coding for the first time to show cash requested
+            view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+            $(target).append(view_item.render().el)
         , @)
 
       error: ->
         console.log "Couldn't fetch Successfully."
     })
+
+  loadRequstedAdvanceList: (e) ->
+    _this = @
+    # alert("You changed")
+    payment_mode_id = $("input[type=radio][name=advance_request_type]:checked").val()
+
+    $(@el).find('#modal-settlements .modal-content .selected_reports_total').text("0")
+
+    target = $(@el).find('#modal-settlements .modal-content .settlement-modal-reports')
+    $(target).html("")
+
+    @params.view_to_load = 'approved_money_request'
+    @params.id = @user_id
+    # @params.payment_mode_id = payment_mode_id
+    # collection = new FinlyF.Collections.Settlements()
+    @collectionSettlementReports.each((item) ->
+      if parseInt(item.get('payment_mode_id')) == parseInt(payment_mode_id)
+        view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+        $(target).append(view_item.render().el)
+        # console.log view_item.render
+    , @)
+
+
+
+    # @collectionSettlementReports.url = "/settlements/" + @user_id
+    # @collectionSettlementReports.fetch({
+    #   data: @params
+    #   reset: true,
+    #   data: _this.params
+    #   success: ->
+    #     _this.collectionSettlementReports.each((item) ->
+    #       if parseInt(item.get('payment_mode_id')) == parseInt(payment_mode_id)
+    #         view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+    #         $(target).append(view_item.render().el)
+    #         # console.log view_item.render
+    #     , @)
+
+    #   error: ->
+    #     console.log "Couldn't fetch Successfully."
+    # })
 
 
   initDebt: (e) ->

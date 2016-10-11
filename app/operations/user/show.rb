@@ -3,7 +3,7 @@ class User::Show < User::Base
 
   def pre_validate
     unless user.present?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
     end
   end
 
@@ -16,7 +16,7 @@ class User::Show < User::Base
       result = operation.run
       if operation.success?
         self.selected_user = result.with_id(id).first rescue nil
-        messages[:error] << 'User not found' if self.selected_user.blank?
+        add_message :error, 'User not found' if self.selected_user.blank?
       else
         messages[:error] = operation.messages[:error]
       end
@@ -57,7 +57,8 @@ class User::Show < User::Base
       conditional_finance_manager = company_default_mapping.non_default.finance_manager
       conditional_approves_to = company_default_mapping.non_default.approves_to
       conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
-      {company_default: policy.nil?, policy: policy, default: default_mapping, conditional_manager: conditional_manager,
+      {company_default: policy.nil?, policy: policy, default: default_mapping,
+       conditional_manager: conditional_manager,
        conditional_finance_manager: conditional_finance_manager,
        conditional_approves_to: conditional_approves_to,
        conditional_approves_finance_to: conditional_approves_finance_to}
@@ -79,6 +80,45 @@ class User::Show < User::Base
           actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         elsif !selected_user.active and selected_user.id != user.id
           actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+        end
+      end
+
+      if self.selected_user.cards.present?
+        card = self.selected_user.cards.first
+        if manager_view? or finance_view? or admin_view?
+          card_params = {}
+          card_params[:user_id] = selected_user.id
+          card_params[:view] = params[:view]
+          unless selected_user.id == user.id
+            card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:transfer]
+            actions[:transfer] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+            card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:withdraw]
+            actions[:withdraw] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+          end
+          if admin_view? and self.user.company_admin?
+            card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:credit]
+            actions[:credit]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+            card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:debit]
+            actions[:debit]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+          end
+          card_params[:action_type] = nil
+          if card.active
+            card_params[:status_type] = 0
+            actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+          else
+            card_params[:status_type] = 1
+            actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+          end
+        else
+          if card.active
+            card_params = {status_type: 0, user_id: selected_user.id}
+            actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+          else
+            if card.disabled_by_role_id == UserRole.id_for(:employee)
+              card_params = {status_type: 1, user_id: selected_user.id}
+              actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            end
+          end
         end
       end
       actions
