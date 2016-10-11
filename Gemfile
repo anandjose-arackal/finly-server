@@ -7,6 +7,11 @@ gem 'wkhtmltopdf-binary'
 gem 'nokogiri', '1.6.8'
 gem 'autoprefixer-rails', '6.5.0.1'
 
+# adding gems for activeMQ
+gem 'daemons'
+gem 'stomp'
+gem 'activemessaging'
+
 # puma web server
 gem 'figaro'
 gem 'puma'
