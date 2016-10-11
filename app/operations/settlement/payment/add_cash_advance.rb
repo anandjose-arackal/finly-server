@@ -47,7 +47,8 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def validate
     unless validate_date payment_param[:date]
-      messages[:error] << 'Invalid date passed. Try again'
+      add_message :error, 'Invalid date passed. Try again'
+      return false
     end
     if money_requests.present?
       total_amount = 0
@@ -56,6 +57,12 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       end
       unless total_amount <= payment_param[:amount].to_f
         add_message :error, 'Payment amount cannot be less than the money requests total amount'
+      end
+
+      date = Date.parse(payment_params[:date])
+      # validating date of money request against payment date
+      if date < money_requests.order(submitted_at: :asc).first.updated_at
+        add_message :error, "Payment date cannot be before money request date."
       end
     end
   end

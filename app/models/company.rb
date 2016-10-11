@@ -9,7 +9,6 @@
 #  active     :boolean          default(TRUE), not null
 #
 
-
 class Company < ActiveRecord::Base
   include Constants
 

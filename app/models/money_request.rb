@@ -92,6 +92,7 @@ class MoneyRequest < ActiveRecord::Base
   default_scope { order(created_at: :desc, status_id: :asc) }
 
   before_save :handle_name
+  before_save :handle_nil_amount
   before_create :create_items
 
   # Used to retrieve all the users associated with this money request. If user before is provided,
@@ -224,8 +225,16 @@ class MoneyRequest < ActiveRecord::Base
     end
   end
 
+  def handle_nil_amount
+    self.items.each do |item|
+      if item.amount.value == nil
+        item.amount.value = 0
+      end
+    end
+  end
+
   def create_items
-    self.user.company.categories.each do |category|
+    self.user.company.active_categories.each do |category|
       amount = Amount.create value: 0, currency_id: Currency.first.id
       self.items.build category_id: category.id, amount_id: amount.id
     end
