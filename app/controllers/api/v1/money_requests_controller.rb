@@ -47,6 +47,12 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
         @result = MoneyRequest::Reject.(current_user, params)
       when :unapprove
         @result = MoneyRequest::Unapprove.(current_user, params)
+      when :transfer
+        @result = MoneyRequest::Card::Transfer.(current_user, params)
+      when :credit
+        @result = MoneyRequest::Card::Credit.(current_user, params)
+      when :approve_and_forward_to
+        @result = MoneyRequest::ApproveAndForward.(current_user, params)
       when :take_control
         @result = MoneyRequest::TakeControl.(current_user, params)
     end

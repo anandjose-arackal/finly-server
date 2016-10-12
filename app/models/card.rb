@@ -28,6 +28,8 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
 
+  attr_accessor :balance
+
   def serial_id
     self.proxy
   end
