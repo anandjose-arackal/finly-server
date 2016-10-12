@@ -17,7 +17,6 @@ class UsersController < ApplicationController
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
     @result = User::Index.(current_user, params)
-
     respond_to do |format|
       format.json { render json: @result.team.as_json }
     end
