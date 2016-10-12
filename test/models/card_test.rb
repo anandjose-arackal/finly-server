@@ -13,7 +13,9 @@
 #  company_id          :integer
 #  disabled_by_role_id :integer
 #  active              :boolean
+#  disable_note        :text(65535)
 #
+
 
 require 'test_helper'
 
