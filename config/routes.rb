@@ -352,6 +352,8 @@ Rails.application.routes.draw do
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
+  post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+
   devise_for :users
 
   namespace :api do

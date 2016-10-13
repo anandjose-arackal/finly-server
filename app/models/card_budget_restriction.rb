@@ -11,6 +11,7 @@
 #  updated_at             :datetime         not null
 #
 
+
 class CardBudgetRestriction < ActiveRecord::Base
   belongs_to :card
   belongs_to :product_combination
