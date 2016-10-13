@@ -37,7 +37,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
-    $("#primary-navbar a[href^='\\#expenses']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#expenses']").parent().addClass('active')
 
   reports: (query, action) ->
     console.log "hit router"
@@ -53,7 +53,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
-    $("#primary-navbar a[href^='\\#reports']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#reports']").parent().addClass('active')
 
     if params.report_id
       view.showReport(params.report_id)
@@ -67,7 +67,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     view = new FinlyF.Views.ReceiptsIndex({ params: params })
     $("#backbone-container").html(view.render().el)
     @features()
-    $("#primary-navbar a[href^='\\#receipts']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#receipts']").parent().addClass('active')
 
   requests: (query) ->
     console.log "routerd to request"
@@ -80,7 +80,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
-    $("#primary-navbar a[href^='\\#requests']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#requests']").parent().addClass('active')
 
   settlements: (query) ->
     # Admin & Finance view
@@ -94,7 +94,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
-    $("#primary-navbar a[href^='\\#settlements']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#settlements']").parent().addClass('active')
 
   settlements_show: (user, query) ->
     # console.log "settlements show"
@@ -119,7 +119,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
-    $("#primary-navbar a[href^='\\#settlements']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#settlements']").parent().addClass('active')
 
   users: (query)->
     # Admin & Finance view
@@ -132,7 +132,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
-    $("#primary-navbar a[href^='\\#employees']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#employees']").parent().addClass('active')
 
   analytics: (query) ->
     # console.log 'Step 2.A. Route at /. Rending expenses.'
@@ -146,7 +146,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
-    $("#primary-navbar a[href^='\\#analytics']").parent().addClass('active')
+    $("#primary-navbar a.navbar-menu-li[href^='\\#analytics']").parent().addClass('active')
 
   features: ->
     $(".datepicker").datepicker({

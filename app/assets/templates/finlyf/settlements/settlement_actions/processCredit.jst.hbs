@@ -1,0 +1,118 @@
+<div class="modal-dialog" role="document" style="width: 60%;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Credit</h4>
+    </div>
+    <div class="modal-body">
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default settlement-step-1">
+          <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                Select Credit Type
+              </a>
+            </h4>
+          </div>
+          <div id="collapse-step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+              <div class="settlement-action-types col-sm-6">
+                <ul class="settlement-actions">
+                  <li>
+                    {{#if summary.actions.credit_reimbursement}}
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_reimbursement}}" data-action-type="credit_reimbursement"/> Credit Reimbursements
+                      </label>
+                      <label class="hidden">Reimburse by selecting reports</label>
+                    {{/if}}
+                  </li>
+                  
+                  <li>
+                    {{#if summary.actions.credit_settle}}
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_settle}}" data-action-type="credit_settle" /> Settle
+                      </label>
+                      <label class="hidden">Settle Reimbursement against cash in hand and vise versa.</label>
+                    {{/if}}
+                  </li> 
+                  
+                  <li>
+                    {{#if summary.actions.credit_cash_advance}}
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_cash_advance}}" data-action-type="credit_cash_advance" /> Add Cash Advance
+                      </label>
+                      <label class="hidden">Give advance funds to employee by transferring to their card or giving them cash.</label>
+                    {{/if}}
+                  </li> 
+                  
+                  <li>
+                    {{#if summary.actions.credit_money_request}}
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_money_request}}" data-action-type="credit_money_request" /> Credit Advance Fund Requests
+                      </label>
+                      <label class="hidden">Credit advance fund requests from employee.</label>
+                    {{/if}}
+                  </li> 
+                  <li>
+                    {{#if summary.actions.credit_card_from_card}}
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_card_from_card}}" data-action-type="credit_card_from_card"/> Credit User's Card from Your Card
+                      </label>
+                      <label class="hidden">Credit employee's card from your own card.</label>
+                    {{/if}}
+                  </li> 
+                  <li>
+                    {{#if summary.actions.credit_card_from_company_credits}}
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_card_from_company_credits}}" data-action-type="credit_card_from_company_credits"/> Credit User's Card From Company Credits
+                      </label>
+                      <label class="hidden">Credit employee's card from company's credits.</label>
+                    {{/if}}
+                  </li> 
+                </ul>
+              </div>
+
+              <div class="col-sm-6 settlement-action-definition hidden"></div>
+            </div><!-- panel-body -->
+          </div>
+        </div>
+        <div class="panel panel-default settlement-step-2">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Blah
+              </a>
+            </h4>
+          </div>
+          <div id="collapse-step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              {{!-- Content --}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+
+<style type="text/css">
+  ul.settlement-actions{
+    padding-left: none;
+  }
+
+  ul.settlement-actions li{
+    list-style-type: none;
+    padding: 0 10px;
+  }
+
+
+  ul.settlement-actions li:hover{
+    background: #DDDAEA;
+  }
+
+  .settlement-action-definition{
+    padding: 10px;
+    background: #DDDAEA;
+  }
+</style>
+

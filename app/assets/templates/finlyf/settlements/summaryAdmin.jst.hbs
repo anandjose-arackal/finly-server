@@ -20,16 +20,8 @@
       </div>
     </div>
 
-    <div class="row no-margin" style="height: 30%;">
-      {{#if item.actions.settle}}
-        <button class="btn btn-sm btn-warning btn-process-debt btn-report-summary-action" data-url="{{item.actions.settle}}">Settle Debt</button>
-      {{/if}}
-      {{#if item.actions.add_reimbursement}}
-        <button class="btn btn-sm btn-warning btn-process-reimburse btn-report-summary-action" data-url="{{item.actions.add_reimbursement}}">Reimburse</button>
-      {{/if}}
-      {{#if item.actions.add_cash_advance}}
-        <button class="btn btn-sm btn-success btn-process-payment btn-report-summary-action" data-payment-type="2">Clear Debt</button>
-      {{/if}}
+    <div class="row no-margin text-center" style="height: 30%;">
+      <button class="btn btn-success btn-sm btn-summary-action btn-credit">Credit</button>      
       
     </div>
   </div>
@@ -56,14 +48,8 @@
       </div>
     </div>
 
-    <div class="row no-margin" style="height: 30%;">
-      {{#if item.actions.add_cash_advance}}
-        <button class="btn btn-sm btn-success btn-process-payment btn-report-summary-action" data-payment-type="1">Add Payment</button>
-      {{/if}}
-
-      {{#if item.actions.credit_money_request}}
-        <button class="btn btn-sm btn-success btn-process-money-request btn-report-summary-action" data-url="{{item.actions.credit_money_request}}" style="width: 200px;">Credit Advance Request</button>
-      {{/if}}
+    <div class="row no-margin text-center" style="height: 30%;">
+      <button class="btn btn-sm btn-warning btn-summary-action btn-debit">Debit</button>
     </div>
   </div>
 

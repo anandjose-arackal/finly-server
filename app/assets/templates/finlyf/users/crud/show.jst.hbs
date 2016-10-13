@@ -271,18 +271,23 @@
         {{/if}}
       </div>
       <div class="row no-margin">
-        {{#if item.card.active}}
+        {{#if item.actions.deactivate_card}}
           <button class="btn btn-sm btn-danger btn-card-update-status btn-wd-100" data-card-status-type="0">Deactivate</button>
-        {{else}}
+        {{/if}}
+        {{#if item.actions.activate_card}}
           <button class="btn btn-sm btn-success btn-card-update-status btn-wd-100" data-card-status-type="1">Activate</button>
         {{/if}}
       </div>
+      {{#if item.actions.credit}}
       <div class="row no-margin">
-        <button class="btn btn-sm btn-success btn-card-action btn-wd-100" data-card-action-type="load">Load Funds</button>
+        <button class="btn btn-sm btn-success btn-card-action btn-wd-100" data-card-action-type="load">Credit</button>
       </div>
+      {{/if}}
+      {{#if item.actions.debit}}
       <div class="row no-margin">
-        <button class="btn btn-sm btn-danger btn-card-action btn-wd-100" data-card-action-type="unload">Unload Funds</button>
+        <button class="btn btn-sm btn-danger btn-card-action btn-wd-100" data-card-action-type="unload">Debit</button>
       </div>
+      {{/if}}
 
     </div>
   </div>

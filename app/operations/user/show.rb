@@ -91,15 +91,15 @@ class User::Show < User::Base
           card_params[:view] = params[:view]
           unless selected_user.id == user.id
             card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:transfer]
-            actions[:transfer] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+            actions[:credit_card_from_card] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
             card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:withdraw]
-            actions[:withdraw] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+            actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
           end
           if admin_view? and self.user.company_admin?
             card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:credit]
-            actions[:credit]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+            actions[:credit_card_from_company_credits]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
             card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:debit]
-            actions[:debit]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
+            actions[:debit_card_to_company_credits]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
           end
           card_params[:action_type] = nil
           if card.active

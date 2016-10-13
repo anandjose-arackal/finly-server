@@ -336,7 +336,7 @@ class FinlyF.Views.User extends Backbone.View
       data: {
         view: _this.params.view
         authenticity_token: $("#authenticity_token").val()
-        user_id: _this.model.get('id')
+        to_user_id: _this.model.get('id')
         amount: amount
         password: password
         action_type: action_type
