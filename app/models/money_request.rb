@@ -89,6 +89,7 @@ class MoneyRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :items
   delegate :status_name, to: :status
+  delegate :payment_mode_name, to: :payment_mode
 
   default_scope { order(created_at: :desc, status_id: :asc) }
 

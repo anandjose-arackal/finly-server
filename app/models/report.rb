@@ -133,6 +133,7 @@ class Report < ActiveRecord::Base
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
+
   def status_id
     self.report_status_id
   end
@@ -280,6 +281,7 @@ class Report < ActiveRecord::Base
   end
 
   private
+
   def is_employee
     unless self.user.employee?
       errors.add(:User, 'is not allowed to create reports')
