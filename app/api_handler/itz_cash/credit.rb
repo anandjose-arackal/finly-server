@@ -12,6 +12,10 @@ class ItzCash::Credit < ItzCash::Base
     end
     if params.blank? or params[:amount].blank?
       add_message :error, 'Amount cannot be blank'
+      return
+    end
+    if user.company.d_code.blank?
+      add_message :error, 'Company has not been configured to initiate the transfer'
     end
   end
 
@@ -20,10 +24,11 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_params
-    serial_id = user.cards.first.serial_id
-    {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: Constants::ItzCash::DUMMY_DCODE,
+    card = user.cards.first
+    serial_id = card.serial_id
+    {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: user.company.d_code,
      merchanttypekey: Constants::ItzCash::MERCHANT_TYPE_KEY,
-     reftransid: Generator.new_transaction_id, productcode: Constants::ItzCash::PRODUCT_CODE, amount: amount,
+     reftransid: Generator.new_transaction_id, productcode: card.product_code, amount: amount,
      transactiontype: transaction_type}
   end
 
