@@ -1,3 +1,14 @@
+# operation to mass import user details onto the system
+# Sheet columns:
+  # email: user email
+  # name: Full name of the employee
+  # Manager: User's reporting manager
+  # Finance Manager: User's finance manager
+  # Assign Manager Role? : Yes/No depending on whether user is supposed to be manager or not
+  # Assign Finance Manager role?: Yes/No depending on whether user is supposed to be a finance manager or not
+  # Policy: If the user is to be added to a particular policy as well.
+
+
 require 'roo'
 class User::Invite::Import < BaseOperation
   attr_accessor :file, :success_hash
@@ -31,6 +42,7 @@ class User::Invite::Import < BaseOperation
     self.header = sheet.row(1)
     (2..sheet.last_row).each do |i|
       row = Hash[[header, sheet.row(i)].transpose]
+      row[:role_mapping_attributes] = [{user_role_id: UserRole.employee_id}]
       row = process_row(row)
       row[:team_mapping_attributes] = [row[:team_mapping_attributes]]
       user = User.invite!(row.to_hash)
@@ -107,6 +119,12 @@ class User::Invite::Import < BaseOperation
         row[:policy_id] = policy_id
       end
       row.delete('policy')
+    end
+    if row['Assign Manager Role?'].present? && row['Assign Manager Role?'].casecmp("Yes") == 0
+      row[:role_mapping_attributes] << {user_role_id: UserRole.manager_id}
+    end
+    if row['Assign Finance Manager Role?'].present? && row['Assign Finance Manager Role?'].casecmp("Yes") == 0
+      row[:role_mapping_attributes] << {user_role_id: UserRole.finance_manager_id}
     end
     row
   end

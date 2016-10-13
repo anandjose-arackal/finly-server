@@ -35,10 +35,6 @@ class UsersController < ApplicationController
     respond
   end
 
-  # placeholder action for importing file
-  def mass_import
-
-  end
 
   def profile
     @result = User::Profile.(current_user, params)
@@ -54,6 +50,11 @@ class UsersController < ApplicationController
       flash[:error] = @result.messages[:error]
     end
     redirect_to request.referrer
+  end
+
+   # placeholder action for importing file
+  def mass_import
+
   end
 
   # action that imports from a CSV or Excel file for mass invitations
