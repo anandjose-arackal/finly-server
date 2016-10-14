@@ -403,10 +403,10 @@ if CardTransaction.count == 0
   # creating expenses from the transactions
 end
 
-# temporary otp verification all numbers in db
-User.all.each do |user|
-  user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-end
+# # temporary otp verification all numbers in db
+# User.all.each do |user|
+#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+# end
 
 
 # creating Finly users and junk transaction data.
@@ -611,3 +611,4 @@ end
 #       end
 #     end
 # end
+AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password')

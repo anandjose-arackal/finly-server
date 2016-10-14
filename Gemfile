@@ -12,6 +12,9 @@ gem 'daemons'
 gem 'stomp'
 gem 'activemessaging'
 
+# gem for admin panel
+gem 'activeadmin', github: 'activeadmin'
+
 # puma web server
 gem 'figaro'
 gem 'puma'
@@ -94,7 +97,7 @@ gem 'sidekiq'
 # gem for font awesome
 gem 'font-awesome-rails'
 
-gem 'opro', github: 'opro/opro', branch: 'master'
+gem 'opro'
 
 gem 'has_scope'
 

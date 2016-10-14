@@ -43,7 +43,7 @@ class Expense < ActiveRecord::Base
 
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
-  delegate :expense_type, to: :expense_type
+  delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
 
@@ -75,6 +75,7 @@ class Expense < ActiveRecord::Base
   end
 
   default_scope { order('expenses.created_at DESC') }
+
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -150,6 +151,12 @@ class Expense < ActiveRecord::Base
         return self.card_expense.editable_merchant
       else
         # do nothing
+    end
+  end
+
+  def report_name
+    if report_id
+      self.report.name
     end
   end
 
