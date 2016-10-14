@@ -3,17 +3,17 @@ json.user do
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number
   json.current_user_id @result.user.id
-  json.editable @result.user.company_admin?
+  json.editable (@result.user.company_admin? and params[:view] == 'admin')
 end
 json.role do
   json.admin @result.roles[:admin]
   json.manager @result.roles[:manager]
   json.finance_manager @result.roles[:finance_manager]
   json.editable do
-    admin = @result.user.company_admin?
+    admin = (@result.user.company_admin? and params[:view] == 'admin')
     json.admin (admin and not @result.selected_user == @result.user)
-    json.manager (admin or @result.user.manager?)
-    json.finance_manager (admin or @result.user.finance_manager?)
+    json.manager (admin or (@result.user.manager? and params[:view] == 'manager'))
+    json.finance_manager (admin or (@result.user.finance_manager? and params[:view] == 'finance_manager'))
   end
 end
 json.mapping @result.mapping.each do |mapping|

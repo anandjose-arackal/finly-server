@@ -1,3 +1,5 @@
+require "#{Rails.root}/app/operations/money_request/card/transfer"
+
 class MoneyRequest::Card::Credit < MoneyRequest::Card::Transfer
 
   def authorized_user_types

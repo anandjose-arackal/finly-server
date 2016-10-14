@@ -12,6 +12,7 @@
 #  rule_type_id     :integer
 #
 
+
 require 'test_helper'
 
 class BudgetRuleTest < ActiveSupport::TestCase

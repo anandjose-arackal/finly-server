@@ -9,6 +9,7 @@
 #
 
 
+
 class MoneyRequestTrackingAction < ActiveRecord::Base
 
   ACTIONS={create: 1, retract: 2, submit: 3, approve: 4, approve_and_forward: 5, auto_approve: 6, reject: 7, unapprove: 8,

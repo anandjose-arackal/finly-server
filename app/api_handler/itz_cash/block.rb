@@ -12,22 +12,21 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def base_url
-    'http://demo.itzcash.com/'
+    'https://staging.itzcash.com/'
   end
 
   def path
-    'myaccount/servlet/ItzCashBlockUnBlockHotListServlet'
+    'user/servlet/NaradaBlockUnblockServlet'
   end
 
   def post_params
     serial_id = user.cards.first.serial_id
-    operation_type = operation_type
-    blocked_mode = 'I'
-    itzmodule = Constants::ItzCash::MODULE
-    { serial_id: serial_id, operation_type: operation_type, blocked_mode: blocked_mode, itzmodule: itzmodule }
+    request_type = self.request_type
+    itz_module = Constants::ItzCash::MODULE
+    { serial_id: serial_id, requesttype: request_type, itzmodule: itz_module }
   end
 
-  def operation_type
+  def request_type
     Constants::ItzCash::OPERATION_TYPE_BLOCK
   end
 

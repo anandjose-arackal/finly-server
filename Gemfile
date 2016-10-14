@@ -1,8 +1,16 @@
-source 'https://rubygems.org'
+  source 'https://rubygems.org'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+
+gem 'nokogiri', '1.6.8'
+gem 'autoprefixer-rails', '6.5.0.1'
+
+# adding gems for activeMQ
+gem 'daemons'
+gem 'stomp'
+gem 'activemessaging'
 
 # puma web server
 gem 'figaro'
@@ -93,7 +101,7 @@ gem 'has_scope'
 gem 'sendgrid-ruby'
 gem 'griddler'
 gem 'griddler-sendgrid'
-gem 'rmagick'
+# gem 'rmagick'
 gem 'imgkit'
 gem 'wkhtmltoimage-binary'
 gem 'proselytism', git: 'git://github.com/ramanbedi1989/proselytism.git'

@@ -15,6 +15,7 @@
 //// require turboboost
 // require nprogress
 // require nprogress-turbolinks
+//= require ohsnap.min
 
 // NProgress.configure({
 //   showSpinner: false,

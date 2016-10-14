@@ -19,6 +19,7 @@
 #
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base

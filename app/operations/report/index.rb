@@ -38,7 +38,6 @@ class Report::Index < Report::Base
         end
       when UserRole.manager_id
         controlling_report_query = user.controlling_reports.non_owner(user.id)
-                                       .with_controlling_user_role(UserRole.id_for(:manager))
         interacted_reports_query= user.manager_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
@@ -46,7 +45,6 @@ class Report::Index < Report::Base
         self.reports = Report.from(sql)
       when UserRole.finance_manager_id
         controlling_report_query = user.controlling_reports.non_owner(user.id)
-                                       .with_controlling_user_role(UserRole.id_for(:finance_manager))
         interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"

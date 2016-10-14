@@ -8,7 +8,6 @@
 #  updated_at :datetime         not null
 #
 
-
 class CardType < ActiveRecord::Base
 
 end

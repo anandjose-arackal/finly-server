@@ -352,6 +352,8 @@ Rails.application.routes.draw do
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
+  post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+
   devise_for :users
 
   namespace :api do
@@ -388,11 +390,18 @@ Rails.application.routes.draw do
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
+      resources :money_requests, only: [:create, :index, :show, :destroy, :update]
+      resources :money_requests do
+        post 'comment' => 'money_requests#comment', as: :comment
+      end
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
         post 'add_note', to: 'receipts#add_note', as: :add_note
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
       end
+      resources :users, only: [:index, :show]
+      post 'cards/:id/balance/update', to: 'cards#update_balance'
+      post 'cards/:id/status/update', to: 'cards#update_status'
       namespace :configuration do
         get 'categories' => 'category#index', as: :categories
         post 'gcm/register', to: 'gcm#create'

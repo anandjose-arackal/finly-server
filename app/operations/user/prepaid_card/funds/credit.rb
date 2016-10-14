@@ -6,9 +6,8 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
   end
 
   def pre_validate
-    if user.blank? or params.blank? or (params[:id].blank? and
-        params[:to_user_id].blank? and params[:to_user].blank?)
-      messages[:error] << 'User not found'
+    if user.blank? or params.blank?
+      add_message :error, 'User not found'
     end
     return if has_errors?
     unless user.company_admin?
@@ -23,7 +22,8 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
     elsif not user.valid_password?(params[:password])
       add_message :error, 'Invalid Password!'
     end
-    if params.blank? or (params[:to_user_id].blank? and params[:to_user].blank?)
+    if params.blank? or (params[:id].blank? and
+        params[:to_user_id].blank? and params[:to_user].blank?)
       add_message :error, 'User not found to credit the funds'
     end
   end
@@ -31,8 +31,8 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
   def init
     self.to_user = params[:to_user]
     self.amount = params[:amount].to_i
-    if to_user.blank? and (params[:id].present? or params[:to_user_id].present?)
-      to_user_id = (params[:id] or params[:to_user_id])
+    if to_user.blank? and (params[:to_user_id].present? or params[:id].present?)
+      to_user_id = (params[:to_user_id] or params[:id])
       to_u = User.with_company_id(user.company_id).with_id(to_user_id).first rescue nil
       if to_u.present? and to_u.company_id == user.company_id
         self.to_user = to_u

@@ -22,7 +22,9 @@
 #  date                      :datetime
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  timestamp                 :datetime
 #
+
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 

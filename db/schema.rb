@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161006131250) do
+ActiveRecord::Schema.define(version: 20161012120916) do
 
   create_table "amounts", force: :cascade do |t|
     t.float    "value",       limit: 24
@@ -156,6 +156,7 @@ ActiveRecord::Schema.define(version: 20161006131250) do
     t.datetime "date"
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
+    t.datetime "timestamp"
   end
 
   add_index "card_transactions", ["card_amount_id"], name: "index_card_transactions_on_card_amount_id", using: :btree
@@ -482,6 +483,13 @@ ActiveRecord::Schema.define(version: 20161006131250) do
   add_index "money_requests", ["status_id"], name: "index_money_requests_on_status_id", using: :btree
   add_index "money_requests", ["user_id"], name: "index_money_requests_on_user_id", using: :btree
 
+  create_table "msg_queue_messages", force: :cascade do |t|
+    t.text     "message",       limit: 65535
+    t.date     "received_date"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
   create_table "new_card_requests", force: :cascade do |t|
     t.integer  "company_id",         limit: 4
     t.integer  "requesting_user_id", limit: 4
@@ -594,6 +602,15 @@ ActiveRecord::Schema.define(version: 20161006131250) do
 
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
+
+  create_table "preview_registrations", force: :cascade do |t|
+    t.string   "email",        limit: 255
+    t.text     "company",      limit: 65535
+    t.string   "phone_number", limit: 255
+    t.text     "name",         limit: 65535
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
 
   create_table "product_combinations", force: :cascade do |t|
     t.string   "name",       limit: 255

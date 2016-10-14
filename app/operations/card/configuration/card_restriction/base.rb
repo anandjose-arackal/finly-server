@@ -18,7 +18,7 @@ class Card::Configuration::CardRestriction::Base < Card::Base
 	end
 
 	def budget_restriction_params
-		params.require(:budget_restriction).permit(:period_id, :card_id, :amount_attributes: [:value, :currency_id])
+		params.require(:budget_restriction).permit(:period_id, :card_id, amount_attributes: [:value, :currency_id])
 	end
 
 	def transaction_restriction_params
