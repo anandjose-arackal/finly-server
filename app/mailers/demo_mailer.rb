@@ -1,6 +1,7 @@
 class DemoMailer < ApplicationMailer
 
-  def preview_welcome(company)
-
+  def preview_welcome(preview_registration)
+    @preview_registration = preview_registration
+    mail to: preview_registration.email, subject: 'Welcome to Finly!'
   end
 end

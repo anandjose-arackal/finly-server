@@ -1,5 +1,20 @@
 ActiveAdmin.register Policy do
 
+  filter :name, as: :string
+  filter :default
+  filter :company_id, as: :select, collection: proc {Company.all}
+
+  index do
+    id_column
+    column :name
+    column :default
+    column :is_deletd
+    column :company
+
+    actions
+  end
+
+  permit_params :name, :default, :company_id
 # See permitted parameters documentation:
 # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
 #

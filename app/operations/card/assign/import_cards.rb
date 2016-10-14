@@ -35,11 +35,11 @@ class Card::Assign::ImportCards < Card::Assign::Base
     (2..sheet.last_row).each do |i|
       row = Hash[[header, sheet.row(i)].transpose]
       row = process_row(row)
-
-      if user
+      card = Card.new(row)
+      if card.save
         success_hash[i] = "success!"
       else
-        success_hash[i] = user.errors.full_messages
+        success_hash[i] = card.errors.full_messages
       end
     end
   end
@@ -74,7 +74,26 @@ class Card::Assign::ImportCards < Card::Assign::Base
 
   # method that adds the respective card and associted user to the db
   def process_row(row)
-
+    # processing the various columns of the spreadsheet
+    if row['Card Proxy'].present?
+      row['proxy'] = row['Card Proxy']
+      row.delete('Card Proxy')
+    end
+    if row['Ending Number'].present?
+      row['ending_number'] = row['Ending Number']
+      row.delete('Ending Number')
+    end
+    if row['Company'].present?
+      company = Company.find_by(name: row['Company'])
+      row['company_id'] = company.id
+      row.delete('Company')
+    end
+    if row['User Email'].present?
+      user = User.find_by(email: row['User Email'])
+      row['user_id'] = user.id
+      row.delete('User Email')
+    end
+    row
   end
 
 end

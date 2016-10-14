@@ -4,6 +4,9 @@ module Constants
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /[MmFf]/i
 
+  # todo - needs to be edited once we get the account details.
+  ITZCASH_EMAIL_ID = 'something@itzcash.com'
+
   # todo - remove admin after testing
   SUPERADMIN_ACCOUNTS = ['sreeram@finlytest.io', 'vivek@finlytest.io', 'veekshith@finlytest.io', 'bala@finlytest.io', 'admin@finlytest.io']
 
