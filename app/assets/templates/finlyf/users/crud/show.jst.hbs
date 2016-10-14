@@ -288,16 +288,41 @@
           <button class="btn btn-sm btn-success btn-card-update-status btn-wd-100" data-card-status-type="1">Activate</button>
         {{/if}}
       </div>
-      {{#if item.actions.credit}}
-      <div class="row no-margin">
-        <button class="btn btn-sm btn-success btn-card-action btn-wd-100" data-card-action-type="load">Credit</button>
-      </div>
-      {{/if}}
-      {{#if item.actions.debit}}
-      <div class="row no-margin">
-        <button class="btn btn-sm btn-danger btn-card-action btn-wd-100" data-card-action-type="unload">Debit</button>
-      </div>
-      {{/if}}
+      {{#ifCond item.actions.credit_card_from_company_credits '||' item.actions.credit_card_from_card}}
+        <div class="dropdown">
+          <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Credit
+            <span class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu" aria-labelledby="dLabel">
+            {{#if item.actions.credit_card_from_company_credits}}
+              <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_company_credits}}" data-action-type="credit_card_from_company_credits">From Company Credits</a> </li>
+            {{/if}}
+            {{#if item.actions.credit_card_from_card}}
+              <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_card}}" data-action-type="credit_card_from_card">From Your Card</a> </li>
+            {{/if}}
+          </ul>
+        </div>
+      {{/ifCond}} 
+
+      {{#ifCond item.actions.debit_card_to_company_credits '||' item.actions.debit_card_to_card}}
+        <div class="dropdown">
+          <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Debit
+            <span class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu" aria-labelledby="dLabel">
+            {{#if item.actions.debit_card_to_company_credits}}
+              <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_company_credits}}" data-action-type="debit_card_to_company_credits">To Company Credits</a> </li>
+            {{/if}}
+            {{#if item.actions.debit_card_to_card}}
+              <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_card}}" data-action-type="debit_card_to_card">To Your Card</a> </li>
+            {{/if}}
+          </ul>
+        </div>
+      {{/ifCond}} 
 
     </div>
   </div>
@@ -687,10 +712,6 @@
     display: none;
   }
 
-
-
-
-
   /*Unique Styles to be moved to main css file*/
   .card{
     width: 400px;
@@ -775,12 +796,3 @@
     color: white;
   }
 </style>
-
-
-
-
-
-
-
-
-

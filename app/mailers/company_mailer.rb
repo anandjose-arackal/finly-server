@@ -1,4 +1,4 @@
-class CompanyMailer < AplicationMailer
+class CompanyMailer < ApplicationMailer
 
   def balance_update(transaction_details)
     @amount = transaction_details[:amount]
@@ -7,5 +7,4 @@ class CompanyMailer < AplicationMailer
     @remarks = transaction_details[:remarks]
     mail to: CONSTANTS::ITZCASH_EMAIL_ID, subject: 'Welcome to Finly!'
   end
-
 end

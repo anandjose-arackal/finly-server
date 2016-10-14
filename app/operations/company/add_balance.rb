@@ -6,7 +6,7 @@
 #   date: Date of the NEFT transfer
 #   remarks: Optional remarks
 
-class Coompany::AddBalance < Company::Base
+class Company::AddBalance < Company::Base
 
   def pre_validate
     if user.blank? or params.blank?

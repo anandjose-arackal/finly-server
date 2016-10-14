@@ -285,16 +285,20 @@ class FinlyF.Views.User extends Backbone.View
     _this = @
 
     target = e.currentTarget
-    action_type = $(target).attr('data-card-action-type')
+    item = {
+      type: $(target).attr('data-action-type')
+      url: $(target).attr('data-url')
+    }
+    action_type = $(target).attr('data-action-type')
     # modal = ("#modal-mp")
     modal = ("#modal-sub-mp")
 
     $(modal).modal('show')
 
-    if action_type == 'load'
-      $(modal).html(@templateLoadFunds())
-    else if action_type == 'unload'
-      $(modal).html(@templateUnloadFunds())
+    if action_type == 'credit_card_from_company_credits' || action_type == 'credit_card_from_card'
+      $(modal).html(@templateLoadFunds({item: item}))
+    else if action_type == 'debit_card_to_company_credits' || action_type == 'debit_card_to_card'
+      $(modal).html(@templateUnloadFunds({item: item}))
 
 
     #Getting the card balance in modal
@@ -320,32 +324,42 @@ class FinlyF.Views.User extends Backbone.View
     _this = @
     target = e.currentTarget
     $(target).html("<i class='fa fa-spinner fa-spin'></i>").attr("disabled", true)
+    url = $(target).attr('data-url')
 
-    action_type = $(target).attr('data-card-action-type')
+    action_type = $(target).attr('data-action-type')
     modal = $(@el).find('#modal-sub-mp')
     form = $(target).closest('.modal-body')
 
 
+
+
     amount = $(modal).find("input[name=amount]").val()
     password = $(modal).find("input[name=password]").val()
+    data = {
+      view: _this.params.view
+      authenticity_token: $("#authenticity_token").val()
+      # to_user_id: _this.model.get('id')
+      amount: amount
+      password: password
+      # action_type: action_type
+    }
+
+    if action_type == 'credit_card_from_company_credits' || action_type == 'credit_card_from_card'
+      data.to_user_id = _this.model.get('id')
+    else if action_type == 'debit_card_to_company_credits' || action_type == 'debit_card_to_card'
+      data.from_user_id = _this.model.get('id')
 
     $.ajax({
-      url: '/cards/update_balance'
+      url: url
       type: "POST",
       dataType: 'json',
-      data: {
-        view: _this.params.view
-        authenticity_token: $("#authenticity_token").val()
-        to_user_id: _this.model.get('id')
-        amount: amount
-        password: password
-        action_type: action_type
-      },
+      data: data,
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
           $(modal).html("")
+          #Update current card balance.
         else
           console.log res
           $(target).attr("disabled", true)
