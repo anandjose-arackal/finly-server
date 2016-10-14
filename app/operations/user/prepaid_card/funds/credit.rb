@@ -31,8 +31,8 @@ class User::PrepaidCard::Funds::Credit < User::PrepaidCard::Funds::Base
   def init
     self.to_user = params[:to_user]
     self.amount = params[:amount].to_i
-    if to_user.blank? and params[:to_user_id].present?
-      to_user_id = params[:to_user_id]
+    if to_user.blank? and (params[:id].present? or params[:to_user_id].present?)
+      to_user_id = (params[:id] or params[:to_user_id])
       to_u = User.with_company_id(user.company_id).with_id(to_user_id).first rescue nil
       if to_u.present? and to_u.company_id == user.company_id
         self.to_user = to_u

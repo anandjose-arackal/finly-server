@@ -1,5 +1,11 @@
 class User::PrepaidCard::Funds::Debit < User::PrepaidCard::Funds::Credit
 
+  def pre_validate
+    params[:to_user] = params[:from_user] if params[:from_user].present?
+    params[:to_user_id] = params[:from_user_id] if params[:from_user_id].present?
+    super
+  end 
+
   def process
     self.credit_presenter = ItzCash::Debit.(to_user, params)
     if credit_presenter.success?

@@ -64,7 +64,7 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
       payment_attributes[:date] = Date.today
       payment_attributes[:note] = params[:note]
       payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
-      selected_user.payments.create payment_attributes
+      user.payments.create payment_attributes
 
       credit_presenter = ItzCash::Credit.(to_user, amount: self.amount)
       if credit_presenter.success?
