@@ -61,7 +61,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     # 'click .btn-process-debt': 'initDebt'
     # 'click .btn-process-payment': 'initPayment'
     # 'click .btn-process-money-request': 'initCreditMoneyRequest'
-    # 'change input[type=radio][name=advance_request_type]': 'loadRequstedAdvanceList' 
+    'change input[type=radio][name=advance_request_type]': 'loadRequstedAdvanceList' 
 
     #settlements
     'click .btn-back-step-2': 'cancelConfirmation'
@@ -479,26 +479,28 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   #       console.log "Couldn't fetch Successfully."
   #   })
 
-  # loadRequstedAdvanceList: (e) ->
-  #   _this = @
-  #   # alert("You changed")
-  #   payment_mode_id = $("input[type=radio][name=advance_request_type]:checked").val()
+  loadRequstedAdvanceList: (e) ->
+    _this = @
+    # alert("You changed")
+    target = e.currentTarget
+    modal_body = $(target).closest(".modal-body")
+    payment_mode_id = $(modal_body).find("input[type=radio][name=advance_request_type]:checked").val()
 
-  #   $(@el).find('#modal-settlements .modal-content .selected_reports_total').text("0")
+    $(modal_body).find('.selected_items_total').text("0")
 
-  #   target = $(@el).find('#modal-settlements .modal-content .settlement-modal-reports')
-  #   $(target).html("")
+    items_container = $(modal_body).find('.settlement-action-items')
+    $(items_container).html("")
 
-  #   @params.view_to_load = 'approved_money_request'
-  #   @params.id = @user_id
-  #   # @params.payment_mode_id = payment_mode_id
-  #   # collection = new FinlyF.Collections.Settlements()
-  #   @collectionSettlementReports.each((item) ->
-  #     if parseInt(item.get('payment_mode_id')) == parseInt(payment_mode_id)
-  #       view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
-  #       $(target).append(view_item.render().el)
-  #       # console.log view_item.render
-  #   , @)
+    @params.view_to_load = 'approved_money_request'
+    @params.id = @user_id
+    # @params.payment_mode_id = payment_mode_id
+    # collection = new FinlyF.Collections.Settlements()
+    @collectionSettlementReports.each((item) ->
+      if parseInt(item.get('payment_mode_id')) == parseInt(payment_mode_id)
+        view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+        $(items_container).append(view_item.render().el)
+        # console.log view_item.render
+    , @)
 
 
 
@@ -655,6 +657,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       (_.indexOf(_this.settlementActionData.selected, model.get('id')) > -1)
     )
     $(container).closest('.modal-body').find('.selected_items_total').text(@selectedReportsTotal())
+    console.log "Data is", @settlementActionData
 
   showActionDefinition: (e) ->
     # console.log "Hovering"
@@ -812,11 +815,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           data: _this.params
           success: ->
             _this.collectionSettlementReports.each((item) ->
-              # if parseInt(item.get('payment_mode_id')) == 1#hard coding for the first time to show cash requested
-              #   view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
-              #   $(target).append(view_item.render().el)
-              view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
-              $(items_container).append(view_item.render().el)
+              if parseInt(item.get('payment_mode_id')) == 1#hard coding for the first time to show cash requested
+                view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+                $(items_container).append(view_item.render().el)
+              # view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
+              # $(items_container).append(view_item.render().el)
 
             , @)
 
@@ -967,6 +970,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           date: $(container).find('input[name=payment\\[date\\]]').val()
           amount: parseFloat(_this.selectedReportsTotal())
         }
+        console.log "Submit action data", data
       when 'credit_card_from_card'
         # data.action_type = x
         data.amount = _this.settlementActionData.c_card_from_card.amount
