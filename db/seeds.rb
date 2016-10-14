@@ -127,7 +127,7 @@ if Amount.count == 0
 end
 
 if Company.count == 0
-  c = Company.create(name: 'Finly')
+  c = Company.create(name: 'Finly', d_code: 'D000000360')
   c.reload
 else
   c = Company.first
@@ -365,13 +365,14 @@ if Card.count == 0
     5.times do
       number = random_mobile_number
       company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
+                           product_code: 'NGPRHD',
                            card_type_id: random_integer(1, 3))
     end
   end
 
   User.all.each do |user|
     number = "S0001774009#{(user.id - 1)}"
-    user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
+    user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
                       card_type_id: 1, company_id: user.company.id, ending_number: '1234', active: true)
   end
 end
