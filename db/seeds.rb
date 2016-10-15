@@ -198,17 +198,17 @@ if User.count == 0
   end
 end
 
-if Policy.non_default.count == 0
-  p = PolicyCreateService.new(a).create_policy('Test Policy')
-  p.configuration.update_attribute(:require_category, true) if p.present?
-  PolicyUserService.new(p).add_user(u[0], false)
-  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
+# if Policy.non_default.count == 0
+#   p = PolicyCreateService.new(a).create_policy('Test Policy')
+#   p.configuration.update_attribute(:require_category, true) if p.present?
+#   PolicyUserService.new(p).add_user(u[0], false)
+#   u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
 
-  p2 = PolicyCreateService.new(a).create_policy('Another test Policy')
-  u.each do |user|
-    PolicyUserService.new(p2).add_user(user, false)
-  end
-end
+#   p2 = PolicyCreateService.new(a).create_policy('Another test Policy')
+#   u.each do |user|
+#     PolicyUserService.new(p2).add_user(user, false)
+#   end
+# end
 
 if ExpenseType.count ==0
   ExpenseType.create(id: 1, name: "Manual")
@@ -267,29 +267,29 @@ if BudgetPeriod.count == 0
   b = BudgetPeriod.create!(name: "Year")
 end
 
-p = Policy.find(3)
-if p.rules_count == 0
-  # warning rule that requires a receipt for expenses above 50
-  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
-                              category_id: 1,
-                              rule_type_id: 1,
-                              expense_rule_type_id: 1)
-  # warning rule that requires a note for expense above 50
-  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
-                              category_id: 1,
-                              rule_type_id: 1,
-                              expense_rule_type_id: 2)
+# p = Policy.find(3)
+# if p.rules_count == 0
+#   # warning rule that requires a receipt for expenses above 50
+#   r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
+#                               category_id: 1,
+#                               rule_type_id: 1,
+#                               expense_rule_type_id: 1)
+#   # warning rule that requires a note for expense above 50
+#   r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
+#                               category_id: 1,
+#                               rule_type_id: 1,
+#                               expense_rule_type_id: 2)
 
-  # setting monthly budget for category 1 as 100 in INR
-  b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
-                             category_id: 1,
-                             budget_period_id: 3,
-                             rule_type_id: 1)
-  # set monthly budget for all expenses as 150 INR
-  b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
-                             budget_period_id: 3,
-                             rule_type_id: 2)
-end
+#   # setting monthly budget for category 1 as 100 in INR
+#   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
+#                              category_id: 1,
+#                              budget_period_id: 3,
+#                              rule_type_id: 1)
+#   # set monthly budget for all expenses as 150 INR
+#   b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
+#                              budget_period_id: 3,
+#                              rule_type_id: 2)
+# end
 
 if PaymentType.count == 0
   PaymentType::TYPES.each do |key, value|
@@ -403,10 +403,10 @@ if CardTransaction.count == 0
   # creating expenses from the transactions
 end
 
-# temporary otp verification all numbers in db
-User.all.each do |user|
-  user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-end
+# # temporary otp verification all numbers in db
+# User.all.each do |user|
+#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+# end
 
 
 # creating Finly users and junk transaction data.
@@ -611,3 +611,4 @@ end
 #       end
 #     end
 # end
+AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password')

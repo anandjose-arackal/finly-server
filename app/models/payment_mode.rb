@@ -17,4 +17,8 @@ class PaymentMode < ActiveRecord::Base
     MODES[item]
   end
 
+  def payment_mode_name
+    self.name
+  end
+
 end

@@ -17,13 +17,13 @@
 
   <ul id="menu-nav-views-dropdown">
     <% if current_user.admin? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="admin">Admin View</a></li>
+      <li><a href='#reports/params={"view":"admin"}' class="navbar-view-type" data-view-type="admin">Admin View</a></li>
     <% end %>
     <% if current_user.finance_manager? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
+      <li><a href='#reports/params={"view":"finance_manager"}' class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
     <% end %>
     <% if current_user.manager? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="manager">Manager View</a></li>
+      <li><a href='#reports/params={"view":"manager"}' class="navbar-view-type" data-view-type="manager">Manager View</a></li>
     <% end %>
     <% if current_user.employee? %>
       <li><a href="#" class="navbar-view-type" data-view-type="personal">Personal View</a></li>

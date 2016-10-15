@@ -148,6 +148,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
+        _this.expenseSelectOptions()
 
       error: ->
         console.log "Couldn't fetch successfully."

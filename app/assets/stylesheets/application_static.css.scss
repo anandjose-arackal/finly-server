@@ -13,6 +13,9 @@
 
  *= require font-awesome
 */
-
+@font-face {
+  font-family: "Bree Serif";
+  src: font_url('bree_regular.otf') format("opentype");
+}
 @import "bootstrap";
 @import "bootstrap-sprockets";

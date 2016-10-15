@@ -50,7 +50,7 @@ class User::PrepaidCard::Funds::Withdraw < User::PrepaidCard::Funds::Base
       add_message :error, "Card is not assigned to the #{from_user.name} to withdraw the funds from"
       return
     end
-    if from_user.id == to_user.id
+    if from_user.id == user.id
       add_message :error, 'You cannot withdraw funds from your own card'
     end
   end
