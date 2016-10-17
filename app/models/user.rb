@@ -135,7 +135,7 @@ class User < ActiveRecord::Base
   scope :invited_by, ->(id) { where invited_by_id: id }
 
   # scopes for filters
-  scope :filter_search, -> (term) { where("name like ? OR email like ?", "%#{term}%", "%#{term}%") }
+  scope :filter_search, -> (term) { where("first_name like ? OR maiden_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_state, -> (state) do
     case (state)
       when '1', 1
