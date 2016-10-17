@@ -1,4 +1,4 @@
-  source 'https://rubygems.org'
+source 'https://rubygems.org'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf'
@@ -143,7 +143,7 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-gem 'deep_cloneable', '~> 2.2.1'
+gem 'deep_cloneable', '2.2.1'
 
 gem 'animate-rails'
 

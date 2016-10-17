@@ -1,4 +1,4 @@
-class CompanyMailer < AplicationMailer
+class CompanyMailer < ApplicationMailer
 
   def balance_update(transaction_details)
     @amount = transaction_details[:amount]

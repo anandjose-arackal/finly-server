@@ -133,7 +133,7 @@ else
   c = Company.first
 end
 
-if c.categories.count ==
+if c.categories.count == 0
   10.times do |i|
     c.categories.create!(name: "Test category #{i+1}")
   end
@@ -199,12 +199,15 @@ if User.count == 0
 end
 
 if Policy.non_default.count == 0
-  p = PolicyCreateService.new(a).create_policy('Test Policy')
+  a = User.first
+  p = Policy::Create.(a, {name: 'Test Policy'})
+  p = Policy.find_by(name: "Test Policy")
   p.configuration.update_attribute(:require_category, true) if p.present?
   PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
 
-  p2 = PolicyCreateService.new(a).create_policy('Another test Policy')
+  p2 = Policy::Create.(a, {name: 'Another test Policy'})
+  p2 = Policy.find_by(name: 'Another test Policy')
   u.each do |user|
     PolicyUserService.new(p2).add_user(user, false)
   end
@@ -400,13 +403,14 @@ if CardTransaction.count == 0
                                                card_transaction_id: trans.id})
     end
   end
-  # creating expenses from the transactions
 end
 
-# # temporary otp verification all numbers in db
-# User.all.each do |user|
-#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-# end
+# temporary otp verification all numbers in db
+User.all.each do |user|
+  user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+end
+
+AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 
 
 # creating Finly users and junk transaction data.
@@ -611,4 +615,4 @@ end
 #       end
 #     end
 # end
-AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password')
+

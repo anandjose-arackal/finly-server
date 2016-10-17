@@ -57,6 +57,7 @@ class Company < ActiveRecord::Base
   end
 
   private
+
   def init_config_present
     self.build_configuration.save unless self.configuration.present?
     self.policies.build(default: true).save unless self.policies.default.present?

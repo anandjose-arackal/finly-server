@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161013063350) do
+ActiveRecord::Schema.define(version: 20161013064003) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -189,7 +189,6 @@ ActiveRecord::Schema.define(version: 20161013063350) do
     t.datetime "date"
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
-    t.datetime "timestamp"
   end
 
   add_index "card_transactions", ["card_amount_id"], name: "index_card_transactions_on_card_amount_id", using: :btree
@@ -215,6 +214,7 @@ ActiveRecord::Schema.define(version: 20161013063350) do
     t.integer  "disabled_by_role_id", limit: 4
     t.boolean  "active"
     t.text     "disable_note",        limit: 65535
+    t.string   "product_code",        limit: 255,   null: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -238,6 +238,7 @@ ActiveRecord::Schema.define(version: 20161013063350) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.boolean  "active",                 default: true, null: false
+    t.string   "d_code",     limit: 255
   end
 
   create_table "company_configurations", force: :cascade do |t|
@@ -515,13 +516,6 @@ ActiveRecord::Schema.define(version: 20161013063350) do
   add_index "money_requests", ["policy_id"], name: "index_money_requests_on_policy_id", using: :btree
   add_index "money_requests", ["status_id"], name: "index_money_requests_on_status_id", using: :btree
   add_index "money_requests", ["user_id"], name: "index_money_requests_on_user_id", using: :btree
-
-  create_table "msg_queue_messages", force: :cascade do |t|
-    t.text     "message",       limit: 65535
-    t.date     "received_date"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-  end
 
   create_table "new_card_requests", force: :cascade do |t|
     t.integer  "company_id",         limit: 4
