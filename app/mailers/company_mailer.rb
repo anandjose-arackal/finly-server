@@ -7,5 +7,4 @@ class CompanyMailer < ApplicationMailer
     @remarks = transaction_details[:remarks]
     mail to: CONSTANTS::ITZCASH_EMAIL_ID, subject: 'Welcome to Finly!'
   end
-
 end

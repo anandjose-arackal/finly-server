@@ -106,11 +106,12 @@ class Settlement::Show < Settlement::Base
     return unless admin_view? or finance_view?
     return if self.selected_user.id == user.id and not admin_view?
     self.actions = {}
-    self.actions[:add_reimbursement] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}
-    self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:settlement))}
-    self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:debt_clearance))}
-    self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:advance))}
-    self.actions[:credit_money_request] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:advance))}
+    self.actions[:credit_reimbursement] = Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)
+    self.actions[:credit_settle] = Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:settlement))
+    self.actions[:debit_settle] = Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:settlement))
+    self.actions[:debit_cash_advance] = Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:debt_clearance))
+    self.actions[:credit_cash_advance] = Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:advance))
+    self.actions[:credit_money_request] = Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:advance))
 
     if self.selected_user.cards.present?
       card = self.selected_user.cards.first
@@ -120,32 +121,32 @@ class Settlement::Show < Settlement::Base
         card_params[:view] = params[:view]
         unless selected_user.id == user.id
           card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:transfer]
-          actions[:transfer] = {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+          actions[:credit_card_from_card] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
           card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:withdraw]
-          actions[:withdraw] = {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+          actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_card_balance_path(card_params)
         end
         if admin_view? and self.user.company_admin?
           card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:credit]
-          actions[:credit]= {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+          actions[:credit_card_from_company_credits]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
           card_params[:action_type] = User::PrepaidCard::Funds::Base::ACTIONS[:debit]
-          actions[:debit]= {url: Rails.application.routes.url_helpers.update_card_balance_path(card_params)}
+          actions[:debit_card_to_company_credits]= Rails.application.routes.url_helpers.update_card_balance_path(card_params)
         end
         card_params[:action_type] = nil
         if card.active
           card_params[:status_type] = 0
-          actions[:deactivate_card] = {url: Rails.application.routes.url_helpers.update_card_status_path(card_params)}
+          actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
         else
           card_params[:status_type] = 1
-          actions[:activate_card] = {url: Rails.application.routes.url_helpers.update_card_status_path(card_params)}
+          actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
         end
       else
         if card.active
           card_params = {status_type: 0, user_id: selected_user.id}
-          actions[:deactivate_card] = {url: Rails.application.routes.url_helpers.update_card_status_path(card_params)}
+          actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
         else
           if card.disabled_by_role_id == UserRole.id_for(:employee)
             card_params = {status_type: 1, user_id: selected_user.id}
-            actions[:activate_card] = {url: Rails.application.routes.url_helpers.update_card_status_path(card_params)}
+            actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
           end
         end
       end

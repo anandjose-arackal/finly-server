@@ -1,0 +1,86 @@
+<div class="modal-dialog" role="document" style="width: 60%;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Debit</h4>
+    </div>
+    <div class="modal-body">
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default settlement-step-1">
+          <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                Please Select Debit Type
+              </a>
+            </h4>
+          </div>
+          <div id="collapse-step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+              <div class="settlement-action-types col-sm-6">
+                <ul class="settlement-actions">
+                  {{#if summary.actions.debit_cash_advance}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-action-type="debit_cash_advance"/> Debit Advanced Funds
+                      </label>
+                      <label class="hidden">Take funds back from user to company.</label>
+                    </li>
+                  {{/if}}
+                  
+                  {{#if summary.actions.debit_card_to_card}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_card" /> Debit from Card to Card
+                      </label>
+                      <label class="hidden">Debit from employee's card to your own card.</label>
+                    </li> 
+                  {{/if}}
+                  
+                  {{#if summary.actions.debit_card_to_company_credits}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_company_credits" /> Debit Card to Company Credits
+                      </label>
+                      <label class="hidden">Debit from employee's card to company credits.</label>
+                    </li> 
+                  {{/if}}
+                </ul>
+              </div>
+
+              <div class="col-sm-6 settlement-action-definition hidden"></div>
+            </div><!-- panel-body -->
+          </div>
+        </div>
+        <div class="panel panel-default settlement-step-2">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Please Select Debit Type
+              </a>
+            </h4>
+          </div>
+          <div id="collapse-step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              {{!-- Content --}}
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default settlement-step-3">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#" aria-expanded="false" aria-controls="collapseTwo">
+                Confirm
+              </a>
+            </h4>
+          </div>
+          <div id="collapse-step-3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              {{!-- Content --}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

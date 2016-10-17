@@ -18,6 +18,11 @@
  *= require_tree .
 */
 
+@font-face {
+  font-family: "Bree Serif";
+  src: font_url('bree_regular.otf') format("opentype");
+}
+
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
@@ -25,7 +30,7 @@
 // Oh snap codes
 
 .alert-red {
-  color: white;
+  color: white; 
   background-color: #DA4453;
 }
 #ohsnap .alert-green {
