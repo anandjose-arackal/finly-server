@@ -75,6 +75,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'submit .navbar-form': 'cancelEvents'
 
     #New actions
+    # 'click .settlement-actions li': 'processCreditDebit'
     'click .btn-summary-action.btn-debit': 'processDebit'
     'click .btn-summary-action.btn-credit': 'processCredit'
     'change input[name=settlement_credit_action]': 'creditDebitOptions'
@@ -88,6 +89,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     'mouseenter ul.settlement-actions li': 'showActionDefinition'
     'mouseleave ul.settlement-actions li': 'hideActionDefinition'
+
+    #additional events/hacks
+    #set height of settlement action definition
+    'shown.bs.modal #modal-settlements': 'setHeight'
 
 
   initialize: (options) ->
@@ -717,8 +722,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     # div_definition = $(target).closest('.modal-body').find('.settlement-action-definition')
     # $(div_definition).addClass('hidden')
-
+  
   processDebit: (e) ->
+    _this = @
     e.preventDefault()
     target = e.currentTarget
 
@@ -729,9 +735,17 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     $(modal).html(@templateProcessDebit({summary: @selectedUserSummary}))
 
     #set height of summary
+    meta_data = {
+      height: 0
+    }
+    # $(".settlement-action-types").load(->
+    #   console.log "This is", this
+    #   meta_data.height = $(this).height()
+    # )
+    
     # console.log $(modal).find(".settlement-action-types").height()
     # console.log $(modal).find(".settlement-action-types").html()
-    # $(modal).find(".settlement-action-definition").height($(modal).find(".settlement-action-types").height())
+    # $(modal).find(".settlement-action-definition").height(meta_data.height)
 
 
   processCredit: (e) ->
@@ -743,6 +757,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     # console.log "Summary", @selectedUserSummary
     $(modal).html(@templateProcessCredit({summary: @selectedUserSummary}))
+
+  setHeight: (e) ->
+    target = e.currentTarget
+
+    setTimeout(->
+      console.log "height", $(target).find(".settlement-action-types ul.settlement-actions").height()
+      $(target).find(".settlement-action-definition").height($(target).find(".settlement-action-types ul.settlement-actions").height() - 20)
+    ,1)
 
   creditDebitOptions: (e) ->
     _this = @
