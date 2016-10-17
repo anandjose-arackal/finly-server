@@ -7,7 +7,7 @@ class FinlyF.Views.Report extends Backbone.View
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
   templateShowExpense: HandlebarsTemplates['finlyf/reports/expenses/show']
   templateExistingExpense: HandlebarsTemplates['finlyf/reports/expenses/existingExpenses']
-  className: 'item col-sm-12'
+  className: 'item col-sm-12 report'
 
   events:
     'click .select-item': 'toggleSelect'
@@ -77,6 +77,7 @@ class FinlyF.Views.Report extends Backbone.View
       $(@el).addClass('selected')
     else
       $(@el).removeClass('selected')
+    @parent.trigger('item:selected')
 
   populateDetails: ->
     @model.set('current_view', @current_view)

@@ -102,10 +102,3 @@ Handlebars.registerHelper('percentage', function(a, b){
   return parseInt(parseFloat(a) / parseFloat(b) * 100);
 })
 
-
-
-
-
-
-
-

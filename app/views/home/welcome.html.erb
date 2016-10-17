@@ -1,13 +1,14 @@
 <div class="jumbotron" style="min-height: 500px;">
   <div class="container">
     <div style="">
-      <img class="feature_image" src="<%= image_url('home_screen_bg.png') %>" style="">
+      <img class="feature_image" src="<%= image_url('landing/BG.png') %>" style="">
     </div>
 
 
-    <div class="text-center">
-      <h1 style="font-size: 40px; color: #F2EC5C; font-weight: 200;">Scalable &amp; Intelligent<br />Expense Management System</h1>
-      <p style="color: rgb(204, 204, 204); font-size: 16px; width: 500px; margin-left: auto; margin-right: auto;">Simplify expense management and payables processing so you can focus on the important things — like growing your business!</p>
+    <div class="text-center" style=" margin-bottom: 20px;">
+      <h1 style="font-size: 40px; color: #F2EC5C; font-weight: 200;">Expense Management for Businesses made Simple</h1>
+      <p style="color: rgb(204, 204, 204); margin-bottom: 50px; font-size: 16px; width: 500px; margin-left: auto; margin-right: auto;">Simplify expense management and payables processing so you can focus on the important things — like growing your business!</p>
+      <a class="btn-ghost-round btn-request-demo" href="#">Schedule a Demo</a>
     </div>
 
   </div>
@@ -112,9 +113,9 @@
 <!-- End Testimonials -->
 
 
-<div class="jumbotron" style="background-color: #F2F2F2; color: white;">
+<div class="jumbotron" style="background-color: #F2F2F2; color: white;" id="section-schedule-demo">
   <div class="container">
-    <h2 class="text-center" style="color: #456B9F;">Request Demo</h2>
+    <h2 class="text-center" style="color: #456B9F;">Schedule a Demo</h2>
     <div class="row">
       <div class="col-lg-6 text-center">
         <%= image_tag("landing/contact-us.png", class: 'img-responsive', style: "height: 290px; display: inline;") %>
@@ -122,7 +123,7 @@
 
       <div class="col-lg-5 col-lg-offset-1">
         <div style="display: inline-block; vertical-align: middle; height: 100%;">
-          <p style="color: #565656; font-size: 24px; font-weight: 500;">Interested in joining us early?<br />Leave us your contact details.</p>
+          <p style="color: #565656; font-size: 24px; font-weight: 500;">Interested in scheduling a demo?<br />Leave us your contact details.</p>
           <form id="form-request-demo" data-remote="true" method="post" action="<%= preview_registration_path %>">
             <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
             <div class="form-group">
@@ -136,86 +137,27 @@
         </div>
       </div>
     </div><!-- .row -->
-    <div class="row">
-      <div class="row no-margin">
-        <h2 class="text-center" style="font-weight: 100; color: #456B9F;">We are social</h2>
-        <div class="text-center">
-          <a href="http://facebook.com">
-            <%= image_tag("landing/social/facebook.png", height: "50", class: "social-icons") %>
-          </a>
-          <a href="#">
-            <%= image_tag("landing/social/twitter.png", height: "50", class: "social-icons") %>
-          </a>
-          <a href="#">
-            <%= image_tag("landing/social/linkedin.png", height: "50", class: "social-icons") %>
-          </a>
-          <a href="#">
-            <%= image_tag("landing/social/instgram.png", height: "50", class: "social-icons") %>
-          </a>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
 
 <footer>
-  <div class="footer" id="footer">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6">
-            <h4>Product</h4>
-            <!-- <hr /> -->
-            <ul>
-              <li> <a href="#">Features</a></li>
-              <li><a href="#">Security</a></li>
-              <li> <a href="#">Playstore</a></li>
-              <li> <a href="#">iTunes</a></li>
-            </ul>
-        </div>
-        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
-          <h4>Get in touch</h4>
-          <!-- <hr /> -->
-          <ul>
-            <li> <a href="#">Facebook</a> </li>
-            <li> <a href="#">Twitter</a> </li>
-            <li> <a href="#">LinkedIn</a> </li>
-            <li> <a href="#">Email</a> </li>
-          </ul>
-        </div>
-        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
-          <h4>Company</h4>
-          <!-- <hr /> -->
-          <ul>
-            <li> <a href="#">About Us</a> </li>
-            <li> <a href="#">Blog</a> </li>
-            <li> <a href="#">Team</a> </li>
-            <li> <a href="#">Jobs</a> </li>
-          </ul>
-        </div>
-        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
-          <h4>Other</h4>
-          <!-- <hr /> -->
-          <ul>
-            <li> <a href="#">Terms of Service</a> </li>
-            <li> <a href="#">Privacy Policy</a> </li>
-            <li> <a href="#">FAQ</a> </li>
-            <li><a href="#">Sitemap</a></li>
-          </ul>
-        </div>
-      </div>
-      <!--/.row-->
-    </div>
-    <!--/.container-->
-  </div>
-  <!--/.footer-->
-  <div class="container">
-    <hr />
-  </div>
-
   <div class="footer-bottom">
-    <div class="container">
-      <p class="pull-right" style="color: #eee; font-size: 11px;"> Copyright &#169; 2016 <span style="font-weight: bold;">Jouska</span>, Pvt. Tech. Ltd. </p>
+    <div class="container-fluid">
+      <div class="col-sm-9">
+        <ul class="footer-lined-links">
+          <li> <a href="https://fb.com/finly.io" target="_blank">Facebook</a> </li>
+          <li> <a href="https://www.twitter.com/finly" target="_blank">Twitter</a> </li>
+          <li> <a href="https://www.linkedin.com/company/finly.io" target="_blank">LinkedIn</a> </li>
+          <li> <a href="mailto:contact@finly.io">Email</a></li>
+          <li>|</li>
+          <li> <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" target="_blank">Play Store</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <p class="pull-right" style="color: #eee; font-size: 11px;"> Copyright &#169; 2016 Jouska Tech Pvt. Ltd. </p>
+      </div>
+      
     </div>
   </div>
   <!--/.footer-bottom-->
@@ -242,6 +184,11 @@
           }
         }
       });
+    });
+
+    $(".btn-request-demo").on('click', function(e){
+      e.preventDefault();
+      $(window).scrollTop(document.getElementById('section-schedule-demo').offsetTop - 50);
     });
   });
 </script>
@@ -379,5 +326,40 @@
 .animation-element {
   opacity: 0;
   position: relative;
+}
+
+.btn-ghost-round{
+  padding: 10px 20px;
+  border-radius: 30px;
+  background: transparent;
+  border: 2px solid #EDE763;
+  text-transform: uppercase;
+  color: white;
+}
+
+.btn-ghost-round:hover, .btn-ghost-round:active{
+  color: white;
+  text-decoration: none;
+}
+
+ul.footer-lined-links{
+  list-style-type: none;
+  display: inline-block;
+  padding-left: 0;
+}
+
+
+ul.footer-lined-links li{
+  display: inline-block;
+  padding: 0 10px;
+  color: white;
+}
+
+ul.footer-lined-links li a{
+  color: white;
+
+}
+ul.footer-lined-links li a:hover{
+  text-decoration: none;
 }
 </style>
