@@ -18,7 +18,7 @@ class UsersController < ApplicationController
   def index
     @result = User::Index.(current_user, params)
     respond_to do |format|
-      format.json { render json: @result.team.as_json }
+      format.json { render json: @result.paginated_team.as_json }
     end
   end
 
