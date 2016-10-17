@@ -137,7 +137,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           data: @params,
           success: (res)->
             console.log res
-            _this.toggleLoadMore(_this.collectionUsers)
+            _this.toggleLoadMoreUsers(_this.collectionUsers)
         })
         @params = options.params
         
