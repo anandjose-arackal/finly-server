@@ -1,0 +1,2 @@
+class FromCard
+end

@@ -1,0 +1,2 @@
+class FromWallet
+end

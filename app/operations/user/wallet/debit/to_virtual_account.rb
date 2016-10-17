@@ -1,0 +1,2 @@
+class ToVirtualAccount
+end
