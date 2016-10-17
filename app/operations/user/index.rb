@@ -29,7 +29,7 @@ class User::Index < User::Base
         self.users_type_count = self.team.joins(:role_mapping).group(:user_role_id).count
         self.users_status_count = self.team.group(:active).count
         self.pending_invites_count = self.team.pending.count
-        self.paginated_team = self.team.paginate(page: params[:page], per_page: 30)
+        self.paginated_team = self.team.paginate(page: params[:page], per_page: 2)
       end
     end
   end

@@ -13,6 +13,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .filter-state': 'filterState'
     'click .navbar-view-type': 'changeView'
 
+    'click .load-more-users': 'loadMoreUsers'
+
 
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
@@ -25,6 +27,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'submit .navbar-form': 'cancelEvents' 
 
   initialize: (options) ->
+    _this = @
     @params = options.params
     unless @params.filter_state
       @params.filter_state = 1
@@ -32,7 +35,10 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     @collection.fetch({
       reset: true,
       data: @params
+      success: ->
+        _this.toggleLoadMoreUsers(_this.collection)
     })
+    @dump = []
     @collection.on('reset', @processUsers, @)
     @on('refresh', @refetchCollection, @)
 
@@ -43,27 +49,28 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     FinlyF.structureActions(@el, @params) 
     @
 
-  loadMore: (e) ->
-    _this = @
-    target = $(e.currentTarget)
-    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
-    $(target).find('span').text('Loading....')
-    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+  # loadMore: (e) ->
+  #   _this = @
+  #   target = $(e.currentTarget)
+  #   $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+  #   $(target).find('span').text('Loading....')
+  #   @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
 
-    @collection.fetch({
-      data: _this.params,
-      reset: false,
-      success: ->
-        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
-        $(target).find('span').text('Load More')
-        _this.resetPageCount({target: target, page: _this.params.page })
+  #   @collection.fetch({
+  #     data: _this.params,
+  #     reset: false,
+  #     success: ->
+  #       _this.toggleLoadMoreUsers(_this.collection)
+  #       $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+  #       $(target).find('span').text('Load More')
+  #       _this.resetPageCount({target: target, page: _this.params.page })
 
-        _this.dump = (_this.dump.concat(_this.collection.models.slice())).slice()
-        _this.collection.reset(_this.dump)
+  #       _this.dump = (_this.dump.concat(_this.collection.models.slice())).slice()
+  #       _this.collection.reset(_this.dump)
 
-      error: ->
-        console.log "Couldn't fetch Successfully."
-    })
+  #     error: ->
+  #       console.log "Couldn't fetch Successfully."
+  #   })
 
   processUsers: ->
     # console.log "processing users"
@@ -129,6 +136,30 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
       error: ->
         console.log "Couldn't fetch successfully."
+    })
+
+  loadMoreUsers: (e) ->
+    e.preventDefault()
+    _this = @
+    target = $(e.currentTarget)
+    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+    $(target).find('span').text('Loading....')
+    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+
+    @collection.fetch({
+      data: _this.params,
+      reset: false,
+      success: ->
+        _this.toggleLoadMoreUsers(_this.collection)
+        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+        $(target).find('span').text('Load More')
+        _this.resetPageCount({target: target, page: _this.params.page })
+
+        _this.dump= (_this.dump.concat(_this.collection.models.slice())).slice()
+        _this.collection.reset(_this.dump)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
     })
 
   filterStatus: (e) ->
@@ -250,6 +281,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       @searchUser(e)
 
   searchUser: (e) ->
+    _this = @
     query = $(e.currentTarget).val()
     @collection.fetch({
       reset: true,
@@ -258,6 +290,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         filter_state: @params.filter_state
         filter_search: query
       }
+      success: ->
+        _this.toggleLoadMoreUsers(_this.collection)
     }) 
 
   ##Funactionalities
@@ -288,3 +322,11 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  toggleLoadMoreUsers: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 5
+      # console.log "Should hide"
+      $(@el).find('.load-more-users').css('display', 'none')
+    else
+      $(@el).find('.load-more-users').css('display', 'inline')

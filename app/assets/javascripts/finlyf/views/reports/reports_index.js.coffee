@@ -25,6 +25,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     'click .navbar-view-type': 'changeView'
 
     'click .btn-reset-filters': 'resetFilters'
+    'click .btn-report-export': 'exportReports'
     
 
     #Filters
@@ -52,6 +53,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
     @collection.on('reset', @processItems, @)
     @on('item:destroyed', @itemDeleted, @)
+    @on('item:selected', @reportsSelectOptions, @)
 
   render: ->
     $(@el).html(@templateSkeleton())
@@ -114,7 +116,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   appendItems: (item) ->
     # console.log "appending"
     #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Report({ model: item })
+    view_item = new FinlyF.Views.Report({ model: item, parent: @ })
     $(@el).find("#items").append(view_item.render().el)
     # console.log view_item.el
 
@@ -152,6 +154,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       for item in items
         $(item).removeClass("selected")
         $(item).find(".select-item").prop("checked", false)
+    @reportsSelectOptions()
 
   showDetails: (e) ->
     # bd = $("<div />", {
@@ -261,6 +264,17 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
+  reportsSelectOptions: (e) ->
+    items = $(@el).find('#items .item.report')
+    flag = false
+    for item in items
+      if $(item).find('.select-item').prop('checked')
+        flag = true
+    if flag == true
+      $(@el).find('.secondary-navbar .btn-export-options').css('display', 'inline')
+    else
+      $(@el).find('.secondary-navbar .btn-export-options').css('display', 'none')
+
   resetFilters: ->
     params = {}
     params.view = @params.view
@@ -367,6 +381,21 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  exportReports: (e) ->
+    e.preventDefault()
+    export_type = $(e.currentTarget).attr('data-export-type')
+    items = $(@el).find("#items .item.report")
+    reports = []
+    for item in items
+      selected_item = $(item).find('input.select-item')
+      if $(selected_item).prop('checked')
+        reports.push($(selected_item).attr('data-item-id'))
+
+    url = "/export/report." + export_type + "?report_id=" + reports.join(",") + "&view=" + (@params.view || 'personal')
+    console.log url
+    win = window.open(url, '_blank')
+    win.focus()
 
   # keyMappings: (e) ->
   #   console.log "Loggin keys", e.keyCode

@@ -48,6 +48,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .navbar-btn-refresh': 'refetchCollection'
     'click .item': 'showDetails'
     'click .load-more': 'loadMore'
+    'click .load-more-users': 'loadMoreUsers'
     'click .filter-status li a': 'filterStatus'
 
     'click .navbar-menu-li': 'navigate'
@@ -136,10 +137,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           data: @params,
           success: (res)->
             console.log res
+            _this.toggleLoadMore(_this.collectionUsers)
         })
         @params = options.params
         
     @dump = []
+    @dumpUsers = []
 
 
     
@@ -202,6 +205,30 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
+  loadMoreUsers: (e) ->
+    e.preventDefault()
+    _this = @
+    target = $(e.currentTarget)
+    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+    $(target).find('span').text('Loading....')
+    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+
+    @collectionUsers.fetch({
+      data: _this.params,
+      reset: false,
+      success: ->
+        _this.toggleLoadMore(_this.collectionUsers)
+        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+        $(target).find('span').text('Load More')
+        _this.resetPageCount({target: target, page: _this.params.page })
+
+        _this.dumpUsers = (_this.dumpUsers.concat(_this.collectionUsers.models.slice())).slice()
+        _this.collectionUsers.reset(_this.dumpUsers)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
+    })
+
   populateSummary: (id)->
     user_id = id || @user
     # console.log "populating"
@@ -228,7 +255,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   processUsers: ->
     console.log "processing users"
-    @dump = @collectionUsers.models.slice()
+    @dumpUsers = @collectionUsers.models.slice()
     $(@el).find("#users").html("")
 
     @collectionUsers.each(@appendUsers, @)
@@ -1047,3 +1074,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       memo + (value.get('reimbursement_amount') || value.get('total_amount'))
     ), 0)
     return total
+
+  toggleLoadMoreUsers: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 5
+      # console.log "Should hide"
+      $(@el).find('.load-more-users').css('display', 'none')
+    else
+      $(@el).find('.load-more-users').css('display', 'inline')
