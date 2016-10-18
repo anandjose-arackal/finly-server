@@ -1,2 +1,0 @@
-class FromWallet
-end
