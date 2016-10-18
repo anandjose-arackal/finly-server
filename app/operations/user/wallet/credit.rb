@@ -1,4 +1,3 @@
-
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Credit < User::Wallet::Base
   attr_accessor :from_user, :to_user, :from_account, :to_account, :amount
@@ -77,6 +76,8 @@ class User::Wallet::Credit < User::Wallet::Base
         if to_account == :wallet
 
           if to_user.wallet.add_funds(self.amount)
+            user.company.account.funds_credited_to_wallet(self.amount)
+
             payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)
             to_user.payments.create payment_attributes
           else

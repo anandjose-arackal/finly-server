@@ -102,6 +102,8 @@ class User::Wallet::Debit < User::Wallet::Base
           payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
           if from_user.wallet.subtract_funds(self.amount)
+            user.company.account.funds_debited_from_wallet(self.amount)
+
             payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)
             to_user.payments.create payment_attributes
           else

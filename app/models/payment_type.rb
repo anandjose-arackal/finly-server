@@ -17,7 +17,7 @@ class PaymentType < ActiveRecord::Base
            initiate_credit_from_wallet_to_wallet: 7, receive_credit_from_wallet_to_wallet: 8,
            initiate_credit_from_wallet_to_card: 9, receive_credit_from_wallet_to_card: 10,
            initiate_debit_from_wallet_to_wallet: 11, receive_debit_from_wallet_to_wallet: 12,
-           initiate_debit_from_wallet_to_virtual_account: 13}
+           receive_debit_from_wallet_to_virtual_account: 13}
 
   def self.id_for(key)
     TYPES[key]
