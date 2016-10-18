@@ -722,7 +722,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     # div_definition = $(target).closest('.modal-body').find('.settlement-action-definition')
     # $(div_definition).addClass('hidden')
-  
+
   processDebit: (e) ->
     _this = @
     e.preventDefault()
@@ -843,10 +843,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
       when 'credit_cash_advance'
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Add Cash Advance")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Input Amount to be Credited")
         #Append base structure
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCashAdvance({summary: @selectedUserSummary}))
       when 'credit_money_request'#advance funds request
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Credit Advance Requests")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Select Pending Advanced Requests to be Credited")
         #Append base structure
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditMoneyRequest({summary: @selectedUserSummary}))
 
@@ -877,21 +879,26 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         })
       when 'credit_card_from_card'
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Credit from Your Card")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Input Amount to be Credited from Your Card")
         # console.log "Credit card from card" 
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromCard({summary: @selectedUserSummary}))
       when 'credit_card_from_company_credits'
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Credit from Company Credits")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Input Amount to be Credited from Your Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromCompanyCredits({summary: @selectedUserSummary}))
       #DEBIT ACTIONS
       when 'debit_cash_advance'
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Debit Cash Advance")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Input Amount to be Debited from Employee's Cash in Hand")
         #Append base structure
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCashAdvance({summary: @selectedUserSummary}))
       when 'debit_card_to_card' 
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Debit Balance to Your Card")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Input Amount to be Debited from Employee's Card to Your Card")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToCard({summary: @selectedUserSummary}))
       when 'debit_card_to_company_credits' 
         $(modal_body).find(".settlement-step-1 .panel-title a").text("Type: Debit Balance to Company Credits")
+        $(modal_body).find(".settlement-step-2 .panel-title a").text("Input Amount to be Debited from Employee's Card to Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToCompanyCredits({summary: @selectedUserSummary}))
 
     $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
@@ -1099,7 +1106,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   toggleLoadMoreUsers: (collection) ->
     # console.log "Loading", collection.models.length
-    if collection.models.length < 5
+    if collection.models.length < 30
       # console.log "Should hide"
       $(@el).find('.load-more-users').css('display', 'none')
     else
