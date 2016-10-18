@@ -264,10 +264,7 @@
         </div>
         <div class="user-name">{{item.user.name}}</div>
         <div class="visa"><i class="fa fa-cc-visa"></i></div>
-        {{!-- <div class="card-balance text-center">
-          <label class="balance">&nbsp;</label>
-          <button class="btn btn-ghost btn-card-request-balance">Request Balance</button>
-        </div> --}}
+        
       </div>
     </div>
 
@@ -322,7 +319,11 @@
             {{/if}}
           </ul>
         </div>
-      {{/ifCond}} 
+      {{/ifCond}}
+      <div class="card-balance">
+        <label class="balance">&nbsp;</label>
+        <button class="btn btn-card-request-balance">Request Balance</button>
+      </div>
 
     </div>
   </div>
