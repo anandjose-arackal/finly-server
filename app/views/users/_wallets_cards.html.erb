@@ -1,0 +1,90 @@
+<div class="row no-margin">
+  <div class="col-sm-4 no-padding">
+    <div class="row no-margin section-title">
+      <div class="col-sm-6">
+        <h4>Wallet</h4>
+      </div>
+      <div class="col-sm-6 text-right">
+        <button class="btn btn-success btn-sm btn-transfer" data-transfer="wallet-to-card">Transfer to Card</button>
+      </div>
+
+    </div> 
+    <div class="row no-margin" style="margin-top: 20px;">
+      <div class="col-sm-4">
+        <label class="control-label" style="font-size: 20px; font-weight: normal;">Balance:</label>
+      </div>
+      <div class="col-sm-8" style="font-size: 25px; color: #2ECC71;">
+        <span>&#8377;&nbsp;&nbsp;5000.00</span>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="col-sm-8 no-padding" style="padding-left: 10px;">
+    <div class="row no-margin section-title">
+      <div class="col-sm-6">
+        <h4>Cards</h4>
+      </div>
+      <div class="col-sm-6 text-right">
+        <button class="btn btn-success btn-sm btn-transfer" data-transfer="card-to-wallet">Transfer to Wallet</button>
+      </div>
+    </div>
+    <div class="row no-margin" style="padding: 10px;">
+      <% current_user.cards.each do |card| %>
+        <div class="card text-center" style="display: inline-block;">
+          <div class="logo">Finly</div>
+          <div class="status">
+            <% if card.active %>
+              <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label>
+            <% else %>
+              <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
+            <% end %>
+          </div>
+          <div class="card-type">Expense Card</div>
+          <div class="card-number">
+            <span class="first-four">XXXX</span>
+            <span class="second-four">XXXX</span>
+            <span class="third-four">XXXX</span>
+            <span class="fourth-four"><%= card.ending_number %></span>
+          </div>
+          <div class="user-name"><%= card.user.name %></div>
+          <div class="visa"><i class="fa fa-cc-visa"></i></div>
+        </div>
+        <div class="card-balance" style="display: inline-block; position: absolute; margin-left: 15px;">
+          <label class="control-label" style="font-size: 20px; font-weight: normal;">Card Balance:</label>
+          <span class="balance" style="font-size: 25px; color: #2ECC71;">&#8377;&nbsp;&nbsp;5000.00</span>
+        </div>
+      <% end %>    
+    </div>
+     
+  </div>
+
+</div>
+
+<style type="text/css">
+  .section-title{
+    background: #DDDAEA;
+    padding: 0 10px;
+  }
+</style>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    //Get card balance and populate
+  });
+
+  $(".btn-transfer").on('click', function(e){
+    console.log(this);
+    transfer_type = $(this).attr('data-transfer')
+    switch(transfer_type) {
+      case 'wallet-to-card':
+        // show modal
+        break;
+      case 'card-to-wallet':
+        // show modal
+      }
+    //Show modal for collecting amoutn and password
+
+    //Send data 
+  });
+</script>

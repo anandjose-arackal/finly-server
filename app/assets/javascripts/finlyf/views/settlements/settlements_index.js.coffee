@@ -973,11 +973,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-3 .panel-title a").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToCardConfirm({summary: @selectedUserSummary}))
         _this.settlementActionData.d_card_to_card.amount = $(container).find('input[name=amount]').val()
-      when 'debit_card_to_company_credits' 
+      when 'debit_card_to_company_credits'
+        console.log "First"
         $(modal_body).find(".settlement-step-3 .panel-title a").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToCompanyCreditsConfirm({summary: @selectedUserSummary}))
         _this.settlementActionData.d_card_to_company_credits.amount = $(container).find('input[name=amount]').val()
-    # console.log _this.settlementActionData
+    console.log _this.settlementActionData
     $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   submitAction: (e) ->
@@ -996,6 +997,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     data = {}
     data.view = _this.params.view
     data.authenticity_token = $("#authenticity_token").val()
+    console.log action_type
 
     switch action_type
       when 'credit_reimbursement'
@@ -1057,6 +1059,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.amount = _this.settlementActionData.d_card_to_company_credits.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.from_user_id = _this.user_id
+        console.log data
 
     console.log data
     $.ajax({
