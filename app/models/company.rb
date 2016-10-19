@@ -20,6 +20,7 @@ class Company < ActiveRecord::Base
   has_one :configuration, class_name: 'CompanyConfiguration', dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :export_preferences, dependent: :destroy
+  has_one :account, class_name: 'CompanyAccount'
 
   accepts_nested_attributes_for :configuration
 
@@ -60,10 +61,14 @@ class Company < ActiveRecord::Base
 
   def init_config_present
     self.build_configuration.save unless self.configuration.present?
+
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
     DEFAULT_CATEGORIES.each do |category|
       self.categories.create(name: category)
     end
+
+    self.build_account.save if self.account.blank?
   end
+
 end

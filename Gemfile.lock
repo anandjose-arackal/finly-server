@@ -18,6 +18,16 @@ GIT
       sprockets (< 4.1)
 
 GIT
+  remote: git://github.com/opro/opro.git
+  revision: 6e0fe4e3a0975eb151acf10e6b5f4d131ca26380
+  branch: master
+  specs:
+    opro (0.5.0)
+      jbuilder (~> 2.3)
+      kramdown
+      rails (>= 3.1.0)
+
+GIT
   remote: git://github.com/ramanbedi1989/proselytism.git
   revision: bcb1713c0585eb7f733fc4f3752635c073e8a905
   specs:
@@ -227,9 +237,6 @@ GEM
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
-    opro (0.5.0)
-      kramdown
-      rails (>= 3.1.0)
     orm_adapter (0.5.0)
     paper_trail (5.1.1)
       activerecord (>= 3.0, < 6.0)
@@ -400,7 +407,7 @@ DEPENDENCIES
   jquery-ui-rails
   mysql2 (>= 0.3.13, < 0.5)
   nokogiri (= 1.6.8)
-  opro
+  opro!
   paper_trail (~> 5.1.1)
   paperclip
   proselytism!
