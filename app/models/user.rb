@@ -44,7 +44,6 @@
 #
 
 
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -58,6 +57,8 @@ class User < ActiveRecord::Base
 
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
+  has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
+
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
@@ -166,6 +167,7 @@ class User < ActiveRecord::Base
     # self.build_profile.save if self.profile.blank?
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
     self.build_balance_sheet.save if self.balance_sheet.blank?
+    self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
   end
 
   def name

@@ -18,6 +18,6 @@ Gemfile.lock
 
 /.idea
 .vagrant/
-Vagrantfile
-bootstrap.sh
+#Vagrantfile
+#bootstrap.sh
 vendor/bundle/
