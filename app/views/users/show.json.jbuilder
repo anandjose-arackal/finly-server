@@ -89,3 +89,9 @@ json.card do
     json.extract! card, :ending_number, :description, :active, :serial_id
   end
 end
+
+# Todo Wallet
+json.wallet do
+  json.balance 4000.00
+  
+end

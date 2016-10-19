@@ -15,7 +15,8 @@
  *= require jquery-ui
  *= require animate
  *= require_self
- *= require_tree .
+ *= require_tree "."
+ *= stub 'application_static'
 */
 
 @font-face {

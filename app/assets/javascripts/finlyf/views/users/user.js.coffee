@@ -360,6 +360,9 @@ class FinlyF.Views.User extends Backbone.View
           $(modal).modal('hide')
           $(modal).html("")
           #Update current card balance.
+          $(_this.el).find(".card-balance").find(".balance").html("&nbsp;")
+          $(_this.el).find(".btn-card-request-balance").text("Request Balance")
+
         else
           console.log res
           $(target).attr("disabled", true)
