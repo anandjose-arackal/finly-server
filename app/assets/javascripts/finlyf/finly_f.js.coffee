@@ -117,4 +117,19 @@ window.FinlyF =
 
 $(document).ready ->
   FinlyF.initialize()
-
+  $("#modal-balance").on("shown.bs.modal", (e) ->
+    e.preventDefault()
+    user_id = $(this).find(".modal-body").attr('data-user-id')
+    $.ajax({
+      dataType: "json"
+      type : 'get'
+      url: '/balance/'
+      data:
+        user_id: user_id
+      success: (data) ->
+        # response(data)
+        console.log data
+      error: (err) ->
+        console.log err
+    })
+  )

@@ -38,8 +38,14 @@
           <% if value == '/users/' %>
             <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
           <% else %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+            <!-- Special Functionality for my balance -->
+            <% if key =~ /balance/i %>
+              <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li>
+            <% else %>
+              <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+            <% end %>
           <% end %>
+
         <% end %>
       <% end %>
     <% elsif current_user.finance_manager? %>
@@ -123,3 +129,15 @@
 <div id="ohsnap"></div>
 <div id="ohsnap-priority"></div>
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-balance">
+  <div class="modal-dialog" role="document" style="width: 60%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">My Balance</h4>
+      </div>
+      <div class="modal-body" data-user-id="<%= current_user.id %>">
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

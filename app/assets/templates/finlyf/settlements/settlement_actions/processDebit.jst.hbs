@@ -6,13 +6,23 @@
     </div>
     <div class="modal-body">
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        <div class="panel panel-default settlement-step-1">
+        <div class="panel panel-default settlement-step-1 active" data-step="1" data-navigate="1">
           <div class="panel-heading" role="tab" id="headingOne">
-            <h4 class="panel-title">
-              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
-                Please Select Debit Type
-              </a>
-            </h4>
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Please Select Debit Type</span>
+                  
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
           </div>
           <div id="collapse-step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
             <div class="panel-body">
@@ -35,6 +45,24 @@
                       <label class="hidden">Debit from employee's card to your own card.</label>
                     </li> 
                   {{/if}}
+
+                  {{#if summary.actions.debit_card_to_wallet}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_wallet" /> Debit from Card to Wallet
+                      </label>
+                      <label class="hidden">Debit from employee's card to your wallet.</label>
+                    </li> 
+                  {{/if}}
+
+                  {{#if summary.actions.debit_wallet_to_wallet}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from Wallet to Wallet
+                      </label>
+                      <label class="hidden">Debit from employee's wallet to your wallet.</label>
+                    </li> 
+                  {{/if}}
                   
                   {{#if summary.actions.debit_card_to_company_credits}}
                     <li>
@@ -51,13 +79,23 @@
             </div><!-- panel-body -->
           </div>
         </div>
-        <div class="panel panel-default settlement-step-2">
+        <div class="panel panel-default settlement-step-2" data-step="2" data-navigate="0">
           <div class="panel-heading" role="tab" id="headingTwo">
-            <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Please Select Debit Type
-              </a>
-            </h4>
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Please Select Debit Type</span>
+                  
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
           </div>
           <div id="collapse-step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
             <div class="panel-body">
@@ -66,13 +104,22 @@
           </div>
         </div>
 
-        <div class="panel panel-default settlement-step-3">
+        <div class="panel panel-default settlement-step-3" data-step="3" data-navigate="0">
           <div class="panel-heading" role="tab" id="headingTwo">
-            <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#" aria-expanded="false" aria-controls="collapseTwo">
-                Confirm
-              </a>
-            </h4>
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Confirmation</span>
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
           </div>
           <div id="collapse-step-3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
             <div class="panel-body">

@@ -7,6 +7,7 @@ json.cash_in_card 200
 
 json.company_credits 20000
 json.current_user_cash_in_card 2000
+json.current_user_wallet_balance 13000
 #dummy values end here
 
 
