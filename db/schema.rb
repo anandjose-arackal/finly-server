@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161013064003) do
+ActiveRecord::Schema.define(version: 20161018100357) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -240,6 +240,18 @@ ActiveRecord::Schema.define(version: 20161013064003) do
     t.boolean  "active",                 default: true, null: false
     t.string   "d_code",     limit: 255
   end
+
+  create_table "company_accounts", force: :cascade do |t|
+    t.integer  "company_id",        limit: 4, null: false
+    t.integer  "wallet_balance_id", limit: 4
+    t.integer  "company",           limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "company_accounts", ["company"], name: "index_company_accounts_on_company", using: :btree
+  add_index "company_accounts", ["company_id"], name: "index_company_accounts_on_company_id", using: :btree
+  add_index "company_accounts", ["wallet_balance_id"], name: "index_company_accounts_on_wallet_balance_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                   null: false
@@ -866,6 +878,38 @@ ActiveRecord::Schema.define(version: 20161013064003) do
 
   add_index "user_tags", ["user_id"], name: "index_user_tags_on_user_id", using: :btree
 
+  create_table "user_wallet_track_actions", force: :cascade do |t|
+    t.string   "CreateUserWallets", limit: 255, null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  create_table "user_wallet_tracks", force: :cascade do |t|
+    t.integer  "user_wallet_id",              limit: 4, null: false
+    t.integer  "user_wallet_track_action_id", limit: 4, null: false
+    t.integer  "amount_id",                   limit: 4, null: false
+    t.integer  "action_user_id",              limit: 4, null: false
+    t.integer  "balance_after_action_id",     limit: 4, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "user_wallet_tracks", ["action_user_id"], name: "index_user_wallet_tracks_on_action_user_id", using: :btree
+  add_index "user_wallet_tracks", ["amount_id"], name: "index_user_wallet_tracks_on_amount_id", using: :btree
+  add_index "user_wallet_tracks", ["balance_after_action_id"], name: "index_user_wallet_tracks_on_balance_after_action_id", using: :btree
+  add_index "user_wallet_tracks", ["user_wallet_id"], name: "index_user_wallet_tracks_on_user_wallet_id", using: :btree
+  add_index "user_wallet_tracks", ["user_wallet_track_action_id"], name: "index_user_wallet_tracks_on_user_wallet_track_action_id", using: :btree
+
+  create_table "user_wallets", force: :cascade do |t|
+    t.integer  "balance_id", limit: 4, null: false
+    t.integer  "user_id",    limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "user_wallets", ["balance_id"], name: "index_user_wallets_on_balance_id", using: :btree
+  add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "",    null: false
     t.string   "encrypted_password",     limit: 255, default: "",    null: false
@@ -956,6 +1000,7 @@ ActiveRecord::Schema.define(version: 20161013064003) do
   add_foreign_key "cards", "companies"
   add_foreign_key "cards", "users"
   add_foreign_key "categories", "companies"
+  add_foreign_key "company_accounts", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_tags", "companies"
@@ -1016,5 +1061,9 @@ ActiveRecord::Schema.define(version: 20161013064003) do
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
   add_foreign_key "user_tags", "users"
+  add_foreign_key "user_wallet_tracks", "amounts"
+  add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
+  add_foreign_key "user_wallet_tracks", "user_wallets"
+  add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
 end
