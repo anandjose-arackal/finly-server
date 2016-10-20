@@ -59,7 +59,7 @@ class MoneyRequest::Base < BaseOperation
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)
           if self.money_request.payment_mode_card?
             if user.company_admin?
-              actions[:credit_card_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+              actions[:credit_card_from_company_credits]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
                                                                                                                         view: params[:view])}
             end
             actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
