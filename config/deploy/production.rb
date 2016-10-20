@@ -8,6 +8,8 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 server 'www.finly.io', user: 'deploy', roles: %w{web app db}
+set :rvm_type, :user
+set :rvm_ruby_version, 'ruby-2.3.0' # Edit this if you are using MRI Ruby
 
 # role-based syntax
 # ==================
