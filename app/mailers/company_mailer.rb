@@ -5,6 +5,7 @@ class CompanyMailer < ApplicationMailer
     @reference_id = transaction_details[:transaction_id]
     @date = transaction_details[:date]
     @remarks = transaction_details[:remarks]
-    mail to: CONSTANTS::ITZCASH_EMAIL_ID, subject: 'Welcome to Finly!'
+    @company = transaction_details[:company]
+    mail to: CONSTANTS::ITZCASH_EMAIL_ID, subject: 'Transaction Details for Company: #{transaction_details[:company]}'
   end
 end

@@ -427,6 +427,10 @@ Rails.application.routes.draw do
 
   resources :export_preferences
 
+  resources :companies do
+    post 'add_balance', to: 'companies#add_balance', as: :add_balance
+  end
+
   get 'organization_account' => 'organization_account#show'
   post 'add_category', to: 'organization_account#add_category', as: :add_category
   delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
