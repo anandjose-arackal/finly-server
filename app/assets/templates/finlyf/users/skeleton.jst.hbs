@@ -233,8 +233,12 @@
 section {
   padding: 20px;
   background: white;
-  border-bottom: 1px solid #eee;
+  /*border-bottom: 1px solid #eee;*/
   margin-bottom: 5px;
+}
+
+.user-details{
+  height: 100%;
 }
 </style>
 
@@ -289,12 +293,12 @@ section {
 <nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="margin-top: 53px; border-color: transparent; z-index: 5;">
   <div class="container-fluid">
     <div class="row no-margin no-padding">
-      <div class="col-sm-3 no-padding" style="">
+      <div class="col-sm-2 no-padding" style="">
         <div class="navbar-header navbar-sidebar" style="width: 100%;">
           {{!-- navbar_sidebar.jst.hbs partial --}}
         </div>
       </div>
-      <div class="col-sm-9" style="">
+      <div class="col-sm-10" style="">
         <div class="navbar-collapse collapse navbar-main">
           {{!-- navbar_main.jst.hbs partial --}}
         </div><!--/.nav-collapse -->    
@@ -304,7 +308,7 @@ section {
 </nav>
 
 <div class="container-fluid container-main" style="margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-  <div class="col-sm-3 sidebar no-padding">
+  <div class="col-sm-2 sidebar no-padding">
   
     <div class="row no-margin">
       <form class="navbar-form" role="search">
@@ -324,7 +328,7 @@ section {
     </div>
   </div>
 
-  <div class="col-sm-9 col-sm-offset-3 main no-padding" id="user-details" style="padding: 10px;">
+  <div class="col-sm-10 col-sm-offset-2 main no-padding" id="user-details" style="">
     <div class="row no-margin">
       <div class="col-sm-10 col-sm-offset-1">
         <h2>Please Select an Employee from the list on the left to view/edit their details, policies, roles etc.</h2>
