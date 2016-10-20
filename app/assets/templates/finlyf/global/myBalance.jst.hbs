@@ -1,0 +1,49 @@
+<div class="row no-margin">
+  <div class="col-sm-10 col-sm-offset-1">
+    <div class="row no-margin">
+      <div class="col-sm-6 balance-container text-center">
+        <div>
+          <h3>&#8377;&nbsp;&nbsp;{{item.cash_in_card}}</h3>
+          <label>Cash in Card</label>
+        </div>
+      </div>
+
+      <div class="col-sm-6 balance-container text-center">
+        <div>
+          <h3>&#8377;&nbsp;{{item.cash_in_hand}}</h3>
+          <label>Cash in Hand</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-6 balance-container text-center">
+        <div>
+          <h3>&#8377;&nbsp;{{item.cash_in_wallet}}</h3>
+          <label>Cash in Wallet</label>
+        </div>
+      </div>
+
+      {{#if item.company_credits}}
+      <div class="col-sm-6 balance-container text-center">
+        <div>
+          <h3>&#8377;&nbsp;{{item.company_credits}}</h3>
+          <label>Company Credits</label>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+.balance-container{
+  display: flex;
+  align-items: center;
+  min-height: 150px;
+}
+.balance-container div{
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
