@@ -16,9 +16,13 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def process
-    # todo hit api to calculate balance here
+    response = ItzCash::VirtualAccountBalance.(user)
+    unless response.success?
+      add_message :error, response.messages[:error]
+      return
+    end
 
-    itzcash_balance = 20000
+    itzcash_balance = response.wallets.first[:balance]
     self.balance = (itzcash_balance - total_wallet_balance)
   end
 

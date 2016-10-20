@@ -1,6 +1,6 @@
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Credit < User::Wallet::Base
-  attr_accessor :from_user, :to_user, :from_account, :to_account, :amount
+  attr_accessor :from_user, :to_user, :from_account, :to_account, :amount, :to_user_payment, :from_user_payment
 
   def authorized_user_types
     if params.present? and params[:from_account].present? and params[:to_account].present?
@@ -58,7 +58,15 @@ class User::Wallet::Credit < User::Wallet::Base
       add_message :error, 'Invalid Request'
     end
     if from_account == :virtual_account
-      # todo check virtual account balance to ensure sufficient funds exist to initiate the transfer
+      balance_presenter = Company::VirtualAccount::Balance.(user, params)
+      if balance_presenter.success?
+        balance_amount = balance_presenter.balance
+        if balance_amount < self.amount
+          add_message :error, 'Insufficient balance in your Finly Account to initiate this transfer'
+        end
+      else
+        add_message :error, balance_presenter.messages[:error]
+      end
     end
   end
 
@@ -79,7 +87,7 @@ class User::Wallet::Credit < User::Wallet::Base
             user.company.account.funds_credited_to_wallet(self.amount)
 
             payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)
-            to_user.payments.create payment_attributes
+            self.to_user_payment = to_user.payments.create payment_attributes
           else
             add_message :error, to_user.wallet.errors.full_messages
           end
@@ -92,7 +100,7 @@ class User::Wallet::Credit < User::Wallet::Base
             return
           end
           payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_card)
-          to_user.payments.create payment_attributes
+          self.to_user_payment =to_user.payments.create payment_attributes
 
         end
       when :wallet
@@ -114,10 +122,10 @@ class User::Wallet::Credit < User::Wallet::Base
           if from_user.wallet.subtract_funds(self.amount)
             to_user.wallet.add_funds(self.amount)
             payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)
-            from_user.payments.create payment_from_attributes
+            self.from_user_payment =from_user.payments.create payment_from_attributes
 
             payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_wallet)
-            to_user.payments.create payment_to_attributes
+            self.to_user_payment =to_user.payments.create payment_to_attributes
           else
             add_message :error, from_user.wallet.errors.full_messages
           end
@@ -129,16 +137,31 @@ class User::Wallet::Credit < User::Wallet::Base
             from_user.wallet.subtract_funds(self.amount)
 
             payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_card)
-            from_user.payments.create payment_from_attributes
+            self.from_user_payment =from_user.payments.create payment_from_attributes
 
             payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_card)
-            to_user.payments.create payment_to_attributes
+            self.to_user_payment =to_user.payments.create payment_to_attributes
 
           else
             add_message :error, credit_presenter.messages[:error]
           end
 
         end
+    end
+  end
+
+  def success
+    params[:to_user_payment] = self.to_user_payment
+    params[:from_user_payment] = self.from_user_payment
+    User::Wallet::Credit::SuccessPresenter.new(user, params, messages)
+  end
+
+  class User::Wallet::Credit::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :to_user_payment, :from_user_payment
+
+    def init
+      self.from_user_payment = params[:from_user_payment]
+      self.to_user_payment = params[:to_user_payment]
     end
   end
 

@@ -117,4 +117,23 @@ window.FinlyF =
 
 $(document).ready ->
   FinlyF.initialize()
-
+  templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
+  $("#modal-balance").on("shown.bs.modal", (e) ->
+    _this = this
+    e.preventDefault()
+    user_id = $(this).find(".modal-body").attr('data-user-id')
+    $.ajax({
+      dataType: "json"
+      type : 'get'
+      url: '/settlements/summary?view_to_load=payments&view=personal'
+      data:
+        # user_id: user_id
+        authenticity_token: $("#authenticity_token").val()
+      success: (data) ->
+        # response(data)
+        $(_this).find('.modal-body').html(templateBalance({item: data}))
+        console.log data
+      error: (err) ->
+        console.log err
+    })
+  )

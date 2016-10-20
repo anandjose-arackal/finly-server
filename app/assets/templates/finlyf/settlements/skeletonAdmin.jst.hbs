@@ -270,6 +270,71 @@ ul.settlement-actions li label{
   background: #DDDAEA;
   height: 10px;
 }
+
+
+.panel-group .panel{
+  border-radius: 0;
+  /*margin-top: 0;*/
+}
+
+.panel-group .panel + .panel {
+  margin-top: 0;
+}
+
+.panel-default{
+  border: none;
+  border-left: 1px solid #a29bd1;
+  border-right: 1px solid #a29bd1;
+  border-top: 1px solid #a29bd1;
+}
+
+.panel-default:last-child{
+  border-bottom: 1px solid #a29bd1;
+}
+
+.panel-heading{
+  padding: 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.panel-default > .panel-heading{
+  background-color: #a29bd1;
+  border-bottom: 1px solid white;
+}
+
+.panel-default:last-child > .panel-heading{
+  background-color: #a29bd1;
+  border-bottom: none;
+}
+
+.panel-body{
+  background: #F8F8FC;
+}
+
+.panel[data-navigate="0"] .panel-heading .row{
+  cursor: not-allowed;
+}
+
+.panel[data-navigate="1"] .panel-heading .row{
+  cursor: pointer;
+}
+
+.panel.active .step-title .fa-plus{
+  display: none;
+}
+
+.panel.active .step-title .fa-minus{
+  display: inline;
+}
+
+.panel .step-title .fa-plus{
+  display: inline;
+}
+
+.panel .step-title .fa-minus{
+  display: none;
+}
 </style>
 
 
@@ -338,9 +403,8 @@ ul.settlement-actions li label{
       <div class="col-md-9" style="">
         <div class="navbar-collapse collapse navbar-main">
           <ul class="navbar-nav nav">
-            <li><a>Company Balance: 50,500.00</a></li>
-            <li><a>Your Wallet Balance: 2,500.00</a></li>
-            <li><a>Your Card Balance: 10,500.00</a></li>
+            <li class="hidden"><a style="font-size: 17px;">Company Balance: &#8377;&nbsp;<span class="company-balance">50,500.00</span></a></li>
+            <li class="hidden"><a style="font-size: 17px;">Your Wallet Balance: &#8377;&nbsp;<span class="user-wallet-balance">2000.00</span></a></li>
           </ul>
         </div><!--/.nav-collapse -->    
       </div>
