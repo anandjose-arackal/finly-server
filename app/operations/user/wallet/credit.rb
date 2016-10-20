@@ -58,7 +58,15 @@ class User::Wallet::Credit < User::Wallet::Base
       add_message :error, 'Invalid Request'
     end
     if from_account == :virtual_account
-      # todo check virtual account balance to ensure sufficient funds exist to initiate the transfer
+      balance_presenter = Company::VirtualAccount::Balance.(user, params)
+      if balance_presenter.success?
+        balance_amount = balance_presenter.balance
+        if balance_amount < self.amount
+          add_message :error, 'Insufficient balance in your Finly Account to initiate this transfer'
+        end
+      else
+        add_message :error, balance_presenter.messages[:error]
+      end
     end
   end
 
