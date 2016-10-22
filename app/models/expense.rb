@@ -19,7 +19,6 @@
 #
 
 
-
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -79,6 +78,8 @@ class Expense < ActiveRecord::Base
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
+  scope :with_user, ->(user_id) { where user_id: user_id }
+  scope :with_user_or_report, ->(user_id, report_id) { where('report_id IN (?) OR user_id IN (?)', report_id, user_id) }
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
@@ -126,8 +127,8 @@ class Expense < ActiveRecord::Base
   scope :manual, -> { joins(:manual_expense) }
   scope :card, -> { joins(:card_expense) }
 
-  scope :only_card_expenses, -> {where(expense_type_id: 2)}
-  scope :only_manual_expenses, -> {where(expense_type_id: 1)}
+  scope :only_card_expenses, -> { where(expense_type_id: 2) }
+  scope :only_manual_expenses, -> { where(expense_type_id: 1) }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }

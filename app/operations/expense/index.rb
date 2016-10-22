@@ -31,11 +31,10 @@ class Expense::Index < Expense::Base
       self.expenses = user.expenses.includes(:manual_expense).includes(:card_expense)
     else
       report_ids = Report::Index.(user, params).reports.pluck(:id)
-      self.expenses = Expense.where(report_id: report_ids).includes(:manual_expense).includes(:card_expense)
-
       # adding all card expenses of the users in the team
       team_user_ids = User::Index.(user, params).team.pluck(:id)
-      self.expenses += Expense.where(user_id: team_user_ids).only_card_expenses
+
+      self.expenses = Expense.with_user_or_report(report_ids, team_user_ids).includes(:manual_expense).includes(:card_expense)
     end
   end
 
