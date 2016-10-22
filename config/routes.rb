@@ -493,6 +493,7 @@ Rails.application.routes.draw do
     patch 'update_role', to: 'users#update_user_role', as: :update_role
     get 'profile', to: 'users#profile', as: :profile
     post 'update_password', to: 'users#update_password', as: :update_password
+    get 'balance', to: 'users#balance', as: :balance
   end
 
   # routes for testing import

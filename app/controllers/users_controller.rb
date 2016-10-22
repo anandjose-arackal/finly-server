@@ -66,6 +66,18 @@ class UsersController < ApplicationController
     end
   end
 
+  # params = {require_card_balance: true(default)/false, user_id: 1}
+  def balance
+    @result = User::Balance.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json { render json: @result.balances }
+      end
+    else
+      respond response: :failure
+    end
+  end
+
   private
   def update_handler(type = nil)
     unless type
