@@ -86,6 +86,7 @@ class BaseHandler
     return unless p.present?
     begin
       self.response = self.connection.post p, param
+      puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
       messages[:error] << 'Request timedout. Please try again'

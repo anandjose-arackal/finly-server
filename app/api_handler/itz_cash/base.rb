@@ -18,7 +18,7 @@ class ItzCash::Base < BaseHandler
   def failure
     if response_code.present? and not response_code.to_i == 0
       error_message = Constants::ItzCash::ERROR_CODES[response_code.to_i]
-      error_message = 'Unknown error which performing the action' if error_message.blank?
+      error_message = 'Unknown error while performing the action' if error_message.blank?
       add_message :error, error_message
     end
     # add_message :error, self.parsed_response.last if self.parsed_response.present?

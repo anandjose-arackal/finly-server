@@ -35,7 +35,8 @@ class MoneyRequest::Base < BaseOperation
 
   class MoneyRequest::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_request, :items, :manager, :finance_manager, :status, :total, #:money_request_currency,
-                  :required_by_date, :comments, :actions, :policies, :selected_policy, :violations, :result
+                  :required_by_date, :comments, :actions, :policies, :selected_policy, :violations,
+                  :result, :card
 
     def init
       self.money_request = params[:money_request]
@@ -49,6 +50,21 @@ class MoneyRequest::Base < BaseOperation
       self.selected_policy = money_request.policy
       self.manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :manager)
       self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
+      self.card = load_card
+    end
+
+    def load_card
+      if money_request.user.cards.present?
+        card = money_request.user.cards.first
+        param = {}
+        param[:assigned] = true
+        param[:ending_numbers] = card.ending_number
+        param[:active] = card.active
+        param[:disabled_by_role] = card.disabled_by_role.name rescue nil
+        param[:disabled_by_user] = card.disabled_by_user.name rescue nil
+        return param
+      end
+      {assigned: false}
     end
 
     def load_actions
@@ -74,7 +90,7 @@ class MoneyRequest::Base < BaseOperation
         if self.money_request.processing? and self.money_request.controlling_user?(user)
           if self.money_request.payment_mode_card?
             actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
-                                                                                                    view: params[:view])}
+                                                                                                              view: params[:view])}
             actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
           else
             actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}

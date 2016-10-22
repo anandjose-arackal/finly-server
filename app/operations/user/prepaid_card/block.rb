@@ -36,10 +36,11 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
 
   def post_process
     return unless success?
-    update_params = {active: false, disabled_by_role_id: user_role_id, disable_note: params[:disable_note]}
+    update_params = {active: false, disabled_by_role_id: user_role_id,
+                     disabled_by_user_id: user.id, disable_note: params[:disable_note]}
     selected_user.cards.first.update_attributes(update_params)
     if self.block_presenter.present? and self.block_presenter.success?
-      messages[:success] << "Successfully blocked the card!"
+      messages[:success] << 'Successfully blocked the card!'
     end
   end
 
@@ -50,6 +51,7 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
 
   protected
   def user_role_id
+    # todo update from view to user relation with the user
     if personal_view?
       return UserRole.id_for(:employee)
     elsif manager_view?

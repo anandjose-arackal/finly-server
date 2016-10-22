@@ -23,7 +23,8 @@ class ItzCash::Block < ItzCash::Base
     serial_id = user.cards.first.serial_id
     request_type = self.request_type
     itz_module = Constants::ItzCash::MODULE
-    { serial_id: serial_id, requesttype: request_type, itzmodule: itz_module }
+    remarks = (params[:remarks] or 'nil') rescue 'nil'
+    {serialid: serial_id, requesttype: request_type, itzmodule: itz_module, remarks: remarks}
   end
 
   def request_type
@@ -31,7 +32,7 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def post_process
-    # todo record the credit in our database
+    user.cards.first.update_attribute(:active, false)
   end
 
   def success

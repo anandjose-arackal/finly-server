@@ -1,6 +1,8 @@
 class User::PrepaidCard::Base < BaseOperation
   attr_accessor :selected_user
 
+  STATUS = {block: 0, unblock: 1}
+
   def pre_validate
     if user.blank? or params.blank? or (params[:id].blank? and params[:user_id].blank?)
       messages[:error] << 'User not found'

@@ -87,11 +87,15 @@ json.card do
   if assigned
     card = @result.selected_user.cards.first
     json.extract! card, :ending_number, :description, :active, :serial_id
+    json.disabled_by do
+      json.name card.disabled_by_user.name rescue nil
+      role_name = nil
+      role_name = UserRole.name_for(card.disabled_by_role_id) if card.disabled_by_role_id.present?
+      json.role role_name
+    end
   end
 end
 
-# Todo Wallet
 json.wallet do
-  json.balance 4000.00
-  
+  json.balance @result.wallet.balance_value
 end

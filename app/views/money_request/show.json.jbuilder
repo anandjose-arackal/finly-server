@@ -13,6 +13,8 @@ json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
 
+json.card @result.card
+
 json.forwardable_users do
   forwardable_users = @result.forwardable_users
   if forwardable_users.present?
