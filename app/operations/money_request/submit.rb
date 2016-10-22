@@ -38,7 +38,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
     manager = presenter.user
     manager_role_id = presenter.role_id
     # If no manager assigned, auto approve the money_request
-    if manager.blank?
+    if manager.blank? and not money_request.payment_mode_card?
       # call the approve class with the right parameters
       approve_op = MoneyRequest::Approve.(user, {money_request_id: money_request.id, auto_approve: true})
       unless approve_op.success?
@@ -51,8 +51,9 @@ class MoneyRequest::Submit < MoneyRequest::Base
     end
     memo = (params[:note] or params[:memo] or money_request.memo)
     submitted_at = DateTime.now
+    manager_id = manager.id rescue nil
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
-        controlling_user_id: manager.id,
+        controlling_user_id: manager_id,
         controlling_for_user_id: nil,
         controlling_user_role_id: manager_role_id, controlling_for_user_role_id: nil,
         memo: memo,

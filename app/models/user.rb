@@ -128,12 +128,12 @@ class User < ActiveRecord::Base
     where "first_name like ? or maiden_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', maiden_name, ' ', last_name) like ?",
           "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%"
   end
-  scope :filter_email, -> (email) { where("email like ?", "%#{email}%") }
+  scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
   scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
-  scope :only_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.manager_id }
-  scope :only_finance_managers, -> { where "user_role_mappings.user_role_id = ?", UserRole.finance_manager_id }
-  scope :only_admins, -> { where "user_role_mappings.user_role_id = ?", UserRole.admin_id }
+  scope :only_managers, -> { where 'user_role_mappings.user_role_id = ?', UserRole.manager_id }
+  scope :only_finance_managers, -> { where 'user_role_mappings.user_role_id = ?', UserRole.finance_manager_id }
+  scope :only_admins, -> { where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }

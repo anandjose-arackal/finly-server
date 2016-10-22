@@ -30,8 +30,11 @@ class MoneyRequestComment < ActiveRecord::Base
   belongs_to :rejected_to, class_name: 'User'
   belongs_to :payment
 
-  ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
-             take_control: 8, comment: 9, update: 10, credited: 11}
+  # ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
+  #            take_control: 8, comment: 9, update: 10, credited: 11}
+
+  ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, approve_and_forward: 5, auto_approve: 6, reject: 7, unapprove: 8,
+             take_control: 9, comment: 10, update: 11, credited: 12}
 
   def generate(u=nil)
     comment = nil
@@ -48,6 +51,8 @@ class MoneyRequestComment < ActiveRecord::Base
         comment = "#{name} submitted the advance request"
       when MoneyRequestCommentAction.id_for(:approve)
         comment = "#{name} approved the advance request"
+      when MoneyRequestCommentAction.id_for(:approve_and_forward)
+        comment = "#{name} approved and forwarded the advance request to #{rejected_to.name}"
       when MoneyRequestCommentAction.id_for(:auto_approve)
         comment = 'Request auto-approved as no manager is assigned to the user'
       when MoneyRequestCommentAction.id_for(:reject)

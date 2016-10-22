@@ -60,6 +60,7 @@ class Expense::Index < Expense::Base
     has_scope :filter_merchant
     has_scope :filter_receipt
     has_scope :filter_search
+    has_scope :filter_expense_type_id
     has_scope :filter_amount, using: [:type, :value], type: :hash
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash

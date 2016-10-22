@@ -80,6 +80,7 @@ class Expense < ActiveRecord::Base
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :with_user_or_report, ->(user_id, report_id) { where('report_id IN (?) OR user_id IN (?)', report_id, user_id) }
+  scope :filter_expense_type_id, ->(type_id) {where expense_type_id: type_id}
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do

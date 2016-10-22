@@ -191,6 +191,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def controlling_user?(user)
+    return false if self.controlling_user.blank?
     self.controlling_user.id == user.id
   end
 
