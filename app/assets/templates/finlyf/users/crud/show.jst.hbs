@@ -253,6 +253,7 @@
         </section>
       </div>
       <div class="tab-pane" id="c">
+      {{#if item.card.assigned}}
         <section class="user-wallet">
           <div class="row">
             <div class="col-sm-6"><h4>Wallet</h4></div>
@@ -298,6 +299,9 @@
             </div>
           </div>
         </section>
+      {{else}}
+      <section><h4>Employee is not associated with wallet.</h4> </section>
+      {{/if}}
       </div>
       <div class="tab-pane" id="d">
         {{#if item.card.assigned}}
@@ -389,6 +393,10 @@
 
             </div>
           </div>
+        </section>
+        {{else}}
+        <section>
+          <h4>Employee is not associated with any cards.</h4>
         </section>
         {{/if}}
       </div>
