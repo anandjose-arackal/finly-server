@@ -291,14 +291,21 @@ class FinlyF.Views.User extends Backbone.View
     }
     action_type = $(target).attr('data-action-type')
     # modal = ("#modal-mp")
-    modal = ("#modal-sub-mp")
+    modal = $(@el).find("#modal-sub-mp")
 
     $(modal).modal('show')
 
-    if action_type == 'credit_card_from_company_credits' || action_type == 'credit_card_from_card'
-      $(modal).html(@templateLoadFunds({item: item}))
-    else if action_type == 'debit_card_to_company_credits' || action_type == 'debit_card_to_card'
-      $(modal).html(@templateUnloadFunds({item: item}))
+    switch action_type
+      when 'credit_wallet_from_virtual_account', 'credit_card_from_virtual_account', 'credit_wallet_from_wallet', 'credit_card_from_wallet'
+        $(modal).html(@templateLoadFunds({item: item}))
+      when 'debit_wallet_to_virtual_account', 'debit_wallet_to_wallet'
+        $(modal).html(@templateUnloadFunds({item: item}))
+      
+    
+    # if action_type == 'credit_card_from_virtual_account' || action_type == 'credit_card_from_wallet' || 
+    #   $(modal).html(@templateLoadFunds({item: item}))
+    # else if action_type == 'debit_card_to_company_credits' || action_type == 'debit_card_to_card'
+    #   $(modal).html(@templateUnloadFunds({item: item}))
 
 
     #Getting the card balance in modal

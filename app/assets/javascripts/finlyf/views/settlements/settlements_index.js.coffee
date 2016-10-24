@@ -38,8 +38,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   tCreditCardFromWalletConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/card_from_wallet_confirm']
   tCreditWalletFromWallet: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/wallet_from_wallet']
   tCreditWalletFromWalletConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/wallet_from_wallet_confirm']
-  tCreditCardFromCompanyCredits: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/card_from_company_credits']
-  tCreditCardFromCompanyCreditsConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/card_from_company_credits_confirm']
+  tCreditCardFromVirtualAccount: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/card_from_virtual_account']
+  tCreditCardFromVirtualAccountConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/card_from_virtual_account_confirm']
+  tCreditWalletFromVirtualAccount: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/wallet_from_virtual_account']
+  tCreditWalletFromVirtualAccountConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/credit/wallet_from_virtual_account_confirm']
 
   tDebitCashAdvance: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/cash_advance']
   tDebitCashAdvanceConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/cash_advance_confirm']
@@ -51,6 +53,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   tDebitWalletToWalletConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/wallet_to_wallet_confirm']
   tDebitCardToCompanyCredits: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/card_to_company_credits']
   tDebitCardToCompanyCreditsConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/card_to_company_credits_confirm']
+  tDebitWalletToVirtualAccount: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/wallet_to_virtual_account']
+  tDebitWalletToVirtualAccountConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/wallet_to_virtual_account_confirm']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -140,12 +144,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           c_card_from_card: {}
           c_card_from_wallet: {}
           c_wallet_from_wallet: {}
-          c_card_from_company_credits: {}
+          c_card_from_virtual_account: {}
+          c_wallet_from_virtual_account: {}
           d_card_to_card: {}
           d_card_to_wallet: {}
           d_wallet_to_wallet: {}
           d_card_to_company_credits: {}
           d_cash_advance: {}
+          d_wallet_to_virtual_account: {}
         }
         # @selected = []
         # @selectedReports = []
@@ -954,10 +960,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditWalletFromWallet({summary: @selectedUserSummary}))
-      when 'credit_card_from_company_credits'
+      when 'credit_card_from_virtual_account'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Company Balance")
-        $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromCompanyCredits({summary: @selectedUserSummary}))
+        $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromVirtualAccount({summary: @selectedUserSummary}))
+      when 'credit_wallet_from_virtual_account'
+        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit Wallet from Company Credits")
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Company Balance")
+        $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditWalletFromVirtualAccount({summary: @selectedUserSummary}))
       #DEBIT ACTIONS
       when 'debit_cash_advance'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Cash Advance")
@@ -972,14 +982,14 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToWallet({summary: @selectedUserSummary}))
-      when 'debit_card_to_wallet'
+      when 'debit_wallet_to_wallet'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitWalletToWallet({summary: @selectedUserSummary}))
-      when 'debit_card_to_company_credits' 
+      when 'debit_wallet_to_virtual_account' 
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Company Balance")
-        $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToCompanyCredits({summary: @selectedUserSummary}))
+        $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitWalletToVirtualAccount({summary: @selectedUserSummary}))
 
     $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
@@ -1046,14 +1056,19 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditCardFromWalletConfirm({summary: @selectedUserSummary}))
         _this.settlementActionData.c_card_from_wallet.amount = $(container).find('input[name=amount]').val()
-      when 'credit_card_from_wallet'
+      when 'credit_wallet_from_wallet'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditWalletFromWalletConfirm({summary: @selectedUserSummary}))
         _this.settlementActionData.c_wallet_from_wallet.amount = $(container).find('input[name=amount]').val()
-      when 'credit_card_from_company_credits'
+      when 'credit_card_from_virtual_account'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
-        $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditCardFromCompanyCreditsConfirm({summary: @selectedUserSummary}))
-        _this.settlementActionData.c_card_from_company_credits.amount = $(container).find('input[name=amount]').val()
+        $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditCardFromVirtualAccountConfirm({summary: @selectedUserSummary}))
+        _this.settlementActionData.c_card_from_virtual_account.amount = $(container).find('input[name=amount]').val()
+
+      when 'credit_wallet_from_virtual_account'
+        $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
+        $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditWalletFromVirtualAccountConfirm({summary: @selectedUserSummary}))
+        _this.settlementActionData.c_wallet_from_virtual_account.amount = $(container).find('input[name=amount]').val()
       when 'debit_cash_advance'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCashAdvanceConfirm({summary: @selectedUserSummary}))
@@ -1068,15 +1083,15 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToWalletConfirm({summary: @selectedUserSummary}))
         _this.settlementActionData.d_card_to_wallet.amount = $(container).find('input[name=amount]').val()
-      when 'debit_card_to_wallet'
+      when 'debit_wallet_to_wallet'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitWalletToWalletConfirm({summary: @selectedUserSummary}))
         _this.settlementActionData.d_wallet_to_wallet.amount = $(container).find('input[name=amount]').val()
-      when 'debit_card_to_company_credits'
+      when 'debit_wallet_to_virtual_account'
         console.log "First"
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
-        $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToCompanyCreditsConfirm({summary: @selectedUserSummary}))
-        _this.settlementActionData.d_card_to_company_credits.amount = $(container).find('input[name=amount]').val()
+        $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitWalletToVirtualAccountConfirm({summary: @selectedUserSummary}))
+        _this.settlementActionData.d_wallet_to_virtual_account.amount = $(container).find('input[name=amount]').val()
     console.log _this.settlementActionData
     $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
@@ -1140,12 +1155,17 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
 
-      when 'credit_card_from_wallet'
+      when 'credit_wallet_from_wallet'
         data.amount = _this.settlementActionData.c_wallet_from_wallet.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
-      when 'credit_card_from_company_credits'
-        data.amount = _this.settlementActionData.c_card_from_company_credits.amount
+      when 'credit_card_from_virtual_account'
+        data.amount = _this.settlementActionData.c_card_from_virtual_account.amount
+        data.password = $(container).find('input[type=password][name=password]').val()
+        data.to_user_id = _this.user_id
+
+      when 'credit_wallet_from_virtual_account'
+        data.amount = _this.settlementActionData.c_wallet_from_virtual_account.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
 
@@ -1169,7 +1189,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.password = $(container).find('input[type=password][name=password]').val()
         data.from_user_id = _this.user_id 
 
-      when 'debit_card_to_wallet'
+      when 'debit_wallet_to_wallet'
         data.amount = _this.settlementActionData.d_wallet_to_wallet.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.from_user_id = _this.user_id 
@@ -1177,7 +1197,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.amount = _this.settlementActionData.d_card_to_company_credits.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.from_user_id = _this.user_id
-        console.log data
+      when 'debit_wallet_to_virtual_account'
+        data.amount = _this.settlementActionData.d_wallet_to_virtual_account.amount
+        data.password = $(container).find('input[type=password][name=password]').val()
+        data.from_user_id = _this.user_id
+        # console.log data
 
     console.log data
     $.ajax({
