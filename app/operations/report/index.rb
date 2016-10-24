@@ -59,7 +59,7 @@ class Report::Index < Report::Base
 
   def post_process
     if self.reports.present?
-      self.reports = self.reports.exclude_deleted rescue self.reports
+      self.reports = self.reports.exclude_deleted.includes(:expenses, :policy, :status) rescue self.reports
     end
   end
 

@@ -23,4 +23,8 @@ class PaymentType < ActiveRecord::Base
     TYPES[key]
   end
 
+  def self.name_for(id)
+    TYPES.key(id).to_s.humanize rescue nil
+  end
+
 end

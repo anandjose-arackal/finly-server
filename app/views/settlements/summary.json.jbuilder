@@ -10,8 +10,6 @@ json.current_user_cash_in_card 2000
 json.current_user_wallet_balance 13000
 #dummy values end here
 
-
-
 unless params[:view] == 'personal'
   json.actions do
     @result.actions.each do |key, value|
