@@ -125,12 +125,14 @@ $(document).ready ->
     $.ajax({
       dataType: "json"
       type : 'get'
-      url: '/settlements/summary?view_to_load=payments&view=personal'
+      # url: '/settlements/summary?view_to_load=payments&view=personal'
+      url: 'users/' + user_id + '/balance'
       data:
-        # user_id: user_id
+        target_user_id: user_id
         authenticity_token: $("#authenticity_token").val()
+        all: true
+        view: 'personal'
       success: (data) ->
-        # response(data)
         $(_this).find('.modal-body').html(templateBalance({item: data}))
         console.log data
       error: (err) ->
