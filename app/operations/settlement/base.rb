@@ -25,7 +25,7 @@ class Settlement::Base < BaseOperation
     unless date.is_a?(Date)
       date = Date.parse(date)
     end
-
+    debugger
     if date.present? and date > Date.today
       add_message :error, 'Date cannot be later than the current date'
       return false
