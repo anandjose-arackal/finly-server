@@ -79,12 +79,20 @@
                       <label class="hidden">Credit employee's wallet from your wallet.</label>
                     </li> 
                   {{/if}}
-                  {{#if summary.actions.credit_card_from_company_credits}}
+                  {{#if summary.actions.credit_card_from_virtual_account}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_card_from_company_credits}}" data-action-type="credit_card_from_company_credits"/> Credit User's Card From Company Credits
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account"/> Credit User's Card From Company Credits
                       </label>
                       <label class="hidden">Credit employee's card from company's credits.</label>
+                    </li> 
+                  {{/if}}
+                  {{#if summary.actions.credit_wallet_from_virtual_account}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account"/> Credit User's Wallet From Company Credits
+                      </label>
+                      <label class="hidden">Credit employee's wallet from company's credits.</label>
                     </li> 
                   {{/if}}
                 </ul>
