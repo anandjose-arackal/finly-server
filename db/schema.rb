@@ -212,6 +212,7 @@ ActiveRecord::Schema.define(version: 20161018100357) do
     t.datetime "updated_at",                        null: false
     t.integer  "company_id",          limit: 4
     t.integer  "disabled_by_role_id", limit: 4
+    t.integer  "disabled_by_user_id", limit: 4
     t.boolean  "active"
     t.text     "disable_note",        limit: 65535
     t.string   "product_code",        limit: 255,   null: false
