@@ -77,7 +77,7 @@ class User::Wallet::Credit < User::Wallet::Base
         payment_attributes = {}
         payment_attributes[:initiating_user] = from_user
         payment_attributes[:receiving_user] = to_user
-        payment_attributes[:date] = Date.today
+        payment_attributes[:date] = DateUtils.local_date
         payment_attributes[:note] = params[:note]
         payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
@@ -107,14 +107,14 @@ class User::Wallet::Credit < User::Wallet::Base
         payment_from_attributes = {}
         payment_from_attributes[:initiating_user] = to_user
         payment_from_attributes[:receiving_user] = from_user
-        payment_from_attributes[:date] = Date.today
+        payment_from_attributes[:date] = DateUtils.local_date
         payment_from_attributes[:note] = params[:note]
         payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
         payment_to_attributes = {}
         payment_to_attributes[:initiating_user] = from_user
         payment_to_attributes[:receiving_user] = to_user
-        payment_to_attributes[:date] = Date.today
+        payment_to_attributes[:date] = DateUtils.local_date
         payment_to_attributes[:note] = params[:note]
         payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
         if to_account == :wallet

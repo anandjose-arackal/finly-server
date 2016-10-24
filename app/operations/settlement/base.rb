@@ -25,8 +25,7 @@ class Settlement::Base < BaseOperation
     unless date.is_a?(Date)
       date = Date.parse(date)
     end
-    debugger
-    if date.present? and date > Date.today
+    if date.present? and date > DateUtils.local_date
       add_message :error, 'Date cannot be later than the current date'
       return false
     end
@@ -38,7 +37,7 @@ class Settlement::Base < BaseOperation
       date = Date.parse(date) rescue date
     end
     cash = user.balance_sheet.cash_in_hand
-    return cash if date.blank? or date == Date.today
+    return cash if date.blank? or date == DateUtils.local_date
     payments = user.payments.made_after(date).with_amount
     payments_to_user = payments.transferred_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)

@@ -95,7 +95,7 @@ class AnalyticsService < BaseService
     #       when 'filter_date'
     #         next unless value.is_a?(Hash) || value[:type].blank? || (value[:from].blank? && value[:to].blank?)
     #         type = value[:type]
-    #         from = value[:from] || Date.today
+    #         from = value[:from] || DateUtils.local_date
     #         to = value[:to]
     #         type_val = nil
     #         if type == 'expense'

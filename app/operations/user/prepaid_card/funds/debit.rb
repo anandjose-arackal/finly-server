@@ -13,7 +13,7 @@ class User::PrepaidCard::Funds::Debit < User::PrepaidCard::Funds::Credit
       payment_attributes[:initiating_user] = user
       payment_attributes[:receiving_user] = to_user
       payment_attributes[:payment_type_id] = PaymentType.id_for(:card_debit)
-      payment_attributes[:date] = Date.today
+      payment_attributes[:date] = DateUtils.local_date
       payment_attributes[:note] = params[:note]
       payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
       self.payment = to_user.payments.create payment_attributes

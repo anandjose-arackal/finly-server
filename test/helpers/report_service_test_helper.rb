@@ -7,13 +7,13 @@ module ReportServiceTestHelper
     expenses_ids = []
     if amount.blank?
       5.times.each do
-        e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1})
+        e = expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name, expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date, currency_id: 1})
         expenses << e
         expenses_ids << e.id
       end
     else
       1.times.each do
-        e = expense_service.add_expense(expense: {amount: amount, merchant: Faker::Company.name, expense_status_id: 1, expense_type_id: 1, date: Date.today, currency_id: 1})
+        e = expense_service.add_expense(expense: {amount: amount, merchant: Faker::Company.name, expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date, currency_id: 1})
         expenses << e
         expenses_ids << e.id
       end

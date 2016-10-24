@@ -50,7 +50,7 @@ class ReportServiceTest < ActiveSupport::TestCase
     assert_difference 'Expense.count', 5 do
       5.times.each do
         expenses << expense_service.add_expense(expense: {amount: Faker::Commerce.price, merchant: Faker::Company.name, expense_status_id: 1,
-                                                          expense_type_id: 1, date: Date.today, currency_id: 1})
+                                                          expense_type_id: 1, date: DateUtils.local_date, currency_id: 1})
       end
     end
     assert_equal expenses.size, 5

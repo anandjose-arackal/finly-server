@@ -236,7 +236,7 @@ if Expense.count == 0
                    expense_status_id: 1,
                    expense_type_id: 1,
                    note: "#{Faker::Lorem.sentence}",
-                   date: Faker::Date.between(20.days.ago, Date.today),
+                   date: Faker::Date.between(20.days.ago, DateUtils.local_date),
                    user_id: random_integer(1, 10),
                    category_id: random_integer(1, 5),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
@@ -311,7 +311,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -327,7 +327,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -344,7 +344,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+                                 category_id: random_integer(1,8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -388,7 +388,7 @@ if CardTransaction.count == 0
       random_amount = random(10, 1000)
       trans = CardTransaction.create(card_id: card.id, user_id: user.id,
                                      transaction_amount_attributes: {value: random_amount, currency_id: 1},
-                                     date: Date.today,
+                                     date: DateUtils.local_date,
                                      merchant_name: 'Randomness',
                                      transaction_currency_code: 'INR')
       # junk card expense
@@ -396,7 +396,7 @@ if CardTransaction.count == 0
                      expense_status_id: 1,
                      expense_type_id: 2,
                      note: "This is a card expense, hello! #{trans.id}",
-                     date: Faker::Date.between(20.days.ago, Date.today),
+                     date: Faker::Date.between(20.days.ago, DateUtils.local_date),
                      user_id: user.id,
                      category_id: random_integer(1, 5),
                      card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
@@ -470,7 +470,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #     5.times.each do
 #       e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #     end
 
@@ -483,7 +483,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #       5.times.each do
 #         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #         expenses << e
 #         expenses_ids << e.id
@@ -499,7 +499,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #       5.times.each do
 #         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #         expenses << e
 #         expenses_ids << e.id
@@ -516,7 +516,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #       5.times.each do
 #         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #         expenses << e
 #         expenses_ids << e.id
@@ -557,7 +557,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #     5.times.each do
 #       e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #     end
 
@@ -570,7 +570,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #       5.times.each do
 #         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #         expenses << e
 #         expenses_ids << e.id
@@ -586,7 +586,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #       5.times.each do
 #         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #         expenses << e
 #         expenses_ids << e.id
@@ -603,7 +603,7 @@ AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_conf
 #       5.times.each do
 #         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
 #                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: Date.today,
+#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
 #                                  receipts_attributes: [])
 #         expenses << e
 #         expenses_ids << e.id
