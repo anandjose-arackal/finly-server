@@ -21,7 +21,7 @@ json.array! @result.items do |item|
     json.type 'payment'
     json.payment_amount item.amount.value
     json.initiating_user item.initiating_user.name
-    json.payment_type item.payment_type.name
+    json.payment_type PaymentType.name_for(item.payment_type_id)
   elsif item.is_a?(MoneyRequest)
     json.type 'money_request'
     if item.final_approver
