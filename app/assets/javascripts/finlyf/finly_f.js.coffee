@@ -118,6 +118,7 @@ window.FinlyF =
 $(document).ready ->
   FinlyF.initialize()
   templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
+  templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
   balance_data = {}
   $("#modal-balance").on("shown.bs.modal", (e) ->
     _this = this
@@ -140,16 +141,56 @@ $(document).ready ->
       success: (data) ->
         $(_this).find('.modal-body').html(templateBalance({item: data}))
         balance_data = data
+
+
+        $(".btn-transfer-wallet-to-card").on('click', (e) ->
+          $("#modal-balance").modal('hide')
+          # $.ajax({
+
+          # })
+          $("#modal-global-transfer").modal('show')
+          $("#modal-global-transfer").find('.modal-body').html(templateWalletToCard({item: balance_data}))
+        )
         # console.log data
       error: (err) ->
         console.log err
     })
   )
 
-  $(".btn-transfer-wallet-to-card").on('click', (e) ->
-    $("#modal-balance").modal('hide')
-    $.ajax({
+  # $(".btn-transfer-wallet-to-card").on('click', (e) ->
+  #   $("#modal-balance").modal('hide')
+  #   # $.ajax({
 
-    })
-    # $("#modal-global-transfer").modal('s
+  #   # })
+  #   $("#modal-global-transfer").modal('show')
+  #   $("#modal-global-transfer").find('.modal-body').html(templateWalletToCard({item: balance_data}))
+  # )
+
+  $("#modal-global-transfer").on('shown.bs.modal', (e) ->
+    modal = this
+    to_user_id = $(modal).attr('data-user-id')
+    $(".btn-transfer-wallet-to-card").on('click', (evt) ->
+      evt.preventDefault()
+      amount = $(modal).find('input[name=amount]').val()
+      password = $(modal).find('input[type=password]').val()
+
+      url = $(this).attr('data-url')
+
+      $.ajax({
+        url: url,
+        type: 'post'
+        dataType: 'json'
+        data: {
+          amount: amount
+          password: password
+          view: 'personal'
+          to_user_id: 1
+        }
+        success: (res) ->
+          FinlyF.snapNotify(res)
+          $(modal).modal('hide')
+      })
+
+    )
+
   )
