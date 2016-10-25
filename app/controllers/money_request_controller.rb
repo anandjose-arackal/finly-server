@@ -43,6 +43,7 @@ class MoneyRequestController < ApplicationController
       when :take_control
         @result = MoneyRequest::TakeControl.(current_user, params)
     end
+    debugger
     respond render: :show
   end
 
