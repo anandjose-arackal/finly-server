@@ -16,8 +16,15 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount].blank? or params[:payment][:amount].to_d < 0
-      add_message :error, "Reimbursement cannot be negative."
+    if params[:payment][:amount].blank? or params[:payment][:amount].to_d <= 0
+      add_message :error, 'Amount cannot be less than or equal to 0'
+    end
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate this transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
     end
   end
 

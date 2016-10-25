@@ -18,13 +18,20 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount] and params[:payment][:amount].to_d < 0
-      messages[:error] << 'Reimbursement amount cannot be negative'
+    if params[:payment][:amount] and params[:payment][:amount].to_d <= 0
+      add_message :error, 'Reimbursement amount cannot be less than or equal to 0'
       return
     end
     if params[:report_ids].blank?
-      messages[:error] << 'No reports to reimburse'
+      add_message :error, 'No reports to reimburse'
     end
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate this transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    # end
   end
 
   def init

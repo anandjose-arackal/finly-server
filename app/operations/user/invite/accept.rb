@@ -56,7 +56,7 @@ class User::Invite::Accept < User::Invite::Base
     date_of_birth = profile_param[:date_of_birth]
     gender = profile_param[:gender]
     address_1 = profile_param[:address_1]
-    address_2  = profile_param[:address_2]
+    address_2 = profile_param[:address_2]
     city = profile_param[:city]
     state_id = profile_param[:state_id]
     pin_code = profile_param[:pin_code]
@@ -74,7 +74,7 @@ class User::Invite::Accept < User::Invite::Base
     return unless verify_field city, 'City cannot be blank'
     return unless verify_field state_id, 'State ID cannot be blank'
     return unless verify_field pin_code, 'Pincode cannot be blank'
-  
+
     if mobile_number.blank? or mobile_number.length != 10
       add_message :error, 'Mobile number has to be 10 digits'
       return
@@ -99,11 +99,10 @@ class User::Invite::Accept < User::Invite::Base
       add_message :error, 'Invalid gender selected'
     end
 
-    y, m, d = date_of_birth.split '-'
-    unless Date.valid_date? y.to_i, m.to_i, d.to_i
+    unless DateUtils.validate_date_format?(date_of_birth)
       add_message :error, 'Invalid date provided'
     end
-    
+
   end
 
   def verify_field(field, message)
