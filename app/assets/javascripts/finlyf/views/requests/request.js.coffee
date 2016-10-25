@@ -310,7 +310,7 @@ class FinlyF.Views.Request extends Backbone.View
     container = $(target).closest(".modal")
 
     url = $(target).attr("data-url")
-    action_type = $(target).attr("data-action-type")
+    # action_type = $(target).attr("data-action-type")
     password = $(container).find('input[name=password]').val()
     amount = $(container).find('input[name=amount]').val()
 
@@ -320,9 +320,10 @@ class FinlyF.Views.Request extends Backbone.View
       dataType: 'json',
       data: {
         authenticity_token: $("#authenticity_token").val()
-        type: action_type,
+        # type: action_type,
         password: password,
         amount: amount
+        view: _this.params.view
       },
       success: (res) ->
         FinlyF.snapNotify(res.messages)
