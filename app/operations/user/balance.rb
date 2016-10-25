@@ -29,6 +29,11 @@ class User::Balance < User::Base
   end
 
   def process
+    target_user_card_assigned = false
+    current_user_card_assigned = false
+    target_user_card_assigned = target_user.cards.present? if target_user.present?
+    current_user_card_assigned = user.cards.present? if user.present?
+
     self.balances={}
 
     # Virtual Account
@@ -39,8 +44,8 @@ class User::Balance < User::Base
     self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]
 
     # Card
-    self.balances[:target_user_card] = User::PrepaidCard::Show.(user, user: target_user).balance rescue nil if params[:target_user_card] or params[:target_user_all]
-    self.balances[:current_user_card] = User::PrepaidCard::Show.(user, user: user).balance rescue nil if params[:current_user_card] or params[:current_user_all]
+    self.balances[:target_user_card] = User::PrepaidCard::Show.(user, user: target_user).balance rescue nil if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
+    self.balances[:current_user_card] = User::PrepaidCard::Show.(user, user: user).balance rescue nil if current_user_card_assigned and (params[:current_user_card] or params[:current_user_all])
 
     # Cash In Hand
     self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
