@@ -274,18 +274,39 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         else
           $(_this.el).find(".summary").html(_this.templateSummaryAdmin({item: res}))
           _this.selectedUserSummary = res
-          _this.populateBalance()
+          # _this.populateBalance()
       error: (err) ->
         console.log err
 
     })
 
-  populateBalance: ->
-    $(@el).find(".user-wallet-balance").closest("li").removeClass("hidden")
-    $(@el).find(".company-balance").closest("li").removeClass("hidden")
+  # populateBalance: ->
+  #   _this = @
+  #   $(@el).find(".user-wallet-balance").closest("li").removeClass("hidden")
+  #   $(@el).find(".company-balance").closest("li").removeClass("hidden")
+  #   $.ajax({
+  #     dataType: "json"
+  #     type : 'get'
+  #     # url: '/settlements/summary?view_to_load=payments&view=personal'
+  #     url: 'users/' + _this.user_id + '/balance'
+  #     data:
+  #       # target_user_id: user_id
+  #       authenticity_token: $("#authenticity_token").val()
+  #       current_user_all: true
+  #       current_user_wallet: true
+  #       current_user_card: true
+  #       current_user_cash_in_hand: true
+  #       virtual_account: true
+  #       # view: 'admin'
+  #     success: (data) ->
+  #       $(_this).find('.modal-body').html(templateBalance({item: data}))
+  #       console.log data
+  #     error: (err) ->
+  #       console.log err
+  #   })
 
-    $(@el).find(".user-wallet-balance").text(@selectedUserSummary.current_user_wallet_balance)
-    $(@el).find(".company-balance").text(@selectedUserSummary.company_credits)
+  #   $(@el).find(".user-wallet-balance").text(@selectedUserSummary.current_user_wallet_balance)
+  #   $(@el).find(".company-balance").text(@selectedUserSummary.company_credits)
 
   processUsers: ->
     console.log "processing users"
@@ -367,7 +388,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         reset: true,
         # data: _this.params
         success: ->
-          _this.populateSummary(_this.user_id)
+          # _this.populateSummary(_this.user_id)
 
         error: ->
           console.log "Couldn't fetch Successfully."
@@ -1101,7 +1122,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         #Append base structure
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditReimburseConfirm({summary: @selectedUserSummary}))
 
-        $(modal_body).find(".settlement-step-2 .panel-heading .step-heading-summary").html("Total: &#8377;&nbsp;" + _this.settlementActionData.c_cash_advance.amount)
+        # $(modal_body).find(".settlement-step-2 .panel-heading .step-heading-summary").html("Total: &#8377;&nbsp;" + _this.settlementActionData.c_cash_advance.amount)
         #Collect relevant data from Step 2
         # container = $(e.currentTarget).closest('.settlement-action-items')
         # reports =  $(container).find('.settlement-report')

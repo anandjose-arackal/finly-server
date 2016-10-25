@@ -8,29 +8,31 @@
       <div class="row no-margin">
         {{#switch item.type}}
           {{#case 'debit_wallet_to_virtual_account'}}
+
+            <div class="col-sm-6 text-center">
+              <h3 class="target_user_wallet_balance" style="margin-bottom: 0;">&nbsp;</h3>
+              <span style="font-size: 11px;=">(User's Wallet Balance)</span>
+            </div>
+
+            <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
             <div class="col-sm-6 text-center">
               <h3 class="virtual_account_balance" style="margin-bottom: 0;">&nbsp;</h3>
               <span style="font-size: 11px;=">(Company Balance)</span>
             </div>
-
-            <div class="transfer-flow"><i class="fa fa-long-arrow-left"></i></div>
-
-            <div class="col-sm-6 text-center">
-              <h3 class="target_user_wallet_balance" style="margin-bottom: 0;">&nbsp;</h3>
-              <span style="font-size: 11px;=">(User's Wallet Balance)</span>
-            </div>
+            
           {{/case}}
           {{#case 'debit_wallet_to_wallet'}}
             <div class="col-sm-6 text-center">
-              <h3 class="current_user_wallet_balance" style="margin-bottom: 0;">&nbsp;</h3>
-              <span style="font-size: 11px;=">(Your Wallet Balance)</span>
-            </div>
-
-            <div class="transfer-flow"><i class="fa fa-long-arrow-left"></i></div>
-
-            <div class="col-sm-6 text-center">
               <h3 class="target_user_wallet_balance" style="margin-bottom: 0;">&nbsp;</h3>
               <span style="font-size: 11px;=">(User's Wallet Balance)</span>
+            </div>
+
+            <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+            <div class="col-sm-6 text-center">
+              <h3 class="current_user_wallet_balance" style="margin-bottom: 0;">&nbsp;</h3>
+              <span style="font-size: 11px;=">(Your Wallet Balance)</span>
             </div>
           {{/case}}
         {{/switch}}

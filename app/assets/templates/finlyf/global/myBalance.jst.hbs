@@ -3,14 +3,14 @@
     <div class="row no-margin">
       <div class="col-sm-6 balance-container text-center">
         <div>
-          <h3>&#8377;&nbsp;&nbsp;{{item.cash_in_card}}</h3>
+          <h3>&#8377;&nbsp;&nbsp;{{item.current_user_card}}</h3>
           <label>Cash in Card</label>
         </div>
       </div>
 
       <div class="col-sm-6 balance-container text-center">
         <div>
-          <h3>&#8377;&nbsp;{{item.cash_in_hand}}</h3>
+          <h3>&#8377;&nbsp;{{item.current_user_cash_in_hand}}</h3>
           <label>Cash in Hand</label>
         </div>
       </div>
@@ -19,15 +19,15 @@
     <div class="row no-margin">
       <div class="col-sm-6 balance-container text-center">
         <div>
-          <h3>&#8377;&nbsp;{{item.cash_in_wallet}}</h3>
+          <h3>&#8377;&nbsp;{{item.current_user_wallet}}</h3>
           <label>Cash in Wallet</label>
         </div>
       </div>
 
-      {{#if item.company_credits}}
+      {{#if item.virtual_account}}
       <div class="col-sm-6 balance-container text-center">
         <div>
-          <h3>&#8377;&nbsp;{{item.company_credits}}</h3>
+          <h3>&#8377;&nbsp;{{item.virtual_account}}</h3>
           <label>Company Credits</label>
         </div>
       </div>
