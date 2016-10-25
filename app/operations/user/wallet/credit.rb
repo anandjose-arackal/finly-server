@@ -29,9 +29,13 @@ class User::Wallet::Credit < User::Wallet::Base
     self.from_user = user
     self.to_user = params[:to_user]
     if to_user.blank? and params[:to_user_id].present?
-      op= User::Team::Index.new(user, params)
-      users = op.run
-      self.to_user = (users.with_id(params[:to_user_id]).first rescue nil) if op.success? and users.present?
+      if params[:to_user_id].to_i == user.id
+        self.to_user = user
+      else
+        op= User::Team::Index.new(user, params)
+        users = op.run
+        self.to_user = (users.with_id(params[:to_user_id]).first rescue nil) if op.success? and users.present?
+      end
     end
   end
 
