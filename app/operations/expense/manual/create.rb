@@ -13,7 +13,7 @@ class Expense::Manual::Create < Expense::Manual::Base
       messages[:error] << 'You have not provided any details to create an expense'
       return
     end
-    if params[:expense][:amount].to_i < 0
+    if params[:expense][:amount].to_d < 0
       messages[:error] << "Amount can't be negative."
     end
   end
@@ -51,7 +51,7 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def post_process
     # add comment in report if expense is added within report
-    if self.expense.report_id.present? and self.expense.report.open?
+    if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
       unless comment.save
         messages[:error] = comment.errors.full_messages

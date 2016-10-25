@@ -24,14 +24,14 @@ class User::PrepaidCard::Funds::Transfer < User::PrepaidCard::Funds::Base
     unless user.valid_password? params[:password]
       add_message :error, 'Invalid password!'
     end
-    if params[:amount].blank? or params[:amount].to_i <= 0
+    if params[:amount].blank? or params[:amount].to_d <= 0
       add_message :error, 'Transfer amount cannot be less than or equal to 0'
     end
   end
 
   def init
     self.to_user = params[:to_user]
-    self.amount = params[:amount].to_i
+    self.amount = params[:amount].to_d
     if to_user.blank? and params[:to_user_id].present?
       to_user_id = params[:to_user_id]
       to_u = User.with_company_id(user.company_id).with_id(to_user_id).first rescue nil

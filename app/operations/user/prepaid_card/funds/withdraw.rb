@@ -24,14 +24,14 @@ class User::PrepaidCard::Funds::Withdraw < User::PrepaidCard::Funds::Base
     unless user.valid_password? params[:password]
       add_message :error, 'Invalid password!'
     end
-    if params[:amount].blank? or params[:amount].to_i <= 0
+    if params[:amount].blank? or params[:amount].to_d <= 0
       add_message :error, 'Withdrawal amount cannot be less than or equal to 0'
     end
   end
 
   def init
     self.from_user = params[:from_user]
-    self.amount = params[:amount].to_i
+    self.amount = params[:amount].to_d
     if from_user.blank? and params[:from_user_id].present?
       from_user_id = params[:from_user_id]
       to_u = User.with_company_id(user.company_id).with_id(from_user_id).first rescue nil

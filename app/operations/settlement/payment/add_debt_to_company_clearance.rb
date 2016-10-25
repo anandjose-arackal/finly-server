@@ -16,7 +16,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount].blank? or params[:payment][:amount].to_i < 0
+    if params[:payment][:amount].blank? or params[:payment][:amount].to_d < 0
       add_message :error, "Reimbursement cannot be negative."
     end
   end
