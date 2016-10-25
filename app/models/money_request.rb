@@ -91,7 +91,7 @@ class MoneyRequest < ActiveRecord::Base
   delegate :status_name, to: :status
   delegate :payment_mode_name, to: :payment_mode
 
-  default_scope { order(created_at: :desc, status_id: :asc) }
+  default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   before_save :handle_name
   before_save :handle_nil_amount
