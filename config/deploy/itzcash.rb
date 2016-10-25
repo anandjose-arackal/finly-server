@@ -7,9 +7,8 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '180.179.138.175', user: 'sreeramn', roles: %w{web app db}
+server '180.179.138.175', user: 'sreeramn', roles: %w{web app db}, port: 2212
 set :stage, 'production'
-set :deploy_to, '/home/sreeramn/finly-server'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.3.0' # Edit this if you are using MRI Ruby
