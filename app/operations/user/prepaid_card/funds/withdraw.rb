@@ -62,7 +62,7 @@ class User::PrepaidCard::Funds::Withdraw < User::PrepaidCard::Funds::Base
       payment_attributes[:initiating_user] = user
       payment_attributes[:receiving_user] = from_user
       payment_attributes[:payment_type_id] = PaymentType.id_for(:card_transfer_receiving_debit)
-      payment_attributes[:date] = Date.today
+      payment_attributes[:date] = DateUtils.local_date
       payment_attributes[:note] = params[:note]
       payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
       from_user.payments.create payment_attributes

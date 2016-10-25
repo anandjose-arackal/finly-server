@@ -103,7 +103,7 @@ class Expense < ActiveRecord::Base
     unless date_from.blank? && date_to.blank?
       type_val = :date
       date_from = "1990-01-01" if date_from.blank?
-      date_to = Date.today if date_to.blank?
+      date_to = DateUtils.local_date if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date + 1 if date_to.present?
       expenses = arel_table
@@ -214,7 +214,7 @@ class Expense < ActiveRecord::Base
 
   # cannot add an expense with future date
   def no_future_date
-    if date.present? and date > Date.today
+    if date.present? and date > DateUtils.local_date
       errors.add(:date, 'cannot be in the future!')
     end
   end

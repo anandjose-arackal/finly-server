@@ -7,7 +7,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def pre_validate
     required_by_date = params[:money_request][:required_by_date] rescue nil
-    if required_by_date.present? and Date.parse(required_by_date) < Date.today
+    if required_by_date.present? and Date.parse(required_by_date) < DateUtils.local_date
       messages[:error] << 'Invalid Required By Date'
     end
   end

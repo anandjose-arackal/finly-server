@@ -109,19 +109,25 @@
             <div class="col-sm-6"><label class="control-label">Payment Mode</label></div>
             <div class="col-sm-6">
               <label class="control-label item-attr-preview">
-                {{#if item.payment_mode_id}}
-                  {{#switch item.payment_mode_id}}
-                    {{#case 1}}Cash{{/case}}
-                    {{#case 2}}Card{{/case}}
-                  {{/switch}} 
-                {{else}}
-                  --
-                {{/if}}
-                </label>
-              <select class="form-control item-attr-edit" name="money_request[payment_mode_id]">
-                <option value="1" {{#if_eq item.payment_mode_id 1}}selected="selected"{{/if_eq}}>Cash</option>
-                <option value="2" {{#if_eq item.payment_mode_id 2}}selected="selected"{{/if_eq}}>Card</option>
-              </select> 
+              {{#if item.payment_mode_id}}
+                {{#switch item.payment_mode_id}}
+                  {{#case 1}}Cash{{/case}}
+                  {{#case 2}}Card{{/case}}
+                {{/switch}} 
+              {{else}}
+                --
+              {{/if}}
+              </label>
+              {{#unless item.card.assigned}}
+                <select class="form-control item-attr-edit" name="money_request[payment_mode_id]">
+                  <option value="1" {{#if_eq item.payment_mode_id 1}}selected="selected"{{/if_eq}}>Cash</option>
+                  <option value="2" {{#if_eq item.payment_mode_id 2}}selected="selected"{{/if_eq}}>Card</option>
+                </select> 
+              {{else}}
+                <label class="control-label item-attr-edit">Cash</label>
+                <input type="hidden" name="money_request[payment_mode_id]" value="1">
+              {{/unless}}
+
             </div>
           </div>
           <div class="row no-margin">

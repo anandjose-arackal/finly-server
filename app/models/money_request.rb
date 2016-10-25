@@ -80,7 +80,7 @@ class MoneyRequest < ActiveRecord::Base
       date_to = "2100-01-01" if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date + 1 if date_to.present?
-      # date_to = Date.today if date_to.blank?
+      # date_to = DateUtils.local_date if date_to.blank?
       money_requests = arel_table
       where(money_requests[:created_at].gteq(date_from).and(money_requests[:created_at].lteq(date_to)))
     end

@@ -52,7 +52,7 @@ class UsersController < ApplicationController
     redirect_to request.referrer
   end
 
-   # placeholder action for importing file
+  # placeholder action for importing file
   def mass_import
 
   end
@@ -66,16 +66,23 @@ class UsersController < ApplicationController
     end
   end
 
-  # params = {require_card_balance: true(default)/false, user_id: 1}
+  # params = {
+  #   target_user_id: 1,
+  #   target_user_wallet: true,
+  #   target_user_card: true,
+  #   target_user_cash_in_hand: true,
+  #   target_user_pending_reimbursement: true,
+  #   target_user_pending_advance_request: true,
+  #   current_user_wallet: true,
+  #   current_user_card: true,
+  #   current_user_cash_in_hand: true,
+  #   current_user_pending_reimbursement: true,
+  #   current_user_pending_advance_request: true,
+  #   virtual_account: true
+  # }
   def balance
     @result = User::Balance.(current_user, params)
-    if @result.success?
-      respond_to do |format|
-        format.json { render json: @result.balances }
-      end
-    else
-      respond response: :failure
-    end
+    respond
   end
 
   private

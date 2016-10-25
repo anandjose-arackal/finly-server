@@ -32,7 +32,7 @@ class SettlementsController < ApplicationController
   end
 
   def summary
-    @result = Settlement::Show.(current_user, params)
+    @result = Settlement::Summary.(current_user, params)
     respond
   end
 

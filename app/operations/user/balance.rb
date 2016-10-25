@@ -1,5 +1,5 @@
 class User::Balance < User::Base
-  attr_accessor :selected_user, :require_card_balance, :balances
+  attr_accessor :target_user, :balances
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -9,47 +9,62 @@ class User::Balance < User::Base
     if user.blank?
       add_message :error, 'User not found'
     end
+    if params.blank?
+      add_message :error, 'Nothing to load'
+    end
   end
 
   def init
-    self.params= {} if params.blank?
-    if params[:used_id].present? or params[:id].present?
-      user_id = (params[:used_id] or params[:id])
-      self.selected_user = User::Index.(user, params).team.with_id(user_id).first rescue nil
-    else
-      self.selected_user = user
+    self.target_user = (params[:target_user] or params[:user])
+    if self.target_user.blank? and params[:target_user_id].present? or params[:user_id] or params[:id].present?
+      user_id = (params[:target_user_id] or params[:user_id] or params[:id])
+      self.target_user = User::Index.(user, params).team.with_id(user_id).first rescue nil
     end
-    self.require_card_balance = true
-    self.require_card_balance = params[:require_card_balance] unless params[:require_card_balance].nil?
   end
 
   def validate
-    if selected_user.blank?
-      add_message :error, 'User not found'
-    end
+    # if target_user.blank?
+    #   add_message :error, 'User not found'
+    # end
   end
 
   def process
     self.balances={}
-    if selected_user.company_admin?
-      self.balances[:virtual_account] = Company::VirtualAccount::Balance.(selected_user).balance rescue nil
-    end
-    self.balances[:wallet] = User::Wallet::Balance.(user, for_user: selected_user)
-    self.balances[:card] = User::PrepaidCard::Show.(user, user: selected_user).balance rescue nil if require_card_balance
-    self.balances[:cash_in_hand] = selected_user.balance_sheet.cash_in_hand.value rescue nil
-    self.balances[:pending_reimbursement] = selected_user.balance_sheet.pending_reimbursement.value
-    self.balances[:pending_advance_request] = selected_user.balance_sheet.pending_advance.value
+
+    # Virtual Account
+    self.balances[:virtual_account] = Company::VirtualAccount::Balance.(user).balance rescue nil if params[:virtual_account] and user.company_admin?
+
+    # Wallet
+    self.balances[:target_user_wallet] = User::Wallet::Balance.(user, for_user: target_user) if params[:target_user_wallet] or params[:target_user_all]
+    self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]
+
+    # Card
+    self.balances[:target_user_card] = User::PrepaidCard::Show.(user, user: target_user).balance rescue nil if params[:target_user_card] or params[:target_user_all]
+    self.balances[:current_user_card] = User::PrepaidCard::Show.(user, user: user).balance rescue nil if params[:current_user_card] or params[:current_user_all]
+
+    # Cash In Hand
+    self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
+    self.balances[:current_user_cash_in_hand] = user.balance_sheet.cash_in_hand.value rescue nil if params[:current_user_cash_in_hand] or params[:current_user_all]
+
+    # Pending Reimbursement
+    self.balances[:target_user_pending_reimbursement] = target_user.balance_sheet.pending_reimbursement.value if params[:target_user_pending_reimbursement] or params[:target_user_all]
+    self.balances[:current_user_pending_reimbursement] = user.balance_sheet.pending_reimbursement.value if params[:current_user_pending_reimbursement] or params[:current_user_all]
+
+    # Pending Cash Advance
+    self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.value if params[:target_user_pending_advance_request] or params[:target_user_all]
+    self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.value if params[:current_user_pending_advance_request] or params[:current_user_all]
+
   end
 
   def success
-    User::Balance::SuccessPresenter.new(user, {selected_user: selected_user, balances: self.balances}, messages)
+    User::Balance::SuccessPresenter.new(user, {target_user: target_user, balances: self.balances}, messages)
   end
 
   class User::Balance::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :selected_user, :balances
+    attr_accessor :target_user, :balances
 
     def init
-      self.selected_user = params[:selected_user]
+      self.target_user = params[:target_user]
       self.balances = params[:balances]
     end
 

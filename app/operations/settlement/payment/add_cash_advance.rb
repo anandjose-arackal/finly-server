@@ -62,7 +62,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       date = Date.parse(payment_params[:date])
       # validating date of money request against payment date
       if date < money_requests.order(submitted_at: :asc).first.updated_at
-        add_message :error, "Payment date cannot be before money request date."
+        add_message :error, 'Payment date cannot be before money request date'
       end
     end
   end

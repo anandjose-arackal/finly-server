@@ -120,6 +120,8 @@ gem 'faraday'
 
 gem 'hooks'
 
+gem 'bullet', :group => 'development'
+
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print'
 

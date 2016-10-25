@@ -22,7 +22,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     assert @ss.cash_in_hand.currency, @currency
 
     amount2 = 120
-    @ss.add_cash_advance(@admin, Date.today, amount2, @currency)
+    @ss.add_cash_advance(@admin, DateUtils.local_date, amount2, @currency)
     assert @ss.cash_in_hand.value, amount + amount2
     assert @ss.cash_in_hand.currency, @currency
   end
@@ -32,33 +32,33 @@ class SettlementServiceTest < ActiveSupport::TestCase
     amount = cash_in_hand.value
     if amount == 0
       amount = 500
-      assert @ss.add_cash_advance(@admin, Date.today, amount, @currency)
+      assert @ss.add_cash_advance(@admin, DateUtils.local_date, amount, @currency)
       cash_in_hand = @ss.cash_in_hand
       amount = cash_in_hand.value
     end
     assert_equal cash_in_hand.value, amount
 
     # Adding debt clearance requires initiating user, date, amount value and currency
-    assert_not @ss.add_debt_to_company_clearance nil, Date.today, amount, @currency
+    assert_not @ss.add_debt_to_company_clearance nil, DateUtils.local_date, amount, @currency
     assert @ss.errors.present?
     assert_not @ss.add_debt_to_company_clearance @admin, nil, amount, @currency
     assert @ss.errors.present?
-    assert_not @ss.add_debt_to_company_clearance @admin, Date.today, nil, @currency
+    assert_not @ss.add_debt_to_company_clearance @admin, DateUtils.local_date, nil, @currency
     assert @ss.errors.present?
-    assert_not @ss.add_debt_to_company_clearance @admin, Date.today, amount, @nil
+    assert_not @ss.add_debt_to_company_clearance @admin, DateUtils.local_date, amount, @nil
     assert @ss.errors.present?
-    assert @ss.add_debt_to_company_clearance @admin, Date.today, amount, @currency
+    assert @ss.add_debt_to_company_clearance @admin, DateUtils.local_date, amount, @currency
     assert @ss.errors.blank?
 
     amount = 500
-    @ss.add_cash_advance(@admin, Date.today, amount, @currency)
+    @ss.add_cash_advance(@admin, DateUtils.local_date, amount, @currency)
     assert_equal cash_in_hand.value, amount
 
     # Can only be cleared by finance manager or admin
-    assert_not @ss.add_debt_to_company_clearance(User.find_by(email: 'manager0@finlytest.io'), Date.today, amount, @currency)
+    assert_not @ss.add_debt_to_company_clearance(User.find_by(email: 'manager0@finlytest.io'), DateUtils.local_date, amount, @currency)
     assert @ss.errors.present?
     assert_equal cash_in_hand.value, amount
-    assert @ss.add_debt_to_company_clearance(@finance, Date.today, amount, @currency)
+    assert @ss.add_debt_to_company_clearance(@finance, DateUtils.local_date, amount, @currency)
     assert @ss.errors.blank?
     assert_equal cash_in_hand.value, 0
 
@@ -112,7 +112,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     amount = 1000
     expected_reimbursable_amount = 500
     expected_cash_in_advance = 0
-    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    assert @ss.add_cash_advance(@admin, DateUtils.local_date, cash_advance, @currency)
     r = dummy_report_flow @user, final_approve: true, amount: amount
     assert r.accounted?
     report_amount = ReportDetailService.new(r).total_amount
@@ -128,7 +128,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     amount = 1000
     expected_reimbursable_amount = 0
     expected_cash_in_advance = 0
-    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    assert @ss.add_cash_advance(@admin, DateUtils.local_date, cash_advance, @currency)
     r = dummy_report_flow @user, final_approve: true, amount: amount
     assert r.accounted?
     report_amount = ReportDetailService.new(r).total_amount
@@ -144,7 +144,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     amount = 1000
     expected_reimbursable_amount = 0
     expected_cash_in_advance = 4000
-    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    assert @ss.add_cash_advance(@admin, DateUtils.local_date, cash_advance, @currency)
     r = dummy_report_flow @user, final_approve: true, amount: amount
     assert r.accounted?
     report_amount = ReportDetailService.new(r).total_amount
@@ -182,7 +182,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     cash_advance = 500
     amount = 1000
     expected_reimbursable_amount = 500
-    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    assert @ss.add_cash_advance(@admin, DateUtils.local_date, cash_advance, @currency)
     r = dummy_report_flow @user, final_approve: true, amount: amount
     assert r.accounted?
     report_amount = ReportDetailService.new(r).total_amount
@@ -203,7 +203,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     cash_advance = 500
     amount = 1000
     expected_reimbursable_amount = 0
-    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    assert @ss.add_cash_advance(@admin, DateUtils.local_date, cash_advance, @currency)
     r = dummy_report_flow @user, final_approve: true, amount: amount
     assert r.accounted?
     report_amount = ReportDetailService.new(r).total_amount
@@ -223,7 +223,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     cash_advance = 1000
     amount = 1000
     expected_reimbursable_amount = 0
-    assert @ss.add_cash_advance(@admin, Date.today, cash_advance, @currency)
+    assert @ss.add_cash_advance(@admin, DateUtils.local_date, cash_advance, @currency)
     r = dummy_report_flow @user, final_approve: true, amount: amount
     assert r.accounted?
     report_amount = ReportDetailService.new(r).total_amount
@@ -250,7 +250,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     assert_equal r.reimbursement_amount.precision_value, amount
     assert_no_difference 'ReportComment.count' do
       assert_no_difference 'ReportTrack.count' do
-        assert_not @ss.add_reimbursement(@admin, [r.id], Date.today, reimbursement_amount, Currency.first)
+        assert_not @ss.add_reimbursement(@admin, [r.id], DateUtils.local_date, reimbursement_amount, Currency.first)
       end
     end
     assert r.approved?
@@ -267,7 +267,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     assert_equal r.reimbursement_amount.precision_value, amount
     assert_no_difference 'ReportComment.count' do
       assert_no_difference 'ReportTrack.count' do
-        assert_not @ss.add_reimbursement(@admin, [r.id], Date.today, reimbursement_amount, Currency.first)
+        assert_not @ss.add_reimbursement(@admin, [r.id], DateUtils.local_date, reimbursement_amount, Currency.first)
       end
     end
     assert r.approved?
@@ -286,7 +286,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     assert_equal r.reimbursement_amount.precision_value, amount
     assert_difference 'ReportComment.count', 1 do
       assert_difference 'ReportTrack.count', 1 do
-        assert @ss.add_reimbursement(@admin, [r.id], Date.today, reimbursement_amount, Currency.first)
+        assert @ss.add_reimbursement(@admin, [r.id], DateUtils.local_date, reimbursement_amount, Currency.first)
       end
     end
     assert @ss.errors.blank?
@@ -305,7 +305,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     reimbursement_amount = 3000
     assert_no_difference 'ReportComment.count' do
       assert_no_difference 'ReportTrack.count'do
-        assert_not @ss.add_reimbursement(@admin, report_ids, Date.today, reimbursement_amount, Currency.first)
+        assert_not @ss.add_reimbursement(@admin, report_ids, DateUtils.local_date, reimbursement_amount, Currency.first)
       end
     end
     assert @ss.errors.present?
@@ -324,7 +324,7 @@ class SettlementServiceTest < ActiveSupport::TestCase
     reimbursement_amount = 4000
     assert_difference 'ReportComment.count', report_ids.count do
       assert_difference 'ReportTrack.count', report_ids.count do
-        assert @ss.add_reimbursement(@admin, report_ids, Date.today, reimbursement_amount, Currency.first)
+        assert @ss.add_reimbursement(@admin, report_ids, DateUtils.local_date, reimbursement_amount, Currency.first)
       end
     end
     assert @ss.errors.blank?

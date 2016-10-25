@@ -4,6 +4,10 @@ class CardsController < ApplicationController
   def details
     @result = User::PrepaidCard::Show.(current_user, params)
     # respond
+    if @result.failure?
+      respond response: :failure
+      return
+    end
     respond_to do |format|
       format.json { render json: {balance: @result.balance} }
     end
