@@ -15,7 +15,7 @@ class Expense::Manual::Update < Expense::Manual::Base
       messages[:error] << "Expense ID missing!"
       return false
     end
-    if params[:expense].present? and params[:expense][:amount].present? and params[:expense][:amount].to_i < 0
+    if params[:expense].present? and params[:expense][:amount].present? and params[:expense][:amount].to_d < 0
       messages[:error] << "Amount can't be negative."
       return false
     end

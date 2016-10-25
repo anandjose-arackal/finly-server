@@ -17,7 +17,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount] and params[:payment][:amount].to_i < 0
+    if params[:payment][:amount] and params[:payment][:amount].to_d < 0
       add_message :error, 'Reimbursement amount cannot be negative'
     end
     if params[:report_ids].blank?

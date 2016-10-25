@@ -11,11 +11,11 @@ class UserWallet < ActiveRecord::Base
   end
 
   def add_funds(amount)
-    if amount.blank? or amount.to_i <= 0
+    if amount.blank? or amount.to_d <= 0
       errors.add(:amount, 'cannot be less than or equal to 0')
       return false
     end
-    new_balance = amount.to_i + self.balance_value
+    new_balance = amount.to_d + self.balance_value
     unless self.balance.update_attribute(:value, new_balance)
       @errors.merge!(self.balance.instance_variable_get(:@errors))
       return false
@@ -24,15 +24,15 @@ class UserWallet < ActiveRecord::Base
   end
 
   def subtract_funds(amount)
-    if amount.blank? or amount.to_i <= 0
+    if amount.blank? or amount.to_d <= 0
       errors.add(:amount, 'cannot be less than or equal to 0')
       return false
     end
-    if amount.to_i > self.balance_value
+    if amount.to_d > self.balance_value
       errors.add(:amount, 'cannot be greater than the remaining balance in the wallet')
       return false
     end
-    new_balance = self.balance_value - amount.to_i
+    new_balance = self.balance_value - amount.to_d
     unless self.balance.update_attribute(:value, new_balance)
       @errors.merge!(self.balance.instance_variable_get(:@errors))
       return false

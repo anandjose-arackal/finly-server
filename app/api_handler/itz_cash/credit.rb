@@ -38,7 +38,7 @@ class ItzCash::Credit < ItzCash::Base
 
   def init
     super
-    self.amount = params[:amount].to_i rescue nil
+    self.amount = params[:amount].to_d rescue nil
     # Convert amount value in paise
     self.amount = (self.amount * 100) if self.amount
   end
