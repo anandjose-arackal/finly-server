@@ -23,10 +23,6 @@ class ExpensesController < ApplicationController
         @result = Expense::Manual::Update.(current_user, params)
       when '2'
         @result = Expense::ExCard::Update.(current_user, params)
-      else
-        # todo for testing - remove later.
-        # @result = Expense::Manual::Update.(current_user, params)
-        @result = Expense::ExCard::Update.(current_user, params)
     end
     respond response: :success
   end
