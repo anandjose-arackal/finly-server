@@ -128,10 +128,14 @@ $(document).ready ->
       # url: '/settlements/summary?view_to_load=payments&view=personal'
       url: 'users/' + user_id + '/balance'
       data:
-        target_user_id: user_id
+        # target_user_id: user_id
         authenticity_token: $("#authenticity_token").val()
-        all: true
-        view: 'personal'
+        current_user_all: true
+        current_user_wallet: true
+        current_user_card: true
+        current_user_cash_in_hand: true
+        virtual_account: true
+        # view: 'admin'
       success: (data) ->
         $(_this).find('.modal-body').html(templateBalance({item: data}))
         console.log data

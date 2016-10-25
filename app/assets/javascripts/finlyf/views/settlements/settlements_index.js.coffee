@@ -856,6 +856,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     $(modal_body).find(".settlement-step-1").removeClass('active')
     $(modal_body).find(".settlement-step-2").addClass('active').attr('data-navigate', '1')
+    $(modal_body).find(".settlement-step-2 .panel-heading .step-heading-summary").html("")
 
     switch action_type
       when 'credit_reimbursement'
@@ -956,18 +957,74 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromWallet({summary: @selectedUserSummary}))
+        $.ajax({
+          url: 'users/' + _this.user_id + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            console.log res
+            $(modal_body).find('.settlement-step-2 .current_user_wallet_balance').text(res.current_user_wallet)
+            $(modal_body).find('.settlement-step-2 .target_user_card_balance').text(res.target_user_card)
+        })
       when 'credit_wallet_from_wallet'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditWalletFromWallet({summary: @selectedUserSummary}))
+        $.ajax({
+          url: 'users/' + _this.user_id + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            console.log res
+            $(modal_body).find('.settlement-step-2 .current_user_wallet_balance').text(res.current_user_wallet)
+            $(modal_body).find('.settlement-step-2 .target_user_wallet_balance').text(res.target_user_wallet)
+        })
       when 'credit_card_from_virtual_account'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromVirtualAccount({summary: @selectedUserSummary}))
+        $.ajax({
+          url: 'users/' + _this.user_id + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal_body).find('.settlement-step-2 .virtual_account_balance').text(res.virtual_account)
+            $(modal_body).find('.settlement-step-2 .target_user_card_balance').text(res.target_user_card)
+        })
       when 'credit_wallet_from_virtual_account'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit Wallet from Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditWalletFromVirtualAccount({summary: @selectedUserSummary}))
+        $.ajax({
+          url: 'users/' + _this.user_id + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal_body).find('.settlement-step-2 .virtual_account_balance').text(res.virtual_account)
+            $(modal_body).find('.settlement-step-2 .target_user_wallet_balance').text(res.target_user_wallet)
+        })
       #DEBIT ACTIONS
       when 'debit_cash_advance'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Cash Advance")
@@ -982,15 +1039,43 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToWallet({summary: @selectedUserSummary}))
+        
       when 'debit_wallet_to_wallet'
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitWalletToWallet({summary: @selectedUserSummary}))
+        $.ajax({
+          url: 'users/' + _this.user_id + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal_body).find('.settlement-step-2 .current_user_wallet_balance').text(res.current_user_wallet)
+            $(modal_body).find('.settlement-step-2 .target_user_wallet_balance').text(res.target_user_wallet)
+        })
       when 'debit_wallet_to_virtual_account' 
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitWalletToVirtualAccount({summary: @selectedUserSummary}))
-
+        $.ajax({
+          url: 'users/' + _this.user_id + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal_body).find('.settlement-step-2 .virtual_account_balance').text(res.virtual_account)
+            $(modal_body).find('.settlement-step-2 .target_user_wallet_balance').text(res.target_user_wallet)
+        })
     $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
   confirmAction: (e) ->
@@ -1008,6 +1093,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     $(modal_body).find(".settlement-step-2").removeClass('active')
     $(modal_body).find(".settlement-step-3").addClass('active').attr('data-navigate', '1')
+    $(modal_body).find(".settlement-step-2 .panel-heading .step-heading-summary").html("")
     switch action_type
       when 'credit_reimbursement'
         #Setup and how colapse 3
@@ -1015,6 +1101,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         #Append base structure
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditReimburseConfirm({summary: @selectedUserSummary}))
 
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-heading-summary").html("Total: &#8377;&nbsp;" + _this.settlementActionData.c_cash_advance.amount)
         #Collect relevant data from Step 2
         # container = $(e.currentTarget).closest('.settlement-action-items')
         # reports =  $(container).find('.settlement-report')
@@ -1043,6 +1130,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         _this.settlementActionData.c_cash_advance.amount = $(container).find('input[name=payment\\[amount\\]]').val()
         _this.settlementActionData.c_cash_advance.date = $(container).find('input[name=payment\\[date\\]]').val()
         _this.settlementActionData.c_cash_advance.note = $(container).find('textarea[name=payment\\[note\\]]').val()
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-heading-summary").html("Total: &#8377;&nbsp;" + _this.settlementActionData.c_cash_advance.amount)
 
       when 'credit_money_request'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")

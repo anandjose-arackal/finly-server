@@ -106,7 +106,6 @@
             </div>
           </div> 
           <form class="form-user-roles">
-            
           
             <div class="row">
               <div class="col-sm-3">Admin?</div>
@@ -160,7 +159,6 @@
               <div class="col-sm-3">Manager?</div>
               <div class="col-sm-9">
                 <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
-
 
                 {{#if item.role.editable.manager}}
                   {{#if item.role.manager}}
@@ -254,7 +252,7 @@
       </div>
       <div class="tab-pane" id="c">
       {{#if item.card.assigned}}
-        <section class="user-wallet">
+        <section class="user-wallet" style="min-height: 500px;">
           <div class="row">
             <div class="col-sm-6"><h4>Wallet</h4></div>
           </div>
@@ -925,5 +923,14 @@
 .list-group .list-group-item h4, .list-group .list-group-item span {
   line-height: 11px;
 }
+
+.transfer-flow{
+  position: absolute;
+  margin-left: 47%;
+  top: 36px;
+  font-size: 20px;
+}
+
+
 
 </style>

@@ -296,10 +296,102 @@ class FinlyF.Views.User extends Backbone.View
     $(modal).modal('show')
 
     switch action_type
-      when 'credit_wallet_from_virtual_account', 'credit_card_from_virtual_account', 'credit_wallet_from_wallet', 'credit_card_from_wallet'
+      when 'credit_wallet_from_virtual_account'
         $(modal).html(@templateLoadFunds({item: item}))
-      when 'debit_wallet_to_virtual_account', 'debit_wallet_to_wallet'
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.virtual_account_balance').html("&#8377;&nbsp;" + res.virtual_account)
+            $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
+      when 'credit_card_from_virtual_account'
+        $(modal).html(@templateLoadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.virtual_account_balance').html("&#8377;&nbsp;" + res.virtual_account)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
+      when 'credit_wallet_from_wallet'
+        $(modal).html(@templateLoadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_wallet_balance').html("&#8377;&nbsp;" + res.current_user_wallet)
+            $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
+      when 'credit_card_from_wallet'
+        $(modal).html(@templateLoadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_wallet_balance').html("&#8377;&nbsp;" + res.current_user_wallet)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
+        })
+      when 'debit_wallet_to_virtual_account'
         $(modal).html(@templateUnloadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.virtual_account_balance').html("&#8377;&nbsp;" + res.virtual_account)
+            $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
+      when 'debit_wallet_to_wallet'
+        $(modal).html(@templateUnloadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_wallet_balance').html("&#8377;&nbsp;" + res.current_user_wallet)
+            $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
       
     
     # if action_type == 'credit_card_from_virtual_account' || action_type == 'credit_card_from_wallet' || 
@@ -309,20 +401,20 @@ class FinlyF.Views.User extends Backbone.View
 
 
     #Getting the card balance in modal
-    $.ajax({
-      url: '/cards/details',
-      dataType: 'json',
-      type: "POST",
-      data: {
-        authenticity_token: $("#authenticity_token").val()
-        user_id: _this.model.get('id')
-        view: _this.params.view
-      }
-      success: (res) ->
-        $(modal).find('.card-balance').html("&#8377;&nbsp;&nbsp;" + res.balance)
-      error: (err) ->
-        console.log "Error", err
-    })
+    # $.ajax({
+    #   url: '/cards/details',
+    #   dataType: 'json',
+    #   type: "POST",
+    #   data: {
+    #     authenticity_token: $("#authenticity_token").val()
+    #     user_id: _this.model.get('id')
+    #     view: _this.params.view
+    #   }
+    #   success: (res) ->
+    #     $(modal).find('.card-balance').html("&#8377;&nbsp;&nbsp;" + res.balance)
+    #   error: (err) ->
+    #     console.log "Error", err
+    # })
 
     # $.ajax
 
@@ -351,10 +443,17 @@ class FinlyF.Views.User extends Backbone.View
       # action_type: action_type
     }
 
-    if action_type == 'credit_card_from_company_credits' || action_type == 'credit_card_from_card'
+    if action_type == 'credit_wallet_from_virtual_account' || action_type == 'credit_card_from_card'
       data.to_user_id = _this.model.get('id')
     else if action_type == 'debit_card_to_company_credits' || action_type == 'debit_card_to_card'
       data.from_user_id = _this.model.get('id')
+
+    switch action_type
+      when 'credit_wallet_from_virtual_account', 'credit_card_from_virtual_account', 'credit_wallet_from_wallet', 'credit_card_from_wallet'
+        data.to_user_id = _this.model.get('id')
+      when 'debit_wallet_to_virtual_account', 'debit_wallet_to_wallet'
+        data.from_user_id = _this.model.get('id')
+    
 
     $.ajax({
       url: url
@@ -367,8 +466,13 @@ class FinlyF.Views.User extends Backbone.View
           $(modal).modal('hide')
           $(modal).html("")
           #Update current card balance.
-          $(_this.el).find(".card-balance").find(".balance").html("&nbsp;")
-          $(_this.el).find(".btn-card-request-balance").text("Request Balance")
+          # $(_this.el).find(".card-balance").find(".balance").html("&nbsp;")
+          # $(_this.el).find(".btn-card-request-balance").text("Request Balance")
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
 
         else
           console.log res
