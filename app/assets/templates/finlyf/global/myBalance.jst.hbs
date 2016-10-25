@@ -3,26 +3,30 @@
     <div class="row no-margin">
       <div class="col-sm-6 balance-container text-center">
         <div>
-          <h3>&#8377;&nbsp;&nbsp;{{item.current_user_card}}</h3>
-          <label>Cash in Card</label>
+          <h3>&#8377;&nbsp;{{item.current_user_wallet}}</h3>
+          <label>Cash in Wallet</label>
         </div>
       </div>
 
+      <div class="col-sm-6 balance-container text-center">
+        <div>
+          <h3>&#8377;&nbsp;&nbsp;{{item.current_user_card}}</h3>
+          <label>Cash in Card</label>
+          <button class="btn btn-xs btn-success btn-transfer-wallet-to-card">Load from Wallet</button>
+        </div>
+      </div>
+
+      
+    </div>
+
+    <div class="row no-margin">
       <div class="col-sm-6 balance-container text-center">
         <div>
           <h3>&#8377;&nbsp;{{item.current_user_cash_in_hand}}</h3>
           <label>Cash in Hand</label>
         </div>
       </div>
-    </div>
-
-    <div class="row no-margin">
-      <div class="col-sm-6 balance-container text-center">
-        <div>
-          <h3>&#8377;&nbsp;{{item.current_user_wallet}}</h3>
-          <label>Cash in Wallet</label>
-        </div>
-      </div>
+      
 
       {{#if item.virtual_account}}
       <div class="col-sm-6 balance-container text-center">

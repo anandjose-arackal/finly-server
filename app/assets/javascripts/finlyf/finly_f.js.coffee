@@ -118,6 +118,7 @@ window.FinlyF =
 $(document).ready ->
   FinlyF.initialize()
   templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
+  balance_data = {}
   $("#modal-balance").on("shown.bs.modal", (e) ->
     _this = this
     e.preventDefault()
@@ -138,8 +139,17 @@ $(document).ready ->
         # view: 'admin'
       success: (data) ->
         $(_this).find('.modal-body').html(templateBalance({item: data}))
-        console.log data
+        balance_data = data
+        # console.log data
       error: (err) ->
         console.log err
     })
+  )
+
+  $(".btn-transfer-wallet-to-card").on('click', (e) ->
+    $("#modal-balance").modal('hide')
+    $.ajax({
+
+    })
+    # $("#modal-global-transfer").modal('s
   )

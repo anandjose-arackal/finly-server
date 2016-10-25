@@ -183,8 +183,8 @@ class FinlyF.Views.Request extends Backbone.View
     # }
     _this = @
     formData = new FormData($('form#edit-money-request')[0])
-    payment_mode_id = $("form#edit-money-request select[name=money_request\\[payment_mode_id\\]] option:selected").val()
-    console.log "payment_mode_id", payment_mode_id
+    payment_mode_id = $("form#edit-money-request select[name=money_request\\[payment_mode_id\\]] option:selected").val() || $("form#edit-money-request input[name=money_request\\[payment_mode_id\\]]").val()
+    # console.log "payment_mode_id", payment_mode_id
     formData.append('money_request[payment_mode_id]', payment_mode_id)
     $.ajax({
       url: '/money_request/' + _this.model.get('id')
