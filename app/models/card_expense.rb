@@ -18,4 +18,9 @@ class CardExpense < ActiveRecord::Base
   def card_merchant_name
     self.editable_merchant
   end
+
+  scope :merchant_like, -> (merchant, expense_ids) do
+    where(expense_id: expense_ids).where('lower(editable_merchant) LIKE ?', "%#{merchant.downcase}%").pluck(:editable_merchant)
+  end
+
 end

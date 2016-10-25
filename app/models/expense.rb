@@ -19,6 +19,7 @@
 #
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -95,6 +96,7 @@ class Expense < ActiveRecord::Base
         # do nothing
     end
   end
+
   scope :filter_sort, ->(sort_by, order) do
     order.upcase! if order
     order("#{sort_by} #{order}") # sort_by: created_at, date etc. order: asc/desc
@@ -111,7 +113,18 @@ class Expense < ActiveRecord::Base
     end
   end
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
-  scope :filter_merchant, -> (merchant_name) { joins(:manual_expense).select('expenses.*').where('merchant like ?', "%#{merchant_name}%") }
+
+  scope :filter_merchant, -> (merchant_name) {
+    expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
+    expense_ids += CardExpense.where('editable_merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
+
+    where(id: expense_ids)
+  }
+
+  # scope :filter_merchant, -> (merchant_name) {
+  #   joins(:manual_expense, :card_expense).select('expenses.*').where('lower(merchant) like ? OR lower(editable_merchant) like ?', "%#{merchant_name}%", "%#{merchant_name}%")
+  # }
+
   scope :filter_status_id, -> (status_id) { where expense_status_id: status_id }
   scope :filter_search, -> (value) { joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant like ? OR note like ?', "%#{value}%", "%#{value}%") }
 
