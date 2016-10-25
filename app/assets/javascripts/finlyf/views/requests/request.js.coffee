@@ -305,6 +305,7 @@ class FinlyF.Views.Request extends Backbone.View
     $(modal).modal('show')
 
   confirmTransfer: (e) ->
+    _this = @
     e.preventDefault()
     target = e.currentTarget
     container = $(target).closest(".modal")
@@ -323,7 +324,7 @@ class FinlyF.Views.Request extends Backbone.View
         # type: action_type,
         password: password,
         amount: amount
-        view: _this.params.view
+        view: _this.current_view
       },
       success: (res) ->
         FinlyF.snapNotify(res.messages)
