@@ -45,7 +45,7 @@ class Receipt < ActiveRecord::Base
     unless date_from.blank? && date_to.blank?
       type_val = :created_at
       date_from = "1990-01-01" if date_from.blank?
-      date_to = Date.today if date_to.blank?
+      date_to = DateUtils.local_date if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date + 1 if date_to.present?
       receipts = arel_table

@@ -7,7 +7,7 @@ module ReportOperationTestHelper
                                  note: "Sup dawg",
                                  expense_status_id: 1,
                                  expense_type_id: 1,
-                                 date: Date.today,
+                                 date: DateUtils.local_date,
                                  currency_id: 1,
                                  category_id: 1 }
     }

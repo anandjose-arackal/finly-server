@@ -9,7 +9,7 @@ class CreateTest < ActiveSupport::TestCase
                                  note: "Sup dawg",
                                  expense_status_id: 1,
                                  expense_type_id: 1,
-                                 date: Date.today,
+                                 date: DateUtils.local_date,
                                  currency_id: 1,
                                  category_id: 1 }
     }
@@ -32,7 +32,7 @@ class CreateTest < ActiveSupport::TestCase
       @expense = create_op.run
     end
     assert_equal "Olacabs", @expense.merchant_name
-    assert_equal Date.today, @expense.date
+    assert_equal DateUtils.local_date, @expense.date
 
     # creating an expense with receipt
     @expense_params[:expense][:receipt] = @image
@@ -41,7 +41,7 @@ class CreateTest < ActiveSupport::TestCase
       @expense = create_op.run
     end
     assert_equal "Olacabs", @expense.merchant_name
-    assert_equal Date.today, @expense.date
+    assert_equal DateUtils.local_date, @expense.date
     assert @expense.receipts.count
   end
 

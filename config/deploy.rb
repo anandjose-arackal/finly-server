@@ -4,9 +4,9 @@ lock '3.6.1'
 
 
 set :application, 'finly-server'
-set :repo_url, 'git@bitbucket.org:vivek_a17/finly-server.git'
+set :repo_url, 'git@bitbucket.org:finlycore/finly-server.git'
 set :branch, ENV['BRANCH'] || :master
-set :deploy_to, '/home/deploy/finly-server'
+set :deploy_to, '/home/sreeramn/finly-server'
 set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}

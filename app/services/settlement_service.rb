@@ -20,7 +20,7 @@ class SettlementService < BaseService
 
   def cash_in_hand(date = nil)
     cash = user.balance_sheet.cash_in_hand
-    return cash if date.blank? or date == Date.today
+    return cash if date.blank? or date == DateUtils.local_date
     payments = user.payments.made_after(date).with_amount
     payments_to_user = payments.transferred_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
@@ -222,7 +222,7 @@ class SettlementService < BaseService
     if date.blank?
       errors << 'Date cannot be blank'
     end
-    if date.present? and date > Date.today
+    if date.present? and date > DateUtils.local_date
       errors << 'Date cannot be later than the currency date'
     end
     errors.blank?
