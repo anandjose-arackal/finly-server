@@ -43,7 +43,6 @@ class ItzCash::Block < ItzCash::Base
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
   end
 
-
   class ItzCash::Block::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :description
 
@@ -53,6 +52,13 @@ class ItzCash::Block < ItzCash::Base
       self.description = params[:description]
     end
 
+  end
+
+  protected
+
+  # Handle success for -100 as -100 is returned if the card is already blocked
+  def success?
+    self.process_complete and not has_errors? and not self.timeout and (self.response.status == 200 or self.response.status == -100)
   end
 
 end

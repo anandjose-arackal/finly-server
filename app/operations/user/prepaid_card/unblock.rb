@@ -3,20 +3,20 @@ class User::PrepaidCard::Unblock < User::PrepaidCard::Block
   def validate_status
     card = selected_user.cards.first
     if card.active
-      messages[:error] << 'Card is already active'
+      add_message :error, 'Card is already active'
       return
     end
     disabled_by_role = card.disabled_by_role_id
     curr_role = user_role_id
-    if curr_role == UserRole.id_for(:employee) and disabled_by_role != UserRole.id_for(:employee)
-      messages[:error] << "The card has been disabled by the #{UserRole.name_for(disabled_by_role)}. You do not have the appropriate permission to enable the card"
+    if curr_role == UserRole.id_for(:employee) and disabled_by_role != nil and disabled_by_role != UserRole.id_for(:employee) and 
+      add_message :error, "The card has been disabled by the #{UserRole.name_for(disabled_by_role)}. You do not have the appropriate permission to enable the card"
     end
   end
 
   def process
     self.block_presenter = ItzCash::Unblock.(selected_user, params)
     if block_presenter.failure?
-      messages[:error] = block_presenter.messages[:error]
+      add_message :error, block_presenter.messages[:error]
     end
   end
 
@@ -25,7 +25,7 @@ class User::PrepaidCard::Unblock < User::PrepaidCard::Block
     selected_user.cards.first.update_attributes({active: true, disabled_by_role_id: nil,
                                                  disabled_by_user: nil, disable_note: nil})
     if self.block_presenter.present? and self.block_presenter.success?
-      messages[:success] << 'Successfully unblocked the card!'
+      add_message :success, 'Successfully unblocked the card!'
     end
   end
 

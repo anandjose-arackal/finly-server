@@ -9,16 +9,16 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
     super
     return if has_errors?
     if params[:password].blank?
-      messages[:error] << 'You need to provide your password for disabling the card'
+      add_message :error, 'You need to provide your password for disabling the card'
     elsif not user.valid_password?(params[:password])
-      messages[:error] << 'Invalid Password!'
+      add_message :error, 'Invalid Password!'
     end
   end
 
   def process
     self.block_presenter = ItzCash::Block.(selected_user, params)
     if block_presenter.failure?
-      messages[:error] = block_presenter.messages[:error]
+      add_message :error, block_presenter.messages[:error]
     end
   end
 
@@ -30,7 +30,7 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
 
   def validate_status
     unless selected_user.cards.first.active
-      messages[:error] << 'Card is already blocked'
+      add_message :error, 'Card is already blocked'
     end
   end
 
@@ -40,7 +40,7 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
                      disabled_by_user_id: user.id, disable_note: params[:disable_note]}
     selected_user.cards.first.update_attributes(update_params)
     if self.block_presenter.present? and self.block_presenter.success?
-      messages[:success] << 'Successfully blocked the card!'
+      add_message :success, 'Successfully blocked the card!'
     end
   end
 
