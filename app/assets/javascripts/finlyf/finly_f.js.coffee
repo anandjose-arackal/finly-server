@@ -128,7 +128,7 @@ $(document).ready ->
       dataType: "json"
       type : 'get'
       # url: '/settlements/summary?view_to_load=payments&view=personal'
-      url: 'users/' + user_id + '/balance'
+      url: '/users/' + user_id + '/balance'
       data:
         # target_user_id: user_id
         authenticity_token: $("#authenticity_token").val()
@@ -194,6 +194,10 @@ $(document).ready ->
             $(modal).modal('hide')
           else
             $(target).attr('disabled', false)
+        error: (err) ->
+          console.log "Error", err
+          $(target).attr('disabled', false)
+          
       })
 
     )

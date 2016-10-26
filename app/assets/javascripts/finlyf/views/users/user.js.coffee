@@ -521,6 +521,11 @@ class FinlyF.Views.User extends Backbone.View
         if res.success == true
           $(modal).modal('hide')
           $(modal).html("")
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
         else
           console.log res
       error: (err) ->

@@ -14,7 +14,7 @@
         <label class="control-label" style="font-size: 20px; font-weight: normal;">Balance:</label>
       </div>
       <div class="col-sm-8" style="font-size: 25px; color: #2ECC71;">
-        <span>&#8377;&nbsp;&nbsp;5000.00</span>
+        <span>&#8377;&nbsp;&nbsp;</span><span class="current_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span>
       </div>
       
     </div>
@@ -52,13 +52,44 @@
         </div>
         <div class="card-balance" style="display: inline-block; position: absolute; margin-left: 15px;">
           <label class="control-label" style="font-size: 20px; font-weight: normal;">Card Balance:</label>
-          <span class="balance" style="font-size: 25px; color: #2ECC71;">&#8377;&nbsp;&nbsp;5000.00</span>
+          <span class="balance" style="font-size: 25px; color: #2ECC71;">&#8377;&nbsp;&nbsp;</span><span class="current_user_card_balance"><i class="fa fa-spin fa-spinner"></i></span>
         </div>
+        <% if card.active %>
+          <button class="btn btn-sm btn-danger btn-card-update-status" data-card-status-type="0" data-target="#modal-confirm-card-status" data-toggle="modal">Deactivate</button>
+        <% else %>
+          <button class="btn btn-sm btn-success btn-card-update-status" data-card-status-type="1" data-target="#modal-confirm-card-status" data-toggle="modal">Activate</button>
+        <% end %>
       <% end %>    
     </div>
      
   </div>
 
+</div>
+
+<div class="modal fade in" tabindex="-1" role="dialog" id="modal-confirm-card-status">
+  <div class="modal-dialog" role="document" style="width: 40%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Confirm Card Status Change</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row no-margin">
+          <div class="col-sm-8 col-sm-offset-2">
+
+            <div class="form-group">
+              <label class="control-form">Password:</label>
+              <input name="password" class="form-control password" type="password">
+            </div>
+
+            <div class="form-group text-center">
+              <button class="btn btn-success btn-confirm-card-status btn-wd-100" data-card-status-type="1">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
 </div>
 
 <style type="text/css">
@@ -71,6 +102,21 @@
 <script type="text/javascript">
   $(document).ready(function(){
     //Get card balance and populate
+    $.ajax({
+      url: '/users/' + '<%= current_user.id %>' + '/balance',
+      data: {
+        current_user_wallet: true,
+        current_user_card: true
+      },
+      dataType: 'json',
+      success: function(res){
+        $(".current_user_wallet_balance").html(res.current_user_wallet);
+        $(".current_user_card_balance").html(res.current_user_card);
+      },
+      error: function(err){
+        console.log("Error", err);
+      }
+    });
   });
 
   $(".btn-transfer").on('click', function(e){
@@ -86,5 +132,34 @@
     //Show modal for collecting amoutn and password
 
     //Send data 
+  });
+
+  $(".btn-card-update-status").on('click', function(e){
+    var card_status = $(this).attr('data-card-status-type');
+    $(".btn-confirm-card-status").attr('data-card-status-type', card_status)
+  });
+  $(".btn-confirm-card-status").on('click', function(e){
+    var card_status = $(this).attr('data-card-status-type');
+    target = this;
+    $.ajax({
+      url: '/cards/update_status',
+      type: "POST",
+      dataType: 'json',
+      data: {
+        view: 'personal',
+        user_id: '<%= current_user.id %>',
+        status_type: card_status,
+        password: $(target).closest('.modal-body').find('input[type=password]').val()
+      },
+      success: function(res){
+        console.log(res);
+        if(res.success === true){
+          window.location.reload();
+        }
+      },
+      error: function(err){
+        console.log("ERror", err);
+      }
+    });
   });
 </script>
