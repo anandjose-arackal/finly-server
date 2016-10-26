@@ -24,7 +24,7 @@ class User::Wallet::Debit < User::Wallet::Base
 
   def init
     super
-    self.amount= params[:amount].to_i rescue nil
+    self.amount= params[:amount].to_d rescue nil
     self.from_account = params[:from_account].to_sym rescue nil
     self.to_account = params[:to_account].to_sym rescue nil
     self.to_user = user

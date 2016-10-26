@@ -23,15 +23,19 @@ class User::Wallet::Credit < User::Wallet::Base
 
   def init
     super
-    self.amount= params[:amount].to_i rescue nil
+    self.amount= params[:amount].to_d rescue nil
     self.from_account = params[:from_account].to_sym rescue nil
     self.to_account = params[:to_account].to_sym rescue nil
     self.from_user = user
     self.to_user = params[:to_user]
     if to_user.blank? and params[:to_user_id].present?
-      op= User::Team::Index.new(user, params)
-      users = op.run
-      self.to_user = (users.with_id(params[:to_user_id]).first rescue nil) if op.success? and users.present?
+      if params[:to_user_id].to_i == user.id
+        self.to_user = user
+      else
+        op= User::Team::Index.new(user, params)
+        users = op.run
+        self.to_user = (users.with_id(params[:to_user_id]).first rescue nil) if op.success? and users.present?
+      end
     end
   end
 

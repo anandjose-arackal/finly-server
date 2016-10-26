@@ -38,7 +38,7 @@
             <button class="btn btn-sm btn-danger btn-report-action" data-action-type="reject" data-url="{{item.actions.reject}}">Reject</button>
           {{/if}}
 
-          {{#ifCond item.actions.card_transfer '||' item.actions.card_credit}}
+          {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
 
           <div class="dropdown">
             <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -47,11 +47,11 @@
             </button>
 
             <ul class="dropdown-menu" aria-labelledby="dLabel">
-              {{#if item.actions.card_transfer}}
-                <li><a class="btn-transfer" data-url="{{item.actions.card_transfer}}" data-action-type="transfer">From Your Card</a> </li>
+              {{#if item.actions.credit_card_from_wallet}}
+                <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="transfer">From Your Wallet</a> </li>
               {{/if}}
-              {{#if item.actions.card_credit}}
-                <li><a class="btn-transfer" data-url="{{item.actions.card_credit}}" data-action-type="credit">From Company Credits</a> </li>
+              {{#if item.actions.credit_card_from_virtual_account}}
+                <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit">From Company Credits</a> </li>
               {{/if}}
             </ul>
           </div>
@@ -118,7 +118,7 @@
                 --
               {{/if}}
               </label>
-              {{#unless item.card.assigned}}
+              {{#if item.card.assigned}}
                 <select class="form-control item-attr-edit" name="money_request[payment_mode_id]">
                   <option value="1" {{#if_eq item.payment_mode_id 1}}selected="selected"{{/if_eq}}>Cash</option>
                   <option value="2" {{#if_eq item.payment_mode_id 2}}selected="selected"{{/if_eq}}>Card</option>
@@ -126,7 +126,7 @@
               {{else}}
                 <label class="control-label item-attr-edit">Cash</label>
                 <input type="hidden" name="money_request[payment_mode_id]" value="1">
-              {{/unless}}
+              {{/if}}
 
             </div>
           </div>

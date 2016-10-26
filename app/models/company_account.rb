@@ -22,11 +22,11 @@ class CompanyAccount < ActiveRecord::Base
   end
 
   def funds_credited_to_wallet(amount)
-    if amount.blank? or amount.to_i <= 0
+    if amount.blank? or amount.to_d <= 0
       errors.add(:amount, 'cannot be less than or equal to 0')
       return false
     end
-    new_balance = amount.to_i + self.wallet_balance.value
+    new_balance = amount.to_d + self.wallet_balance.value
     unless self.wallet_balance.update_attribute(:value, new_balance)
       @errors.merge!(self.balance.instance_variable_get(:@errors))
       return false
@@ -35,15 +35,15 @@ class CompanyAccount < ActiveRecord::Base
   end
 
   def funds_debited_from_wallet(amount)
-    if amount.blank? or amount.to_i <= 0
+    if amount.blank? or amount.to_d <= 0
       errors.add(:amount, 'cannot be less than or equal to 0')
       return false
     end
-    if amount.to_i > self.wallet_balance.value
+    if amount.to_d > self.wallet_balance.value
       errors.add(:amount, 'cannot be greater than the remaining balance in the wallet')
       return false
     end
-    new_balance = self.wallet_balance.value - amount.to_i
+    new_balance = self.wallet_balance.value - amount.to_d
     unless self.wallet_balance.update_attribute(:value, new_balance)
       @errors.merge!(self.balance.instance_variable_get(:@errors))
       return false

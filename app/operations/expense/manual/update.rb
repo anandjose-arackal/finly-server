@@ -15,9 +15,9 @@ class Expense::Manual::Update < Expense::Manual::Base
       messages[:error] << "Expense ID missing!"
       return false
     end
-    if params[:expense].present? and params[:expense][:amount].present? and params[:expense][:amount].to_i < 0
-      messages[:error] << "Amount can't be negative."
-      return false
+    amount_value = params[:expense][:amount_attributes][:value].to_d rescue nil
+    if amount_value.present? and amount_value <= 0
+      messages[:error] << 'Amount cannot be less than or equal to 0'
     end
   end
 
@@ -53,7 +53,7 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def process
     unless expense.update(updated_expense_params)
-      messages[:error] = self.expense.errors.full_messages
+      add_message :error, self.expense.errors.full_messages
       return false
     end
     true

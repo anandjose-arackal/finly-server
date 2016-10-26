@@ -75,12 +75,15 @@ class MoneyRequest::Base < BaseOperation
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)
           if self.money_request.payment_mode_card?
             if user.company_admin?
-              actions[:credit_card_from_company_credits]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+              actions[:credit_card_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                        from_account: :virtual_account,
                                                                                                                         view: params[:view])}
             end
-            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                              from_account: :wallet,
                                                                                                               view: params[:view])}
-            actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+            actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :approve_and_forward_to,
+                                                                                                             view: params[:view])}
           else
             actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
           end
@@ -89,7 +92,8 @@ class MoneyRequest::Base < BaseOperation
       elsif finance_view? or manager_view?
         if self.money_request.processing? and self.money_request.controlling_user?(user)
           if self.money_request.payment_mode_card?
-            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
+            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                              from_account: :wallet,
                                                                                                               view: params[:view])}
             actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
           else

@@ -22,6 +22,10 @@ class Settlement::Base < BaseOperation
       add_message :error, 'Date cannot be blank'
       return false
     end
+    unless DateUtils.validate_date_format?(date)
+      add_message :error, 'Invalid date format'
+      return false
+    end
     unless date.is_a?(Date)
       date = Date.parse(date)
     end

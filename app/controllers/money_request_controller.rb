@@ -37,7 +37,7 @@ class MoneyRequestController < ApplicationController
         @result = MoneyRequest::Unapprove.(current_user, params)
       when :credit
         # from_account: wallet / virtual_account
-        @result = MoneyRequest::Card::Credit.(current_user, params)
+        @result = MoneyRequest::PrepaidCard::Credit.(current_user, params)
       when :approve_and_forward_to
         @result = MoneyRequest::ApproveAndForward.(current_user, params)
       when :take_control
