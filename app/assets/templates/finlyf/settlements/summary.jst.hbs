@@ -34,9 +34,15 @@
       <div class="col-sm-8">
         <span class="settlement-summary-type">Card Balance:</span>
       </div>
-      <div class="col-sm-4">
-        <label class="settlement-summary-value">&#8377;&nbsp;{{item.card_balance}}</label>
-      </div>
+      {{#if item.card_balance}}
+        <div class="col-sm-4">
+          <label class="settlement-summary-value">&#8377;&nbsp;{{item.card_balance}}</label>
+        </div>
+      {{else}}
+        <div class="col-sm-4">
+          <label class="settlement-summary-value">Not Assigned</label>
+        </div>
+      {{/if}}
     </div>
     <div class="row no-margin" style="height: 35%;">
       <div class="col-sm-8">

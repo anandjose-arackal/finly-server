@@ -96,7 +96,7 @@
       <div>
         <select class="form-control" name="user[profile_attributes][state_id]">
           <% @states.each do |state| %>
-            <option value="<%= state.id %>"><%= state.name %></option>
+            <option value="<%= state[:code] %>"><%= state[:name] %></option>
           <% end %>
         </select>
       </div>

@@ -224,6 +224,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   inviteEmployee: (e) ->
     e.preventDefault()
     _this = @
+    target = e.currentTarget
+    $(target).attr('disabled', true)
     modal = $(e.currentTarget).closest('#modal-mp')
     form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
     values = {}
@@ -257,10 +259,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
           $(modal).modal('hide')
           if parseInt(_this.params.filter_state) == 2
             _this.refetchCollection()
+        else
+          $(target).attr('disabled', false)
 
         # console.log res
       error: (err) ->
         console.log "Err", err
+        $(target).attr('disabled', false)
     })
 
   filterState: (e) ->

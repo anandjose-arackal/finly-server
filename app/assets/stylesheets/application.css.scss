@@ -17,6 +17,7 @@
  *= require_self
  *= require_tree "."
  *= stub 'application_static'
+ *= stub 'application_backbone'
 */
 
 @font-face {
@@ -56,7 +57,7 @@
   bottom: 0;
   left: auto;
   margin-top: 60px;
-  position: absolute;
+  position: fixed;
   z-index: 1051;
   width: 33%;
   margin-right: auto;

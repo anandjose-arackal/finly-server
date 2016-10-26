@@ -43,8 +43,11 @@
         <span class="settlement-summary-type">Card Balance:</span>
       </div>
       <div class="col-sm-4">
-        <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_money_request}}</label>
-        <input type="hidden" name="card_balance" value="{{item.cash_in_hand}}">
+      {{#if item.card_balance}}
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.card_balance}}</label>
+      {{else}}
+        <label class="settlement-summary-value">Not Assigned</label>
+      {{/if}}
       </div>
     </div>
     <div class="row no-margin" style="height: 25%;">

@@ -251,55 +251,51 @@
         </section>
       </div>
       <div class="tab-pane" id="c">
-      {{#if item.card.assigned}}
-        <section class="user-wallet" style="min-height: 500px;">
-          <div class="row">
-            <div class="col-sm-6"><h4>Wallet</h4></div>
+      <section class="user-wallet" style="min-height: 500px;">
+        <div class="row">
+          <div class="col-sm-6"><h4>Wallet</h4></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="col-sm-3" style="padding-top: 15px;">Balance:</div>
+            <div class="col-sm-9"><h4 class="wallet-balance" style="font-size: 24px; font-weight: bold;">&#8377;&nbsp;&nbsp;{{item.wallet.balance}}</h4></div>
           </div>
-          <div class="row">
-            <div class="col-sm-6">
-              <div class="col-sm-3" style="padding-top: 15px;">Balance:</div>
-              <div class="col-sm-9"><h4 class="wallet-balance" style="font-size: 24px; font-weight: bold;">&#8377;&nbsp;&nbsp;{{item.wallet.balance}}</h4></div>
-            </div>
-            <div class="col-sm-6">
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Credit
-                    <span class="caret"></span>
-                  </button>
+          <div class="col-sm-6">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  Credit
+                  <span class="caret"></span>
+                </button>
 
-                  <ul class="dropdown-menu" aria-labelledby="dLabel">
-                    {{#if item.actions.credit_wallet_from_virtual_account}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
-                    {{/if}}
-                    {{#if item.actions.credit_wallet_from_wallet}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Wallet</a> </li>
-                    {{/if}}
-                  </ul>
-                </div>
+                <ul class="dropdown-menu" aria-labelledby="dLabel">
+                  {{#if item.actions.credit_wallet_from_virtual_account}}
+                    <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
+                  {{/if}}
+                  {{#if item.actions.credit_wallet_from_wallet}}
+                    <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Wallet</a> </li>
+                  {{/if}}
+                </ul>
+              </div>
 
 
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Debit
-                    <span class="caret"></span>
-                  </button>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  Debit
+                  <span class="caret"></span>
+                </button>
 
-                  <ul class="dropdown-menu" aria-labelledby="dLabel">
-                    {{#if item.actions.debit_wallet_to_virtual_account}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
-                    {{/if}}
-                    {{#if item.actions.debit_wallet_to_wallet}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Wallet</a> </li>
-                    {{/if}}
-                  </ul>
-                </div>
-            </div>
+                <ul class="dropdown-menu" aria-labelledby="dLabel">
+                  {{#if item.actions.debit_wallet_to_virtual_account}}
+                    <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
+                  {{/if}}
+                  {{#if item.actions.debit_wallet_to_wallet}}
+                    <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Wallet</a> </li>
+                  {{/if}}
+                </ul>
+              </div>
           </div>
-        </section>
-      {{else}}
-      <section><h4>Employee is not associated with wallet.</h4> </section>
-      {{/if}}
+        </div>
+      </section>
       </div>
       <div class="tab-pane" id="d">
         {{#if item.card.assigned}}

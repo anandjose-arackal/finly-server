@@ -88,7 +88,7 @@ window.FinlyF =
       FinlyF.primary_router.navigate('expenses', {trigger: true})
 
   snapNotify: (obj) ->
-    # console.log obj
+    console.log "From snap", obj
     ohSnapX()
     for type, messages of obj
       switch type
@@ -170,6 +170,8 @@ $(document).ready ->
     modal = this
     to_user_id = $(modal).attr('data-user-id')
     $(".btn-transfer-wallet-to-card").on('click', (evt) ->
+      $(this).attr('disabled', true)
+      target = this
       evt.preventDefault()
       amount = $(modal).find('input[name=amount]').val()
       password = $(modal).find('input[type=password]').val()
@@ -187,8 +189,11 @@ $(document).ready ->
           to_user_id: 1
         }
         success: (res) ->
-          FinlyF.snapNotify(res)
-          $(modal).modal('hide')
+          FinlyF.snapNotify(res.messages)
+          if res.success == true
+            $(modal).modal('hide')
+          else
+            $(target).attr('disabled', false)
       })
 
     )

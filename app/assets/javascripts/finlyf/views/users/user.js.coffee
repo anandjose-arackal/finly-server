@@ -326,7 +326,7 @@ class FinlyF.Views.User extends Backbone.View
           success: (res) ->
             # console.log res
             $(modal).find('.virtual_account_balance').html("&#8377;&nbsp;" + res.virtual_account)
-            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
         })
       when 'credit_wallet_from_wallet'
         $(modal).html(@templateLoadFunds({item: item}))
@@ -473,12 +473,12 @@ class FinlyF.Views.User extends Backbone.View
               view: _this.params.view
             }
           })
-
         else
-          console.log res
-          $(target).attr("disabled", true)
+          # console.log res
+          $(target).html("Transfer").attr("disabled", false)
       error: (err) ->
         console.log "Error", err
+        $(target).html("Transfer").attr("disabled", false)
 
     })
 

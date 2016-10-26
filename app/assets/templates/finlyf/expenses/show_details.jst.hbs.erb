@@ -124,6 +124,12 @@
     
   </div>
 </div>
+
+{{#if_eq item.expense_type_id 2}}
+  <input type="hidden" name="type" value="2" />
+{{else}}
+  <input type="hidden" name="type" value="1" />
+{{/if_eq}}
 </form>
 <style type="text/css">
   
