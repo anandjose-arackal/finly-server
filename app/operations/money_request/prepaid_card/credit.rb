@@ -5,10 +5,6 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
     if user.blank?
       add_message :error, 'User not found'
     end
-    if user.cards.blank?
-      add_message :error, 'Card is not assigned to the user to transfer the funds'
-      return
-    end
     if params.blank? or (params[:money_request_id].blank? and params[:id].blank?)
       add_message :error, 'Request not found to initiate the transfer'
     end
@@ -24,6 +20,9 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
     end
     unless params[:from_account].to_sym == :wallet or params[:from_account].to_sym == :virtual_account
       add_message :error, 'Invalid account type'
+    end
+    if params[:to_account].present? and not params[:to_account].to_sym == :card and not params[:to_account].to_sym == :wallet
+      add_message :error, 'Invalid transfer to account type'
     end
   end
 
@@ -60,7 +59,10 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
 
   def process
     if amount > 0
-      result = User::Wallet::Credit.(user, from_account: params[:from_account].to_sym, to_account: :card, to_user: to_user, amount: self.amount, password: params[:password])
+      from_account = params[:from_account].to_sym
+      to_account = :card
+      to_account = params[:to_account].to_sym if params[:to_account].present?
+      result = User::Wallet::Credit.(user, from_account: from_account, to_account: to_account, to_user: to_user, amount: self.amount, password: params[:password])
       if result.failure?
         add_message :error, result.messages[:error]
         return
