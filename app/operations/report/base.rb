@@ -45,6 +45,7 @@ class Report::Base < BaseOperation
 
     def init
       self.report = params[:report]
+      report.reload
       self.categories = user.company.categories
       self.expenses = report.expenses
       self.status = report.relative_status_name user
