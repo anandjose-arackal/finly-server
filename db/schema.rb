@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161025140923) do
+ActiveRecord::Schema.define(version: 20161026101609) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -170,31 +170,25 @@ ActiveRecord::Schema.define(version: 20161025140923) do
   add_index "card_transaction_restrictions", ["product_combination_id"], name: "index_card_transaction_restrictions_on_product_combination_id", using: :btree
 
   create_table "card_transactions", force: :cascade do |t|
-    t.integer  "user_id",                   limit: 4
-    t.integer  "card_id",                   limit: 4
-    t.integer  "merchant_id",               limit: 4
-    t.string   "merchant_name",             limit: 255
-    t.integer  "terminal_id",               limit: 4
-    t.string   "transaction_currency_code", limit: 255
-    t.string   "transaction_type",          limit: 255
-    t.text     "post_data",                 limit: 65535
-    t.integer  "transaction_amount_id",     limit: 4
-    t.integer  "card_amount_id",            limit: 4
-    t.datetime "date"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.string   "reference_id",              limit: 255
-    t.string   "auth_transaction_id",       limit: 255
-    t.string   "transaction_mode",          limit: 255
-    t.string   "itzcash_merchant_key",      limit: 255
-    t.string   "merchant_city",             limit: 255
-    t.string   "response_code",             limit: 255
-    t.string   "serial_id",                 limit: 255
-    t.string   "product_code",              limit: 255
+    t.integer  "user_id",               limit: 4
+    t.integer  "card_id",               limit: 4
+    t.string   "merchant_name",         limit: 255
+    t.string   "transaction_type",      limit: 255
+    t.text     "post_data",             limit: 65535
+    t.integer  "transaction_amount_id", limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.string   "reference_id",          limit: 255
+    t.string   "auth_transaction_id",   limit: 255
+    t.string   "transaction_mode",      limit: 255
+    t.string   "itzcash_merchant_key",  limit: 255
+    t.string   "merchant_city",         limit: 255
+    t.string   "response_code",         limit: 255
+    t.string   "serial_id",             limit: 255
+    t.string   "product_code",          limit: 255
     t.datetime "transaction_timestamp"
   end
 
-  add_index "card_transactions", ["card_amount_id"], name: "index_card_transactions_on_card_amount_id", using: :btree
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
   add_index "card_transactions", ["transaction_amount_id"], name: "index_card_transactions_on_transaction_amount_id", using: :btree
   add_index "card_transactions", ["user_id"], name: "index_card_transactions_on_user_id", using: :btree
