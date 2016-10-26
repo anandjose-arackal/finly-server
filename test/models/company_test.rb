@@ -7,6 +7,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  active     :boolean          default(TRUE), not null
+#  d_code     :string(255)
 #
 
 

@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: company_accounts
+#
+#  id                :integer          not null, primary key
+#  company_id        :integer          not null
+#  wallet_balance_id :integer
+#  company           :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
 class CompanyAccount < ActiveRecord::Base
   belongs_to :company
   belongs_to :wallet_balance, class_name: 'Amount'

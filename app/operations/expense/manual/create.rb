@@ -13,8 +13,9 @@ class Expense::Manual::Create < Expense::Manual::Base
       messages[:error] << 'You have not provided any details to create an expense'
       return
     end
-    if params[:expense][:amount].to_d < 0
-      messages[:error] << "Amount can't be negative."
+    amount_value = params[:expense][:amount_attributes][:value].to_d rescue nil
+    if amount_value.present? and amount_value <= 0
+      messages[:error] << 'Amount cannot be less than or equal to 0'
     end
   end
 

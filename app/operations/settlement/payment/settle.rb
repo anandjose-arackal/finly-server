@@ -23,6 +23,13 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     if params[:report_ids].blank?
       add_message :error, 'No reports to reimburse'
     end
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate this transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    # end
   end
 
   def init

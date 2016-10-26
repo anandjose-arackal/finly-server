@@ -12,8 +12,10 @@
 #  updated_at          :datetime         not null
 #  company_id          :integer
 #  disabled_by_role_id :integer
+#  disabled_by_user_id :integer
 #  active              :boolean
 #  disable_note        :text(65535)
+#  product_code        :string(255)      not null
 #
 
 
