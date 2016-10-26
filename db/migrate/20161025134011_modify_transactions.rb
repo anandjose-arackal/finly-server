@@ -15,5 +15,10 @@ class ModifyTransactions < ActiveRecord::Migration
     remove_column :card_transactions, :network
     remove_column :card_transactions, :trace_number
     remove_column :card_transactions, :merchant_category_code
+    remove_column :card_transactions, :date
+    remove_column :card_transactions, :card_amount_id
+    remove_column :card_transactions, :transaction_currency_code
+    remove_column :card_transactions, :terminal_id
+    remove_column :card_transactions, :merchant_id
   end
 end

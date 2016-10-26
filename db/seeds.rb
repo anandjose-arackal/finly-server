@@ -389,17 +389,17 @@ if CardTransaction.count == 0
     card = user.cards.first
     10.times do
       random_amount = random(10, 1000)
-      trans = CardTransaction.create(card_id: card.id, user_id: user.id,
+      trans = CardTransaction.create(user_id: user.id,
                                      transaction_amount_attributes: {value: random_amount, currency_id: 1},
-                                     date: DateUtils.local_date,
+                                     transaction_timestamp: DateUtils.local_date_time,
                                      merchant_name: 'Randomness',
-                                     transaction_currency_code: 'INR')
+                                     serial_id: card.proxy)
       # junk card expense
-      Expense.create(amount_attributes: {value: random_amount, currency_id: 1},
+      Expense.create(amount_attributes: {value: trans.transaction_amount.value, currency_id: 1},
                      expense_status_id: 1,
                      expense_type_id: 2,
                      note: "This is a card expense, hello! #{trans.id}",
-                     date: Faker::Date.between(20.days.ago, DateUtils.local_date),
+                     date: trans.transaction_timestamp.to_date,
                      user_id: user.id,
                      category_id: random_integer(1, 5),
                      card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
