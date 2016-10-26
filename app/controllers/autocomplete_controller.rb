@@ -1,10 +1,6 @@
 class AutocompleteController < ApplicationController
   def merchant
-    expense_ids = Expense::Index.new(current_user, params).run.unreported_expenses.pluck(:id)
-    # todo - find out how to search from within the array of merchants, generalize it basically
-    query = (params[:filter_search] or params[:query])
-    merchants = ManualExpense.merchant_like(query, expense_ids)
-    merchants += CardExpense.merchant_like(query, expense_ids)
+    merchants = Autocomplete::Merchant.(current_user, params)
 
     respond_to do |format|
       format.json {render json: merchants.as_json }
