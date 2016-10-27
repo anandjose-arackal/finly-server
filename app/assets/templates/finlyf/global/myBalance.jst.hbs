@@ -10,9 +10,14 @@
 
       <div class="col-sm-6 balance-container text-center">
         <div>
+        {{#if item.current_user_card}}
           <h3>&#8377;&nbsp;&nbsp;{{item.current_user_card}}</h3>
           <label>Cash in Card</label>
           <button class="btn btn-xs btn-success btn-transfer-wallet-to-card">Load from Wallet</button>
+        {{else}}
+          <h3>&nbsp;</h3>
+          <label>Card Unassigned</label>
+        {{/if}}
         </div>
       </div>
 

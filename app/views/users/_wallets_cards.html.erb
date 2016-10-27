@@ -101,6 +101,67 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+
+
+    snapNotify = function(obj) {
+      var color, container, message, messages, results, type;
+      console.log(obj);
+      results = [];
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          results.push((function() {
+            var i, len, results1;
+            results1 = [];
+            for (i = 0, len = messages.length; i < len; i++) {
+              message = messages[i];
+              results1.push(ohSnap(message, {
+                color: color,
+                'duration': '6000'
+                // 'container-id': container
+              }));
+            }
+            return results1;
+          })());
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    };
     //Get card balance and populate
     $.ajax({
       url: '/users/' + '<%= current_user.id %>' + '/balance',
@@ -153,6 +214,7 @@
       },
       success: function(res){
         console.log(res);
+        snapNotify(res.messages)
         if(res.success === true){
           window.location.reload();
         }

@@ -285,7 +285,7 @@ class FinlyF.Views.Report extends Backbone.View
     # $(e.currentTarget).addClass('btn-edit-item btn-warning').removeClass('btn-update-item btn-success').html("Edit  <i class='fa fa-edit'></i>")
 
   postComment: (e) ->
-    $(e.currentTarget).text('Posting...')
+    $(e.currentTarget).text('Posting...').attr('disabled', true)
     _this = @
     target = $(e.currentTarget)
     report_id = $(target).attr('data-item-id')
@@ -307,7 +307,7 @@ class FinlyF.Views.Report extends Backbone.View
             }
           })
         else
-          $(e.currentTarget).text('Post')
+          $(e.currentTarget).text('Post').attr('disabled', false)
       error: (err) ->
         console.log "Error", err
         $(e.currentTarget).text('Post')

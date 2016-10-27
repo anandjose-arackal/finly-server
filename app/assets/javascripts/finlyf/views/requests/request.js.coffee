@@ -215,7 +215,7 @@ class FinlyF.Views.Request extends Backbone.View
 
   postComment: (e) ->
     e.preventDefault()
-    $(e.currentTarget).text('Posting...')
+    $(e.currentTarget).text('Posting...').attr('disabled', true)
     _this = @
     target = $(e.currentTarget)
     money_request_id = $(target).attr('data-item-id')
@@ -237,7 +237,7 @@ class FinlyF.Views.Request extends Backbone.View
             }
           })
         else
-          $(e.currentTarget).text('Post')
+          $(e.currentTarget).text('Post').attr('disabled', false)
       error: (err) ->
         console.log "Error", err
         $(e.currentTarget).text('Post')
@@ -304,6 +304,26 @@ class FinlyF.Views.Request extends Backbone.View
     $(modal).html(@templateModalLoadFunds({item: item}))
     $(modal).modal('show')
 
+    $.ajax({
+      dataType: "json"
+      type : 'get'
+      # url: '/settlements/summary?view_to_load=payments&view=personal'
+      url: '/users/' + _this.model.get('user_id') + '/balance'
+      data:
+        # target_user_id: user_id
+        authenticity_token: $("#authenticity_token").val()
+        current_user_wallet: true
+        target_user_card: true
+        virtual_account: true
+        # view: 'admin'
+      success: (data) ->
+        $(modal).find('.current_user_wallet_balance').html(data.current_user_wallet)
+        $(modal).find('.target_user_card_balance').html(data.target_user_card)
+        $(modal).find('.virtual_account_balance').html(data.virtual_account)
+      error: (err) ->
+        console.log err
+    })
+
   confirmTransfer: (e) ->
     _this = @
     e.preventDefault()
@@ -314,6 +334,8 @@ class FinlyF.Views.Request extends Backbone.View
     # action_type = $(target).attr("data-action-type")
     password = $(container).find('input[name=password]').val()
     amount = $(container).find('input[name=amount]').val()
+
+    modal = $(@el).find("#modal-mp")
 
     $.ajax({
       url: url,
@@ -329,6 +351,7 @@ class FinlyF.Views.Request extends Backbone.View
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
+          $(modal).modal('hide')
           _this.model.fetch({
             data: {view: _this.current_view}
           })

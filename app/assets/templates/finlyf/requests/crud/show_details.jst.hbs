@@ -48,10 +48,10 @@
 
             <ul class="dropdown-menu" aria-labelledby="dLabel">
               {{#if item.actions.credit_card_from_wallet}}
-                <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="transfer">From Your Wallet</a> </li>
+                <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Wallet</a> </li>
               {{/if}}
               {{#if item.actions.credit_card_from_virtual_account}}
-                <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit">From Company Credits</a> </li>
+                <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
               {{/if}}
             </ul>
           </div>
