@@ -10,12 +10,8 @@ class ItzCash::AccountDetails < ItzCash::Base
     end
   end
 
-  def base_url
-    'http://demo.itzcash.com'
-  end
-
-  def path
-    'myaccount/servlet/ItzCashAccountDetailsServlet'
+  def env_key
+    'itzcash_account_details'
   end
 
   def post_params

@@ -11,12 +11,8 @@ class ItzCash::Block < ItzCash::Base
     end
   end
 
-  def base_url
-    'https://staging.itzcash.com/'
-  end
-
-  def path
-    'user/servlet/NaradaBlockUnblockServlet'
+  def env_key
+    'itzcash_block_unblock'
   end
 
   def post_params
