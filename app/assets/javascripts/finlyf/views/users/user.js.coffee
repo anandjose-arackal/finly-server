@@ -25,11 +25,13 @@ class FinlyF.Views.User extends Backbone.View
 
     'click .btn-card-update-status': 'prepareCardStatus'
     'click .btn-confirm-card-status': 'cardStatus'
+    'click ul.user-tab-panes li': 'changeActiveTab'
 
   initialize: (options) ->
     @params = options.params
     @page = options.page
     @parent = options.parent
+    @active_tab = @active_tab || '#tab-user-details'
 
     if @page == 'user'
       @model = new FinlyF.Models.User({id: options.model_id})
@@ -55,6 +57,16 @@ class FinlyF.Views.User extends Backbone.View
     # console.log "here we are in after sync"
     # console.log @model.toJSON()
     $(@el).html(@templateShow({item: @model.toJSON()}))
+    # console.log("Active Tab: ", @active_tab)
+    # $(@el).find(@active_tab).tab('show')
+    $(@el).find('a[href="' + @active_tab + '"]').tab('show');
+
+  changeActiveTab: (e) ->
+    target = $(e.currentTarget).find('a')
+    new_active_tab = $(target).attr('href')
+    @active_tab = new_active_tab
+
+
 
   edit: (e) ->
     target = $(e.currentTarget)
@@ -497,6 +509,7 @@ class FinlyF.Views.User extends Backbone.View
     e.preventDefault()
     _this = @
     target = e.currentTarget
+    $(target).attr('disabled', true)
 
     status_type = $(target).attr('data-card-status-type')
     modal = $(@el).find('#modal-sub-mp')
@@ -527,9 +540,11 @@ class FinlyF.Views.User extends Backbone.View
             }
           })
         else
+          $(target).attr('disabled', false)
           console.log res
       error: (err) ->
         console.log "Error", err
+        $(target).attr('disabled', false)
 
     })
 
