@@ -66,6 +66,17 @@ class ItzCash::Credit < ItzCash::Base
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
   end
 
+  def failure
+    # Check if credit failed because amount is greater than remaining eligibility
+    if self.parsed_response.present? and (parsed_response[0] == -3004 or parsed_response[0] == '-3004')
+      response = ItzCash::AccountDetails.(user, params)
+      if response.success? and response.remaining_load_eligibility < self.amount
+        add_message :error, "The given amount exceeds the eligibility limit of the card. You can only transfer upto ₹#{response.remaining_load_eligibility}"
+      end
+    end
+    super
+  end
+
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
 
