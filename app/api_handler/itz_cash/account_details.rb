@@ -28,13 +28,14 @@ class ItzCash::AccountDetails < ItzCash::Base
     params[:distributor_id] = parsed_response[6]
     params[:charge_code] = parsed_response[7]
     params[:product_code] = parsed_response[8]
-    params[:description] = parsed_response[9]
+    params[:remaining_load_eligibility] = parsed_response[9].to_d
+    params[:description] = parsed_response[10]
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
   end
 
   class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :balance, :status_code, :suspended_status, :rate_group_id,
-                  :distributor_id, :charge_code, :product_code, :description
+                  :distributor_id, :charge_code, :product_code, :description, :remaining_load_eligibility
 
     def init
       self.response_code =params[:response_code]
@@ -46,6 +47,7 @@ class ItzCash::AccountDetails < ItzCash::Base
       self.distributor_id = params[:distributor_id]
       self.charge_code = params[:charge_code]
       self.product_code = params[:product_code]
+      self.remaining_load_eligibility = params[:remaining_load_eligibility]
       self.description = params[:description]
     end
 

@@ -137,7 +137,7 @@ class BaseHandler
   end
 
   def failure?
-    self.process_complete and (has_errors? or self.timeout or self.response.status == 200)
+    self.process_complete and (has_errors? or self.timeout or self.response.nil? or not self.response.status == 200)
   end
 
   # Used to present the data to the UI
