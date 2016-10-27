@@ -20,13 +20,14 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     if params[:payment][:amount].blank? or params[:payment][:amount].to_f < 0
       messages[:error] << 'Amount being added blank or negative'
     end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate this transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-    end
+    # no password required for this operation, hence
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate this transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    # end
   end
 
   def init
@@ -54,7 +55,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def validate
     unless validate_date payment_param[:date]
-      add_message :error, 'Invalid date passed. Try again'
+      # add_message :error, 'Invalid date passed. Try again'
       return false
     end
     if money_requests.present?
@@ -68,7 +69,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
       date = Date.parse(payment_params[:date])
       # validating date of money request against payment date
-      if date < money_requests.order(submitted_at: :asc).first.updated_at
+      if date < money_requests.order(submitted_at: :asc).first.updated_at.to_date
         add_message :error, 'Payment date cannot be before money request date'
       end
     end

@@ -100,7 +100,8 @@ class Analytics::Charts < BaseOperation
         expense_sums = expenses.joins(:amount).group(:user_id).sum(:value)
         user_ids.each do |id|
           user_name = User.find_by(id: id).name
-          charts << {item: user_name, total: precision_value(expense_sums[id])}
+          expense_sum = expense_sums[id] ? precision_value(expense_sums[id]) : 0
+          charts << {item: user_name, total: expense_sum}
         end
       else
         # default will be category wise breakdown
