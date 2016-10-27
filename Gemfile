@@ -10,7 +10,7 @@ gem 'autoprefixer-rails', '6.5.0.1'
 # adding gems for activeMQ
 gem 'daemons'
 gem 'stomp'
-gem 'activemessaging'
+# gem 'activemessaging'
 
 # gem for admin panel
 gem 'activeadmin', github: 'activeadmin'

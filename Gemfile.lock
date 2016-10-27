@@ -59,9 +59,6 @@ GEM
     activejob (4.2.6)
       activesupport (= 4.2.6)
       globalid (>= 0.3.0)
-    activemessaging (0.13.1)
-      activesupport
-      rake
     activemodel (4.2.6)
       activesupport (= 4.2.6)
       builder (~> 3.1)
@@ -385,7 +382,6 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin!
-  activemessaging
   animate-rails
   annotate
   autoprefixer-rails (= 6.5.0.1)
