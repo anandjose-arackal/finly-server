@@ -133,7 +133,7 @@ class BaseHandler
   end
 
   def success?
-    self.process_complete and not has_errors? and not self.timeout and self.response.status == 200
+    self.process_complete and not has_errors? and not self.timeout and not self.response.blank? and self.response.status == 200 
   end
 
   def failure?
