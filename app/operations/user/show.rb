@@ -1,5 +1,5 @@
 class User::Show < User::Base
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :card
 
   def pre_validate
     unless user.present?
@@ -16,7 +16,11 @@ class User::Show < User::Base
       result = operation.run
       if operation.success?
         self.selected_user = result.with_id(id).first rescue nil
-        add_message :error, 'User not found' if self.selected_user.blank?
+        if self.selected_user.blank?
+          add_message :error, 'User not found'
+        elsif self.selected_user.cards.present?
+          self.card = ItzCash::AccountDetails.(selected_user).card rescue nil
+        end
       else
         messages[:error] = operation.messages[:error]
       end
@@ -25,6 +29,7 @@ class User::Show < User::Base
 
   def success
     params[:selected_user] = selected_user
+    params[:card] = card
     User::Show::Presenter.new(user, params, messages)
   end
 
@@ -32,7 +37,7 @@ class User::Show < User::Base
     attr_accessor :team_mapping, :mapping, :policies, :roles, :company_managers,
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
-                  :team_members_presenter, :selected_user, :mapping_editable, :wallet
+                  :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card
 
     def init
       self.selected_user = params[:selected_user]
@@ -47,6 +52,7 @@ class User::Show < User::Base
       self.actions = load_actions
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
+      self.card = params[:card]
     end
 
     private

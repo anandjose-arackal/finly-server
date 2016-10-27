@@ -3,7 +3,7 @@ class Settlement::Summary < Settlement::Base
 
   def pre_validate
     unless user.present?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
     end
   end
 
@@ -41,13 +41,13 @@ class Settlement::Summary < Settlement::Base
     user_op = Settlement::Index.new(user, params)
     user_result = user_op.run
     unless user_op.success?
-      self.messages[:error] = user_op.messages[:error]
+      add_message :error, user_op.messages[:error]
       return
     end
     user_id = (params[:id] or params[:user_id])
     self.selected_user = user_result.users.with_id(user_id).first rescue nil
     if self.selected_user.blank?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
     end
   end
 

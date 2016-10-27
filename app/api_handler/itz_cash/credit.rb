@@ -70,11 +70,11 @@ class ItzCash::Credit < ItzCash::Base
     # Check if credit failed because amount is greater than remaining eligibility
     if self.parsed_response.present? and (parsed_response[0] == -3004 or parsed_response[0] == '-3004')
       response = ItzCash::AccountDetails.(user, params)
-      if response.success? and response.remaining_load_eligibility < (self.amount / 100)
-        if response.remaining_load_eligibility < 1
+      if response.success? and response.available_card_eligibility < (self.amount / 100)
+        if response.available_card_eligibility < 1
           add_message :error, 'Card has reached its maximum transferable limit'
         else
-          add_message :error, "The given amount exceeds the eligibility limit of the card. You can only transfer upto ₹#{response.remaining_load_eligibility}"
+          add_message :error, "The given amount exceeds the eligibility limit of the card. You can only transfer upto ₹#{response.available_card_eligibility}"
         end
       end
     end
