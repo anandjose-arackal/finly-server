@@ -19,8 +19,8 @@ class ItzCash::Credit < ItzCash::Base
     end
   end
 
-  def path
-    '/user/servlet/NaradaCreditDebitServlet'
+  def env_key
+    'itzcash_credit_debit'
   end
 
   def post_params

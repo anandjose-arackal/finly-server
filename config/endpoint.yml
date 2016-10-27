@@ -1,0 +1,37 @@
+default: &default
+  base_url: "https://staging.itzcash.com"
+  itzcash_account_details:
+    base: "http://demo.itzcash.com"
+    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+  itzcash_credit_debit:
+    path: "user/servlet/NaradaCreditDebitServlet"
+  itzcash_block_unblock:
+    path: "user/servlet/NaradaBlockUnblockServlet"
+  itzcash_corporate_balance:
+    path: "user/servlet/CorporateBalanceServlet"
+  msg91_generate_otp:
+    base: "https://sendotp.msg91.com"
+    path: "api/generateOTP"
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+itzcash_uat:
+  base_url: "http://cvmstest.itzcash.com:8080"
+  itzcash_account_details:
+    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+  itzcash_credit_debit:
+    path: "user/servlet/NaradaCreditDebitServlet"
+  itzcash_block_unblock:
+    path: "user/servlet/NaradaBlockUnblockServlet"
+  itzcash_corporate_balance:
+    path: "user/servlet/CorporateBalanceServlet"
+  msg91_generate_otp:
+    base: "https://sendotp.msg91.com"
+    path: "api/generateOTP"
+
+production:
+  <<: *default

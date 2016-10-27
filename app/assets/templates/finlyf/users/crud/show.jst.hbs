@@ -1,17 +1,17 @@
 <div class="row-no-margin" style="height: 100%;">
   <div class="col-sm-2 no-padding" style="position: fixed; z-index: 1;">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#a" data-toggle="tab">Details</a></li>
-      <li><a href="#b" data-toggle="tab">Roles</a></li>
-      <li><a href="#c" data-toggle="tab">Wallet</a></li>
-      <li><a href="#d" data-toggle="tab">Cards</a></li>
-      <li><a href="#e" data-toggle="tab">Policies</a></li>
+    <ul class="nav nav-tabs user-tab-panes">
+      <li class="active"><a href="#tab-user-details" data-toggle="tab">Details</a></li>
+      <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
+      <li><a href="#tab-user-wallet" data-toggle="tab">Wallet</a></li>
+      <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li>
+      <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
     </ul>
   </div>
 
   <div class="col-sm-10 col-sm-offset-2 no-padding" style="height: 100%; background: #fff; box-shadow: 0 0 30px 0 rgba(0,0,0,.1);">
     <div class="tab-content">
-      <div class="tab-pane active" id="a">
+      <div class="tab-pane active" id="tab-user-details">
         <section class="user-info">
           <div class="row">
             <div class="col-sm-6">
@@ -93,7 +93,7 @@
           </form>
         </section>
       </div>
-      <div class="tab-pane" id="b">
+      <div class="tab-pane" id="tab-user-roles">
         <section class="user-roles">
           <div class="row">
             <div class="col-sm-6">
@@ -250,7 +250,7 @@
           </form>
         </section>
       </div>
-      <div class="tab-pane" id="c">
+      <div class="tab-pane" id="tab-user-wallet">
       <section class="user-wallet" style="min-height: 500px;">
         <div class="row">
           <div class="col-sm-6"><h4>Wallet</h4></div>
@@ -297,7 +297,7 @@
         </div>
       </section>
       </div>
-      <div class="tab-pane" id="d">
+      <div class="tab-pane" id="tab-user-cards">
         {{#if item.card.assigned}}
         <section class="user-cards">
           <div class="row">
@@ -394,7 +394,7 @@
         </section>
         {{/if}}
       </div>
-      <div class="tab-pane" id="e">
+      <div class="tab-pane" id="tab-user-policies">
         <section class="user-policies">
           <div class="row">
             <div class="col-sm-6">

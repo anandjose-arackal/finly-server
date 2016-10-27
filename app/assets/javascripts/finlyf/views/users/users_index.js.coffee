@@ -122,7 +122,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       target = e.currentTarget
       $(target).find("i").addClass("fa-spin")
 
-    # @params.page = 1
+    @params.page = 1
     # console.log @params
     @collection.fetch({
       reset: true,

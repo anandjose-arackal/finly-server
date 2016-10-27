@@ -1,12 +1,8 @@
 class OtpVerification::Create < OtpVerification::Base
   attr_accessor :mobile_number, :status, :code, :otp
 
-  def base_url
-    'https://sendotp.msg91.com'
-  end
-
-  def path
-    '/api/generateOTP'
+  def env_key
+    'msg91_generate_otp'
   end
 
   def pre_validate
