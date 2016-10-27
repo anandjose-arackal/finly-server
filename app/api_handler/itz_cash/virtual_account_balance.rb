@@ -10,8 +10,8 @@ class ItzCash::VirtualAccountBalance < ItzCash::Base
     end
   end
 
-  def path
-    '/user/servlet/CorporateBalanceServlet'
+  def env_key
+    'itzcash_corporate_balance'
   end
 
   def post_params

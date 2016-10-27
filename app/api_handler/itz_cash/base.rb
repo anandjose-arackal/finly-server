@@ -1,11 +1,6 @@
 class ItzCash::Base < BaseHandler
   attr_accessor :response_code, :parsed_response
 
-  def base_url
-    url = super
-    (url or 'https://staging.itzcash.com')
-  end
-
   def parse
     self.parsed_response = self.response.body.split(',') rescue []
     self.response_code = parsed_response[0] if self.parsed_response.present?

@@ -12,12 +12,25 @@ class BaseHandler
     clear_messages
   end
 
+  def env_key
+
+  end
+
   def base_url
-    params[:base_url] if params.present?
+    if params.present? and params[:base_url].present?
+      (params[:base_url] or params['base_url'])
+    elsif env_key.present?
+      ENV["#{env_key}_base"]
+    else
+      nil
+    end
   end
 
   def path
-
+    key = self.env_key
+    if key.present?
+      ENV["#{key}_path"]
+    end
   end
 
   def post_params
