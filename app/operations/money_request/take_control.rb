@@ -7,7 +7,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
   def authorize
     super
     if user.policy_admin?
-      if money_request.policy and not user.policy_admin?(money_request.policy) # that is the money_request has a policy and the user is not policy admin
+      if money_request.policy and not user.policy_admin?(money_request.policy) and not user.company_admin? # that is the money_request has a policy and the user is not policy admin
         raise_unauthorized_exception
         return false
       end
