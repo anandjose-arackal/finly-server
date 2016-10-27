@@ -377,7 +377,7 @@ if Card.count == 0
     if user.id < 6
       number = "S0001774009#{(user.id - 1)}"
       user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-                        card_type_id: 1, company_id: user.company.id, ending_number: '1234', active: true)
+                        card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
     end
   end
 end

@@ -45,9 +45,9 @@ class UsersController < ApplicationController
     @result = update_password_op.run
     if @result.success?
       sign_in @result.user, :bypass => true
-      flash[:success] = @result.messages[:success]
+      flash[:success] = @result.messages[:success].first rescue nil
     else
-      flash[:error] = @result.messages[:error]
+      flash[:error] = @result.messages[:error].first rescue nil
     end
     redirect_to request.referrer
   end
