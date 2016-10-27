@@ -37,7 +37,7 @@
             <% if card.active %>
               <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label>
             <% else %>
-              <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
+              <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Blocked</span></label>
             <% end %>
           </div>
           <div class="card-type">Expense Card</div>
@@ -55,9 +55,9 @@
           <span class="balance" style="font-size: 25px; color: #2ECC71;">&#8377;&nbsp;&nbsp;</span><span class="current_user_card_balance"><i class="fa fa-spin fa-spinner"></i></span>
         </div>
         <% if card.active %>
-          <button class="btn btn-sm btn-danger btn-card-update-status" data-card-status-type="0" data-target="#modal-confirm-card-status" data-toggle="modal">Deactivate</button>
+          <button class="btn btn-sm btn-danger btn-card-update-status" data-card-status-type="0" data-target="#modal-confirm-card-status" data-toggle="modal">Block</button>
         <% else %>
-          <button class="btn btn-sm btn-success btn-card-update-status" data-card-status-type="1" data-target="#modal-confirm-card-status" data-toggle="modal">Activate</button>
+          <button class="btn btn-sm btn-success btn-card-update-status" data-card-status-type="1" data-target="#modal-confirm-card-status" data-toggle="modal">Unblock</button>(Disabled By: <%= card.disabled_by_user.name %>)
         <% end %>
       <% end %>    
     </div>

@@ -334,15 +334,15 @@
                 {{#if item.card.active}}
                   <label class="control-label">Active</label>
                 {{else}}
-                  <label class="control-label">Inactive</label>
+                  <label class="control-label">Blocked</label>
                 {{/if}}
               </div>
               <div class="row no-margin">
                 {{#if item.actions.deactivate_card}}
-                  <button class="btn btn-sm btn-danger btn-card-update-status btn-wd-100" data-card-status-type="0">Deactivate</button>
+                  <button class="btn btn-sm btn-danger btn-card-update-status btn-wd-100" data-card-status-type="0">Block</button>
                 {{/if}}
                 {{#if item.actions.activate_card}}
-                  <button class="btn btn-sm btn-success btn-card-update-status btn-wd-100" data-card-status-type="1">Activate</button>
+                  <button class="btn btn-sm btn-success btn-card-update-status btn-wd-100" data-card-status-type="1">Unblock</button>
                 {{/if}}
               </div>
               {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
