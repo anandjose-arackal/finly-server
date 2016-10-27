@@ -54,7 +54,7 @@ class ItzCash::Block < ItzCash::Base
 
   # Handle success for -100 as -100 is returned if the card is already blocked
   def success?
-    self.process_complete and not has_errors? and not self.timeout and (self.response.status == 200 or self.response.status == -100)
+    self.process_complete and not has_errors? and not self.timeout and (self.response != nil and self.response.status == 200 or self.response.status == -100)
   end
 
 end
