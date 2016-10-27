@@ -72,6 +72,9 @@ class User::Wallet::Credit < User::Wallet::Base
         add_message :error, balance_presenter.messages[:error]
       end
     end
+    if to_account == :card and self.amount > 50000
+      add_message :error, 'Cannot transfer the given amount. Please reduce the amount and try again'
+    end
   end
 
   def process

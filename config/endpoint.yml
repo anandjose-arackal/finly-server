@@ -20,8 +20,9 @@ test:
   <<: *default
 
 itzcash_uat:
-  base_url: "http://cvmstest.itzcash.com:8080"
+  base_url: "http://cvmsuat.itzcash.com:8080"
   itzcash_account_details:
+    base: "http://cvmstest.itzcash.com:8080"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
   itzcash_credit_debit:
     path: "user/servlet/NaradaCreditDebitServlet"
