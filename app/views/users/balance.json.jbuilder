@@ -1,6 +1,15 @@
 json.merge! @result.balances
-allow_card_transfer = false
-if @result.selected_user.cards.present?
-  allow_card_transfer = @result.selected_user.cards.first.active
+if @result.target_user.present?
+  target_user_card_active = false
+  if @result.target_user.cards.present?
+    target_user_card_active = @result.target_user.cards.first.active
+  end
+  json.target_user_card_active target_user_card_active
 end
-json.allow_card_transfer allow_card_transfer
+if @result.user.present?
+  current_user_card_active = false
+  if @result.user.cards.present?
+    current_user_card_active = @result.user.cards.first.active
+  end
+  json.current_user_card_active current_user_card_active
+end
