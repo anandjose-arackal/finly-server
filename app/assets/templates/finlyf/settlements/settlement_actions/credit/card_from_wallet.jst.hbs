@@ -15,11 +15,19 @@
     
     <div class="form-group">
       <label class="control-form">Amount:</label>
-      <input type="number" name="amount" class="form-control card-funds-amount" value="{{item.amount}}" />
+      {{#if item.target_user.card.active}}
+      <input type="number" name="amount" class="form-control card-funds-amount" value="" />
+      {{else}}
+      <input type="text" name="amount" class="form-control card-funds-amount" value="Employee's card is blocked!" disabled="disabled" />
+      {{/if}}
     </div>
 
     <div class="form-group text-center">
+    {{#if item.target_user_card.active}}
       <button class="btn btn-success btn-confirm-transfer step-2-action" data-action-type="credit_card_from_wallet">Proceed</button>
+    {{else}}
+      <button class="btn btn-success btn-confirm-transfer" disabled="disabled" data-action-type="credit_card_from_wallet">Proceed</button>
+    {{/if}}
     </div>
   </div>
 </div>
