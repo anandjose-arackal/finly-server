@@ -16,6 +16,6 @@
 class PreviewRegistration < ActiveRecord::Base
 
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT
-  validates :mobile_number, presence: true, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER
+  validates :phone_number, presence: true, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER
 
 end

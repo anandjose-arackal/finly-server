@@ -11,6 +11,7 @@ set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
+set :rails_env, "itzcash_uat"
 # set :rvm_type, :user
 # set :rvm_ruby_version, 'ruby-2.3.0' # Edit this if you are using MRI Ruby
 
@@ -22,9 +23,9 @@ set :puma_conf, "#{shared_path}/puma.rb"
 set :puma_access_log, "#{shared_path}/log/puma_error.log"
 set :puma_error_log, "#{shared_path}/log/puma_access.log"
 set :puma_role, :app
-set :puma_env, fetch(:rack_env, fetch(:rails_env, 'itzcash_uat')) # will be enabled if pushing to itzcash UAT server
-# set :puma_env, fetch(:rack_env, fetch(:rails_env, 'production'))
-set :puma_threads, [0, 8]
+# set :puma_env, fetch(:rack_env, fetch(:rails_env, 'itzcash_uat')) # will be enabled if pushing to itzcash UAT server
+set :puma_env, fetch(:rack_env, fetch(:rails_env, 'production'))
+set :puma_threads, [0, 24]
 set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
