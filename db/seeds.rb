@@ -129,6 +129,7 @@ end
 if Company.count == 0
   c = Company.create(name: 'Finly', d_code: 'D000000360')
   c.reload
+  Company.create(name: 'Dummy company')
 else
   c = Company.first
 end
@@ -214,19 +215,19 @@ if Policy.non_default.count == 0
 end
 
 if ExpenseType.count ==0
-  ExpenseType.create(id: 1, name: "Manual")
-  ExpenseType.create(id: 2, name: "Card")
-  ExpenseType.create(id: 3, name: "Distance")
-  ExpenseType.create(id: 4, name: "Time")
-  ExpenseType.create(id: 5, name: "Per Diem")
+  ExpenseType.create(id: 1, name: 'Manual')
+  ExpenseType.create(id: 2, name: 'Card')
+  ExpenseType.create(id: 3, name: 'Distance')
+  ExpenseType.create(id: 4, name: 'Time')
+  ExpenseType.create(id: 5, name: 'Per Diem')
 end
 
 if ExpenseStatus.count ==0
-  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
-  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
-  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
-  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
-  ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
+  ExpenseStatus.create(id: 1, name: 'Unreported', order: 1)
+  ExpenseStatus.create(id: 2, name: 'Unsubmitted', order: 2)
+  ExpenseStatus.create(id: 3, name: 'Submitted', order: 3)
+  ExpenseStatus.create(id: 4, name: 'Rejected', order: 4)
+  ExpenseStatus.create(id: 5, name: 'Cancelled', order: 5)
 end
 
 if Expense.count == 0
@@ -253,21 +254,21 @@ if Receipt.count == 0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
+  ExpenseRuleType.create!(name: 'Require Receipt')
+  ExpenseRuleType.create!(name: 'Require Note')
+  ExpenseRuleType.create!(name: 'Disallow Expense')
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
+  RuleType.create!(name: 'Warning')
+  RuleType.create!(name: 'Blocking')
 end
 
 if BudgetPeriod.count == 0
-  b = BudgetPeriod.create!(name: "Day")
-  b = BudgetPeriod.create!(name: "Week")
-  b = BudgetPeriod.create!(name: "Month")
-  b = BudgetPeriod.create!(name: "Year")
+  BudgetPeriod.create!(name: 'Day')
+  BudgetPeriod.create!(name: 'Week')
+  BudgetPeriod.create!(name: 'Month')
+  BudgetPeriod.create!(name: 'Year')
 end
 
 p = Policy.find(3)
