@@ -291,6 +291,11 @@ class User < ActiveRecord::Base
     json
   end
 
+  # overriding devise's default methdod so that it compares against both email and phone number to authenticate
+  def self.find_for_database_authentication(conditions={})
+    find_by(mobile_number: conditions[:email]) || find_by(email: conditions[:email])
+  end
+
   private
   # def valid_role
   #   if self.role_mapping.count == 0
