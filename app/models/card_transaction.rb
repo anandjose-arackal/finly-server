@@ -2,28 +2,24 @@
 #
 # Table name: card_transactions
 #
-#  id                        :integer          not null, primary key
-#  user_id                   :integer
-#  card_id                   :integer
-#  merchant_id               :integer
-#  merchant_name             :string(255)
-#  terminal_id               :integer
-#  transaction_currency_code :string(255)
-#  transaction_type          :string(255)
-#  post_data                 :text(65535)
-#  transaction_amount_id     :integer
-#  card_amount_id            :integer
-#  date                      :datetime
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  reference_id              :string(255)
-#  auth_transaction_id       :string(255)
-#  transaction_mode          :string(255)
-#  itzcash_merchant_key      :string(255)
-#  merchant_city             :string(255)
-#  response_code             :string(255)
-#  serial_id                 :string(255)
-#  product_code              :string(255)
+#  id                    :integer          not null, primary key
+#  user_id               :integer
+#  card_id               :integer
+#  merchant_name         :string(255)
+#  transaction_type      :string(255)
+#  post_data             :text(65535)
+#  transaction_amount_id :integer
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  reference_id          :string(255)
+#  auth_transaction_id   :string(255)
+#  transaction_mode      :string(255)
+#  itzcash_merchant_key  :string(255)
+#  merchant_city         :string(255)
+#  response_code         :string(255)
+#  serial_id             :string(255)
+#  product_code          :string(255)
+#  transaction_timestamp :datetime
 #
 
 
