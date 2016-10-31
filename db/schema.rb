@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161025140923) do
+ActiveRecord::Schema.define(version: 20161031134740) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -55,6 +55,23 @@ ActiveRecord::Schema.define(version: 20161025140923) do
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
 
+  create_table "auto_submit_configs", force: :cascade do |t|
+    t.boolean  "enabled",                           default: false, null: false
+    t.integer  "period_id",           limit: 4,                     null: false
+    t.text     "default_note",        limit: 65535
+    t.integer  "default_category_id", limit: 4,                     null: false
+    t.integer  "default_policy_id",   limit: 4
+    t.integer  "submitable_id",       limit: 4,                     null: false
+    t.string   "submitable_type",     limit: 255,                   null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+  end
+
+  add_index "auto_submit_configs", ["default_category_id"], name: "index_auto_submit_configs_on_default_category_id", using: :btree
+  add_index "auto_submit_configs", ["default_policy_id"], name: "index_auto_submit_configs_on_default_policy_id", using: :btree
+  add_index "auto_submit_configs", ["period_id"], name: "index_auto_submit_configs_on_period_id", using: :btree
+  add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree
+
   create_table "balance_sheets", force: :cascade do |t|
     t.integer  "user_id",                  limit: 4
     t.integer  "cash_in_hand_id",          limit: 4
@@ -68,25 +85,19 @@ ActiveRecord::Schema.define(version: 20161025140923) do
   add_index "balance_sheets", ["pending_reimbursement_id"], name: "index_balance_sheets_on_pending_reimbursement_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
-  create_table "budget_periods", force: :cascade do |t|
-    t.string   "name",       limit: 255
+  create_table "budget_rules", force: :cascade do |t|
+    t.integer  "category_id",  limit: 4
+    t.integer  "amount_id",    limit: 4
+    t.integer  "period_id",    limit: 4
+    t.integer  "policy_id",    limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
-  end
-
-  create_table "budget_rules", force: :cascade do |t|
-    t.integer  "category_id",      limit: 4
-    t.integer  "amount_id",        limit: 4
-    t.integer  "budget_period_id", limit: 4
-    t.integer  "policy_id",        limit: 4
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.integer  "rule_type_id",     limit: 4
+    t.integer  "rule_type_id", limit: 4
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
-  add_index "budget_rules", ["budget_period_id"], name: "index_budget_rules_on_budget_period_id", using: :btree
   add_index "budget_rules", ["category_id"], name: "index_budget_rules_on_category_id", using: :btree
+  add_index "budget_rules", ["period_id"], name: "index_budget_rules_on_period_id", using: :btree
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
@@ -287,6 +298,17 @@ ActiveRecord::Schema.define(version: 20161025140923) do
     t.string   "contactable_type", limit: 255
     t.string   "designation",      limit: 255
   end
+
+  create_table "crono_jobs", force: :cascade do |t|
+    t.string   "job_id",            limit: 255,   null: false
+    t.text     "log",               limit: 65535
+    t.datetime "last_performed_at"
+    t.boolean  "healthy"
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "crono_jobs", ["job_id"], name: "index_crono_jobs_on_job_id", unique: true, using: :btree
 
   create_table "currencies", force: :cascade do |t|
     t.string   "country",      limit: 255
@@ -597,6 +619,12 @@ ActiveRecord::Schema.define(version: 20161025140923) do
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
+
+  create_table "periods", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "policies", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -979,10 +1007,11 @@ ActiveRecord::Schema.define(version: 20161025140923) do
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
   add_foreign_key "amounts", "currencies"
+  add_foreign_key "auto_submit_configs", "periods"
   add_foreign_key "balance_sheets", "users"
   add_foreign_key "budget_rules", "amounts"
-  add_foreign_key "budget_rules", "budget_periods"
   add_foreign_key "budget_rules", "categories"
+  add_foreign_key "budget_rules", "periods"
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
   add_foreign_key "card_budget_restrictions", "cards"

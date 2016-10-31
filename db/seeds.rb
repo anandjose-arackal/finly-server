@@ -134,6 +134,14 @@ else
   c = Company.first
 end
 
+
+if Period.count == 0
+  Period.create!(name: 'Day')
+  Period.create!(name: 'Week')
+  Period.create!(name: 'Month')
+  Period.create!(name: 'Year')
+end
+
 if c.categories.count == 0
   10.times do |i|
     c.categories.create!(name: "Test category #{i+1}")
@@ -264,13 +272,6 @@ if RuleType.count == 0
   RuleType.create!(name: 'Blocking')
 end
 
-if BudgetPeriod.count == 0
-  BudgetPeriod.create!(name: 'Day')
-  BudgetPeriod.create!(name: 'Week')
-  BudgetPeriod.create!(name: 'Month')
-  BudgetPeriod.create!(name: 'Year')
-end
-
 p = Policy.find(3)
 if p.rules_count == 0
   # warning rule that requires a receipt for expenses above 50
@@ -287,11 +288,11 @@ if p.rules_count == 0
   # setting monthly budget for category 1 as 100 in INR
   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
                              category_id: 1,
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 1)
   # set monthly budget for all expenses as 150 INR
   b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 2)
 end
 

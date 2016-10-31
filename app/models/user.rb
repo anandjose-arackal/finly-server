@@ -87,6 +87,7 @@ class User < ActiveRecord::Base
   has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
+  has_one :auto_submit_config, as: :submitable
 
   has_many :cards
   has_many :card_transactions
@@ -176,6 +177,7 @@ class User < ActiveRecord::Base
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
+    self.build_auto_submit_config(period_id: Period.id_for(:week), default_category_id: self.company.categories.with_name('Other').first.id, enabled: false).save
   end
 
   def name
