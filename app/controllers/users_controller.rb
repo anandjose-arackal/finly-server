@@ -6,6 +6,7 @@ class UsersController < ApplicationController
   def show
     @result = User::Show.(current_user, params)
     @managers = User::Team::GetManagers.(current_user, params)
+    sleep 2
     respond
   end
 

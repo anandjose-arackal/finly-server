@@ -104,6 +104,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
+    
+    FinlyF.stopMainLoader()
 
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")

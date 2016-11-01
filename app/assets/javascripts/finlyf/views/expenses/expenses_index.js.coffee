@@ -113,6 +113,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
+    FinlyF.stopMainLoader()
+
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
@@ -361,6 +363,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   filter: (e) ->
+    loader_div = $(@el).find('.main')
+    FinlyF.startMainLoader(loader_div)
+
     if e
       e.preventDefault()
       target = $(e.currentTarget)
@@ -397,9 +402,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           data: params,
           success: ->
             _this.toggleLoadMore(_this.collection)
+
+            
             # console.log "Fetched all the data"
           error: ->
             console.log "Couldn't fetch Successfully."
+          done: ->
+            FinlyF.stopMainLoader()
         })
 
   globalSearch: (e) ->
