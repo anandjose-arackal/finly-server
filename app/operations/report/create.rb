@@ -2,21 +2,30 @@
 # params:
 # name: optional, if creating a report with a name
 # expense_ids: ids of the expenses that the report is to be created with
+# expenses: array of expense objects to be added to the report
 
 class Report::Create < Report::Base
+  attr_accessor :auto_submit, :for_user
 
   def authorized_user_types
     [:employee]
   end
 
+  def authorize_user(user_types)
+    # Do not authorize user for auto submit
+    return if user.blank? and params.present? and params[:auto_submit]
+    super user_types
+  end
+
   def pre_validate
-    if user.blank?
-      messages[:error] << 'User not found'
+    if user.blank? and (params.blank? or not params[:auto_submit])
+      add_message :error, 'User not found'
     end
   end
 
   def init
-
+    self.auto_submit = params[:auto_submit]
+    self.for_user = (params[:for_user] or user)
   end
 
   def authorize
@@ -24,28 +33,30 @@ class Report::Create < Report::Base
   end
 
   def process
-    role_id  = UserRole.id_for(:employee)
-    self.report = user.reports.build report_status_id: ReportStatus.open_id, controlling_user: user,
-                                     controlling_user_role_id: role_id,
+    role_id = UserRole.id_for(:employee)
+    self.report = for_user.reports.build report_status_id: ReportStatus.open_id, controlling_user: for_user,
+                                     controlling_user_role_id: role_id, policy_id: params[:policy_id],
                                      name: params[:name]
     if report.save
-      report_track = report.tracks.build action_user: user, modified_user: user,
-                                         modified_user_role_id: role_id,
-                                         report_tracking_action_id: ReportTrackingAction.create_id,
-                                         report_status_id: ReportStatus.open_id
-      report_track.save
+      report.tracks.create action_user: for_user, modified_user: for_user,
+                           modified_user_role_id: role_id,
+                           report_tracking_action_id: ReportTrackingAction.create_id,
+                           report_status_id: ReportStatus.open_id
+      expenses = params[:expenses]
       expense_ids = nil
-      expense_ids = params[:expense_ids].split(',') if params[:expense_ids]
-      if expense_ids.present?
-        Report::Expenses::Add.(user, {report_id: report.id, expense_ids: expense_ids})
+      if params[:expense_ids] and expenses.blank?
+        expense_ids = params[:expense_ids].split(',')
+      end
+      if expense_ids.present? or expenses.present?
+        Report::Expenses::Add.(user, {for_user: for_user, report: report, expenses: expenses, expense_ids: expense_ids})
       end
     else
-      messages[:error] = report.errors.full_messages
+      add_message :error, report.errors.full_messages
     end
   end
 
   def post_process
-    messages[:success] << "Report created."
+    add_message :success, 'Report created'
   end
 
 end

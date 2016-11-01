@@ -46,8 +46,12 @@ class UpdateTest < ActiveSupport::TestCase
   end
 
   test 'Successful update' do
-    result = User::Configuration::AutoSubmit::Update.(@current_user, user: {id: @updating_user.id, enabled: true, default_category_id: 1, period_id: Period.id_for(:day)}, view: 'admin')
+    assert_not @updating_user.auto_submit_config.enabled
+    assert_not_equal @updating_user.auto_submit_config.default_category_id, 2
+    result = User::Configuration::AutoSubmit::Update.(@current_user, user: {id: @updating_user.id, enabled: true, default_category_id: 2, period_id: Period.id_for(:day)}, view: 'admin')
     assert result.success?
+    assert @updating_user.reload.auto_submit_config.enabled
+    assert_equal @updating_user.auto_submit_config.default_category_id, 2
   end
 
 end

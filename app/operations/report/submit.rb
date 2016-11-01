@@ -102,7 +102,7 @@ class Report::Submit < Report::Base
 
     Event::EReport::Submit.(user, report: report)
 
-    messages[:success] << "Report Submitted."
+    messages[:success] << 'Report Submitted'
 
   end
 
