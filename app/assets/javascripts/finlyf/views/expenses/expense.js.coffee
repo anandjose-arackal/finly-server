@@ -3,14 +3,18 @@ class FinlyF.Views.Expense extends Backbone.View
   templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   templateShow: HandlebarsTemplates['finlyf/expenses/show']
   templateShowDetails: HandlebarsTemplates['finlyf/expenses/show_details']
+  templatePreviewReceipt: HandlebarsTemplates['finlyf/expenses/extras/preview']
   className: 'item col-md-12'
 
   events:
     'click .select-item': 'toggleSelect'
     # 'input [contenteditable=true]': 'updateModel'
+    'click img.receipt-image': 'previewReceipt'
     'click .btn-edit-expense': 'edit'
     'click .btn-update-expense': 'update'
     'click .btn-delete-expense': 'delete'
+    'click .detach-uploaded-receipt': 'detachUploadedReceipt'
+    'change input#edit-expense-receipt-upload': 'showUploadedReceipt'
 
   initialize: (options) ->
     _this = @
@@ -53,6 +57,13 @@ class FinlyF.Views.Expense extends Backbone.View
       $(@el).removeClass('selected')
 
     @parent.trigger('item:selected')
+
+  previewReceipt: (e) ->
+    console.log "Will preview receipt"
+    modal = $("#modal-receipt-preview")
+    console.log modal
+    $(modal).html(@templatePreviewReceipt({item: @model.toJSON()}))
+    $(modal).modal('show')
 
   populateDetails: ->
     if @report_preview
@@ -97,6 +108,39 @@ class FinlyF.Views.Expense extends Backbone.View
     $(@el).find(".datepicker").datepicker({
       dateFormat: "yy-mm-dd"
     })
+
+
+  detachUploadedReceipt: (e) ->
+    e.preventDefault()
+    $(e.currentTarget).addClass('hidden')
+    # console.log "Will remove the receipt!"
+    # /assets/images/receipt-placeholder.png
+
+    target = $(e.currentTarget).closest('.item-receipt')
+    # close_button = $(target).find('.remove-uploaded-receipt')
+    input = $(target).find('input[type=file]#edit-expense-receipt-upload')
+    image = $(target).find("img#edit-preview-image")
+
+    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    # input.replaceWith(input.val(null).clone(true))
+    input2 = input.after(input.clone())
+    $(input2).attr('type', 'text').attr('name', "expense[receipts_attributes]").attr('id', 'edit-expense-receipt-upload-text').val(null)
+    # $(input).attr('type', 'text').val(null)
+
+  showUploadedReceipt: (e) ->
+    # console.log "hello from jkljfklasd"
+    # onchange="document.getElementById('edit-preview-image').src = window.URL.createObjectURL(this.files[0])"
+    file = e.currentTarget
+
+    target = $(e.currentTarget).closest('.item-receipt')
+    # input = $(target).find('input[type=file]#expense-receipt-upload')
+    close_button = $(target).find('.detach-uploaded-receipt')
+    image = $(target).find("img#edit-preview-image")
+    image_url = window.URL.createObjectURL(file.files[0])
+    $(image).attr('src', image_url)
+    $(close_button).removeClass('hidden')
+    $(target).find("#edit-expense-receipt-upload-text").remove()
+    # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
 
 
   update: (e) ->

@@ -12,6 +12,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   templateMain: HandlebarsTemplates['finlyf/receipts/crud/index']
   templateNew: HandlebarsTemplates['finlyf/receipts/crud/new']
 
+  templatePreviewReceipt: HandlebarsTemplates['finlyf/receipts/crud/preview']
   #expenses
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
 
@@ -154,23 +155,28 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         $(item).find(".select-item").prop("checked", false)
 
   selectCurrent: (e) ->
-    # if $(e.currentTarget).hasClass('fa-trash')
-    #   @delete(e)
-    #   return
-    # console.log "hi"
-    items = $(@el).find("#items .item")
-    for item in items
-      $(item).find('.select-item').prop('checked', false)
-      $(item).removeClass('selected')
+    target = $(e.currentTarget)
+    model_id = $(target).find('input.select-item').attr('data-item-id')
+    receipt = @collection.get(model_id)
 
-    $(e.currentTarget).find('.select-item').prop('checked', true)
-    $(e.currentTarget).closest('.item').addClass('selected')
-    @receiptSelectOptions()
+    modal = $(@el).find("#modal-receipt-preview")
+    $(modal).html(@templatePreviewReceipt({item: receipt.toJSON()}))
+    $(modal).modal('show')
+    
+    # items = $(@el).find("#items .item")
+    # for item in items
+    #   $(item).find('.select-item').prop('checked', false)
+    #   $(item).removeClass('selected')
+
+    # $(e.currentTarget).find('.select-item').prop('checked', true)
+    # $(e.currentTarget).closest('.item').addClass('selected')
+    # @receiptSelectOptions()
 
   new: ->
     $("#modal-new .modal-body").html(@templateNew)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
-    $("#modal-new").attr('data-backdrop', false)
+    $("#modal-new .modal-dialog").css("width", "30%")
+    # $("#modal-new").attr('data-backdrop', true)
     $("#modal-new").modal('show')
 
   create: (e)->
@@ -259,18 +265,22 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       $(@el).find('.secondary-navbar .btn-new-expense').css('display', 'none')
 
 
-  newExpense: ->
-    items = $(@el).find("#items .item")
-    for item in items
-      selected_item = $(item).find('.select-item')
-      if $(selected_item).prop('checked')
-        receipt_id = $(selected_item).attr('data-item-id')
-        break
+  newExpense: (e) ->
+    # items = $(@el).find("#items .item")
+    # for item in items
+    #   selected_item = $(item).find('.select-item')
+    #   if $(selected_item).prop('checked')
+    #     receipt_id = $(selected_item).attr('data-item-id')
+    #     break
     
-    selected_receipt = @collection.get(parseInt(receipt_id))
+    model_id = $(e.currentTarget).attr('data-item-id') 
+    selected_receipt = @collection.get(parseInt(model_id))
+
+    $("#modal-receipt-preview").modal('hide')
 
     $("#modal-new .modal-body").html(@templateNewExpense({receipt: {id: selected_receipt.get('id')}}))
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
+    $("#modal-new .modal-dialog").css("width", "60%")
 
     category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
     options = $("#newExpenseCategory option")
@@ -279,7 +289,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
         value: $(option).attr('value')
         text: $(option).text()
       }).appendTo(category_select)
-    $("#modal-new").attr('data-backdrop', false)
+    $("#modal-new").attr('data-backdrop', true)
     $("#modal-new").modal('show')
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
 
@@ -311,14 +321,14 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
   delete: (e) ->
     _this = @
-    items = $(@el).find("#items .item")
-    for item in items
-      selected_item = $(item).find('.select-item')
-      if $(selected_item).prop('checked')
-        receipt_id = $(selected_item).attr('data-item-id')
-        break
-    
-    selected_receipt = @collection.get(parseInt(receipt_id))
+    # items = $(@el).find("#items .item")
+    # for item in items
+    #   selected_item = $(item).find('.select-item')
+    #   if $(selected_item).prop('checked')
+    #     receipt_id = $(selected_item).attr('data-item-id')
+    #     break
+    model_id = $(e.currentTarget).attr('data-item-id') 
+    selected_receipt = @collection.get(parseInt(model_id))
 
     # selected_receipt.destroy({
     #   silent: true
@@ -338,6 +348,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
+          $("#modal-receipt-preview").modal('hide')
           _this.refetchCollection()
           _this.toggleReceiptSelectOptions()
       error: (err) ->

@@ -7,6 +7,7 @@ class FinlyF.Views.Report extends Backbone.View
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
   templateShowExpense: HandlebarsTemplates['finlyf/reports/expenses/show']
   templateExistingExpense: HandlebarsTemplates['finlyf/reports/expenses/existingExpenses']
+  templateReceiptPreview: HandlebarsTemplates['finlyf/reports/extras/previewReceipt']
   className: 'item col-sm-12 report'
 
   events:
@@ -14,9 +15,14 @@ class FinlyF.Views.Report extends Backbone.View
     'input [contenteditable=true]': 'updateModel'
     'click .btn-update-item': 'update'
     'click .add-new-expense': 'newExpense'
+    'click .remove-uploaded-receipt': 'removeUploadedReceipt'
+    'change input#expense-receipt-upload': 'showUploadedReceipt'
+
     'click .add-existing-expense': 'existingExpense'
     'click .btn-create-expense': 'createExpense'
     'click .btn-post-comment': 'postComment'
+
+    'click .receipt': 'previewReceipt'
 
     'click .btn-delete-item': 'delete'
     'click .btn-edit-item': 'edit'
@@ -93,7 +99,7 @@ class FinlyF.Views.Report extends Backbone.View
     data = {
       report_id: $(e.currentTarget).attr('data-item-id')
     }
-    $("#modal-new").attr("data-backdrop", false)
+    $("#modal-new").attr("data-backdrop", true)
     $("#modal-new .modal-body").html(@templateNewExpense({data: data}))
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
 
@@ -106,11 +112,53 @@ class FinlyF.Views.Report extends Backbone.View
         text: $(option).text()
       }).appendTo(category_select) 
     
+    $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
     $("#modal-new").find('.btn-create-expense').on('click', (e) ->
       _this.createExpense(@);
     )
+
+    # Since the modal is outside the scope of this view, events need to be manually attached
+    modal_new = $("#modal-new")
+    $(modal_new).find(".remove-uploaded-receipt").on('click', (e) ->
+      _this.removeUploadedReceipt(e)
+    )
+    $(modal_new).find("input#expense-receipt-upload").on('change', (e) ->
+      _this.showUploadedReceipt(e)
+    )
+
+
+  # New expense
+  showUploadedReceipt: (e) ->
+    console.log "Hello", e
+    file = e.currentTarget
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # input = $(target).find('input[type=file]#expense-receipt-upload')
+    close_button = $(target).find('.remove-uploaded-receipt')
+    image = $(target).find("img#preview-image")
+    image_url = window.URL.createObjectURL(file.files[0])
+    $(image).attr('src', image_url)
+    $(close_button).removeClass('hidden')
+    # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
+
+  # New expense
+  removeUploadedReceipt: (e) ->
+    e.preventDefault()
+    $(e.currentTarget).addClass('hidden')
+    console.log "Will remove the receipt!"
+    # /assets/images/receipt-placeholder.png
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # close_button = $(target).find('.remove-uploaded-receipt')
+    input = $(target).find('input[type=file]#expense-receipt-upload')
+    image = $(target).find("img#preview-image")
+
+    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    input.replaceWith(input.val('').clone(true))
+
+    # $(close_button).css('display', 'none')
 
   createExpense: (e) ->
     # console.log "Creating expense"
@@ -490,6 +538,16 @@ class FinlyF.Views.Report extends Backbone.View
         console.log err
     })
 
+  previewReceipt: (e) ->
+    target = e.currentTarget
 
+    image_url = $(target).find("img").attr('src')
+
+    item = {
+      url: image_url
+    }
+
+    $("#modal-receipt-preview").html(@templateReceiptPreview({item: item}))
+    $("#modal-receipt-preview").modal('show')
 
 

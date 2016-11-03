@@ -66,9 +66,9 @@
     {{/if}}
 
       
-    <div class="col-sm-4 no-padding text-center">
+    <div class="col-sm-4 no-padding text-center upload-receipt">
       <label class="text-center control-label">Receipt</label><br />
-
+      <i class="remove-uploaded-receipt fa fa-times-circle hidden" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: 14px;right: 19px;"></i>
       <label for="expense-receipt-upload">
         <!-- <i class="fa fa-times-circle" id="remove-preview-image"></i> -->
         <img class="preview-image img-responsive" id="preview-image" src="<%= image_url('receipt-placeholder.png') %>" alt="Click to upload image" style="max-width: 200px;max-height: 200px;"/>
@@ -76,7 +76,7 @@
       {{#if receipt}}
         <input type="number" id="expense-receipt-upload" name="receipt_id" class="form-control input-upload-image" value="{{receipt.id}}"/>
       {{else}}
-        <input type="file" id="expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('preview-image').src = window.URL.createObjectURL(this.files[0])" />
+        <input type="file" id="expense-receipt-upload" accept="image/x-png, image/gif, image/jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image"/>
       {{/if}}
     </div>
   </div>
