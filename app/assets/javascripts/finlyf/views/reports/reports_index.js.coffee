@@ -112,6 +112,8 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
+    
+    FinlyF.stopMainLoader()
 
   appendItems: (item) ->
     # console.log "appending"

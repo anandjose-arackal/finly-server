@@ -77,6 +77,10 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     @dump = @collection.models.slice()
     $(@el).find("#users").html("")
 
+    # Stop main loader
+    main = $(@el).find('.sidebar')
+    FinlyF.stopMainLoader(main)
+
     @collection.each(@appendUsers, @)
 
   appendUsers: (user) ->
@@ -95,6 +99,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
+    
+    FinlyF.stopMainLoader()
 
   showDetails: (e) ->
     $(e.currentTarget).siblings().removeClass('active')
@@ -113,6 +119,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     })
 
     $(@el).find("#user-details").html(preview_view.render().el)
+    # Load main loader
+    main = $(@el).find("#user-details .user-details")
+    FinlyF.startMainLoader(main)
 
   refetchCollection: (e) ->
     #REFRESH

@@ -57,6 +57,7 @@ class FinlyF.Views.User extends Backbone.View
     # console.log "here we are in after sync"
     # console.log @model.toJSON()
     $(@el).html(@templateShow({item: @model.toJSON()}))
+    FinlyF.stopMainLoader(@el)
     # console.log("Active Tab: ", @active_tab)
     # $(@el).find(@active_tab).tab('show')
     $(@el).find('a[href="' + @active_tab + '"]').tab('show');
