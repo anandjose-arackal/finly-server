@@ -71,7 +71,6 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
-  has_many :cards
 
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
@@ -132,8 +131,9 @@ class User < ActiveRecord::Base
   scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
   scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
-  scope :only_managers, -> { where 'user_role_mappings.user_role_id = ?', UserRole.manager_id }
-  scope :only_finance_managers, -> { where 'user_role_mappings.user_role_id = ?', UserRole.finance_manager_id }
+  scope :only_managers, -> { where('user_role_mappings.user_role_id = ?', UserRole.manager_id).uniq }
+  scope :only_finance_managers, -> { where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).uniq }
+  scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :only_admins, -> { where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
@@ -167,7 +167,6 @@ class User < ActiveRecord::Base
 
   scope :signed_up, -> { where invitation_token: nil }
   scope :pending, -> { where.not(invitation_token: nil) }
-  scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 
@@ -291,7 +290,7 @@ class User < ActiveRecord::Base
     json
   end
 
-  # overriding devise's default methdod so that it compares against both email and phone number to authenticate
+  # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(mobile_number: conditions[:email]) || find_by(email: conditions[:email])
   end

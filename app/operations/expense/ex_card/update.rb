@@ -20,11 +20,15 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     self.updated_expense_params = update_card_expense_params
     if updated_expense_params[:receipts_attributes] == [nil]
       updated_expense_params.delete(:receipts_attributes)
+      # if the receipts attributes is passed as [nil], the receipt attached to this expense gets disassociated
+      # todo - check of the api fails because of this
+      receipt = expense.receipts.first
+      if receipt
+        receipt.parent = nil
+        receipt.save
+      end
     end
-    # todo - handle merchant name update for cards
-    # if expense.card_expense.present? and params[:expense][:merchant]
-    #   self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
-    # end
+
     if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
       self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
     end

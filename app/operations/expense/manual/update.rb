@@ -27,6 +27,13 @@ class Expense::Manual::Update < Expense::Manual::Base
     self.updated_expense_params = manual_expense_params
     if updated_expense_params[:receipts_attributes] == [nil]
       updated_expense_params.delete(:receipts_attributes)
+      # if the receipts attributes is passed as [nil], the receipt attached to this expense gets disassociated
+      # todo - check if the api fails because of this
+      receipt = expense.receipts.first
+      if receipt
+        receipt.parent = nil
+        receipt.save
+      end
     end
     if expense
       if self.updated_expense_params[:amount_attributes].present? and self.updated_expense_params[:amount_attributes][:value].present? and

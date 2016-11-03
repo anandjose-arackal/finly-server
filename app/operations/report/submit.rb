@@ -52,10 +52,9 @@ class Report::Submit < Report::Base
     # else
 
     # Only report owners can submit report
-      unless report.user_id == user.id
-        raise_unauthorized_exception
-      end
-    # end
+    unless report.user_id == user.id
+      raise_unauthorized_exception
+    end
   end
 
   def process
@@ -103,7 +102,6 @@ class Report::Submit < Report::Base
     Event::EReport::Submit.(user, report: report)
 
     messages[:success] << "Report Submitted."
-
   end
 
 end

@@ -6,6 +6,8 @@ class RejectTest < ActiveSupport::TestCase
   include ReportOperationTestHelper
 
   def setup
+    @admin = User.first
+    @employee = User.with_roles.only_employees.first
 
   end
 
