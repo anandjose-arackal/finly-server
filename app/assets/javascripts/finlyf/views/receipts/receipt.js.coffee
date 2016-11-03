@@ -6,7 +6,7 @@ class FinlyF.Views.Receipt extends Backbone.View
 
   events:
     # 'click .select-item': 'toggleSelect'
-    'input [contenteditable=true]': 'updateModel'
+    # 'input [contenteditable=true]': 'updateModel'
     'click .btn-update-item': 'update'
 
   initialize: (options) ->

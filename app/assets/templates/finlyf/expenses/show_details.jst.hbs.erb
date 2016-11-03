@@ -111,15 +111,19 @@
     </div>
 
     <div class="item-receipt item-attr-edit text-center">
-      <label for="edit-expense-receipt-upload">
-        {{#if item.receipts}}
-          <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
-        {{else}}
-          <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
-        {{/if}}
+      {{#if item.receipts}}
+        <i class="detach-uploaded-receipt fa fa-times-circle" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
+        <label for="edit-expense-receipt-upload">
 
-      </label>
-      <input type="file" id="edit-expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('edit-preview-image').src = window.URL.createObjectURL(this.files[0])" />
+        <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+        </label>
+      {{else}}
+        <label for="edit-expense-receipt-upload">
+        <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+        </label>
+      {{/if}}
+
+      <input type="file" id="edit-expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" />
     </div>
     
   </div>
