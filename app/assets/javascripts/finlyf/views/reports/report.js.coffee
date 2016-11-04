@@ -446,7 +446,9 @@ class FinlyF.Views.Report extends Backbone.View
       model_id: expense_id
       preview: true
       view: @current_view
-      report: true
+      report: true #will be removed
+      screen: 'report'
+      parent: @
     })
     $(@el).find("#modal-mp").html(@templateShowExpense())
     $(@el).find("#modal-mp .modal-content .modal-body .row").html(preview_view.render().el)

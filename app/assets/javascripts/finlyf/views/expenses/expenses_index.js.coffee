@@ -219,7 +219,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     preview_view = new FinlyF.Views.Expense({
       model_id: model.get('id')
       preview: true
+      view: @params.view
       parent: @
+      screen: 'expenses'
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)

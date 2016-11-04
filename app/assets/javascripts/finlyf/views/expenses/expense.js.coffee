@@ -13,23 +13,22 @@ class FinlyF.Views.Expense extends Backbone.View
     'click .btn-edit-expense': 'edit'
     'click .btn-update-expense': 'update'
     'click .btn-delete-expense': 'delete'
+    'click .btn-upload-expense-receipt': 'processUploadReceipt'
+    'click .btn-confirm-upload-expense-receipt': 'uploadExpenseReceipt'
     'click .detach-uploaded-receipt': 'detachUploadedReceipt'
     'change input#edit-expense-receipt-upload': 'showUploadedReceipt'
 
   initialize: (options) ->
     _this = @
     @preview = options.preview
-
-    #is being previewed from a report
-    if options.report
-      @report_preview = options.report
-    # if options.report
-    #   @preview_in_report = true
     if options.parent
       @parent = options.parent
+
     if @preview
+      @screen = options.screen #from which screen it is being viewed
       @view = options.view
-      # console.log "Preview is passed true"
+
+
       $(@el).removeClass("item")
       @model = new FinlyF.Models.Expense({id: options.model_id})
       @model.fetch({
@@ -38,6 +37,31 @@ class FinlyF.Views.Expense extends Backbone.View
           authenticity_token: $("#authenticity_token").val()
         }
       })
+
+
+
+
+
+
+    # #is being previewed from a report
+    # if options.report
+    #   @report_preview = options.report
+    # # if options.report
+    # #   @preview_in_report = true
+    # if options.parent
+    #   @parent = options.parent
+    # if @preview
+    #   @view = options.view
+      # @view = @parent.params.view || options.view
+      # console.log "Preview is passed true and view is", @view, @parent
+      # $(@el).removeClass("item")
+      # @model = new FinlyF.Models.Expense({id: options.model_id})
+      # @model.fetch({
+      #   data: {
+      #     view: _this.view
+      #     authenticity_token: $("#authenticity_token").val()
+      #   }
+      # })
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
 
@@ -67,8 +91,10 @@ class FinlyF.Views.Expense extends Backbone.View
 
   populateDetails: ->
     if @report_preview
-      @model.set('report_preview', true)
+      # @model.set('report_preview', true)
+      # @model.set('view', @view)
       @model.set('view', @view)
+      @model.set('screen', @screen)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
   showSaveOption: ->
@@ -141,6 +167,55 @@ class FinlyF.Views.Expense extends Backbone.View
     $(close_button).removeClass('hidden')
     $(target).find("#edit-expense-receipt-upload-text").remove()
     # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
+
+  processUploadReceipt: (e) ->
+    target = e.currentTarget
+    $(target).addClass('btn-confirm-upload-expense-receipt btn-success').removeClass('btn-upload-expense-receipt btn-warning').html("<i class='fa fa-upload'></i>&nbsp;&nbsp;Upload Receipt")
+
+    receipt_div = $(@el).find('.receipt-area')
+
+    $(receipt_div).find(".item-attr-preview").css("display", "none")
+    $(receipt_div).find(".item-attr-edit").css("display", "block")
+
+  uploadExpenseReceipt: (e) ->
+    target = e.currentTarget
+    $(target).html("&nbsp;&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;&nbsp;").attr('disabled', true)
+
+    _this = @
+    e.preventDefault()
+    formData = new FormData($(@el).find('form#form-update-item')[0])
+
+    $.ajax({
+      url: '/expenses/' + _this.model.get('id')
+      type: "PUT",
+      data: formData,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          if $(target).closest('.modal-content')
+            #Adding refresh trigger in reprots#show
+            $(target).closest('.modal-content').attr('data-refresh-true', true)
+
+            #Adding refresh trigger in expense#index
+            if _this.parent
+              $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
+          _this.model.fetch()
+          # if _this.report_preview
+          # $("#modal-new").modal('hide')
+          # _this.refetchCollection()
+        else
+          $(target).html("<i class='fa fa-upload'></i>&nbsp;&nbsp;Upload Receipt")
+          $(target).attr('disabled', false)
+
+      error: (err) ->
+        $(target).html("<i class='fa fa-upload'></i>&nbsp;&nbsp;Upload Receipt")
+        $(target).attr('disabled', false)
+      cache: false,
+      contentType: false,
+      processData: false
+    })
+
+
 
 
   update: (e) ->
