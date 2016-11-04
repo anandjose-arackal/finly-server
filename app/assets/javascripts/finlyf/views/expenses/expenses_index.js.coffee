@@ -35,6 +35,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter-expenses': 'filter'
+    'click .remove-uploaded-receipt': 'removeUploadedReceipt'
+    'change input#expense-receipt-upload': 'showUploadedReceipt'
 
   initialize: (options) ->
     if Backbone.history.getFragment() == ""
@@ -112,6 +114,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
+
+    FinlyF.stopMainLoader()
 
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
@@ -215,7 +219,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     preview_view = new FinlyF.Views.Expense({
       model_id: model.get('id')
       preview: true
+      view: @params.view
       parent: @
+      screen: 'expenses'
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
@@ -248,6 +254,35 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     
     $("#modal-new").modal('show')
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+
+  showUploadedReceipt: (e) ->
+    file = e.currentTarget
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # input = $(target).find('input[type=file]#expense-receipt-upload')
+    close_button = $(target).find('.remove-uploaded-receipt')
+    image = $(target).find("img#preview-image")
+    image_url = window.URL.createObjectURL(file.files[0])
+    $(image).attr('src', image_url)
+    $(close_button).removeClass('hidden')
+    # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
+
+  removeUploadedReceipt: (e) ->
+    e.preventDefault()
+    $(e.currentTarget).addClass('hidden')
+    console.log "Will remove the receipt!"
+    # /assets/images/receipt-placeholder.png
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # close_button = $(target).find('.remove-uploaded-receipt')
+    input = $(target).find('input[type=file]#expense-receipt-upload')
+    image = $(target).find("img#preview-image")
+
+    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    input.replaceWith(input.val('').clone(true))
+
+    # $(close_button).css('display', 'none')
+
 
   create: (e)->
     _this = @
@@ -361,6 +396,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   filter: (e) ->
+    loader_div = $(@el).find('.main')
+    FinlyF.startMainLoader(loader_div)
+
     if e
       e.preventDefault()
       target = $(e.currentTarget)
@@ -397,9 +435,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           data: params,
           success: ->
             _this.toggleLoadMore(_this.collection)
+
+            
             # console.log "Fetched all the data"
           error: ->
             console.log "Couldn't fetch Successfully."
+          done: ->
+            FinlyF.stopMainLoader()
         })
 
   globalSearch: (e) ->

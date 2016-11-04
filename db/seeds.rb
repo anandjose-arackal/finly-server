@@ -415,8 +415,14 @@ User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
-AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-
+if AdminUser.count == 0
+  # creating admin panel users who can access admin panel
+  AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+  AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+  AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+  AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+  AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+end
 
 # creating Finly users and junk transaction data.
 # jouska = Company.create(name: 'Jouska')

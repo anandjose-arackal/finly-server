@@ -2,6 +2,16 @@ ActiveAdmin.register User do
 
   filter :first_name_or_last_name_or_maiden_name_cont, as: :string, label: "Name"
   filter :company_id, as: :select, collection: proc {Company.all}
+  filter :email, as: :string
+  filter :updated_at, as: :date_range
+
+  scope :pending
+  scope :signed_up
+  scope :active
+  scope ("Inactive") do |scope|
+    scope.where(active: false)
+  end
+
 
   index do
     id_column
@@ -9,6 +19,9 @@ ActiveAdmin.register User do
     column :email
     column :mobile_number
     column :company
+    column :last_sign_in_at
+    column :last_sign_in_ip
+    column :active
 
     actions
   end
@@ -22,6 +35,7 @@ ActiveAdmin.register User do
     f.inputs :password
     f.inputs :password_confirmation
     f.inputs :mobile_number
+    f.inputs :active
     f.inputs "COmpany ID", :company_id
     f.inputs "User Roles" do
       f.has_many :role_mapping do |role_mapping|
@@ -39,7 +53,7 @@ ActiveAdmin.register User do
     f.actions
   end
 
-  permit_params :first_name, :last_name, :email, :mobile_number, :password, :password_confirmation, :company_id, role_mapping_attributes: [:user_role_id],
+  permit_params :first_name, :last_name, :email, :mobile_number, :active, :password, :password_confirmation, :company_id, role_mapping_attributes: [:user_role_id],
                                                                               team_mapping_attributes: [:manager_id, :finance_manager_id, :default]
 # See permitted parameters documentation:
 # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters

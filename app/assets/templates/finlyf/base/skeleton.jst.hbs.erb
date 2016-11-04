@@ -89,7 +89,8 @@
 }
 
 .receipt-container{
-  height: 100%;
+  /*height: 100%;*/
+  margin-bottom: 10px;
 }
 
 .item.col-sm-3 .receipt-container .receipt-image, .receipt .receipt-container .receipt-image{
@@ -108,7 +109,7 @@
   position:fixed;
   background: #fff;
   background: #F5F6F9;
-  /*position: relative;*/
+  position: relative;
   height: calc(100% - 100px);
   overflow-y: scroll;
   z-index: 4;
@@ -375,7 +376,7 @@
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">
-    <div class="modal-dialog" role="document" style="width: 60%;">
+    <div class="modal-dialog" role="document" style="">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -385,6 +386,10 @@
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-receipt-preview">
+    
   </div><!-- /.modal -->
 
   
