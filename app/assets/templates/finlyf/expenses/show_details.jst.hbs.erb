@@ -5,9 +5,9 @@
   {{#if item.deletable}}
     <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
   {{/if}}
-  {{#unless item.allow_upload_receipt}}
+  {{#if item.allow_upload_receipt}}
     <button class="btn btn-upload-expense-receipt btn-sm btn-warning"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit Receipt</button>
-  {{/unless}}
+  {{/if}}
 </div>
 
 <div class="row no-margin expense-violations">
