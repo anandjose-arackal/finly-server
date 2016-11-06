@@ -20,11 +20,6 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
 
   def authorize
     raise_unauthorized_exception if self.selected_user.blank?
-    return if update_param.blank?
-    default_category_id = update_param[:default_category_id]
-    if default_category_id.present? and user.company.categories.with_id(default_category_id).blank?
-      raise_unauthorized_exception
-    end
   end
 
   def validate
@@ -49,7 +44,7 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
 
   protected
   def update_params
-    self.params.require(:user).permit(:id, :user_id, :enabled, :period_id, :default_note, :default_category_id, :default_policy_id)
+    self.params.require(:user).permit(:id, :user_id, :enabled, :period_id, :default_note, :default_policy_id)
   end
 
 end

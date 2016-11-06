@@ -56,18 +56,17 @@ ActiveRecord::Schema.define(version: 20161031134740) do
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
 
   create_table "auto_submit_configs", force: :cascade do |t|
-    t.boolean  "enabled",                           default: false, null: false
-    t.integer  "period_id",           limit: 4,                     null: false
-    t.text     "default_note",        limit: 65535
-    t.integer  "default_category_id", limit: 4,                     null: false
-    t.integer  "default_policy_id",   limit: 4
-    t.integer  "submitable_id",       limit: 4,                     null: false
-    t.string   "submitable_type",     limit: 255,                   null: false
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.boolean  "enabled",                              default: false, null: false
+    t.boolean  "limit_to_card_expenses",               default: false, null: false
+    t.integer  "period_id",              limit: 4,                     null: false
+    t.text     "default_memo",           limit: 65535
+    t.integer  "default_policy_id",      limit: 4
+    t.integer  "submitable_id",          limit: 4,                     null: false
+    t.string   "submitable_type",        limit: 255,                   null: false
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
   end
 
-  add_index "auto_submit_configs", ["default_category_id"], name: "index_auto_submit_configs_on_default_category_id", using: :btree
   add_index "auto_submit_configs", ["default_policy_id"], name: "index_auto_submit_configs_on_default_policy_id", using: :btree
   add_index "auto_submit_configs", ["period_id"], name: "index_auto_submit_configs_on_period_id", using: :btree
   add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree

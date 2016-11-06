@@ -5,26 +5,19 @@
 # expenses: array of expense objects to be added to the report
 
 class Report::Create < Report::Base
-  attr_accessor :auto_submit, :for_user
+  attr_accessor :for_user
 
   def authorized_user_types
     [:employee]
   end
 
-  def authorize_user(user_types)
-    # Do not authorize user for auto submit
-    return if user.blank? and params.present? and params[:auto_submit]
-    super user_types
-  end
-
   def pre_validate
-    if user.blank? and (params.blank? or not params[:auto_submit])
+    if user.blank?
       add_message :error, 'User not found'
     end
   end
 
   def init
-    self.auto_submit = params[:auto_submit]
     self.for_user = (params[:for_user] or user)
   end
 

@@ -5,18 +5,22 @@
 
 class Report::Expenses::Add < Report::Base
 
-  attr_accessor :expenses
+  attr_accessor :expenses, :auto_submit
 
   def authorized_user_types
+    return nil if params.present? and params[:auto_submit]
     [:employee]
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      add_message :error, 'No user or params passed'
+    if params.blank?
+      add_message :error, 'Error loading expenses'
       return
     end
-
+    if user.blank? and not params[:auto_submit]
+      add_message :error, 'User not found'
+      return
+    end
     if params[:expense_ids].blank? and params[:expense_id].blank? and params[:expenses].blank?
       add_message :error, 'No expenses to add'
     end
@@ -24,6 +28,7 @@ class Report::Expenses::Add < Report::Base
 
   def init
     self.report= params[:report]
+    self.auto_submit = params[:auto_submit]
     return if self.report.blank? and params[:report_id].blank?
     if self.report.blank? and params[:report_id].present?
       index_operation = Report::Index.new(self.user, self.params)
@@ -55,7 +60,7 @@ class Report::Expenses::Add < Report::Base
       return false
     end
 
-    unless report.user_id == user.id
+    unless auto_submit or (user.present? and report.user_id == user.id)
       add_message :error, 'You cannot add expenses to this report'
     end
   end
