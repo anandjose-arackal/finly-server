@@ -7,12 +7,24 @@ class ApproveTest < ActiveSupport::TestCase
 
   def setup
     @admin = User.first
-    @user = User.find_by(email: 'user0@finlytest.io')
+    @employee = User.find_by(email: 'user0@finlytest.io')
     @manager = User.find_by(email: 'manager0@finlytest.io')
     @second_manager = User.find_by(email: 'manager1@finlytest.io')
     @third_manager = User.find_by(email: 'manager2@finlytest.io')
     @finance_manager = User.find_by(email: 'finance0@finlytest.io')
     @second_finance_manager = User.find_by(email: 'finance1@finlytest.io')
+  end
+
+  test "successful approval of the report" do
+
+  end
+
+  test "cannot approve a report that's not in processing state" do
+
+  end
+
+  test "cannot approve a report unless you're the controlling user" do
+
   end
 
   test "Report approval flow" do

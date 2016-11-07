@@ -26,7 +26,7 @@ class Policy::Rules::Create < Policy::Rules::Base
 
   def validate
     super()
-    if rule_parameters.blank?
+    if rule_params.blank?
       messages[:error] << "Rule attributes not provided"
       return false
     end

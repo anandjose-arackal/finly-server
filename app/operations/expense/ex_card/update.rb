@@ -19,14 +19,16 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     self.expense = user.expenses.find_by(id: id)
     self.updated_expense_params = update_card_expense_params
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
-      updated_expense_params.delete(:receipts_attributes)
-      # if the receipts attributes is passed as [nil], the receipt attached to this expense gets disassociated
-      # todo - check of the api fails because of this
-      receipt = expense.receipts.first
-      if receipt
-        receipt.parent = nil
-        receipt.save
+      # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
+      # todo - check if the api fails because of this
+      if updated_expense_params[:receipts_attributes] == [""]
+        receipt = expense.receipts.first
+        if receipt
+          receipt.parent = nil
+          receipt.save
+        end
       end
+      updated_expense_params.delete(:receipts_attributes)
     end
     if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
       self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id

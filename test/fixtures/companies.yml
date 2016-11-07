@@ -10,4 +10,8 @@
 #  d_code     :string(255)
 #
 
+finly:
+  name: "Finly"
+  active: true
+
 

@@ -175,6 +175,16 @@ if User.count == 0
   end
 
   u = []
+
+  # creating user0
+  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "user0@finlytest.io",
+                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
+                   role_mapping_attributes: [{user_role_id: 4},
+                                             {user_role_id: UserRole.employee_id}],
+                   team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+
   10.times do |pos|
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,

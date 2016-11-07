@@ -5,7 +5,8 @@ require 'mocha/mini_test'
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-  # fixtures :all
+  # fixtures :policies, :expense_rules
+
 
   # load "#{Rails.root}/db/seeds.rb"
 
