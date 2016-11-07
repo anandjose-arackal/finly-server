@@ -15,7 +15,7 @@
 
     <div class="form-group">
       <label class="control-form">Amount:</label>
-      {{#if item.target_user_card.active}}
+      {{#if item.target_user_card_details.active}}
       <input type="number" name="amount" class="form-control card-funds-amount"/>
       {{else}}
       <input type="text" name="amount" class="form-control card-funds-amount" value="Employee's card is blocked!" disabled="disabled" />
@@ -23,7 +23,7 @@
     </div>
 
     <div class="form-group text-center">
-      {{#if item.target_user_card.active}}
+      {{#if item.target_user_card_details.active}}
       <button class="btn btn-success btn-confirm-transfer step-2-action" data-action-type="credit_card_from_virtual_account">Proceed</button>
       {{else}}
       <button class="btn btn-success btn-confirm-transfer" disabled="disabled" data-action-type="credit_card_from_virtual_account">Proceed</button>
