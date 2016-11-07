@@ -11,7 +11,7 @@
 
 class Period < ActiveRecord::Base
 
-  VALUES = {day: 1, week: 2, month: 3, year: 4}
+  VALUES = {day: 1, week: 2, month: 3, quarter: 4, year: 5}
 
   validates :name, presence: true
 

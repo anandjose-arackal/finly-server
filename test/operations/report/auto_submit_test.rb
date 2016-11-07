@@ -50,6 +50,42 @@ class AutoSubmitTest < ActiveSupport::TestCase
     assert_equal report.controlling_user, @manager
   end
 
+  test 'if no manager is assigned, auto submitted report should be marked as approved if user has pending reimbursements' do
+    User::Team::Review::NextReviewer.stubs(:call).returns(User::Team::Review::NextReviewer::Presenter.new(nil, role_id: nil))
+    BalanceSheet.any_instance.stubs(:cash_in_hand).returns(Amount.new(value: 0))
+
+    assert @user.balance_sheet.cash_in_hand.value < @expenses.with_amount.sum(:value)
+    @user.auto_submit_config.stubs(:enabled).returns(true)
+    assert @user.auto_submit_config.enabled
+    result = nil
+    assert_difference 'Report.count', 1 do
+      result = Report::AutoSubmit.(nil, user: @user)
+    end
+    assert result.success?
+    report = result.params[:report]
+    assert report.present?
+    assert report.approved?
+    assert_equal report.controlling_user, nil
+  end
+
+  test 'if no manager is assigned, auto submitted report should be marked as closed if user has no pending reimbursements' do
+    User::Team::Review::NextReviewer.stubs(:call).returns(User::Team::Review::NextReviewer::Presenter.new(nil, role_id: nil))
+    BalanceSheet.any_instance.stubs(:cash_in_hand).returns(Amount.new(value: @expenses.with_amount.sum(:value) + 100))
+
+    assert @user.balance_sheet.cash_in_hand.value > @expenses.with_amount.sum(:value)
+    @user.auto_submit_config.stubs(:enabled).returns(true)
+    assert @user.auto_submit_config.enabled
+    result = nil
+    assert_difference 'Report.count', 1 do
+      result = Report::AutoSubmit.(nil, user: @user)
+    end
+    assert result.success?
+    report = result.params[:report]
+    assert report.present?
+    assert report.closed?
+    assert_equal report.controlling_user, nil
+  end
+
   test 'Auto submit should submit all unreported expenses (Manual + Card) of the user if "Only Card Expenses" is not set' do
     @user.auto_submit_config.stubs(:enabled).returns(true)
     assert @user.auto_submit_config.enabled

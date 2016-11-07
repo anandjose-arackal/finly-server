@@ -93,7 +93,7 @@ class Report::AutoSubmit < Report::Base
     # If no manager assigned, auto approve the report
     if manager.blank?
       # call the approve class with the right parameters
-      approve_op = Report::Approve.new(user, {report_id: report.id, auto_approve: true})
+      approve_op = Report::Approve.new(user, {report: self.report, auto_approve: true, auto_submit: true})
       unless approve_op.run.success?
         self.add_message :error, approve_op.messages[:error]
         return false

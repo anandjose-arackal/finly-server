@@ -22,5 +22,14 @@ class AutoSubmitConfig < ActiveRecord::Base
   validates :period_id, presence: true
   validates :submitable_id, presence: true
   validates :submitable_type, presence: true
-  validates :enabled, :inclusion => { :in => [true, false] }
+  validates :enabled, :inclusion => {:in => [true, false]}
+
+  scope :enabled, -> { where enabled: true }
+  scope :daily, -> { where period_id: Period.id_for(:day) }
+  scope :weekly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week)] }
+  scope :monthly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month)] }
+  scope :quarterly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month), Period.id_for(:quarter)] }
+  scope :yearly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month), Period.id_for(:quarter), Period.id_for(:year)] }
+  scope :user_level, -> { where submitable_type: 'User' }
+  scope :includes_submitable, -> { includes :submitable }
 end
