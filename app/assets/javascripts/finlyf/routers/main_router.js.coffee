@@ -22,6 +22,11 @@ class FinlyF.Routers.Main extends Backbone.Router
     'analytics/params=:query': 'analytics'
 
 
+    # Non backboned pages
+    'settings': 'settings'
+    'settings/params=:query': 'settings'
+
+
   initialize: ->
     # body = $("body")
     # FinlyF.startMainLoader(body)
@@ -184,6 +189,20 @@ class FinlyF.Routers.Main extends Backbone.Router
     @features()
 
     $("#primary-navbar a.navbar-menu-li[href^='\\#analytics']").parent().addClass('active')
+
+  # account: (user, query) ->
+  # settings: (user) ->
+  settings: (query)->
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+
+    view = new FinlyF.Views.SettingsIndex({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
 
   features: ->
     $(".datepicker").datepicker({
