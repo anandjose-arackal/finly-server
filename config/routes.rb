@@ -325,6 +325,9 @@
 #
 
 Rails.application.routes.draw do
+  get 'users/user_profile'
+  get 'users/user_balance'
+  get 'users/user_security'
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)

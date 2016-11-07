@@ -37,8 +37,35 @@ class UsersController < ApplicationController
 
 
   def profile
+    ap params
     @result = User::Profile.(current_user, params)
   end
+
+
+
+  #Created for asynchronously loading files for backbone
+  def user_profile
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'my_profile'}
+    end
+  end
+
+  def user_balance
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'wallets_cards'}
+    end
+  end
+
+  def user_security
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'change_password'}
+    end
+  end
+
+  
 
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)

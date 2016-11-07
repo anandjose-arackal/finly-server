@@ -11,7 +11,7 @@ admin:
     cog:
       - Organization Account: '/organization_account?view=admin'
       # - Policies: '/policies'
-      - My Account: '/users/'
+      - My Account: '#settings'
       # - Expense Policies: '/policies?view=admin'
       - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -26,7 +26,8 @@ personal:
       - Receipts: receipts
       - Expenses: expenses
     cog:
-      - My Account: '/users/'
+      - My Account: '#settings'
+      # - My Account: '/users/'
       - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
@@ -42,7 +43,7 @@ manager:
       - Team Advance Requests: requests
       - Team Reports: reports
     cog:
-      - My Account: '/users/'
+      - My Account: '#settings'
       - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
@@ -60,7 +61,7 @@ finance_manager:
       - Team Reports: reports
 
     cog:
-      - My Account: '/users/'
+      - My Account: '#settings'
       - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'  
