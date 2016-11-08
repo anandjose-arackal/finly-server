@@ -27,7 +27,7 @@ class CreateAndDestroyTest < ActiveSupport::TestCase
                                          policy_id: @policy.id,
                                          category_id: 1,
                                          rule_type_id: 1,
-                                         budget_period_id: 1}
+                                         period_id: 1}
                            }
 
   end
@@ -49,7 +49,7 @@ class CreateAndDestroyTest < ActiveSupport::TestCase
       @rule = create_op.run
     end
     assert_equal 110, @rule.amount_value
-    assert_equal 1, @rule.budget_period_id
+    assert_equal 1, @rule.period_id
     assert_equal 1, @rule.category_id
     assert_equal 1, @rule.rule_type_id
   end

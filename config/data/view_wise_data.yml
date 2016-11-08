@@ -2,6 +2,7 @@ admin:
   links:
     primary_navbar:
       # - Company Expenses: expenses
+      - Company Expenses: expenses
       - Company Analytics: analytics
       - Company Settlements: settlements
       - Company Employees: employees
@@ -33,6 +34,7 @@ personal:
 manager:
   links:
     primary_navbar:
+      - Team Expenses: expenses
 #      - Team Analytics: analytics
       # - Team Expenses: expenses
       # - Team Analytics: analytics
@@ -48,6 +50,7 @@ manager:
 finance_manager:
   links:
     primary_navbar:
+      - Team Expenses: expenses
 #      - Team Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics

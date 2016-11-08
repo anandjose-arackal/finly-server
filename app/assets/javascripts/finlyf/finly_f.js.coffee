@@ -115,6 +115,15 @@ window.FinlyF =
           # console.log "Message ", message, "Color:", color, "container", container
           ohSnap(message, {color: color, 'duration': '9000', 'container-id': container})
 
+  startMainLoader: (el) ->
+    $(el).addClass("main-loader")
+
+  stopMainLoader: (el) ->
+    if el
+      $(el).removeClass('main-loader')
+    else
+      $(".main-loader").removeClass("main-loader")
+
 $(document).ready ->
   FinlyF.initialize()
   templateBalance = HandlebarsTemplates['finlyf/global/myBalance']

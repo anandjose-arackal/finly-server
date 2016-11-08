@@ -144,6 +144,9 @@ GEM
     coffee-script-source (1.10.0)
     concurrent-ruby (1.0.2)
     connection_pool (2.2.0)
+    crono (1.0.3)
+      activerecord (>= 4.0)
+      activesupport (>= 4.0)
     daemons (1.2.4)
     debug_inspector (0.0.2)
     deep_cloneable (2.2.1)
@@ -225,12 +228,15 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
+    metaclass (0.0.4)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mimemagic (0.3.2)
     mini_portile2 (2.1.0)
     minitest (5.9.1)
+    mocha (1.2.1)
+      metaclass (~> 0.0.1)
     multi_json (1.12.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -399,6 +405,7 @@ DEPENDENCIES
   capistrano-rvm
   capistrano3-puma
   coffee-rails (~> 4.1.0)
+  crono
   daemons
   deep_cloneable (= 2.2.1)
   devise
@@ -418,6 +425,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   jquery-ui-rails
+  mocha
   mysql2 (>= 0.3.13, < 0.5)
   nokogiri (= 1.6.8)
   opro!
@@ -448,4 +456,4 @@ DEPENDENCIES
   wkhtmltopdf-binary
 
 BUNDLED WITH
-   1.13.2
+   1.13.6

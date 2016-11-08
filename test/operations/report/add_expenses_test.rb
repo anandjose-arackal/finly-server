@@ -8,7 +8,7 @@ class AddExpensesTest < ActiveSupport::TestCase
     @expense_ids = @employee.expenses.unreported.limit(2).pluck(:id)
   end
 
-  test 'successful adding of expenses to an open report' do
+  test "successful adding of expenses to an open report" do
 
     create_op = Report::Create.new(@employee)
     @report = create_op.run
@@ -40,6 +40,9 @@ class AddExpensesTest < ActiveSupport::TestCase
     assert_equal 2, @report.expenses.count
   end
 
+  test "cannot add expenses to a repor that is approved" do
+
+  end
 
   test "Adding expenses to another's report should fail" do
 

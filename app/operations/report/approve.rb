@@ -4,39 +4,44 @@
 # auto_approve : optional - set to true if the report is to be auto-approved. i.e. if there is no reporting manager
 
 class Report::Approve < Report::Base
-  attr_accessor :auto_approve
+  attr_accessor :auto_approve, :auto_submit
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
     [:manager, :finance_manager, :admin]
   end
 
   def pre_validate
-    if user.blank?
-      messages[:error] << 'User not found'
+    if user.blank? and params.blank? or not (params[:auto_approve] or params[:auto_submit])
+      add_message :error, 'User not found'
     end
     if params.blank?
-      messages[:error] << 'Error loading configuration'
+      add_message :error, 'Error loading configuration'
     end
   end
 
   def init
-    id = (params[:id] or params[:report_id])
-    self.report = user.controlling_reports.with_id(id).first rescue nil
+    self.report = params[:report]
+    if self.report.blank?
+      id = (params[:id] or params[:report_id])
+      self.report = user.controlling_reports.with_id(id).first rescue nil
+    end
     self.auto_approve = params[:auto_approve]
+    self.auto_approve = params[:auto_submit]
   end
 
   def authorize
     unless report
       raise_unauthorized_exception
     end
-    unless report.controlling_user_id == user.id
+    unless auto_approve or report.controlling_user_id == user.id
       raise_unauthorized_exception
     end
   end
 
   def validate
-    unless report.processing? or params[:auto_approve]
-      messages[:error] << 'Cannot approve this report as it is not in processing state'
+    unless report.processing? or auto_approve
+      add_message :error, 'Cannot approve this report as it is not in processing state'
     end
   end
 
@@ -76,7 +81,7 @@ class Report::Approve < Report::Base
       end
       return true
     end
-    messages[:error] = report.errors.full_messages
+    add_message :error, report.errors.full_messages
   end
 
   def post_process
@@ -90,7 +95,7 @@ class Report::Approve < Report::Base
 
       # recomputing settlement and marking the report as accounted
       unless report.processing?
-        Settlement::Report::Approved.(user, report: report)
+        Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve, auto_submit: auto_submit)
         report.reload
       end
       # if report is closed, add the relevant comment
@@ -100,9 +105,9 @@ class Report::Approve < Report::Base
         comment.save
       end
       # Send notifications
-      Event::EReport::Approve.(self.user, report: self.report)
+      Event::EReport::Approve.(self.user, report: self.report, auto_approve: auto_approve, auto_submit: auto_submit)
 
-      messages[:success] << 'Report approved!'
+      add_message :success, 'Report approved!'
     end
   end
 

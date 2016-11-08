@@ -87,6 +87,10 @@ class User::Team::Index < User::Team::Base
   end
 
   # def success
+  #   self.response
+  # end
+
+  # def success
   #   User::Team::Base::TeamPresenter.new(user, team: response)
   # end
 

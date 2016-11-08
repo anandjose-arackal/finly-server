@@ -5,57 +5,70 @@
 
 class Report::Expenses::Add < Report::Base
 
-  attr_accessor :expenses
+  attr_accessor :expenses, :auto_submit
 
   def authorized_user_types
+    return nil if params.present? and params[:auto_submit]
     [:employee]
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << "No user or params passed."
+    if params.blank?
+      add_message :error, 'Error loading expenses'
+      return
     end
-
-    if params[:expense_ids].blank? and params[:expense_id].blank?
-      messages[:error] << "No expenses to add."
+    if user.blank? and not params[:auto_submit]
+      add_message :error, 'User not found'
+      return
+    end
+    if params[:expense_ids].blank? and params[:expense_id].blank? and params[:expenses].blank?
+      add_message :error, 'No expenses to add'
     end
   end
 
   def init
-    index_operation = Report::Index.new(self.user, self.params)
-    reports_presenter = index_operation.run
-    unless index_operation.success?
-      self.messages = index_operation.errors
-      return false
+    self.report= params[:report]
+    self.auto_submit = params[:auto_submit]
+    return if self.report.blank? and params[:report_id].blank?
+    if self.report.blank? and params[:report_id].present?
+      index_operation = Report::Index.new(self.user, self.params)
+      reports_presenter = index_operation.run
+      unless index_operation.success?
+        self.messages = index_operation.errors
+        return false
+      end
+      self.report = reports_presenter.reports.with_id(params[:report_id]).first rescue nil
     end
-    self.report = reports_presenter.reports.with_id(params[:report_id]).first rescue nil
-    ids = (params[:expense_ids] or params[:expense_id])
-    # Split if IDS are sent as one comma delimited string
-    ids= ids.split(',')
-    self.expenses = user.expenses.with_id(ids)
+    self.expenses = params[:expenses]
+    if params[:expenses].blank? and user.present?
+      ids = (params[:expense_ids] or params[:expense_id])
+      # Split if IDS are sent as one comma delimited string
+      ids= ids.split(',')
+      self.expenses = user.expenses.with_id(ids)
+    end
   end
 
   def authorize
     unless report
-      messages[:error] << "Report not found."
+      add_message :error, 'Report not found'
       return false
     end
 
     # checking if the expense ids correspond to actual expenses
     unless expenses
-      messages[:error] << "No expenses found to add to the report."
+      add_message :error, 'No expenses found to add to the report'
       return false
     end
 
-    unless report.user_id == user.id
-      messages[:error] << "You cannot add expenses to this report."
+    unless auto_submit or (user.present? and report.user_id == user.id)
+      add_message :error, 'You cannot add expenses to this report'
     end
   end
 
   def validate
     # checking state of the report
     unless report.open? or report.retracted? or report.rejected?
-      messages[:error] << 'Cannot add expenses to report unless report is in open or retracted state'
+      add_message :error, 'Cannot add expenses to report unless report is in open or retracted state'
     end
   end
 
@@ -75,7 +88,7 @@ class Report::Expenses::Add < Report::Base
           comment.save
         end
       end
-      messages[:success] << "Expenses added."
+      add_message :success, 'Expenses added'
     end
   end
 end

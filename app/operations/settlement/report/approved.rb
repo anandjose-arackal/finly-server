@@ -8,6 +8,7 @@ class Settlement::Report::Approved < Report::Base
   attr_accessor :report
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
     [:employee]
   end
 
@@ -29,18 +30,18 @@ class Settlement::Report::Approved < Report::Base
 
   def process
     balance_sheet = report.user.balance_sheet
-    total_amount = report.total_amount
+    total_non_card_amount = report.total_amount(:only_manual_expenses)
     currency = Currency.first # todo - temporary until currency is implemented
     latest_date = nil
     latest_date = report.latest_expense.date if report.latest_expense.present?
     cash_in_hand = balance_sheet.cash_in_hand latest_date
     pending_reimbursement = 0
-    new_cash_in_hand_value = cash_in_hand.value - total_amount
+    new_cash_in_hand_value = cash_in_hand.value - total_non_card_amount
     if new_cash_in_hand_value < 0
-      pending_reimbursement = total_amount - cash_in_hand.value
+      pending_reimbursement = total_non_card_amount - cash_in_hand.value
       new_cash_in_hand_value = 0
     end
-    report.user.balance_sheet.subtract_cash_in_hand (total_amount - pending_reimbursement), currency
+    report.user.balance_sheet.subtract_cash_in_hand (total_non_card_amount - pending_reimbursement), currency
     report.user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)

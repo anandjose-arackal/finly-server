@@ -21,6 +21,7 @@
 
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -53,7 +54,7 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validate :no_future_date
-  validate :created_by
+  # validate :created_by
   validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
@@ -81,7 +82,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_user_or_report, ->(user_id, report_id) { where('report_id IN (?) OR user_id IN (?)', report_id, user_id) }
+  scope :with_user_or_report, ->(user_ids, report_ids) { where('report_id IN (?) OR user_id IN (?)', report_ids, user_ids).uniq }
   scope :filter_expense_type_id, ->(type_id) {where expense_type_id: type_id}
 
   # scopes for the filters
@@ -220,11 +221,11 @@ class Expense < ActiveRecord::Base
   private
 
   # only employees can create an expense
-  def created_by
-    unless self.user.employee?
-      errors.add(:expense, 'can only be created by employees')
-    end
-  end
+  # def created_by
+  #   unless self.user.employee?
+  #     errors.add(:expense, 'can only be created by employees')
+  #   end
+  # end
 
   # cannot add an expense with future date
   def no_future_date

@@ -268,6 +268,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         authenticity_token: $("#authenticity_token").val()
       },
       success: (res) ->
+        #Stopping main loader
+        summary = $(_this.el).find('.summary')
+        FinlyF.stopMainLoader(summary)
         # console.log "res", res
         if _this.view == 'personal'
           $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
@@ -315,6 +318,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     @collectionUsers.each(@appendUsers, @)
 
+    FinlyF.stopMainLoader()
+
   appendUsers: (user) ->
     console.log "appending users"
     view_user = new FinlyF.Views.User({model: user, page: 'settlements'})
@@ -331,6 +336,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
+    
+
+    #Stopping main loader
+    main = $(@el).find('.settlements-content')
+    FinlyF.stopMainLoader(main)
 
   appendItems: (item) ->
     #Creating view for each report and appending them
@@ -435,6 +445,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   userSettlements: (e) ->
     $(@el).find('.settlements-content').css('display', 'block')
+    # Show main loader
+    settlements_content = $(@el).find(".settlements-content")
+    summary = $(@el).find(".summary")
+    FinlyF.startMainLoader(settlements_content)
+    FinlyF.startMainLoader(summary)
     #Load settlement for the user
     target = e.currentTarget
     $(target).siblings().removeClass("active")
@@ -1314,7 +1329,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.from_user_id = _this.user_id
         # console.log data
 
-    console.log data
+    # console.log data
+    summary = $(@el).find(".summary")
+    FinlyF.startMainLoader(summary)
     $.ajax({
       url: url,
       data: data,

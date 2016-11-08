@@ -1,7 +1,7 @@
 class MsgQueuePoller
 
   def self.run
-    client = Stomp::Connection.new("", "", "180.179.138.163", 61613, true)
+    client = Stomp::Connection.new("finly", "Li3Wp4yk", "180.179.138.163", 61613, true)
     client.subscribe("/queue/FinlyQueue")
 
 
@@ -33,13 +33,13 @@ class MsgQueuePoller
                       product_code: data[10]
                       }
 
-      # triggering the operation to create a card transaction
-      result = Card::Transaction::Create.(trans_params)
-
-      # if the transaction operation fails for some reason, log it in the transaction table, and mark it as not expensed
-      unless result.success?
-        trans_params[:expensed] = false
-      end
+      # # triggering the operation to create a card transaction
+      # result = Card::Transaction::Create.(trans_params)
+      #
+      # # if the transaction operation fails for some reason, log it in the transaction table, and mark it as not expensed
+      # unless result.success?
+      #   trans_params[:expensed] = false
+      # end
 
       trans = CardTransaction.create(trans_params)
 

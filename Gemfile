@@ -12,12 +12,17 @@ gem 'daemons'
 gem 'stomp'
 # gem 'activemessaging'
 
+# grm for mocking and stubbing in test cases
+gem 'mocha'
+
 # gem for admin panel
 gem 'activeadmin', github: 'activeadmin'
 
 # puma web server
 gem 'figaro'
 gem 'puma'
+
+gem 'crono'
 
 # gem to import from excel
 gem 'roo'

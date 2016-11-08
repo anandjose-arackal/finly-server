@@ -23,8 +23,8 @@ module PoliciesHelper
         end
     elsif rule.is_a?(BudgetRule)
         rule_in_words = "Total Expenses"
-        if rule.budget_period_id
-          case rule.budget_period_id
+        if rule.period_id
+          case rule.period_id
             when 1
               period = "day"
             when 2
