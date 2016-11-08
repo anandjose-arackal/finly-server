@@ -136,10 +136,9 @@ end
 
 
 if Period.count == 0
-  Period.create!(name: 'Day')
-  Period.create!(name: 'Week')
-  Period.create!(name: 'Month')
-  Period.create!(name: 'Year')
+  Period::VALUES.each do |key, value|
+    Period.create id: value, name: key
+  end
 end
 
 if c.categories.count == 0
