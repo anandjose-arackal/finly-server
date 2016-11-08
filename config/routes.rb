@@ -325,9 +325,7 @@
 #
 
 Rails.application.routes.draw do
-  get 'users/user_profile'
-  get 'users/user_balance'
-  get 'users/user_security'
+  
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -434,7 +432,11 @@ Rails.application.routes.draw do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
   end
 
-  get 'organization_account' => 'organization_account#show'
+  # get 'organization_account' => 'organization_account#show'
+  get 'organization_account/blah' => 'organization_account#blah'
+  get 'organization_account/categories' => 'organization_account#categories'
+  get 'organization_account/export_preferences' => 'organization_account#export_preferences'
+
   post 'add_category', to: 'organization_account#add_category', as: :add_category
   delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
 
@@ -488,6 +490,12 @@ Rails.application.routes.draw do
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
 
   get 'users/get_managers', to: 'users#get_managers'
+
+  #Backbone parials
+  get 'users/user_profile'
+  get 'users/user_balance'
+  get 'users/user_security'
+  #backbone partials for users ends
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do

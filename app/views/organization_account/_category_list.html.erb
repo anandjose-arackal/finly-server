@@ -15,10 +15,10 @@
 <% end %>
 
 
-<form data-remote data-turboboost method="post" action="<%= categories_path %>" style="margin-top: 30px;">
+<form id="form-add-category" data-remote data-turboboost method="post" action="<%= categories_path %>" style="margin-top: 30px;">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
   <input type="text" class="form-control" name="category[name]" id="newCategory" placeholder="Add new category name" style="display: inline-block;width: 35%; border-radius: 1px">
-  <button class="green-button" id="add_new_category" style="margin-left: 80px;height: 30px; line-height: 30px" type="submit" onclick="setHeight()">
+  <button class="green-button btn-add-category" id="add_new_category" style="margin-left: 80px;height: 30px; line-height: 30px" type="submit" onclick="setHeight()">
     ADD NEW CATEGORY
   </button>
 </form>

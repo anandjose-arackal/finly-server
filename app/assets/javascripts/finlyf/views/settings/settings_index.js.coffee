@@ -6,7 +6,7 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
 
   events:
     'click .navigate-tab li a': 'navigateTab'
-
+    'submit form#changePassword': 'changePassword'
   initialize: (options) ->
     console.log "init, ", options
     if options
@@ -44,7 +44,7 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
     # FinlyF.primary_router.navigate('settings/params=' + JSON.stringify(@params), {trigger: false})
 
   fetchTabContent: ->
-    # console.log tab
+    # console.log "Fetching"
     main = $(@el).find(".main")
     current_tab = $(@el).find('.main #' + @params.tab)
 
@@ -67,4 +67,24 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
         $(current_tab).html(res)
       error: (err) ->
         console.log "Error", err
+    })
+
+  changePassword: (e) ->
+    _this = @
+    e.preventDefault()
+    form = e.currentTarget
+    url = $(form).attr('action')
+
+    $.ajax({
+      url: url,
+      data: $(form).serialize(),
+      type: "POST",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+        else
+          ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
     })

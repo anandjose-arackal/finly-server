@@ -36,10 +36,10 @@ class UsersController < ApplicationController
   end
 
 
-  def profile
-    ap params
-    @result = User::Profile.(current_user, params)
-  end
+  # def profile
+  #   ap params
+  #   @result = User::Profile.(current_user, params)
+  # end
 
 
 
@@ -72,11 +72,13 @@ class UsersController < ApplicationController
     @result = update_password_op.run
     if @result.success?
       sign_in @result.user, :bypass => true
-      flash[:success] = @result.messages[:success].first rescue nil
+      # flash[:success] = @result.messages[:success].first rescue nil
     else
-      flash[:error] = @result.messages[:error].first rescue nil
+      # flash[:error] = @result.messages[:error].first rescue nil
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
+    # redirect_to request.referrer
+    respond
   end
 
   # placeholder action for importing file
