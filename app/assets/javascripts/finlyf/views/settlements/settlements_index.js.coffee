@@ -990,6 +990,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         # console.log "Credit card from card" 
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromCard({summary: @selectedUserSummary}))
       when 'credit_card_from_wallet'
+        console.log @selectedUserSummary
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Wallet")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Wallet")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromWallet({summary: @selectedUserSummary}))
@@ -1026,6 +1027,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
             $(modal_body).find('.settlement-step-2 .target_user_wallet_balance').text(res.target_user_wallet)
         })
       when 'credit_card_from_virtual_account'
+        console.log @selectedUserSummary
         $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromVirtualAccount({summary: @selectedUserSummary}))

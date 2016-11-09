@@ -32,7 +32,7 @@ class RuleServiceTest < ActiveSupport::TestCase
                                         policy_id: 3,
                                         category_id: 1,
                                         rule_type_id: 1,
-                                        budget_period_id: 1}
+                                        period_id: 1}
                           }
 
     @modified_budget_rule_params = {budget_rule: {amount: 120,
@@ -40,7 +40,7 @@ class RuleServiceTest < ActiveSupport::TestCase
                                                  policy_id: 3,
                                                  category_id: 1,
                                                  rule_type_id: 1,
-                                                 budget_period_id: 2}
+                                                 period_id: 2}
                                    }
 
     @rsadmin = RuleService.new(@admin, @policy.id)

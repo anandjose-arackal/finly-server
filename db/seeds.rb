@@ -129,8 +129,16 @@ end
 if Company.count == 0
   c = Company.create(name: 'Finly', d_code: 'D000000360')
   c.reload
+  Company.create(name: 'Dummy company')
 else
   c = Company.first
+end
+
+
+if Period.count == 0
+  Period::VALUES.each do |key, value|
+    Period.create id: value, name: key
+  end
 end
 
 if c.categories.count == 0
@@ -186,7 +194,14 @@ if User.count == 0
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   10.times do |pos|
-    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
+    # u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
+    #                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
+    #                  role_mapping_attributes: [{user_role_id: 4},
+    #                                            {user_role_id: UserRole.employee_id}],
+    #                  team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+    #                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+    #                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee#{pos}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
                                                {user_role_id: UserRole.employee_id}],
@@ -224,19 +239,19 @@ if Policy.non_default.count == 0
 end
 
 if ExpenseType.count ==0
-  ExpenseType.create(id: 1, name: "Manual")
-  ExpenseType.create(id: 2, name: "Card")
-  ExpenseType.create(id: 3, name: "Distance")
-  ExpenseType.create(id: 4, name: "Time")
-  ExpenseType.create(id: 5, name: "Per Diem")
+  ExpenseType.create(id: 1, name: 'Manual')
+  ExpenseType.create(id: 2, name: 'Card')
+  ExpenseType.create(id: 3, name: 'Distance')
+  ExpenseType.create(id: 4, name: 'Time')
+  ExpenseType.create(id: 5, name: 'Per Diem')
 end
 
 if ExpenseStatus.count ==0
-  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
-  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
-  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
-  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
-  ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
+  ExpenseStatus.create(id: 1, name: 'Unreported', order: 1)
+  ExpenseStatus.create(id: 2, name: 'Unsubmitted', order: 2)
+  ExpenseStatus.create(id: 3, name: 'Submitted', order: 3)
+  ExpenseStatus.create(id: 4, name: 'Rejected', order: 4)
+  ExpenseStatus.create(id: 5, name: 'Cancelled', order: 5)
 end
 
 if Expense.count == 0
@@ -263,21 +278,14 @@ if Receipt.count == 0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
+  ExpenseRuleType.create!(name: 'Require Receipt')
+  ExpenseRuleType.create!(name: 'Require Note')
+  ExpenseRuleType.create!(name: 'Disallow Expense')
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
-end
-
-if BudgetPeriod.count == 0
-  b = BudgetPeriod.create!(name: "Day")
-  b = BudgetPeriod.create!(name: "Week")
-  b = BudgetPeriod.create!(name: "Month")
-  b = BudgetPeriod.create!(name: "Year")
+  RuleType.create!(name: 'Warning')
+  RuleType.create!(name: 'Blocking')
 end
 
 p = Policy.find(3)
@@ -296,11 +304,11 @@ if p.rules_count == 0
   # setting monthly budget for category 1 as 100 in INR
   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
                              category_id: 1,
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 1)
   # set monthly budget for all expenses as 150 INR
   b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 2)
 end
 

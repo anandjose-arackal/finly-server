@@ -28,7 +28,7 @@ class Expense::Index < Expense::Base
 
   def process
     if role_id.blank? or role_id == UserRole.employee_id
-      self.expenses = user.expenses.includes(:manual_expense).includes(:card_expense)
+      self.expenses = user.expenses.unreported.includes(:manual_expense).includes(:card_expense)
     else
       report_ids = Report::Index.(user, params).reports.pluck(:id)
       # adding all card expenses of the users in the team
@@ -52,7 +52,7 @@ class Expense::Index < Expense::Base
   class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses
+    attr_accessor :expenses, :paginated_expenses, :categories
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
@@ -69,8 +69,7 @@ class Expense::Index < Expense::Base
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
-        self.unreported_expenses = expenses.unreported
-        self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+        self.paginated_expenses = self.expenses.paginate(page: params[:page], per_page: 30)
       end
       self.categories = user.company.active_categories
     end

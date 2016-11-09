@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: budget_periods
+# Table name: periods
 #
 #  id         :integer          not null, primary key
 #  name       :string(255)
@@ -11,7 +11,7 @@
 
 require 'test_helper'
 
-class BudgetPeriodTest < ActiveSupport::TestCase
+class PeriodTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
