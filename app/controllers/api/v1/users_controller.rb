@@ -13,12 +13,6 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
 
   def show
     @result = User::Show.(current_user, params)
-
-    ## Jugaad
-    if @result.success? and @result.selected_user.cards.present?
-      @result.selected_user.cards.first.balance = 500
-    end
-    ## Jugaad end
     respond
   end
 

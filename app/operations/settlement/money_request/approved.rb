@@ -2,6 +2,7 @@ class Settlement::MoneyRequest::Approved < MoneyRequest::Base
   attr_accessor :money_request, :selected_user
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve])
     [:manager, :finance_manager, :admin]
   end
 
