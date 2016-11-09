@@ -26,8 +26,8 @@ class Report::Approve < Report::Base
       id = (params[:id] or params[:report_id])
       self.report = user.controlling_reports.with_id(id).first rescue nil
     end
-    self.auto_approve = params[:auto_approve]
-    self.auto_approve = params[:auto_submit]
+    self.auto_approve = (params[:auto_approve] or false)
+    self.auto_submit = (params[:auto_submit] or false)
   end
 
   def authorize
@@ -58,7 +58,8 @@ class Report::Approve < Report::Base
     end
     curr_user_role = User::Team::Review::UserRole.(user, self.report)
     update_attributes = {report_status_id: status, controlling_user: manager, controlling_for_user_id: nil,
-                         controlling_user_role_id: to_user_role_id, controlling_for_user_role_id: nil, memo: nil}
+                         controlling_user_role_id: to_user_role_id, controlling_for_user_role_id: nil, memo: nil,
+                         auto_approve: auto_approve}
     update_attributes[:submitted_at] = DateTime.now if auto_approve
     if report.update_attributes update_attributes
       if auto_approve
