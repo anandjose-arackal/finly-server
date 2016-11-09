@@ -41,6 +41,8 @@
             <!-- Special Functionality for my balance -->
             <% if key =~ /balance/i %>
               <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li>
+            <% elsif key =~ /transfer/i %>
+              <li><a href="<%= value %>" target="_blank"><%= key %></a></li>
             <% else %>
               <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
             <% end %>

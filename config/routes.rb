@@ -534,6 +534,7 @@ Rails.application.routes.draw do
 
   resources :export_preferences
 
+  get 'companies/notify', to: 'companies#notify'
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
   end
@@ -647,6 +648,8 @@ Rails.application.routes.draw do
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
 
   get 'analytics' => 'analytics#show'
+
+  get 'companies/notify' => 'companies#notify'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
