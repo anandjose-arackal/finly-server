@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161025140923) do
+ActiveRecord::Schema.define(version: 20161109124808) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -176,8 +176,8 @@ ActiveRecord::Schema.define(version: 20161025140923) do
     t.string   "transaction_type",      limit: 255
     t.text     "post_data",             limit: 65535
     t.integer  "transaction_amount_id", limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.string   "reference_id",          limit: 255
     t.string   "auth_transaction_id",   limit: 255
     t.string   "transaction_mode",      limit: 255
@@ -187,6 +187,8 @@ ActiveRecord::Schema.define(version: 20161025140923) do
     t.string   "serial_id",             limit: 255
     t.string   "product_code",          limit: 255
     t.datetime "transaction_timestamp"
+    t.boolean  "expensed",                            default: true
+    t.text     "error_message",         limit: 65535
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
