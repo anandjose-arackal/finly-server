@@ -17,8 +17,8 @@ require "capistrano/deploy"
 #
 
 # todo - find a better way to switch between rvm and rbenv when deploying to production with diff environments
-# require 'capistrano/rvm'
-require 'capistrano/rbenv'
+require 'capistrano/rvm'
+# require 'capistrano/rbenv'
 # require 'capistrano/chruby'
 require 'capistrano/bundler'
 require 'capistrano/rails/assets'

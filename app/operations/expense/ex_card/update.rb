@@ -15,8 +15,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
 
   def init
-    id = (params[:expense_id] or params[:id])
-    self.expense = user.expenses.find_by(id: id)
+    super
+    # id = (params[:expense_id] or params[:id])
+    # self.expense = user.expenses.find_by(id: id)
     self.updated_expense_params = update_card_expense_params
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
@@ -45,9 +46,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     unless expense
       raise_unauthorized_exception
     end
-    unless expense.user_id == user.id
-      raise_unauthorized_exception
-    end
+    # unless expense.user_id == user.id
+    #   raise_unauthorized_exception
+    # end
   end
 
 

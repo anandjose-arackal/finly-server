@@ -7,4 +7,5 @@ class CompaniesController < ApplicationController
     @result = Company::AddBalance.(current_user, params)
     respond
   end
+
 end

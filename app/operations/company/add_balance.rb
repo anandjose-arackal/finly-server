@@ -35,7 +35,7 @@ class Company::AddBalance < Company::Base
   end
 
   def authorize
-    unless user.company_id == params[:company_id]
+    unless user.company_id == params[:company_id].to_i
       raise_unauthorized_exception
     end
   end

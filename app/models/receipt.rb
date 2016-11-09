@@ -28,7 +28,7 @@ class Receipt < ActiveRecord::Base
 
   validates :image, presence: true
 
-  validate :validate_expense_user
+  # validate :validate_expense_user
 
   has_attached_file :image, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}, default_url: "/assets/:style/missing.png"
   validates_attachment :image, content_type: {
@@ -59,12 +59,12 @@ class Receipt < ActiveRecord::Base
 
   private
 
-  def validate_expense_user
-    if self.user && self.parent
-      if self.user.id != self.parent.user.id
-        errors.add(:base, "Parent expense does not belong to current user.")
-      end
-    end
-  end
+  # def validate_expense_user
+  #   if self.user && self.parent
+  #     if self.user.id != self.parent.user.id
+  #       errors.add(:base, "Parent expense does not belong to current user.")
+  #     end
+  #   end
+  # end
 
 end

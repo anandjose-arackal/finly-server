@@ -91,6 +91,7 @@
         url: '/companies/<%= current_company.id %>/add_balance',
         type: "POST",
         data: formData,
+        dataType: "json",
         success: function(res){
           // FinlyF.snapNotify(res.messages);
           console.log(res);

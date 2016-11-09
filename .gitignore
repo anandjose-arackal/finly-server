@@ -15,6 +15,7 @@ Gemfile.lock
 !/log/.keep
 /tmp
 /public/system/receipts/*
+/public/assets/
 
 /.idea
 .vagrant/
