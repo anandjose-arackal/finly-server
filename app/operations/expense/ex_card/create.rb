@@ -53,7 +53,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     params[:card_expense_attributes] = {editable_merchant: transaction[:merchant_name]} if transaction[:merchant_name]
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
-    params[:date] = transaction[:date]
+    params[:date] = transaction[:transaction_timestamp]
 
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
     params[:category_id] = 1
@@ -63,11 +63,6 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date,
                   amount_attributes: [:value, :currency_id],
                   card_expense_attributes: [:editable_merchant])
-  end
-
-  def create_new_currency(currency_code)
-    new_curr = Currency.create!(country_code: currency_code)
-    new_curr.id
   end
 
 
