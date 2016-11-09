@@ -216,9 +216,18 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
-  def total_amount
-    return precision_value(self.expenses.with_amount.sum(:value)) if self.expenses.present?
-    0
+
+  def total_amount(options=[])
+    return 0 unless self.expenses.present?
+    if options.present?
+      options = [options] unless options.kind_of?(Array)
+      if options.present?
+        options.each do |item|
+          self.expenses = self.expenses.send(item.to_sym) if item.present? and self.expenses.respond_to?(item.to_sym)
+        end
+      end
+    end
+    precision_value(self.expenses.with_amount.sum(:value))
   end
 
   def controlling_user?(user)
