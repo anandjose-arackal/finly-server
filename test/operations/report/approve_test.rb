@@ -13,6 +13,7 @@ class ApproveTest < ActiveSupport::TestCase
     @third_manager = User.find_by(email: 'manager2@finlytest.io')
     @finance_manager = User.find_by(email: 'finance0@finlytest.io')
     @second_finance_manager = User.find_by(email: 'finance1@finlytest.io')
+    @report = Report.first
   end
 
   test "successful approval of the report" do

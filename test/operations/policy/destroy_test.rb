@@ -10,7 +10,7 @@ class DestroyTest < ActiveSupport::TestCase
     # @policy = Policy::Users::AddUser.new(@admin, {policy_id: @policy.id, added_user_id: @manager.id, admin: true}).run
   end
 
-  test "admins and policy admins can destroy a policy" do
+  test "company admins can destroy a policy" do
     assert @policy
     assert @policy.users.count > 0
     destroy_op = Policy::Destroy.new(@admin, policy_id: @policy.id)
@@ -28,6 +28,7 @@ class DestroyTest < ActiveSupport::TestCase
     # mocking the user as a policy admin
     @manager.stubs(:policy_admin?).returns(true)
     Policy::Index.stubs(:call).returns(index_presenter)
+
     destroy_op = Policy::Destroy.new(@manager, policy_id: @policy.id)
     assert_difference 'Policy.not_deleted.count', -1 do
       @result = destroy_op.run

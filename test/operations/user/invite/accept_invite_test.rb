@@ -7,14 +7,31 @@ class AcceptInviteTest < ActiveSupport::TestCase
     @manager = User.find_by email: 'manager0@finlytest.io'
     @finance_manager = User.find_by email: 'finance0@finlytest.io'
     @employee = User.find_by email: 'user0@finlytest.io'
+
+    @valid_accept_params = {user: { invitation_token: "", # will be added after getting a valid invite token
+                                    password: "password007",
+                                    password_confirmation: "password007",
+                                    mobile_number: "8105739684",
+                                    first_name: "Hello",
+                                    last_name: "World",
+                                    profile_attributes: { date_of_birth: "2006-01-01",
+                                                          gender: "m",
+                                                          address_1: "Malleshwaram",
+                                                          address_2: "Bangalore",
+                                                          city: "Bangalore",
+                                                          state_id: "S18",
+                                                          pin_code: "560003"
+                                                        }
+                                  }
+                           }
+
   end
 
   test "successful acceptance of an invite" do
-    user_invite_op = User::Invite::Create.new(@manager,{invite: {company_id: @manager.company_id, email: 'user99@finlytest.io',
-                                                                 role_mapping_attributes: [{user_role_id: 4}],
-                                                                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
+    user_invite_op = User::Invite::Create.new(@manager, @valid_accept_params)
+
     assert_difference 'User.count', 1 do
-      @new_user = user_invite_op.run
+      @result = user_invite_op.run
     end
     assert @new_user
     assert @new_user.employee?

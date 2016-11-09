@@ -23,7 +23,7 @@ class CreateTest < ActiveSupport::TestCase
     assert_equal 1, policy.users.count
   end
 
-  test "only admins can create policies within a company" do
+  test "non-admins cannot create a policy within a company" do
     create_op = Policy::Create.new(@manager, name: "Test")
     assert_no_difference 'Policy.count', 1 do
       begin

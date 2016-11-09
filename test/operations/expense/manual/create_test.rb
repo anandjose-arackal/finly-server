@@ -9,7 +9,7 @@ class CreateTest < ActiveSupport::TestCase
                                  note: "Sup dawg",
                                  date: DateUtils.local_date,
                                  category_id: 1 }
-    }
+                      }
     @invalid_expense_params = {expense: {amount_attributes: { value: 100, currency_id: 1},
                                          manual_expense_attributes: {merchant: "Olacabs"},
                                          note: "Sup dawg",
