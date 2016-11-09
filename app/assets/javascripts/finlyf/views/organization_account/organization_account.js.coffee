@@ -7,6 +7,7 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
   events:
     'click .navigate-tab li a': 'navigateTab'
     'submit form#form-add-category': 'addCategory'
+    'click .btn-delete-category': 'deleteCategory'
 
   initialize: (options) ->
     if options
@@ -90,4 +91,21 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
           ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
     })
 
+  deleteCategory: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    url = $(target).data('data-url')
+    $.ajax({
+      url: url,
+      type: "DELETE",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+        # else
+          # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
+    })
 
