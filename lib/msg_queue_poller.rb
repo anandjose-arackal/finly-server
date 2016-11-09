@@ -39,6 +39,7 @@ class MsgQueuePoller
       # if the transaction operation fails for some reason, log it in the transaction table, and mark it as not expensed
       unless result.success?
         trans_params[:expensed] = false
+        trans_params[:error_message] = result.messages[:error]
       end
 
       trans = CardTransaction.create(trans_params)

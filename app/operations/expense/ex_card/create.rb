@@ -48,11 +48,8 @@ class Expense::ExCard::Create < Expense::ExCard::Base
   private
   # this will be called when the expense is being created - i.e. the moment the card is used, parameters will be created from the transaction object
   def card_expense_params
-    currency_id = Currency.find_by(country_code: transaction[:transaction_currency_code]).id
 
-    currency_id = create_new_currency(transaction[:transaction_currency_code]) if currency_id.nil?
-
-    params[:amount_attributes] = {value: transaction.transaction_amount_value, currency_id: currency_id}
+    params[:amount_attributes] = {value: transaction.transaction_amount_value, currency_id: 1} # todo - temporary, will change once currencies are implemented
     params[:card_expense_attributes] = {editable_merchant: transaction[:merchant_name]} if transaction[:merchant_name]
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
@@ -61,6 +58,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
     params[:category_id] = 1
     #######################################################################################
+
 
     params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date,
                   amount_attributes: [:value, :currency_id],
