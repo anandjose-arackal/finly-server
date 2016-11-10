@@ -3,16 +3,9 @@ json.manager_name @result.manager.name rescue nil
 json.finance_manager_name @result.finance_manager.name rescue nil
 json.dates @result.dates
 json.actions do
-  json.take_control @result.actions[:take_control].present?
-  json.review @result.actions[:approve].present?
-  json.unapprove @result.actions[:unapprove].present?
-  json.reimburse @result.actions[:reimburse].present?
-  json.add_expenses @result.actions[:add_expenses].present?
-  json.delete @result.actions[:delete].present?
-  json.retract @result.actions[:retract].present?
-  json.reimbursement_confirm @result.actions[:reimbursement_confirm].present?
-  json.editable @result.actions[:editable].present?
-  json.submit @result.actions[:submit].present?
+  @result.actions.each do |key, value|
+    json.set! key, (value[:url].present? or value[:value].present?)
+  end
 end
 json.sections @result.expenses_category_sorted do |item|
   json.name item[:section_name]
