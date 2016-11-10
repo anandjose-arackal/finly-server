@@ -1,13 +1,7 @@
 json.partial! '/api/v1/reports/report', report: @result.report
 json.manager_name @result.manager.name rescue nil
 json.finance_manager_name @result.finance_manager.name rescue nil
-json.total do
-  json.value @result.total
-  json.currency do
-    json.extract! Currency.first, :id, :country, :country_code, :symbol
-  end
-end
-json.date @result.dates
+json.dates @result.dates
 json.actions do
   json.take_control @result.actions[:take_control].present?
   json.review @result.actions[:approve].present?
