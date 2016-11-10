@@ -25,11 +25,7 @@
               <a id="showReportsButton" class="btn btn-primary btn-md" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>
             </div>
             <div class="col-sm-1">
-              <%= form_for(policy, :html => { :method => :delete, :remote => true }) do |f| %>
-                <%= button_tag( :class => "btn btn-sm btn-danger") do %>
-                  <i class="fa fa-trash-o" role="button"></i>
-                <% end %>
-              <% end %>  
+              <button class="btn btn-sm btn-danger btn-delete-policy" data-url="<%= policy_path(policy) %>"><i class="fa fa-trash-o"></i></button>
             </div>
             
           </div>
@@ -46,7 +42,7 @@
       font-weight: 600;
       font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Add new policy</p>
   <hr>
-  <form data-turboboost id="policyCreate"  action="<%= policies_path(view: 'admin') %>" method="post" data-remote="true">
+  <form data-turboboost id="form-add-policy"  action="<%= policies_path(view: 'admin') %>">
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
     <input type="text" id="policyName" name="name" style="height: 40px;
@@ -57,30 +53,9 @@
     <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
     <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
 
-    <input type="submit" class="abaButton" onclick="return validate()" style="border-radius: 1px;margin-top: 20px;margin-left: 0px" id="createPolicy" value="Create">
+    <input type="submit" class="btn btn-success btn-sm" value="Create">
   </form>
 </div>
-
-<script>
-
-  function validate(){
-    var x;
-    x = document.getElementById("policyName").value.trim();
-    if (x == "") {
-      alert("Enter a Policy Name");
-      return false;
-    }
-  }
-
-  function getPolicyReportsPath(policyId) {
-
-    path = '/admin/company/reports?filter_policy_id=' + policyId;
-
-    return path;
-
-  }
-
-</script>
 
 <style type="text/css">
   .policy{

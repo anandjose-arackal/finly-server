@@ -9,6 +9,17 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
     'submit form#form-add-category': 'addCategory'
     'click .btn-delete-category': 'deleteCategory'
 
+    'submit form#form-add-policy': 'addPolicy'
+    'click .btn-delete-policy': 'deletePolicy'
+
+    'submit form#form-add-export-column': 'addExportColumn'
+    'change select.select-export-preference-columns': 'showExportPreferenceUpdateOption'
+    # 'change input.input-export-preference-name': 'showExportPreferenceUpdateOption'
+    'input input.input-export-preference-name': 'showExportPreferenceUpdateOption'
+
+    'submit form.form-update-export-preferences': 'updateExportPreference'
+    'click .btn-delete-export-preference': 'deleteExportPreference'
+
   initialize: (options) ->
     if options
       @params = options.params || {}
@@ -68,10 +79,7 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
     })
 
   addCategory: (e) ->
-    console.log e
     e.preventDefault()
-    console.log "Hi"
-    return
     _this = @
     form = e.currentTarget
 
@@ -87,15 +95,15 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
         if res.success == true
           _this.fetchTabContent()
           # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
-        else
-          ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
     })
 
   deleteCategory: (e) ->
     e.preventDefault()
     target = e.currentTarget
+    _this = @
 
-    url = $(target).data('data-url')
+    url = $(target).attr('data-url')
+    # console.log target, url
     $.ajax({
       url: url,
       type: "DELETE",
@@ -109,3 +117,110 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
           # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
     })
 
+  addPolicy: (e) ->
+    e.preventDefault()
+    _this = @
+    form = e.currentTarget
+
+    url = $(form).attr('action')
+
+    $.ajax({
+      url: url,
+      data: $(form).serialize(),
+      type: "POST",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+    })   
+
+
+  deletePolicy: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    _this = @
+
+    url = $(target).attr('data-url')
+    # console.log target, url
+    $.ajax({
+      url: url,
+      type: "DELETE",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+        # else
+          # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
+    })
+
+  addExportColumn: (e) ->
+    e.preventDefault()
+    console.log "Here"
+    _this = @
+    form = e.currentTarget
+
+    url = $(form).attr('action')
+
+    $.ajax({
+      url: url,
+      data: $(form).serialize(),
+      type: "POST",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+    }) 
+
+  updateExportPreference: (e) ->
+    e.preventDefault()
+
+    _this = @
+    form = e.currentTarget
+
+    url = $(form).attr('action')
+
+    $.ajax({
+      url: url,
+      data: $(form).serialize(),
+      type: "PUT",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+    })
+
+  deleteExportPreference: (e) ->
+    e.preventDefault()
+    console.log "Will delete the preference"
+    target = e.currentTarget
+    _this = @
+
+    url = $(target).attr('data-url')
+    # console.log target, url
+    $.ajax({
+      url: url,
+      type: "DELETE",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+        # else
+          # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
+    })
+
+
+
+  showExportPreferenceUpdateOption: (e) ->
+    target = e.currentTarget
+    form = $(target).closest('form')
+
+    button = $(form).find('.btn-update-export-preference')
+    $(button).removeClass('hidden')
