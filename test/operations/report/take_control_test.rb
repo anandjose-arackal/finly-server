@@ -35,6 +35,11 @@ class TakeControlTest < ActiveSupport::TestCase
 
   end
 
+  test "policy admins can take control of a report belonging to that policy" do
+    @employee.stubs(:policy_admin?).returns(true)
+
+  end
+
   # test "only admins can take control of a report" do
   #   # first employee submits the report
   #   assert_difference '@user.reports.count', 1 do
