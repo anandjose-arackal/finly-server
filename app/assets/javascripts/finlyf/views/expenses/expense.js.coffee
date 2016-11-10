@@ -19,6 +19,7 @@ class FinlyF.Views.Expense extends Backbone.View
     'change input#edit-expense-receipt-upload': 'showUploadedReceipt'
 
   initialize: (options) ->
+    console.log "Options", options
     _this = @
     @preview = options.preview
     if options.parent
@@ -90,10 +91,10 @@ class FinlyF.Views.Expense extends Backbone.View
     $(modal).modal('show')
 
   populateDetails: ->
+    @model.set('view', @view)
     if @report_preview
       # @model.set('report_preview', true)
       # @model.set('view', @view)
-      @model.set('view', @view)
       @model.set('screen', @screen)
     $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
 
@@ -199,7 +200,11 @@ class FinlyF.Views.Expense extends Backbone.View
             #Adding refresh trigger in expense#index
             if _this.parent
               $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
-          _this.model.fetch()
+          _this.model.fetch({
+            data: {
+              view: _this.view
+            }
+          })
           # if _this.report_preview
           # $("#modal-new").modal('hide')
           # _this.refetchCollection()
@@ -241,7 +246,11 @@ class FinlyF.Views.Expense extends Backbone.View
             #Adding refresh trigger in expense#index
             if _this.parent
               $(_this.parent.el).find("#item-details .close-item-details button.close-details").attr("data-refresh-true", true)
-          _this.model.fetch()
+          _this.model.fetch({
+            data: {
+              view: _this.view
+            }
+          })
           # if _this.report_preview
           # $("#modal-new").modal('hide')
           # _this.refetchCollection()
