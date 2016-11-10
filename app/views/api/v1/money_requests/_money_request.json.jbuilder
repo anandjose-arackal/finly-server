@@ -15,3 +15,9 @@ json.payment_mode do
   json.id = money_request.payment_mode_id
   json.name = money_request.payment_mode.name rescue nil
 end
+json.total_amount do
+  json.value money_request.total_amount
+  json.currency do
+    json.extract! Currency.first, :id, :country, :country_code, :symbol
+  end
+end
