@@ -454,6 +454,7 @@ users.each do |user|
   i+=1
 
   # also activating users
+  user.confirm
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
