@@ -1,12 +1,6 @@
 json.partial! 'money_request', money_request: @result.money_request
-json.manager_name @result.manager.name rescue nil
-json.finance_manager_name @result.finance_manager.name rescue nil
-json.total do
-  json.value @result.total
-  json.currency do
-    json.extract! Currency.first, :id, :country, :country_code, :symbol
-  end
-end
+json.manager_name @result.manager.present? ? @result.manager.name : ''
+json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
 json.actions do
   json.take_control @result.actions[:take_control].present?
   json.review @result.actions[:approve].present?
