@@ -2,7 +2,7 @@ ActiveAdmin.register Company do
 
   filter :name, as: :string
 
-  permit_params :name
+  permit_params :name, :d_code
 # See permitted parameters documentation:
 # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
 #
