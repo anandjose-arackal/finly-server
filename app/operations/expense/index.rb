@@ -56,7 +56,7 @@ class Expense::Index < Expense::Base
   class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :paginated_expenses, :categories
+    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
