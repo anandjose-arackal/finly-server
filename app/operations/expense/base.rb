@@ -14,7 +14,6 @@ class Expense::Base < BaseOperation
   def init
     id = (params[:expense_id] or params[:id])
     self.expense = Expense::Index.(user, params).expenses.with_id(id).first rescue nil
-    debugger
   end
 
   def success

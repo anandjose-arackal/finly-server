@@ -27,10 +27,20 @@ require 'test_helper'
 require 'helpers/report_service_test_helper'
 
 class ReportTest < ActiveSupport::TestCase
-  include ReportServiceTestHelper
+
   # test "the truth" do
   #   assert true
   # end
+
+  test "report cannot exist without a name" do
+
+  end
+
+  test "destroying a report ensures the expenses are returned to unreported state and receipts are unassociated" do
+
+  end
+
+  test ""
 
   test 'an empty report cannot be submitted' do
     user = User.find_by(email: 'user0@finlytest.io')

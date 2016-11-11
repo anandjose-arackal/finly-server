@@ -213,13 +213,14 @@ if Policy.non_default.count == 0
   p = Policy::Create.(a, {name: 'Test Policy'})
   p = Policy.find_by(name: "Test Policy")
   p.configuration.update_attribute(:require_category, true) if p.present?
-  PolicyUserService.new(p).add_user(u[0], false)
+  Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
+  # PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
-
   p2 = Policy::Create.(a, {name: 'Another test Policy'})
   p2 = Policy.find_by(name: 'Another test Policy')
   u.each do |user|
-    PolicyUserService.new(p2).add_user(user, false)
+    Policy::Users::AddUser.(a, {view: 'admin', policy_id: p2.id, :user_id => "#{user.id}"})
+    # PolicyUserService.new(p2).add_user(user, false)
   end
 end
 
@@ -312,9 +313,10 @@ end
 
 if Report.count == 0
   c.users.all.each do |user|
+
+    # creating open reports
     3.times.each do
-      report = ReportService.new(user: user).create
-      report_service = ReportService.new(user: user, report: report)
+      report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
@@ -326,11 +328,12 @@ if Report.count == 0
         expenses << e
         expenses_ids << e.id
       end
-      report_service.add_expense(expenses_ids)
+      Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
     end
+
+    # creating submitted reports
     3.times.each do
-      report = ReportService.new(user: user).create
-      report_service = ReportService.new(user: user, report: report)
+      report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
@@ -342,12 +345,13 @@ if Report.count == 0
         expenses << e
         expenses_ids << e.id
       end
-      report_service.add_expense(expenses_ids)
-      report_service.submit
+      Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
+      Report::Submit.(user, {report_id: report.id})
     end
+
+    # creating approved reports
     3.times.each do
-      report = ReportService.new(user: user).create
-      report_service = ReportService.new(user: user, report: report)
+      report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
@@ -359,10 +363,12 @@ if Report.count == 0
         expenses << e
         expenses_ids << e.id
       end
-      report_service.add_expense(expenses_ids)
-      report_service.submit
+      Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
+      Report::Submit.(user, {report_id: report.id})
+      report.reload
       while report.controlling_user.present?
-        ReportService.new(user: report.controlling_user, report: report).approve
+        Report::Approve.(report.controlling_user, {report_id: report.id})
+        report.reload
       end
     end
   end

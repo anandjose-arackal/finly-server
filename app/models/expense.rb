@@ -81,7 +81,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_user_or_report, ->(user_ids, report_ids) { where('report_id IN (?) OR user_id IN (?)', report_ids, user_ids).uniq }
+  # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) {where expense_type_id: type_id}
 
   # scopes for the filters
