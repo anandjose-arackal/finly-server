@@ -60,9 +60,14 @@ class User::Team::Review::NextReviewer < BaseOperation
   private
   def next_reviewer(sym, obj)
     user = (obj.controlling_for_user or obj.controlling_user or obj.user)
-    role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id or UserRole.id_for(:employee))
+    role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
+    role = UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
     arg_hash={}
     arg_hash[sym] = obj
+    if role.blank?
+      add_message :error, 'Error loading the report configuration'
+      return
+    end
     if obj.user.id == user.id
       arg_hash[:type] = :manager
       manager = User::Team::Approver.(user, arg_hash)
@@ -87,7 +92,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       manager = User::Team::Approver.(user, arg_hash)
       if manager.nil?
         arg_hash[:type] = :finance_manager
-        self.response =User::Team::Approver.(obj.user, arg_hash)
+        self.response = User::Team::Approver.(obj.user, arg_hash)
         if self.response.present?
           self.role_id = UserRole.id_for(:finance_manager)
         end

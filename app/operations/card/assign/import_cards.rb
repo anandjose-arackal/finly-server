@@ -1,7 +1,6 @@
 require 'roo'
 # todo - come back to this once you get details about the fields of speadsheet
 
-
 class Card::Assign::ImportCards < Card::Assign::Base
 
   attr_accessor :file, :success_hash, :header

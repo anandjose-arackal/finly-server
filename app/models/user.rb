@@ -277,7 +277,7 @@ class User < ActiveRecord::Base
     pending_reimbursement = reports.with_amount.without_payment.sum(:value)
     value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
     # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    min_value = [cash, value].min
+    min_value = [cash.value, value].min
     Amount.new(value: min_value, currency: cash.currency)
   end
 
