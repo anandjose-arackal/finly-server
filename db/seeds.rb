@@ -446,6 +446,10 @@ if AdminUser.count == 0
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 end
 
+user = User.find_by(email: 'manager4@finlytest.io')
+user.cards.create(proxy: "S00017740099", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
+                  card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+
 # creating Finly users and junk transaction data.
 # jouska = Company.create(name: 'Jouska')
 #   jouska.reload
