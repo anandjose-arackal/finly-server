@@ -35,14 +35,14 @@ class MoneyRequest::Index < MoneyRequest::Base
           return false
         end
       when UserRole.id_for(:manager)
-        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id)
+        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager))
         interacted_money_requests_query= user.manager_money_requests
         sql = MoneyRequest.connection.unprepared_statement {
           "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
         }
         self.money_requests = MoneyRequest.from(sql)
       when UserRole.id_for(:finance_manager)
-        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id)
+        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager))
         interacted_money_requests_query = user.finance_money_requests
         sql = MoneyRequest.connection.unprepared_statement {
           "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
