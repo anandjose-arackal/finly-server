@@ -168,7 +168,7 @@ $(document).ready ->
 
   $("#modal-global-transfer").on('shown.bs.modal', (e) ->
     modal = this
-    to_user_id = $(modal).attr('data-user-id')
+    to_user_id = $("#current_user_id").val()
     $(".btn-transfer-wallet-to-card").on('click', (evt) ->
       $(this).attr('disabled', true)
       target = this
@@ -186,7 +186,7 @@ $(document).ready ->
           amount: amount
           password: password
           view: 'personal'
-          to_user_id: 1
+          to_user_id: to_user_id
         }
         success: (res) ->
           FinlyF.snapNotify(res.messages)
