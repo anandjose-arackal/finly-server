@@ -70,7 +70,11 @@ class Expense::Index < Expense::Base
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
         self.unreported_expenses = expenses.unreported
-        self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+        if params[:view] == 'personal' or params[:view].nil?
+          self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+        else
+          self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
+        end
       end
       self.categories = user.company.active_categories
     end
