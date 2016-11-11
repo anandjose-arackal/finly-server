@@ -40,6 +40,8 @@ class Payment < ActiveRecord::Base
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
+  scope :personal, -> { where 'initiating_user_id == receiving_user_id' }
+  scope :non_personal, -> { where 'initiating_user_id != receiving_user_id' }
 
   # validates :amount_id, presence: true
   validates :date, presence: true
