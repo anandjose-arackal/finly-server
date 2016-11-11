@@ -12,11 +12,11 @@ class Report::Approve < Report::Base
   end
 
   def pre_validate
-    if user.blank? and params.blank? or not (params[:auto_approve] or params[:auto_submit])
-      add_message :error, 'User not found'
-    end
     if params.blank?
       add_message :error, 'Error loading configuration'
+    end
+    if user.blank? and not params[:auto_approve] and not params[:auto_submit]
+      add_message :error, 'User not found'
     end
   end
 
