@@ -7,7 +7,17 @@
 class Report::Submit < Report::Base
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
     [:employee]
+  end
+
+  def pre_validate
+    if params.blank?
+      add_message :error, 'Error loading configuration'
+    end
+    if user.blank? and not params[:auto_approve] and not params[:auto_submit]
+      add_message :error, 'User not found'
+    end
   end
 
   def init
