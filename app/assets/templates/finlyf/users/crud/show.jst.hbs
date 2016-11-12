@@ -3,8 +3,8 @@
     <ul class="nav nav-tabs user-tab-panes">
       <li class="active"><a href="#tab-user-details" data-toggle="tab">Details</a></li>
       <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
-      <li><a href="#tab-user-wallet" data-toggle="tab">Wallet</a></li>
-      <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li>
+      <li><a href="#tab-user-wallet-cards" data-toggle="tab">Wallet &amp; Cards</a></li>
+      {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
       <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
     </ul>
   </div>
@@ -250,54 +250,53 @@
           </form>
         </section>
       </div>
-      <div class="tab-pane" id="tab-user-wallet">
-      <section class="user-wallet" style="min-height: 500px;">
-        <div class="row">
-          <div class="col-sm-6"><h4>Wallet</h4></div>
-        </div>
-        <div class="row">
-          <div class="col-sm-6">
-            <div class="col-sm-3" style="padding-top: 15px;">Balance:</div>
-            <div class="col-sm-9"><h4 class="wallet-balance" style="font-size: 24px; font-weight: bold;">&#8377;&nbsp;&nbsp;{{item.wallet.balance}}</h4></div>
+      <div class="tab-pane" id="tab-user-wallet-cards">
+        <section class="user-wallet" style="">
+          <div class="row">
+            <div class="col-sm-6"><h4>Wallet</h4></div>
           </div>
-          <div class="col-sm-6">
-              <div class="dropdown">
-                <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  Credit
-                  <span class="caret"></span>
-                </button>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="col-sm-3" style="padding-top: 15px;">Balance:</div>
+              <div class="col-sm-9"><h4 class="wallet-balance currency" style="font-size: 24px; font-weight: bold;">&#8377;&nbsp;&nbsp;{{item.wallet.balance}}</h4></div>
+            </div>
+            <div class="col-sm-6">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    Credit
+                    <span class="caret"></span>
+                  </button>
 
-                <ul class="dropdown-menu" aria-labelledby="dLabel">
-                  {{#if item.actions.credit_wallet_from_virtual_account}}
-                    <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
-                  {{/if}}
-                  {{#if item.actions.credit_wallet_from_wallet}}
-                    <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Wallet</a> </li>
-                  {{/if}}
-                </ul>
-              </div>
+                  <ul class="dropdown-menu" aria-labelledby="dLabel">
+                    {{#if item.actions.credit_wallet_from_virtual_account}}
+                      <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
+                    {{/if}}
+                    {{#if item.actions.credit_wallet_from_wallet}}
+                      <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Wallet</a> </li>
+                    {{/if}}
+                  </ul>
+                </div>
 
 
-              <div class="dropdown">
-                <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  Debit
-                  <span class="caret"></span>
-                </button>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    Debit
+                    <span class="caret"></span>
+                  </button>
 
-                <ul class="dropdown-menu" aria-labelledby="dLabel">
-                  {{#if item.actions.debit_wallet_to_virtual_account}}
-                    <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
-                  {{/if}}
-                  {{#if item.actions.debit_wallet_to_wallet}}
-                    <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Wallet</a> </li>
-                  {{/if}}
-                </ul>
-              </div>
+                  <ul class="dropdown-menu" aria-labelledby="dLabel">
+                    {{#if item.actions.debit_wallet_to_virtual_account}}
+                      <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
+                    {{/if}}
+                    {{#if item.actions.debit_wallet_to_wallet}}
+                      <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Wallet</a> </li>
+                    {{/if}}
+                  </ul>
+                </div>
+            </div>
           </div>
-        </div>
-      </section>
-      </div>
-      <div class="tab-pane" id="tab-user-cards">
+        </section>
+        <hr />
         {{#if item.card.assigned}}
         <section class="user-cards">
           <div class="row">
@@ -399,6 +398,9 @@
         </section>
         {{/if}}
       </div>
+      {{!-- <div class="tab-pane" id="tab-user-cards">
+        
+      </div> --}}
       <div class="tab-pane" id="tab-user-policies">
         <section class="user-policies">
           <div class="row">
@@ -927,9 +929,15 @@
 
 .transfer-flow{
   position: absolute;
-  margin-left: 47%;
-  top: 36px;
+  margin-left: 48%;
+  top: 37px;
   font-size: 20px;
+}
+
+label.grey-text{
+  color: #888;
+  text-transform: uppercase;
+  font-weight: normal;
 }
 
 

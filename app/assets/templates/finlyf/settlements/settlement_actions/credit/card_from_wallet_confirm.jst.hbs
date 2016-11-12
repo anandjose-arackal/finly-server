@@ -1,8 +1,59 @@
-<div class="form-group">
-  <label class="control-form">Password:</label>
-  <input type="password" name="password" class="form-control password"/>
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="row no-margin">
+      <h4>Summary:</h4>
+    </div>
+
+    {{!-- <div class="row no-margin">
+      <div class="col-sm-3 text-right">Initiating User:</div>
+      <div class="col-sm-8"><label>You</label></div>
+    </div> --}}
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Receiving User:</div>
+      <div class="col-sm-8"><label>{{summary.userData.user_details.name}}</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Type of Payment:</div>
+      <div class="col-sm-8"><label>Credit</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">From:</div>
+      <div class="col-sm-8"><label>Your Wallet</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">To:</div>
+      <div class="col-sm-8"><label>{{summary.userData.user_details.name}}'s Card</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Total Amount:</div>
+      <div class="col-sm-8"><label class="currency">&#8377;&nbsp;{{summary.actionData.c_card_from_wallet.amount}}</label></div>
+    </div>
+    
+  </div>
 </div>
 
-<div class="form-group text-center">
-  <button class="btn btn-success btn-confirm-transfer step-3-action" data-url="{{summary.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">Confirm &amp; Transfer</button>
+<div class="row"><div class="col-sm-12 no-padding"><hr /></div></div>
+
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="form-group">
+      <label class="control-form">Password:</label>
+      <input type="password" name="password" class="form-control password"/>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-success btn-confirm-transfer step-3-action" data-url="{{summary.userData.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">Confirm &amp; Transfer</button>
+    </div>
+  </div>
 </div>
+
+
+
+
+
+

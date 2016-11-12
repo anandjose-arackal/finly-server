@@ -310,7 +310,7 @@ class FinlyF.Views.Request extends Backbone.View
         target_user_card: true
         target_user_wallet: true
         virtual_account: true
-        # view: 'admin'
+        view: _this.current_view
       success: (data) ->
         $(modal).find('.current_user_wallet_balance').html(data.current_user_wallet)
         $(modal).find('.target_user_card_balance').html(data.target_user_card)

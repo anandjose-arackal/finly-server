@@ -33,7 +33,11 @@
                       <label>
                         <input type="radio" name='settlement_credit_action' data-action-type="debit_cash_advance"/> Debit Advanced Funds
                       </label>
-                      <label class="hidden">Take funds back from user to company.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw funds back from Employees Account to Company Account.
+                        </div>
+                      </div>
                     </li>
                   {{/if}}
                   
@@ -42,7 +46,11 @@
                       <label>
                         <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_card" /> Debit from Card to Card
                       </label>
-                      <label class="hidden">Debit from employee's card to your own card.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from Employees Account to My Account.
+                        </div>
+                      </div>
                     </li> 
                   {{/if}}
 
@@ -60,7 +68,11 @@
                       <label>
                         <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from Wallet to Wallet
                       </label>
-                      <label class="hidden">Debit from employee's wallet to your wallet.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from Employees Account to My Account.
+                        </div>
+                      </div>
                     </li> 
                   {{/if}}
                   
@@ -78,13 +90,19 @@
                       <label>
                         <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_virtual_account" /> Debit Wallet to Company Credits
                       </label>
-                      <label class="hidden">Debit from employee's wallet to company credits.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from Employees Account back into Company Account.
+                        </div>
+                      </div>
                     </li> 
                   {{/if}}
                 </ul>
               </div>
 
-              <div class="col-sm-6 settlement-action-definition"></div>
+              <div class="col-sm-6 settlement-action-definition" data-definition-type="debit">
+                <h4 class="text-center">Withdraw Cash from Employee.</h4>
+              </div>
             </div><!-- panel-body -->
           </div>
         </div>
