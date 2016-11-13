@@ -20,7 +20,10 @@
 #  accounted                    :boolean          default(FALSE), not null
 #  archived                     :boolean          default(FALSE), not null
 #  is_deleted                   :boolean          default(FALSE), not null
+#  auto_submit                  :boolean          default(FALSE), not null
+#  auto_approve                 :boolean          default(FALSE), not null
 #
+
 
 
 

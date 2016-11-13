@@ -64,7 +64,7 @@ class Report::AutoSubmit < Report::Base
     role_id = UserRole.id_for(:employee)
     self.report = selected_user.reports.build report_status_id: ReportStatus.open_id, controlling_user: selected_user,
                                               controlling_user_role_id: role_id, policy_id: auto_submit_config.default_policy_id,
-                                              name: params[:name]
+                                              name: params[:name], auto_submit: true
     if report.save
       Report::Expenses::Add.(user, {selected_user: selected_user, report: report, expenses: processing_expenses, auto_submit: true})
     else
