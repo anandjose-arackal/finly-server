@@ -1,7 +1,7 @@
 <div id="backbone-container">
 </div>
 
-<input type="hidden" id="current_user_id" value="<%= current_user.id %>">
+<input type="hidden" id="current_user_id" value="<%= current_user.id %>" data-user-name="<%= current_user.name %>" data-user-email="<%= current_user.email %>">
 
 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 <input name="utf8" id="form_utf8" type="hidden" value="&#x2713;"/>
@@ -36,13 +36,13 @@
       <% views["admin"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
           <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
           <% else %>
             <!-- Special Functionality for my balance -->
             <% if key =~ /balance/i %>
-              <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li>
+              <!-- <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li> -->
             <% else %>
-              <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+              <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
             <% end %>
           <% end %>
 

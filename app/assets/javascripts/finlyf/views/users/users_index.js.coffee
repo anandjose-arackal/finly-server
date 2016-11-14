@@ -271,6 +271,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   filterState: (e) ->
     e.preventDefault()
     target = e.currentTarget
+    @params.page = 1
 
     @params.filter_state = parseInt($(target).attr('data-filter-state'))
 

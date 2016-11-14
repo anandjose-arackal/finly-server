@@ -257,10 +257,14 @@
           </div>
           <div class="row">
             <div class="col-sm-6">
-              <div class="col-sm-3" style="padding-top: 15px;">Balance:</div>
+              <div class="col-sm-3" style="padding-top: 15px; font-size: 16px;">Balance:</div>
               <div class="col-sm-9"><h4 class="wallet-balance currency" style="font-size: 24px; font-weight: bold;">&#8377;&nbsp;&nbsp;{{item.wallet.balance}}</h4></div>
             </div>
+          </div>
+          <div class="row">
             <div class="col-sm-6">
+              <div class="col-sm-3" style="padding-top: 15px; font-size: 16px;">Actions:</div>
+              <div class="col-sm-9">
                 <div class="dropdown">
                   <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                     Credit
@@ -293,6 +297,7 @@
                     {{/if}}
                   </ul>
                 </div>
+              </div>
             </div>
           </div>
         </section>
@@ -300,7 +305,7 @@
         {{#if item.card.assigned}}
         <section class="user-cards">
           <div class="row">
-            <div class="col-sm-6"><h4>Assigned Cards</h4></div>
+            <div class="col-sm-6"><h4 style="margin-bottom: 20px;">Assigned Cards</h4></div>
           </div>
 
           <div class="row">
@@ -328,67 +333,64 @@
             </div>
 
             <div class="col-sm-6 card-actions">
-              <div class="row no-margin">
-                <label class="control-label">Status:</label>
-                {{#if item.card.active}}
-                  <label class="control-label">Active</label>
-                {{else}}
-                  <label class="control-label">Blocked</label>
-                {{/if}}
-              </div>
-              <div class="row no-margin">
-                {{#if item.actions.deactivate_card}}
-                  <button class="btn btn-sm btn-danger btn-card-update-status btn-wd-100" data-card-status-type="0">Block</button>
-                {{/if}}
-                {{#if item.actions.activate_card}}
-                  <button class="btn btn-sm btn-success btn-card-update-status btn-wd-100" data-card-status-type="1">Unblock</button>
-                {{/if}}
-              </div>
-              {{#if item.card.active}}
-                {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
-                  <div class="dropdown">
-                    <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                      Credit
-                      <span class="caret"></span>
-                    </button>
-
-                    <ul class="dropdown-menu" aria-labelledby="dLabel">
-                      {{#if item.actions.credit_card_from_virtual_account}}
-                        <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
-                      {{/if}}
-                      {{#if item.actions.credit_card_from_wallet}}
-                        <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Wallet</a> </li>
-                      {{/if}}
-                    </ul>
-                  </div>
-                {{/ifCond}} 
-              {{else}}
-                <button class="btn btn-sm btn-success" disabled="disabled">Credit <span class="caret"></span></button>
-                (Blocked by {{item.card.disabled_by.name}})
-              {{/if}}
-
-              {{#ifCond item.actions.debit_card_to_company_credits '||' item.actions.debit_card_to_card}}
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Debit
-                    <span class="caret"></span>
-                  </button>
-
-                  <ul class="dropdown-menu" aria-labelledby="dLabel">
-                    {{#if item.actions.debit_card_to_company_credits}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_company_credits}}" data-action-type="debit_card_to_company_credits">To Company Credits</a> </li>
-                    {{/if}}
-                    {{#if item.actions.debit_card_to_card}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_card}}" data-action-type="debit_card_to_card">To Your Wallet</a> </li>
-                    {{/if}}
-                  </ul>
+              <div class="row" style="margin-bottom: 25px;">
+                <div class="col-sm-3" style="font-size: 16px;">
+                  Status:
                 </div>
-              {{/ifCond}}
-              <div class="card-balance">
-                <label class="balance">&nbsp;</label>
-                <button class="btn btn-card-request-balance">Request Balance</button>
-              </div>
+                <div class="col-sm-9" style="margin-top: -5px; font-size: 16px;">
+                  {{#if item.card.active}}
+                    <label class="control-label">Active</label>
+                  {{else}}
+                    <label class="control-label">Blocked</label>
+                  {{/if}}
 
+                  {{#if item.actions.deactivate_card}}
+                  &nbsp;&nbsp;&nbsp; <button class="btn btn-sm btn-danger btn-card-update-status no-margin" data-card-status-type="0">Block</button>
+                  {{/if}}
+                  {{#if item.actions.activate_card}}
+                  &nbsp;&nbsp;&nbsp;<button class="btn btn-sm btn-success btn-card-update-status no-margin" data-card-status-type="1">Unblock</button>
+                  {{/if}}
+                </div>
+              </div>
+              <div class="row" style="margin-bottom: 25px;">
+                <div class="col-sm-3" style="font-size: 16px;">
+                  Actions: 
+                </div>
+                <div class="col-sm-9">
+                  {{#if item.card.active}}
+                    {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
+                      <div class="dropdown">
+                        <button class="btn btn-sm btn-success" style="margin: 0;" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                          Credit
+                          <span class="caret"></span>
+                        </button>
+
+                        <ul class="dropdown-menu" aria-labelledby="dLabel">
+                          {{#if item.actions.credit_card_from_virtual_account}}
+                            <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
+                          {{/if}}
+                          {{#if item.actions.credit_card_from_wallet}}
+                            <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Wallet</a> </li>
+                          {{/if}}
+                        </ul>
+                      </div>
+                    {{/ifCond}} 
+                  {{else}}
+                    <button class="btn btn-sm btn-success" disabled="disabled">Credit <span class="caret"></span></button>
+                    (Blocked by {{item.card.disabled_by.name}})
+                  {{/if}}
+                </div>
+              </div>
+              <div class="row" style="margin-bottom: 25px;">
+                <div class="col-sm-3" style="font-size: 16px;">
+                  Balance: 
+                </div>
+                <div class="col-sm-9" style="font-size: 16px;">
+                  <div class="card-balance">
+                    <label class="balance currency">&nbsp;</label>&nbsp;&nbsp;&nbsp;<i style="color: #4CAF50;" class="fa fa-refresh btn-card-request-balance"></i>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -800,8 +802,8 @@
     padding: 20px;
     height: 235px;
     border-radius: 14px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 0;
+    /*margin-right: auto;*/
   }
 
   .card .status{
@@ -860,8 +862,8 @@
   }
 
   .card-balance label.balance{
-    display: block;
-    font-size: 30px;
+    /*display: block;*/
+    font-size: 24px;
   }
   .btn-ghost{
     width: 150px;

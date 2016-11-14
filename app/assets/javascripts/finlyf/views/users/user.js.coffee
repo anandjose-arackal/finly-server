@@ -558,9 +558,10 @@ class FinlyF.Views.User extends Backbone.View
     if e
       e.preventDefault()
       target = e.currentTarget
-      $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
+      $(target).addClass('fa-pulse')
+      # $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
 
-    card_balance_div = $(@el).find('.card-balance .balance')
+    card_balance_div = $(@el).find('.card-balance')
 
     $.ajax({
       url: '/cards/details',
@@ -573,7 +574,9 @@ class FinlyF.Views.User extends Backbone.View
       }
       success: (res) ->
         # console.log "Success", res
-        $(card_balance_div).html("&#8377;&nbsp;&nbsp;" + res.balance)
+        $(card_balance_div).find('.balance').html("&#8377;&nbsp;&nbsp;" + res.balance)
+        $(card_balance_div).find('.btn-card-request-balance').removeClass('fa-spinner fa-pulse').addClass('fa-refresh')
+        $(target).removeClass('fa-pulse')
       error: (err) ->
         console.log "Error", err
 
