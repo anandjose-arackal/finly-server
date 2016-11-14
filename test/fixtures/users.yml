@@ -43,6 +43,40 @@
 #  last_name              :string(255)      not null
 #
 
+# one kind of user for each user type
+
+admin:
+  id: 1
+  email: 'admin@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Admin"
+
+manager:
+  id: 2
+  email: 'manager@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Manager"
+
+finance_manager:
+  id: 3
+  email: 'finance_manager@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Finance Manager"
+
+employee:
+  id: 4
+  email: 'employee@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Employee"
+
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
