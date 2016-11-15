@@ -35,13 +35,13 @@
   font-size: 10px;
 }
 
-.navbar-balance .loading-animation{
+.navbar-balance .loading-animations{
   margin: 30px auto;
 }
 
 .loading-animation {
   /* border-radius: 6px; */
-  background-color: #594da8;
+  background-color: #3F51B5;
   height: 80%;
   width: 6px;
   margin-right: 1px;
@@ -59,7 +59,7 @@
   -webkit-transform: scaleY(.5);
   -moz-transform: scaleY(.5);
   transform: scaleY(.5);
-  background-color: #594da8;
+  background-color: #3F51B5;
   }
   20% {
     -webkit-transform: scaleY(1);
@@ -157,6 +157,13 @@
 
 // Home css scss content ends
 
+
+$brand-primary: #3F51B5;
+$brand-success: #4CAF50;
+$brand-warning: #FFC107;
+// $brand-warning: #FFA000;
+$brand-danger: #FF5722;
+$brand-info: #00BCD4;
 @import "bootstrap";
 @import "bootstrap-sprockets";
 
@@ -220,7 +227,7 @@
 
 .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
   color: #fff;
-  background-color: #594da8;
+  background-color: #3F51B5;
 }
 //Customization over bootstrap
 .form-control{

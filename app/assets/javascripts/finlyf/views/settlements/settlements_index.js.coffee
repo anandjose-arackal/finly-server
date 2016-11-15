@@ -777,8 +777,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromCard({summary: @selectedUserSummary}))
       when 'credit_card_from_wallet'
         console.log @selectedUserSummary
-        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Wallet")
-        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Wallet")
+        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Finly Account")
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Finly Account")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditCardFromWallet({summary: @selectedUserSummary}))
         $.ajax({
           url: 'users/' + _this.user_id + '/balance'
@@ -795,8 +795,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
             $(modal_body).find('.settlement-step-2 .target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
         })
       when 'credit_wallet_from_wallet'
-        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Wallet")
-        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Wallet")
+        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit from Your Finly Account")
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Finly Account")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditWalletFromWallet({summary: @selectedUserSummary}))
         $.ajax({
           url: 'users/' + _this.user_id + '/balance'
@@ -832,7 +832,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
             $(modal_body).find('.settlement-step-2 .target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
         })
       when 'credit_wallet_from_virtual_account'
-        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit Wallet from Company Credits")
+        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Credit Finly Account from Company Credits")
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Credited from Your Company Balance")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tCreditWalletFromVirtualAccount({summary: @selectedUserSummary}))
         $.ajax({
@@ -860,13 +860,13 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Card")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToCard({summary: @selectedUserSummary}))
       when 'debit_card_to_wallet'
-        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Wallet")
-        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Wallet")
+        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Finly Account")
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Finly Account")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitCardToWallet({summary: @selectedUserSummary}))
         
       when 'debit_wallet_to_wallet'
-        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Wallet")
-        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Wallet")
+        $(modal_body).find(".settlement-step-1 .panel-heading .step-title .title").text("Type: Debit Balance to Your Finly Account")
+        $(modal_body).find(".settlement-step-2 .panel-heading .step-title .title").text("Input Amount to be Debited from Employee's Card to Your Finly Account")
         $(modal_body).find('.settlement-step-2 .panel-body').html(@tDebitWalletToWallet({summary: @selectedUserSummary}))
         $.ajax({
           url: 'users/' + _this.user_id + '/balance'
