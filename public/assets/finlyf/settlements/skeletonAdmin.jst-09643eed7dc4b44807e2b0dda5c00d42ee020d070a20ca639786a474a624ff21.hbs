@@ -1,0 +1,487 @@
+<style type="text/css">
+
+.navbar-inverse{
+  color: white;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: #46568b;
+  background: #423689;
+  background: #594DA8;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: white;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: transparent;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus{
+  border-color: #F4F560;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  /*color: #fff;*/
+  /*font-weight: bold;*/
+  border-bottom: 3px solid #CD925A;
+  border-bottom: 3px solid #F4F560;
+  background-color: transparent;
+}
+.container-fluid{
+  padding: 0;
+}
+
+.no-margin{
+  margin: 0;
+}
+
+.no-padding{
+  padding: 0;
+}
+
+.main-header{
+  padding: 16px 15px;
+  text-transform: uppercase;
+  color: #535353;
+  font-size: 12px;
+}
+.item{
+  padding: 15px;
+  border: 0.5px solid #eee;
+  /*border-bottom: none;*/
+  background: white;
+  color: #666;
+  cursor: pointer;
+  /*margin-bottom: 5px;*/
+}
+
+.item.selected{
+  background: #FFF1DA;
+}
+
+.item.col-sm-3, .receipt{
+  padding: 20px;
+  border: none;
+  background: transparent;
+  color: #555;
+  /*padding: 10px;*/
+  /*background: red;*/
+}
+
+.item.col-sm-3 .receipt-container, .receipt .receipt-container {
+  padding: 10px;
+  background: white;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+}
+
+.item.col-sm-3 .receipt-container .receipt-details, .receipt .receipt-container .receipt-details{
+  /*padding: 10px;*/
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
+.item.col-sm-3 .receipt-container .receipt-details h4{
+  font-size: 15px;
+  padding-top: 0;
+}
+
+.item.col-sm-3 .receipt-container .receipt-image, .receipt, .receipt-container .receipt-image{
+  overflow:hidden;
+  height: 250px;
+  padding-bottom: 10px;
+}
+
+.item.col-sm-3 .receipt-container .receipt-image img, .receipt .receipt-container .receipt-image img{
+  /*border: 3px solid #efefef;*/
+  padding: 10px;
+}
+
+.sidebar{
+  height: calc(100% - 100px);
+  background: #fff;
+  background: #F5F6F9;
+  position:fixed;
+  height: calc(100% - 100px);
+  overflow-y: scroll;
+}
+
+
+.main{
+  z-index: 4;
+  position:fixed;
+  /*overflow-y: scroll;*/
+  background: rgb(252, 252, 252) none repeat scroll 0% 0%;
+  background: #F5F6F9;
+  max-height: calc(100% - 53px); 
+  padding: 0px;
+  box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  height: calc(100% - 100px);
+}
+.main.preview .col-md-8{
+  /*display: none;*/
+}
+
+.sidebar-element{
+  padding: 10px 0;
+}
+.close-item-details{
+  position: absolute;
+  z-index: 100;
+  padding: 5px 15px;
+  left: 0px;
+  /*border: 0.5px solid #efefef;*/
+  font-weight: 100;
+  font-size: 20px;
+}
+#item-details{
+  height: calc(100% - 103px);
+  left: 100%;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  transition: all 0.5s;
+  position: fixed;
+  margin-top: -10px;
+  display: block;
+
+  /*width: 55.555%;*/
+  width: 45.555%;
+}
+
+.show-details-panel{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.main.preview #item-details{
+  /*left: 54.444%;*/
+}
+
+.details-header{
+  padding: 16px 15px;
+  height: 70px;
+}
+
+.navbar-btn{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  background: transparent none repeat scroll 0% 0%;
+  border: 0.5px solid rgb(89, 77, 168);
+  border-radius: 2px;
+}
+
+.btn-finly-danger:hover{
+  background: rgb(234, 97, 83);
+  color: white;
+}
+
+.btn-finly-default:hover{
+  background: #594DA8;
+  color: white;
+}
+
+
+/*Forms, Fiels, Labels*/
+.input-icon {
+  float: right;
+  margin-right: 7px;
+  margin-top: -24px;
+  position: relative;
+  z-index: 1;
+  color: #676767;
+  pointer-events: none;
+}
+
+.finly-backdrop{
+  background: rgba(0,0,0, 0.5);
+  position: fixed;
+  height: calc(100% - 53px);
+  width: 100%;
+  top: 53px;
+  z-index: 3;
+}
+
+.nav-pills > li > a {
+  border-radius: 0;
+}
+
+.user{
+  padding: 10px;
+  cursor: pointer;
+}
+
+.user:hover{
+  background: #FEE252;
+
+}
+
+.user.active{
+  background: #FEE252;
+}
+
+
+.settlement-report{
+  padding: 5px 0;
+  border: 1px solid #dfdfdf;
+}
+
+
+.secondary-navbar{
+  margin-top: 53px;
+  border-color: transparent;
+  z-index: 5;
+}
+.secondary-navbar li{
+  margin-left: 10px;
+}
+
+
+
+/*Credit Debit styles*/
+ul.settlement-actions{
+  padding-left: 0;
+}
+
+ul.settlement-actions li{
+  list-style-type: none;
+  padding: 10px 0 5px 10px;
+  margin-right: -15px;
+}
+
+ul.settlement-actions li.active{
+  background: #fff;
+}
+
+
+ul.settlement-actions li:hover{
+  background: #fff;
+}
+
+ul.settlement-actions li label{
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+
+.settlement-action-definition{
+  padding: 10px;
+  background: #fff;
+  height: 10px;
+}
+
+
+.panel-group .panel{
+  border-radius: 0;
+  /*margin-top: 0;*/
+}
+
+.panel-group .panel + .panel {
+  margin-top: 0;
+}
+
+.panel-default{
+  border: none;
+  border-left: 1px solid #a29bd1;
+  border-right: 1px solid #a29bd1;
+  border-top: 1px solid #a29bd1;
+}
+
+.panel-default:last-child{
+  border-bottom: 1px solid #a29bd1;
+}
+
+.panel-heading{
+  padding: 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.panel-default > .panel-heading{
+  background-color: #a29bd1;
+  border-bottom: 1px solid white;
+}
+
+.panel-default:last-child > .panel-heading{
+  background-color: #a29bd1;
+  border-bottom: none;
+}
+
+.panel-body{
+  background: #F8F8FC;
+}
+
+.panel[data-navigate="0"] .panel-heading .row{
+  cursor: not-allowed;
+}
+
+.panel[data-navigate="1"] .panel-heading .row{
+  cursor: pointer;
+}
+
+.panel.active .step-title .fa-plus{
+  display: none;
+}
+
+.panel.active .step-title .fa-minus{
+  display: inline;
+}
+
+.panel .step-title .fa-plus{
+  display: inline;
+}
+
+.panel .step-title .fa-minus{
+  display: none;
+}
+
+
+.alert{
+  padding: 10px;
+  margin-bottom: 0;
+  font-size: 12px;
+}
+
+label.grey-text{
+  color: #888;
+  text-transform: uppercase;
+  font-weight: normal;
+}
+
+
+.transfer-flow{
+  position: absolute;
+  margin-left: 44%;
+  top: 21px;
+  font-size: 20px;
+}
+
+
+</style>
+
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top" style="" id="primary-navbar">
+  <div class="container-fluid">
+
+    <div class="row no-margin no-padding">
+      <div class="col-md-2">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand company-name" href="#" style="color: white; font-family: 'Bree Serif', serif; font-weight: 300;font-size: 30px;" href="<%= root_path %>" data-turbolinks="false">Finly
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-10">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="current-view-type">Personal View</span>&nbsp;&nbsp;<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-nav-views-dropdown">
+                
+              </ul>
+            </li>
+          </ul>
+          
+          <ul class="nav navbar-nav navbar-right">
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></a>
+              <ul class="navbar-cog dropdown-menu">
+
+                <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->     
+      </div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="">
+  <div class="container-fluid">
+    <div class="row no-margin no-padding">
+      <div class="col-md-3" style="box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset; padding-left: 0; padding-right: 0;">
+        <div class="navbar-header navbar-sidebar" style="width: 100%;">
+          <form class="navbar-form" role="search" style="padding-right: 0;">  
+            <div class="input-group" style="width: 100%;">
+              <input type="text" class="search-user input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
+              <div class="input-group-btn">
+                <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-md-9" style="">
+        <div class="navbar-collapse collapse navbar-main">
+          <ul class="navbar-nav nav">
+            <li class="hidden"><a style="font-size: 17px;">Company Balance: &#8377;&nbsp;<span class="company-balance">50,500.00</span></a></li>
+            <li class="hidden"><a style="font-size: 17px;">Your Wallet Balance: &#8377;&nbsp;<span class="user-wallet-balance">2000.00</span></a></li>
+          </ul>
+        </div><!--/.nav-collapse -->    
+      </div>
+    </div>
+  </div><!--/.container-fluid -->
+</nav>
+
+
+<div class="container-fluid container-main" style="position: relative;margin-top: 33px; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
+
+  <div class="col-sm-3 no-padding users sidebar">
+    <div class="row no-margin">
+      
+    </div>
+
+    <div class="row no-margin" id="users">
+      
+    </div>
+    <div class="col-sm-12 text-center no-padding">
+      <button class="btn btn-sm load-more-users" data-page="1"><i class="fa fa-cloud-download"></i>&nbsp;&nbsp;<span>Load More</span></button>
+    </div>
+  </div>
+
+  <div class="col-sm-9 col-sm-offset-3 main">
+
+    <div class="summary row no-margin" style="background: #DDDAEA;color: #555;margin-bottom: 0px; height: 185px;box-shadow: 0 0 2px -1px rgba(0, 0, 0, 0.5);border-bottom: 3px solid #fff;">
+      <div class="col-sm-10 col-sm-offset-1">
+        <h1>Select user to see settlement details.</h1>
+      </div>
+    </div>  
+    
+    <div class="row no-margin settlements-content" style="height: calc(100% - 200px); display:none;">
+      <div class="container-fluid"> 
+        <ul class="nav nav-pills filter-status">
+          <li class="{{#if_eq item.view_to_load 'payments'}}active{{/if_eq}}"><a href="#" data-view="payments">Settlements History</a></li>
+          <li class="{{#if_eq item.view_to_load 'approved'}}active{{/if_eq}}"><a href="#" data-view="approved">Approved Reports</a></li>
+          <li class="{{#if_eq item.view_to_load 'reimbursed'}}active{{/if_eq}}"><a href="#" data-view="reimbursed">Reimbursed Reports</a></li>
+          <li class="{{#if_eq item.view_to_load 'closed'}}active{{/if_eq}}"><a href="#" data-view="closed">Closed Reports</a></li>
+          <li class="{{#if_eq item.view_to_load 'credited_money_request'}}active{{/if_eq}}"><a href="#" data-view="credited_money_request">Credited Requests</a></li>
+          <li class="{{#if_eq item.view_to_load 'money_request'}}active{{/if_eq}}"><a href="#" data-view="approved_money_request">Approved Requests</a></li>
+        </ul>
+      </div>
+
+      <div class="settlements-index" style="height: 100%; overflow-y: scroll;"></div>
+    </div>
+  </div>
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-settlements">
+    <div class="modal-dialog" role="document" style="width: 60%;">
+      <div class="modal-content">
+        
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</div>
+
+
