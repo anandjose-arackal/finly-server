@@ -42,6 +42,7 @@ window.FinlyF =
     
 
   structureActions: (el, params)->
+    # console.log "Strucure action params", params
     # Append user profile to the navbar dropdown
     profile_div = $(el).find(".navbar-user-dropdown-profile")
     # $(profile_div).html(FinlyF.Global.templates.templateUserNavProfile({user: FinlyF.Global.current_user}))
@@ -111,6 +112,7 @@ window.FinlyF =
         type : 'get'
         url: '/users/' + user_id + '/balance'
         data:
+          view: params.view || 'personal'
           authenticity_token: $("#authenticity_token").val()
           current_user_wallet: true
           current_user_card: true

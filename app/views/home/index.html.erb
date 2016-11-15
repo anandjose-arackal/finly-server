@@ -36,14 +36,10 @@
       <% views["admin"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
           <% if value == '/users/' %>
-            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
           <% else %>
             <!-- Special Functionality for my balance -->
-            <% if key =~ /balance/i %>
-              <!-- <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li> -->
-            <% else %>
-              <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
-            <% end %>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
 
         <% end %>
@@ -52,13 +48,10 @@
       <% views["finance_manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
           <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
           <% else %>
-            <% if key =~ /balance/i %>
-              <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li>
-            <% else %>
-              <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
-            <% end %>
+            <!-- <%# if key =~ /balance/i %> -->
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
@@ -66,13 +59,9 @@
       <% views["manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
           <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
           <% else %>
-            <% if key =~ /balance/i %>
-              <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li>
-            <% else %>
-              <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
-            <% end %>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
@@ -80,13 +69,9 @@
       <% views["personal"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
           <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
           <% else %>
-            <% if key =~ /balance/i %>
-              <li><a href="#" data-toggle="modal" data-target="#modal-balance"><%= key %></a></li>
-            <% else %>
-              <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
-            <% end %>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>

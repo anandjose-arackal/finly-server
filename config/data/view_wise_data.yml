@@ -12,7 +12,7 @@ admin:
       # - Policies: '/policies'
       - My Account: '/users/'
       # - Expense Policies: '/policies?view=admin'
-      - My Balance: '#modal-balance'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
 personal:
@@ -26,7 +26,7 @@ personal:
       - Expenses: expenses
     cog:
       - My Account: '/users/'
-      - My Balance: '#modal-balance'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
@@ -41,7 +41,7 @@ manager:
       - Team Reports: reports
     cog:
       - My Account: '/users/'
-      - My Balance: '#modal-balance'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
@@ -58,6 +58,6 @@ finance_manager:
 
     cog:
       - My Account: '/users/'
-      - My Balance: '#modal-balance'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'  
