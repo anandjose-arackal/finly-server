@@ -1,0 +1,18 @@
+<div class="col-sm-1"><input class="settlement-report-select" type="checkbox" data-item-id="{{item.id}}" /></div>
+<div class="col-sm-2">
+{{#switch item.payment_mode_id}}
+  {{#case 1}}<i class="fa fa-money"></i>&nbsp; Cash{{/case}}
+  {{#case 2}}<i class="fa fa-cc-visa"></i>&nbsp; Card{{/case}}
+{{/switch}}
+</div>
+<div class="col-sm-3">{{item.name}}</div>
+
+<div class="col-sm-2">
+  {{#if item.final_approver}}
+    {{item.final_approver}}
+  {{else}}
+    Auto-Approved
+  {{/if}}
+</div>
+<div class="col-sm-2">{{item.required_by_date}}</div>
+<div class="col-sm-2 text-right">{{item.request_amount}}</div>
