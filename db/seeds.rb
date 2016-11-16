@@ -203,9 +203,38 @@ if User.count == 0
   fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
 
+  # creating Wayne Enterprises
+
+  c2 = Company.create(name: "Wayne Enterprises", d_code: "D000000360")
+
+  a = User.create(company: c2, first_name: "Bruce", last_name: "Wayne", email: "bruce@wayne.com",
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
+                  role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+                                            {user_role_id: UserRole.employee_id}],
+                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+  a = User.create(company: c2, first_name: "Robin", last_name: "Williams", email: "robin@wayne.com",
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
+                  role_mapping_attributes: [{user_role_id: UserRole.manager_id},
+                                            {user_role_id: UserRole.employee_id}],
+                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+  a = User.create(company: c2, first_name: "Commisioner", last_name: "Gordon", email: "gordon@wayne.com",
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
+                  role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
+                                            {user_role_id: UserRole.employee_id}],
+                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+  a = User.create(company: c2, first_name: "Harvey", last_name: "Dent", email: "harvey@wayne.com",
+                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
+                  role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
+                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+
   User.all.each do |user|
     user.confirm
   end
+
 end
 
 if Policy.non_default.count == 0
@@ -438,13 +467,11 @@ if AdminUser.count == 0
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 end
 
-# confirming users from
-# c = Company.second
-# c.users.each_with_index do |user, index|
-#   user.confirm
-#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-#
-#   number = "S0001774009#{(5 + index)}"
-#   user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-#                     card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
-# end
+#confirming users from Wayne enterprises
+c = Company.second
+c.users.each_with_index do |user, index|
+
+  number = "S0001774009#{(5 + index)}"
+  user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
+                    card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+end
