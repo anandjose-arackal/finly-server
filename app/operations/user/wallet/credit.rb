@@ -158,6 +158,7 @@ class User::Wallet::Credit < User::Wallet::Base
 
         end
     end
+    
   end
 
   def success
