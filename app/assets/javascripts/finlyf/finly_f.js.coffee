@@ -130,6 +130,15 @@ window.FinlyF =
       })
     )
 
+    $(navbar_right).find("#navbar-user-dropdown").on('hide.bs.dropdown', (e) ->
+      console.log "Closing", e
+      target = $(e.currentTarget)
+      if target.hasClass("keepopen") || target.parents(".keepopen").length
+        return false # returning false should stop the dropdown from hiding.
+      else
+        return true
+    )
+
     #Sidebar
     $(el).find('.sidebar .filter-category-id').val(params.filter_category_id)
     $(el).find('.sidebar .filter-receipt').val(params.filter_receipt)
