@@ -11,7 +11,7 @@
 </div>
 
 <div class="row no-margin" style="margin-bottom: 10px;">
-  <div class="col-xs-5 no-padding">Wallet Balance:</div>
+  <div class="col-xs-5 no-padding">Finly Account Balance:</div>
   <div class="col-xs-7 no-padding text-right">&#8377;&nbsp;{{item.current_user_wallet}}</div>
 </div>
 
@@ -26,7 +26,7 @@
       &#8377;&nbsp;&nbsp;{{item.current_user_card}}<br />
       (Blocked by {{item.current_user_card_details.disabled_by.name}})
     {{/if}}
-    <button class="btn btn-success btn-transfer-wallet-to-card btn-sm" style="margin: 10px 0 0;">Load Funds from Wallet</button>
+    <button class="btn btn-success btn-transfer-wallet-to-card btn-sm" style="margin: 10px 0 0; position: relative; right: 35px;">Load Funds from Finly Account</button>
   {{else}}
     Card Unassigned.
   {{/if}}

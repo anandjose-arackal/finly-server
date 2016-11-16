@@ -555,13 +555,13 @@
 <style type="text/css">
   .policy{
     /*background: #423496;*/
-    background: #F3F1FD;
+    background: #C5CAE9;
   }
   .policy .policy-name{
-    background: #D1CBF1;
+    background: #A0A8DB;
   }
   .manager-container{
-    border: 1px solid #D1CBF1;
+    border: 1px solid #A0A8DB;
     margin-bottom: 10px;
     padding: 10px;
   }

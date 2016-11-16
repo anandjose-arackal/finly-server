@@ -1,0 +1,81 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <h4 class="modal-title">Select Advance Requests to Credit</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row no-margin">
+    <div class="process-screen col-sm-12">
+      <div class="row no-margin">
+        <div class="col-sm-8 no-padding" style="border-right: 1px solid #eee;">
+          <div class="row no-margin">
+            <div class="col-sm-9"><h5>Total Advance Requested</h5></div>
+            <div class="col-sm-3"><h5 class="requested_money"></h5></div>
+          </div>
+          <div class="row no-margin">
+            <div class="col-sm-9"><h5>Selected Advance Requests' Total</h5></div>
+            <div class="col-sm-3"><h5 class="selected_reports_total">0</h5></div>
+          </div>
+        </div>
+
+        <div class="col-sm-4 no-padding text-center">
+          <button class="btn btn-sm btn-success btn-settlement-action btn-wd-100" disabled="disabled">Credit</button>
+        </div>
+
+
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-12" style="padding: 10px; background: #B4AFD0;">
+          <label><input type="radio" name="advance_request_type" checked="checked" value="1" />&nbsp;&nbsp;<i class="fa fa-money"></i>&nbsp;Cash Requests</label>&nbsp;&nbsp;&nbsp;&nbsp;
+          <label><input type="radio" name="advance_request_type" value="2" />&nbsp;<i class="fa fa-cc-visa"></i>&nbsp;&nbsp;Card Requests</label>
+        </div>
+        <div class="col-sm-12 no-padding" style="background: #DDDAEA; font-weight: bold;">
+          <div class="col-sm-1"><input type="checkbox" disabled="disabled" /></div>
+          <div class="col-sm-2">Payment Mode</div>
+          <div class="col-sm-3">Name</div>
+          <div class="col-sm-2">Final Approver</div>
+          <div class="col-sm-2">Requested Date</div>
+          <div class="col-sm-2 text-right">Requested Amount</div>
+        </div>
+        <div class="settlement-modal-reports"></div>
+      </div>
+
+    </div>
+
+    <div class="confirmation-screen col-sm-6 col-sm-offset-3" style="display: none;">
+      <div class="row no-margin" style="margin-bottom: 10px">
+        <div class="col-sm-6">
+          <button class="btn btn-lg navbar-btn btn-cancel-confirmation"><i class="fa fa-backward"></i></button>
+        </div>
+      </div>
+      <div class="row no-margin" style="margin-bottom: 10px;">
+        <div class="col-sm-4 text-right">
+          <label class="control-label">Note</label>
+        </div>
+
+        <div class="col-sm-8">
+          <textarea class="form-control" name="payment[note]"></textarea>
+        </div>
+      </div>
+
+      <div class="row no-margin" style="margin-bottom: 10px;">
+        <div class="col-sm-4 text-right">
+          <label class="control-label">Date</label>
+        </div>
+
+        <div class="col-sm-8">
+          <input class="form-control datepicker" type="text" name="payment[date]">
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        <div class="col-sm-8 col-sm-offset-5">
+          <button class="btn btn-sm btn-primary confirm-report-action" data-action-type="credit-money-request">Credit</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  
+</div>

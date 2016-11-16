@@ -1,0 +1,26 @@
+{{!-- item = report --}}
+<div class="col-md-4">
+  <div class="col-sm-1 no-padding">
+    <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+  </div>
+  <div class="col-sm-4">{{item.date}}</div>
+  <div class="col-sm-7">{{item.name}}</div>
+</div>
+
+<div class="col-md-8">
+  <div class="col-sm-3 text-center">
+  {{#switch item.status}}
+    {{#case 'Open'}}<span class="label label-default">{{item.status}}</span>{{/case}}
+    {{#case 'Approved'}}<span class="label label-success">{{item.status}}</span>{{/case}}
+    {{#case 'Rejected'}}<span class="label label-danger">{{item.status}}</span>{{/case}}
+    {{#case 'Retracted'}}<span class="label label-default">{{item.status}}</span>{{/case}}
+    {{#case 'Processing'}}<span class="label label-primary">{{item.status}}</span>{{/case}}
+    {{#case 'Reimbursed'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+    {{#case 'Reimbursement Confirmed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+    {{#case 'Closed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+  {{/switch}}
+  </div>
+  <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
+  <div class="col-sm-3">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
+  <div class="col-sm-4">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
+</div>

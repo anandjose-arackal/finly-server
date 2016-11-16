@@ -3,7 +3,7 @@
     <ul class="nav nav-tabs user-tab-panes">
       <li class="active"><a href="#tab-user-details" data-toggle="tab">Details</a></li>
       <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
-      <li><a href="#tab-user-wallet-cards" data-toggle="tab">Wallet &amp; Cards</a></li>
+      <li><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Account &amp; Cards</a></li>
       {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
       <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
     </ul>
@@ -253,7 +253,7 @@
       <div class="tab-pane" id="tab-user-wallet-cards">
         <section class="user-wallet" style="">
           <div class="row">
-            <div class="col-sm-6"><h4>Wallet</h4></div>
+            <div class="col-sm-6"><h4>Finly Account</h4></div>
           </div>
           <div class="row">
             <div class="col-sm-6">
@@ -276,7 +276,7 @@
                       <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
                     {{/if}}
                     {{#if item.actions.credit_wallet_from_wallet}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Wallet</a> </li>
+                      <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Finly Account</a> </li>
                     {{/if}}
                   </ul>
                 </div>
@@ -293,7 +293,7 @@
                       <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
                     {{/if}}
                     {{#if item.actions.debit_wallet_to_wallet}}
-                      <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Wallet</a> </li>
+                      <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Finly Account</a> </li>
                     {{/if}}
                   </ul>
                 </div>
@@ -370,7 +370,7 @@
                             <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
                           {{/if}}
                           {{#if item.actions.credit_card_from_wallet}}
-                            <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Wallet</a> </li>
+                            <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Finly Account</a> </li>
                           {{/if}}
                         </ul>
                       </div>
@@ -757,13 +757,13 @@
 <style type="text/css">
   .policy{
     /*background: #423496;*/
-    background: #F3F1FD;
+    background: #DEE1F2;
   }
   .policy .policy-name{
-    background: #D1CBF1;
+    background: #A0A8DB;
   }
   .manager-container{
-    border: 1px solid #D1CBF1;
+    border: 1px solid #A0A8DB;
     margin-bottom: 10px;
     padding: 10px;
   }
@@ -797,7 +797,7 @@
     width: 400px;
     position: relative;
     /*background: papayawhip;*/
-    background: #594da8;
+    background: #3F51B5;
     color: white;
     padding: 20px;
     height: 235px;
