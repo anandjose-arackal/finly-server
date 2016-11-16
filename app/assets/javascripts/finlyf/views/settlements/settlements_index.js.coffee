@@ -992,6 +992,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
+        console.log "Summary Action Data is ", summary.actionData, "& userData is", summary.userData
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditWalletFromWalletConfirm({summary: summary}))
       when 'credit_card_from_virtual_account'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")

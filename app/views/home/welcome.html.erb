@@ -164,9 +164,60 @@
 </footer>
 
 <div id="ohsnap"></div>
+<div id="ohsnap-priority"></div>
 
 <script type="text/javascript">
   $(document).ready(function(){
+    snapNotify = function(obj){
+      // console.log "From snap", obj
+      ohSnapX()
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            ohSnap(message, {
+              color: color,
+              'duration': '9000',
+              'container-id': container
+            });
+          }
+        }
+      }
+    }
     $("#btn-submit-request").on('click', function(e){
       e.preventDefault();
 
@@ -176,11 +227,12 @@
         type: "POST",
         dataType: 'json',
         success: function(res){
-          console.log(res);
+          // console.log(res);
           if(res.success === true){
             ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
           } else {
-            ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
           }
         }
       });

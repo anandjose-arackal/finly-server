@@ -47,10 +47,10 @@ ActiveRecord::Schema.define(version: 20161109124808) do
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "amounts", force: :cascade do |t|
-    t.float    "value",       limit: 24
-    t.integer  "currency_id", limit: 4,  null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.decimal  "value",                 precision: 64, scale: 12
+    t.integer  "currency_id", limit: 4,                           null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
