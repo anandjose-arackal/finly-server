@@ -6,7 +6,7 @@ class CreateAmounts < ActiveRecord::Migration
       t.timestamps null: false
     end
     create_table :amounts do |t|
-      t.float :value
+      t.decimal  :value, :precision=>64, :scale=>12
       t.references :currency, index:true, foreign_key:true, null: false
 
       t.timestamps null: false
