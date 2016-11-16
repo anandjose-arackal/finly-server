@@ -56,9 +56,10 @@ class Expense::Manual::Update < Expense::Manual::Base
     unless expense
       raise_unauthorized_exception
     end
-    # unless personal_view? and expense.user_id == user.id
-    #   raise_unauthorized_exception
-    # end
+    # i.e. if an employee is editing an expense
+    if personal_view? and expense.user_id != user.id
+      raise_unauthorized_exception
+    end
   end
 
   def process

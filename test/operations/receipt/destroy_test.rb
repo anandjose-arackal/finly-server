@@ -1,13 +1,13 @@
 require 'test_helper'
 
-
 class DestroyTest < ActiveSupport::TestCase
 
   def setup
     @user = users(:employee)
     @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
-    @receipt = @user.receipts.first
+    @receipt = Receipt::Create.(@user, {receipt: {image: @image}}).receipt
     @other_user = users(:admin)
+    @expense = Expense.first
   end
 
   test "destroying an existing receipt" do
@@ -15,19 +15,37 @@ class DestroyTest < ActiveSupport::TestCase
     assert_difference '@user.receipts.count', -1 do
       @result = destroy_op.run
     end
-    assert @result
+    assert @result.success?
+    assert_not Receipt.exists?(@receipt.id)
   end
 
   test "cannot delete another user's receipts" do
-    # creating a new receipt for the other user
-    create_op = Receipt::Create.new(@other_user, receipt: {image: @image})
-    @other_receipt = create_op.run.receipt
+    # mocking the ownership of the receipt as belonging to another user
+    Receipt.any_instance.stubs(:user_id).returns(@other_user.id)
 
-    destroy_op = Receipt::Destroy.new(@user, receipt_id: @other_receipt.id)
-    assert_no_difference '@other_user.receipts.count' do
+    destroy_op = Receipt::Destroy.new(@user, receipt_id: @receipt.id)
+    assert_no_difference 'Receipt.all.count' do
+      begin
+        @result = destroy_op.run
+      rescue NotAuthorizedException
+        @rescued = true
+      end
+    end
+
+    assert Receipt.exists?(@receipt.id)
+  end
+
+  test "cannot destroy a receipt that is associated with an expense" do
+    # mocking the presence of an expense associated with this receipt
+    Receipt.any_instance.stubs(:parent).returns(@expense)
+
+    destroy_op = Receipt::Destroy.new(@user, receipt_id: @receipt.id)
+    assert_no_difference 'Receipt.all.count' do
       @result = destroy_op.run
     end
+
     assert_not @result.success?
+    assert_not @result.messages[:error].empty?
   end
 
 end

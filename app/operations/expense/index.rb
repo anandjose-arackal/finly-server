@@ -38,7 +38,6 @@ class Expense::Index < Expense::Base
       admin_expense_ids = Expense.with_report(report_ids).pluck(:id)
       admin_expense_ids += Expense.only_card_expenses.with_user(team_user_ids).pluck(:id)
       self.expenses = Expense.where(id: admin_expense_ids).uniq
-      # self.expenses = Expense.with_user_or_report(report_ids, team_user_ids).includes(:manual_expense).includes(:card_expense)
     end
   end
 

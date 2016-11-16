@@ -46,9 +46,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     unless expense
       raise_unauthorized_exception
     end
-    # unless expense.user_id == user.id
-    #   raise_unauthorized_exception
-    # end
+    if personal_view? and expense.user_id != user.id
+      raise_unauthorized_exception
+    end
   end
 
 

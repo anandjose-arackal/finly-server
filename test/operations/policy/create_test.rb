@@ -4,9 +4,9 @@ require 'helpers/report_operation_test_helper'
 class CreateTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
-    @manager = User.find_by(email: 'manager2@finlytest.io')
-    @finance_manager = User.find_by(email: 'finance1@finlytest.io')
+    @admin = users(:admin)
+    @manager = users(:manager)
+    @finance_manager = users(:finance_manager)
   end
 
   test "successfully creating a policy by an admin" do

@@ -8,7 +8,7 @@ class CreateTest < ActiveSupport::TestCase
     @receipt_params = {receipt: {image: @image}}
   end
 
-  test 'adding a new receipt to a user' do
+  test "adding a new receipt to a user" do
     receipt_op = Receipt::Create.new(@user, @receipt_params)
     assert_difference '@user.receipts.count', 1 do
       @receipt = receipt_op.run
@@ -18,6 +18,10 @@ class CreateTest < ActiveSupport::TestCase
   end
 
   test "only images with the right formats can be uploaded as receipts" do
+
+  end
+
+  test "" do
 
   end
 

@@ -1,11 +1,13 @@
+# requires one user of each type and one expense and report apiece for each of them
+
 require 'test_helper'
 
 class UpdateTest < ActiveSupport::TestCase
 
   def setup
     @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
-    @user = User.first
-    @expense = @user.expenses.unreported.only_manual_expenses.first
+    @user = users(:admin)
+    @expense = @user.expenses.only_manual_expenses.first
     @update_params = {expense: {amount_attributes: {value: 1200, currency_id: 1},
                                 manual_expense_attributes: {merchant: "Uber"},
                                 note: "New note",
@@ -18,20 +20,36 @@ class UpdateTest < ActiveSupport::TestCase
                                          date: Date.tomorrow},
                                id: "#{@expense.id}"
                               }
-    @other_user = User.second
+    @other_user = users(:manager)
     @other_expense = @other_user.expenses.first
     @receipt_params = {expense: {receipts_attributes: {image: @image}}}
-    @receipt = @expense.receipts.first
+    @receipt = Receipt::Create.(@user, {receipt: {image: @image}})
+    @report = @user.reports.first
   end
 
   test "updating an expense with valid parameters" do
+    # mocking this expense to not be associated with a report
+    Expense.any_instance.stubs(:report_id).returns(nil)
+
     update_op = Expense::Manual::Update.new(@user, @update_params)
     assert_no_difference '@user.expenses.count' do
       @result = update_op.run
     end
+    assert @result.success?
     assert_equal "Uber", @result.expense.merchant_name
     assert_equal Date.yesterday, @result.expense.date
     assert_equal 1200, @result.expense.amount_value
+  end
+
+  test "updating an expense by attaching a receipt" do
+    @receipt_params[:id] = @other_user.expenses.first.id
+    update_op = Expense::Manual::Update.new(@other_user, @receipt_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert @result.success?
+    assert_not @result.expense.receipts.empty?
+    assert_equal "1363397.png", @result.expense.receipts.first.image_file_name
   end
 
   test "can't update an expenses with invalid parameters" do
@@ -63,6 +81,58 @@ class UpdateTest < ActiveSupport::TestCase
       end
     end
     assert @rescued
+  end
+
+  test "successfully editing an expense associated with a report that is open/retracted/rejected" do
+    # mocking the expense belonging to a report and the fact that the report is in processing state
+    Expense.any_instance.stubs(:report_id).returns(true)
+    Expense.any_instance.stubs(:report).returns(@report)
+    Report.any_instance.stubs(:open?).returns(true)
+    Report.any_instance.stubs(:retracted?).returns(false)
+    Report.any_instance.stubs(:rejected?).returns(false)
+
+    update_op = Expense::Manual::Update.new(@user, @update_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert @result.success?
+    assert_equal "Uber", @result.expense.merchant_name
+    assert_equal Date.yesterday, @result.expense.date
+    assert_equal 1200, @result.expense.amount_value
+
+  end
+
+  test "cannot update an expense that is associated with a processing report" do
+    # mocking the expense belonging to a report and the fact that the report is in processing state
+    Expense.any_instance.stubs(:report_id).returns(true)
+    Expense.any_instance.stubs(:report).returns(@report)
+    Report.any_instance.stubs(:open?).returns(false)
+    Report.any_instance.stubs(:retracted?).returns(false)
+    Report.any_instance.stubs(:rejected?).returns(false)
+
+    update_op = Expense::Manual::Update.new(@user, @update_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+    assert_equal "Report cannot be edited in this state", @result.messages[:error].first
+  end
+
+  test "reporting manager can update a user's expense" do
+
+  end
+
+  test "non reporting manager cannot update a user's expense" do
+
+  end
+
+  test "admins can update anyone in the company's expenses" do
+
+  end
+
+  test "admins cannot update an expense that is not associated wiith a report" do
+
   end
 
 end

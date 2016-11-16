@@ -59,6 +59,7 @@ class Receipt < ActiveRecord::Base
 
   private
 
+
   # def validate_expense_user
   #   if self.user && self.parent
   #     if self.user.id != self.parent.user.id

@@ -1,15 +1,14 @@
+# this test requires one user of each type and one non default policy
+
 require 'test_helper'
 
 class CreateInviteTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
-    @employee = User.find_by(email: 'user0@finlytest.io')
-    @manager = User.find_by(email: 'manager0@finlytest.io')
-    @second_manager = User.find_by(email: 'manager1@finlytest.io')
-    @third_manager = User.find_by(email: 'manager2@finlytest.io')
-    @finance_manager = User.find_by(email: 'finance0@finlytest.io')
-    @second_finance_manager = User.find_by(email: 'finance1@finlytest.io')
+    @admin = users(:admin)
+    @employee = users(:employee)
+    @manager = users(:manager)
+    @finance_manager = users(:finance_manager)
 
     @policy = Policy.non_default.first
     @invite_params = {pending_invite: { company_id: 1,
