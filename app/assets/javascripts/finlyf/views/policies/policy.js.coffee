@@ -6,6 +6,7 @@ class FinlyF.Views.Policy extends Backbone.View
 
   events:
     'click .navigate-tab li a': 'navigateTab'
+    'click .btn-create-rule': 'createRule'
 
   initialize: (options) ->
     @policy_id = options.id
@@ -67,6 +68,12 @@ class FinlyF.Views.Policy extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
+
+  createRule: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    rule_type = $(target).attr('data-rule-type')
 
   addCategory: (e) ->
     e.preventDefault()
