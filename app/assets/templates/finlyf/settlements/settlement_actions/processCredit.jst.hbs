@@ -13,7 +13,7 @@
           <div class="row no-margin">
             <div class="col-sm-12 no-padding" style="padding: 10px 0;">
               <div class="col-sm-6" style="margin-bottom: 10px;">
-                <div class="col-sm-5">Employee Name:</div>
+                <div class="col-sm-5">User Name:</div>
                 <div class="col-sm-7"><label>{{summary.user_details.name}}</label></div>
               </div>
               <div class="col-sm-6" style="margin-bottom: 10px;">
@@ -59,9 +59,9 @@
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          <p>Reimburse employee for the expenses he incurred on behalf of the Organisation.</p>
+                          <p>Reimburse user for the expenses he incurred on behalf of the Organisation.</p>
                           <div class="alert alert-info">
-                            <strong>Note:</strong> All reimbursements are made against reports submitted by the employee. Select reports to be reimbursed in the next section.
+                            <strong>Note:</strong> All reimbursements are made against reports submitted by the user. Select reports to be reimbursed in the next section.
                           </div>
                         </div>
 
@@ -77,7 +77,7 @@
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          Add details of funds handed over to an employee as an advance.
+                          Add details of funds handed over to an user as an advance.
                         </div>
                       </div>
                     </li> 
@@ -90,7 +90,7 @@
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          Fulfill requests for advance from the employee.
+                          Fulfill requests for advance from the user.
                         </div>
                       </div>
                     </li> 
@@ -102,9 +102,9 @@
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          <p>Instantaneously transfer funds from your User Account to Employees Card.</p>
+                          <p>Instantaneously transfer funds from your Finly Account to User's Card.</p>
                           <div class="alert alert-info">
-                            <strong>Note:</strong> This is an irreversible process and funds cannot be withdrawn from Employees Card.
+                            <strong>Note:</strong> This is an irreversible process and funds cannot be withdrawn from Users Card.
                           </div>
                         </div>
                       </div>
@@ -113,13 +113,13 @@
                   {{#if summary.actions.credit_wallet_from_wallet}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet"/> Credit Employee's Finly Account from Your Finly Account
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet"/> Credit User's Finly Account from Your Finly Account
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          <p>Instantaneously transfer funds from your User Account to Employees Account.</p>
+                          <p>Instantaneously transfer funds from your Finly Account to User's Finly Account.</p>
                           <div class="alert alert-info">
-                            <strong>Note:</strong> This is a reversible process and funds can be withdrawn from Employees Account.
+                            <strong>Note:</strong> This is a reversible process and funds can be withdrawn from User's Finly Account.
                           </div>
                         </div>
                       </div>
@@ -132,9 +132,9 @@
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          <p>Instantaneously transfer funds from your Company Account to Employees Card.</p>
+                          <p>Instantaneously transfer funds from your Company Account to User's Card.</p>
                           <div class="alert alert-info">
-                            <strong>Note:</strong> This is an irreversible process and funds cannot be withdrawn from Employees Card.
+                            <strong>Note:</strong> This is an irreversible process and funds cannot be withdrawn from User's Card.
                           </div>
                         </div>
                         
@@ -148,9 +148,9 @@
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          <p>Instantaneously transfer funds from Employee Account to Employees Account.</p>
+                          <p>Instantaneously transfer funds from Company Account to User's Finly Account.</p>
                           <div class="alert alert-info">
-                            <strong>Note:</strong> This is a reversible process and funds can be withdrawn from Employees Account.
+                            <strong>Note:</strong> This is a reversible process and funds can be withdrawn from User's Account.
                           </div>
                         </div>
                       </div>
@@ -160,7 +160,7 @@
               </div>
 
               <div class="col-sm-6 settlement-action-definition" data-definition-type="credit">
-                <h4 class="text-center">Transfer Cash to Employee.</h4>
+                <h4 class="text-center">Transfer Cash to User.</h4>
               </div>
             </div><!-- panel-body -->
           </div>
