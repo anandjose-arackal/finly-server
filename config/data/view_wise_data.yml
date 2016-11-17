@@ -9,7 +9,7 @@ admin:
       - Advance Requests: requests
       - Company Reports: reports
     cog:
-      - Organization Account: '/organization_account?view=admin'
+      - Organization Account: '#organization_account'
       # - Policies: '/policies'
       - My Account: '#settings'
       # - Expense Policies: '/policies?view=admin'

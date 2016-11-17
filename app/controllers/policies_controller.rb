@@ -22,6 +22,27 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
   end
 
+  def expense_rules
+    @result = Policy::Show.(current_user, params)
+    respond_to do |format|
+      format.html {render partial: 'expense_rules'}
+    end
+  end
+
+  def budget_rules
+    @result = Policy::Show.(current_user, params)
+    respond_to do |format|
+      format.html {render partial: 'budget_rules'}
+    end
+  end
+
+  def policy_members
+    @result = Policy::Show.(current_user, params)
+    respond_to do |format|
+      format.html {render partial: 'policy_members'}
+    end
+  end
+
   def invitable_users
     @result = Policy::InvitableUsers.(current_user, params)
     respond

@@ -1,0 +1,609 @@
+<style type="text/css">
+
+.navbar-inverse{
+  color: white;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: #46568b;
+  background: #423689;
+  background: #594DA8;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: white;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: transparent;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus{
+  border-color: #F4F560;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  /*color: #fff;*/
+  /*font-weight: bold;*/
+  border-bottom: 3px solid #CD925A;
+  border-bottom: 3px solid #F4F560;
+  background-color: transparent;
+}
+.container-fluid{
+  padding: 0;
+}
+
+.no-margin{
+  margin: 0;
+}
+
+.no-padding{
+  padding: 0;
+}
+
+.main-header{
+  padding: 16px 15px;
+  text-transform: uppercase;
+  color: #535353;
+  font-size: 12px;
+}
+.item{
+  padding: 15px;
+  border: 0.5px solid #eee;
+  /*border-bottom: none;*/
+  background: white;
+  color: #666;
+  cursor: pointer;
+  /*margin-bottom: 5px;*/
+}
+
+.item.selected{
+  background: #FFF1DA;
+}
+
+.item.col-sm-3, .receipt{
+  padding: 20px;
+  border: none;
+  background: transparent;
+  color: #555;
+  /*padding: 10px;*/
+  /*background: red;*/
+}
+
+.item.col-sm-3 .receipt-container, .receipt .receipt-container {
+  padding: 10px;
+  background: white;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+}
+
+.item.col-sm-3 .receipt-container .receipt-details, .receipt .receipt-container .receipt-details{
+  /*padding: 10px;*/
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
+.item.col-sm-3 .receipt-container .receipt-details h4{
+  font-size: 15px;
+  padding-top: 0;
+}
+.receipt{
+  height: 320px;
+}
+
+.receipt-container{
+  height: 100%;
+}
+
+.item.col-sm-3 .receipt-container .receipt-image, .receipt .receipt-container .receipt-image{
+  overflow:hidden;
+  height: 250px;
+  padding-bottom: 10px;
+}
+
+.item.col-sm-3 .receipt-container .receipt-image img, .receipt .receipt-container .receipt-image img{
+  /*border: 3px solid #efefef;*/
+  padding: 10px;
+}
+
+.sidebar{
+  height: calc(100% - 100px);
+  position:fixed;
+  background: #fff;
+  background: #F5F6F9;
+  /*position: relative;*/
+  height: calc(100%);
+  overflow-y: scroll;
+  z-index: 4;
+}
+
+.secondary-navbar{
+  margin-top: 53px;
+  border-color: transparent;
+  z-index: 5;
+}
+.secondary-navbar li{
+  margin-left: 10px;
+}
+
+.main{
+  z-index: 4;
+  position:fixed;
+  overflow-y: scroll;
+  background: rgb(252, 252, 252) none repeat scroll 0% 0%;
+  background: #fff;
+  max-height: calc(100%); 
+  padding: 10px;
+  box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  height: calc(100%);
+}
+.main.preview .col-md-8{
+  /*display: none;*/
+}
+
+.sidebar-element{
+  padding: 10px 0;
+}
+.close-item-details{
+  position: absolute;
+  z-index: 100;
+  padding: 5px 15px;
+  left: 0px;
+  /*border: 0.5px solid #efefef;*/
+  font-weight: 100;
+  font-size: 20px;
+}
+#item-details{
+  height: calc(100% - 103px);
+  left: 100%;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  transition: all 0.5s;
+  position: fixed;
+  margin-top: -10px;
+  display: block;
+
+  /*width: 55.555%;*/
+  width: 45.555%;
+}
+
+.show-details-panel{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.main.preview #item-details{
+  /*left: 54.444%;*/
+}
+
+.details-header{
+  padding: 16px 15px;
+  height: 70px;
+}
+
+.navbar-btn{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  background: transparent none repeat scroll 0% 0%;
+  border: 0.5px solid rgb(89, 77, 168);
+  border-radius: 2px;
+}
+
+.btn-finly-danger:hover{
+  background: rgb(234, 97, 83);
+  color: white;
+}
+
+.btn-finly-default:hover{
+  background: #594DA8;
+  color: white;
+}
+
+
+/*Forms, Fiels, Labels*/
+.input-icon {
+  float: right;
+  margin-right: 7px;
+  margin-top: -24px;
+  position: relative;
+  z-index: 1;
+  color: #676767;
+  pointer-events: none;
+}
+
+.finly-backdrop{
+  background: rgba(0,0,0, 0.5);
+  position: fixed;
+  height: calc(100% - 53px);
+  width: 100%;
+  top: 53px;
+  z-index: 3;
+}
+
+.alert {
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+hr{
+  margin-top: 10px;
+  margin-bottom: 15px;
+  border: 0;
+  border-top: 1px solid #ddd;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#policies {
+
+  overflow: hidden;
+
+  .innerdiv {
+
+    #divsection_heading {
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: #333;
+      border-bottom: 1px solid #DDD;
+      margin-bottom: 30px;
+      padding: 0 0 10px 0;
+    }
+
+  }
+}
+
+
+
+#createNewRule{
+  margin-bottom: 20px;border-radius: 1px;
+  height: 34px;
+  border: none;
+  outline: none;
+  background-color: #93c178;
+  color: #fff;
+  line-height: 34px;
+  padding: 0 26px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#createNewRuleModal {
+  h5 {
+    margin-top: 30px;
+    font-size: 14px;
+    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: #777;
+
+    span {
+      margin: 0px;
+      float: right;
+    }
+  }
+
+  input[type="radio"] {
+    margin-right: 10px;
+    margin-left: 25px;
+    margin-top: 5px;
+
+  }
+
+  .selectors {
+    margin-left: 25px;
+  }
+
+  span {
+    margin: 10px;
+  }
+
+  input[type="text"] {
+    width: 100px;
+    padding-left: 10px;
+    height: 40px;
+    vertical-align: initial;
+  }
+
+  #createPolicy{
+    color: #fff;
+    background-color: #93c178;
+    line-height: 38px;
+    padding: 0 24px;
+    border-radius: 1px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    border-style: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    -moz-transition: background-color 200ms ease;
+    -webkit-transition: background-color 200ms ease;
+    transition: background-color 200ms ease;
+    width: 140px;
+    margin-left: 5px;
+    margin-top: 20px;
+  }
+}
+
+#warningDiv, #blockingDiv, #autoApprovalDiv {
+
+  background: white;
+  border: 1px solid #d8d8d8;
+  width: 49%;
+  display: inline-block;
+vertical-align: top;
+  .header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+    text-align: center;
+
+
+    span{
+      float: right;
+      color: #46568b;
+      cursor: pointer;
+    }
+    img {
+      height: 25px;
+      float: left;
+
+    }
+  }
+}
+
+
+#inviteUsersToPolicy {
+
+  .dialogInputStyle {
+    width: 80%;
+    margin-left: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    border-radius: 1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 0px #eee inset;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    vertical-align: middle;
+    color: #444;
+    line-height: 20px;
+    padding: 16px;
+  }
+
+  .editProfileDialogHeaders {
+    font-size: 14px;
+    font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    padding: 20px 0 5px 40px;
+    color: #777;
+  }
+  .sendButton {
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-left: 40px;
+    color: white;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    height: 45px;
+    text-align: center;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    resize: vertical;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    border: 1px solid transparent;
+    border-radius: 1px;
+    -webkit-transition: all 0.15s ease-in-out;
+    -moz-transition: all 0.15s ease-in-out;
+    -o-transition: all 0.15s ease-in-out;
+    -moz-transition: all 0.15s ease-in-out;
+    -webkit-transition: all 0.15s ease-in-out;
+    transition: all 0.15s ease-in-out;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: #93c178;
+  }
+
+
+
+}
+
+
+#policyMembersDiv {
+
+  button {
+    letter-spacing: 1px;
+    font-weight: 500;
+    height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 11px;
+  }
+
+  th {
+    background: rgba(238, 238, 238, 0.5);
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+    height: 30px;
+    font-weight: 500;
+    color: #404040;
+  }
+
+  ul {
+    display: inline;
+    padding: 7px 1px 8px 1px;
+  }
+
+  li {
+    display: inline;
+    padding: 7px;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+
+
+}
+
+#policyMembersDiv > label {
+  font-size: 13px;
+  font-weight: 300;
+  margin-left: 250px;
+
+}
+
+#listOfUsers tr {
+  margin-top: 20px;
+}
+
+#listOfUsers tbody > tr {
+  height: 60px;
+}
+
+
+.segmented-control {
+  border-radius: 3px;
+  background: #f8f8f8;
+  border: 2px solid #ddd;
+  color: #666;
+  height: 34px;
+  display: table;
+}
+
+.activeMembers {
+  background-color: #93c178;
+  color: white;
+}
+
+
+#policyListTable table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-top: 5px;
+  width: 100%;
+  word-wrap: break-word;
+
+  th {
+    background: rgba(238,238,238,0.5);
+    border-bottom: 1px solid #ddd;
+    color: #404040;
+    padding: 10px 15px 10px 15px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  td {
+    padding: 15px;
+    color: #404040;
+    border-bottom: 1px solid #eee;
+
+    i {
+      font-size: 20px;
+      color: red;
+      float: right;
+    }
+
+    button{
+      padding: 5px;
+      width: 110px;
+      letter-spacing: 1px;
+      font-size: 11px;
+    }
+  }
+
+
+}
+</style>
+
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top" style="" id="primary-navbar">
+  <div class="container-fluid">
+
+    <div class="row no-margin no-padding">
+      <div class="col-md-2">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand company-name" href="#" style="color: white; font-family: 'Bree Serif', serif; font-weight: 300;font-size: 30px;" href="<%= root_path %>" data-turbolinks="false">Finly
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-10">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="current-view-type">Personal View</span>&nbsp;&nbsp;<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-nav-views-dropdown">
+                
+              </ul>
+            </li>
+          </ul>
+          
+          <ul class="nav navbar-nav navbar-right">
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></a>
+              <ul class="navbar-cog dropdown-menu">
+
+                <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->     
+      </div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container-fluid container-main" style="margin-top: -18px; position: relative; height: calc(100vh - 53px); padding-left: 0; padding-right: 0; width: 100%;">
+  <div class="col-sm-2 sidebar">
+  </div>
+
+  <div class="col-sm-10 col-sm-offset-2 main">
+    <div class="row hidden no-margin" id="expense_rules" data-url="policies/expense_rules">
+      <h1>Policy Rules</h1>
+    </div>
+    <div class="row hidden no-margin" id="budget_rules" data-url="policies/budget_rules">
+      <h1>Policy Rules</h1>
+    </div>
+    <div class="row hidden no-margin" id="policy_members" data-url="policies/policy_members">
+      <h1>Policy Member</h1>
+    </div>
+  </div>
+</div>

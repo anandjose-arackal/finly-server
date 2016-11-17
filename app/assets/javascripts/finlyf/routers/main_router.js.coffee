@@ -29,6 +29,9 @@ class FinlyF.Routers.Main extends Backbone.Router
     'organization_account': 'organization_account'
     'organization_account/params=:query': 'organization_account'
 
+    'policies/:id': 'policies_show'
+    'policies/:id/params=:query': 'policies_show'
+
 
   initialize: ->
     # body = $("body")
@@ -215,6 +218,27 @@ class FinlyF.Routers.Main extends Backbone.Router
       params = {}
 
     view = new FinlyF.Views.OrganizationAccount({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
+
+  policies_show: (id, query) ->
+    if typeof query != 'undefined'
+      # console.log "we're here"
+      if query != null
+        params = JSON.parse(query)
+      else
+        params = {
+          view: 'admin'
+        }
+    else
+      params = {
+        view: 'admin'
+      }
+    console.log params
+    view = new FinlyF.Views.Policy({
+      id: id,
       params: params
     })
     $("#backbone-container").html(view.render().el)
