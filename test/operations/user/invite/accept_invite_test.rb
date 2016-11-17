@@ -56,13 +56,9 @@ class AcceptInviteTest < ActiveSupport::TestCase
     assert_not @new_user.invitation_token
     assert_equal @admin.company_id, @new_user.company_id
     assert @new_user.invite_accepted?
-
-    # check that the user is all set up for OTP verification
-
   end
 
   test "unsuccessful acceptance of an invite due to invalid parameters" do
-
     # invalid mobile number
     @valid_accept_params[:user][:mobile_number] = "1234567892"
     accept_op = User::Invite::Accept.new(nil, @valid_accept_params)
@@ -88,7 +84,6 @@ class AcceptInviteTest < ActiveSupport::TestCase
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
     assert_equal "Invalid Pincode entered", @result.messages[:error].first
-
   end
 
   test "" do

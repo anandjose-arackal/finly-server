@@ -1,9 +1,6 @@
 # action to accept a particular user's invitation
 # params
-# invitation_token: the unique string created when this user was invited
-# name:
-# mobile_number:
-# password:
+
 
 class User::Invite::Accept < User::Invite::Base
   attr_accessor :invited_user, :accept_params
