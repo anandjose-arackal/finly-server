@@ -10,6 +10,7 @@ class RulesController < ApplicationController
       flash[:success] = "Rule created!"
       respond_to do |format|
         format.js {}
+        format.json {}
       end
     else
       flash.now[:error] = @result.messages[:error]
@@ -25,6 +26,7 @@ class RulesController < ApplicationController
       flash[:success] = "Rule destroyed"
       respond_to do |format|
         format.js {}
+        format.json {}
       end
     else
       flash.now[:error] = @result.messages[:error]

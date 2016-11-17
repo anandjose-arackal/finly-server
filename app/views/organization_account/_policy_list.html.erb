@@ -19,7 +19,7 @@
         <li class="policy">
           <div class="row no-margin">
             <div class="col-sm-8" style="font-size: 21px;line-height: 42px;">
-              <%= link_to policy.name, policy_path(id: policy.id, view: params[:view]) %>
+              <%= link_to policy.name, "#policies/" + policy.id.to_s + '/params={"view": "admin"}' %>
             </div>
             <div class="col-sm-3">
               <a id="showReportsButton" class="btn btn-primary btn-md" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>

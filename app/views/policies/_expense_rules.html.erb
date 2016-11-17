@@ -1,5 +1,8 @@
-
-
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <h4>Expense Rules</h4>
+  </div>
+</div>
 <div class="row no-margin">
   <div class="col-sm-6 no-padding" style="padding: 10px;">
     <div class="warning-rules" style="background: white; padding: 10px;">
@@ -7,7 +10,7 @@
         <div class="col-sm-6 no-padding"><img src="<%= image_url('warn_rule') %>" style="height: 35px; margin-right: 20px;">WARNING RULES</div>
         <div class="col-sm-6 text-right">
           <% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
-            <button class="btn-create-rule btn btn-primary btn-sm">Create New Rule</button>
+            <button class="btn-new-rule btn btn-primary btn-sm" data-rule-type="warning" data-rule-category="expense">Create New Rule</button>
           <% end %>         
         </div>
       </div>
@@ -27,13 +30,13 @@
               </div>
               <div class="col-sm-1 text-right">
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy, view: params[:view]), :html => { :method => :delete, :remote => true } do |f| %>
+                  <form action="<%= policy_remove_rule_path(@result.policy, view: params[:view]) %>" class="form-remove-rule">
                     <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
                     <input name="expense_rule_id" type="hidden" value="<%=rule.id%>">
                     <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
                       <i class="fa fa-times" role="button"></i>
                     <% end %>
-                  <% end %>  
+                  </form>
                 <% end %>
               </div>
             </div>
@@ -49,14 +52,12 @@
             What is a warning rule?
           </p>
           <div class="collapse" id="collapseWarningDefinition">
-            <div class="well">
-              <p>
-                Expenses that violate warning rules can be added to the report, but you
-                probably
-                shouldn’t.
-                Before you submit the report
-                Finly will display the warnings, and the expense will be badged with a warning icon.  
-              </p>
+            <div class="alert alert-info">
+              Expenses that violate warning rules can be added to the report, but you
+              probably
+              shouldn’t.
+              Before you submit the report
+              Finly will display the warnings, and the expense will be badged with a warning icon.  
             </div>
           </div>
         </div>
@@ -70,7 +71,7 @@
         <div class="col-sm-6 no-padding"><img src="<%= image_url('block_rule') %>" style="height: 35px; margin-right: 20px;">BLOCKING RULES</div>
         <div class="col-sm-6 text-right">
           <% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
-            <button class="btn-create-rule btn btn-primary btn-sm">Create New Rule</button>
+            <button class="btn-new-rule btn btn-primary btn-sm" data-rule-type="blocking" data-rule-category="expense">Create New Rule</button>
           <% end %>         
         </div>
       </div>
@@ -90,13 +91,13 @@
               </div>
               <div class="col-sm-1">
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy, view: params[:view]), :html => { :method => :delete, :remote => true } do |f| %>
+                  <form action="<%= policy_remove_rule_path(@result.policy, view: params[:view]) %>" class="form-remove-rule">
                     <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
                     <input name="expense_rule_id" type="hidden" value="<%=rule.id%>">
                     <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
                       <i class="fa fa-times" role="button"></i>
                     <% end %>
-                  <% end %>  
+                  </form>
                 <% end %>
               </div>
             </div>
@@ -112,11 +113,9 @@
             What is a blocking rule?
           </p>
           <div class="collapse" id="collapseBlockingDefinition">
-            <div class="well">
-              <p>
-                You can’t submit reports with expenses that violate blocking rules. The
-                blocks will be displayed in the report.
-              </p>
+            <div class="alert alert-info">
+              You can’t submit reports with expenses that violate blocking rules. The
+              blocks will be displayed in the report.
             </div>
           </div>
         </div>

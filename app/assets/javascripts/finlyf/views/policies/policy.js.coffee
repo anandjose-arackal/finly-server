@@ -6,7 +6,11 @@ class FinlyF.Views.Policy extends Backbone.View
 
   events:
     'click .navigate-tab li a': 'navigateTab'
-    'click .btn-create-rule': 'createRule'
+    'click .btn-new-rule': 'newRule'
+
+    'submit form#form-create-rule': 'createRule'
+    'hidden.bs.modal #modal-create-rule': 'clearDiv'
+    'submit form.form-remove-rule': 'removeRule'
 
   initialize: (options) ->
     @policy_id = options.id
@@ -69,11 +73,76 @@ class FinlyF.Views.Policy extends Backbone.View
         console.log "Error", err
     })
 
-  createRule: (e) ->
+  newRule: (e) ->
     e.preventDefault()
     target = e.currentTarget
 
     rule_type = $(target).attr('data-rule-type')
+    rule_category = $(target).attr('data-rule-category')
+    modal = $(@el).find('#modal-create-rule')
+
+    $(modal).modal('show')
+
+    $.ajax({
+      url: '/policies/create_rule',
+      data: {
+        id: @policy_id,
+        view: @params.view
+        rule_type: rule_type
+        rule_category: rule_category
+      },
+      dataType: 'html',
+      success: (res) ->
+        $(modal).html(res)
+      error: (err) ->
+        $(modal).modal('hide')
+        alert("Oops! Something went wrong. Please try again.")
+    })
+
+  createRule: (e) ->
+    e.preventDefault()
+    _this = @
+    form = e.currentTarget
+
+    modal = $(@el).find('#modal-create-rule')
+
+    url = $(form).attr('action')
+
+    $.ajax({
+      url: url,
+      data: $(form).serialize(),
+      type: "POST",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+    })
+
+  removeRule: (e) ->
+    e.preventDefault()
+    _this = @
+
+    form = e.currentTarget
+
+    modal = $(@el).find('#modal-create-rule')
+
+    url = $(form).attr('action')
+
+    $.ajax({
+      url: url,
+      data: $(form).serialize(),
+      type: "DELETE",
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.fetchTabContent()
+          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+    })
+
 
   addCategory: (e) ->
     e.preventDefault()
@@ -221,3 +290,8 @@ class FinlyF.Views.Policy extends Backbone.View
 
     button = $(form).find('.btn-update-export-preference')
     $(button).removeClass('hidden')
+
+  clearDiv: (e) ->
+    console.log "Clearing div"
+    target = e.currentTarget
+    $(target).html("")

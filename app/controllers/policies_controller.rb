@@ -43,6 +43,17 @@ class PoliciesController < ApplicationController
     end
   end
 
+  def create_rule
+    @result = Policy::Show.(current_user, params)
+    respond_to do |format|
+      if params[:rule_category] == 'expense'
+        format.html {render partial: 'create_expense_rule'}
+      elsif params[:rule_category] == 'budget'
+        format.html {render partial: 'create_budget_rule'}
+      end
+    end
+  end
+
   def invitable_users
     @result = Policy::InvitableUsers.(current_user, params)
     respond

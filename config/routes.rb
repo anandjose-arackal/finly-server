@@ -417,6 +417,7 @@ Rails.application.routes.draw do
   get 'policies/expense_rules' => 'policies#expense_rules'
   get 'policies/budget_rules' => 'policies#budget_rules'
   get 'policies/policy_members' => 'policies#policy_members'
+  get 'policies/create_rule' => 'policies#create_rule'
   resources :policies, except: [:new, :edit]
   resources :policies do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
@@ -437,7 +438,7 @@ Rails.application.routes.draw do
   end
 
   # get 'organization_account' => 'organization_account#show'
-  get 'organization_account/blah' => 'organization_account#blah'
+  get 'organization_account/blah' => 'organization_account#blah' #todo
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
 
