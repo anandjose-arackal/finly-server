@@ -3,12 +3,23 @@ require 'test_helper'
 class AcceptInviteTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
-    @manager = User.find_by email: 'manager0@finlytest.io'
-    @finance_manager = User.find_by email: 'finance0@finlytest.io'
-    @employee = User.find_by email: 'user0@finlytest.io'
-
-    @valid_accept_params = {user: { invitation_token: "", # will be added after getting a valid invite token
+    @admin = users(:admin)
+    @manager = users(:manager)
+    @finance_manager = users(:finance_manager)
+    @employee = users(:employee)
+    @invite_params = {pending_invite: { company_id: 1,
+                                                         email: "test@test.com",
+                                                         note: "Test note.",
+                                                         team_mapping_attributes: {manager_id: @manager.id,
+                                                                                   finance_manager_id: @finance_manager.id}
+                                      },
+                                       admin: "1",
+                                       manager: "0",
+                                       finance_manager: "0"
+                      }
+    @invited_user = User::Invite::Create.(@admin, @invite_params).invite.first
+    invitation_token = @invited_user.raw_invitation_token
+    @valid_accept_params = {user: { invitation_token: invitation_token, # will be added after getting a valid invite token
                                     password: "password007",
                                     password_confirmation: "password007",
                                     mobile_number: "8105739684",
@@ -28,62 +39,60 @@ class AcceptInviteTest < ActiveSupport::TestCase
   end
 
   test "successful acceptance of an invite" do
-    user_invite_op = User::Invite::Create.new(@manager, @valid_accept_params)
 
-    assert_difference 'User.count', 1 do
-      @result = user_invite_op.run
-    end
-    assert @new_user
-    assert @new_user.employee?
+    # mocking the post_process method so that the OTP API isn't called unnecessarily
+    User::Invite::Accept.any_instance.stubs(:post_process).returns(true)
 
-    # accepting this invite by the user
-    token = @new_user.raw_invitation_token
-    name = 'test name'
-    password = 'password'
-    mobile_number = '9845894295'
-    invite_accept_op = User::Invite::Accept.new(invitation_token: token, name: name, mobile_number: mobile_number, password: password)
-    @new_user = invite_accept_op.run
+    # accepting an invite by a user
+    invite_accept_op = User::Invite::Accept.new(nil, @valid_accept_params)
+
+    @result = invite_accept_op.run
+    assert @result.success?
+    @new_user = @result.accepted_user
     assert @new_user
-    assert_equal "test name", @new_user.name
-    assert_equal "9845894295", @new_user.mobile_number
+    assert_equal "test@test.com", @new_user.email
+    assert_equal "Hello World", @new_user.name
+    assert_equal "8105739684", @new_user.mobile_number
     assert_not @new_user.invitation_token
-    assert_equal @manager.company_id, @new_user.company_id
-  end
+    assert_equal @admin.company_id, @new_user.company_id
+    assert @new_user.invite_accepted?
 
-  test "unsuccessful acceptance of an invite" do
-    user_invite_op = User::Invite::Create.new(@manager,{invite: {company_id: @manager.company_id, email: 'user99@finlytest.io',
-                                                                 role_mapping_attributes: [{user_role_id: 4}],
-                                                                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
-    assert_difference 'User.count', 1 do
-      @new_user = user_invite_op.run
-    end
-    assert @new_user
-    assert @new_user.employee?
-
-    # trying invalid parameters to accept invite
-    token = @new_user.raw_invitation_token
-    name = 'test name'
-    password = 'password'
-    mobile_number = '9845894295'
-    invite_accept_op = User::Invite::Accept.new(invitation_token: token, name: nil, mobile_number: mobile_number, password: password)
-    @result = invite_accept_op.run
-    assert_not @result
-    assert @new_user.invitation_token
-
-    invite_accept_op = User::Invite::Accept.new(invitation_token: "ksjgndsfgidsgsdfgdfsg", name: name, mobile_number: mobile_number, password: password)
-    @result = invite_accept_op.run
-    assert_not @result
-    assert @new_user.invitation_token
-
-    invite_accept_op = User::Invite::Accept.new(invitation_token: token, name: name, mobile_number: nil, password: password)
-    @result = invite_accept_op.run
-    assert_not @result
-    assert @new_user.invitation_token
-
-    invite_accept_op = User::Invite::Accept.new(invitation_token: token, name: name, mobile_number: mobile_number, password: nil)
-    @result = invite_accept_op.run
-    assert_not @result
-    assert @new_user.invitation_token
+    # check that the user is all set up for OTP verification
 
   end
+
+  test "unsuccessful acceptance of an invite due to invalid parameters" do
+
+    # invalid mobile number
+    @valid_accept_params[:user][:mobile_number] = "1234567892"
+    accept_op = User::Invite::Accept.new(nil, @valid_accept_params)
+    @result = accept_op.run
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+    assert_equal "Please enter a valid mobile number", @result.messages[:error].first
+
+    # invalid password
+    @valid_accept_params[:user][:mobile_number] = "8105739684"
+    @valid_accept_params[:user][:password] = "1234567892"
+    accept_op = User::Invite::Accept.new(nil, @valid_accept_params)
+    @result = accept_op.run
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+    assert_equal "Confirmation password does not match the given password", @result.messages[:error].first
+
+    # invalid pin code
+    @valid_accept_params[:user][:password] = "password007"
+    @valid_accept_params[:user][:profile_attributes][:pin_code] = "12345621321"
+    accept_op = User::Invite::Accept.new(nil, @valid_accept_params)
+    @result = accept_op.run
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+    assert_equal "Invalid Pincode entered", @result.messages[:error].first
+
+  end
+
+  test "" do
+
+  end
+
 end

@@ -73,34 +73,40 @@ class User::Invite::Accept < User::Invite::Base
     return unless verify_field address_2, 'Address 2 cannot be blank'
     return unless verify_field city, 'City cannot be blank'
     return unless verify_field state_id, 'State ID cannot be blank'
-    return unless verify_field pin_code, 'Pincode cannot be blank'
+    return unless verify_field pin_code, 'Pin code cannot be blank'
 
-    if mobile_number.blank? or mobile_number.length != 10
-      add_message :error, 'Mobile number has to be 10 digits'
+    if mobile_number.blank? or mobile_number.length != 10 or (mobile_number =~ Constants::VALID_MOBILE_NUMBER).nil?
+      add_message :error, 'Please enter a valid mobile number'
       return
     end
     unless password == password_confirmation
-      add_message :error, 'Confirmation password is not matching the given password'
+      add_message :error, 'Confirmation password does not match the given password'
+      return
     end
     # manually adding here because devise isn't throwing an error during sign up. todo - investigate
     if password.length < 8
       add_message :error, 'Password length must be at least 8 characters'
+      return
     end
 
     if State.name_for(state_id).blank?
       add_message :error, 'Invalid state selected'
+      return
     end
 
     if (pin_code =~ Constants::VALID_PIN_CODE).nil?
       add_message :error, 'Invalid Pincode entered'
+      return
     end
 
     unless gender == 'm' or gender == 'f'
       add_message :error, 'Invalid gender selected'
+      return
     end
 
     unless DateUtils.validate_date_format?(date_of_birth)
       add_message :error, 'Invalid date provided'
+      return
     end
 
   end
