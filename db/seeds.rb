@@ -485,13 +485,13 @@ end
 c2 = Company.create(name: "Itzcash", d_code: "D000000360")
 
 a = User.create(company: c2, first_name: "Roopali", last_name: "Poojari", email: "roopalip@itzcash.com",
-                password: "itzcash007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
+                password: "itzcash007", password_confirmation: "itzcash007", company_id: c2.id, mobile_number: random_mobile_number,
                 role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                           {user_role_id: UserRole.employee_id}],
-                profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'f', address_1: 'Dummy Address',
                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 a = User.create(company: c2, first_name: "Abhishek", last_name: "S", email: "sabhishek@itzcash.com",
-                password: "itzcash007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
+                password: "itzcash007", password_confirmation: "itzcash007", company_id: c2.id, mobile_number: random_mobile_number,
                 role_mapping_attributes: [{user_role_id: UserRole.manager_id},
                                           {user_role_id: UserRole.employee_id}],
                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
