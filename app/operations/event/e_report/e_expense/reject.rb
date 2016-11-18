@@ -18,10 +18,11 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def affected_users
-    self.report.user
+    self.report.associated_users
   end
 
   def send_push_notification(user)
+    return unless user.id == report.user_id
     message = "Expense rejected : #{self.rejected_expense}"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
@@ -31,10 +32,19 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    "Expense rejected : #{self.rejected_expense}"
+    unless user == self.report.controlling_user
+      "#{rejecting_user.name} has rejected expense: #{rejected_expense.merchant_name}"
+    else
+      "You rejected the expense : #{rejected_expense.merchant_name}"
+    end
   end
 
   def mailer_body(user)
-    "#{self.report.controlling_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in the report: '#{self.report.name}'"
+    unless user == self.report.controlling_user
+      "#{self.report.controlling_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in report: '#{self.report.name}'"
+    else
+      "You rejected the expense : #{rejected_expense.merchant_name} in report: #{self.report.name}"
+    end
+    
   end
 end

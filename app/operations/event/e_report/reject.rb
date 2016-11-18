@@ -16,7 +16,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    [rejecting_user, self.report.controlling_user]
+    self.report.associated_users
   end
 
   def send_push_notification(user)
@@ -30,15 +30,15 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user.id
+    unless user == self.rejecting_user
       "#{rejecting_user.name} has rejected the report: #{self.report.name}"
     else
-      "Report rejected : #{self.report.name}"
+      "You rejected the report : #{self.report.name}"
     end
   end
 
   def mailer_body(user)
-    if user.id == report.controlling_user.id
+    unless user == self.rejecting_user
       "#{rejecting_user.name} has rejected the report: '#{self.report.name}'"
     else
       "You have rejected the report : #{self.report.name}"
