@@ -42,7 +42,7 @@ class Policy::Users::AddUser < Policy::Base
       end
     end
     unless user.policy_admin?(policy) or user.admin?
-      messages[:error] << "You are not a policy admin for this particular policy."
+      raise_unauthorized_exception
     end
   end
 

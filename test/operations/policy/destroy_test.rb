@@ -3,11 +3,11 @@ require 'test_helper'
 class DestroyTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
-    @manager = User.find_by(email: 'manager2@finlytest.io')
-    @finance_manager = User.find_by(email: 'finance1@finlytest.io')
+    @admin = users(:admin)
+    @manager = users(:manager)
+    @finance_manager = users(:finance_manager)
+    @employee = users(:employee)
     @policy = Policy::Create.(@admin, name: "Testing...").policies.order(created_at: :desc).first
-    # @policy = Policy::Users::AddUser.new(@admin, {policy_id: @policy.id, added_user_id: @manager.id, admin: true}).run
   end
 
   test "company admins can destroy a policy" do

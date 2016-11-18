@@ -1,13 +1,12 @@
 require 'test_helper'
-require 'helpers/report_operation_test_helper'
 
 class CreateAndDestroyTest < ActiveSupport::TestCase
 
   def setup
     @company = Company.first
-    @admin = User.find_by(email: 'admin@finlytest.io')
-    @manager = User.find_by(email: 'manager0@finlytest.io')
-    @employee = User.find_by(email: 'user0@finlytest.io')
+    @admin = users(:admin)
+    @manager = users(:manager)
+    @employee = users(:employee)
     @policy = Policy.non_default.second
     @sample_expense_rule = @policy.expense_rules.first
     @sample_budget_rule = @policy.budget_rules.first
