@@ -21,6 +21,7 @@
 
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -33,6 +34,7 @@ class Expense < ActiveRecord::Base
   belongs_to :category
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
+  belongs_to :surcharge, class_name: "Amount"
 
   has_many :receipts, as: :parent
 
@@ -42,8 +44,10 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :amount, :manual_expense, :card_expense
   accepts_nested_attributes_for :receipts
 
+
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
+  delegate :surcharge_value, to: :card_expense
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
@@ -167,6 +171,15 @@ class Expense < ActiveRecord::Base
         return self.card_expense.editable_merchant
       else
         # do nothing
+    end
+  end
+
+  def surcharge_value
+    case self.expense_type_id
+      when 1
+        return 0
+      when 2
+        return self.card_expense.surcharge_amount
     end
   end
 

@@ -15,6 +15,9 @@ gem 'stomp'
 # gem for admin panel
 gem 'activeadmin', github: 'activeadmin'
 
+# gem for faking test data
+gem 'mocha'
+
 # puma web server
 gem 'figaro'
 gem 'puma'
