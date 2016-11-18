@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'sidekiq/testing'
 
-class EventSubmitReportTest < ActiveSupport::TestCase
+class SubmitTest < ActiveSupport::TestCase
 
   def setup
     @report = Report.first
@@ -33,7 +33,7 @@ class EventSubmitReportTest < ActiveSupport::TestCase
 
     response = nil
     event = Event::EReport::Submit.new(@owner, report: @report)
-    # Ensure 2 mailers have been triggered
+    # Ensure 1 mailer have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',1 do
       response = event.run
     end
@@ -48,7 +48,6 @@ class EventSubmitReportTest < ActiveSupport::TestCase
   test 'behavior when report is not sent' do
     response = nil
     event = Event::EReport::Submit.new(@owner)
-    # Ensure 2 mailers have been triggered
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -58,17 +57,15 @@ class EventSubmitReportTest < ActiveSupport::TestCase
   test 'behavior when current user is not sent' do
     response = nil
     event = Event::EReport::Submit.new(nil, report: @report)
-    # Ensure 2 mailers have been triggered
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
     assert response.failure?
   end
 
-    test 'behavior when current user is not sent and report is not sent	' do
+  test 'behavior when current user is not sent and report is not sent ' do
     response = nil
     event = Event::EReport::Submit.new(nil, report: nil)
-    # Ensure 2 mailers have been triggered
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
