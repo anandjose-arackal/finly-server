@@ -65,6 +65,8 @@ gem 'handlebars_assets'
 #For pushing notifications
 gem 'gcm'
 
+gem 'mocha'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

@@ -24,6 +24,7 @@ class Event::EReport::Base < Event::SetNotification
   end
 
   def send_mailer(user)
+  	return if user.blank?
     subject = self.mailer_subject(user)
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
@@ -39,7 +40,7 @@ class Event::EReport::Base < Event::SetNotification
 
   def mailer_button_name(user)
     if report.controlling_user_id.present? and
-        user.id == report.controlling_user_id and not user.id == report.user.id
+      user.id == report.controlling_user_id and not user.id == report.user.id
       'Review Report'
     else
       'View Report'
