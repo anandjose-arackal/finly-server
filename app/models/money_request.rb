@@ -107,6 +107,9 @@ class MoneyRequest < ActiveRecord::Base
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
+      user_ids = trackings.map(&:action_user_id)
+    else
+      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id)).uniq
     end
     user_ids = trackings.map(&:action_user_id).uniq
     if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)

@@ -9,7 +9,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   def validate
     super
     unless self.rejected_expense.present?
-      messages[:error] << 'Expense not found'
+      add_message :error, 'Expense not found'
     end
   end
 
@@ -18,7 +18,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def affected_users
-    self.report.associated_users
+    self.report.associated_users self.user
   end
 
   def send_push_notification(user)
@@ -33,7 +33,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
 
   def mailer_subject(user)
     unless user == self.report.controlling_user
-      "#{rejecting_user.name} has rejected expense: #{rejected_expense.merchant_name}"
+      "#{self.report.controlling_user.name} has rejected expense: #{rejected_expense.merchant_name}"
     else
       "You rejected the expense : #{rejected_expense.merchant_name}"
     end

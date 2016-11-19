@@ -3,13 +3,15 @@ class Event::EReport::Base < Event::SetNotification
 
   def pre_validate
     unless user.present?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
+      return
     end
     if params.blank? or params[:report].blank?
-      messages[:error] << 'Report not found'
+      add_message :error, 'Report not found'
+      return
     end
     unless params[:report].is_a?(::Report)
-      messages[:error] << 'Error loading report'
+      add_message :error, 'Error loading report'
     end
   end
 
@@ -19,7 +21,7 @@ class Event::EReport::Base < Event::SetNotification
 
   def validate
     unless self.report.present?
-      messages[:error] << 'Report not found'
+      add_message :error, 'Report not found'
     end
   end
 

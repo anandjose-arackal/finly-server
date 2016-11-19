@@ -112,8 +112,10 @@ class Report < ActiveRecord::Base
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
+      user_ids = trackings.map(&:action_user_id)
+    else
+      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id)).uniq
     end
-    user_ids = trackings.map(&:action_user_id).uniq
     if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
       if controlling_for_user_id.present?
         user_ids << controlling_for_user_id
@@ -307,8 +309,8 @@ class Report < ActiveRecord::Base
 
   def has_expenses
     if report_status_id_changed? and report_status_id_was.present? and
-        (report_status_id_was == ReportStatus.open_id or report_status_id_was == ReportStatus.retracted_id) and
-        (report_status_id == ReportStatus.processing_id or report_status_id == ReportStatus.closed_id)
+      (report_status_id_was == ReportStatus.open_id or report_status_id_was == ReportStatus.retracted_id) and
+      (report_status_id == ReportStatus.processing_id or report_status_id == ReportStatus.closed_id)
       unless expenses.present?
         errors.add :cannot, 'submit an empty report'
       end

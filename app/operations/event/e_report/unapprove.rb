@@ -9,7 +9,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
     # users = [self.report.controlling_user]
     # users << prev_user if prev_user.present?
     # users
-    [self.report.controlling_user]
+    [self.report.controlling_user, self.report.tracks.last.modified_user]
   end
 
   def send_push_notification(user)

@@ -18,7 +18,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    self.report.associated_users
+    self.report.associated_users self.user
   end
 
   def send_push_notification(user)
