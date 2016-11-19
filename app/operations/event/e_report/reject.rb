@@ -3,12 +3,14 @@ class Event::EReport::Reject < Event::EReport::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.action_user
+    self.rejecting_user = self.report.tracks.last.action_user rescue nil
   end
 
   def validate
     super
-    self.rejecting_user.present?
+    unless self.rejecting_user.present?
+      add_message :error, 'User not found'
+    end
   end
 
   def event_id

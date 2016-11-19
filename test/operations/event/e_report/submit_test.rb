@@ -6,7 +6,7 @@ class SubmitTest < ActiveSupport::TestCase
   def setup
     @report = Report.first
     @owner = User.first
-    @manager = User.second
+    @manager = User.only_managers.first
     @report.stubs(:user).returns(@owner)
   end
 

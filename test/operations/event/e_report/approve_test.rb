@@ -8,8 +8,8 @@ class ApproveTest < ActiveSupport::TestCase
 
     @report = Report.first
     @owner = User.first
-    @approving_manager = User.second
-    @finance_manager = User.third
+    @approving_manager = User.only_managers.first
+    @finance_manager = User.only_finance_managers.first
     @report.stubs(:user).returns(@owner)
   end
 
