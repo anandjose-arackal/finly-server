@@ -1,7 +1,7 @@
 class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
 
   def event_id
-    Event.settlement_add_advance_id
+    Event.settlement_add_reimbursement_id
   end
 
   def send_push_notification(user)

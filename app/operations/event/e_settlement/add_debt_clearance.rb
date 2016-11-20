@@ -1,7 +1,7 @@
 class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
 
   def event_id
-    Event.settlement_clear_debt_id
+    Event.settlement_debt_clearance_id
   end
 
   def send_push_notification(user)
@@ -17,7 +17,7 @@ class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
   end
 
   def mailer_body(user)
-    "This is to notify you that your payment of ₹#{payment.amount.value} back to the company has been recorded"
+    "This is to notify you that your payment of ₹#{payment.amount.value} back to the company has been recorded by #{payment.initiating_user.name}"
   end
 
 end
