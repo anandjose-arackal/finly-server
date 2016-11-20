@@ -1,15 +1,48 @@
 Dir["#{Rails.root}/app/operations/event/*.rb"].each {|file| require file }
 
+require "minitest/unit"
+require "mocha/mini_test"
+
 # Preview all emails at http://localhost:3000/rails/mailers/settlement_mailer
 class SettlementMailerPreview < ActionMailer::Preview
 
   # http://localhost:3000/rails/mailers/settlement_mailer/add_cash
   def add_cash
-    event = Event::ESettlement::AddAdvance.new(User.second, {payment: Payment.first})
+    amount = Amount.new
+    payment = Payment.new(id: 10000)
+    amount.stubs(:value).returns(100)
+    payment.stubs(:amount => amount, :initiating_user => User.first)
+    event = Event::ESettlement::AddCashAdvance.new(User.second, {payment: payment})
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    SettlementMailer.send_mail(Event::ESettlement::Base::MailerPresenter.new(event.user, event.payment, subject, body, 'View Settlement'))
+    SettlementMailer.send_mail(Event::ESettlement::Base::MailerPresenter.new(event.user, event.payment, subject, body, event.mailer_button_name(event.user)))
+  end
+
+  # http://localhost:3000/rails/mailers/settlement_mailer/debt_clearance
+  def debt_clearance
+    amount = Amount.new
+    payment = Payment.new(id: 10000)
+    amount.stubs(:value).returns(100)
+    payment.stubs(:amount => amount, :initiating_user => User.first)
+    event = Event::ESettlement::AddDebtClearance.new(User.second, {payment: payment})
+    event.init
+    subject = event.mailer_subject(event.user)
+    body = event.mailer_body(event.user)
+    SettlementMailer.send_mail(Event::ESettlement::Base::MailerPresenter.new(event.user, event.payment, subject, body, event.mailer_button_name(event.user)))
+  end
+
+    # http://localhost:3000/rails/mailers/settlement_mailer/reimburse
+  def reimburse
+    amount = Amount.new
+    payment = Payment.new(id: 10000)
+    amount.stubs(:value).returns(100)
+    payment.stubs(:amount => amount, :initiating_user => User.first, :reports => [Report.first, Report.second, Report.third])
+    event = Event::ESettlement::AddReimbursement.new(User.second, {payment: payment})
+    event.init
+    subject = event.mailer_subject(event.user)
+    body = event.mailer_body(event.user)
+    SettlementMailer.send_mail(Event::ESettlement::Base::MailerPresenter.new(event.user, event.payment, subject, body, event.mailer_button_name(event.user)))
   end
 
 end

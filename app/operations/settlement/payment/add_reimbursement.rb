@@ -85,5 +85,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
   def post_process
     add_message :success, 'Reports reimbursed'
+
+    Event::ESettlement::AddReimbursement.(user, payment: self.payment)
   end
 end

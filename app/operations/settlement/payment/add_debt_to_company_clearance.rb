@@ -71,5 +71,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def post_process
     add_message :success, 'Added debt to company clearance'
+
+    Event::ESettlement::AddDebtClearance.(user, payment: self.payment)
   end
 end
