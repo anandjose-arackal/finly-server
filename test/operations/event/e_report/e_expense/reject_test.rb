@@ -7,7 +7,7 @@ class RejectTest < ActiveSupport::TestCase
     Sidekiq.redis { |conn| conn.flushdb }
 
     @report = Report.first
-    @owner = User.first
+    @owner = User.last
     @rejected_expense = Expense.first
     @first_approver = User.only_managers.first
     @second_approver = User.only_finance_managers.first

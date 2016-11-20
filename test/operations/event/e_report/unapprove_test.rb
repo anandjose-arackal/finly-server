@@ -7,7 +7,7 @@ class UnapproveTest < ActiveSupport::TestCase
     Sidekiq.redis { |conn| conn.flushdb }
 
     @report = Report.first
-    @owner = User.first
+    @owner = User.last
     @manager = User.only_managers.first
     @finance_manager = User.only_finance_managers.first
     @report.stubs(:user).returns(@owner)
