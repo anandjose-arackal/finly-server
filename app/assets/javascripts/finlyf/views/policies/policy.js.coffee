@@ -311,6 +311,8 @@ class FinlyF.Views.Policy extends Backbone.View
 
   initPolicyMemberSettings: (e) ->
     e.preventDefault()
+    target = e.currentTarget
+    user_id = $(target).attr('data-user-id')
     modal = $(@el).find("#modal-policy-member-settings")
 
     $(modal).modal('show')
@@ -321,6 +323,7 @@ class FinlyF.Views.Policy extends Backbone.View
       data: {
         view: @params.view,
         policy_id: @policy_id
+        user_id: user_id
       },
       success: (res) ->
         $(modal).html(res)
