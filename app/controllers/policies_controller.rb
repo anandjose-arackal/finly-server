@@ -71,6 +71,9 @@ class PoliciesController < ApplicationController
 
   def policy_member_settings
     # @result = Policy::InvitableUsers.(current_user, params)
+
+    # to-do
+    # @result = Policy::Mappings::Show.(user, user: selected_user, policy: nil)
     @result = User::Show.(current_user, params)
     @managers = User::Team::GetManagers.(current_user, params)
     # respond
