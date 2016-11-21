@@ -20,7 +20,7 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_type
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :receiving_user, class_name: 'User'
-  has_many :reports
+  has_many :reports, foreign_key: :reimbursement_id
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks

@@ -40,6 +40,7 @@ class Report < ActiveRecord::Base
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
+  # Payment made as reimbursment
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursement_amount, class_name: 'Amount'
 
