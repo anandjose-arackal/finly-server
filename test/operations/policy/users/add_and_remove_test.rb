@@ -204,25 +204,40 @@ class AddAndRemoveTest < ActiveSupport::TestCase
 
   test "cannot remove the last admin from a policy" do
     assert @policy
-    remove_user_op = Policy::Users::RemoveUser.new(@admin, {policy_id: @policy.id, user_id: @employee.id})
+
+    # adding another @manager user as an admin
+    add_user_op = Policy::Users::AddUser.new(@admin, {policy_id: @policy.id, user_id: "#{@manager.id}", admin: true})
+    @policy = add_user_op.run.policy
+    assert_equal 2, @policy.users.count
+    assert_equal 2, @policy.admins.count
+    assert @manager.policy_admin?(@policy)
+
+    # adding another user just for kicks
+    add_user_op = Policy::Users::AddUser.new(@manager, {policy_id: @policy.id, user_id: "#{@employee.id}"})
+    @policy = add_user_op.run.policy
+    assert_equal 3, @policy.users.count
+    assert_equal 2, @policy.admins.count
+
+    remove_user_op = Policy::Users::RemoveUser.new(@manager, {policy_id: @policy.id, user_id: "#{@admin.id}"})
     assert_difference '@policy.users.count', -1 do
-      @policy = remove_user_op.run
+      @result = remove_user_op.run
     end
-    assert @policy
-    assert_not @policy.users.find_by(id: @employee.id)
+    @policy = @result.policy
+    assert @result.success?
+    assert_not @policy.users.find_by(id: @admin.id)
     assert_equal 1, @policy.admins.count # checking that there's only one admin left
 
     # removing the last admin from the policy should fail
-    remove_user_op = Policy::Users::RemoveUser.new(@admin, {policy_id: @policy.id, added_user_id: @admin.id})
+    remove_user_op = Policy::Users::RemoveUser.new(@admin, {policy_id: @policy.id, user_id: "#{@manager.id}"})
     assert_no_difference '@policy.users.count' do
       begin
-        @policy = remove_user_op.run
+        remove_user_op.run
       rescue
         @rescued = true
       end
     end
     assert @rescued
-    assert_not @policy.users.find_by(id: @second_manager.id)
-
+    assert @policy.users.find_by(id: @manager.id)
   end
+
 end

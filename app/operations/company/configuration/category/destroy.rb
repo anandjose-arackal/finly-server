@@ -16,6 +16,11 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
   def validate
     unless self.category.present?
       messages[:error] << 'Category not found'
+      return false
+    end
+    if category.name == "Other" or category.name == "Personal"
+      messages[:error] << "Cannot destroy 'Other' or 'Personal' categories"
+      return false
     end
   end
 

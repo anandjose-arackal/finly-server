@@ -11,7 +11,14 @@
 #
 
 finly:
+  id: 1
   name: "Finly"
   active: true
+  d_code: "D000000360"
 
+random:
+  id: 2
+  name: "Random"
+  active: true
+  d_code: "D000000360"
 
