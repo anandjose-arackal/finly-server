@@ -1,5 +1,5 @@
 class Policy::Mappings::Show < Policy::Base
-  attr_accessor :policy_id, :updating_user, :map
+  attr_accessor :policy, :updating_user, :map
 
   def pre_validate
     if user.blank? or (params[:user_id].blank? and params[:id].blank? and params[:user].blank?)
@@ -32,9 +32,9 @@ class Policy::Mappings::Show < Policy::Base
 
   def init
     if params[:policy].present?
-      self.policy_id = params[:policy].id
+      self.policy = params[:policy]
     elsif params[:policy_id].present?
-      self.policy_id = params[:policy_id]
+      self.policy = updating_user.policies.with_id(params[:policy_id])
     end
     if self.updating_user.blank? and params[:user].present?
       self.updating_user = params[:user]
@@ -48,13 +48,14 @@ class Policy::Mappings::Show < Policy::Base
   end
 
   def process
+  	policy_id = self.policy.present? ? self.policy.id : nil
     company_default_mapping = updating_user.team_mapping.policy(policy_id)
     default_mapping = company_default_mapping.default
     conditional_manager = company_default_mapping.non_default.manager
     conditional_finance_manager = company_default_mapping.non_default.finance_manager
     conditional_approves_to = company_default_mapping.non_default.approves_to
     conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
-    self.map = {company_default: policy.nil?, policy: policy, default: default_mapping,
+    self.map = {company_default: self.policy.nil?, policy: self.policy, default: default_mapping,
                 conditional_manager: conditional_manager,
                 conditional_finance_manager: conditional_finance_manager,
                 conditional_approves_to: conditional_approves_to,
