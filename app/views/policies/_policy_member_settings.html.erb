@@ -38,121 +38,332 @@
       <input hidden="hidden" form="updateUserPolicyConfiguration" id="policyMemberSettingsApprovesFinanceToMappingId"
              name="policy[conditional_approves_finance_to][mapping_id]">
 
-      <div style="display: none;"> 
-        <div id="policyMemberSettingsEmployeeSection">
-          <hr>
-          <label>Submits To:</label>
-
-          <select id="policyMemberManagerSelector" form="updateUserPolicyConfiguration"
-                  name="policy[default][manager_id]" class="selectors" style=" margin-left: 45px; width: 150px">
-            <option value="" selected="selected"></option>
-            <%# @result.company_managers.each do |manager| %>
-                <!-- <option value="<%#= manager.id %>"><%#= manager.name %></option> -->
-            <%# end %>
-          </select>
-
-          <p>This is the default manager to whom <span id="policyMemberName"></span> will submit their reports to.</p>
-
-          <label>If Report Total is Over:</label>
-          <input id="policyMemberManagerConditionalAmount" form="updateUserPolicyConfiguration"
-                 name="policy[conditional_manager][greater_than_amount_attributes][value]" type="number" placeholder="Amount">
-
-          <div>
-            <label>Then Submits To:</label>
-            <select id="policyMemberManagerConditionalSelector" form="updateUserPolicyConfiguration"
-                    name="policy[conditional_manager][manager_id]" class="selectors" style=" margin-top: 15px;">
-              <option value="" selected="selected"></option>
-              
-            </select>
+      <div class="row no-margin">
+        <div class="policy">
+          <div class="row policy-name no-margin">
+            <div class="col-sm-6">
+              <h4>
+                <%= @result.map[:policy].name %>
+                <input type="hidden" name="user_manager_mapping[0][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
+              </h4>
+            </div>
           </div>
-          <p>If the report exceeds the amount above, who does <span id="policyMemberName2"></span> submit those reports to?</p>
 
-          <hr>
-          <label>Finance Manager:</label>
+          <div class="policy-rules row no-margin">
+            <form>
+              <div class="row no-margin" style="padding: 10px 10px 0;">
+                <div class="col-sm-12 manager-data manager-container">
+                  <div class="row manager non-conditional no-margin">
+                    Submits reports To:&nbsp;&nbsp;
 
-          <select id="policyMemberFinanceManager" form="updateUserPolicyConfiguration" name="policy[default][finance_manager_id]"
-                  class="selectors" style=" margin-left: 45px; width: 150px">
-            <option value="" selected="selected"></option>
-            
-          </select>
+                    <input type="hidden" name="user_manager_mapping[0][mapping_id]" value="<%= @result.map[:default][0].id %>">{{!-- (Mapping ID 0) --}}
+                    <label class="control-label item-attr-preview">
+                      <%= @result.map[:default][0].manager.name %>
+                     <%= select("user_manager_mapping[0][mapping]", "manager_id", @managers.team_managers.collect {|p| [ p.name, p.id ] }) %>
+                      <!-- {{#if this.default.manager.name}}
+                        {{this.default.manager.name}}
+                      {{else}}
+                        Not Set
+                      {{/if}} -->
+                    </label>{{!-- Manager 0 --}}
+                    <!-- <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="{{this.default.manager.id}}">
+                      <option value="">None</option>
+                      {{#each ../item.team_managers}}
+                        <option value="{{this.id}}">{{this.name}}</option>
+                      {{/each}}
+                    </select> -->
+                    <!-- {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" value="{{this.default.manager.id}}"> --}} -->
+                  </div>
+                  
+                  
+                  {{#each this.conditional_manager}}
+                  
+                  <div class="row x conditional no-margin" data-condition-serial="{{add @index 1}}">
 
-          <p>This is the default finance manager whom <span id="policyMemberName3"></span> will have her finances approved by.</p>
+                    <div class="col-sm-12 hideme">
+                      {{#if ../this.company_default}}{{else}}
+                        <input type="number" name="user_manager_mapping[{{increment @index 1}}][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 1)
+                      {{/if}}
+                      <input type="number" class="mapping-id" name="user_manager_mapping[{{increment @index 1}}][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 1)
+                    </div>
 
-          <label>If Report Total is Over:</label>
-          <input id="policyMemberFinanceManagerConditionalAmount" form="updateUserPolicyConfiguration"
-                 name="policy[conditional_finance_manager][greater_than_amount_attributes][value]" type="number" placeholder="Amount">
+                    <div class="col-sm-3">If report total is greater than:</div>
 
-          <div>
-            <label>Then Submits To:</label>
-            <select id="policyMemberFinanceManagerConditionalManager" form="updateUserPolicyConfiguration"
-                    name="policy[conditional_finance_manager][finance_manager_id]" class="selectors" style=" margin-top: 15px;">
-              <option value="" selected="selected"></option>
-              
-            </select>
+                    <div class="col-sm-2">
+                      <label class="control-label item-attr-preview">
+                      {{#if this.greater_than_amount.value}}
+                        {{this.greater_than_amount.value}}
+                      {{else}}
+                        Not Set
+                      {{/if}}
+                      </label>{{!-- (Greater than amount 1) --}}
+                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[{{increment @index 1}}][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[{{increment @index 1}}][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+                    </div>
+
+                    <div class="col-sm-3">then submits report to:</div>
+
+                    <div class="col-sm-3">
+                      <label class="control-label item-attr-preview">
+                      {{#if this.manager.name}}
+                        {{this.manager.name}}
+                      {{else}}
+                        Not Set
+                      {{/if}}
+                      </label>{{!-- (Conditional Manager 1) --}}
+                      <select class="form-control item-attr-edit" name="user_manager_mapping[{{increment @index 1}}][mapping][manager_id]" data-default-value="{{this.manager.id}}">
+                        <option value="">None</option>
+                        {{#each ../../item.team_managers}}
+                          <option value="{{this.id}}">{{this.name}}</option>
+                        {{/each}}
+                      </select>
+                      {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[1][mapping][manager_id]" value="{{this.conditional_manager.manager.id}}"> --}}
+                    </div>
+                    <div class="col-sm-1">
+                      <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
+                    </div>
+                  </div><!-- .conditional -->
+                  {{/each}}
+                  <div class="col-sm-12 add-condition">
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="manager">Add Condition</button>
+                  </div>
+                </div><!-- .col-sm-12 -->
+                <hr />
+                <div class="col-sm-12 finance-manager-data manager-container">
+                  <div class="row finance-manager non-conditional no-margin">
+                    Submits Report Finance to:&nbsp;&nbsp;
+
+                    <label class="control-label item-attr-preview">
+                      {{#if this.default.finance_manager.name}}
+                        {{this.default.finance_manager.name}}
+                      {{else}}
+                        Not Set
+                      {{/if}}
+                    </label>{{!-- (Finance Manager 0) --}}
+                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="{{this.default.finance_manager.id}}">
+                      <option value="">None</option>
+                      {{#each ../item.team_finance_managers}}
+                        <option value="{{this.id}}">{{this.name}}</option>
+                      {{/each}}
+                    </select>
+                    {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" value="{{this.default.finance_manager.id}}"> --}}
+                  </div>
+
+                  {{#each this.conditional_finance_manager}}
+                  <div class="row finance-manager conditional no-margin" data-condition-serial="{{add ../this.conditional_manager.length @index 1}}">
+                    <div class="col-sm-12 hideme">
+                      {{#if ../this.company_default}}{{else}}
+                        <input type="number" name="user_manager_mapping[{{add ../this.conditional_manager.length @index 1}}][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 2)
+                      {{/if}}
+
+                      <input type="number" class="mapping-id" name="user_manager_mapping[{{add ../this.conditional_manager.length @index 1}}][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 2)
+                    </div>
+
+                    <div class="col-sm-3">If report total is greater than:</div>
+
+                    <div class="col-sm-2">
+                      <label class="control-label item-attr-preview">
+                        {{#if this.greater_than_amount.value}}
+                          {{this.greater_than_amount.value}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>{{!-- (Greater than amount 2) --}}
+                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length @index 1}}][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length @index 1}}][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+                    </div>
+
+                    
+                    <div class="col-sm-3">then submits report finance to:</div>
+
+
+
+                    <div class="col-sm-3">
+                      <label class="control-label item-attr-preview">
+                      {{#if this.finance_manager.name}}
+                        {{this.finance_manager.name}}
+                      {{else}}
+                        Not Set
+                      {{/if}}
+                      </label>{{!-- (Conditional Manager 2) --}}
+                      <select class="form-control item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length @index 1}}][mapping][finance_manager_id]" data-default-value="{{this.finance_manager.id}}">
+                        <option value="">None</option>
+                        {{#each ../../item.team_finance_managers}}
+                          <option value="{{this.id}}">{{this.name}}</option>
+                        {{/each}}
+                      </select>
+                      {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[2][mapping][finance_manager_id]" value="{{this.conditional_finance_manager.finance_manager.id}}"> --}}
+                    </div>
+
+                    <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
+
+                  </div><!-- .conditional -->
+                  {{/each}}
+                  <div class="col-sm-12 add-condition">
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="finance_manager">Add Condition</button>
+                  </div>
+                </div><!-- .col-sm-12 -->
+              </div><!-- .row -->
+
+              <div class="row no-margin" style="padding:0 10px;">
+                {{#if ../item.role.manager}}
+                <div class="col-sm-12 approves-to-data manager-container">
+                  <div class="row approves-to non-conditional no-margin">
+                    Approves To:&nbsp;&nbsp;
+                    <label class="control-label item-attr-preview">
+                    {{#if this.default.approves_to.name}}
+                      {{this.default.approves_to.name}}
+                    {{else}}
+                      Not Set
+                    {{/if}}
+                    </label>{{!-- (Approves_to 0) --}}
+
+                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="{{this.default.approves_to.id}}">
+                      <option value="">None</option>
+                      {{#each ../item.team_managers}}
+                        <option value="{{this.id}}">{{this.name}}</option>
+                      {{/each}}
+                    </select>
+                    {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" value="{{this.default.approves_to.id}}"> --}}
+                  </div>
+
+                  {{#each conditional_approves_to}}
+                  <div class="row conditional approves_to no-margin" data-condition-serial="{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length @index 1}}">
+
+                    <div class="col-sm-12 hideme">
+                      {{#if ../this.company_default}}{{else}}
+                        <input type="number" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length @index 1}}][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 3)
+                      {{/if}}
+                      <input type="number" class="mapping-id" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length @index 1}}][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 3)
+                    </div>
+
+                    <div class="col-sm-3">If report total is greater than:</div>
+
+                    <div class="col-sm-2">
+                      <label class="control-label item-attr-preview">
+                        {{#if this.greater_than_amount.value}}
+                          {{this.greater_than_amount.value}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>{{!-- (Greater than amount 3) --}}
+                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length @index 1}}][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length @index 1}}][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+
+                    </div>
+
+                    <div class="col-sm-3">then approves report to:</div>
+
+                    <div class="col-sm-3">
+                      <label class="control-label item-attr-preview">
+                        {{#if this.approves_to.name}}
+                          {{this.approves_to.name}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>{{!-- (Conditional approves to 3) --}}
+
+                      <select class="form-control item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length @index 1}}][mapping][approves_to_id]" data-default-value="{{this.approves_to.id}}">
+                        <option value="">None</option>
+                        {{#each ../../item.team_managers}}
+                          <option value="{{this.id}}">{{this.name}}</option>
+                        {{/each}}
+                      </select>
+                      {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[3][mapping][approves_to_id]" value="{{this.conditional_approves_to.approves_to.id}}"> --}}
+                    </div>
+                    <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
+                  </div>
+                  {{/each}}
+                  <div class="col-sm-12 add-condition">
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="approves_to">Add Condition</button>
+                  </div>
+                </div><!-- .col-sm-12 -->
+                {{/if}}
+
+
+                {{#if ../item.role.finance_manager}}
+                <div class="col-sm-12 approves-finance-to-data manager-container">
+                  <div class="row approves-finance-to non-conditional no-margin">
+                    Approves Finance To:&nbsp;&nbsp;
+
+                    <label class="control-label item-attr-preview">
+                      {{#if this.default.approves_finance_to.name}}
+                        {{this.default.approves_finance_to.name}}
+                      {{else}}
+                        Not Set
+                      {{/if}}
+                    </label>{{!-- (Approves Finance to 0) --}}
+
+                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="{{this.default.approves_finance_to.id}}">
+                      <option value="">None</option>
+                      {{#each ../item.team_finance_managers}}
+                        <option value="{{this.id}}">{{this.name}}</option>
+                      {{/each}}
+                    </select>
+                    {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" value="{{this.default.approves_finance_to.id}}"> --}}
+                  </div>
+
+                  {{#each this.conditional_approves_finance_to}}
+                  <div class="row conditional approves-finance-to no-margin" data-condition-serial="{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length ../this.conditional_approves_to.length @index 1}}">
+                    <div class="col-sm-12 hideme">
+                      {{#if ../this.company_default}}{{else}}
+                        <input type="number" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length ../this.conditional_approves_to.length @index 1}}][mapping][policy_id]" value="{{../this.policy.id}}">{{../this.policy.name}}(Policy Name 4)
+                      {{/if}}
+
+                      <input type="number" class="mapping-id" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length ../this.conditional_approves_to.length @index 1}}][mapping_id]" value="{{this.mapping_id}}">(Mapping ID 4)
+                    </div>
+
+                    <div class="col-sm-3">If report total is greater than:</div>
+
+                    <div class="col-sm-2">
+                      <label class="item-attr-preview">
+                        {{#if this.greater_than_amount.value}}
+                          {{this.greater_than_amount.value}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>{{!-- (Greater than amount 4) --}}
+                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length ../this.conditional_approves_to.length @index 1}}][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length ../this.conditional_approves_to.length @index 1}}][mapping][greater_than_amount_attributes][value]" value="{{this.greater_than_amount.value}}">
+
+                    </div>
+
+                    <div class="col-sm-3">then approves report finance to:</div>
+
+                    <div class="col-sm-3">
+                      <label class="control-label item-attr-preview">
+                        {{#if this.approves_finance_to.name}}
+                          {{this.approves_finance_to.name}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>{{!-- (Conditional approves to 4) --}}
+                      <select class="form-control item-attr-edit" name="user_manager_mapping[{{add ../this.conditional_manager.length ../this.conditional_finance_manager.length ../this.conditional_approves_to.length @index 1}}][mapping][approves_finance_to_id]" data-default-value="{{this.approves_finance_to.id}}">
+                        <option value="">None</option>
+                        {{#each ../../item.team_finance_managers}}
+                          <option value="{{this.id}}">{{this.name}}</option>
+                        {{/each}}
+                      </select>
+                      {{!-- <input type="number" class="item-attr-edit" name="user_manager_mapping[4][mapping][approves_finance_to_id]" value="{{this.conditional_approves_finance_to.approves_to.id}}"> --}}
+                    </div>
+                    <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
+                  </div>
+                  {{/each}}
+                  <div class="col-sm-12 add-condition">
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="{{this.policy.id}}" data-manager-type="approves_finance_to">Add Condition</button>
+                  </div>
+
+                </div><!-- .col-sm-12 -->
+                {{/if}}
+              </div>
+              <input type="hidden" name="type" value="team">
+            </form>
           </div>
-          <p>If the finance exceeds the amount above, who does <span id="policyMemberName4"></span> get the finances approved by?</p>
-        </div>
-
-        <hr>
-        <div id="policyMemberSettingsApprovesToSection">
-          <label>Approves To:</label>
-          <select id="policyMemberApprovesToSelector" form="updateUserPolicyConfiguration" name="policy[default][approves_to_id]"
-                  class="selectors" style=" margin-left: 45px; width: 150px">
-            <option value="" selected="selected"></option>
-            
-          </select>
-
-          <p>Does <span id="policyMemberName5"></span> have reports to approve? If so, who do they forward these approved reports to?
-            (This
-            is usually to someone in accounting or finance)</p>
-
-          <label>If Report Total is Over:</label>
-          <input id="policyMemberApprovesToConditionalAmount" form="updateUserPolicyConfiguration"
-                 name="policy[conditional_approves_to][greater_than_amount_attributes][value]" type="number" placeholder="Amount">
-
-          <div>
-            <label>Then Approves To:</label>
-            <select id="policyMemberApprovesToConditionalSelector" name="policy[conditional_approves_to][approves_to_id]"
-                    form="updateUserPolicyConfiguration" class="selectors" style=" margin-top: 15px;">
-              <option value="" selected="selected"></option>
-              
-            </select>
-          </div>
-          <p>If the report exceeds the amount above, who does <span id="policyMemberName6"></span> forward those approved reports
-            to?</p>
-          <hr>
-        </div>
-
-
-        <div id="policyMemberSettingsApprovesFinanceToSection">
-          <label>Approves Finance To:</label>
-
-          <select id="policyMemberApprovesFinanceToSelector" form="updateUserPolicyConfiguration"
-                  name="policy[default][approves_finance_to_id]" class="selectors" style=" margin-left: 45px; width: 150px">
-            <option value="" selected="selected"></option>
-            
-          </select>
-
-          <p>Does <span id="policyMemberName7"></span> have finances to approve? If so, who do they forward these approved finances
-            to? </p>
-
-          <label>If Report Total is Over:</label>
-          <input id="policyMemberApprovesFinanceToConditionalAmount" form="updateUserPolicyConfiguration"
-                 name="policy[conditional_approves_finance_to][greater_than_amount_attributes][value]" type="number" placeholder="Amount">
-
-          <div>
-            <label>Then Approves Finance To:</label>
-            <select id="policyMemberApprovesFinanceToConditionalSelector" form="updateUserPolicyConfiguration"
-                    name="policy[conditional_approves_finance_to][approves_finance_to_id]" class="selectors" style=" margin-top: 15px;">
-              <option value="" selected="selected"></option>
-              
-            </select>
-          </div>
-          <p>If the report exceeds the amount above, who does <span id="policyMemberName8"></span> get the finances approved by?</p>
-          <hr>
-        </div>
+        </div><!-- .policy -->   
 
       </div>
+
+
       <br />
       <button form="updateUserPolicyConfiguration" type="submit" class="green-button" style="background-color: #465c8b;letter-spacing: 1px;
           padding: 7px 10px 7px 10px;

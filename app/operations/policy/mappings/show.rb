@@ -34,7 +34,7 @@ class Policy::Mappings::Show < Policy::Base
     if params[:policy].present?
       self.policy = params[:policy]
     elsif params[:policy_id].present?
-      self.policy = updating_user.policies.with_id(params[:policy_id])
+      self.policy = updating_user.policies.with_id(params[:policy_id]).first
     end
     if self.updating_user.blank? and params[:user].present?
       self.updating_user = params[:user]
