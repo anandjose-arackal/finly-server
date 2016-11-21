@@ -12,6 +12,21 @@ class FinlyF.Views.Policy extends Backbone.View
     'hidden.bs.modal #modal-create-rule': 'clearDiv'
     'submit form.form-remove-rule': 'removeRule'
 
+    # Policies
+    'click #btn-assign-users-to-policy': 'initAssignUserstoPolicy'
+    'hidden.bs.modal #modal-assign-user-policy': 'clearDiv'
+    'change input.select-invitable-user': 'selectUserstoAssign'
+
+    'click #addUsersToPolicyButton': 'assignUserstoPolicy'
+
+
+    # for unassigning from policy
+    'change input.select-assigned-user': 'selectUserstoUnAssign'
+    'click #btn-unassign-users-to-policy': 'unAssignUsersfromPolicy'
+
+    #policy member settings
+    'click .policy-member-settings': 'initPolicyMemberSettings'
+
   initialize: (options) ->
     @policy_id = options.id
     console.log options
@@ -28,6 +43,7 @@ class FinlyF.Views.Policy extends Backbone.View
   render: ->
     $(@el).html(@templateSkeleton())
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
+    @policyName()
     @fetchTabContent()
     FinlyF.structureActions(@el, @params)
     @
@@ -46,8 +62,25 @@ class FinlyF.Views.Policy extends Backbone.View
 
     # FinlyF.primary_router.navigate('settings/params=' + JSON.stringify(@params), {trigger: false})
 
+  policyName: ->
+    # Fetch Policy Name
+    _this = @
+
+    $.ajax({
+      url: '/policies/details'
+      dataType: 'json',
+      data: {
+        id: @policy_id
+      }
+      success: (res) ->
+        $(_this.el).find('#policy-name').html(res.name)
+      error: (err) ->
+        console.log "Err", err
+
+    })
+
   fetchTabContent: ->
-    # console.log "Fetching"
+    # Continue with fetching content
     main = $(@el).find(".main")
     current_tab = $(@el).find('.main #' + @params.tab)
 
@@ -103,6 +136,9 @@ class FinlyF.Views.Policy extends Backbone.View
     e.preventDefault()
     _this = @
     form = e.currentTarget
+    button = $(form).find('.btn-create-rule')
+
+    $(button).attr('disabled', true)
 
     modal = $(@el).find('#modal-create-rule')
 
@@ -118,7 +154,12 @@ class FinlyF.Views.Policy extends Backbone.View
         if res.success == true
           $(modal).modal('hide')
           _this.fetchTabContent()
+        else
+          $(button).attr('disabled', false)
           # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+      error: (err) ->
+        $(button).attr('disabled', false)
+
     })
 
   removeRule: (e) ->
@@ -144,154 +185,151 @@ class FinlyF.Views.Policy extends Backbone.View
     })
 
 
-  addCategory: (e) ->
+  initAssignUserstoPolicy: (e) ->
     e.preventDefault()
-    _this = @
-    form = e.currentTarget
+    modal = $(@el).find("#modal-assign-user-policy")
 
-    url = $(form).attr('action')
+    $(modal).modal('show')
 
     $.ajax({
-      url: url,
-      data: $(form).serialize(),
-      type: "POST",
-      dataType: 'json',
+      url: '/policies/' + @policy_id + '/invitable_users'
+      dataType: 'html',
+      type: "POST"
+      data: {
+        view: @params.view,
+        policy_id: @policy_id
+      },
       success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.fetchTabContent()
-          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+        $(modal).html(res)
+      error: (err) ->
+        $(modal).modal('hide')
+        alert("Oops! Something went wrong. Please try again.")
     })
 
-  deleteCategory: (e) ->
+  selectUserstoAssign: (e) ->
+    button = $(@el).find("#addUsersToPolicyButton")
+    flag = false
+    @selected_invitable_users = []
+
+    invitable_users = $(@el).find("#invitable-users .invitable-user")
+    for user in invitable_users
+      if $(user).find("input.select-invitable-user").prop('checked')
+        user_id = $(user).attr('data-user-id')
+        @selected_invitable_users.push(user_id)
+        flag = true
+
+    console.log "Selected Users", @selected_invitable_users
+    if flag == true
+      $(button).removeClass('hidden')
+    else
+      $(button).addClass('hidden')
+
+  
+
+  assignUserstoPolicy: (e) ->
     e.preventDefault()
-    target = e.currentTarget
     _this = @
+    target = e.currentTarget
+    $(target).attr('disabled', true)
+
+    modal = $(@el).find("#modal-assign-user-policy")
 
     url = $(target).attr('data-url')
-    # console.log target, url
+
     $.ajax({
       url: url,
-      type: "DELETE",
+      type: 'post',
       dataType: 'json',
+      data: {
+        user_id: _this.selected_invitable_users.join(",")
+        authentication_token: $("#authentication_token").val()
+        view: _this.params.view
+      },
       success: (res) ->
-        FinlyF.snapNotify(res.messages)
+        console.log "Res", res
         if res.success == true
+          FinlyF.snapNotify(res.messages)
+          $(modal).modal('hide')
           _this.fetchTabContent()
-          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
-        # else
-          # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
+        else 
+          $(target).attr('disabled', false)
+      error: (err) ->
+        $(target).attr('disabled', false)
+        console.log "err", err
+
     })
 
-  addPolicy: (e) ->
+  selectUserstoUnAssign: (e) ->
+    button = $(@el).find("#btn-unassign-users-to-policy")
+    flag = false
+    @selected_assigned_users = []
+
+    assigned_users = $(@el).find("#assigned-users .assigned-user")
+    for user in assigned_users
+      if $(user).find("input.select-assigned-user").prop('checked')
+        user_id = $(user).attr('data-user-id')
+        @selected_assigned_users.push(user_id)
+        flag = true
+
+    console.log "Selected Users", @selected_assigned_users
+    if flag == true
+      $(button).removeClass('hidden')
+    else
+      $(button).addClass('hidden')
+
+  unAssignUsersfromPolicy: (e) ->
     e.preventDefault()
     _this = @
-    form = e.currentTarget
-
-    url = $(form).attr('action')
-
-    $.ajax({
-      url: url,
-      data: $(form).serialize(),
-      type: "POST",
-      dataType: 'json',
-      success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.fetchTabContent()
-          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
-    })   
-
-
-  deletePolicy: (e) ->
-    e.preventDefault()
     target = e.currentTarget
-    _this = @
+    $(target).attr('disabled', true)
 
     url = $(target).attr('data-url')
-    # console.log target, url
-    $.ajax({
-      url: url,
-      type: "DELETE",
-      dataType: 'json',
-      success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.fetchTabContent()
-          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
-        # else
-          # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
-    })
-
-  addExportColumn: (e) ->
-    e.preventDefault()
-    console.log "Here"
-    _this = @
-    form = e.currentTarget
-
-    url = $(form).attr('action')
 
     $.ajax({
       url: url,
-      data: $(form).serialize(),
-      type: "POST",
+      type: 'post',
       dataType: 'json',
+      data: {
+        user_id: _this.selected_assigned_users.join(",")
+        authentication_token: $("#authentication_token").val()
+        view: _this.params.view
+      },
       success: (res) ->
-        FinlyF.snapNotify(res.messages)
+        # console.log "Res", res
         if res.success == true
+          FinlyF.snapNotify(res.messages)
+          # $(modal).modoal('hide')
           _this.fetchTabContent()
-    }) 
+        else 
+          $(target).attr('disabled', false)
+      error: (err) ->
+        $(target).attr('disabled', false)
+        console.log "err", err
 
-  updateExportPreference: (e) ->
-    e.preventDefault()
-
-    _this = @
-    form = e.currentTarget
-
-    url = $(form).attr('action')
-
-    $.ajax({
-      url: url,
-      data: $(form).serialize(),
-      type: "PUT",
-      dataType: 'json',
-      success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.fetchTabContent()
-    })
-
-  deleteExportPreference: (e) ->
-    e.preventDefault()
-    console.log "Will delete the preference"
-    target = e.currentTarget
-    _this = @
-
-    url = $(target).attr('data-url')
-    # console.log target, url
-    $.ajax({
-      url: url,
-      type: "DELETE",
-      dataType: 'json',
-      success: (res) ->
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.fetchTabContent()
-          # ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
-        # else
-          # ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
     })
 
 
+  initPolicyMemberSettings: (e) ->
+    e.preventDefault()
+    modal = $(@el).find("#modal-policy-member-settings")
 
-  showExportPreferenceUpdateOption: (e) ->
-    target = e.currentTarget
-    form = $(target).closest('form')
+    $(modal).modal('show')
 
-    button = $(form).find('.btn-update-export-preference')
-    $(button).removeClass('hidden')
+    $.ajax({
+      url: '/policies/policy_member_settings'
+      dataType: 'html',
+      data: {
+        view: @params.view,
+        policy_id: @policy_id
+      },
+      success: (res) ->
+        $(modal).html(res)
+      error: (err) ->
+        $(modal).modal('hide')
+        alert("Oops! Something went wrong. Please try again.")
+    })
+
 
   clearDiv: (e) ->
-    console.log "Clearing div"
     target = e.currentTarget
     $(target).html("")

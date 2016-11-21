@@ -418,6 +418,9 @@ Rails.application.routes.draw do
   get 'policies/budget_rules' => 'policies#budget_rules'
   get 'policies/policy_members' => 'policies#policy_members'
   get 'policies/create_rule' => 'policies#create_rule'
+  get 'policies/policy_member_settings/' => 'policies#policy_member_settings'
+
+  get 'policies/details' => 'policies#details'
   resources :policies, except: [:new, :edit]
   resources :policies do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
