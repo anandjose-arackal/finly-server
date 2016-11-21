@@ -48,7 +48,7 @@ class Policy::Mappings::Show < Policy::Base
   end
 
   def process
-  	policy_id = self.policy.present? ? self.policy.id : nil
+    policy_id = self.policy.present? ? self.policy.id : nil
     company_default_mapping = updating_user.team_mapping.policy(policy_id)
     default_mapping = company_default_mapping.default
     conditional_manager = company_default_mapping.non_default.manager
