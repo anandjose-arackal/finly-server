@@ -20,14 +20,13 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     if params[:payment][:amount].blank? or params[:payment][:amount].to_f < 0
       add_message :error, 'Amount cannot be equal to or less than 0'
     end
-    # no password required for this operation, hence
-    # if params[:password].blank?
-    #   add_message :error, 'You need to provide your password to initiate this transfer'
-    #   return
-    # end
-    # unless user.valid_password?(params[:password])
-    #   add_message :error, 'Invalid Password'
-    # end
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate this transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+    end
   end
 
   def init
