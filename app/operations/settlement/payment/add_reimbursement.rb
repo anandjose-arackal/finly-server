@@ -63,7 +63,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     validate_date payment_params[:date]
 
     # is this really necessary
-    total_amount = precision_value(reports.with_amount.sum(:value))
+    total_amount = precision_value(reports.with_amount.sum(:value)).to_f
     unless total_amount == precision_value(payment_params[:amount]).to_f
       add_message :error, 'Reimbursement amount does not match report totals'
     end
