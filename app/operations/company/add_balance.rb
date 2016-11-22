@@ -24,9 +24,9 @@ class Company::AddBalance < Company::Base
   def init
     self.transaction_details = {}
     self.transaction_details[:amount] = params[:amount]
-    self.transaction_details[:transaction_id] = params[:transaction_id]
+    self.transaction_details[:reference_id] = params[:reference_id]
     self.transaction_details[:date] = params[:date]
-    self.transaction_details[:remarks] = params[:remarks]
+    self.transaction_details[:remarks] = params[:remark]
     self.transaction_details[:company] = Company.find_by(id: params[:company_id]).name
   end
 
@@ -47,6 +47,7 @@ class Company::AddBalance < Company::Base
 
   def post_process
     # triggerring mailer so that itzCash is notified
+    debugger
     CompanyMailer.delay.balance_update(transaction_details)
   end
 

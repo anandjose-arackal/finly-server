@@ -33,25 +33,25 @@ Rails.application.configure do
 
   ######################################################################
 
-  # Do care if the application_mailer can't send.
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :test
-  config.action_mailer.default_url_options = { host: 'localhost:3000'}
+  # # Do care if the application_mailer can't send.
+  # config.action_mailer.raise_delivery_errors = true
+  # config.action_mailer.delivery_method = :test
+  # config.action_mailer.default_url_options = { host: 'localhost:3000'}
 
-  # config.action_mailer.default_url_options = { host: "www.finly.io" }
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.smtp_settings = {
-  #     address:              'smtp.sendgrid.net',
-  #     port:                 587,
-  #     domain:               'www.finly.io',
-  #     user_name:            'vivekagb',
-  #     password:             'idAr5APhk61X',
-  #     # ssl:                  true,
-  #     # tls:                  true,
-  #     authentication:       :plain,
-  #     enable_starttls_auto: true,
-  #     :openssl_verify_mode  => 'none'
-  # }
+  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+      address:              'smtp.sendgrid.net',
+      port:                 587,
+      domain:               'www.finly.io',
+      user_name:            'vivekagb',
+      password:             'idAr5APhk61X',
+      # ssl:                  true,
+      # tls:                  true,
+      authentication:       :plain,
+      enable_starttls_auto: true,
+      :openssl_verify_mode  => 'none'
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
