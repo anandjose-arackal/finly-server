@@ -73,12 +73,13 @@ class PoliciesController < ApplicationController
     # @result = Policy::InvitableUsers.(current_user, params)
     # selected_user = User.find(params[:user_id])
     # to-do
+    @target_user = User.find(params[:user_id])
     @result = Policy::Mappings::Show.(current_user, params)
     # @result = Policy::Mappings::Show.(current_user, user: params[:user_id], policy: params[:policy_id])
     # @result = User::Show.(current_user, params)
     @managers = User::Team::GetManagers.(current_user, params)
     # respond
-    debugger
+    # debugger
     respond_to do |format|
       format.html {render partial: 'policy_member_settings'}
     end

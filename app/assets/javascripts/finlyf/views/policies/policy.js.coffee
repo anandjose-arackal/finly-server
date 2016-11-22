@@ -26,6 +26,7 @@ class FinlyF.Views.Policy extends Backbone.View
 
     #policy member settings
     'click .policy-member-settings': 'initPolicyMemberSettings'
+    'submit form#form-policy-member-settings': 'updatePolicyMemberSettings'
 
   initialize: (options) ->
     @policy_id = options.id
@@ -327,10 +328,53 @@ class FinlyF.Views.Policy extends Backbone.View
       },
       success: (res) ->
         $(modal).html(res)
+        selects = $(modal).find("select.select-assign-manager")
+        for select in selects
+          $(select).val($(select).attr('data-default-value'))
       error: (err) ->
         $(modal).modal('hide')
         alert("Oops! Something went wrong. Please try again.")
     })
+
+  updatePolicyMemberSettings: (e) ->
+    e.preventDefault()
+    _this = @
+    form = e.currentTarget
+
+    user_id = $(form).find("button.btn-update-policy-member-settings").attr('data-user-id')
+    
+
+
+    $.ajax({
+      url: '/users/' + user_id,
+      data: $(form).serialize(),
+      type: 'PUT',
+      processData: true,
+      dataType: 'json',
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+      error: (err) ->
+        console.log "Err", err
+    })
+
+    # # console.log values
+    # model = new FinlyF.Models.User({id: @model.get('id')})
+    # model.save(values, {
+    #   data: values,
+    #   processData: true
+    #   success: (model, res) ->
+    #     FinlyF.snapNotify(res.messages)
+    #     # console.log res
+    #     if res.success == true
+    #       console.log "now it will fetch ", _this.params.view
+    #       _this.model.fetch({
+    #         data: {
+    #           view: _this.params.view
+    #         }
+    #       })
+    #   error: (err) ->
+    #     console.log "Err", err
+    # })
 
 
   clearDiv: (e) ->
