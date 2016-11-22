@@ -86,9 +86,6 @@ class User::Team::Index < User::Team::Base
     apply_scopes(self.response, params) if self.response.present?
   end
 
-  # def success
-  #   User::Team::Base::TeamPresenter.new(user, team: response)
-  # end
 
   private
   def admin_team

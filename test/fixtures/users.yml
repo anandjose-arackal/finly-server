@@ -52,6 +52,7 @@ admin:
   company_id: 1
   first_name: "Finly"
   last_name: "Admin"
+  mobile_number: "9899999991"
 
 manager:
   id: 2
@@ -60,6 +61,7 @@ manager:
   company_id: 1
   first_name: "Finly"
   last_name: "Manager"
+  mobile_number: "9899999992"
 
 finance_manager:
   id: 3
@@ -68,6 +70,7 @@ finance_manager:
   company_id: 1
   first_name: "Finly"
   last_name: "Finance Manager"
+  mobile_number: "9899999993"
 
 employee:
   id: 4
@@ -76,14 +79,16 @@ employee:
   company_id: 1
   first_name: "Finly"
   last_name: "Employee"
+  mobile_number: "9899999994"
 
 inactive_employee:
   id: 7
   email: 'inactive_employee@finlytest.io'
   active: false
   company_id: 1
-  first_name: "Inactive Finly"
+  first_name: "InactiveFinly"
   last_name: "Employee"
+  mobile_number: "9899999997"
 
 other_company_admin:
   id: 5
@@ -92,6 +97,7 @@ other_company_admin:
   company_id: 2
   first_name: "Random"
   last_name: "Admin"
+  mobile_number: "9899999995"
 
 other_company_manager:
   id: 6
@@ -100,7 +106,7 @@ other_company_manager:
   company_id: 2
   first_name: "Random"
   last_name: "Manager"
-
+  mobile_number: "9899999996"
 
 
 

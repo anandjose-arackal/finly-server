@@ -15,7 +15,7 @@ class DestroyTest < ActiveSupport::TestCase
 
   test "admins can destroy a category for the company" do
     destroy_op = Company::Configuration::Category::Destroy.new(@admin, id: @category.id)
-    assert_difference '@company.categories.active', -1 do
+    assert_difference '@company.categories.active.count', -1 do
       @result = destroy_op.run
     end
     assert @result.success?
@@ -24,7 +24,7 @@ class DestroyTest < ActiveSupport::TestCase
 
   test "destroying a category only 'soft-deletes' it" do
     destroy_op = Company::Configuration::Category::Destroy.new(@admin, id: @category.id)
-    assert_no_difference '@company.categories' do
+    assert_no_difference '@company.categories.count' do
       @result = destroy_op.run
     end
     assert @result.success?
@@ -35,7 +35,7 @@ class DestroyTest < ActiveSupport::TestCase
   test "non admins cannot destroy a category for the company" do
     # finance manager trying to destroy a category
     destroy_op = Company::Configuration::Category::Destroy.new(@finance_manager, id: @category.id)
-    assert_no_difference '@company.categories' do
+    assert_no_difference '@company.categories.count' do
       begin
         @result = destroy_op.run
       rescue
@@ -46,7 +46,7 @@ class DestroyTest < ActiveSupport::TestCase
 
     # manager trying the same shit
     destroy_op = Company::Configuration::Category::Destroy.new(@manager, id: @category.id)
-    assert_no_difference '@company.categories' do
+    assert_no_difference '@company.categories.count' do
       begin
         @result = destroy_op.run
       rescue
@@ -61,7 +61,7 @@ class DestroyTest < ActiveSupport::TestCase
     @category = @company.categories.find_by(name: 'Other')
 
     destroy_op = Company::Configuration::Category::Destroy.new(@admin, id: @category.id)
-    assert_no_difference '@company.categories.active' do
+    assert_no_difference '@company.categories.active.count' do
       @result = destroy_op.run
     end
     assert_not @result.success?
@@ -71,8 +71,8 @@ class DestroyTest < ActiveSupport::TestCase
     # trying to destroy 'Personal' category
     @category = @company.categories.find_by(name: 'Personal')
 
-    destroy_op = Company::Configuration::Category::Destroy.new(@manager, id: @category.id)
-    assert_no_difference '@company.categories.active' do
+    destroy_op = Company::Configuration::Category::Destroy.new(@admin, id: @category.id)
+    assert_no_difference '@company.categories.active.count' do
       @result = destroy_op.run
     end
     assert_not @result.success?

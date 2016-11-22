@@ -4,26 +4,29 @@ class CreateTest < ActiveSupport::TestCase
 
   def setup
     @employee = users(:employee)
+    @admin = users(:admin)
     @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
     @receipt_params = {receipt: {image: @image}}
   end
 
   test "adding a new receipt to a user" do
-    receipt_op = Receipt::Create.new(@user, @receipt_params)
-    assert_difference '@user.receipts.count', 1 do
-      @receipt = receipt_op.run
+    receipt_op = Receipt::Create.new(@employee, @receipt_params)
+    assert_difference '@employee.receipts.count', 1 do
+      @result = receipt_op.run
     end
-    assert @receipt.success?
-    assert_equal @receipt.receipt.user_id, @employee.id
+    assert @result.success?
+    assert_equal @result.receipt.user_id, @employee.id
   end
 
-  test "only images with the right formats can be uploaded as receipts" do
-
+  test "cannot add a receipt to another user's armada" do
+    receipt_op = Receipt::Create.new(@admin, @receipt_params)
+    assert_no_difference '@employee.receipts.count' do
+      assert_difference '@admin.receipts.count', 1 do
+        @result = receipt_op.run
+      end
+    end
+    assert @result.success?
+    assert @result.receipt.user_id, @admin.id
   end
-
-  test "" do
-
-  end
-
 
 end
