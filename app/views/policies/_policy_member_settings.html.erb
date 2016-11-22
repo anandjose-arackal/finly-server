@@ -6,24 +6,40 @@
 
     </div>
 
-    <form data-remote data-turboboost hidden="hidden"  id="updateUserPolicyConfiguration" action="<%= policy_update_user_configuration_path(load_params policy_id: @result.policy.id) %>" method="post">
-      <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-      <input name="_method" type="hidden" value="patch"/>
-    </form>
 
     <div class="modal-body">
-      <label style="margin-top: 0">User Name: </label>
-      <span id="policyMemberEmailId" style="margin-left: 30px">MaryJain@spidey.com</span>
+      <div class="row no-margin">
+        <div class="col-sm-6">
+          <div class="row no-margin">
+            <div class="col-sm-4">User Name:</div> 
+            <div class="col-sm-8"><label><%= @target_user.name %></label></div> 
+          </div>
+          <div class="row no-margin">
+            <div class="col-sm-4">User Email:</div> 
+            <div class="col-sm-8"><label><%= @target_user.email %></label></div> 
+          </div>
+
+          <div class="row no-margin">
+            <div class="col-sm-4">User Mobile:</div> 
+            <div class="col-sm-8"><label><%= @target_user.mobile_number %></label></div> 
+          </div>
+          
+        </div>
+      </div>
+      
       <label>Policy Admin
         <span style="font-size: 10px; font-weight: 400 "> (Policy Admins can take control of any of the reports submitted by the employees belonging to this policy)</span>
       </label>
+      <form id="form-policy-member-settings">
 
+      <input type="hidden" name="policy[policy_id]" value="<%= @result.map[:policy].id %>">
+      <input type="hidden" name="policy[user_id]" value="<%= @target_user.id %>">
       <div>
         <span class="radio-inline" style="font-size: 12px">
-          <input id="dialogAdminTrue" type="radio" form="updateUserPolicyConfiguration" name="policy[admin]" style="font-size: 8px" value="1" form="updateUserForm">Yes
+          <input  type="radio" name="policy[admin]" style="font-size: 8px" value="1">&nbsp;&nbsp;Yes
         </span>
         <span class="radio-inline" style="font-size: 12px">
-          <input id="dialogAdminFalse" type="radio" form="updateUserPolicyConfiguration" name="policy[admin]" style="font-size: 8px" checked="checked" value="0" form="updateUserForm">No
+          <input  type="radio" name="policy[admin]" style="font-size: 8px" value="0">&nbsp;&nbsp;No
         </span>
       </div>
 
@@ -39,7 +55,6 @@
           </div>
 
           <div class="policy-rules row no-margin">
-            <form id="form-policy-member-settings">
               <div class="row no-margin" style="padding: 10px 10px 0;">
                 <div class="col-sm-12 manager-data manager-container">
                   <div class="row manager non-conditional no-margin">
@@ -61,7 +76,7 @@
                   <% conditional_manager_count += 1  %>
                   <div class="row x conditional no-margin" data-condition-serial="<%= index + 1 %>">
 
-                    <div class="col-sm-12 hidden">
+                    <div class="col-sm-12 hideme hidden">
                         <input type="number" name="user_manager_mapping[<%= index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
                       <input type="number" class="mapping-id" name="user_manager_mapping[<%= index + 1 %>][mapping_id]" value="<%= conditional_manager.id %>">
                     </div>
@@ -91,7 +106,7 @@
                   <% end %>
 
                   <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy] %>" data-manager-type="manager">Add Condition</button>
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="manager">Add Condition</button>
                   </div>
                 </div><!-- .col-sm-12 -->
                 <hr />
@@ -113,7 +128,7 @@
 
                   <% conditional_finance_manager_count += 1 %>
                   <div class="row finance-manager conditional no-margin" data-condition-serial="<%= conditional_manager_count + index + 1 %>">
-                    <div class="col-sm-12 hidden">
+                    <div class="col-sm-12 hideme hidden">
                       <input type="number" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
 
                       <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping_id]" value="<%= conditional_finance_manager.id %>">
@@ -145,7 +160,7 @@
                   </div><!-- .conditional -->
                   <% end %>
                   <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy] %>" data-manager-type="finance_manager">Add Condition</button>
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="finance_manager">Add Condition</button>
                   </div>
                 </div><!-- .col-sm-12 -->
               </div><!-- .row -->
@@ -171,7 +186,7 @@
                   <% conditional_approves_to_count += 1 %>
                   <div class="row conditional approves_to no-margin" data-condition-serial="<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>">
 
-                    <div class="col-sm-12 hidden">  
+                    <div class="col-sm-12 hideme hidden">  
                       <input type="number" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
 
                       <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping_id]" value="<%= conditional_approves_to.id %>">
@@ -200,7 +215,7 @@
                   </div>
                   <% end %>
                   <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy] %>" data-manager-type="approves_to">Add Condition</button>
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="approves_to">Add Condition</button>
                   </div>
                 </div><!-- .col-sm-12 -->
                 <% end %>
@@ -225,7 +240,7 @@
 
                   <% conditional_approves_finance_to_count += 1 %>
                   <div class="row conditional approves-finance-to no-margin" data-condition-serial="<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>">
-                    <div class="col-sm-12 hidden">
+                    <div class="col-sm-12 hideme hidden">
 
                       <input type="number" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
 
@@ -256,7 +271,7 @@
                   </div>
                   <% end %>
                   <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy] %>" data-manager-type="approves_finance_to">Add Condition</button>
+                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="approves_finance_to">Add Condition</button>
                   </div>
                 </div><!-- .col-sm-12 -->
                 <% end %>
@@ -266,12 +281,20 @@
             </form>
           </div>
         </div><!-- .policy -->   
-
       </div>
-
-
-      <br />
     </div>
 
   </div>
+</div>
+<div class="hidden">
+  <select class="hidden data-team-managers">
+    <% @managers.team_managers.each do |m| %>
+      <option value="<%= m.id %>"><%= m.name %></option>
+    <% end %>
+  </select> 
+  <select class="hidden data-team-finance-managers">
+    <% @managers.team_finance_managers.each do |m| %>
+      <option value="<%= m.id %>"><%= m.name %></option>
+    <% end %>
+  </select> 
 </div>

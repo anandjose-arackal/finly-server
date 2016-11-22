@@ -4,6 +4,8 @@ class FinlyF.Views.Policy extends Backbone.View
   #main
   templateSkeleton: HandlebarsTemplates['finlyf/policies/base/skeleton']
 
+  templateAddCondition: HandlebarsTemplates['finlyf/policies/extras/addCondition']
+  
   events:
     'click .navigate-tab li a': 'navigateTab'
     'click .btn-new-rule': 'newRule'
@@ -27,6 +29,8 @@ class FinlyF.Views.Policy extends Backbone.View
     #policy member settings
     'click .policy-member-settings': 'initPolicyMemberSettings'
     'submit form#form-policy-member-settings': 'updatePolicyMemberSettings'
+    'click .btn-add-condition': 'newCondition'
+    'click .btn-remove-condition': 'removeCondition'
 
   initialize: (options) ->
     @policy_id = options.id
@@ -340,6 +344,7 @@ class FinlyF.Views.Policy extends Backbone.View
     e.preventDefault()
     _this = @
     form = e.currentTarget
+    modal = $(form).closest('.modal')
 
     user_id = $(form).find("button.btn-update-policy-member-settings").attr('data-user-id')
     
@@ -353,28 +358,94 @@ class FinlyF.Views.Policy extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
       error: (err) ->
         console.log "Err", err
     })
 
-    # # console.log values
-    # model = new FinlyF.Models.User({id: @model.get('id')})
-    # model.save(values, {
-    #   data: values,
-    #   processData: true
-    #   success: (model, res) ->
-    #     FinlyF.snapNotify(res.messages)
-    #     # console.log res
-    #     if res.success == true
-    #       console.log "now it will fetch ", _this.params.view
-    #       _this.model.fetch({
-    #         data: {
-    #           view: _this.params.view
-    #         }
-    #       })
-    #   error: (err) ->
-    #     console.log "Err", err
-    # })
+  newCondition: (e) ->
+    _this = @
+    e.preventDefault()
+    target = $(e.currentTarget)
+    policy = $(target).closest('.policy-rules')
+
+    arr = []
+    conditionals = $(policy).find('.conditional')
+    # console.log "count", conditionals.length
+    for conditional in conditionals
+      # console.log "Conditional counter", $(conditional).attr('data-condition-serial')
+      arr.push(parseInt($(conditional).attr('data-condition-serial')))
+
+    # console.log Math.max.apply(Math,arr) + 1
+
+    modal = $(target).closest('.modal')
+    managers = []
+    finance_managers = []
+    managers_data = $(modal).find("select.data-team-managers option")
+    finance_managers_data = $(modal).find("select.data-team-finance-managers option")
+
+    for manager in managers_data
+      m = {
+        id: $(manager).val()
+        name: $(manager).text()
+      }
+      managers.push(m)
+
+    for finance_manager in finance_managers_data
+      m = {
+        id: $(finance_manager).val()
+        name: $(finance_manager).text()
+      }
+      finance_managers.push(m)
+
+    item = {
+      # condition_serial: Math.max.apply(Math,arr) + 1
+      policy_id: $(target).attr('data-policy-id')
+      manager_type: $(target).attr('data-manager-type')
+      managers: managers
+      finance_managers: finance_managers
+    }
+    if arr.length == 0
+      item.condition_serial = 1
+    else
+      item.condition_serial = Math.max.apply(Math,arr) + 1
+
+    console.log "Item", item
+
+    # console.log item
+    $(target).closest('.add-condition').before(@templateAddCondition({item: item}))
+
+  removeCondition: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    $(target).attr('disabled', true)
+
+    conditional = $(target).closest('.conditional')
+    mapping_id = $(conditional).find('.hideme .mapping-id').val()
+
+    user_id = $(target).closest("form#form-policy-member-settings").find("button.btn-update-policy-member-settings").attr('data-user-id')
+    
+    if mapping_id
+      $.ajax({
+        url: '/users/' + user_id
+        type: "DELETE",
+        dataType: 'JSON',
+        data: {
+          mapping_id: mapping_id
+        },
+        success: (res) ->
+          FinlyF.snapNotify(res.messages)
+          if res.success == true
+            $(conditional).remove()
+          else
+            $(target).attr('disabled', false)
+        error: (err) ->
+          console.log "Error", err
+          $(target).attr('disabled', false)
+      })
+    else
+      $(conditional).remove()
 
 
   clearDiv: (e) ->
