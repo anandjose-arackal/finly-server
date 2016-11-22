@@ -1065,7 +1065,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     data = {}
     data.view = _this.params.view
     data.authenticity_token = $("#authenticity_token").val()
-    console.log action_type
+    # console.log action_type
 
     switch action_type
       when 'credit_reimbursement'
@@ -1076,15 +1076,19 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           note: $(container).find('textarea[name=payment\\[note\\]]').val()
           date: $(container).find('input[name=payment\\[date\\]]').val()
           amount: parseFloat(_this.selectedReportsTotal())
+
         }
+        data.password = $(container).find('input[type=password][name=password]').val()
         # console.log data
       when 'credit_cash_advance'
         data.payment = {
           amount: _this.settlementActionData.c_cash_advance.amount
           date: _this.settlementActionData.c_cash_advance.date
           note: _this.settlementActionData.c_cash_advance.note
+
           # payment_type: parseInt($(target).find("input[name=payment\\[payment_type\\]]:checked").val())
         }
+        data.password = $(container).find('input[type=password][name=password]').val()
         # data.payment_type = parseInt($(target).find("input[name=payment_type]").val())
         # data.payment_type = 1 #Already there in the url
         data.password = $(container).find('input[name=password]').val()
@@ -1096,7 +1100,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           date: $(container).find('input[name=payment\\[date\\]]').val()
           amount: parseFloat(_this.selectedReportsTotal())
         }
-        console.log "Submit action data", data
+        data.password = $(container).find('input[type=password][name=password]').val()
+        # console.log "Submit action data", data
       when 'credit_card_from_card'
         # data.action_type = x
         data.amount = _this.settlementActionData.c_card_from_card.amount
@@ -1127,20 +1132,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           amount: _this.settlementActionData.d_cash_advance.amount
           date: _this.settlementActionData.d_cash_advance.date
           note: _this.settlementActionData.d_cash_advance.note
+
           # payment_type: parseInt($(target).find("input[name=payment\\[payment_type\\]]:checked").val())
         }
         # data.payment_type = parseInt($(target).find("input[name=payment_type]").val())
         # data.payment_type = 1 #Already there in the url
         data.password = $(container).find('input[name=password]').val()
-
-      when 'debit_card_to_card'
-        data.amount = _this.settlementActionData.d_card_to_card.amount
-        data.password = $(container).find('input[type=password][name=password]').val()
-        data.from_user_id = _this.user_id
-      when 'debit_card_to_wallet'
-        data.amount = _this.settlementActionData.d_card_to_wallet.amount
-        data.password = $(container).find('input[type=password][name=password]').val()
-        data.from_user_id = _this.user_id 
 
       when 'debit_wallet_to_wallet'
         data.amount = _this.settlementActionData.d_wallet_to_wallet.amount

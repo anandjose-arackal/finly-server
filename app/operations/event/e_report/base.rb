@@ -3,13 +3,15 @@ class Event::EReport::Base < Event::SetNotification
 
   def pre_validate
     unless user.present?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
+      return
     end
     if params.blank? or params[:report].blank?
-      messages[:error] << 'Report not found'
+      add_message :error, 'Report not found'
+      return
     end
     unless params[:report].is_a?(::Report)
-      messages[:error] << 'Error loading report'
+      add_message :error, 'Error loading report'
     end
   end
 
@@ -19,11 +21,12 @@ class Event::EReport::Base < Event::SetNotification
 
   def validate
     unless self.report.present?
-      messages[:error] << 'Report not found'
+      add_message :error, 'Report not found'
     end
   end
 
   def send_mailer(user)
+  	return if user.blank?
     subject = self.mailer_subject(user)
     body = self.mailer_body(user)
     button_name = self.mailer_button_name(user)
@@ -39,7 +42,7 @@ class Event::EReport::Base < Event::SetNotification
 
   def mailer_button_name(user)
     if report.controlling_user_id.present? and
-        user.id == report.controlling_user_id and not user.id == report.user.id
+      user.id == report.controlling_user_id and not user.id == report.user.id
       'Review Report'
     else
       'View Report'

@@ -18,7 +18,7 @@ class Event::EReport::Approve < Event::EReport::Base
 
   def affected_users
     if approved
-      [self.report.controlling_user, self.report.user]
+      [self.report.tracks.last.action_user, self.report.user]
     else
       [self.report.tracks.last.action_user, self.report.controlling_user]
     end

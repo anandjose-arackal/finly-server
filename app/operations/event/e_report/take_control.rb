@@ -6,7 +6,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
 
   def affected_users
     # [self.report.controlling_user, self.report.controlling_for_user]
-    [self.report.controlling_user]
+    [self.report.controlling_user, self.report.controlling_for_user]
   end
 
   def send_push_notification(user)
@@ -21,15 +21,15 @@ class Event::EReport::TakeControl < Event::EReport::Base
 
   def mailer_subject(user)
     if user.id == report.controlling_user_id
-
+      "You have taken control of the report: #{self.report.name}"
     else
-      "#{self.report.controlling_user.name} has has taken control of the report"
+      "#{self.report.controlling_user.name} has has taken control of the report: #{self.report.name}"
     end
   end
 
   def mailer_body(user)
     if user.id == report.controlling_user_id
-
+      "You have taken control of the report.<br/><br/>Report: \"#{self.report.name}\""
     else
       "#{self.report.controlling_user.name} has has taken control of the report which was awaiting your review.<br/><br/>Report: \"#{self.report.name}\""
     end
