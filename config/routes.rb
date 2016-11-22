@@ -540,6 +540,10 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'statements/:id/summary' => 'statements#summary'
+  resources :statements do
+  end
+
   # get 'settlements/summary' => 'settlements#summary'
 
   root 'home#index'

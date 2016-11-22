@@ -16,6 +16,8 @@ class FinlyF.Routers.Main extends Backbone.Router
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
     'settlements/:user/params=:query': 'settlements_show'
+
+    'statements/:user/params=:query': 'statements'
     'employees/params=:query': 'users'
     'employees': 'users'
     'analytics': 'analytics'
@@ -159,6 +161,26 @@ class FinlyF.Routers.Main extends Backbone.Router
     FinlyF.startMainLoader(summary)
     @features()
     $("#primary-navbar a.navbar-menu-li[href^='\\#settlements']").parent().addClass('active')
+
+  statements: (user, query) ->
+    console.log "hitting the route"
+    if typeof query != 'undefined'
+      if query != null
+        params = JSON.parse(query)
+      else
+        params = {}
+    else
+      params = {}
+    view = new FinlyF.Views.Statement({
+      user: user,
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    # summary = $("#backbone-container  .main .summary")
+    # main = $("#backbone-container .settlements-content")
+    # FinlyF.startMainLoader(main)
+    # FinlyF.startMainLoader(summary)
+    @features()
 
   users: (query)->
     # body = $("body")
