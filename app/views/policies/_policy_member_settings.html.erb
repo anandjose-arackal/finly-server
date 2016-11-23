@@ -32,15 +32,17 @@
       </label>
       <form id="form-policy-member-settings">
 
-      <input type="hidden" name="policy[policy_id]" value="<%= @result.map[:policy].id %>">
-      <input type="hidden" name="policy[user_id]" value="<%= @target_user.id %>">
+      <input type="hidden" name="user_policy_config[][policy_id]" value="<%= @result.map[:policy].id %>">
       <div>
-        <span class="radio-inline" style="font-size: 12px">
-          <input  type="radio" name="policy[admin]" style="font-size: 8px" value="1">&nbsp;&nbsp;Yes
-        </span>
-        <span class="radio-inline" style="font-size: 12px">
-          <input  type="radio" name="policy[admin]" style="font-size: 8px" value="0">&nbsp;&nbsp;No
-        </span>
+
+      <% policy_admin = @target_user.policy_admin?(@result.map[:policy].id) ? true : false %>
+
+        <label class="radio-inline" style="font-size: 12px">
+          <input  type="radio" name="user_policy_config[][admin]" style="font-size: 8px" <%= "checked='checked'" if policy_admin %>" value="1">&nbsp;&nbsp;Yes
+        </label>
+        <label class="radio-inline" style="font-size: 12px">
+          <input  type="radio" name="user_policy_config[][admin]" style="font-size: 8px" <%= "checked='checked'" unless policy_admin %>" value="0">&nbsp;&nbsp;No
+        </label>
       </div>
 
       <div class="row no-margin">

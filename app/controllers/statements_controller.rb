@@ -10,5 +10,4 @@ class StatementsController < ApplicationController
 
   def summary
   end
-
 end
