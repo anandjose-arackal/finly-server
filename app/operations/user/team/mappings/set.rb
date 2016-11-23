@@ -68,6 +68,9 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
     end
   end
 
+  def authorize
+  end
+
   def process
     self.updating_records.each do |record|
       record.save
