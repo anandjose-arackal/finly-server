@@ -45,6 +45,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_not @result.transaction.error_message
     assert_equal 23.2, @result.transaction.transaction_amount_value
     assert_equal 25.3, @result.transaction.billing_amount_value
+    assert_equal @user.id, @result.transaction.user.id
 
     # checking the expense created out of the transaction
     @c_expense = @user.expenses.order(created_at: :desc).first
@@ -93,6 +94,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_not @result.transaction.error_message
     assert_equal 23.2, @result.transaction.transaction_amount_value
     assert_equal 23.2, @result.transaction.billing_amount_value
+    assert_equal @user.id, @result.transaction.user.id
 
     # checking the expense created out of the transaction
     @c_expense = @user.expenses.order(created_at: :desc).first
@@ -141,6 +143,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_not @result.transaction.error_message
     assert_equal 123.0, @result.transaction.transaction_amount_value
     assert_equal 124.0, @result.transaction.billing_amount_value
+    assert_equal @user.id, @result.transaction.user.id
 
     @user.reload
     assert_equal cih + 124.0, @user.cash_in_hand.value
@@ -187,6 +190,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 123.0, @result.transaction.transaction_amount_value
     assert_equal 124.0, @result.transaction.billing_amount_value
     assert_equal "Credit", @result.transaction.transaction_type
+    assert_equal @user.id, @result.transaction.user.id
   end
 
   test "if the expense creation fails, the transaction is marked as not expensed" do

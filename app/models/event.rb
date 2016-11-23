@@ -13,6 +13,7 @@
 #
 
 
+
 class Event < ActiveRecord::Base
 
   ACTIONS = [{key: :report_submit, has_push_notification: true, has_mailer: true,

@@ -146,10 +146,10 @@ class User::Wallet::Credit < User::Wallet::Base
             from_user.wallet.subtract_funds(self.amount)
 
             payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_card)
-            self.from_user_payment =from_user.payments.create payment_from_attributes
+            self.from_user_payment = from_user.payments.create payment_from_attributes
 
             payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_card)
-            self.to_user_payment =to_user.payments.create payment_to_attributes
+            self.to_user_payment = to_user.payments.create payment_to_attributes
 
             add_message :success, 'Credit successful'
           else

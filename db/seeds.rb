@@ -317,7 +317,7 @@ if Report.count == 0
   c.users.all.each do |user|
 
     # creating open reports
-    3.times.each do
+    # 3.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -331,10 +331,10 @@ if Report.count == 0
         expenses_ids << e.id
       end
       Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
-    end
+    # end
 
     # creating submitted reports
-    3.times.each do
+    # 3.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -349,10 +349,10 @@ if Report.count == 0
       end
       Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
       Report::Submit.(user, {report_id: report.id})
-    end
+    # end
 
     # creating approved reports
-    3.times.each do
+    # 3.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -372,7 +372,7 @@ if Report.count == 0
         Report::Approve.(report.controlling_user, {report_id: report.id})
         report.reload
       end
-    end
+    # end
   end
 end
 

@@ -11,8 +11,6 @@ class Card::Transaction::Create < BaseOperation
 
   end
 
-
-
   def initialize(params, messages={})
     self.params = params
     self.messages = messages
@@ -23,6 +21,7 @@ class Card::Transaction::Create < BaseOperation
     self.user = self.card.user rescue nil
     self.type = params[:transaction_type]
     self.mode = params[:transaction_mode]
+    params[:user_id] = user.id
   end
 
   def authorize
@@ -39,7 +38,7 @@ class Card::Transaction::Create < BaseOperation
     case type
       when "Debit"
         case mode
-          when "POS"
+          when "POS", "Ecom"
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
