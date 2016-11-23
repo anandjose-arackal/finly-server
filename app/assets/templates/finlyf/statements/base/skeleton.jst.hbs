@@ -129,10 +129,10 @@
   overflow-y: scroll;
   background: rgb(252, 252, 252) none repeat scroll 0% 0%;
   background: #fff;
-  max-height: calc(100%); 
+  max-height: calc(100% - 103px); 
   padding: 10px;
   box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
-  height: calc(100%);
+  height: calc(100% - 103px);
 }
 .main.preview .col-md-8{
   /*display: none;*/
@@ -285,9 +285,8 @@ hr{
   <div class="container-fluid">
     <div class="row no-margin no-padding">
       <div class="col-md-2" style="box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
-        <div class="navbar-header navbar-sidebar">
-          {{!-- navbar_sidebar.jst.hbs partial --}}
-          {{!-- Hello --}}
+        <div class="navbar-header">
+          <a class="navbar-brand">User Details</a>
         </div>
       </div>
       <div class="col-md-10" style="">
