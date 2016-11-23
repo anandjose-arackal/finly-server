@@ -1,13 +1,14 @@
 class FinlyF.Views.Statement extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/statements/base/skeleton']
   templateSidebar: HandlebarsTemplates['finlyf/statements/sidebar/sidebar']
-  templateNavbarMainSummary: HandlebarsTemplates['finlyf/statements/navbar/navbar_main']
-  templateNavbarMainTransactions: HandlebarsTemplates['finlyf/statements/navbar/navbar_main']
+  templateNavbarMain: HandlebarsTemplates['finlyf/statements/navbar/navbar_main']
 
-  templateMain: HandlebarsTemplates['finlyf/statements/crud/main']
+  templateMainSummary: HandlebarsTemplates['finlyf/statements/crud/main']
+  templateMainTransactions: HandlebarsTemplates['finlyf/statements/crud/main']
 
   events:
-    'click .filter-statements': 'filterStatements'
+    'click li.filter-statement-type': 'filterStatementType'
+    'change input.filter-date-from, input.filter-date-to': 'fetchScopedData'
 
   initialize: (options) ->
     _this = @
@@ -24,27 +25,40 @@ class FinlyF.Views.Statement extends Backbone.View
     @params.filter_date_to = @formatDate(today)
 
 
-    # $.ajax({
-    #   url: '/statements/' + @user + '/summary'
-    #   dataType: 'json'
-    #   data: @params
-
-    #   success: (res) ->
-    #     _this.populateSummary(res)
-    #   error: (err) ->
-    #     console.log "Err", err
-    # })
+    $.ajax({
+      url: '/users/' + @user
+      dataType: 'json'
+      data: {
+        view: _this.params.view
+      }
+      success: (res) ->
+        _this.populateUserData(res)
+      error: (err) ->
+        console.log "Err", err
+    })
 
 
   render: ->
     $(@el).html(@templateSkeleton({item: @params}))
     $(@el).find(".sidebar").html(@templateSidebar())
-    $(@el).find(".navbar-main").html(@templateNavbarMain({item: @params}))
 
     FinlyF.structureActions(@el, @params)
+    @fetchTabData()
     @
 
-  fetchTabDate: ->
+  fetchScopedData: (e) ->
+    target = e.currentTarget
+    if $(target).hasClass('filter-date-from')
+      @params.filter_date_from = $(target).val()
+    else
+      @params.filter_date_to = $(target).val()
+    FinlyF.startMainLoader($(@el).find('.main'))
+    @fetchTabData()
+
+  fetchTabData: ->
+    $(@el).find(".navbar-main").html(@templateNavbarMain({item: @params}))
+    $(@el).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    _this = @
     switch @params.statement_type
       when 'summary'
         url = '/statements/' + @user + '/summary'
@@ -60,6 +74,8 @@ class FinlyF.Views.Statement extends Backbone.View
       dataType: 'json'
       data: @params
       success: (res) ->
+
+        FinlyF.stopMainLoader($(_this.el).find('.main'))
         _this.populateSummary(res)
       error: (err) ->
         console.log "Err", err
@@ -72,12 +88,18 @@ class FinlyF.Views.Statement extends Backbone.View
     else
       $(@el).find(".main").html(@templateMainTransactions({item: item}))
 
+  populateUserData: (item) ->
+    $(@el).find(".sidebar").html(@templateSidebar({item: item}))
 
-  filterStatements: (e) ->
+
+  filterStatementType: (e) ->
+    FinlyF.startMainLoader($(@el).find('.main'))
     e.preventDefault()
     target = e.currentTarget
 
-    @params.filter_state = parseInt($(target).attr('data-filter-state'))
+    @params.statement_type = $(target).attr('data-show-type')
+    console.log @params
+    @fetchTabData()
 
   formatDate: (d) ->
     console.log d
