@@ -147,7 +147,6 @@ class Statement::Summary < Statement::Base
     unless date
       return balance
     end
-    
   end
 
 end
