@@ -24,8 +24,8 @@ json.table2 do
   json.cash_withdrawal 12
   json.paid_to_employee 12
   json.paid_by_employee 12
-  json.varified_card_ex 12
-  json.varified_cash_ex 12
+  json.verified_card_ex 12
+  json.verified_cash_ex 12
   json.closing_card_balance 12
   json.closing_cash_in_hand 12
 end

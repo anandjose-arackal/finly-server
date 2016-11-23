@@ -1,19 +1,25 @@
 <div class="row sidebar-element">
   <div class="col-sm-3 sidebar-label">
-    From
+    User Name:
   </div>
   <div class="col-sm-9">
-    <input type="text" class="form-control datepicker filter-date-from" style="width: 100%;" value="{{item.filter_date_from}}" />
-    <span class="fa fa-calendar input-icon "></span> 
-
+    {{item.name}}
   </div>
 </div>
 <div class="row sidebar-element">
   <div class="col-sm-3 sidebar-label">
-    To
+    User Email:
   </div>
   <div class="col-sm-9">
-    <input type="text" class="form-control datepicker filter-date-to" style="width: 100%;" value="{{item.filter_date_to}}" />
-    <span class="fa fa-calendar input-icon "></span> 
+    {{item.email}}
+  </div>
+</div>
+
+<div class="row sidebar-element">
+  <div class="col-sm-3 sidebar-label">
+    User Mobile:
+  </div>
+  <div class="col-sm-9">
+    {{item.mobile_number}}
   </div>
 </div>
