@@ -9,7 +9,7 @@
 
 class User::Invite::Create < User::Invite::Base
 
-  attr_accessor :invited_user, :emails, :policy, :policy_id
+  attr_accessor :invited_users, :emails, :policy, :policy_id
 
   def pre_validate
     if params.blank? or user.blank?
@@ -73,15 +73,15 @@ class User::Invite::Create < User::Invite::Base
     # checking validity of user team params
     team_mapping = invite_params[:team_mapping_attributes]
     if team_mapping.blank?
-      messages[:error] << 'User must be assigned a manager and a finance manager to be invited'
+      messages[:error] << 'User must be assigned a team to be invited'
       return false
     end
     unless team_mapping.is_a?(Array) and team_mapping.size > 0
-      messages[:error] << 'User must be assigned a manager and a finance manager to be invited'
+      messages[:error] << 'User must be assigned a team to be invited'
       return false
     end
-
   end
+
 
   def authorize
     # checking if role mapping attributes are compatible
@@ -152,18 +152,18 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def process
+    self.invited_users = []
     emails.each do |email|
       invite_params[:email] = email
       invite_params[:first_name] = ''
       invite_params[:last_name] = ''
-      self.invited_user = User.invite!(invite_params, self.user) do |u|
+      self.invited_users << User.invite!(invite_params, self.user) do |u|
         u.invitation_note = params[:pending_invite][:note]
-        # u.skip_invitation = true
       end
     end
 
-    unless invited_user
-      messages[:error] << 'Invite failed. Try again!'
+    if invited_users.empty?
+      messages[:error] << 'Invites failed. PLease try again'
     end
   end
 
@@ -172,9 +172,11 @@ class User::Invite::Create < User::Invite::Base
     if success?
       self.policy = Policy.find_by(id: policy_id)
       if policy
-        unless Policy::Users::AddUser.new(user, {policy_id: policy.id, user_id: "#{invited_user.id}"}).run.success?
-          messages[:error] << 'User could not be added to policy'
-          return false
+        invited_users.each do |invited_user|
+          unless Policy::Users::AddUser.new(user, {policy_id: policy.id, user_id: "#{invited_user.id}"}).run.success?
+            messages[:error] << 'User could not be added to policy'
+            return false
+          end
         end
       end
       # adding the invitation note to the user

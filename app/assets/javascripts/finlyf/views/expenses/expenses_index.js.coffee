@@ -42,8 +42,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     if Backbone.history.getFragment() == ""
       FinlyF.primary_router.navigate("expenses")
     if options
-
       @params = options.params || {}
+      @params.view = @params.view || 'personal'
       if options.indexOnly
         @indexOnly = true
       if options.parent

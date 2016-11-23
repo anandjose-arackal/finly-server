@@ -140,14 +140,14 @@ if c.categories.count == 0
 end
 
 if User.count == 0
-  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finly.io",
+  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finlytest.io",
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                             {user_role_id: UserRole.employee_id}],
                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finly.io",
+  User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
@@ -155,29 +155,28 @@ if User.count == 0
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   fm = []
-  4.times do |pos|
-    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finly.io",
+  # 4.times do |pos|
+    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{}", email: "finance#{}@finlytest.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                 {user_role_id: UserRole.employee_id}],
                       profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                            address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  end
+  # end
   m = []
-  6.times do |pos|
-    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finly.io",
+  # 6.times do ||
+    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{}", email: "manager#{}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 3},
                                                {user_role_id: UserRole.employee_id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-  end
+  # end
 
   u = []
 
-  # creating user0
-  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "user0@finly.io",
+  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "user0@finlytest.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    role_mapping_attributes: [{user_role_id: 4},
                                              {user_role_id: UserRole.employee_id}],
@@ -185,15 +184,15 @@ if User.count == 0
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  10.times do |pos|
-    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finly.io",
+  # 10.times do ||
+    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
                                                {user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-  end
+  # end
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
   m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
@@ -217,7 +216,7 @@ if Policy.non_default.count == 0
   p.configuration.update_attribute(:require_category, true) if p.present?
   Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
   # PolicyUserService.new(p).add_user(u[0], false)
-  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
+  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[0].id)
   p2 = Policy::Create.(a, {name: 'Another test Policy'})
   p2 = Policy.find_by(name: 'Another test Policy')
   u.each do |user|
@@ -244,13 +243,13 @@ end
 
 if Expense.count == 0
   # junk manual expenses
-  200.times do |i|
+  10.times do |i|
     Expense.create(amount_attributes: {value: random(100, 1000), currency_id: 1},
                    expense_status_id: 1,
                    expense_type_id: 1,
                    note: "#{Faker::Lorem.sentence}",
                    date: Faker::Date.between(20.days.ago, DateUtils.local_date),
-                   user_id: random_integer(1, 10),
+                   user_id: random_integer(1, 5),
                    category_id: random_integer(1, 5),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
@@ -322,7 +321,7 @@ if Report.count == 0
 
       expenses = []
       expenses_ids = []
-      5.times.each do
+      2.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
@@ -339,7 +338,7 @@ if Report.count == 0
 
       expenses = []
       expenses_ids = []
-      5.times.each do
+      2.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
@@ -357,7 +356,7 @@ if Report.count == 0
 
       expenses = []
       expenses_ids = []
-      5.times.each do
+      2.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
@@ -372,8 +371,8 @@ if Report.count == 0
         Report::Approve.(report.controlling_user, {report_id: report.id})
         report.reload
       end
-    # end
-  end
+    end
+  # end
 end
 
 if CardType.count == 0
@@ -433,45 +432,46 @@ end
 
 if AdminUser.count == 0
   # creating admin panel users who can access admin panel
-  # AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+  AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 end
 
-# # creating Wayne Enterprises
-#
-# c2 = Company.create(name: "Wayne Enterprises", d_code: "D000000360")
-#
-# a = User.create(company: c2, first_name: "Bruce", last_name: "Wayne", email: "bruce@wayne.com",
-#                 password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
-#                 role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                           {user_role_id: UserRole.employee_id}],
-#                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-#                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-# a = User.create(company: c2, first_name: "Robin", last_name: "Williams", email: "robin@wayne.com",
-#                 password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
-#                 role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                           {user_role_id: UserRole.employee_id}],
-#                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-#                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-# a = User.create(company: c2, first_name: "Commisioner", last_name: "Gordon", email: "gordon@wayne.com",
-#                 password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
-#                 role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
-#                                           {user_role_id: UserRole.employee_id}],
-#                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-#                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-# a = User.create(company: c2, first_name: "Harvey", last_name: "Dent", email: "harvey@wayne.com",
-#                 password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
-#                 role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-#                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-#                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-#
-# #confirming users from Wayne enterprises
-# c = Company.second
-# c.users.each_with_index do |user, index|
-#
+# creating Finly users and junk transaction data.
+# jouska = Company.create(name: 'Jouska')
+#   jouska.reload
+# # creating Jouska Tech users
+#   veekshith = User.create(name: "Veekshith Rai", email: "veekshith.rai@jouska.com",
+#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
+#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+#                                                {user_role_id: UserRole.manager_id},
+#                                                {user_role_id: UserRole.employee_id}])
+
+#   vivek = User.create(name: "Vivek Bhat", email: "vivek@jouska.com",
+#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
+#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+#                                                {user_role_id: UserRole.finance_manager_id},
+#                                                {user_role_id: UserRole.employee_id}])
+
+#   sreeram = User.create(name: "Sreeram N R", email: "sreeram.nr@jouska.com",
+#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
+#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
+#                                                {user_role_id: UserRole.employee_id}])
+
+#   abinash = User.create(name: "Abinash Kumar", email: "kumar.abinash@jouska.com",
+#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
+#                      role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
+#                                                {user_role_id: UserRole.employee_id}])
+
+#   bala = User.create(name: "Balakumar Rajaram", email: "balakumar.rajaram@jouska.com",
+#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
+#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
+#                                                {user_role_id: UserRole.finance_manager_id},
+#                                                {user_role_id: UserRole.employee_id}])
+
+# User.all.each do |user|
 #   user.confirm
 #   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 #

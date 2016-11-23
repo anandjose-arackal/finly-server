@@ -1,98 +1,175 @@
+# this test requires one user of each type and one non default policy
+
 require 'test_helper'
 
 class CreateInviteTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
-    @user = User.find_by(email: 'user0@finlytest.io')
-    @employee = User.find_by(email: 'user0@finlytest.io')
-    @manager = User.find_by(email: 'manager0@finlytest.io')
-    @second_manager = User.find_by(email: 'manager1@finlytest.io')
-    @third_manager = User.find_by(email: 'manager2@finlytest.io')
-    @finance_manager = User.find_by(email: 'finance0@finlytest.io')
-    @second_finance_manager = User.find_by(email: 'finance1@finlytest.io')
+    @admin = users(:admin)
+    @employee = users(:employee)
+    @manager = users(:manager)
+    @finance_manager = users(:finance_manager)
+
+    @policy = Policy.non_default.first
+    @invite_params = {pending_invite: { company_id: 1,
+                                        email: "test@test.com",
+                                        note: "Test note.",
+                                        team_mapping_attributes: {manager_id: @manager.id,
+                                                                  finance_manager_id: @finance_manager.id},
+                                        policy_id: @policy.id
+                                      },
+                      admin: "1",
+                      manager: "0",
+                      finance_manager: "0"
+                     }
   end
 
-  test "invite flow test" do
-    user_invite_op = User::Invite::Create.new(@manager,{invite: {company_id: @manager.company_id, email: 'user99@finlytest.io',
-                                             role_mapping_attributes: [{user_role_id: 4}],
-                                             team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
+  test "admins can invite new users into the system with a policy" do
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
     assert_difference 'User.count', 1 do
-      @new_user = user_invite_op.run
+      assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 1 do
+        @result = user_invite_op.run
+      end
     end
-    assert @new_user
-    assert @new_user.employee?
-    assert_equal @manager.id, @new_user.invited_by_id
-    assert user_invite_op.errors.empty?
+    invited_user = @result.invite.first
+    assert @result.success?
+    assert_equal "test@test.com", invited_user.email
+    assert invited_user.admin?
+    assert invited_user.employee?
+    # checking if the user has been added to the policy passed while creation
+    assert @policy.users.include?(invited_user)
+    # default policy + Test Policy for this user
+    assert_equal 1, invited_user.policies.count
+  end
 
-    # Employee cannot invite other users
-    user_invite_op = User::Invite::Create.new(@employee,{invite: {company_id: @employee.company_id, email: 'user100@finlytest.io',
-                                                                 role_mapping_attributes: [{user_role_id: 4}],
-                                                                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
+  test "admins can invite new users to the system without a policy as well" do
+
+    # inviting the user without a policy setting ensures that he/she is only added to default
+    @invite_params[:pending_invite][:policy_id] = ""
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_difference 'User.count', 1 do
+      assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 1 do
+        @result = user_invite_op.run
+      end
+    end
+    invited_user = @result.invite.first
+    assert @result.success?
+    assert_equal "test@test.com", invited_user.email
+    assert invited_user.admin?
+    assert invited_user.employee?
+    # checking if the user has been added to the policy passed while creation
+    assert_not @policy.users.include?(invited_user)
+    # ensure the user is not explicitly a part of a policy
+    assert_equal 0, invited_user.policies.count
+  end
+
+  test "managers and finance managers cannot invite other users" do
+    # trying to invite users as manager
+    user_invite_op = User::Invite::Create.new(@manager, @invite_params)
     assert_no_difference 'User.count' do
       begin
-        @new_user = user_invite_op.run
-      rescue
+        @result = user_invite_op.run
+      rescue NotAuthorizedException
         @rescued = true
       end
     end
     assert @rescued
 
-    # Manager/Finance managers can only invite users under them
-
-    # Manager
-    user_invite_op = User::Invite::Create.new(@manager,{invite: {company_id: @employee.company_id, email: 'user111@finlytest.io',
-                                                                  role_mapping_attributes: [{user_role_id: 4}],
-                                                                  team_mapping_attributes: [{default: true, manager_id: @admin.id, finance_manager_id: @finance_manager.id}]}})
+    # trying to invite as finance manager
+    user_invite_op = User::Invite::Create.new(@finance_manager, @invite_params)
     assert_no_difference 'User.count' do
-      @new_user = user_invite_op.run
+      begin
+        @result = user_invite_op.run
+      rescue NotAuthorizedException
+        @rescued = true
+      end
     end
-    assert_not @new_user
-    assert user_invite_op.errors.present?
-
-    # # Finance
-    user_invite_op = User::Invite::Create.new(@finance_manager,{invite: {company_id: @employee.company_id, email: 'user999@finlytest.io',
-                                                                 role_mapping_attributes: [{user_role_id: 4}],
-                                                                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @admin.id}]}})
-    assert_no_difference 'User.count' do
-      @new_user = user_invite_op.run
-    end
-    assert_not @new_user
-    assert user_invite_op.errors.present?
-
-
-    # Manager/Finance managers can only invite users as employee/(manager or finance manager)
-    # manager
-    user_invite_op = User::Invite::Create.new(@manager,{invite: {company_id: @employee.company_id, email: 'user111@finlytest.io',
-                                                                 role_mapping_attributes: [{user_role_id: 4}, {user_role_id: 3}, {user_role_id: 1}],
-                                                                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
-    assert_no_difference 'User.count' do
-      @new_user = user_invite_op.run
-    end
-    assert_not @new_user
-    assert user_invite_op.errors.present?
-
-    # finance
-    user_invite_op = User::Invite::Create.new(@finance_manager,{invite: {company_id: @employee.company_id, email: 'user111@finlytest.io',
-                                                                 role_mapping_attributes: [{user_role_id: 4}, {user_role_id: 2}, {user_role_id: 1}],
-                                                                 team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
-    assert_no_difference 'User.count' do
-      @new_user = user_invite_op.run
-    end
-    assert_not @new_user
-    assert user_invite_op.errors.present?
-
-    # Only admins can invite other admins
-    # Admins can invite users without manager/finance manager
-    user_invite_op = User::Invite::Create.new(@admin,{invite: {company_id: @employee.company_id, email: 'user111@finlytest.io',
-                                                                         role_mapping_attributes: [{user_role_id: 4}, {user_role_id: 2}, {user_role_id: 1}],
-                                                                         team_mapping_attributes: [{default: true, manager_id: @manager.id, finance_manager_id: @finance_manager.id}]}})
-    assert_difference 'User.count', 1 do
-      @new_user = user_invite_op.run
-    end
-    assert @new_user
-    assert @new_user.admin?
-    assert_equal @admin.id, @new_user.invited_by_id
-    assert_not user_invite_op.errors.present?
+    assert @rescued
   end
+
+  test "cannot invite user whose email id already exists in the system" do
+    @invite_params[:pending_invite][:email] = "manager@finlytest.io"
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_no_difference 'User.count' do
+      @result = user_invite_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+    assert_equal "User already invited: manager@finlytest.io", @result.messages[:error].first
+  end
+
+  test "cannot invite a user without a valid company ID" do
+    # leaving the company id blank
+    @invite_params[:pending_invite][:company_id] = ""
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_no_difference 'User.count' do
+      @result = user_invite_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+
+    # entering an invalid company_id or a different company_id
+    @invite_params[:pending_invite][:company_id] = 2
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_no_difference 'User.count' do
+      @result = user_invite_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+  end
+
+  test "adding comma separated emails adds all the users with valid email addresses" do
+    @invite_params[:pending_invite][:email] = "test@test.com, abc@test.com, hello@world.com"
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_difference 'User.count', 3 do
+      assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 3 do
+        @result = user_invite_op.run
+      end
+    end
+    assert @result.success?
+    invited_users = @result.invite
+    assert_equal 3, invited_users.count
+    assert_equal "test@test.com", invited_users.first.email
+    assert_equal "abc@test.com", invited_users.second.email
+    assert_equal "hello@world.com", invited_users.third.email
+
+    invited_users.each do |user|
+      assert user.admin?
+      assert user.employee?
+      # checking if the user has been added to the policy passed while creation
+      assert @policy.users.include?(user)
+      # default policy + Test Policy for this user
+      assert_equal 1, user.policies.count
+    end
+  end
+
+  test "cannot invite a user without a valid email" do
+    # invalid email format
+    @invite_params[:pending_invite][:email] = "say whaaaa"
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_no_difference 'User.count' do
+      @result = user_invite_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+
+    # blank email id
+    @invite_params[:pending_invite][:email] = ""
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_no_difference 'User.count' do
+      @result = user_invite_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+
+    # another invalid format, because hey this is fun
+    @invite_params[:pending_invite][:email] = "asdf@asdf"
+    user_invite_op = User::Invite::Create.new(@admin, @invite_params)
+    assert_no_difference 'User.count' do
+      @result = user_invite_op.run
+    end
+    assert_not @result.success?
+    assert_not @result.messages[:error].empty?
+  end
+
 end

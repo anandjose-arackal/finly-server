@@ -23,7 +23,7 @@ class Export::Base < BaseOperation
   end
 
   def authorized_user_types
-    [:admin]
+    [:company_admin]
   end
 
   def pre_validate

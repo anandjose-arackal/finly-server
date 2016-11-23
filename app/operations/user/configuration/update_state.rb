@@ -17,7 +17,6 @@ class User::Configuration::UpdateState < BaseOperation
   end
 
   def init
-    params[:view] = 'admin'
     id = params[:id] or params[:to_user_id]
     self.to_user = User::Team::Index.(user, params).with_id(id).first rescue nil
   end
@@ -39,10 +38,6 @@ class User::Configuration::UpdateState < BaseOperation
       messages[:error] = to_user.errors.full_messages
     end
   end
-
-  # def success
-  #   self.to_user
-  # end
 
   private
 

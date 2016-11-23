@@ -56,6 +56,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :validatable, password_length: 8..128
 
   attr_accessor :view, :invitation_note
+  attr_reader :raw_invitation_token
 
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
@@ -275,7 +276,7 @@ class User < ActiveRecord::Base
     pending_reimbursement = reports.with_amount.without_payment.sum(:value)
     value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
     # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    min_value = [cash, value].min
+    min_value = [cash.value, value].min
     Amount.new(value: min_value, currency: cash.currency)
   end
 

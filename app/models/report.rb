@@ -25,7 +25,6 @@
 
 
 
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -49,6 +48,7 @@ class Report < ActiveRecord::Base
   validates :status, presence: true
   validate :is_employee
   validate :has_expenses
+  validate :controller_has_role
 
   default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
@@ -288,14 +288,22 @@ class Report < ActiveRecord::Base
 
   def require_reimbursement?
     report_total = total_amount
-    latest_expense = latest_expense
+    latest_exp = latest_expense
     date = nil
-    date = latest_expense.date if latest_expense.present?
+    date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
   end
 
   private
+
+  def controller_has_role
+    if controlling_user_id.present?
+      unless controlling_user_role_id.present?
+        errors.add(:report, 'cannot be processed')
+      end
+    end
+  end
 
   def is_employee
     unless self.user.employee?

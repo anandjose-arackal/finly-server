@@ -17,15 +17,16 @@ class Expense::Base < BaseOperation
   end
 
   def success
-    Expense::Base::Presenter.new(user, {expense: self.expense}, self.messages)
+    Expense::Base::Presenter.new(user, {expense: self.expense, view: params[:view]}, self.messages)
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation
+    attr_accessor :expense, :violation, :editable
 
     def init
       self.expense = params[:expense]
       self.violation = retrieve_violation
+      self.editable = retrieve_editable
     end
 
     def retrieve_violation
@@ -40,6 +41,10 @@ class Expense::Base < BaseOperation
         violations[:items] = items
       end
       violations
+    end
+
+    def retrieve_editable
+
     end
   end
 

@@ -20,15 +20,15 @@
 
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  ending_number: MyString
-  proxy: MyString
-  card_type_id: 
-  description: MyText
-
-two:
-  ending_number: MyString
-  proxy: MyString
-  card_type_id: 
-  description: MyText
+#
+#one:
+#  ending_number: MyString
+#  proxy: MyString
+#  card_type_id:
+#  description: MyText
+#
+#two:
+#  ending_number: MyString
+#  proxy: MyString
+#  card_type_id:
+#  description: MyText

@@ -5,39 +5,57 @@ class DestroyTest < ActiveSupport::TestCase
   def setup
     @user = User.first
     @report = @user.reports.first
-    @other_report = User.second.reports.first
     @employee = User.find_by(email: 'user0@finlytest.io')
-    @processing_report = @employee.reports.processing.first
   end
 
-  test "Deletion of one's own reports" do
-    assert_difference '@user.reports.count', -1 do
+  test "successful deletion of one's own reports that's in open state" do
+    # ensuring the report is in open state
+    Report.any_instance.stubs(:open?).returns(true)
+
+    assert_difference '@user.reports.exclude_deleted.count', -1 do
       @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
-      assert @result
     end
+    assert @result.success?
+  end
+
+  test "successful deletion of one's own report in retracted state" do
+    # stubbing the report state to be in retracted state
+    Report.any_instance.stubs(:retracted?).returns(true)
+
+    assert_difference '@user.reports.exclude_deleted.count', -1 do
+      @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
+    end
+    assert @result.success?
+  end
+
+  test "cannot delete a report that's not in open/retracted/rejected state" do
+    # stubbing the state of the report
+    Report.any_instance.stubs(:open?).returns(false)
+    Report.any_instance.stubs(:rejected?).returns(false)
+    Report.any_instance.stubs(:retracted?).returns(false)
+
+    assert_no_difference '@user.reports.exclude_deleted.count' do
+      @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
+    end
+    assert_not @result.success?
+    assert_not @report.is_deleted
   end
 
   test "cannot delete another user's reports" do
-    assert_no_difference '@user.reports.count' do
+    # stubbing report owner
+    Report.any_instance.stubs(:user_id).returns(User.second.id)
+
+    assert_no_difference '@user.reports.exclude_deleted.count' do
       begin
-        @result = Report::Destroy.new(@user, {report_id: @other_report.id, role_id: 1}).run
+        @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 1}).run
       rescue NotAuthorizedException
-        @result = nil
+        @rescued = true
       end
+      assert @rescued
 
-      assert_not @result
-      assert @report
     end
   end
 
-  test "Report can only be destroyed in open or retracted state" do
-    destroy_op = Report::Destroy.new(@employee, {report_id: @processing_report.id, role_id: 4})
-    assert_no_difference '@employee.reports.count', 1 do
-      @result = destroy_op.run
-    end
-    assert_not @result
-    assert Report.exists?(@processing_report.id)
-    assert_not destroy_op.errors.empty?
-  end
+  test ""
 
 end

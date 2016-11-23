@@ -34,7 +34,10 @@ class Expense::Index < Expense::Base
       # adding all card expenses of the users in the team
       team_user_ids = User::Index.(user, params).team.map(&:id)
 
-      self.expenses = Expense.with_user_or_report(team_user_ids, report_ids).includes(:manual_expense).includes(:card_expense)
+      # todo - slightly dirty method - think of a more elegant way to do this
+      admin_expense_ids = Expense.with_report(report_ids).pluck(:id)
+      admin_expense_ids += Expense.only_card_expenses.with_user(team_user_ids).pluck(:id)
+      self.expenses = Expense.where(id: admin_expense_ids).uniq
     end
   end
 
@@ -70,7 +73,11 @@ class Expense::Index < Expense::Base
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
         self.unreported_expenses = expenses.unreported
-        self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+        if params[:view] == 'personal' or params[:view].nil?
+          self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+        else
+          self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
+        end
       end
       self.categories = user.company.active_categories
     end

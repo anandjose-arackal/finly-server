@@ -1,0 +1,151 @@
+<div class="row no-margin main-container">
+  
+  <div class="col-sm-6 col-sm-offset-3" style="background: #efefef; padding: 7px; border-top-right-radius: 10px; border-top-left-radius: 10px;">
+    <h4 class="text-center">Please fill in the details of transfer</h4>
+  </div> 
+  <div class="col-sm-6 col-sm-offset-3 no-padding main">
+    <form id="form-submit-request">
+    <input type="hidden" name="company_id" value="<%= current_company.id %>">
+    <input type="hidden" name="view" value="admin" />
+
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+      <div class="form-group">
+        <div class="row">
+           <div class="col-xs-4 text-right">
+            <label class="control-label">Amount Transferred:</label>
+          </div> 
+          <div class="col-xs-8">
+            <input type="number" class="form-control" name="amount" />
+          </div>  
+        </div>
+        
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-xs-4 text-right">
+            <label class="control-label">Reference ID:</label>
+          </div> 
+          <div class="col-xs-8">
+            <input type="text" class="form-control" name="reference_id" />
+          </div>  
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-xs-4 text-right">
+            <label class="control-label">Transfer Date:</label>
+          </div> 
+          <div class="col-xs-8">
+            <input type="text" class="form-control" name="date" />
+          </div>  
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-xs-4 text-right">
+            <label class="control-label">Remark:</label>
+          </div> 
+          <div class="col-xs-8">
+            <textarea name="remark"></textarea>
+          </div>  
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-xs-8 col-sm-offset-4">
+            <button class="btn btn-sm btn-submit btn-success">Submit</button>
+          </div>  
+        </div>
+      </div>
+
+    </form>
+
+
+    
+  </div>
+  <div class="col-sm-6 col-sm-offset-3" style="background: #333; height: 5px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px;">
+  </div> 
+</div>
+
+<div class="hidden success-notice-container">
+  <h3 class='success-notice text-center' style="margin-top: 50px;">
+    Successfully Notified Finly about the transfer of <span id="transfer-amount"></span>. Thank you.
+  </h3>
+  <h4 class="text-center success-notice">This window will auto close in <span id="count-down-time">20</span> seconds.</h4>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(e){
+    $("input[name=date]").datepicker({dateFormat: "yy-mm-dd"});
+    // successTemplate = HandlebarsTemplates['abinash'];
+    // $("input[name=date]").datepicker({
+    //   beforeShow: function(input, inst){
+    //     inst.dpDiv.css({marginTop: -input.offsetHeight + 'px', marginLeft: input.offsetWidth + 'px'});
+    //   },
+    //   dateFormat: "yy-mm-dd"
+    // });
+
+    $(".btn-submit").on('click', function(e){
+      e.preventDefault();
+      formData = new FormData($('form#form-submit-request')[0])
+
+      amount = $("form#form-submit-request input[name=amount]").val()
+
+      $.ajax({
+        url: '/companies/<%= current_company.id %>/add_balance',
+        type: "POST",
+        data: formData,
+        dataType: "json",
+        success: function(res){
+          if(res.success === true){
+            $(".main-container").html($(".success-notice-container").html());
+            $("#transfer-amount").val(amount);
+
+            time = parseInt($("#count-down-time").text());
+
+            setInterval(function(){
+              if(time === 0){
+                window.close(); 
+              }
+              time = time - 1;
+              $("#count-down-time").text(time);
+            }, 1000)
+          }
+
+          // FinlyF.snapNotify(res.messages);
+          // console.log(res);
+        },
+        error: function(err){
+          console.log("Error", err);
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+      })
+    });
+  });
+</script>
+
+<style type="text/css">
+  .main{
+    padding: 20px;
+    background: white;
+  }
+  .form-group{
+    margin-bottom: 10px;
+    color: #333;
+  }
+  .ui-datepicker { 
+    /*margin-top: 266px;*/
+    z-index: 1041 !important;
+  }
+
+  .success-notice{
+    color: white;
+  }
+

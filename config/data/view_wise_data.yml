@@ -9,6 +9,7 @@ admin:
       - Company Reports: reports
     cog:
       - Organization Account: '/organization_account?view=admin'
+      - Notify NEFT Transfer: '/companies/notify'
       # - Policies: '/policies'
       - My Account: '/users/'
       # - Expense Policies: '/policies?view=admin'

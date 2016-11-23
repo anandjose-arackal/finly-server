@@ -10,7 +10,7 @@ class UpdateTest < ActiveSupport::TestCase
     @transaction = @user.card_transactions.first
     @card = @transaction.card
     # creating a card expense first
-    @expense = Expense::ExCard::Create.new(@transaction, @card).run.expense
+    @expense = @user.expenses.only_card_expenses.first
     @update_expense_params = {expense: {merchant: "Olacabs",
                                        receipt: @image},
                              expense_id: @expense.id
@@ -20,18 +20,22 @@ class UpdateTest < ActiveSupport::TestCase
                                         expense_status_id: 3},
                               expense_id: @expense.id
                              }
+    @other_user = users(:manager)
+    @other_expense = @other_user.expenses.first
   end
 
-  test 'update a a card expense' do
+  test "successfully updating a card expense" do
 
     # checking previous card expense values
     merchant = @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
     amount = @expense.amount_value
     card_expense_op = Expense::ExCard::Update.new(@user, @update_expense_params)
-    @result = card_expense_op.run
-    assert_not @result.success?
 
+    @result = card_expense_op.run
+    assert @result.success?
+
+    @expense.reload
     # ensuring none of the original parameters have changed
     assert_equal amount, @expense.amount_value
     assert_equal merchant, @expense.card_expense.editable_merchant
@@ -39,18 +43,51 @@ class UpdateTest < ActiveSupport::TestCase
   end
 
   # immutable parameters: amount, currency, date
-  test 'cannot update immutable parameters' do
+  test "can't edit immutable parameters of a card expense" do
     # checking previous card expense values
-    merchant = @expense.card_expense.editable_merchant
     assert @expense.receipts.blank?
-
+    date = @expense.date
+    amount = @expense.amount_value
 
     card_expense_op = Expense::ExCard::Update.new(@user, @invalid_update_params)
     @result = card_expense_op.run
-    assert_not @result.success?
-    assert @expense
-    assert_equal merchant, @expense.card_expense.editable_merchant
+
+    @expense.reload
+    assert @result.success? # the operation succeeds, but the values will not be changed
+
+    assert_equal date, @expense.date
+    assert_equal amount, @expense.amount_value
     assert @expense.receipts.blank?
 
   end
+
+  test "cannot update another user's card expense" do
+    @update_expense_params[:expense_id] = @other_expense.id
+    card_expense_op = Expense::ExCard::Update.new(@user, @update_expense_params)
+    begin
+      @result = card_expense_op.run
+    rescue
+      @rescued = true
+    end
+
+    assert @rescued
+  end
+
+  test "manager can edit the expenses of someone in his/her team" do
+
+  end
+
+  test "finance manager can edit the expenses of someone in his/her team" do
+
+  end
+
+  test "admin can edit the expenses of anyone in the company" do
+
+  end
+
+  test "expenses can be edited by non-owners only if they belong to a report and are processing" do
+
+  end
+
+
 end

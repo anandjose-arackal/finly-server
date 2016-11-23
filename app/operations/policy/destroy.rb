@@ -22,7 +22,7 @@ class Policy::Destroy < Policy::Base
   end
 
   def process
-    unless self.policy.destroy
+    unless policy.destroy
       messages[:error] << "Couldn't delete policy. PLease try again"
     end
   end
