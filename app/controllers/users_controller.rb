@@ -128,7 +128,7 @@ class UsersController < ApplicationController
         success_message = 'Password updated'
       when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
-        success_message = 'User team updated.'
+        success_message = 'User team updated'
       when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = 'Role updated'
