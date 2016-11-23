@@ -36,6 +36,7 @@ class Event::ESettlement::Base < Event::SetNotification
   end
 
   def mailer_button_name(user)
+    'View Payment'
   end
 
   class Event::ESettlement::Base::MailerPresenter < Event::SetNotification::MailerPresenter

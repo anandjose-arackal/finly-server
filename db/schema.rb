@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161025140923) do
+ActiveRecord::Schema.define(version: 20161118114100) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -47,10 +47,10 @@ ActiveRecord::Schema.define(version: 20161025140923) do
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "amounts", force: :cascade do |t|
-    t.float    "value",       limit: 24
-    t.integer  "currency_id", limit: 4,  null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.decimal  "value",                 precision: 64, scale: 12
+    t.integer  "currency_id", limit: 4,                           null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
@@ -123,6 +123,7 @@ ActiveRecord::Schema.define(version: 20161025140923) do
     t.integer  "expense_id",          limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.integer  "surcharge_id",        limit: 4
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -176,8 +177,8 @@ ActiveRecord::Schema.define(version: 20161025140923) do
     t.string   "transaction_type",      limit: 255
     t.text     "post_data",             limit: 65535
     t.integer  "transaction_amount_id", limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.string   "reference_id",          limit: 255
     t.string   "auth_transaction_id",   limit: 255
     t.string   "transaction_mode",      limit: 255
@@ -187,6 +188,9 @@ ActiveRecord::Schema.define(version: 20161025140923) do
     t.string   "serial_id",             limit: 255
     t.string   "product_code",          limit: 255
     t.datetime "transaction_timestamp"
+    t.boolean  "expensed",                            default: true
+    t.text     "error_message",         limit: 65535
+    t.integer  "billing_amount_id",     limit: 4
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree

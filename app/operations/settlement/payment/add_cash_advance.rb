@@ -18,16 +18,15 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   def pre_validate
     super()
     if params[:payment][:amount].blank? or params[:payment][:amount].to_f < 0
-      messages[:error] << 'Amount being added blank or negative'
+      add_message :error, 'Amount cannot be equal to or less than 0'
     end
-    # no password required for this operation, hence
-    # if params[:password].blank?
-    #   add_message :error, 'You need to provide your password to initiate this transfer'
-    #   return
-    # end
-    # unless user.valid_password?(params[:password])
-    #   add_message :error, 'Invalid Password'
-    # end
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate this transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+    end
   end
 
   def init
@@ -97,7 +96,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def post_process
-    add_message :success, 'Cash advance added!'
+    add_message :success, 'Cash advance added'
+    
+    Event::ESettlement::AddCashAdvance.(user, payment: self.payment)
   end
 
 end

@@ -18,6 +18,9 @@ module Constants
 
   class Constants::ItzCash
 
+    MSG_QUEUE_USERNAME = "finly"
+    MSG_QUEUE_PASSWORD = "Li3Wp4yk"
+
     MODULE = 'FINLY'
     MERCHANT_TYPE_KEY = 'DEFAULT_ITIL'
     # PRODUCT_CODE = 'NGPRHD'

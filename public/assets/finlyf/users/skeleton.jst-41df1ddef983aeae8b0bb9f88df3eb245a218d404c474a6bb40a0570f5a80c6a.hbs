@@ -1,0 +1,377 @@
+<style type="text/css">
+
+.navbar-inverse{
+  color: white;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: #46568b;
+  background: #423689;
+  background: #594DA8;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: white;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: transparent;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus{
+  border-color: #F4F560;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  /*color: #fff;*/
+  /*font-weight: bold;*/
+  border-bottom: 3px solid #CD925A;
+  border-bottom: 3px solid #F4F560;
+  background-color: transparent;
+}
+.container-fluid{
+  padding: 0;
+}
+
+
+.main-header{
+  padding: 16px 15px;
+  text-transform: uppercase;
+  color: #535353;
+  font-size: 12px;
+}
+.item{
+  padding: 15px;
+  border: 0.5px solid #eee;
+  /*border-bottom: none;*/
+  background: white;
+  color: #666;
+  cursor: pointer;
+  /*margin-bottom: 5px;*/
+}
+
+.item.selected{
+  background: #FFF1DA;
+}
+
+.item.col-sm-3, .receipt{
+  padding: 20px;
+  border: none;
+  background: transparent;
+  color: #555;
+  /*padding: 10px;*/
+  /*background: red;*/
+}
+
+.item.col-sm-3 .receipt-container, .receipt .receipt-container {
+  padding: 10px;
+  background: white;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+}
+
+.item.col-sm-3 .receipt-container .receipt-details, .receipt .receipt-container .receipt-details{
+  /*padding: 10px;*/
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
+.item.col-sm-3 .receipt-container .receipt-details h4{
+  font-size: 15px;
+  padding-top: 0;
+}
+
+.item.col-sm-3 .receipt-container .receipt-image, .receipt, .receipt-container .receipt-image{
+  overflow:hidden;
+  height: 250px;
+  padding-bottom: 10px;
+}
+
+.item.col-sm-3 .receipt-container .receipt-image img, .receipt .receipt-container .receipt-image img{
+  /*border: 3px solid #efefef;*/
+  padding: 10px;
+}
+
+.sidebar{
+  position:fixed;
+  background: #fff;
+  background: #F5F6F9;
+  position: fixed;
+  height: calc(100% - 103px);
+  overflow-y: scroll;
+}
+
+.secondary-navbar li{
+  margin-left: 10px;
+}
+
+.main{
+  z-index: 4;
+  position:fixed;
+  overflow-y: scroll;
+  background: rgb(252, 252, 252) none repeat scroll 0% 0%;
+  background: #F5F6F9;
+  max-height: calc(100% - 103px); 
+  /*padding: 10px;*/
+  box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  height: calc(100% - 100px);
+}
+.main.preview .col-md-8{
+  /*display: none;*/
+}
+
+.sidebar-element{
+  padding: 10px 0;
+}
+.close-item-details{
+  position: absolute;
+  z-index: 100;
+  padding: 5px 15px;
+  left: 0px;
+  /*border: 0.5px solid #efefef;*/
+  font-weight: 100;
+  font-size: 20px;
+}
+#item-details{
+  height: calc(100% - 103px);
+  left: 100%;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
+  transition: all 0.5s;
+  position: fixed;
+  margin-top: -10px;
+  display: block;
+
+  /*width: 55.555%;*/
+  width: 45.555%;
+}
+
+.show-details-panel{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.main.preview #item-details{
+  /*left: 54.444%;*/
+}
+
+.details-header{
+  padding: 16px 15px;
+  height: 70px;
+}
+
+.navbar-btn{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  background: transparent none repeat scroll 0% 0%;
+  border: 0.5px solid rgb(89, 77, 168);
+  border-radius: 2px;
+}
+
+.btn-finly-danger:hover{
+  background: rgb(234, 97, 83);
+  color: white;
+}
+
+.btn-finly-default:hover{
+  background: #594DA8;
+  color: white;
+}
+
+
+/*Forms, Fiels, Labels*/
+.input-icon {
+  float: right;
+  margin-right: 7px;
+  margin-top: -24px;
+  position: relative;
+  z-index: 1;
+  color: #676767;
+  pointer-events: none;
+}
+
+.finly-backdrop{
+  background: rgba(0,0,0, 0.5);
+  position: fixed;
+  height: calc(100% - 53px);
+  width: 100%;
+  top: 53px;
+  z-index: 3;
+}
+
+.user:hover {
+  background: #FEE252;
+  cursor: pointer;
+
+}
+.user {
+  padding: 10px;
+}
+
+.user.active{
+  background: #FEE252;
+}
+
+.item-attr-preview.hide{
+  display: none;
+}
+
+.item-attr-edit{
+  display: none;
+}
+.item-attr-edit.show{
+  display: inline !important;
+}
+
+section {
+  padding: 20px;
+  background: white;
+  /*border-bottom: 1px solid #eee;*/
+  margin-bottom: 5px;
+}
+
+.user-details{
+  height: 100%;
+}
+</style>
+
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top" style="" id="primary-navbar">
+  <div class="container-fluid">
+
+    <div class="row no-margin no-padding">
+      <div class="col-md-2">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand company-name" href="#" style="color: white; font-family: 'Bree Serif', serif; font-weight: 300;font-size: 30px;" href="<%= root_path %>" data-turbolinks="false">Finly
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-10">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="current-view-type">Personal View</span>&nbsp;&nbsp;<span class="caret"></span></a>
+              <ul class="dropdown-menu menu-nav-views-dropdown">
+                
+              </ul>
+            </li>
+          </ul>
+          
+          <ul class="nav navbar-nav navbar-right">
+
+            <li class="dropdown" id="navbar-user-dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 12px 10px 8px 10px;">
+                <img src="/assets/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <div class="navbar-user-dropdown navbar-user-dropdown-profile">
+                    <div class="row">
+                      <div class="col-xs-4" style="padding: 0;padding-left: 20px;">
+                        <img src="/assets/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
+                      </div>
+                      <div class="col-xs-8">
+                        <p class="text-left"><strong class="navbar-user-dropdown-name"></strong></p>
+                        <p class="text-left small navbar-user-dropdown-email"></p>
+                        <p class="text-left li-my-account"></p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="divider" style="margin: 0;"></li>
+                <li>
+                  <div class="navbar-user-dropdown">
+                    <div class="row">
+                      <div class="col-xs-12 navbar-balance" style="min-height: 100px;">
+                        <div title="Loading..." class="loading-animations">
+                          <div class="loading-animation" style="animation-delay: -1.3s;"></div>
+                          <div class="loading-animation" style="animation-delay: -1.2s"></div>
+                          <div class="loading-animation" style="animation-delay: -1.1s"></div>
+                          <div class="loading-animation" style="animation-delay: -1s"></div>
+                          <div class="loading-animation" style="animation-delay: -0.9s"></div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <div class="navbar-user-dropdown navbar-user-dropdown-action">
+                    <div class="row">
+                      <div class="col-xs-12 navbar-cog">
+                        <a href="/users/sign_out" class="btn btn-danger btn-block" data-method="delete">Log out</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->     
+      </div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="margin-top: 53px; border-color: transparent; z-index: 5;">
+  <div class="container-fluid">
+    <div class="row no-margin no-padding">
+      <div class="col-sm-2 no-padding" style="">
+        <div class="navbar-header navbar-sidebar" style="width: 100%;">
+          {{!-- navbar_sidebar.jst.hbs partial --}}
+        </div>
+      </div>
+      <div class="col-sm-10" style="">
+        <div class="navbar-collapse collapse navbar-main">
+          {{!-- navbar_main.jst.hbs partial --}}
+        </div><!--/.nav-collapse -->    
+      </div>
+    </div>
+  </div><!--/.container-fluid -->
+</nav>
+
+<div class="container-fluid container-main" style="margin-top: 33px; position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
+  <div class="col-sm-2 sidebar no-padding">
+  
+    <div class="row no-margin">
+      <form class="navbar-form" role="search">
+        <div class="input-group" style="width: 100%;">
+          <input type="text" class="search-user input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
+          <div class="input-group-btn">
+            <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="row no-margin" id="users">
+    </div>
+    <div class="col-sm-12 text-center no-padding">
+      <button class="btn btn-sm load-more-users" data-page="1"><i class="fa fa-cloud-download"></i>&nbsp;&nbsp;<span>Load More</span></button>
+    </div>
+  </div>
+
+  <div class="col-sm-10 col-sm-offset-2 main no-padding" id="user-details" style="">
+    <div class="row no-margin">
+      <div class="col-sm-10 col-sm-offset-1">
+        <h2>Please Select an Employee from the list on the left to view/edit their details, policies, roles etc.</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-mp">
+    
+  </div><!-- /.modal -->
+  
+</div>

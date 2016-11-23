@@ -20,6 +20,9 @@
 #  serial_id             :string(255)
 #  product_code          :string(255)
 #  transaction_timestamp :datetime
+#  expensed              :boolean          default(TRUE)
+#  error_message         :text(65535)
+#  billing_amount_id     :integer
 #
 
 

@@ -36,11 +36,12 @@ class Amount < ActiveRecord::Base
 
   # method that returns the amount value
   def amount_value
-    self.value
+    self.precision_value
   end
 
   alias_method :transaction_amount_value, :amount_value
   alias_method :pending_reimbursement_value, :amount_value
+  alias_method :billing_amount_value, :amount_value
 
   def greater_than_amount_value
     self.value

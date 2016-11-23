@@ -5,6 +5,7 @@ class ExternalUrlController < ApplicationController
   def report
     id = params[:id]
     report = current_user.reports.with_id(id).first rescue nil
+    # todo use report controlling user to figure out user role for report
     if report.blank? and current_user.manager?
       params[:view] = 'manager'
       result = Report::Show.(current_user, params)

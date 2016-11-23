@@ -18,6 +18,9 @@ gem 'mocha'
 # gem for admin panel
 gem 'activeadmin', github: 'activeadmin'
 
+# gem for faking test data
+gem 'mocha'
+
 # puma web server
 gem 'figaro'
 gem 'puma'
@@ -67,6 +70,8 @@ gem 'handlebars_assets'
 
 #For pushing notifications
 gem 'gcm'
+
+gem 'mocha'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

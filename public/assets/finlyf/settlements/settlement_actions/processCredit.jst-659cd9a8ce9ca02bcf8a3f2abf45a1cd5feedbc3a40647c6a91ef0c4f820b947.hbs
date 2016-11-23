@@ -1,0 +1,224 @@
+<div class="modal-dialog" role="document" style="width: 60%;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Credit</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row no-margin">
+        <div class="col-sm-12 no-padding" style="border: 1px solid #A29BD1; border-radius: 2px 2px 0 0; margin-bottom: 10px;">
+          <div class="row no-margin">
+            <h4 class="no-margin" style="background: #A29BD1; padding: 10px;">Selected User Details</h4>
+          </div>
+          <div class="row no-margin">
+            <div class="col-sm-12 no-padding" style="padding: 10px 0;">
+              <div class="col-sm-6" style="margin-bottom: 10px;">
+                <div class="col-sm-5">Employee Name:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.name}}</label></div>
+              </div>
+              <div class="col-sm-6" style="margin-bottom: 10px;">
+                <div class="col-sm-5">Mobile Number:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.mobile_number}}</label></div>
+              </div>
+              <div class="col-sm-6">
+                <div class="col-sm-5">Email:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.email}}</label></div>
+              </div>
+            </div>  
+          </div>
+        </div>
+      </div>
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default settlement-step-1 active" data-step="1" data-navigate="1">
+          <div class="panel-heading" role="tab" id="headingOne">
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Please Select Credit Type</span>
+                  
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
+            
+          </div>
+          <div id="collapse-step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+              <div class="settlement-action-types col-sm-6">
+                <ul class="settlement-actions">
+                  {{#if summary.actions.credit_reimbursement}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_reimbursement}}" data-action-type="credit_reimbursement"/> Credit Reimbursements
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          <p>Reimburse employee for the expenses he incurred on behalf of the Organisation.</p>
+                          <div class="alert alert-info">
+                            <strong>Note:</strong> All reimbursements are made against reports submitted by the employee. Select reports to be reimbursed in the next section.
+                          </div>
+                        </div>
+
+                        
+                      </div>
+                    </li>
+                  {{/if}}
+                  
+                  {{#if summary.actions.credit_cash_advance}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_cash_advance}}" data-action-type="credit_cash_advance" /> Add Cash Advance
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Add details of funds handed over to an employee as an advance.
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+                  
+                  {{#if summary.actions.credit_money_request}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_money_request}}" data-action-type="credit_money_request" /> Credit Advance Fund Requests
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Fulfill requests for advance from the employee.
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+                  {{#if summary.actions.credit_card_from_wallet}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet"/> Credit User's Card from Your Wallet
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          <p>Instantaneously transfer funds from your User Account to Employees Card.</p>
+                          <div class="alert alert-info">
+                            <strong>Note:</strong> This is an irreversible process and funds cannot be withdrawn from Employees Card.
+                          </div>
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+                  {{#if summary.actions.credit_wallet_from_wallet}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet"/> Credit Employee's Wallet from Your Wallet
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          <p>Instantaneously transfer funds from your User Account to Employees Account.</p>
+                          <div class="alert alert-info">
+                            <strong>Note:</strong> This is a reversible process and funds can be withdrawn from Employees Account.
+                          </div>
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+                  {{#if summary.actions.credit_card_from_virtual_account}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account"/> Credit User's Card From Company Credits
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          <p>Instantaneously transfer funds from your Company Account to Employees Card.</p>
+                          <div class="alert alert-info">
+                            <strong>Note:</strong> This is an irreversible process and funds cannot be withdrawn from Employees Card.
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </li> 
+                  {{/if}}
+                  {{#if summary.actions.credit_wallet_from_virtual_account}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-url="{{summary.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account"/> Credit User's Wallet From Company Credits
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          <p>Instantaneously transfer funds from Employee Account to Employees Account.</p>
+                          <div class="alert alert-info">
+                            <strong>Note:</strong> This is a reversible process and funds can be withdrawn from Employees Account.
+                          </div>
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+                </ul>
+              </div>
+
+              <div class="col-sm-6 settlement-action-definition" data-definition-type="credit">
+                <h4 class="text-center">Transfer Cash to Employee.</h4>
+              </div>
+            </div><!-- panel-body -->
+          </div>
+        </div>
+        <div class="panel panel-default settlement-step-2" data-step="2" data-navigate="0">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Please Select Credit Type</span>
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right step-heading-summary"></h4>
+              </div>
+            </div>
+          </div>
+          <div id="collapse-step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              {{!-- Content --}}
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default settlement-step-3" data-step="3" data-navigate="0">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Confirmation</span>
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
+          </div>
+          <div id="collapse-step-3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              <div class="col-sm-12">
+                <div class="summary">
+                  <button class="btn btn-default btn-sm btn-back-step-2">Previous Step</button>
+                </div>
+                <div class="content">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

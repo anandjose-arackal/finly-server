@@ -1,14 +1,56 @@
 window.FinlyF =
+  Global: {
+    templates: {}
+  }
   Models: {}
   Collections: {}
   Views: {}
   Routers: {}
   initialize: ->
-    # console.log "Step 0. Starting FinlyF."
+    FinlyF.Global.templates.templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
+    FinlyF.Global.templates.templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
+    FinlyF.Global.templates.templateUserNavProfile = HandlebarsTemplates['finlyf/global/userNavProfile']
+
+    user = {
+      name: $("#current_user_id").attr('data-user-name')
+      email: $("#current_user_id").attr('data-user-email')
+    }
+
+    FinlyF.Global.current_user = user
+
+
     @primary_router = new FinlyF.Routers.Main()
     Backbone.history.start()
 
+    
+
+    # $.ajax({
+    #   url: '/users/' + $("#current_user_id").val()
+    #   data:
+    #     view: 'personal'
+    #   dataType: 'json'
+    #   success: (res) ->
+    #     console.log res
+    #     FinlyF.Global.current_user = res.user
+    #     console.log FinlyF.Global.current_user
+    #   error: (err) ->
+    #     console.log "Error", err
+    # })
+    
+    # console.log FinlyF.Global.current_user
+    
+    
+
   structureActions: (el, params)->
+    # console.log "Strucure action params", params
+    # Append user profile to the navbar dropdown
+    profile_div = $(el).find(".navbar-user-dropdown-profile")
+    # $(profile_div).html(FinlyF.Global.templates.templateUserNavProfile({user: FinlyF.Global.current_user}))
+
+    $(profile_div).find('.navbar-user-dropdown-name').text(FinlyF.Global.current_user.name)
+    $(profile_div).find('.navbar-user-dropdown-email').text(FinlyF.Global.current_user.email)
+
+
     company_name = $("#data-nav-company").val()
     $(el).find(".company-name").text(company_name)
 
@@ -49,10 +91,53 @@ window.FinlyF =
           $(navbar_right).prepend($(menu).clone())
         $(el).find('.current-view-type').text("Personal View")
 
+    # navbar_cog_container = $(el).find("#pri")
     navbar_cog = $(el).find("#primary-navbar .navbar-right .navbar-cog")
     menus = $("#navbar-cog-navigation-admin li")
     for menu in menus
-      $(navbar_cog).prepend($(menu).clone())
+      a = $(menu).find('a')
+      if $(a).attr('data-profile')
+      # if $(menu).find('a[href*="profile"]')
+        # console.log "Found a profile page for", $(menu).html()
+        $(profile_div).find('.li-my-account').html($(a).clone())
+        # console.log $(navbar_cog).html()
+      else
+        $(navbar_cog).prepend($(menu).clone())
+
+    $(navbar_right).find("#navbar-user-dropdown").on('shown.bs.dropdown', (e) ->
+      _this = this
+      user_id = $("#current_user_id").val()
+      $.ajax({
+        dataType: "json"
+        type : 'get'
+        url: '/users/' + user_id + '/balance'
+        data:
+          view: params.view || 'personal'
+          authenticity_token: $("#authenticity_token").val()
+          current_user_wallet: true
+          current_user_card: true
+          current_user_cash_in_hand: true
+          virtual_account: true
+        success: (data) ->
+          $(_this).find('.navbar-balance').html(FinlyF.Global.templates.templateBalance({item: data}))
+
+          $(".btn-transfer-wallet-to-card").on('click', (e) ->
+            $("#modal-global-transfer").modal('show')
+            $("#modal-global-transfer").find('.modal-body').html(FinlyF.Global.templates.templateWalletToCard({item: data}))
+          )
+        error: (err) ->
+          console.log err
+      })
+    )
+
+    $(navbar_right).find("#navbar-user-dropdown").on('hide.bs.dropdown', (e) ->
+      console.log "Closing", e
+      target = $(e.currentTarget)
+      if target.hasClass("keepopen") || target.parents(".keepopen").length
+        return false # returning false should stop the dropdown from hiding.
+      else
+        return true
+    )
 
     #Sidebar
     $(el).find('.sidebar .filter-category-id').val(params.filter_category_id)
@@ -72,6 +157,47 @@ window.FinlyF =
     else
       FinlyF.primary_router.navigate(path, {trigger: true})
     # console.log "Will navigate to ", path
+    # @userBalance()
+
+
+  userBalance: ->
+    $("#navbar-user-dropdown").attr("data-found", true)
+    console.log "In user balance evetn"
+    $("#navbar-user-dropdown").on('shown.bs.dropdown', (e) ->
+      _this = this
+      user_id = $("#current_user_id").val()
+      $.ajax({
+        dataType: "json"
+        type : 'get'
+        # url: '/settlements/summary?view_to_load=payments&view=personal'
+        url: '/users/' + user_id + '/balance'
+        data:
+          # target_user_id: user_id
+          authenticity_token: $("#authenticity_token").val()
+          # current_user_all: true
+          current_user_wallet: true
+          current_user_card: true
+          current_user_cash_in_hand: true
+          virtual_account: true
+          # view: 'admin'
+        success: (data) ->
+          $(_this).find('.navbar-balance').html(FinlyF.Global.templates.templateBalance({item: data}))
+          # Finly.Gobal.balance_data = data
+
+
+          $(".btn-transfer-wallet-to-card").on('click', (e) ->
+            # $("#modal-balance").modal('hide')
+            # $.ajax({
+
+            # })
+            $("#modal-global-transfer").modal('show')
+            $("#modal-global-transfer").find('.modal-body').html(FinlyF.Global.templates.templateWalletToCard({item: data}))
+          )
+          # console.log data
+        error: (err) ->
+          console.log err
+      })
+    )
 
   changeView: (e) ->
     e.preventDefault()
@@ -126,45 +252,86 @@ window.FinlyF =
 
 $(document).ready ->
   FinlyF.initialize()
-  templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
-  templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
-  balance_data = {}
-  $("#modal-balance").on("shown.bs.modal", (e) ->
-    _this = this
-    e.preventDefault()
-    user_id = $(this).find(".modal-body").attr('data-user-id')
-    $.ajax({
-      dataType: "json"
-      type : 'get'
-      # url: '/settlements/summary?view_to_load=payments&view=personal'
-      url: '/users/' + user_id + '/balance'
-      data:
-        # target_user_id: user_id
-        authenticity_token: $("#authenticity_token").val()
-        current_user_all: true
-        current_user_wallet: true
-        current_user_card: true
-        current_user_cash_in_hand: true
-        virtual_account: true
-        # view: 'admin'
-      success: (data) ->
-        $(_this).find('.modal-body').html(templateBalance({item: data}))
-        balance_data = data
+  # templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
+  # templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
+  # balance_data = {}
+
+  # $("#navbar-user-dropdown").on('shown.bs.dropdown', (e) ->
+  #   _this = this
+  #   e.preventDefault()
+  #   user_id = $(this).find(".modal-body").attr('data-user-id')
+  #   $.ajax({
+  #     dataType: "json"
+  #     type : 'get'
+  #     # url: '/settlements/summary?view_to_load=payments&view=personal'
+  #     url: '/users/' + user_id + '/balance'
+  #     data:
+  #       # target_user_id: user_id
+  #       authenticity_token: $("#authenticity_token").val()
+  #       current_user_all: true
+  #       current_user_wallet: true
+  #       current_user_card: true
+  #       current_user_cash_in_hand: true
+  #       virtual_account: true
+  #       # view: 'admin'
+  #     success: (data) ->
+  #       $(_this).find('.navbar-balance').html(templateBalance({item: data}))
+  #       balance_data = data
 
 
-        $(".btn-transfer-wallet-to-card").on('click', (e) ->
-          $("#modal-balance").modal('hide')
-          # $.ajax({
+  #       $(".btn-transfer-wallet-to-card").on('click', (e) ->
+  #         # $("#modal-balance").modal('hide')
+  #         # $.ajax({
 
-          # })
-          $("#modal-global-transfer").modal('show')
-          $("#modal-global-transfer").find('.modal-body').html(templateWalletToCard({item: balance_data}))
-        )
-        # console.log data
-      error: (err) ->
-        console.log err
-    })
-  )
+  #         # })
+  #         $("#modal-global-transfer").modal('show')
+  #         $("#modal-global-transfer").find('.modal-body').html(templateWalletToCard({item: balance_data}))
+  #       )
+  #       # console.log data
+  #     error: (err) ->
+  #       console.log err
+  #   })
+  # )
+
+
+
+
+  # $("#modal-balance").on("shown.bs.modal", (e) ->
+  #   _this = this
+  #   e.preventDefault()
+  #   user_id = $(this).find(".modal-body").attr('data-user-id')
+  #   $.ajax({
+  #     dataType: "json"
+  #     type : 'get'
+  #     # url: '/settlements/summary?view_to_load=payments&view=personal'
+  #     url: '/users/' + user_id + '/balance'
+  #     data:
+  #       # target_user_id: user_id
+  #       authenticity_token: $("#authenticity_token").val()
+  #       current_user_all: true
+  #       current_user_wallet: true
+  #       current_user_card: true
+  #       current_user_cash_in_hand: true
+  #       virtual_account: true
+  #       # view: 'admin'
+  #     success: (data) ->
+  #       $(_this).find('.modal-body').html(templateBalance({item: data}))
+  #       balance_data = data
+
+
+  #       $(".btn-transfer-wallet-to-card").on('click', (e) ->
+  #         $("#modal-balance").modal('hide')
+  #         # $.ajax({
+
+  #         # })
+  #         $("#modal-global-transfer").modal('show')
+  #         $("#modal-global-transfer").find('.modal-body').html(templateWalletToCard({item: balance_data}))
+  #       )
+  #       # console.log data
+  #     error: (err) ->
+  #       console.log err
+  #   })
+  # )
 
   # $(".btn-transfer-wallet-to-card").on('click', (e) ->
   #   $("#modal-balance").modal('hide')
@@ -177,7 +344,7 @@ $(document).ready ->
 
   $("#modal-global-transfer").on('shown.bs.modal', (e) ->
     modal = this
-    to_user_id = $(modal).attr('data-user-id')
+    to_user_id = $("#current_user_id").val()
     $(".btn-transfer-wallet-to-card").on('click', (evt) ->
       $(this).attr('disabled', true)
       target = this
@@ -195,7 +362,7 @@ $(document).ready ->
           amount: amount
           password: password
           view: 'personal'
-          to_user_id: 1
+          to_user_id: to_user_id
         }
         success: (res) ->
           FinlyF.snapNotify(res.messages)

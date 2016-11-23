@@ -47,7 +47,7 @@ class PendingInvitesController < ApplicationController
   end
 
   def accept
-    ap params
+    # ap params
     # fail
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?

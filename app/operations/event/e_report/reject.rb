@@ -3,12 +3,14 @@ class Event::EReport::Reject < Event::EReport::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.action_user
+    self.rejecting_user = self.report.tracks.last.action_user rescue nil
   end
 
   def validate
     super
-    self.rejecting_user.present?
+    unless self.rejecting_user.present?
+      add_message :error, 'User not found'
+    end
   end
 
   def event_id
@@ -16,7 +18,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    [rejecting_user, self.report.controlling_user]
+    self.report.associated_users self.user
   end
 
   def send_push_notification(user)
@@ -30,15 +32,15 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user.id
+    unless user == self.rejecting_user
       "#{rejecting_user.name} has rejected the report: #{self.report.name}"
     else
-      "Report rejected : #{self.report.name}"
+      "You rejected the report : #{self.report.name}"
     end
   end
 
   def mailer_body(user)
-    if user.id == report.controlling_user.id
+    unless user == self.rejecting_user
       "#{rejecting_user.name} has rejected the report: '#{self.report.name}'"
     else
       "You have rejected the report : #{self.report.name}"

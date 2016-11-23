@@ -2,18 +2,17 @@ admin:
   links:
     primary_navbar:
       # - Company Expenses: expenses
-      - Company Expenses: expenses
       - Company Analytics: analytics
       - Company Settlements: settlements
       - Company Employees: employees
       - Advance Requests: requests
       - Company Reports: reports
     cog:
-      - Organization Account: '#organization_account'
+      - Organization Account: '/organization_account?view=admin'
       # - Policies: '/policies'
-      - My Account: '#settings'
+      - My Account: '/users/'
       # - Expense Policies: '/policies?view=admin'
-      - My Balance: '#modal-balance'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
 personal:
@@ -26,16 +25,14 @@ personal:
       - Receipts: receipts
       - Expenses: expenses
     cog:
-      - My Account: '#settings'
-      # - My Account: '/users/'
-      - My Balance: '#modal-balance'
+      - My Account: '/users/'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
 manager:
   links:
     primary_navbar:
-      - Team Expenses: expenses
 #      - Team Analytics: analytics
       # - Team Expenses: expenses
       # - Team Analytics: analytics
@@ -43,15 +40,14 @@ manager:
       - Team Advance Requests: requests
       - Team Reports: reports
     cog:
-      - My Account: '#settings'
-      - My Balance: '#modal-balance'
+      - My Account: '/users/'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
 finance_manager:
   links:
     primary_navbar:
-      - Team Expenses: expenses
 #      - Team Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
@@ -61,7 +57,7 @@ finance_manager:
       - Team Reports: reports
 
     cog:
-      - My Account: '#settings'
-      - My Balance: '#modal-balance'
+      - My Account: '/users/'
+      # - My Balance: '#modal-balance'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'  
