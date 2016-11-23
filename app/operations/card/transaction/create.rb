@@ -64,8 +64,8 @@ class Card::Transaction::Create < BaseOperation
               return false
             end
             # add to cash in hand
-            unless user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
-              messages[:error] = "Could not add credited amount to cash in hand. Try again"
+            unless user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value], atm_withdrawal: true)
+              messages[:error] = "Could not add withdrawn amount to cash in hand. Try again"
               transaction.expensed = false
               transaction.error_message = @result.messages[:error]
               transaction.save

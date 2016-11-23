@@ -62,6 +62,14 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
   end
 
+  def validate
+    if expense.report_id and personal_view?
+      unless expense.report.editable?
+        messages[:error] << "Expense cannot be edited at this stage"
+      end
+    end
+  end
+
   def process
     unless expense.update(updated_expense_params)
       add_message :error, self.expense.errors.full_messages

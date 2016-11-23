@@ -12,6 +12,12 @@ class Statement::Base < BaseOperation
 
   end
 
+  def pre_validate
+    if user.blank? or params.blank?
+      messages[:error] << "Invalid parameters. Try again"
+    end
+  end
+
   def load_selected_user
     if personal_view?
       self.selected_user = self.user

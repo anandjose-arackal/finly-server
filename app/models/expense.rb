@@ -59,7 +59,7 @@ class Expense < ActiveRecord::Base
   validates :user_id, presence: true
   validate :no_future_date
   validate :created_by
-  validate :report_status
+  # validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
 
@@ -247,15 +247,15 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  # ensuring the report is either open or retracted before allowing editing of expense
-  def report_status
-    if self.report_id
-      report = self.report
-      unless report.open? or report.retracted? or report.rejected?
-        errors.add(:report, 'cannot be edited in this state')
-      end
-    end
-  end
+  # # ensuring the report is either open or retracted before allowing editing of expense
+  # def report_status
+  #   if self.report_id
+  #     report = self.report
+  #     unless report.open? or report.retracted? or report.rejected?
+  #       errors.add(:report, 'cannot be edited in this state')
+  #     end
+  #   end
+  # end
 
   def valid_expense_type
     case expense_type_id
