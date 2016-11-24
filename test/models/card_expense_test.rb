@@ -8,6 +8,7 @@
 #  expense_id          :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
+#  surcharge_id        :integer
 #
 
 

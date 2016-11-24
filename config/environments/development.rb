@@ -38,12 +38,12 @@ Rails.application.configure do
   # config.action_mailer.delivery_method = :test
   # config.action_mailer.default_url_options = { host: 'localhost:3000'}
 
-  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.default_url_options = { host: "192.168.81.136:3000" }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
       address:              'smtp.sendgrid.net',
       port:                 587,
-      domain:               'www.finly.io',
+      domain:               '192.168.81.136:3000',
       user_name:            'vivekagb',
       password:             'idAr5APhk61X',
       # ssl:                  true,
@@ -62,7 +62,8 @@ Rails.application.configure do
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.
-  config.assets.debug = true
+
+  config.assets.debug = false
 
   # Asset digests allow you to set far-future HTTP expiration dates on all assets,
   # yet still be able to expire them through the digest params.
@@ -72,6 +73,7 @@ Rails.application.configure do
   # Checks for improperly declared sprockets dependencies.
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
+  
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true

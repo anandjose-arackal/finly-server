@@ -7,5 +7,5 @@ json.array!(@result.paginated_expenses) do |expense|
       json.note expense.note
     end
   end
-  json.date expense.date.strftime("%d %b")
+  json.date expense.date.strftime("%d %b %Y")
 end

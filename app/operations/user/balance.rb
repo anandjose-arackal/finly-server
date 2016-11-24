@@ -18,7 +18,11 @@ class User::Balance < User::Base
     self.target_user = (params[:target_user] or params[:user])
     if self.target_user.blank? and params[:target_user_id].present? or params[:user_id] or params[:id].present?
       user_id = (params[:target_user_id] or params[:user_id] or params[:id])
-      self.target_user = User::Index.(user, params).team.with_id(user_id).first rescue nil
+      if user_id == user.id
+        self.target_user = user
+      else
+        self.target_user = User::Index.(user, params).team.with_id(user_id).first rescue nil
+      end
     end
   end
 
@@ -42,7 +46,7 @@ class User::Balance < User::Base
     # Wallet
     self.balances[:target_user_wallet] = User::Wallet::Balance.(user, for_user: target_user) if params[:target_user_wallet] or params[:target_user_all]
     self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]
-
+    # debugger
     # Card
     if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
       presenter = User::PrepaidCard::Show.(user, user: target_user)

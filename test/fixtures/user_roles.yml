@@ -10,3 +10,23 @@
 
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+admin:
+  id: 1
+  name: "Admin"
+
+manager:
+  id: 2
+  name: "Manager"
+
+fin_manager:
+  id: 3
+  name: "Finance Manager"
+
+employee:
+  id: 4
+  name: "Employee"
+
+auditor:
+  id: 5
+  name: "Auditor"

@@ -1,14 +1,16 @@
 <div class="row no-margin">
-  <div class="col-sm-6 text-center">
-    <h3 class="" style="margin-bottom: 0;">₹&nbsp;{{item.current_user_wallet}}</h3>
-    <span style="font-size: 11px;=">(Your Wallet Balance)</span>
+  <div class="col-sm-3 col-sm-offset-2">
+    <label class="grey-text">From:</label>
+    <h4 class="no-margin">Your&nbsp;Finly&nbsp;Account</h4>
+    <h3 class="no-margin mt-5 virtual_account_balance currency" style="margin-bottom: 0;">₹&nbsp;{{item.current_user_wallet}}</h3>
   </div>
 
   <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
 
-  <div class="col-sm-6 text-center">
-    <h3 class="" style="margin-bottom: 0;">₹&nbsp;{{item.current_user_card}}</h3>
-    <span style="font-size: 11px;=">(Your Card Balance)</span>
+  <div class="col-sm-2 col-sm-offset-2">
+    <label class="grey-text">To:</label>
+    <h4 class="no-margin">Your&nbsp;Card</h4>
+    <h3 class="no-margin mt-5 target_user_wallet_balance currency" style="margin-bottom: 0;">₹&nbsp;{{item.current_user_card}}</h3>
   </div>
 </div>
 <div class="col-sm-12"><hr></div>

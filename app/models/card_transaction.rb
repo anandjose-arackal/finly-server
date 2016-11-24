@@ -20,8 +20,10 @@
 #  serial_id             :string(255)
 #  product_code          :string(255)
 #  transaction_timestamp :datetime
+#  expensed              :boolean          default(TRUE)
+#  error_message         :text(65535)
+#  billing_amount_id     :integer
 #
-
 
 class CardTransaction < ActiveRecord::Base
   belongs_to :user
@@ -31,10 +33,16 @@ class CardTransaction < ActiveRecord::Base
 
   belongs_to :transaction_amount, class_name: "Amount", dependent: :destroy
   belongs_to :card_amount, class_name: "Amount", dependent: :destroy
+  belongs_to :billing_amount, class_name: "Amount", dependent: :destroy
 
   delegate :transaction_amount_value, to: :transaction_amount
+  delegate :billing_amount_value, to: :billing_amount
 
   accepts_nested_attributes_for :transaction_amount
   accepts_nested_attributes_for :card_amount
+  accepts_nested_attributes_for :billing_amount
+
+  scope :debits, -> {where transaction_type: "Debit"}
+  scope :credits, -> {where transaction_type: "Credit"}
 
 end

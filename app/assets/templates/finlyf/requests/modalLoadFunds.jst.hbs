@@ -15,21 +15,50 @@
       <div class="row no-margin">
         <div class="col-sm-10 col-sm-offset-1">
           <div class="col-sm-6 text-center">
-          {{#if_eq item.action_type 'credit_card_from_wallet'}}
-            <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="current_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
-            <span style="font-size: 11px;=">(Your Wallet Balance)</span>
-          {{else}}
-            <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="virtual_account_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
-            <span style="font-size: 11px;=">(Company Credits)</span>
-          {{/if_eq}}
+          {{#switch item.action_type}}
+            {{#case 'credit_card_from_wallet'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="current_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(Your Finly Account Balance)</span>
+            {{/case}}
+
+            {{#case 'credit_card_from_virtual_account'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="virtual_account_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(Company Credits)</span>
+            {{/case}}
+            {{#case 'credit_wallet_from_wallet'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="current_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(Your Finly Account Balance)</span>
+            {{/case}}
+            {{#case 'credit_wallet_from_virtual_account'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="virtual_account_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(Company Credits)</span>
+            {{/case}}
+          {{/switch}}
           </div>
 
 
           <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
 
           <div class="col-sm-6 text-center">
-            <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="target_user_card_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
-            <span style="font-size: 11px;=">(User's Card Balance)</span>
+          {{#switch item.action_type}}
+            {{#case 'credit_card_from_wallet'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="target_user_card_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(User's Card Balance)</span>
+            {{/case}}
+
+            {{#case 'credit_card_from_virtual_account'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="target_user_card_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(User's Card Balance)</span>
+            {{/case}}
+            {{#case 'credit_wallet_from_wallet'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="target_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(User's Finly Account Balance)</span>
+            {{/case}}
+            {{#case 'credit_wallet_from_virtual_account'}}
+              <h3 style="margin-bottom: 0;">&#8377;&nbsp;<span class="target_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span></h3>
+              <span style="font-size: 11px;=">(User's Finly Account Balance)</span>
+            {{/case}}
+          {{/switch}}
           </div>
         </div>
       </div>

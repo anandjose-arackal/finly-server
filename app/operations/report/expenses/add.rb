@@ -22,10 +22,9 @@ class Report::Expenses::Add < Report::Base
   end
 
   def init
-    index_operation = Report::Index.new(self.user, self.params)
-    reports_presenter = index_operation.run
-    unless index_operation.success?
-      self.messages = index_operation.errors
+    reports_presenter = Report::Index.(self.user, self.params)
+    unless reports_presenter.success?
+      self.messages = reports_presenter.messages[:error]
       return false
     end
     self.report = reports_presenter.reports.with_id(params[:report_id]).first rescue nil

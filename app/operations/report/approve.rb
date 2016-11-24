@@ -7,6 +7,7 @@ class Report::Approve < Report::Base
   attr_accessor :auto_approve
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve])
     [:manager, :finance_manager, :admin]
   end
 
@@ -90,7 +91,7 @@ class Report::Approve < Report::Base
 
       # recomputing settlement and marking the report as accounted
       unless report.processing?
-        Settlement::Report::Approved.(user, report: report)
+        Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
       end
       # if report is closed, add the relevant comment
@@ -100,7 +101,7 @@ class Report::Approve < Report::Base
         comment.save
       end
       # Send notifications
-      Event::EReport::Approve.(self.user, report: self.report)
+      Event::EReport::Approve.(self.user, report: self.report, auto_approve: auto_approve)
 
       messages[:success] << 'Report approved!'
     end

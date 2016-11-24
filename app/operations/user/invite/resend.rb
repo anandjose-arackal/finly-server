@@ -45,6 +45,10 @@ class User::Invite::Resend < User::Invite::Base
     end
   end
 
+  def success
+    User::Invite::Base::InvitePresenter.new(user, {invite: invited_user}, messages)
+  end
+
   def post_process
     messages[:success] << "Invite resent!"
   end

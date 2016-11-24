@@ -3,12 +3,11 @@
 # Table name: amounts
 #
 #  id          :integer          not null, primary key
-#  value       :float(24)
+#  value       :decimal(64, 12)
 #  currency_id :integer          not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #
-
 
 class Amount < ActiveRecord::Base
   include MathUtil
@@ -36,11 +35,12 @@ class Amount < ActiveRecord::Base
 
   # method that returns the amount value
   def amount_value
-    self.value
+    self.precision_value
   end
 
   alias_method :transaction_amount_value, :amount_value
   alias_method :pending_reimbursement_value, :amount_value
+  alias_method :billing_amount_value, :amount_value
 
   def greater_than_amount_value
     self.value

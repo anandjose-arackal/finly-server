@@ -40,6 +40,7 @@ class Report < ActiveRecord::Base
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
+  # Payment made as reimbursment
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursement_amount, class_name: 'Amount'
 
@@ -47,6 +48,7 @@ class Report < ActiveRecord::Base
   validates :status, presence: true
   validate :is_employee
   validate :has_expenses
+  validate :controller_has_role
 
   default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
@@ -112,8 +114,10 @@ class Report < ActiveRecord::Base
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
+      user_ids = trackings.map(&:action_user_id)
+    else
+      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id)).uniq
     end
-    user_ids = trackings.map(&:action_user_id).uniq
     if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
       if controlling_for_user_id.present?
         user_ids << controlling_for_user_id
@@ -216,9 +220,19 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
-  def total_amount
-    return precision_value(self.expenses.with_amount.sum(:value)) if self.expenses.present?
-    0
+
+  def total_amount(options=[])
+    return 0 unless self.expenses.present?
+    temp_expenses = self.expenses
+    if options.present?
+      options = [options] unless options.kind_of?(Array)
+      if options.present?
+        options.each do |item|
+          temp_expenses = self.expenses.send(item.to_sym) if item.present? and self.expenses.respond_to?(item.to_sym)
+        end
+      end
+    end
+    precision_value(temp_expenses.with_amount.sum(:value))
   end
 
   def controlling_user?(user)
@@ -274,14 +288,22 @@ class Report < ActiveRecord::Base
 
   def require_reimbursement?
     report_total = total_amount
-    latest_expense = latest_expense
+    latest_exp = latest_expense
     date = nil
-    date = latest_expense.date if latest_expense.present?
+    date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
   end
 
   private
+
+  def controller_has_role
+    if controlling_user_id.present?
+      unless controlling_user_role_id.present?
+        errors.add(:report, 'cannot be processed')
+      end
+    end
+  end
 
   def is_employee
     unless self.user.employee?
@@ -297,8 +319,8 @@ class Report < ActiveRecord::Base
 
   def has_expenses
     if report_status_id_changed? and report_status_id_was.present? and
-        (report_status_id_was == ReportStatus.open_id or report_status_id_was == ReportStatus.retracted_id) and
-        (report_status_id == ReportStatus.processing_id or report_status_id == ReportStatus.closed_id)
+      (report_status_id_was == ReportStatus.open_id or report_status_id_was == ReportStatus.retracted_id) and
+      (report_status_id == ReportStatus.processing_id or report_status_id == ReportStatus.closed_id)
       unless expenses.present?
         errors.add :cannot, 'submit an empty report'
       end

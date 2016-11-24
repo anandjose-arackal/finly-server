@@ -21,6 +21,8 @@
 
 
 
+
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -33,6 +35,7 @@ class Expense < ActiveRecord::Base
   belongs_to :category
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
+  belongs_to :surcharge, class_name: "Amount"
 
   has_many :receipts, as: :parent
 
@@ -42,8 +45,10 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :amount, :manual_expense, :card_expense
   accepts_nested_attributes_for :receipts
 
+
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
+  delegate :surcharge_value, to: :card_expense
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
@@ -81,7 +86,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_user_or_report, ->(user_ids, report_ids) { where('report_id IN (?) OR user_id IN (?)', report_ids, user_ids).uniq }
+  # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) {where expense_type_id: type_id}
 
   # scopes for the filters
@@ -167,6 +172,15 @@ class Expense < ActiveRecord::Base
         return self.card_expense.editable_merchant
       else
         # do nothing
+    end
+  end
+
+  def surcharge_value
+    case self.expense_type_id
+      when 1
+        return 0
+      when 2
+        return self.card_expense.surcharge_amount
     end
   end
 

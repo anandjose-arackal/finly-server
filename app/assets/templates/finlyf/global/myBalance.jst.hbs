@@ -1,65 +1,34 @@
-<div class="row no-margin">
-  <div class="col-sm-10 col-sm-offset-1">
-    <div class="row no-margin">
-      <div class="col-sm-6 balance-container text-center">
-        <div>
-          <h3>&#8377;&nbsp;{{item.current_user_wallet}}</h3>
-          <label>Cash in Wallet</label>
-        </div>
-      </div>
+{{#if item.virtual_account}}
+<div class="row no-margin" style="margin-bottom: 10px;">
+  <div class="col-xs-5 no-padding">Company Balance:</div>
+  <div class="col-xs-7 no-padding text-right">&#8377;&nbsp;{{item.virtual_account}}</div>
+</div>
+{{/if}}
 
-      <div class="col-sm-6 balance-container text-center">
-        <div>
-        {{#if item.current_user_card_details.assigned}}
-          {{#if item.current_user_card_details.active}}
-            <h3>&#8377;&nbsp;&nbsp;{{item.current_user_card}}</h3>
-            <label>Cash in Card</label>
-            <button class="btn btn-xs btn-success btn-transfer-wallet-to-card">Load from Wallet</button>
-          {{else}}
-            <h3>&#8377;&nbsp;&nbsp;{{item.current_user_card}}</h3>
-            <label>Cash in Card</label><br />
-            (Blocked by {{item.current_user_card_details.disabled_by.name}})
-            <button class="btn btn-xs btn-success" disabled="disabled">Load from Wallet</button>
-          {{/if}}
-        {{else}}
-          <h3>&nbsp;</h3>
-          <label>Card Unassigned</label>
-        {{/if}}
-        </div>
-      </div>
-
-      
-    </div>
-
-    <div class="row no-margin">
-      <div class="col-sm-6 balance-container text-center">
-        <div>
-          <h3>&#8377;&nbsp;{{item.current_user_cash_in_hand}}</h3>
-          <label>Cash in Hand</label>
-        </div>
-      </div>
-      
-
-      {{#if item.virtual_account}}
-      <div class="col-sm-6 balance-container text-center">
-        <div>
-          <h3>&#8377;&nbsp;{{item.virtual_account}}</h3>
-          <label>Company Credits</label>
-        </div>
-      </div>
-      {{/if}}
-    </div>
-  </div>
+<div class="row no-margin" style="margin-bottom: 10px;">
+  <div class="col-xs-5 no-padding">Cash in Hand:</div>
+  <div class="col-xs-7 no-padding text-right">&#8377;&nbsp;{{item.current_user_cash_in_hand}}</div>
 </div>
 
-<style type="text/css">
-.balance-container{
-  display: flex;
-  align-items: center;
-  min-height: 150px;
-}
-.balance-container div{
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
+<div class="row no-margin" style="margin-bottom: 10px;">
+  <div class="col-xs-5 no-padding">Finly Account Balance:</div>
+  <div class="col-xs-7 no-padding text-right">&#8377;&nbsp;{{item.current_user_wallet}}</div>
+</div>
+
+
+<div class="row no-margin">
+  <div class="col-xs-5 no-padding">Card Balance:</div>
+  <div class="col-xs-7 no-padding text-right">
+  {{#if item.current_user_card_details.assigned}}
+    {{#if item.current_user_card_details.active}}
+      &#8377;&nbsp;&nbsp;{{item.current_user_card}}
+    {{else}}
+      &#8377;&nbsp;&nbsp;{{item.current_user_card}}<br />
+      (Blocked by {{item.current_user_card_details.disabled_by.name}})
+    {{/if}}
+    <button class="btn btn-success btn-transfer-wallet-to-card btn-sm" style="margin: 10px 0 0; position: relative; right: 35px;">Load Funds from Finly Account</button>
+  {{else}}
+    Card Unassigned.
+  {{/if}}
+  </div>
+</div>

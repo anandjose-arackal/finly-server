@@ -6,7 +6,7 @@
   border-bottom: none;
   background: #46568b;
   background: #423689;
-  background: #594DA8;
+  background: #3F51B5;
 }
 .navbar-inverse .navbar-nav > li > a {
     color: white;
@@ -195,7 +195,7 @@
 }
 
 .btn-finly-default:hover{
-  background: #594DA8;
+  background: #3F51B5;
   color: white;
 }
 
@@ -259,12 +259,53 @@
           </ul>
           
           <ul class="nav navbar-nav navbar-right">
-            
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></a>
-              <ul class="navbar-cog dropdown-menu">
 
-                <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+            <li class="dropdown" id="navbar-user-dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 12px 10px 8px 10px;">
+                <img src="/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <div class="navbar-user-dropdown navbar-user-dropdown-profile">
+                    <div class="row">
+                      <div class="col-xs-4" style="padding: 0;padding-left: 20px;">
+                        <img src="/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
+                      </div>
+                      <div class="col-xs-8">
+                        <p class="text-left"><strong class="navbar-user-dropdown-name"></strong></p>
+                        <p class="text-left small navbar-user-dropdown-email"></p>
+                        <p class="text-left li-my-account"></p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="divider" style="margin: 0;"></li>
+                <li>
+                  <div class="navbar-user-dropdown">
+                    <div class="row">
+                      <div class="col-xs-12 navbar-balance" style="min-height: 100px;">
+                        <div title="Loading..." class="loading-animations">
+                          <div class="loading-animation" style="animation-delay: -1.3s;"></div>
+                          <div class="loading-animation" style="animation-delay: -1.2s"></div>
+                          <div class="loading-animation" style="animation-delay: -1.1s"></div>
+                          <div class="loading-animation" style="animation-delay: -1s"></div>
+                          <div class="loading-animation" style="animation-delay: -0.9s"></div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <div class="navbar-user-dropdown navbar-user-dropdown-action">
+                    <div class="row">
+                      <div class="col-xs-12 navbar-cog">
+                        <a href="/users/sign_out" class="btn btn-danger btn-block" data-method="delete">Log out</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
               </ul>
             </li>
           </ul>

@@ -124,15 +124,18 @@ class User::Wallet::Credit < User::Wallet::Base
         payment_to_attributes[:date] = DateUtils.local_date
         payment_to_attributes[:note] = params[:note]
         payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+
         if to_account == :wallet
 
           if from_user.wallet.subtract_funds(self.amount)
             to_user.wallet.add_funds(self.amount)
             payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)
-            self.from_user_payment =from_user.payments.create payment_from_attributes
+            self.from_user_payment = from_user.payments.create payment_from_attributes
 
             payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_wallet)
             self.to_user_payment =to_user.payments.create payment_to_attributes
+
+            add_message :success, 'Credit successful'
           else
             add_message :error, from_user.wallet.errors.full_messages
           end
@@ -144,17 +147,19 @@ class User::Wallet::Credit < User::Wallet::Base
             from_user.wallet.subtract_funds(self.amount)
 
             payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_card)
-            self.from_user_payment =from_user.payments.create payment_from_attributes
+            self.from_user_payment = from_user.payments.create payment_from_attributes
 
             payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_card)
-            self.to_user_payment =to_user.payments.create payment_to_attributes
+            self.to_user_payment = to_user.payments.create payment_to_attributes
 
+            add_message :success, 'Credit successful'
           else
             add_message :error, credit_presenter.messages[:error]
           end
 
         end
     end
+    
   end
 
   def success

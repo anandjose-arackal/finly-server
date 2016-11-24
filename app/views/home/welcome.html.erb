@@ -164,9 +164,60 @@
 </footer>
 
 <div id="ohsnap"></div>
+<div id="ohsnap-priority"></div>
 
 <script type="text/javascript">
   $(document).ready(function(){
+    snapNotify = function(obj){
+      // console.log "From snap", obj
+      ohSnapX()
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            ohSnap(message, {
+              color: color,
+              'duration': '9000',
+              'container-id': container
+            });
+          }
+        }
+      }
+    }
     $("#btn-submit-request").on('click', function(e){
       e.preventDefault();
 
@@ -176,11 +227,12 @@
         type: "POST",
         dataType: 'json',
         success: function(res){
-          console.log(res);
+          // console.log(res);
           if(res.success === true){
             ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
           } else {
-            ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
           }
         }
       });
@@ -199,7 +251,7 @@
   footer{
     padding-top: 25px;
     background: #46568B;
-    background: #594DA8;
+    background: #3F51B5;
   }
 
   footer hr{
@@ -254,7 +306,7 @@
     /*min-height: calc(100vh);*/
     background: #423689;
     /*background: #46568b;*/
-    background:#594DA8;
+    background:#3F51B5;
     /*color: #efefef;*/
     margin-bottom: 0;
     padding-top: 20px;
@@ -279,7 +331,7 @@
   .jumbotron h2{
     font-size: 35px;
     font-weight: 200;
-    color: #594DA8;
+    color: #3F51B5;
     color: #CD925A;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
     margin: 10px auto 30px auto;
@@ -289,7 +341,7 @@
     font-size: 24px;
     font-weight: 200;
     color: #CD925A;
-    color: #594DA8;
+    color: #3F51B5;
     /*color: rgb(147, 193, 120);*/
   }
 
@@ -302,7 +354,7 @@
   .contact-fields{
     padding: 10px;
     color: #232332;
-    color: #594DA8;
+    color: #3F51B5;
     border-radius: 5px;
     border: 0.5px solid #ddd;
     width: 90%;
