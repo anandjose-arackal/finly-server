@@ -9,7 +9,6 @@ class Statement::Base < BaseOperation
     def init
       self.items = params[:items]
     end
-
   end
 
   def pre_validate

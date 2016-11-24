@@ -3,9 +3,6 @@ class Statement::Summary < Statement::Base
 
   attr_accessor :items, :start_date, :end_date
 
-  def pre_validate
-
-  end
 
   def init
     load_selected_user
@@ -87,9 +84,9 @@ class Statement::Summary < Statement::Base
   private
 
   def load_card_transactions
-    items[:atm] = card.transactions.where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
-    items[:pos] = card.transactions.where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
-    items[:online] = card.transactions.where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
+    items[:atm] = card.transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
+    items[:pos] = card.transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
+    items[:online] = card.transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
   end
 
   def user_account_balance(date = nil)
@@ -97,9 +94,9 @@ class Statement::Summary < Statement::Base
     unless date
       return balance
     end
-    debits = selected_user.payments.where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
+    debits = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
                                                             PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)])
-    credits = selected_user.payments.where(payment_type_id: [PaymentType.id_for(:receive_credit_from_wallet_to_wallet),
+    credits = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_wallet_to_wallet),
                                                              PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)])
     balance = balance + debits - credits
     return balance
@@ -112,7 +109,7 @@ class Statement::Summary < Statement::Base
     total = 0
     approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
-      card_ex = report.expenses.only_card_expenses.joins(:amount).sum(:value) rescue 0
+      card_ex = report.expenses.only_card_expenses.where('date > ?', date).joins(:amount).sum(:value) rescue 0
       total += card_ex
     end
     total
@@ -125,7 +122,7 @@ class Statement::Summary < Statement::Base
     total = 0
     approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
-      card_manual = report.expenses.only_manual_expenses.joins(:amount).sum(:value) rescue 0
+      card_manual = report.expenses.only_manual_expenses.where('date > ?', date).joins(:amount).sum(:value) rescue 0
       total += card_manual
     end
     total

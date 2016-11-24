@@ -649,8 +649,7 @@ Rails.application.routes.draw do
   end
 
   get 'statements/:id/summary' => 'statements#summary'
-  resources :statements do
-  end
+  resources :statements
 
   # get 'settlements/summary' => 'settlements#summary'
 
