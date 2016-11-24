@@ -6,12 +6,12 @@ class Statement::Summary < Statement::Base
   def init
     load_selected_user
     if params[:filter_date_from]
-      self.start_date = params[:start_date]
+      self.start_date = Date.parse(params[:filter_date_from])
     else
       self.start_date = Date.parse("01-01-1990") # arbitrarily chosen as the lower bound date
     end
     if params[:filter_date_to]
-      self.end_date = params[:end_date]
+      self.end_date = Date.parse(params[:filter_date_to])
     else
       self.end_date = Date.today
     end
@@ -37,18 +37,18 @@ class Statement::Summary < Statement::Base
 
     # Virtual account details
     items[:user_account_status_details] = {}
-    items[:user_account_status_details][:account_load] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet),
+    items[:user_account_status_details][:account_load] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet),
                                                                           PaymentType.id_for(:receive_credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
-    items[:user_account_status_details][:account_withdrawal] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
+    items[:user_account_status_details][:account_withdrawal] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
                                                                                 PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
-    items[:user_account_status_details][:account_transfer_to_other_accounts] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
-    items[:user_account_status_details][:account_transfer_to_other_cards] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).non_personal.where(payment_type_id: [PaymentType.id_for(:initiate_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
+    items[:user_account_status_details][:account_transfer_to_other_accounts] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
+    items[:user_account_status_details][:account_transfer_to_other_cards] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).non_personal.where(payment_type_id: [PaymentType.id_for(:initiate_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
 
     # transferred to card
     items[:transferred_to_card] = {}
-    items[:transferred_to_card][:from_own_account] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).personal.where(payment_type_id: PaymentType.id_for(:receive_credit_from_wallet_to_card)).joins(:amount).sum(:value)
-    items[:transferred_to_card][:from_other_accounts] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).non_personal.where(payment_type_id: PaymentType.id_for(:receive_credit_from_wallet_to_card)).joins(:amount).sum(:value)
-    items[:transferred_to_card][:from_company_account] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: PaymentType.id_for(:receive_credit_from_virtual_account_to_card)).joins(:amount).sum(:value)
+    items[:transferred_to_card][:from_own_account] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).personal.where(payment_type_id: PaymentType.id_for(:receive_credit_from_wallet_to_card)).joins(:amount).sum(:value)
+    items[:transferred_to_card][:from_other_accounts] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).non_personal.where(payment_type_id: PaymentType.id_for(:receive_credit_from_wallet_to_card)).joins(:amount).sum(:value)
+    items[:transferred_to_card][:from_company_account] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: PaymentType.id_for(:receive_credit_from_virtual_account_to_card)).joins(:amount).sum(:value)
 
     # amount spent from card
     load_card_transactions
@@ -65,11 +65,11 @@ class Statement::Summary < Statement::Base
     items[:opening_cash_in_hand] = cash_in_hand_on_date(start_date)
 
     items[:amount_transacted] = {}
-    items[:amount_transacted][:card_load] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
+    items[:amount_transacted][:card_load] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
                                                                        PaymentType.id_for(:receive_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
-    items[:amount_transacted][:paid_to_employee] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:advance),
+    items[:amount_transacted][:paid_to_employee] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:advance),
                                                                               PaymentType .id_for(:reimbursement)]).joins(:amount).sum(:value)
-    items[:amount_transacted][:paid_by_employee] = selected_user.payments.where('date > ? AND date < ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debt_clearance)]).joins(:amount).sum(:value) # todo - check if this should include settlement
+    items[:amount_transacted][:paid_by_employee] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debt_clearance)]).joins(:amount).sum(:value) # todo - check if this should include settlement
 
     items[:total_verified_expenses] = {}
     items[:total_verified_expenses][:verified_card_expenses] = verified_card_expenses(selected_user)
@@ -80,10 +80,10 @@ class Statement::Summary < Statement::Base
 
     # table 3
     items[:declined_expenses] = {}
-    items[:declined_expenses][:declined_card_expenses] = selected_user.expenses.where('date > ? AND date < ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
-    items[:declined_expenses][:declined_cash_expenses] = selected_user.expenses.where('date > ? AND date < ?', start_date, end_date).only_manual_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
+    items[:declined_expenses][:declined_card_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
+    items[:declined_expenses][:declined_cash_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_manual_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
 
-    items[:unreported_card_expenses] = selected_user.expenses.where('date > ? AND date < ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.unreported_id).joins(:amount).sum(:value)
+    items[:unreported_card_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.unreported_id).joins(:amount).sum(:value)
 
     # items[:total_unverified_card_reversal] todo - need clarification from itzcash
     items[:processing_card_expenses] = {}
@@ -99,13 +99,13 @@ class Statement::Summary < Statement::Base
 
   def load_card_transactions
     items[:spent_from_card] = {}
-    items[:spent_from_card][:atm] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
-    items[:spent_from_card][:pos] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
-    items[:spent_from_card][:online] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
+    items[:spent_from_card][:atm] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
+    items[:spent_from_card][:pos] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
+    items[:spent_from_card][:online] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
   end
 
   def user_account_balance(date = nil)
-    balance = user.wallet.balance_amount
+    balance = selected_user.wallet.balance_amount
     unless date
       return balance
     end
@@ -157,8 +157,8 @@ class Statement::Summary < Statement::Base
   end
 
   def pending_cash_expenses(user = nil)
+    total = 0
     unless user
-      total = 0
       return total
     end
     processing_reports = user.reports.processing
@@ -172,7 +172,14 @@ class Statement::Summary < Statement::Base
   # returns card balance on a particular day
   # if no date is passed it returns current card balance
   def card_balance(date = nil)
-    result = User::PrepaidCard::Show.(selected_user, params)
+    balance_params = {}
+    balance_params[:id] = selected_user.id
+    balance_params[:view] = params[:view]
+
+    result = User::PrepaidCard::Show.(user, balance_params)
+    unless result.success?
+      return 0
+    end
     unless date
       return result.balance.to_f
     end

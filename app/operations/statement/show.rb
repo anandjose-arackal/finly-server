@@ -5,16 +5,16 @@ class Statement::Show < Statement::Base
   def init
     load_selected_user
     if params[:filter_date_from]
-      self.start_date = params[:start_date]
+      self.start_date = Date.parse(params[:filter_date_from])
     else
       self.start_date = Date.parse("01-01-1990") # arbitrarily chosen as the lower bound date
     end
     if params[:filter_date_to]
-      self.end_date = params[:end_date]
+      self.end_date = Date.parse(params[:filter_date_to])
     else
       self.end_date = Date.today
     end
-    self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date)
+    self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date)
     self.items = []
   end
 
