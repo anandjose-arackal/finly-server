@@ -29,7 +29,7 @@ class Statement::Base < BaseOperation
       return
     end
     user_id = (params[:id] or params[:user_id])
-    self.selected_user = user_result.users.with_id(user_id).first rescue nil
+    self.selected_user = user_result.with_id(user_id).first rescue nil
     if self.selected_user.blank?
       messages[:error] << 'User not found'
     end

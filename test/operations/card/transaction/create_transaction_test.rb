@@ -53,6 +53,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 2.1, @c_expense.surcharge_value
     assert_equal "Other", @c_expense.category_name
     assert_equal ExpenseType.card_expense_id, @c_expense.expense_type_id
+    assert_equal @c_expense.id, @result.transaction.expense.id
 
   end
 
@@ -102,6 +103,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 0, @c_expense.surcharge_value
     assert_equal "Other", @c_expense.category_name
     assert_equal ExpenseType.card_expense_id, @c_expense.expense_type_id
+    assert_equal @c_expense.id, @result.transaction.expense.id
 
   end
 

@@ -1,10 +1,20 @@
 class Statement::Show < Statement::Base
 
-  attr_accessor :items, :transactions
+  attr_accessor :items, :transactions, :start_date, :end_date
 
   def init
     load_selected_user
-    self.transactions = user.card_transactions
+    if params[:filter_date_from]
+      self.start_date = params[:start_date]
+    else
+      self.start_date = Date.parse("01-01-1990") # arbitrarily chosen as the lower bound date
+    end
+    if params[:filter_date_to]
+      self.end_date = params[:end_date]
+    else
+      self.end_date = Date.today
+    end
+    self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date)
     self.items = []
   end
 
@@ -22,17 +32,21 @@ class Statement::Show < Statement::Base
 
   def process
     transactions.each do |transaction|
-      items << {
-                date: transaction.date,
-                transaction_type: "Card Transaction",
-                merchant: transaction.merchant_name,
-                debit_amount: (transaction.transaction_type == "Debit") ? transaction.billing_amount_value : "N/A" ,
-                credit_amount: (transaction.transaction_type == "Credit") ? transaction.billing_amount_value : "N/A" ,
-                balance: (0), # todo need to be decided
-                category: expense_category(transaction),
-                status: expense_status(transaction)
-               }
+      self.items << {
+          date: transaction.transaction_timestamp,
+          transaction_type: "Card Transaction",
+          merchant: transaction.merchant_name,
+          debit_amount: (transaction.transaction_type == "Debit") ? transaction.billing_amount_value : "N/A" ,
+          credit_amount: (transaction.transaction_type == "Credit") ? transaction.billing_amount_value : "N/A" ,
+          # balance: (0), # todo need to be decided
+          category: expense_category(transaction),
+          status: expense_status(transaction)
+      }
     end
+  end
+
+  def success
+    Statement::Base::StatementPresenter.new(user, {items: items}, messages)
   end
 
   private
@@ -45,7 +59,7 @@ class Statement::Show < Statement::Base
     if expense.expense_status_id == ExpenseStatus.unreported_id or expense.expense_status_id == ExpenseStatus.unsubmitted_id
       return "Unverified"
     elsif expense.expense_status_id == ExpenseStatus.submitted_id
-      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed?
+      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or report.reimbursement_confirmed?
         return "Verified"
       else
         return "Unverified"
@@ -54,7 +68,7 @@ class Statement::Show < Statement::Base
   end
 
   def expense_category(transaction)
-    expense = transaction.card_expense.expense rescue nil
+    expense = transaction.expense rescue nil
     unless expense
       return "N/A"
     end

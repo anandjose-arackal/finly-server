@@ -19,10 +19,6 @@
 #
 
 
-
-
-
-
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -41,6 +37,7 @@ class Expense < ActiveRecord::Base
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
+  has_one :card_transaction
 
   accepts_nested_attributes_for :amount, :manual_expense, :card_expense
   accepts_nested_attributes_for :receipts

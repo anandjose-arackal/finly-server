@@ -29,7 +29,7 @@ class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 
-  has_one :card_expense
+  belongs_to :expense
 
   belongs_to :transaction_amount, class_name: "Amount", dependent: :destroy
   belongs_to :card_amount, class_name: "Amount", dependent: :destroy

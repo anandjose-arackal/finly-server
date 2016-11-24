@@ -45,7 +45,6 @@ class Card::Transaction::Create < BaseOperation
               messages[:error] = transaction.errors.full_messages
               return false
             end
-
             # create the associated card expense for this transaction
             @result = Expense::ExCard::Create.(transaction, card)
             unless @result.success?
@@ -55,6 +54,8 @@ class Card::Transaction::Create < BaseOperation
               transaction.save
               return false
             end
+            transaction.expense = @result.expense
+            transaction.save
             return true
           when "ATM"
             # create a transaction out of it
@@ -64,7 +65,7 @@ class Card::Transaction::Create < BaseOperation
               return false
             end
             # add to cash in hand
-            unless user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value], atm_withdrawal: true)
+            unless user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value], 1, atm_withdrawal: true)
               messages[:error] = "Could not add withdrawn amount to cash in hand. Try again"
               transaction.expensed = false
               transaction.error_message = @result.messages[:error]
