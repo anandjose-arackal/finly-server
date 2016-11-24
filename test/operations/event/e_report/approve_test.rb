@@ -70,6 +70,24 @@ class ApproveTest < ActiveSupport::TestCase
     assert affected_users.include?(@owner)
   end
 
+  test 'successful auto-approve' do
+    @report.stubs(:approved?).returns(true)
+    @report.stubs(:controlling_user).returns(nil)
+    @report.stubs(:tracks => stub(:last => stub(:action_user => nil)))
+
+    response = nil
+    event = Event::EReport::Approve.new(nil, report: @report, auto_approve: true)
+    # Ensure 1 mailers have been triggered
+    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',1 do
+      response = event.run
+    end
+    assert response.success?
+    affected_users = event.affected_users
+    # Check if mailer is passed to owner
+    assert affected_users.include?(@owner)
+    assert_equal affected_users.size, 1
+  end
+
   test 'behavior when report is not passed' do
     response = nil
     event = Event::EReport::Approve.new(@finance_manager, report: nil)
