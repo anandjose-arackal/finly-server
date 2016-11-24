@@ -346,6 +346,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
   createReport: ->
     #  "report"=>{"expense_id"=>"15,36,39"}}
+    _this = @
     items = $(@el).find('#items .item')
     expenses = []
     flag = false
@@ -369,6 +370,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           report_id = model.get('id')
           params = {
             report_id: report_id
+            view: _this.params.view
           }
           FinlyF.snapNotify(res.messages)
           FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
