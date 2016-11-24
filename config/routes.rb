@@ -549,7 +549,7 @@ Rails.application.routes.draw do
   end
 
   # get 'organization_account' => 'organization_account#show'
-  get 'organization_account/blah' => 'organization_account#blah' #todo
+  get 'organization_account/policies_list' => 'organization_account#policies_list' #todo
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
 
@@ -649,7 +649,9 @@ Rails.application.routes.draw do
   end
 
   get 'statements/:id/summary' => 'statements#summary'
+
   resources :statements
+
 
   # get 'settlements/summary' => 'settlements#summary'
 

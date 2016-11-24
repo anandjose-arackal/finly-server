@@ -3,8 +3,8 @@ class FinlyF.Views.Statement extends Backbone.View
   templateSidebar: HandlebarsTemplates['finlyf/statements/sidebar/sidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/statements/navbar/navbar_main']
 
-  templateMainSummary: HandlebarsTemplates['finlyf/statements/crud/main']
-  templateMainTransactions: HandlebarsTemplates['finlyf/statements/crud/main']
+  templateMainSummary: HandlebarsTemplates['finlyf/statements/crud/mainSummary']
+  templateMainTransactions: HandlebarsTemplates['finlyf/statements/crud/mainTransactions']
 
   events:
     'click li.filter-statement-type': 'filterStatementType'
@@ -64,6 +64,7 @@ class FinlyF.Views.Statement extends Backbone.View
         url = '/statements/' + @user + '/summary'
       when 'transactions'
         url = '/statements/' + @user
+        # url = '/statements/' + @user + '/summary'
       else
         @params.statement_type = 'summary'
         url = '/statements/' + @user + '/summary'

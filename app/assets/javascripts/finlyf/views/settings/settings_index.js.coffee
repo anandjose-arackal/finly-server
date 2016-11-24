@@ -7,6 +7,7 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
   events:
     'click .navigate-tab li a': 'navigateTab'
     'submit form#changePassword': 'changePassword'
+    
   initialize: (options) ->
     console.log "init, ", options
     if options

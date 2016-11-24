@@ -1,13 +1,16 @@
-<% @result.categories.each do |category| %>
-    <div class="row" style="padding-left: 20px; padding-right: 10px">
-      <div class="col-md-11" style="font-size: 12px; font-weight: 500">
-        <%= category.name %>
-      </div>
-      <i class="fa fa-close btn-delete-category" data-url="<%= category_path(category) %>"></i>
+<div class="col-sm-12">
+ <% @result.categories.each do |category| %>
+  <div class="row" style="padding-left: 20px; padding-right: 10px">
+    <div class="col-md-11" style="font-size: 12px; font-weight: 500">
+      <%= category.name %>
     </div>
+    <i class="fa fa-close btn-delete-category" data-url="<%= category_path(category) %>"></i>
+  </div>
 
-    <hr style="margin-top: 10px; margin-bottom: 10px;">
-<% end %>
+  <hr style="margin-top: 10px; margin-bottom: 10px;">
+<% end %> 
+</div>
+
 
 
 <form id="form-add-category" action="<%= categories_path %>" style="margin-top: 30px;">
