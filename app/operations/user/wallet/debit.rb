@@ -66,7 +66,7 @@ class User::Wallet::Debit < User::Wallet::Base
     when :wallet
 
       if to_account == :wallet
-        ZZ
+        
         payment_from_attributes = {}
         payment_from_attributes[:initiating_user] = to_user
         payment_from_attributes[:receiving_user] = from_user
