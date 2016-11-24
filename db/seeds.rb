@@ -212,14 +212,14 @@ end
 
 if Policy.non_default.count == 0
   a = User.first
-  p = Policy::Create.(a, {name: 'Test Policy'})
-  p = Policy.find_by(name: "Test Policy")
+  p = Policy::Create.(a, {name: 'Bangalore team'})
+  p = Policy.find_by(name: "Bangalore team")
   p.configuration.update_attribute(:require_category, true) if p.present?
   Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
   # PolicyUserService.new(p).add_user(u[0], false)
   u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
-  p2 = Policy::Create.(a, {name: 'Another test Policy'})
-  p2 = Policy.find_by(name: 'Another test Policy')
+  p2 = Policy::Create.(a, {name: 'Mumbai team'})
+  p2 = Policy.find_by(name: 'Mumbai team')
   u.each do |user|
     Policy::Users::AddUser.(a, {view: 'admin', policy_id: p2.id, :user_id => "#{user.id}"})
     # PolicyUserService.new(p2).add_user(user, false)
@@ -391,13 +391,13 @@ if Card.count == 0
   #   end
   # end
 
-  User.all.each do |user|
-    if user.id < 6
-      number = "S0001774009#{(user.id - 1)}"
-      user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-                        card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
-    end
-  end
+  # User.all.each do |user|
+  #   if user.id < 6
+  #     number = "S0001774009#{(user.id - 1)}"
+  #     user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
+  #                       card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+  #   end
+  # end
 end
 
 # creating some junk transactions and card expenses for testing
@@ -439,6 +439,21 @@ if AdminUser.count == 0
   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 end
+
+user = User.find_by(email: 'admin@finly.io').update_attributes(first_name: "Bob", last_name: "Admin")
+
+user.cards.create(proxy: "S00017740095", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+
+user = User.find_by(email: 'manager0@finly.io').update_atttributes(first_name: "Suresh", last_name: "Manager")
+user.cards.create(proxy: "S00017740092", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+
+user = User.find_by(email: 'finance0@finly.io').update_attributes(first_name: "Ravi", last_name: "FinanceManager")
+user.cards.create(proxy: "S00017740093", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+
+user = User.find_by(email: 'user0@finly.io').update_attributes(first_name: "John", last_name: "Employee")
+user.cards.create(proxy: "S00017740094", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+
+
 
 # # creating Wayne Enterprises
 #
