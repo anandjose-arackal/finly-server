@@ -19,49 +19,54 @@
         <tr role="row">
           <td><strong>User Account Status Details</strong></td>
           <td>Account Load</td>
-          <td>{{item.account_load}}</td>
+          <td>{{item.user_account_status_details.account_load}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>Account Withdrawal</td>
-          <td>{{item.account_withdrawal}}</td>
+          <td>{{item.user_account_status_details.account_withdrawal}}</td>
         </tr>
         <tr role="row">
           <td></td>
-          <td>Account Transfer</td>
-          <td>{{item.account_transfer_to_other_accounts}}</td>
+          <td>Account Transfer (to Other User Accounts)</td>
+          <td>{{item.user_account_status_details.account_transfer_to_other_accounts}}</td>
+        </tr>
+        <tr role="row">
+          <td></td>
+          <td>Account Transfer (to Other Cards)</td>
+          <td>{{item.user_account_status_details.account_transfer_to_other_cards}}</td>
         </tr>
         <tr role="row">
           <td><strong>Transferred to Card</strong></td>
           <td>From Own Account</td>
-          <td>{{item.account_transfer_to_other_cards}}</td>
+          <td>{{item.transferred_to_card.from_own_account}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>From Other Accounts</td>
-          <td>{{item.table1.from_other_accounts}}</td>
+          <td>{{item.transferred_to_card.from_other_accounts}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>From Company Account</td>
-          <td>{{item.table1.from_company_account}}</td>
+          <td>{{item.transferred_to_card.from_company_account}}</td>
         </tr>
         <tr role="row">
           <td><strong>Spent from Card</strong></td>
           <td>ATM Withdrawals</td>
-          <td>{{item.table1.atm}}</td>
+          <td>{{item.spent_from_card.atm}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>POS Expenses</td>
-          <td>{{item.table1.pos}}</td>
+          <td>{{item.spent_from_card.pos}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>Online Expenses</td>
-          <td>{{item.table1.online}}</td>
+          <td>{{item.spent_from_card.online}}</td>
         </tr>
-        <tr role="row">
+        {{!-- <tr role="row">
           <td></td>
           <td>Reversals</td>
           <td>{{item.table1.reversals}}</td>
@@ -80,7 +85,7 @@
           <td></td>
           <td>Other Surcharges [ eg. IRCTC]</td>
           <td>{{item.table1.other_surcharges}}</td>
-        </tr>
+        </tr> --}}
         <tr role="row">
           <td></td>
           <td></td>
@@ -89,17 +94,17 @@
         <tr role="row">
           <td><strong>= Account Closing Balance</strong></td>
           <td></td>
-          <td>{{item.table1.finly_account_closing_balance}}</td>
+          <td>{{item.account_closing_balance}}</td>
         </tr>
         <tr role="row">
           <td><strong>= Card Closing Balance</strong></td>
           <td></td>
-          <td>{{item.table1.card_account_balance}}</td>
+          <td>{{item.card_closing_balance}}</td>
         </tr>
         <tr role="row">
           <td><strong>= Cash in Hand</strong></td>
           <td></td>
-          <td>{{item.table1.cash_in_hand}}</td>
+          <td>{{item.closing_cash_in_hand}}</td>
         </tr></tbody>
 
     </table>
@@ -121,12 +126,12 @@
         <tr role="row">
           <td><strong>Opening Card Balance with the Employee</strong></td>
           <td></td>
-          <td>{{item.table2.opening_card_balance}}</td>
+          <td>{{item.opening_card_balance}}</td>
         </tr>
         <tr role="row">
           <td><strong>Opening Cash in Hand</strong></td>
           <td></td>
-          <td>{{item.table2.opening_cash_in_hand}}</td>
+          <td>{{item.opening_cash_in_hand}}</td>
         </tr>
         <tr role="row">
           <td></td>
@@ -136,22 +141,18 @@
         <tr role="row">
           <td><strong>Total amount transacted with employee within this period</strong></td>
           <td>Card Load</td>
-          <td>{{item.table2.card_load}}</td>
+          <td>{{item.amount_transacted.card_load}}</td>
         </tr>
-        <tr role="row">
-          <td></td>
-          <td>Card Withdrawal</td>
-          <td>{{item.table2.cash_withdrawal}}</td>
-        </tr>
+        
         <tr role="row">
           <td></td>
           <td>Paid via Cash/ NEFT</td>
-          <td>{{item.table2.paid_to_employee}}</td>
+          <td>{{item.amount_transacted.paid_to_employee}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td><span>Received Cash/ NEFT</span></td>
-          <td>{{item.table2.paid_by_employee}}</td>
+          <td>{{item.amount_transacted.paid_to_employee}}</td>
         </tr>
         <tr role="row">
           <td></td>
@@ -161,12 +162,12 @@
         <tr role="row">
           <td><strong>Total Verified Expenses</strong></td>
           <td>Verified Card Expenses</td>
-          <td>{{item.table2.verified_card_ex}}</td>
+          <td>{{item.total_verified_expenses.verified_card_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>Verified Cash Expenses</td>
-          <td>{{item.table2.verified_cash_ex}}</td>
+          <td>{{item.total_verified_expenses.verified_cash_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
@@ -178,12 +179,12 @@
             <p><strong>= Closing Card Balance</strong></p>
           </td>
           <td></td>
-          <td>{{item.table2.closing_card_balance}}</td>
+          <td>{{item.closing_card_balance}}</td>
         </tr>
         <tr role="row">
           <td><strong>= Remaining Cash with the Employee</strong></td>
           <td></td>
-          <td>{{item.table2.closing_cash_in_hand}}</td>
+          <td>{{item.closing_cash_in_hand}}</td>
         </tr>
       </tbody>
     </table>
@@ -203,9 +204,9 @@
         <tr role="row">
           <td><strong>Opening card Balance with the Employee</strong></td>
           <td></td>
-          <td>{{item.table3.opening_card_balance}}</td>
+          <td>{{item.opening_card_balance}}</td>
         </tr>
-        <tr role="row">
+        {{!-- <tr role="row">
           <td><span><strong>Cash In Hand Calculation</strong></span></td>
           <td><span>Paid via Cash/ NEFT</span></td>
           <td>{{item.table3.declined_card_expenses}}</td>
@@ -219,7 +220,7 @@
           <td></td>
           <td><span>ATM Withdrawals</span></td>
           <td>{{item.table3.total_unverified_card_reversal}}</td>
-        </tr>
+        </tr> --}}
         <tr role="row">
           <td></td>
           <td></td>
@@ -228,19 +229,19 @@
         <tr role="row">
           <td><strong>Declined Expenses</strong></td>
           <td>Card Expenses</td>
-          <td>{{item.table3.unreported_card_expenses}}</td>
+          <td>{{item.declined_expenses.declined_card_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>Cash Expenses</td>
-          <td>{{item.table3.pending_card_expenses}}</td>
+          <td>{{item.declined_expenses.declined_cash_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td></td>
           <td></td>
         </tr>
-        <tr role="row">
+        {{!-- <tr role="row">
           <td><strong>Reversal</strong></td>
           <td>Total unverified card Reversal</td>
           <td>{{item.table3.pending_cash_expenses}}</td>
@@ -249,21 +250,21 @@
           <td></td>
           <td></td>
           <td></td>
-        </tr>
+        </tr> --}}  
         <tr role="row">
           <td><strong>Unreported Cash Expenses</strong></td>
           <td>Unsubmitted Card Expenses</td>
-          <td>{{item.table3.closing_card_balance}}</td>
+          <td>{{item.unreported_card_expenses}}</td>
         </tr>
         <tr role="row">
           <td><strong>Card Expenses in Processing</strong></td>
           <td>Pending Card Expenses</td>
-          <td>{{item.table3.remaining_cash}}</td>
+          <td>{{item.processing_card_expenses.pending_card_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>Pending Cash Expenses</td>
-          <td><em>Cash Expenses that are submitted but are yet to be verified</em></td>
+          <td>{{item.processing_card_expenses.pending_card_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
@@ -275,12 +276,12 @@
             <p><strong>= Closing Card Balance</strong></p>
           </td>
           <td></td>
-          <td><em>Amount in the card on end date specified in Filter</em></td>
+          <td>{{item.card_closing_balance}}</td>
         </tr>
         <tr role="row">
           <td><strong>= Remaining Cash with the Employee</strong></td>
           <td></td>
-          <td><em>Amount in employees hand on end date specified in Filter</em></td>
+          <td>{{item.closing_cash_in_hand}}</td>
         </tr>
       </tbody>
     </table>

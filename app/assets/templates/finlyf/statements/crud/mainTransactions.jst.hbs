@@ -8,7 +8,7 @@
           <th><div>Merchant</div></th>
           <th><div>Debit</div></th>
           <th><div>Credit</div></th>
-          <th><div>Balance</div></th>
+          {{!-- <th><div>Balance</div></th> --}}
           <th><div>Category</div></th>
           <th><div>Status</div></th>
         </tr>
@@ -21,7 +21,7 @@
           <td>{{#if this.merchant}}{{this.merchant}}{{else}}-{{/if}}</td>
           <td>{{#if this.debit_amount}}{{this.debit_amount}}{{else}}-{{/if}}</td>
           <td>{{#if this.credit_amount}}{{this.credit_amount}}{{else}}-{{/if}}</td>
-          <td>{{#if this.balance}}{{this.balance}}{{else}}-{{/if}}</td>
+          {{!-- <td>{{#if this.balance}}{{this.balance}}{{else}}-{{/if}}</td> --}}
           <td>{{#if this.category}}{{this.category}}{{else}}-{{/if}}</td>
           <td>{{#if this.status}}{{this.status}}{{else}}-{{/if}}</td>
         </tr>
