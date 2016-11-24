@@ -16,7 +16,7 @@ class User::Wallet::Credit < User::Wallet::Base
   def pre_validate
     super
     if params.blank? or params[:from_account].blank? or params[:to_account].blank? or
-        (params[:to_user].blank? and params[:to_user_id].blank?)
+      (params[:to_user].blank? and params[:to_user_id].blank?)
       add_message :error, 'Invalid request'
     end
   end
@@ -80,86 +80,86 @@ class User::Wallet::Credit < User::Wallet::Base
   def process
 
     case from_account
-      when :virtual_account
-        payment_attributes = {}
-        payment_attributes[:initiating_user] = from_user
-        payment_attributes[:receiving_user] = to_user
-        payment_attributes[:date] = DateUtils.local_date
-        payment_attributes[:note] = params[:note]
-        payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+    when :virtual_account
+      payment_attributes = {}
+      payment_attributes[:initiating_user] = from_user
+      payment_attributes[:receiving_user] = to_user
+      payment_attributes[:date] = DateUtils.local_date
+      payment_attributes[:note] = params[:note]
+      payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-        if to_account == :wallet
+      if to_account == :wallet
 
-          if to_user.wallet.add_funds(self.amount)
-            user.company.account.funds_credited_to_wallet(self.amount)
+        if to_user.wallet.add_funds(self.amount)
+          user.company.account.funds_credited_to_wallet(self.amount)
 
-            payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)
-            self.to_user_payment = to_user.payments.create payment_attributes
-          else
-            add_message :error, to_user.wallet.errors.full_messages
-          end
-
-        elsif to_account == :card
-
-          credit_presenter = ItzCash::Credit.(to_user, params)
-          unless credit_presenter.success?
-            add_message :error, credit_presenter.messages[:error]
-            return
-          end
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_card)
-          self.to_user_payment =to_user.payments.create payment_attributes
-
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)
+          self.to_user_payment = to_user.payments.create payment_attributes
+        else
+          add_message :error, to_user.wallet.errors.full_messages
         end
-      when :wallet
-        payment_from_attributes = {}
-        payment_from_attributes[:initiating_user] = to_user
-        payment_from_attributes[:receiving_user] = from_user
-        payment_from_attributes[:date] = DateUtils.local_date
-        payment_from_attributes[:note] = params[:note]
-        payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-        payment_to_attributes = {}
-        payment_to_attributes[:initiating_user] = from_user
-        payment_to_attributes[:receiving_user] = to_user
-        payment_to_attributes[:date] = DateUtils.local_date
-        payment_to_attributes[:note] = params[:note]
-        payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+      elsif to_account == :card
 
-        if to_account == :wallet
-
-          if from_user.wallet.subtract_funds(self.amount)
-            to_user.wallet.add_funds(self.amount)
-            payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)
-            self.from_user_payment = from_user.payments.create payment_from_attributes
-
-            payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_wallet)
-            self.to_user_payment =to_user.payments.create payment_to_attributes
-
-            add_message :success, 'Credit successful'
-          else
-            add_message :error, from_user.wallet.errors.full_messages
-          end
-
-        elsif to_account == :card
-
-          credit_presenter = ItzCash::Credit.(to_user, params)
-          if credit_presenter.success?
-            from_user.wallet.subtract_funds(self.amount)
-
-            payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_card)
-            self.from_user_payment = from_user.payments.create payment_from_attributes
-
-            payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_card)
-            self.to_user_payment = to_user.payments.create payment_to_attributes
-
-            add_message :success, 'Credit successful'
-          else
-            add_message :error, credit_presenter.messages[:error]
-          end
-
+        credit_presenter = ItzCash::Credit.(to_user, params)
+        unless credit_presenter.success?
+          add_message :error, credit_presenter.messages[:error]
+          return
         end
+        payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_card)
+        self.to_user_payment =to_user.payments.create payment_attributes
+
+      end
+    when :wallet
+      payment_from_attributes = {}
+      payment_from_attributes[:initiating_user] = to_user
+      payment_from_attributes[:receiving_user] = from_user
+      payment_from_attributes[:date] = DateUtils.local_date
+      payment_from_attributes[:note] = params[:note]
+      payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+
+      payment_to_attributes = {}
+      payment_to_attributes[:initiating_user] = from_user
+      payment_to_attributes[:receiving_user] = to_user
+      payment_to_attributes[:date] = DateUtils.local_date
+      payment_to_attributes[:note] = params[:note]
+      payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+
+      if to_account == :wallet
+
+        if from_user.wallet.subtract_funds(self.amount)
+          to_user.wallet.add_funds(self.amount)
+          payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)
+          self.from_user_payment = from_user.payments.create payment_from_attributes
+
+          payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_wallet)
+          self.to_user_payment =to_user.payments.create payment_to_attributes
+
+          add_message :success, 'Credit successful'
+        else
+          add_message :error, from_user.wallet.errors.full_messages
+        end
+
+      elsif to_account == :card
+
+        credit_presenter = ItzCash::Credit.(to_user, params)
+        if credit_presenter.success?
+          from_user.wallet.subtract_funds(self.amount)
+
+          payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_card)
+          self.from_user_payment = from_user.payments.create payment_from_attributes
+
+          payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_card)
+          self.to_user_payment = to_user.payments.create payment_to_attributes
+
+          add_message :success, 'Credit successful'
+        else
+          add_message :error, credit_presenter.messages[:error]
+        end
+
+      end
     end
-    
+
   end
 
   def success
