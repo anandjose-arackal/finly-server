@@ -31,14 +31,20 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       end
       updated_expense_params.delete(:receipts_attributes)
     end
-    if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
-      self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
+    if expense
+      if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
+        self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
+      end
     end
   end
 
 
   def validate
-
+    if expense.report_id and personal_view?
+      unless expense.report.editable?
+        messages[:error] << "Expense cannot be edited at this stage"
+      end
+    end
   end
 
 

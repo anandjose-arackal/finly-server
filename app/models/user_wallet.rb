@@ -21,6 +21,8 @@ class UserWallet < ActiveRecord::Base
     self.balance.value
   end
 
+  alias_method :balance_amount, :balance_value
+
   def add_funds(amount)
     if amount.blank? or amount.to_d <= 0
       errors.add(:amount, 'cannot be less than or equal to 0')

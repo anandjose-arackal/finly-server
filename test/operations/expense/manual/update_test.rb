@@ -7,6 +7,10 @@ class UpdateTest < ActiveSupport::TestCase
   def setup
     @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
     @user = users(:admin)
+    @manager = users(:manager)
+    @finance_manager = users(:finance_manager)
+    @admin = users(:admin)
+    @employee = users(:employee)
     @expense = @user.expenses.only_manual_expenses.first
     @update_params = {expense: {amount_attributes: {value: 1200, currency_id: 1},
                                 manual_expense_attributes: {merchant: "Uber"},
@@ -99,7 +103,6 @@ class UpdateTest < ActiveSupport::TestCase
     assert_equal "Uber", @result.expense.merchant_name
     assert_equal Date.yesterday, @result.expense.date
     assert_equal 1200, @result.expense.amount_value
-
   end
 
   test "cannot update an expense that is associated with a processing report" do
@@ -116,23 +119,73 @@ class UpdateTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
-    assert_equal "Report cannot be edited in this state", @result.messages[:error].first
+    assert_equal "Expense cannot be edited at this stage", @result.messages[:error].first
   end
 
   test "reporting manager can update a user's expense" do
+    # stubbing the face that Expense Index returns the expense the manager needs to edit
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
+    @update_params[:view] = 'manager'
+    update_op = Expense::Manual::Update.new(@manager, @update_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert @result.success?
+    assert_equal "Uber", @result.expense.merchant_name
+    assert_equal Date.yesterday, @result.expense.date
+    assert_equal 1200, @result.expense.amount_value
+  end
+
+  test "manager who's not in manager view cannot edit team member's expense" do
+    # stubbing the fact that Expense Index returns the expense the manager needs to edit
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
+
+    # no view passed to mimic personal view
+    update_op = Expense::Manual::Update.new(@manager, @update_params)
+    assert_no_difference '@user.expenses.count' do
+      begin
+        @result = update_op.run
+      rescue NotAuthorizedException
+        @rescued = true
+      end
+    end
+    assert @rescued
   end
 
   test "non reporting manager cannot update a user's expense" do
+    # mocking the fact that the expense index does not return the particular expense
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: []}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
+    @update_params[:view] = 'manager'
+    update_op = Expense::Manual::Update.new(@manager, @update_params)
+    assert_no_difference '@user.expenses.count' do
+      begin
+        @result = update_op.run
+      rescue NotAuthorizedException
+        @rescued = true
+      end
+    end
+    assert @rescued
   end
 
   test "admins can update anyone in the company's expenses" do
+    # stubbing the fact that Expense Index returns the expense the manager needs to edit
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
-  end
-
-  test "admins cannot update an expense that is not associated wiith a report" do
-
+    @update_params[:view] = 'admin'
+    update_op = Expense::Manual::Update.new(@admin, @update_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert @result.success?
+    assert_equal "Uber", @result.expense.merchant_name
+    assert_equal Date.yesterday, @result.expense.date
+    assert_equal 1200, @result.expense.amount_value
   end
 
 end

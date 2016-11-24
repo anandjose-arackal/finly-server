@@ -3,9 +3,6 @@ class Statement::Summary < Statement::Base
 
   attr_accessor :items, :start_date, :end_date
 
-  def pre_validate
-
-  end
 
   def init
     load_selected_user
@@ -28,11 +25,15 @@ class Statement::Summary < Statement::Base
     end
   end
 
-  def process
+  def validate
+    if end_date > DateUtils.local_date
+      messages[:error] << "End Date cannot be in the future"
+    end
+  end
 
+  def process
     # table 1
-    # items[:user_account_balance] = # needs to be calculated from wallet transactions
-    # items[:]
+    items[:user_account_opening_balance] = user_account_balance(start_date)
 
     # Virtual account details
     items[:account_load] = selected_user.payments.where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet),
@@ -51,43 +52,54 @@ class Statement::Summary < Statement::Base
     load_card_transactions
 
     # closing balances
-    items[:account_closing_balance]
-    items[:card_closing_balance] = card_balance(date)
-    items[:cash_in_hand]
+    items[:account_closing_balance] = user_account_balance(end_date)
+    items[:card_closing_balance] = card_balance(end_date)
+    items[:closing_cash_in_hand] = cash_in_hand_on_date(end_date)
 
     # table 2
-    items[:opening_card_balance]
-    items[:opening_cash_in_hand]
+    items[:opening_card_balance] = card_balance(start_date)
+    items[:opening_cash_in_hand] = cash_in_hand_on_date(start_date)
     items[:card_load] = selected_user.payments.where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
                                                                        PaymentType.id_for(:receive_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
-    items[:card_withdrawal]
     items[:paid_to_employee] = selected_user.payments.where(payment_type_id: [PaymentType.id_for(:advance),
                                                                               PaymentType .id_for(:reimbursement)]).joins(:amount).sum(:value)
     items[:paid_by_employee] = selected_user.payments.where(payment_type_id: [PaymentType.id_for(:debt_clearance)]).joins(:amount).sum(:value) # todo - check if this should include settlement
     items[:verified_card_expenses] = verified_card_expenses(selected_user)
-    items[:verified_cash_expenses]
+    items[:verified_cash_expenses] = verified_cash_expenses(selected_user)
 
-    items[:closing_card_balance]
-    items[:closing_cash_in_hand]
+    items[:closing_card_balance] = card_balance(end_date)
+    items[:closing_cash_in_hand] = cash_in_hand_on_date(end_date)
 
     # table 3
     items[:declined_card_expenses] = selected_user.expenses.only_card_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
     items[:declined_cash_expenses] = selected_user.expenses.only_manual_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
     items[:unreported_card_expenses] = selected_user.expenses.only_card_expenses.where(expense_status_id: ExpenseStatus.unreported_id).joins(:amount).sum(:value)
 
-    items[:total_unverified_card_reversal]
+    # items[:total_unverified_card_reversal] todo - need clarification from itzcash
 
     items[:pending_card_expenses] = pending_card_expenses(selected_user)
     items[:pending_cash_expenses] = pending_cash_expenses(selected_user)
-
   end
 
   private
 
   def load_card_transactions
-    items[:atm] = card.transactions.where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
-    items[:pos] = card.transactions.where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
-    items[:online] = card.transactions.where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
+    items[:atm] = card.transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
+    items[:pos] = card.transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
+    items[:online] = card.transactions.where('transaction_timestamp > ? AND transaction_timestamp < ?', start_date, end_date).where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
+  end
+
+  def user_account_balance(date = nil)
+    balance = user.wallet.balance_amount
+    unless date
+      return balance
+    end
+    debits = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
+                                                            PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)])
+    credits = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_wallet_to_wallet),
+                                                             PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)])
+    balance = balance + debits - credits
+    return balance
   end
 
   def verified_card_expenses(user = nil)
@@ -97,8 +109,21 @@ class Statement::Summary < Statement::Base
     total = 0
     approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
-      card_ex = report.expenses.only_card_expenses.joins(:amount).sum(:value) rescue 0
+      card_ex = report.expenses.only_card_expenses.where('date > ?', date).joins(:amount).sum(:value) rescue 0
       total += card_ex
+    end
+    total
+  end
+
+  def verified_cash_expenses(user = nil)
+    unless user
+      return 0
+    end
+    total = 0
+    approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
+    approved_reports.each do |report|
+      card_manual = report.expenses.only_manual_expenses.where('date > ?', date).joins(:amount).sum(:value) rescue 0
+      total += card_manual
     end
     total
   end
@@ -113,7 +138,7 @@ class Statement::Summary < Statement::Base
       card_ex = report.expenses.only_card_expenses.joins(:amount).sum(:value) rescue 0
       total += card_ex
     end
-    total
+    return total
   end
 
   def pending_cash_expenses(user = nil)
@@ -125,7 +150,7 @@ class Statement::Summary < Statement::Base
       manual_ex = report.expenses.only_manual_expenses.joins(:amount).sum(:value) rescue 0
       total += manual_ex
     end
-    total
+    return total
   end
 
   # returns card balance on a particular day
@@ -136,17 +161,27 @@ class Statement::Summary < Statement::Base
       return result.balance
     end
     card_expenses = user.card_transactions.debits.where('transaction_timestamp > ?', start_date).joins(:billing_amount).sum(:value)
-    card_load_amount = user.payments.where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
+    card_load_amount = user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
                                                              PaymentType.id_for(:receive_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
     balance = result.balance + card_load_amount - card_expenses
     return balance
   end
 
+  # todo - revisit this calculation
   def cash_in_hand_on_date(date = nil)
     balance = user.cash_in_hand
     unless date
       return balance
     end
+    debt_clearances = user.payments.where('date > ?', end_date).where(payment_type_id: PaymentType.id_for(:debt_clearance)).joins(:amount).sum(:value)
+    added_cash_in_hand = user.payments.where('date > ?', end_date).where(payment_type_id: PaymentTypre.id_for(:advance)).joins(:amount).sum(:value)
+    accounted_reports = user.reports.where(report_status_id: [ReportStatus.approved_id, ReportStatus.closed_id]).where(accounted: true)
+    report_amount = 0
+    accounted_reports.each do |report|
+      report_amount += report.total_amount(:only_manual_expenses) - report.reimbursement_amount.value
+    end
+    balance = balance + debt_clearances - added_cash_in_hand + report_amount
+    return balance
   end
 
 end

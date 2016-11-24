@@ -18,8 +18,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
 
   def affected_users
     users = self.report.associated_users
-    users.delete(self.user)
-    users
+    users.reject { |r| r == self.user }
   end
 
   def send_push_notification(user)

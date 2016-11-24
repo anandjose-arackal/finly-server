@@ -5,47 +5,42 @@ require_relative '../../../../app/operations/expense/ex_card/create'
 class UpdateTest < ActiveSupport::TestCase
 
   def setup
-    @user = User.first
+    @user = users(:employee)
     @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
-    @transaction = @user.card_transactions.first
-    @card = @transaction.card
     # creating a card expense first
     @expense = @user.expenses.only_card_expenses.first
-    @update_expense_params = {expense: {merchant: "Olacabs",
-                                       receipt: @image},
-                             expense_id: @expense.id
+    @update_expense_params = {expense: {card_expense_attributes: {editable_merchant: "Olacabs"},
+                                       note: "Randomness",
+                                       category_id: 2},
+                             id: @expense.id
                             }
     @invalid_update_params = {expense: {date: Date.yesterday,
-                                        amount: 200,
+                                        amount_attributes: {value: 200, currency_id: 1},
                                         expense_status_id: 3},
-                              expense_id: @expense.id
+                              id: @expense.id
                              }
     @other_user = users(:manager)
     @other_expense = @other_user.expenses.first
+    @admin = users(:admin)
+    @manager = users(:manager)
   end
 
   test "successfully updating a card expense" do
 
-    # checking previous card expense values
-    merchant = @expense.card_expense.editable_merchant
-    assert @expense.receipts.blank?
-    amount = @expense.amount_value
     card_expense_op = Expense::ExCard::Update.new(@user, @update_expense_params)
 
     @result = card_expense_op.run
     assert @result.success?
 
     @expense.reload
-    # ensuring none of the original parameters have changed
-    assert_equal amount, @expense.amount_value
-    assert_equal merchant, @expense.card_expense.editable_merchant
-    assert @expense.receipts.blank?
+    assert_equal "Olacabs", @expense.card_expense.editable_merchant
+    assert_equal 2, @expense.category_id
   end
+
 
   # immutable parameters: amount, currency, date
   test "can't edit immutable parameters of a card expense" do
     # checking previous card expense values
-    assert @expense.receipts.blank?
     date = @expense.date
     amount = @expense.amount_value
 
@@ -57,12 +52,11 @@ class UpdateTest < ActiveSupport::TestCase
 
     assert_equal date, @expense.date
     assert_equal amount, @expense.amount_value
-    assert @expense.receipts.blank?
-
   end
 
+
   test "cannot update another user's card expense" do
-    @update_expense_params[:expense_id] = @other_expense.id
+    @update_expense_params[:id] = @other_expense.id
     card_expense_op = Expense::ExCard::Update.new(@user, @update_expense_params)
     begin
       @result = card_expense_op.run
@@ -73,21 +67,68 @@ class UpdateTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "manager can edit the expenses of someone in his/her team" do
+  test "reporting manager can update a user's expense" do
+    # stubbing the face that Expense Index returns the expense the manager needs to edit
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
+    @update_expense_params[:view] = 'manager'
+    update_op = Expense::ExCard::Update.new(@manager, @update_expense_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert @result.success?
+    assert_equal "Olacabs", @result.expense.merchant_name
+    assert_equal "Randomness", @result.expense.note
   end
 
-  test "finance manager can edit the expenses of someone in his/her team" do
+  test "manager who's not in manager view cannot edit team member's expense" do
+    # stubbing the face that Expense Index returns the expense the manager needs to edit
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
+    # no view passed to mimic personal view
+    update_op = Expense::ExCard::Update.new(@manager, @update_expense_params)
+    assert_no_difference '@user.expenses.count' do
+      begin
+        @result = update_op.run
+      rescue NotAuthorizedException
+        @rescued = true
+      end
+    end
+    assert @rescued
   end
 
-  test "admin can edit the expenses of anyone in the company" do
+  test "non reporting manager cannot update a user's expense" do
+    # mocking the fact that the expense index does not return the particular expense
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: []}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
+    @update_expense_params[:view] = 'manager'
+    update_op = Expense::ExCard::Update.new(@manager, @update_expense_params)
+    assert_no_difference '@user.expenses.count' do
+      begin
+        @result = update_op.run
+      rescue NotAuthorizedException
+        @rescued = true
+      end
+    end
+    assert @rescued
   end
 
-  test "expenses can be edited by non-owners only if they belong to a report and are processing" do
+  test "admins can update anyone in the company's expenses" do
+    # stubbing the fact that Expense Index returns the expense the manager needs to edit
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
+    @update_expense_params[:view] = 'admin'
+    update_op = Expense::ExCard::Update.new(@admin, @update_expense_params)
+    assert_no_difference '@user.expenses.count' do
+      @result = update_op.run
+    end
+    assert @result.success?
+    assert_equal "Olacabs", @result.expense.merchant_name
+    assert_equal "Randomness", @result.expense.note
   end
-
 
 end
