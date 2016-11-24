@@ -1,0 +1,32 @@
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <table class="table table-striped" style="border: 1px solid #ddd;">
+      <thead>
+        <tr role="row">
+          <th><div>Date</div></th>
+          <th><div>Type</div></th>
+          <th><div>Merchant</div></th>
+          <th><div>Debit</div></th>
+          <th><div>Credit</div></th>
+          {{!-- <th><div>Balance</div></th> --}}
+          <th><div>Category</div></th>
+          <th><div>Status</div></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each item}}
+        <tr role="row">
+          <td>{{#if this.date}}{{this.date}}{{else}}-{{/if}}</td>
+          <td>{{#if this.transaction_type}}{{this.transaction_type}}{{else}}-{{/if}}</td>
+          <td>{{#if this.merchant}}{{this.merchant}}{{else}}-{{/if}}</td>
+          <td>{{#if this.debit_amount}}{{this.debit_amount}}{{else}}-{{/if}}</td>
+          <td>{{#if this.credit_amount}}{{this.credit_amount}}{{else}}-{{/if}}</td>
+          {{!-- <td>{{#if this.balance}}{{this.balance}}{{else}}-{{/if}}</td> --}}
+          <td>{{#if this.category}}{{this.category}}{{else}}-{{/if}}</td>
+          <td>{{#if this.status}}{{this.status}}{{else}}-{{/if}}</td>
+        </tr>
+        {{/each}}
+      </tbody> 
+    </table>
+  </div>
+</div>

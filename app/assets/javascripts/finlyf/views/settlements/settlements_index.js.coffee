@@ -56,6 +56,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   tDebitWalletToVirtualAccount: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/wallet_to_virtual_account']
   tDebitWalletToVirtualAccountConfirm: HandlebarsTemplates['finlyf/settlements/settlement_actions/debit/wallet_to_virtual_account_confirm']
 
+
+  templateNavbarMain: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main']
+
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
     'click .item': 'showDetails'
@@ -108,6 +111,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     #accordion
     'click .panel-heading .row': 'showAccordionBody'
+
+    'click .btn-employee-statement': 'userStatements'
 
 
   initialize: (options) ->
@@ -477,6 +482,24 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       error: ->
         console.log "Couldn't fetch Successfully."
     })
+
+    item = {
+      name: $(target).text()
+      id: @user_id
+    }
+    $(@el).find(".navbar-main").html(@templateNavbarMain({item: item}))
+
+
+  userStatements: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    user_id = $(target).attr('data-user-id')
+
+    params = {
+      view: @params.view
+    }
+
+    FinlyF.primary_router.navigate('statements/' + user_id.toString() + '/params=' + JSON.stringify(params), {trigger: true})
 
   loadRequstedAdvanceList: (e) ->
     _this = @

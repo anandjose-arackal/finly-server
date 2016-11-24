@@ -2,7 +2,7 @@ class OrganizationAccountController < ApplicationController
 
   before_action :authenticate_user!
 
-  def blah
+  def policies_list
     @result = Company::Configuration::Show.(current_user, params)
     respond_to do |format|
       format.html {render partial: 'policy_list'}

@@ -53,6 +53,7 @@ class User::Show < User::Base
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
       self.card = params[:card]
+      # debugger
     end
 
     private

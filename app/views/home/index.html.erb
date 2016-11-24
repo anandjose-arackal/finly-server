@@ -35,22 +35,21 @@
     <% if current_user.admin? %>
       <% views["admin"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
+          <% elsif value =~ /organization_account/i %>
+            <li><a class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% else %>
-            <!-- Special Functionality for my balance -->
             <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
-
         <% end %>
       <% end %>
     <% elsif current_user.finance_manager? %>
       <% views["finance_manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
           <% else %>
-            <!-- <%# if key =~ /balance/i %> -->
             <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
@@ -58,8 +57,8 @@
     <% elsif current_user.manager? %>
       <% views["manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
           <% else %>
             <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
@@ -68,8 +67,8 @@
     <% elsif current_user.employee? %>
       <% views["personal"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>" data-profile="yes"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
           <% else %>
             <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
