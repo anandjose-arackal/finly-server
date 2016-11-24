@@ -444,7 +444,7 @@ user = User.find_by(email: 'admin@finly.io').update_attributes(first_name: "Bob"
 user = User.find_by(email: 'admin@finly.io')
 user.cards.create(proxy: "S00017740095", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'manager0@finly.io').update_atttributes(first_name: "Suresh", last_name: "Manager")
+user = User.find_by(email: 'manager0@finly.io').update_attributes(first_name: "Suresh", last_name: "Manager")
 user = User.find_by(email: 'manager0@finly.io')
 user.cards.create(proxy: "S00017740092", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
