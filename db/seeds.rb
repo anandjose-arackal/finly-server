@@ -404,12 +404,14 @@ if CardTransaction.count == 0
   User.all.each do |user|
     next unless user.cards.present?
     card = user.cards.first
-    10.times do
+    20.times do
 
+      trans_types = ["POS", "ATM", "Ecom"]
+      trans_modes = ["Debit", "Credit"]
       from_date = Date.parse("01-01-2016 12:00:00")
       to_date = DateTime.now
       random_amount = random_integer(50,200) + 0.1234
-      sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,POS,OLCDCB_POSOFFUS,#{Faker::Space.moon},91,Debit,#{card.proxy},RBLRUP"
+      sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
 
       data = sample_msg_queue_entry.split(",")
 
