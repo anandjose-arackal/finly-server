@@ -9,7 +9,7 @@ class Event::EMoneyRequest::Base < Event::SetNotification
       add_message :error, 'Advance Request not found'
     end
     unless params[:money_request].is_a?(::MoneyRequest)
-      add_message :error, 'Error loading money_request'
+      add_message :error, 'Error loading Advance Request'
     end
   end
 
