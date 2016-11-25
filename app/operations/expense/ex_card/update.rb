@@ -65,12 +65,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     end
   end
 
-  def success
-    Expense::Base::Presenter.new(user, {expense: self.expense}, self.messages)
-  end
-
   def post_process
     # send mailer or notification indicating updation of expense
+    messages[:success] = "Expense updated"
   end
 
   private

@@ -649,7 +649,7 @@ Rails.application.routes.draw do
   end
 
   get 'statements/:id/summary' => 'statements#summary'
-
+  get 'export/statement(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
 
 

@@ -37,12 +37,12 @@ class BalanceSheet < ActiveRecord::Base
     end
   end
 
-  def add_cash_in_hand(value, options = {}, currency=nil)
+  def add_cash_in_hand(value, currency=nil, options = {})
     if value.present? and value.to_f <= 0
       errors.add(:value, 'cannot be less than 0')
       return false
     end
-    if options[:atm_withdrawal]
+    if options and options[:atm_withdrawal]
       # creating an associated payment object for atm withdrawals
       payment = self.user.payments.build(amount_attributes: {value: value, currency_id: 1},
                                payment_type_id: PaymentType.id_for(:atm_withdrawal),

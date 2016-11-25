@@ -44,6 +44,10 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     # mailer to user notifying usage of the card - probably can be merged with transaction mailer
   end
 
+  def success
+    Expense::ExCard::Base::CardExpensePresenter.new(user, {expense: expense}, messages)
+  end
+
   private
   # this will be called when the expense is being created - i.e. the moment the card is used, parameters will be created from the transaction object
   def card_expense_params
