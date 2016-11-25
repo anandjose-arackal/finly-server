@@ -105,7 +105,10 @@ class FinlyF.Views.Statement extends Backbone.View
 
   exportTransactions: (e) ->
     e.preventDefault()
-    url = "/blah/" + @user
+    target = e.currentTarget
+
+    export_type = $(target).attr('data-export-type')
+    url = "/statements/" + @user + '.' + export_type + "?"
     window.open(url,'_blank');
 
   formatDate: (d) ->
