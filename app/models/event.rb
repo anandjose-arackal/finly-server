@@ -68,6 +68,10 @@ class Event < ActiveRecord::Base
              {key: :money_request_comment, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :money_request_reject, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :money_request_take_control, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :money_request_unapprove, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true}]
 
   self.class.instance_eval do
