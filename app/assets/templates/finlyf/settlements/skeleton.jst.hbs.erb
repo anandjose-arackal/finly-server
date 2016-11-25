@@ -104,19 +104,21 @@
   position: relative;
   height: calc(100% - 100px);
   overflow-y: scroll;
+  margin-top: 33px;
 }
 
 
 .main{
   z-index: 4;
-  position:fixed;
-  /*overflow-y: scroll;*/
+  position: fixed;
+  overflow-y: scroll;
   background: rgb(252, 252, 252) none repeat scroll 0% 0%;
   background: #F5F6F9;
-  max-height: calc(100% - 53px); 
+  max-height: calc(100% - 103px);
   padding: 0px;
   box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
-  height: calc(100% - 100px);
+  height: calc(100% - 103px);
+  margin-top: 33px;
 }
 .main.preview .col-md-8{
   /*display: none;*/
@@ -212,6 +214,12 @@
   font-size: 18px;
 }
 
+.secondary-navbar{
+  margin-top: 53px;
+  border-color: transparent;
+  z-index: 5;
+}
+
 
 </style>
 
@@ -304,11 +312,27 @@
   </div><!-- /.container-fluid -->
 </nav>
 
+<nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="">
+  <div class="container-fluid">
+    <div class="row no-margin no-padding">
+      <div class="col-md-2" style="box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+        <div class="navbar-header">
+          <a class="navbar-brand">My Profile Details</a>
+        </div>
+      </div>
+      <div class="col-md-10" style="">
+        <div class="navbar-collapse collapse navbar-main">
+          
+        </div><!--/.nav-collapse -->    
+      </div>
+    </div>
+  </div><!--/.container-fluid -->
+</nav>
+
 
 <div class="container-fluid container-main" style="position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-
-  <div class="col-sm-8 col-sm-offset-2 main">
-
+  <div class="col-sm-2 sidebar"></div>
+  <div class="col-sm-10 main col-sm-offset-2">
     <div class="summary row no-margin" style="background: #C5CAE9;color: #555;; margin-bottom: 0px; height: 150px;padding-top: 20px;">
       <div class="col-sm-12 no-padding" style="height: 100%; padding: 10px 0;">
         <div class="col-sm-6" style="height: 100%;border-right: 1px solid #bbb;">

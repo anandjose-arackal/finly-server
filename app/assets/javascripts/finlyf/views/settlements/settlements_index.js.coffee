@@ -58,6 +58,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
 
   templateNavbarMain: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main']
+  templateNavbarMainPersonal: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main_personal']
+  templateSidebarPersonal: HandlebarsTemplates['finlyf/settlements/sidebar/sidebar_personal']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -142,6 +144,19 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           error: ->
             console.log "Couldn't fetch Successfully."
         })
+
+        # Populating user details in Personal Settlements
+        $.ajax({
+          url: '/users/' + @user
+          dataType: 'json'
+          data: {
+            view: _this.params.view
+          }
+          success: (res) ->
+            _this.populateUserData(res)
+          error: (err) ->
+            console.log "Err", err
+        })
       else
         @selectedUserSummary = {}
         @settlementActionData = {
@@ -197,6 +212,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           $(@el).find(".settlements-index").html(@templateMain())
       else
         $(@el).find(".settlements-index").html(@templateMainPayments())
+      $(@el).find(".navbar-main").html(@templateNavbarMainPersonal({item: {id: @user}}))
     else
       $(@el).html(@templateSkeletonAdmin({item: @params}))
       $(@el).find('.filter-status li a[data-view=payments]').parent().addClass('active')
@@ -290,6 +306,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log err
 
     })
+
+  populateUserData: (item) ->
+    $(@el).find(".sidebar").html(@templateSidebarPersonal({item: item}))
 
   # populateBalance: ->
   #   _this = @

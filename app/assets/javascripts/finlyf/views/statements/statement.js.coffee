@@ -9,6 +9,7 @@ class FinlyF.Views.Statement extends Backbone.View
   events:
     'click li.filter-statement-type': 'filterStatementType'
     'change input.filter-date-from, input.filter-date-to': 'fetchScopedData'
+    'click .btn-export-transactions': 'exportTransactions'
 
   initialize: (options) ->
     _this = @
@@ -101,6 +102,11 @@ class FinlyF.Views.Statement extends Backbone.View
     @params.statement_type = $(target).attr('data-show-type')
     console.log @params
     @fetchTabData()
+
+  exportTransactions: (e) ->
+    e.preventDefault()
+    url = "/blah/" + @user
+    window.open(url,'_blank');
 
   formatDate: (d) ->
     console.log d
