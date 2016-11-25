@@ -18,6 +18,13 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
     super()
   end
 
+  def validate
+    if end_date.to_date > DateUtils.local_date
+      messages[:error] << "End date cannot be in the future"
+      return
+    end
+  end
+
 
   def retrieve_transaction_type(transaction)
     if transaction.transaction_type == "Credit"
@@ -30,6 +37,14 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
       else
         return "Online Transaction"
       end
+    end
+  end
+
+  def retrieve_merchant_name(transaction)
+    if transaction.transaction_type == "Debit"
+      return transaction.merchant_name
+    else
+      return "N/A"
     end
   end
 

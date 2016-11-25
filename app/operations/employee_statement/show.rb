@@ -15,7 +15,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   end
 
   def validate
-    if end_date > DateUtils.local_date
+    if end_date.to_date > DateUtils.local_date
       messages[:error] << "End Date cannot be in the future"
     end
   end
@@ -25,7 +25,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
       self.items << {
           date: transaction.transaction_timestamp,
           transaction_type: retrieve_transaction_type(transaction),
-          merchant: transaction.merchant_name,
+          merchant: retrieve_merchant_name(transaction),
           debit_amount: (transaction.transaction_type == "Debit") ? transaction.billing_amount_value : "N/A" ,
           credit_amount: (transaction.transaction_type == "Credit") ? transaction.billing_amount_value : "N/A" ,
           # balance: (0), # todo need to be decided
@@ -40,6 +40,14 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   end
 
   private
+
+  def retrieve_merchant_name(transaction)
+    if transaction.transaction_type == "Debit"
+      return transaction.merchant_name
+    else
+      return "N/A"
+    end
+  end
 
   def transaction_status(transaction)
     expense = transaction.expense rescue nil

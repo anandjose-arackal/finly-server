@@ -22,6 +22,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #
 
+
 # requires a report with the following states in the db:
 # a report in the db without expenses
 # a report in the db with expenses

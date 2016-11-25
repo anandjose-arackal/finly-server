@@ -7,12 +7,6 @@ class EmployeeStatement::Export::AsCsv < EmployeeStatement::Export::Base
     self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date)
   end
 
-  def validate
-    if end_date > DateUtils.local_date
-      messages[:error] << "End date cannot be int he future"
-      return
-    end
-  end
 
   def process
     column_names = ["Date", "Transaction Type", "Merchant", "Debit Amount", "Credit Amount", "Category", "Status"]
@@ -21,7 +15,7 @@ class EmployeeStatement::Export::AsCsv < EmployeeStatement::Export::Base
       transactions.each do |t|
         csv << ["#{t.transaction_timestamp}",
                 retrieve_transaction_type(t),
-                t.merchant_name,
+                retrieve_merchant_name(t),
                 (t.transaction_type == "Debit") ? t.billing_amount_value : "N/A",
                 (t.transaction_type == "Credit") ? t.billing_amount_value : "N/A",
                 transaction_category(t),

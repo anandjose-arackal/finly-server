@@ -16,7 +16,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
   end
 
   def validate
-    if end_date > DateUtils.local_date
+    if end_date.to_date > DateUtils.local_date
       messages[:error] << "End Date cannot be in the future"
     end
   end

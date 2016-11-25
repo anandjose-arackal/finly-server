@@ -7,12 +7,6 @@ class EmployeeStatement::Export::AsXls < EmployeeStatement::Export::Base
     self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date)
   end
 
-  def validate
-    if end_date > DateUtils.local_date
-      messages[:error] << "End date cannot be int he future"
-      return
-    end
-  end
 
   def process
     @column_names = ["Date", "Transaction Type", "Merchant", "Debit Amount", "Credit Amount", "Category", "Status"]

@@ -406,8 +406,10 @@ if CardTransaction.count == 0
     card = user.cards.first
     10.times do
 
+      from_date = Date.parse("01-01-2016 12:00:00")
+      to_date = DateTime.now
       random_amount = random_integer(50,200) + 0.1234
-      sample_msg_queue_entry = "321744RUPP00035088860000001306,28 Jun 2016 17:32:44,#{random_amount},#{random_amount + random(5,10)},173244,POS,OLCDCB_POSOFFUS,+EYYATTINKARA          THIRUVANANTHA  IN,91,Debit,#{card.proxy},RBLRUP"
+      sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,POS,OLCDCB_POSOFFUS,#{Faker::Space.moon},91,Debit,#{card.proxy},RBLRUP"
 
       data = sample_msg_queue_entry.split(",")
 
@@ -459,54 +461,11 @@ User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
-if AdminUser.count == 0
-  # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-end
-
-
-
-# creating Finly users and junk transaction data.
-# jouska = Company.create(name: 'Jouska')
-#   jouska.reload
-# # creating Jouska Tech users
-#   veekshith = User.create(name: "Veekshith Rai", email: "veekshith.rai@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                                {user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   vivek = User.create(name: "Vivek Bhat", email: "vivek@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                                {user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   sreeram = User.create(name: "Sreeram N R", email: "sreeram.nr@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   abinash = User.create(name: "Abinash Kumar", email: "kumar.abinash@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   bala = User.create(name: "Balakumar Rajaram", email: "balakumar.rajaram@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-# User.all.each do |user|
-#   user.confirm
-#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-#
-#   number = "S0001774009#{(5 + index)}"
-#   user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-#                     card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+# if AdminUser.count == 0
+#   # creating admin panel users who can access admin panel
+#   AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 # end
