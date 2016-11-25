@@ -1,8 +1,8 @@
-class Statement::Base < BaseOperation
+class EmployeeStatement::Base < BaseOperation
 
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :start_date, :end_date
 
-  class Statement::Base::StatementPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class EmployeeStatement::Base::StatementPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :items
 
@@ -14,6 +14,20 @@ class Statement::Base < BaseOperation
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "Invalid parameters. Try again"
+    end
+  end
+
+  def init
+    load_selected_user
+    if params[:filter_date_from]
+      self.start_date = Date.parse(params[:filter_date_from])
+    else
+      self.start_date = Date.parse("01-01-1990") # arbitrarily chosen as the lower bound date
+    end
+    if params[:filter_date_to]
+      self.end_date = Date.parse(params[:filter_date_to])
+    else
+      self.end_date = Date.today
     end
   end
 

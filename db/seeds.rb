@@ -468,6 +468,8 @@ if AdminUser.count == 0
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 end
 
+
+
 # creating Finly users and junk transaction data.
 # jouska = Company.create(name: 'Jouska')
 #   jouska.reload

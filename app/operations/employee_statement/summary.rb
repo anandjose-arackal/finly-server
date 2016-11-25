@@ -1,20 +1,10 @@
 
-class Statement::Summary < Statement::Base
+class EmployeeStatement::Summary < EmployeeStatement::Base
 
-  attr_accessor :items, :start_date, :end_date
+  attr_accessor :items
 
   def init
-    load_selected_user
-    if params[:filter_date_from]
-      self.start_date = Date.parse(params[:filter_date_from])
-    else
-      self.start_date = Date.parse("01-01-1990") # arbitrarily chosen as the lower bound date
-    end
-    if params[:filter_date_to]
-      self.end_date = Date.parse(params[:filter_date_to])
-    else
-      self.end_date = Date.today
-    end
+    super()
     self.items = {}
   end
 
@@ -56,12 +46,12 @@ class Statement::Summary < Statement::Base
     # closing balances
 
     items[:account_closing_balance] = user_account_balance(end_date)
-    items[:card_closing_balance] = card_balance(end_date)
+    items[:card_closing_balance] = card_balance_on_date(end_date)
     items[:closing_cash_in_hand] = cash_in_hand_on_date(end_date)
 
     # table 2
 
-    items[:opening_card_balance] = card_balance(start_date)
+    items[:opening_card_balance] = card_balance_on_date(start_date)
     items[:opening_cash_in_hand] = cash_in_hand_on_date(start_date)
 
     items[:amount_transacted] = {}
@@ -75,7 +65,7 @@ class Statement::Summary < Statement::Base
     items[:total_verified_expenses][:verified_card_expenses] = verified_card_expenses(selected_user)
     items[:total_verified_expenses][:verified_cash_expenses] = verified_cash_expenses(selected_user)
 
-    items[:closing_card_balance] = card_balance(end_date)
+    items[:closing_card_balance] = card_balance_on_date(end_date)
     items[:closing_cash_in_hand] = cash_in_hand_on_date(end_date)
 
     # table 3
@@ -92,7 +82,7 @@ class Statement::Summary < Statement::Base
   end
 
   def success
-    Statement::Base::StatementPresenter.new(user, {items: items}, messages)
+    EmployeeStatement::Base::StatementPresenter.new(user, {items: items}, messages)
   end
 
   private
@@ -124,7 +114,7 @@ class Statement::Summary < Statement::Base
     total = 0
     approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
-      card_ex = report.expenses.only_card_expenses.where('date > ?', date).joins(:amount).sum(:value) rescue 0
+      card_ex = report.expenses.only_card_expenses.where('date > ? AND date <= ?', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_ex
     end
     total
@@ -137,7 +127,7 @@ class Statement::Summary < Statement::Base
     total = 0
     approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
-      card_manual = report.expenses.only_manual_expenses.where('date > ?', date).joins(:amount).sum(:value) rescue 0
+      card_manual = report.expenses.only_manual_expenses.where('date > ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_manual
     end
     total
@@ -150,7 +140,7 @@ class Statement::Summary < Statement::Base
     total = 0
     processing_reports = user.reports.processing
     processing_reports.each do |report|
-      card_ex = report.expenses.only_card_expenses.joins(:amount).sum(:value) rescue 0
+      card_ex = report.expenses.only_card_expenses.where('date > ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_ex
     end
     return total
@@ -163,7 +153,7 @@ class Statement::Summary < Statement::Base
     end
     processing_reports = user.reports.processing
     processing_reports.each do |report|
-      manual_ex = report.expenses.only_manual_expenses.joins(:amount).sum(:value) rescue 0
+      manual_ex = report.expenses.only_manual_expenses.where('date > ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += manual_ex
     end
     return total
@@ -171,7 +161,7 @@ class Statement::Summary < Statement::Base
 
   # returns card balance on a particular day
   # if no date is passed it returns current card balance
-  def card_balance(date = nil)
+  def card_balance_on_date(date = nil)
     balance_params = {}
     balance_params[:id] = selected_user.id
     balance_params[:view] = params[:view]

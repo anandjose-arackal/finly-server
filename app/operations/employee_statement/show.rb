@@ -1,19 +1,9 @@
-class Statement::Show < Statement::Base
+class EmployeeStatement::Show < EmployeeStatement::Base
 
-  attr_accessor :items, :transactions, :start_date, :end_date
+  attr_accessor :items, :transactions
 
   def init
-    load_selected_user
-    if params[:filter_date_from]
-      self.start_date = Date.parse(params[:filter_date_from])
-    else
-      self.start_date = Date.parse("01-01-1990") # arbitrarily chosen as the lower bound date
-    end
-    if params[:filter_date_to]
-      self.end_date = Date.parse(params[:filter_date_to])
-    else
-      self.end_date = Date.today
-    end
+    super()
     self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date)
     self.items = []
   end
@@ -34,25 +24,25 @@ class Statement::Show < Statement::Base
     transactions.each do |transaction|
       self.items << {
           date: transaction.transaction_timestamp,
-          transaction_type: "Card Transaction",
+          transaction_type: retrieve_transaction_type(transaction),
           merchant: transaction.merchant_name,
           debit_amount: (transaction.transaction_type == "Debit") ? transaction.billing_amount_value : "N/A" ,
           credit_amount: (transaction.transaction_type == "Credit") ? transaction.billing_amount_value : "N/A" ,
           # balance: (0), # todo need to be decided
-          category: expense_category(transaction),
-          status: expense_status(transaction)
+          category: transaction_category(transaction),
+          status: transaction_status(transaction)
       }
     end
   end
 
   def success
-    Statement::Base::StatementPresenter.new(user, {items: items}, messages)
+    EmployeeStatement::Base::StatementPresenter.new(user, {items: items}, messages)
   end
 
   private
 
-  def expense_status(transaction)
-    expense = transaction.card_expense.expense rescue nil
+  def transaction_status(transaction)
+    expense = transaction.expense rescue nil
     unless expense
       return "N/A"
     end
@@ -67,12 +57,26 @@ class Statement::Show < Statement::Base
     end
   end
 
-  def expense_category(transaction)
+  def transaction_category(transaction)
     expense = transaction.expense rescue nil
     unless expense
       return "N/A"
     end
     expense.category.name
+  end
+
+  def retrieve_transaction_type(transaction)
+    if transaction.transaction_type == "Credit"
+      return "Load"
+    elsif transaction.transaction_type == "Debit"
+      if transaction.transaction_mode == "POS"
+        return "POS Transaction"
+      elsif transaction.transaction_mode == "ATM"
+        return "ATM Withdrawal"
+      else
+        return "Online Transaction"
+      end
+    end
   end
 
 end

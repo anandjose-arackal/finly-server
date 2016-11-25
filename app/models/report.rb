@@ -109,8 +109,7 @@ class Report < ActiveRecord::Base
   def associated_users(user_before = nil, ordered = false)
     return nil if self.tracks.blank?
     trackings = tracks.without_take_control_action
-    
-      debugger
+
     if user_before.present?
       track = trackings.find_by(action_user_id: user_before.id)
       unless track.blank?

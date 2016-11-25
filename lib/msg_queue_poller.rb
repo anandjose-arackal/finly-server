@@ -1,10 +1,9 @@
 class MsgQueuePoller
 
-  attr_accessor :username, :password
-
   def self.run
-    self.username = Constants::ItzCash::MSG_QUEUE_USERNAME
-    self.password = Constants::ItzCash::MSG_QUEUE_PASSWORD
+
+    username = Constants::ItzCash::MSG_QUEUE_USERNAME
+    password = Constants::ItzCash::MSG_QUEUE_PASSWORD
 
     client = Stomp::Connection.new(username, password, "180.179.138.163", 61613, true)
     client.subscribe("/queue/FinlyQueue")
@@ -38,7 +37,11 @@ class MsgQueuePoller
                       }
 
       # triggering the operation to create a card transaction
-      result = Card::Transaction::Create.(trans_params)
+      begin
+        result = Card::Transaction::Create.(trans_params)
+      rescue
+        # todo - log the output to a log file
+      end
 
       # if the creation of an entry on the transaction table fails, log it in a file
       begin

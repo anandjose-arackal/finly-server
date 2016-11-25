@@ -21,7 +21,7 @@ class Card::Transaction::Create < BaseOperation
     self.user = self.card.user rescue nil
     self.type = params[:transaction_type]
     self.mode = params[:transaction_mode]
-    params[:user_id] = user.id
+    params[:user_id] = user.id if user
   end
 
   def authorize
