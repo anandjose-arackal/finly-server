@@ -58,6 +58,10 @@ class Event < ActiveRecord::Base
              {key: :settlement_debt_clearance, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :settlement_settled, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :money_request_submit, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
+             {key: :money_request_approve, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true}]
 
   self.class.instance_eval do
