@@ -19,10 +19,7 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
   end
 
   def validate
-    if end_date.to_date > DateUtils.local_date
-      messages[:error] << "End date cannot be in the future"
-      return
-    end
+
   end
 
 
@@ -64,7 +61,7 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
     if expense.expense_status_id == ExpenseStatus.unreported_id or expense.expense_status_id == ExpenseStatus.unsubmitted_id
       return "Unverified"
     elsif expense.expense_status_id == ExpenseStatus.submitted_id
-      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or report.reimbursement_confirmed?
+      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or expense.report.reimbursement_confirmed?
         return "Verified"
       else
         return "Unverified"

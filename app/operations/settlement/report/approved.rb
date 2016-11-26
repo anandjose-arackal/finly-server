@@ -60,6 +60,7 @@ class Settlement::Report::Approved < Report::Base
       end
     end
     report.accounted = true
+    report.accounted_at = DateUtils.local_date
     unless report.save
       messages[:error] = report.errors.full_messages
     end

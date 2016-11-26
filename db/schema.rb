@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161124120032) do
+ActiveRecord::Schema.define(version: 20161126202926) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -787,6 +787,7 @@ ActiveRecord::Schema.define(version: 20161124120032) do
     t.boolean  "accounted",                                              default: false, null: false
     t.boolean  "archived",                                               default: false, null: false
     t.boolean  "is_deleted",                                             default: false, null: false
+    t.date     "accounted_at"
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
