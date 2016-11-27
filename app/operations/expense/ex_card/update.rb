@@ -2,7 +2,7 @@
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
 class Expense::ExCard::Update < Expense::ExCard::Base
-  attr_accessor :updated_expense_params
+  attr_accessor :updated_expense_params, :editable_attrs
 
   def pre_validate
     if user.blank? or params.blank?
@@ -16,6 +16,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def init
     super
+    define_editable_attributes
     # id = (params[:expense_id] or params[:id])
     # self.expense = user.expenses.find_by(id: id)
     self.updated_expense_params = update_card_expense_params
@@ -66,10 +67,20 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   end
 
   def post_process
-    # send mailer or notification indicating updation of expense
-    messages[:success] = "Expense updated"
+    # add report comment
+    expense.update_report_comments(user, editable_attrs)
+
+    messages[:success] << "Expense updated"
   end
 
   private
+
+  def define_editable_attributes
+    self.editable_attrs = {note: expense.note,
+                           merchant_name: expense.merchant_name,
+                           category_name: expense.category_name,
+                           receipt: expense.receipts.count
+    }
+  end
 
 end
