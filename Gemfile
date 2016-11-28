@@ -12,15 +12,17 @@ gem 'daemons'
 gem 'stomp'
 # gem 'activemessaging'
 
-# gem for admin panel
-gem 'activeadmin', github: 'activeadmin'
-
-# gem for faking test data
+# grm for mocking and stubbing in test cases
 gem 'mocha'
+
+# gem for admin panel
+gem 'activeadmin', git: 'https://github.com/activeadmin/activeadmin.git'
 
 # puma web server
 gem 'figaro'
 gem 'puma'
+
+gem 'crono'
 
 # gem to import from excel
 gem 'roo'
@@ -68,8 +70,6 @@ gem 'handlebars_assets'
 #For pushing notifications
 gem 'gcm'
 
-gem 'mocha'
-
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -102,7 +102,8 @@ gem 'sidekiq'
 # gem for font awesome
 gem 'font-awesome-rails'
 
-gem 'opro', github: 'opro/opro', branch: 'master'
+gem 'opro', git: 'https://github.com/opro/opro.git', branch: 'master'
+# gem 'opro', github: 'opro/opro', branch: 'master'
 
 gem 'has_scope'
 
@@ -112,7 +113,7 @@ gem 'griddler-sendgrid'
 gem 'rmagick'
 gem 'imgkit'
 gem 'wkhtmltoimage-binary'
-gem 'proselytism', git: 'git://github.com/ramanbedi1989/proselytism.git'
+gem 'proselytism', git: 'https://github.com/ramanbedi1989/proselytism.git'
 
 gem 'require_all'
 
