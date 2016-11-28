@@ -26,7 +26,7 @@ class Report::Approve < Report::Base
       id = (params[:id] or params[:report_id])
       self.report = user.controlling_reports.with_id(id).first rescue nil
     end
-    self.auto_approve = params[:auto_approve]
+    self.auto_approve = (params[:auto_approve] or false)
     self.auto_submit = params[:auto_submit]
   end
 

@@ -283,11 +283,12 @@ if RuleType.count == 0
   e = RuleType.create!(name: "Blocking")
 end
 
-if BudgetPeriod.count == 0
-  b = BudgetPeriod.create!(name: "Day")
-  b = BudgetPeriod.create!(name: "Week")
-  b = BudgetPeriod.create!(name: "Month")
-  b = BudgetPeriod.create!(name: "Year")
+if Period.count == 0
+  b = Period.create!(name: "Day")
+  b = Period.create!(name: "Week")
+  b = Period.create!(name: "Month")
+  b = Period.create!(name: "Quarter")
+  b = Period.create!(name: "Year")
 end
 
 p = Policy.find(3)
