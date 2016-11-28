@@ -34,7 +34,7 @@ class Payment < ActiveRecord::Base
   scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:debt_clearance) }
   scope :settlement, -> { where payment_type_id: PaymentType.id_for(:settlement) }
   scope :received_by_user, ->(user_id) { where receiving_user: user_id }
-  scope :initiated_by_user, ->(user_id) { where receiving_user: user_id }
+  scope :initiated_by_user, ->(user_id) { where initiating_user: user_id }
   scope :transferred_to_user, -> { where.not payment_type: PaymentType.id_for(:debt_clearance) }
   scope :with_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }

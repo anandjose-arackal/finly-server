@@ -47,7 +47,6 @@ class Company::AddBalance < Company::Base
 
   def post_process
     # triggerring mailer so that itzCash is notified
-    debugger
     CompanyMailer.delay.balance_update(transaction_details)
   end
 

@@ -108,6 +108,52 @@ other_company_manager:
   last_name: "Manager"
   mobile_number: "9899999996"
 
+second_manager:
+  id: 8
+  email: 'manager2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Other"
+  last_name: "Manager"
+  mobile_number: "9899999912"
+
+second_finance_manager:
+  id: 9
+  email: 'finance_manager2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Other_Finance"
+  last_name: "Manager"
+  mobile_number: "9899999922"
+
+third_manager:
+  id: 10
+  email: 'manager3@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Third"
+  last_name: "Manager"
+  mobile_number: "9899999932"
+
+third_finance_manager:
+  id: 11
+  email: 'finance_manager3@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Third_Finance"
+  last_name: "Manager"
+  mobile_number: "9899999952"
+
+
+second_employee:
+  id: 12
+  email: 'employee2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Second"
+  last_name: "Employee"
+  mobile_number: "9899999932"
+
 
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
@@ -115,4 +161,4 @@ other_company_manager:
 # This model initially had no columns defined.  If you add columns to the
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
-#
+
