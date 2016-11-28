@@ -19,7 +19,7 @@ class DeviseMailer < Devise::Mailer
   end
 
   def invitation_instructions(record, token, opts={})
-    p token
+    # p token
     note = record.invitation_note
     UserMailer.delay.invite(record, token, note)
   end

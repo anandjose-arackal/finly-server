@@ -163,28 +163,27 @@ if User.count == 0
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   fm = []
-  4.times do |pos|
-    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlytest.io",
+  # 4.times do |pos|
+    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{}", email: "finance#{}@finlytest.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                 {user_role_id: UserRole.employee_id}],
                       profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                            address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  end
+  # end
   m = []
-  6.times do |pos|
-    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finlytest.io",
+  # 6.times do ||
+    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{}", email: "manager#{}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 3},
                                                {user_role_id: UserRole.employee_id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-  end
+  # end
 
   u = []
 
-  # creating user0
   u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "user0@finlytest.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    role_mapping_attributes: [{user_role_id: 4},
@@ -193,22 +192,15 @@ if User.count == 0
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  10.times do |pos|
-    # u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
-    #                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
-    #                  role_mapping_attributes: [{user_role_id: 4},
-    #                                            {user_role_id: UserRole.employee_id}],
-    #                  team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
-    #                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-    #                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee#{pos}@finlytest.io",
+  # 10.times do ||
+    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
                                                {user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-  end
+  # end
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
   m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
@@ -218,9 +210,11 @@ if User.count == 0
   fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
   u[0].team_mapping.build(finance_manager: fm[3], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
 
+
   User.all.each do |user|
     user.confirm
   end
+
 end
 
 if Policy.non_default.count == 0
@@ -230,7 +224,7 @@ if Policy.non_default.count == 0
   p.configuration.update_attribute(:require_category, true) if p.present?
   Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
   # PolicyUserService.new(p).add_user(u[0], false)
-  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[4].id)
+  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[0].id)
   p2 = Policy::Create.(a, {name: 'Another test Policy'})
   p2 = Policy.find_by(name: 'Another test Policy')
   u.each do |user|
@@ -240,30 +234,30 @@ if Policy.non_default.count == 0
 end
 
 if ExpenseType.count ==0
-  ExpenseType.create(id: 1, name: 'Manual')
-  ExpenseType.create(id: 2, name: 'Card')
-  ExpenseType.create(id: 3, name: 'Distance')
-  ExpenseType.create(id: 4, name: 'Time')
-  ExpenseType.create(id: 5, name: 'Per Diem')
+  ExpenseType.create(id: 1, name: "Manual")
+  ExpenseType.create(id: 2, name: "Card")
+  ExpenseType.create(id: 3, name: "Distance")
+  ExpenseType.create(id: 4, name: "Time")
+  ExpenseType.create(id: 5, name: "Per Diem")
 end
 
 if ExpenseStatus.count ==0
-  ExpenseStatus.create(id: 1, name: 'Unreported', order: 1)
-  ExpenseStatus.create(id: 2, name: 'Unsubmitted', order: 2)
-  ExpenseStatus.create(id: 3, name: 'Submitted', order: 3)
-  ExpenseStatus.create(id: 4, name: 'Rejected', order: 4)
-  ExpenseStatus.create(id: 5, name: 'Cancelled', order: 5)
+  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
+  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
+  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
+  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
+  ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
 end
 
 if Expense.count == 0
   # junk manual expenses
-  200.times do |i|
+  10.times do |i|
     Expense.create(amount_attributes: {value: random(100, 1000), currency_id: 1},
                    expense_status_id: 1,
                    expense_type_id: 1,
                    note: "#{Faker::Lorem.sentence}",
                    date: Faker::Date.between(20.days.ago, DateUtils.local_date),
-                   user_id: random_integer(1, 10),
+                   user_id: random_integer(1, 5),
                    category_id: random_integer(1, 5),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
@@ -279,14 +273,21 @@ if Receipt.count == 0
 end
 
 if ExpenseRuleType.count == 0
-  ExpenseRuleType.create!(name: 'Require Receipt')
-  ExpenseRuleType.create!(name: 'Require Note')
-  ExpenseRuleType.create!(name: 'Disallow Expense')
+  e = ExpenseRuleType.create!(name: "Require Receipt")
+  e = ExpenseRuleType.create!(name: "Require Note")
+  e = ExpenseRuleType.create!(name: "Disallow Expense")
 end
 
 if RuleType.count == 0
-  RuleType.create!(name: 'Warning')
-  RuleType.create!(name: 'Blocking')
+  e = RuleType.create!(name: "Warning")
+  e = RuleType.create!(name: "Blocking")
+end
+
+if BudgetPeriod.count == 0
+  b = BudgetPeriod.create!(name: "Day")
+  b = BudgetPeriod.create!(name: "Week")
+  b = BudgetPeriod.create!(name: "Month")
+  b = BudgetPeriod.create!(name: "Year")
 end
 
 p = Policy.find(3)
@@ -323,12 +324,12 @@ if Report.count == 0
   c.users.all.each do |user|
 
     # creating open reports
-    3.times.each do
+    # 3.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
-      5.times.each do
+      2.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
@@ -337,15 +338,15 @@ if Report.count == 0
         expenses_ids << e.id
       end
       Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
-    end
+    # end
 
     # creating submitted reports
-    3.times.each do
+    # 3.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
-      5.times.each do
+      2.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
@@ -355,15 +356,15 @@ if Report.count == 0
       end
       Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
       Report::Submit.(user, {report_id: report.id})
-    end
+    # end
 
     # creating approved reports
-    3.times.each do
+    # 3.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
-      5.times.each do
+      2.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
                                  category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
@@ -379,7 +380,7 @@ if Report.count == 0
         report.reload
       end
     end
-  end
+  # end
 end
 
 if CardType.count == 0
@@ -411,23 +412,56 @@ if CardTransaction.count == 0
   User.all.each do |user|
     next unless user.cards.present?
     card = user.cards.first
-    10.times do
-      random_amount = random(10, 1000)
-      trans = CardTransaction.create(user_id: user.id,
-                                     transaction_amount_attributes: {value: random_amount, currency_id: 1},
-                                     transaction_timestamp: DateUtils.local_date_time,
-                                     merchant_name: 'Randomness',
-                                     serial_id: card.proxy)
+    20.times do
+
+      trans_types = ["POS", "ATM", "Ecom"]
+      trans_modes = ["Debit", "Credit"]
+      from_date = Date.parse("01-01-2016 12:00:00")
+      to_date = DateTime.now
+      random_amount = random_integer(50,200) + 0.1234
+      sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
+
+      data = sample_msg_queue_entry.split(",")
+
+      # for the split between merchant city and merchant name
+      name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
+      merchant_name = name_city[0]
+      merchant_city = name_city[1]
+
+      trans_params = {reference_id: data[0],
+                      transaction_timestamp: data[1],
+                      transaction_amount_attributes: {value: data[2], currency_id: 1},
+                      billing_amount_attributes: {value: data[3], currency_id: 1},
+                      auth_transaction_id: data[4],
+                      transaction_mode: data[5],
+                      itzcash_merchant_key: data[6],
+                      merchant_name: merchant_name,
+                      merchant_city: merchant_city,
+                      response_code: data[8],
+                      transaction_type: data[9],
+                      serial_id: data[10],
+                      product_code: data[11]
+      }
+
+      trans = Card::Transaction::Create.(trans_params).transaction
+
+      # random_amount = random(10, 1000)
+      #
+      # trans = CardTransaction.create(user_id: user.id,
+      #                                transaction_amount_attributes: {value: random_amount, currency_id: 1},
+      #                                transaction_timestamp: DateUtils.local_date_time,
+      #                                merchant_name: 'Randomness',
+      #                                serial_id: card.proxy)
       # junk card expense
-      Expense.create(amount_attributes: {value: trans.transaction_amount.value, currency_id: 1},
-                     expense_status_id: 1,
-                     expense_type_id: 2,
-                     note: "This is a card expense, hello! #{trans.id}",
-                     date: trans.transaction_timestamp.to_date,
-                     user_id: user.id,
-                     category_id: random_integer(1, 5),
-                     card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
-                                               card_transaction_id: trans.id})
+      # Expense.create(amount_attributes: {value: trans.transaction_amount.value, currency_id: 1},
+      #                expense_status_id: 1,
+      #                expense_type_id: 2,
+      #                note: "This is a card expense, hello! #{trans.id}",
+      #                date: trans.transaction_timestamp.to_date,
+      #                user_id: user.id,
+      #                category_id: random_integer(1, 5),
+      #                card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
+      #                                          card_transaction_id: trans.id})
     end
   end
 end
@@ -437,219 +471,50 @@ User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
-if AdminUser.count == 0
-  # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-end
-
-user = User.find_by(email: 'manager4@finlytest.io')
-user.cards.create(proxy: "S00017740099", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-                  card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
-
-# creating Finly users and junk transaction data.
-# jouska = Company.create(name: 'Jouska')
-#   jouska.reload
-# # creating Jouska Tech users
-#   veekshith = User.create(name: "Veekshith Rai", email: "veekshith.rai@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                                {user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   vivek = User.create(name: "Vivek Bhat", email: "vivek@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                                {user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   sreeram = User.create(name: "Sreeram N R", email: "sreeram.nr@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   abinash = User.create(name: "Abinash Kumar", email: "kumar.abinash@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   bala = User.create(name: "Balakumar Rajaram", email: "balakumar.rajaram@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
+# if AdminUser.count == 0
+#   # creating admin panel users who can access admin panel
+#   AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+# end
 # User.all.each do |user|
-#   user.confirm
-# end
-
-#   # creating junk mappings for users
-
-#   sreeram.team_mapping.default.first.update_attributes(manager: vivek)
-#   sreeram.team_mapping.default.first.update_attributes(approves_to: veekshith)
-#   bala.team_mapping.default.first.update_attributes(manager: vivek)
-#   bala.team_mapping.default.first.update_attributes(approves_to: veekshith)
-
-#   abinash.team_mapping.build(manager: vivek, greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
-
-#   abinash.team_mapping.default.first.update_attributes(approves_finance_to: bala)
-#   bala.team_mapping.build(approves_finance_to: vivek, greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
-#   abinash.team_mapping.build(manager: sreeram, greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
-
-
-# # creating junk expenses for jouska employees
-# jouska_category_ids = jouska.active_categories.pluck(:id)
-
-# jouska.users.all.each do |user|
-#     5.times.each do
-#       e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#     end
-
-#     3.times.each do
-#       report = ReportService.new(user: user).create
-#       report_service = ReportService.new(user: user, report: report)
-
-#       expenses = []
-#       expenses_ids = []
-#       5.times.each do
-#         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#         expenses << e
-#         expenses_ids << e.id
-#       end
-#       report_service.add_expense(expenses_ids)
-#     end
-#     3.times.each do
-#       report = ReportService.new(user: user).create
-#       report_service = ReportService.new(user: user, report: report)
-
-#       expenses = []
-#       expenses_ids = []
-#       5.times.each do
-#         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#         expenses << e
-#         expenses_ids << e.id
-#       end
-#       report_service.add_expense(expenses_ids)
-#       report_service.submit
-#     end
-#     3.times.each do
-#       report = ReportService.new(user: user).create
-#       report_service = ReportService.new(user: user, report: report)
-
-#       expenses = []
-#       expenses_ids = []
-#       5.times.each do
-#         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#         expenses << e
-#         expenses_ids << e.id
-#       end
-#       report_service.add_expense(expenses_ids)
-#       report_service.submit
-#       while report.controlling_user.present?
-#         ReportService.new(user: report.controlling_user, report: report).approve
-#       end
-#     end
-#   end
-
-#   jouska = Company.find(7)
-
-#   jouska_category_ids = jouska.active_categories.pluck(:id)
-
-#   users = []
-
-#   users << User.create(name: "Ravi", email: "ravi_the_employee@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}])
-
-#   users << User.create(name: "Eric", email: "eric_the_employee@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}])
-
-#   users << User.create(name: "Ashok", email: "ashok_the_employee@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}])
-
-#   users << User.create(name: "Arjun", email: "arjun_the_employee@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}])
-
-
-# users.each do |user|
-#   user.confirm
-#     5.times.each do
-#       e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#     end
-
-#     3.times.each do
-#       report = ReportService.new(user: user).create
-#       report_service = ReportService.new(user: user, report: report)
-
-#       expenses = []
-#       expenses_ids = []
-#       5.times.each do
-#         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#         expenses << e
-#         expenses_ids << e.id
-#       end
-#       report_service.add_expense(expenses_ids)
-#     end
-#     3.times.each do
-#       report = ReportService.new(user: user).create
-#       report_service = ReportService.new(user: user, report: report)
-
-#       expenses = []
-#       expenses_ids = []
-#       5.times.each do
-#         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#         expenses << e
-#         expenses_ids << e.id
-#       end
-#       report_service.add_expense(expenses_ids)
-#       # report_service.submit
-#     end
-#     3.times.each do
-#       report = ReportService.new(user: user).create
-#       report_service = ReportService.new(user: user, report: report)
-
-#       expenses = []
-#       expenses_ids = []
-#       5.times.each do
-#         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
-#                                  manual_expense_attributes: {merchant: Faker::Company.name},
-#                                  category_id: random_integer(jouska_category_ids.first,jouska_category_ids.last), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
-#                                  receipts_attributes: [])
-#         expenses << e
-#         expenses_ids << e.id
-#       end
-#       report_service.add_expense(expenses_ids)
-#       report_service.submit
-#       while report.controlling_user.present?
-#         ReportService.new(user: report.controlling_user, report: report).approve
-#       end
+#     next unless user.cards.present?
+#     card = user.cards.first
+#     20.times do
+#
+#       trans_types = ["POS", "ATM", "Ecom"]
+#       trans_modes = ["Debit", "Credit"]
+#       from_date = Date.parse("01-01-2016 12:00:00")
+#       to_date = DateTime.now
+#       random_amount = random_integer(50,200) + 0.1234
+#       sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
+#
+#       data = sample_msg_queue_entry.split(",")
+#
+#       # for the split between merchant city and merchant name
+#       name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
+#       merchant_name = name_city[0]
+#       merchant_city = name_city[1]
+#
+#       trans_params = {reference_id: data[0],
+#                       transaction_timestamp: data[1],
+#                       transaction_amount_attributes: {value: data[2], currency_id: 1},
+#                       billing_amount_attributes: {value: data[3], currency_id: 1},
+#                       auth_transaction_id: data[4],
+#                       transaction_mode: data[5],
+#                       itzcash_merchant_key: data[6],
+#                       merchant_name: merchant_name,
+#                       merchant_city: merchant_city,
+#                       response_code: data[8],
+#                       transaction_type: data[9],
+#                       serial_id: data[10],
+#                       product_code: data[11]
+#       }
+#
+#       trans = Card::Transaction::Create.(trans_params).transaction
 #     end
 # end
+
 

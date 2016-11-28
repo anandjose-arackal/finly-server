@@ -20,4 +20,10 @@ class Autocomplete::Merchant < BaseOperation
     self.response += CardExpense.merchant_like(query, expense_ids)
   end
 
+  def post_process
+    if response.empty?
+      self.response = ["No matches"]
+    end
+  end
+
 end

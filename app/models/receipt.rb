@@ -19,6 +19,7 @@
 
 
 
+
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
@@ -58,6 +59,7 @@ class Receipt < ActiveRecord::Base
   end
 
   private
+
 
   # def validate_expense_user
   #   if self.user && self.parent

@@ -1,6 +1,17 @@
 class Expense::ExCard::Base < Expense::Base
   attr_accessor :transaction, :card
 
+
+  class Expense::ExCard::Base::CardExpensePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :expense
+
+    def init
+      self.expense = params[:expense]
+    end
+  end
+
+
   def update_card_expense_params
     receipts = nil
     return {} unless params[:expense].present?
@@ -12,7 +23,7 @@ class Expense::ExCard::Base < Expense::Base
       end
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
-    p = params.require(:expense).permit(:note, :category_id, :expense_type_id,
+    p = params.require(:expense).permit(:note, :category_id,
                                         card_expense_attributes: [:editable_merchant, :id],
                                         receipts_attributes: [:image, :user_id, :id])
     # Hack as image upload from API is failing in strong params

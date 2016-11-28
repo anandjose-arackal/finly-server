@@ -36,20 +36,49 @@ class UsersController < ApplicationController
   end
 
 
-  def profile
+  # def profile
+  #   ap params
+  #   @result = User::Profile.(current_user, params)
+  # end
+
+
+
+  #Created for asynchronously loading files for backbone
+  def user_profile
     @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'my_profile'}
+    end
   end
+
+  def user_balance
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'wallets_cards'}
+    end
+  end
+
+  def user_security
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'change_password'}
+    end
+  end
+
+  
 
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
     @result = update_password_op.run
     if @result.success?
       sign_in @result.user, :bypass => true
-      flash[:success] = @result.messages[:success].first rescue nil
+      # flash[:success] = @result.messages[:success].first rescue nil
     else
-      flash[:error] = @result.messages[:error].first rescue nil
+      # flash[:error] = @result.messages[:error].first rescue nil
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
+    # redirect_to request.referrer
+    respond
   end
 
   # placeholder action for importing file
@@ -99,7 +128,7 @@ class UsersController < ApplicationController
         success_message = 'Password updated'
       when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
-        success_message = 'User team updated.'
+        success_message = 'User team updated'
       when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = 'Role updated'

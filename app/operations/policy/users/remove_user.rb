@@ -2,7 +2,6 @@
 # params:
 # policy_id: the policy from which a user needs to be removed
 # removed_user_id: the id of the user who needs to be removed.
-# todo - generalize this to remove multiple users
 
 class Policy::Users::RemoveUser < Policy::Base
 
@@ -20,7 +19,6 @@ class Policy::Users::RemoveUser < Policy::Base
 
   def validate
     super()
-
   end
 
   def authorize

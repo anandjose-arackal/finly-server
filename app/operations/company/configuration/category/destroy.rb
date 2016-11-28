@@ -1,9 +1,9 @@
 class Company::Configuration::Category::Destroy < Company::Configuration::Category::Base
-  attr_accessor :category, :destroy
+  attr_accessor :category
 
   def pre_validate
     unless params[:id].present? or params[:category_id].present?
-      add_message :error, 'Category ID not found'
+      messages[:error] << 'Category ID not found'
     end
   end
 
@@ -11,21 +11,22 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
     super
     id = (params[:id] or params[:category_id])
     self.category = self.categories.with_id(id).first rescue nil if id.present?
-    return unless self.category.present?
-    self.destroy = !(self.category.name == 'Personal' or self.category.name == 'Other')
   end
 
   def validate
     unless self.category.present?
-      add_message :error, 'Category not found'
+      messages[:error] << 'Category not found'
+      return false
+    end
+    if category.name == "Other" or category.name == "Personal"
+      messages[:error] << "Cannot destroy 'Other' or 'Personal' categories"
+      return false
     end
   end
 
   def process
-    if self.destroy
-      unless self.category.update_attributes(active: false)
-        add_message :error, self.category.errors.full_messages
-      end
+    unless self.category.update_attributes(active: false)
+      messages[:error] = self.category.errors.full_messages
     end
   end
 

@@ -18,6 +18,9 @@ gem 'mocha'
 # gem for admin panel
 gem 'activeadmin', github: 'activeadmin'
 
+# gem for faking test data
+gem 'mocha'
+
 # puma web server
 gem 'figaro'
 gem 'puma'
@@ -27,9 +30,6 @@ gem 'crono'
 # gem to import from excel
 gem 'roo'
 gem 'roo-xls'
-
-# Gem pundit for permission check in actions etc.
-gem 'pundit'
 
 # Gem to show db schema in model file
 gem 'annotate'
@@ -69,6 +69,8 @@ gem 'handlebars_assets'
 
 #For pushing notifications
 gem 'gcm'
+
+gem 'mocha'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

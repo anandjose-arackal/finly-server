@@ -38,38 +38,36 @@ class Expense::ExCard::Create < Expense::ExCard::Base
       messages[:error] = self.expense.errors.full_messages
       return false
     end
-    success
   end
 
   def post_process
     # mailer to user notifying usage of the card - probably can be merged with transaction mailer
   end
 
+  def success
+    Expense::ExCard::Base::CardExpensePresenter.new(user, {expense: expense}, messages)
+  end
+
   private
   # this will be called when the expense is being created - i.e. the moment the card is used, parameters will be created from the transaction object
   def card_expense_params
-    currency_id = Currency.find_by(country_code: transaction[:transaction_currency_code]).id
 
-    currency_id = create_new_currency(transaction[:transaction_currency_code]) if currency_id.nil?
-
-    params[:amount_attributes] = {value: transaction.transaction_amount_value, currency_id: currency_id}
-    params[:card_expense_attributes] = {editable_merchant: transaction[:merchant_name]} if transaction[:merchant_name]
+    params[:amount_attributes] = {value: transaction.billing_amount_value, currency_id: 1} # todo - temporary, will change once currencies are implemented
+    params[:card_expense_attributes] = {editable_merchant: transaction[:merchant_name],
+                                        surcharge_attributes: {value: (transaction.billing_amount_value - transaction.transaction_amount_value), currency_id: 1}
+                                       }
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
-    params[:date] = transaction[:date]
+    params[:date] = transaction[:transaction_timestamp]
 
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
-    params[:category_id] = 1
+    params[:category_id] = user.company.categories.find_by(name: "Other").id
     #######################################################################################
+
 
     params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date,
                   amount_attributes: [:value, :currency_id],
-                  card_expense_attributes: [:editable_merchant])
-  end
-
-  def create_new_currency(currency_code)
-    new_curr = Currency.create!(country_code: currency_code)
-    new_curr.id
+                  card_expense_attributes: [:editable_merchant, surcharge_attributes: [:value, :currency_id]])
   end
 
 

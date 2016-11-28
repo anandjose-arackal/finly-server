@@ -5,6 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
+  attr_accessor :old_amount, :editable_attrs
 
   def pre_validate
     if params.blank? or user.blank?
@@ -23,6 +24,8 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def init
     super
+    # saving previous expense attributes before updation
+    define_editable_attributes
     # setting up the expense params for updation
     self.updated_expense_params = manual_expense_params
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
@@ -56,9 +59,18 @@ class Expense::Manual::Update < Expense::Manual::Base
     unless expense
       raise_unauthorized_exception
     end
-    # unless personal_view? and expense.user_id == user.id
-    #   raise_unauthorized_exception
-    # end
+    # i.e. if an employee is editing an expense
+    if personal_view? and expense.user_id != user.id
+      raise_unauthorized_exception
+    end
+  end
+
+  def validate
+    if expense.report_id and personal_view?
+      unless expense.report.editable?
+        messages[:error] << "Expense cannot be edited at this stage"
+      end
+    end
   end
 
   def process
@@ -71,8 +83,20 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def post_process
     # add comment in report if expense is added within report
+    expense.update_report_comments(user, editable_attrs)
     messages[:success] << "Expense updated."
-    # send mailer indicating updation of expense
+  end
+
+  private
+
+  def define_editable_attributes
+    self.editable_attrs = {note: expense.note,
+                           date: expense.date,
+                           merchant_name: expense.merchant_name,
+                           amount_value: expense.amount_value,
+                           category_name: expense.category_name,
+                           receipt: expense.receipts.count
+                          }
   end
 
 end

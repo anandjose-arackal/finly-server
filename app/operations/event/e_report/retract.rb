@@ -5,11 +5,7 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def affected_users
-    # manager = params[:from_user]
-    # users = [self.user]
-    # users << manager if manager.present?
-    # users
-    [self.user]
+    self.report.associated_users self.report.tracks.last.modified_user
   end
 
   def send_push_notification(user)
@@ -23,7 +19,7 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user_id
+    if user.id == report.user.id
       "Report retracted : #{self.report.name}"
     else
       "#{report.user.name} has retracted the report: #{self.report.name}"

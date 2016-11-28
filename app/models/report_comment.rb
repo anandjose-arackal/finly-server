@@ -107,6 +107,15 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:expense_update)
         # Expense update
         comment = "#{name} updated the expense at : #{expense.merchant_name}. #{updated_field} from #{updated_from} to #{updated_to}"
+      when ReportCommentAction.id_for(:expense_attach_receipt)
+        # adding a receipt to an expense
+        comment = "#{name} attached a receipt to the expense at : #{expense.merchant_name}"
+      when ReportCommentAction.id_for(:expense_detach_receipt)
+        # adding a receipt to an expense
+        comment = "#{name} detached a receipt from the expense at : #{expense.merchant_name}"
+      when ReportCommentAction.id_for(:expense_update_receipt)
+        # adding a receipt to an expense
+        comment = "#{name} updated a receipt on the expense at : #{expense.merchant_name}"
     end
     comment
   end

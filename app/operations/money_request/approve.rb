@@ -2,7 +2,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
   attr_accessor :auto_approve
 
   def authorized_user_types
-    return nil if params.present? and params[:auto_approve]
+    return nil if params.present? and (params[:auto_approve])
     [:manager, :finance_manager, :admin]
   end
 
@@ -91,12 +91,12 @@ class MoneyRequest::Approve < MoneyRequest::Base
   def post_process
     # todo computing settlements
     unless money_request.processing?
-      Settlement::MoneyRequest::Approved.(user, money_request: money_request)
+      Settlement::MoneyRequest::Approved.(user, money_request: money_request, auto_approve: auto_approve)
       money_request.reload
     end
 
     # todo sending notifications
-    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
+    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:cash)
       messages[:success] << 'Successfully approved the advance request'

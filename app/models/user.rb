@@ -46,6 +46,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -56,6 +57,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :validatable, password_length: 8..128
 
   attr_accessor :view, :invitation_note
+  attr_reader :raw_invitation_token
 
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
@@ -133,10 +135,9 @@ class User < ActiveRecord::Base
   scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
   scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
-  scope :only_managers, -> { where('user_role_mappings.user_role_id = ?', UserRole.manager_id).uniq }
-  scope :only_finance_managers, -> { where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).uniq }
-  scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
-  scope :only_admins, -> { where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
+  scope :only_managers, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.manager_id }
+  scope :only_finance_managers, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.finance_manager_id }
+  scope :only_admins, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
@@ -169,6 +170,7 @@ class User < ActiveRecord::Base
 
   scope :signed_up, -> { where invitation_token: nil }
   scope :pending, -> { where.not(invitation_token: nil) }
+  scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
 
@@ -293,7 +295,7 @@ class User < ActiveRecord::Base
     json
   end
 
-  # overriding devise's default method so that it compares against both email and phone number to authenticate
+  # overriding devise's default methdod so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(mobile_number: conditions[:email]) || find_by(email: conditions[:email])
   end

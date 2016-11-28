@@ -1,6 +1,6 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id
 
-json.date @result.expense.date.strftime("%d %b")
+json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 # json.receipts @expense.receipts, :id, :image_file_name
 
@@ -14,4 +14,4 @@ end
 
 json.violations @result.violation
 
-json.editable (@result.expense.report_id.blank? or @result.expense.report.editable?)
+json.editable (@result.expense.report_id.blank? or @result.expense.report.editable? or @result.editable)

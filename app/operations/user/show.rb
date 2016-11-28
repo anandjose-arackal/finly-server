@@ -44,32 +44,33 @@ class User::Show < User::Base
       self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
                     finance_manager: self.selected_user.finance_manager?}
       self.team_mapping = self.selected_user.team_mapping
-      self.mapping = [retrieve_mapping(nil)]
+      self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
       self.policies.each do |policy|
-        self.mapping << retrieve_mapping(policy)
+        self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
       end
       self.actions = load_actions
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
       self.card = params[:card]
+      # debugger
     end
 
     private
-    def retrieve_mapping(policy)
-      policy_id = policy.id rescue nil
-      company_default_mapping = team_mapping.policy(policy_id)
-      default_mapping = company_default_mapping.default
-      conditional_manager = company_default_mapping.non_default.manager
-      conditional_finance_manager = company_default_mapping.non_default.finance_manager
-      conditional_approves_to = company_default_mapping.non_default.approves_to
-      conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
-      {company_default: policy.nil?, policy: policy, default: default_mapping,
-       conditional_manager: conditional_manager,
-       conditional_finance_manager: conditional_finance_manager,
-       conditional_approves_to: conditional_approves_to,
-       conditional_approves_finance_to: conditional_approves_finance_to}
-    end
+    # def retrieve_mapping(policy)
+    #   policy_id = policy.id rescue nil
+    #   company_default_mapping = team_mapping.policy(policy_id)
+    #   default_mapping = company_default_mapping.default
+    #   conditional_manager = company_default_mapping.non_default.manager
+    #   conditional_finance_manager = company_default_mapping.non_default.finance_manager
+    #   conditional_approves_to = company_default_mapping.non_default.approves_to
+    #   conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
+    #   {company_default: policy.nil?, policy: policy, default: default_mapping,
+    #    conditional_manager: conditional_manager,
+    #    conditional_finance_manager: conditional_finance_manager,
+    #    conditional_approves_to: conditional_approves_to,
+    #    conditional_approves_finance_to: conditional_approves_finance_to}
+    # end
 
     def get_managers
 

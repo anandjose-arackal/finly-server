@@ -30,15 +30,14 @@ class Expense::Index < Expense::Base
     if role_id.blank? or role_id == UserRole.employee_id
       self.expenses = user.expenses.unreported.includes(:manual_expense).includes(:card_expense)
     else
-      report_ids = Report::Index.(user, params).reports.pluck(:id)
+      report_ids = Report::Index.(user, params).reports.map(&:id)
       # adding all card expenses of the users in the team
-      team_user_ids = User::Index.(user, params).team.pluck(:id)
+      team_user_ids = User::Index.(user, params).team.map(&:id)
 
       # todo - slightly dirty method - think of a more elegant way to do this
       admin_expense_ids = Expense.with_report(report_ids).pluck(:id)
       admin_expense_ids += Expense.only_card_expenses.with_user(team_user_ids).pluck(:id)
       self.expenses = Expense.where(id: admin_expense_ids).uniq
-      # self.expenses = Expense.with_user_or_report(report_ids, team_user_ids).includes(:manual_expense).includes(:card_expense)
     end
   end
 

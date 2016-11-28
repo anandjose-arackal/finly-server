@@ -1,15 +1,15 @@
 # action that recomputes settlement once a report has been approved
 # the user passed must be the report owner, NOT person approving it.
 # params:
-# report_id: id of the report being marked as approved
+# report: report being marked as approved
 #
 
 class Settlement::Report::Approved < Report::Base
   attr_accessor :report
 
   def authorized_user_types
-    return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
-    [:employee]
+    return nil if params.present? and (params[:auto_approve])
+    [:manager, :finance_manager, :admin]
   end
 
   def pre_validate
@@ -60,6 +60,7 @@ class Settlement::Report::Approved < Report::Base
       end
     end
     report.accounted = true
+    report.accounted_at = DateUtils.local_date
     unless report.save
       messages[:error] = report.errors.full_messages
     end

@@ -43,10 +43,122 @@
 #  last_name              :string(255)      not null
 #
 
+# one kind of user for each user type
+
+admin:
+  id: 1
+  email: 'admin@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Admin"
+  mobile_number: "9899999991"
+
+manager:
+  id: 2
+  email: 'manager@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Manager"
+  mobile_number: "9899999992"
+
+finance_manager:
+  id: 3
+  email: 'finance_manager@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Finance Manager"
+  mobile_number: "9899999993"
+
+employee:
+  id: 4
+  email: 'employee@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Employee"
+  mobile_number: "9899999994"
+
+inactive_employee:
+  id: 7
+  email: 'inactive_employee@finlytest.io'
+  active: false
+  company_id: 1
+  first_name: "InactiveFinly"
+  last_name: "Employee"
+  mobile_number: "9899999997"
+
+other_company_admin:
+  id: 5
+  email: 'admin@random.com'
+  active: true
+  company_id: 2
+  first_name: "Random"
+  last_name: "Admin"
+  mobile_number: "9899999995"
+
+other_company_manager:
+  id: 6
+  email: "manager@random.com"
+  active: true
+  company_id: 2
+  first_name: "Random"
+  last_name: "Manager"
+  mobile_number: "9899999996"
+
+second_manager:
+  id: 8
+  email: 'manager2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Other"
+  last_name: "Manager"
+  mobile_number: "9899999912"
+
+second_finance_manager:
+  id: 9
+  email: 'finance_manager2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Other_Finance"
+  last_name: "Manager"
+  mobile_number: "9899999922"
+
+third_manager:
+  id: 10
+  email: 'manager3@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Third"
+  last_name: "Manager"
+  mobile_number: "9899999932"
+
+third_finance_manager:
+  id: 11
+  email: 'finance_manager3@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Third_Finance"
+  last_name: "Manager"
+  mobile_number: "9899999952"
+
+
+second_employee:
+  id: 12
+  email: 'employee2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Second"
+  last_name: "Employee"
+  mobile_number: "9899999932"
+
+
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 # This model initially had no columns defined.  If you add columns to the
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
-#
+

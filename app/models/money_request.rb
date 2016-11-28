@@ -26,7 +26,6 @@
 
 
 
-
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -64,6 +63,7 @@ class MoneyRequest < ActiveRecord::Base
   scope :include_user, -> { includes :user }
   scope :with_payment, -> { where.not payment_id: nil }
   scope :without_payment, -> { where payment_id: nil }
+  scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
 
   scope :filter_status, ->(status_id) { where status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -108,6 +108,9 @@ class MoneyRequest < ActiveRecord::Base
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
+      user_ids = trackings.map(&:action_user_id)
+    else
+      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id)).uniq
     end
     user_ids = trackings.map(&:action_user_id).uniq
     if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)

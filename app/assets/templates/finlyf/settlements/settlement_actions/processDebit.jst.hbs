@@ -5,6 +5,29 @@
       <h4 class="modal-title">Debit</h4>
     </div>
     <div class="modal-body">
+      <div class="row no-margin">
+        <div class="col-sm-12 no-padding" style="border: 1px solid #A0A8DB; border-radius: 2px 2px 0 0; margin-bottom: 10px;">
+          <div class="row no-margin">
+            <h4 class="no-margin" style="background: #A0A8DB; padding: 10px;">Selected User Details</h4>
+          </div>
+          <div class="row no-margin">
+            <div class="col-sm-12 no-padding" style="padding: 10px 0;">
+              <div class="col-sm-6" style="margin-bottom: 10px;">
+                <div class="col-sm-5">User Name:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.name}}</label></div>
+              </div>
+              <div class="col-sm-6" style="margin-bottom: 10px;">
+                <div class="col-sm-5">Mobile Number:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.mobile_number}}</label></div>
+              </div>
+              <div class="col-sm-6">
+                <div class="col-sm-5">Email:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.email}}</label></div>
+              </div>
+            </div>  
+          </div>
+        </div>
+      </div>
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         <div class="panel panel-default settlement-step-1 active" data-step="1" data-navigate="1">
           <div class="panel-heading" role="tab" id="headingOne">
@@ -33,58 +56,54 @@
                       <label>
                         <input type="radio" name='settlement_credit_action' data-action-type="debit_cash_advance"/> Debit Advanced Funds
                       </label>
-                      <label class="hidden">Take funds back from user to company.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw funds back from User's Finly Account to Company Account.
+                        </div>
+                      </div>
                     </li>
-                  {{/if}}
-                  
-                  {{#if summary.actions.debit_card_to_card}}
-                    <li>
-                      <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_card" /> Debit from Card to Card
-                      </label>
-                      <label class="hidden">Debit from employee's card to your own card.</label>
-                    </li> 
                   {{/if}}
 
                   {{#if summary.actions.debit_card_to_wallet}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_wallet" /> Debit from Card to Wallet
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_wallet" /> Debit from Card to Finly Account
                       </label>
-                      <label class="hidden">Debit from employee's card to your wallet.</label>
+                      <label class="hidden">Debit from User's Card to Your Finly Account.</label>
                     </li> 
                   {{/if}}
 
                   {{#if summary.actions.debit_wallet_to_wallet}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from Wallet to Wallet
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from User's Finly Account to Your Finly Account
                       </label>
-                      <label class="hidden">Debit from employee's wallet to your wallet.</label>
-                    </li> 
-                  {{/if}}
-                  
-                  {{#if summary.actions.debit_card_to_virtual_account}}
-                    <li>
-                      <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_virtual_account" /> Debit Card to Company Credits
-                      </label>
-                      <label class="hidden">Debit from employee's card to company credits.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from User's Finly Account to My Finly Account.
+                        </div>
+                      </div>
                     </li> 
                   {{/if}}
 
                   {{#if summary.actions.debit_wallet_to_virtual_account}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_virtual_account" /> Debit Wallet to Company Credits
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_virtual_account" /> Debit from User's Finly Account to Company Credits
                       </label>
-                      <label class="hidden">Debit from employee's wallet to company credits.</label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from User's Finly Account Back into Company Account.
+                        </div>
+                      </div>
                     </li> 
                   {{/if}}
                 </ul>
               </div>
 
-              <div class="col-sm-6 settlement-action-definition"></div>
+              <div class="col-sm-6 settlement-action-definition" data-definition-type="debit">
+                <h4 class="text-center">Withdraw Cash from User.</h4>
+              </div>
             </div><!-- panel-body -->
           </div>
         </div>

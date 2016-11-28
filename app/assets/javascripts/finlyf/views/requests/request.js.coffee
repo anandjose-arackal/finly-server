@@ -89,13 +89,7 @@ class FinlyF.Views.Request extends Backbone.View
     $(".btn-update-item").css("display", "inline")
 
   addRequestCategory: (e) ->
-    
     e.preventDefault()
-
-
-
-
-
     target = e.currentTarget
 
     container = $(target).closest('.add-request-category')
@@ -314,13 +308,14 @@ class FinlyF.Views.Request extends Backbone.View
         authenticity_token: $("#authenticity_token").val()
         current_user_wallet: true
         target_user_card: true
+        target_user_wallet: true
         virtual_account: true
         view: _this.current_view
-        # view: 'admin'
       success: (data) ->
         $(modal).find('.current_user_wallet_balance').html(data.current_user_wallet)
         $(modal).find('.target_user_card_balance').html(data.target_user_card)
         $(modal).find('.virtual_account_balance').html(data.virtual_account)
+        $(modal).find('.target_user_wallet_balance').html(data.target_user_wallet)
       error: (err) ->
         console.log err
     })
@@ -329,6 +324,7 @@ class FinlyF.Views.Request extends Backbone.View
     _this = @
     e.preventDefault()
     target = e.currentTarget
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spin fa-spinner'></i>&nbsp;&nbsp;")
     container = $(target).closest(".modal")
 
     url = $(target).attr("data-url")
@@ -346,7 +342,7 @@ class FinlyF.Views.Request extends Backbone.View
         authenticity_token: $("#authenticity_token").val()
         # type: action_type,
         password: password,
-        amount: amount
+        amount: amount,
         view: _this.current_view
       },
       success: (res) ->
@@ -357,6 +353,8 @@ class FinlyF.Views.Request extends Backbone.View
             data: {view: _this.current_view}
           })
           $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        else
+          $(target).attr('disabled', false).html("Confirm Transfer")
           
       error: (err) ->
         console.log "Error", err
@@ -399,62 +397,5 @@ class FinlyF.Views.Request extends Backbone.View
       @model.fetch({ data: {view: _this.current_view }})
       $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
     # console.log "Closed Bootstrap modal"
-
-
-  # submit: (e) ->
-  #   e.preventDefault()
-  #   _this = @
-  #   request_id = @model.get('id')
-
-  #   $.ajax({
-  #     url: "/money_request/" + request_id + "/submit",
-  #     dataType: 'json',
-  #     data: {
-  #       money_request_id: money_request_id,
-  #       authenticity_token: $("#authenticity_token").val()
-  #       type: 'submit'
-  #     },
-  #     type: 'PATCH',
-  #     success: (res) ->
-  #       FinlyF.snapNotify(messages)
-  #       # console.log res
-  #       _this.model.fetch({
-  #         data: {
-  #           view: _this.current_view
-  #         }
-  #       })
-  #     error: (err) ->
-  #       console.log err
-  #   })
-
-  # retract: (e) ->
-  #   e.preventDefault()
-  #   _this = @
-  #   report_id = @model.get('id')
-
-  #   $.ajax({
-  #     url: "/money_request/" + report_id + "/retract",
-  #     dataType: 'json',
-  #     data: {
-  #       report_id: report_id,
-  #       authenticity_token: $("#authenticity_token").val()
-  #     },
-  #     type: 'PATCH',
-  #     success: (res) ->
-  #       FinlyF.snapNotify(res.messages)
-  #       # console.log res
-  #       _this.model.fetch({
-  #         data: {
-  #           view: _this.current_view
-  #         }
-  #       })
-  #     error: (err) ->
-  #       console.log err
-  #   })
-
-
-  # showDropDown: (e) ->
-  #   e.preventDefault()
-  #   $(e.currentTarget).dropdown()
 
 

@@ -1,83 +1,87 @@
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="row no-margin">
+      <p>Please choose the format of the csv, and the respective column names you want to export.</p>
+      <hr style="margin-top: 20px">
+    </div>
 
-<div id="exportPreferencesDiv">
+    <% @result.export_preferences.each_with_index do |export_preference, index| %>
+    <div class="row no-margin">
+      <div class="col-sm-12">
+        <p style="font-weight: 700; font-weight: 15px"> Column <%= index + 1 %>: </p>
+        <form class="form-update-export-preferences" action="<%= export_preference_path(export_preference)%>">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+          <div class="row no-margin">
+            <div class="col-sm-1"><span>Export</span></div>
 
+            <div class="col-sm-2">
+              <select class="select-export-preference-columns form-control selectors" name="export[export_field_id]">
+                <% @result.export_fields.each do |export_field| %>
+                    <option value="<%= export_field.id %>"
+                    <% if export_preference.export_field_id == export_field.id %>
+                    selected
+                    <% end %>
+                    ><%= export_field.name %></option>
+                <% end %>
+              </select>      
+            </div>
 
-<p>Please choose the format of the csv, and the respective column names you want to export.</p>
+            <div class="col-sm-1 text-center"><span>as</span></div>
 
-<hr style="margin-top: 20px">
+            <div class="col-sm-2">
+              <input type="text" name="export[name]" class="input-export-preference-name form-control" placeholder="Column Name" value="<%= export_preference.name %>">
+            </div>
 
-<% @result.export_preferences.each_with_index do |export_preference, index| %>
+            <div class="col-sm-1">
+              <button class="btn btn-success hidden btn-update-export-preference" type="submit">Update</button>
+            </div>
 
-<form data-remote data-turboboost id="exportPreferences<%=export_preference.id%>" method="post" action="<%= export_preference_path(export_preference)%>">
+            <div class="col-sm-1">
+              <button class="btn btn-danger btn-delete-export-preference" data-url="<%= export_preference_path(export_preference) %>">
+                <i class="fa fa-trash-o"></i>
+              </button>
+            </div>
+          </div>
+          <hr>
 
- <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
- <input name="_method" type="hidden" value="patch">
-
-  <p style="font-weight: 700; font-weight: 15px"> Column <%= index + 1 %>: </p>
-  <span>Export</span>
-  <select class="selectors" name="export[export_field_id]">
-    <% @result.export_fields.each do |export_field| %>
-        <option value="<%= export_field.id %>"
-        <% if export_preference.export_field_id == export_field.id %>
-        selected
-        <% end %>
-        ><%= export_field.name %></option>
+        </form>
+      </div>
+    </div>
     <% end %>
-  </select>
-  <span> as </span>
-
-
-  <span style="margin-left: 15px;
-      font-size: 14px;
-      background-color: white;
-      padding: 5px;
-      font-variant: small-caps;
-      font-weight: 500;
-  " class="exportColumnValue"><input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" value="<%= export_preference.name %>">
-  </span>
-
-  <i class="fa fa-trash-o" onclick="$('#deleteExportField<%=export_preference.id%>').submit();" style="color: indianred; margin-left: 80px"></i>
-  <hr>
-
-</form>
-
-  <form data-turboboost data-remote id="deleteExportField<%=export_preference.id%>" action="<%= export_preference_path(export_preference)%>" method="post">
-    <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
-    <input name="_method" type="hidden" value="delete">
-    <input name="export_field_id" value="<%=export_preference.id%>" type="hidden">
-  </form>
-
-  <button class="green-button" style="width: 80px;
-      padding: 5px;
-      margin-top: 20px;" id="saveExportConfig" form="exportPreferences<%=export_preference.id%>" type="submit"> SAVE
-  </button>
-      <hr>
-
-
-<% end %>
-
-
-  <div style="background-color: lavender;
-      padding: 15px;">
-    <form data-remote data-turboboost method="post" action="<%= export_preferences_path%>" style="margin-bottom: 30px">
-      <input name="authenticity_token" value="<%= %>" type="hidden">
-
-      <span>Export</span>
-      <select class="selectors" name="export[export_field_id]">
-      <option style="display:none" value="" selected="selected"></option>
-        <% @result.export_fields.each do |export_field| %>
-             <option value="<%= export_field.id %>"><%= export_field.name %></option>
-        <% end %>
-      </select>
-      <span> as </span>
-      <input type="text" name="export[name]" class="exportNameInput" placeholder="Column Name" >
-
-      <button class="green-button" id="addNewColumn" type="submit" style="margin-left: 70px;
-          padding: 7px 10px 7px 10px;" onclick="setHeight()"> ADD NEW COLUMN
-      </button>
-    </form>
-
-
   </div>
+</div>
 
+
+<div style="background-color: lavender;
+    padding: 15px;">
+  <form id="form-add-export-column" action="<%= export_preferences_path %>" style="margin-bottom: 30px">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+
+    <div class="row no-margin">
+      <div class="col-sm-1"><span>Export</span></div>
+
+      <div class="col-sm-2">
+        <select class="form-control selectors" name="export[export_field_id]">
+          <option style="display:none" value="" selected="selected"></option>
+          <% @result.export_fields.each do |export_field| %>
+            <option value="<%= export_field.id %>"><%= export_field.name %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="col-sm-1 text-center"><span>as</span></div>
+
+      <div class="col-sm-2">
+        <input type="text" name="export[name]" class=" form-control exportNameInput" placeholder="Column Name" >
+      </div>
+
+      <div class="col-sm-3">
+        <button class="green-button" id="addNewColumn" type="submit" style="margin-left: 70px; padding: 7px 10px 7px 10px;"> ADD NEW COLUMN
+        </button>
+      </div>
+
+    </div>
+
+  </form>
 </div>

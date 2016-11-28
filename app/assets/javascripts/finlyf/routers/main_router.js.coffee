@@ -16,10 +16,23 @@ class FinlyF.Routers.Main extends Backbone.Router
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
     'settlements/:user/params=:query': 'settlements_show'
+
+    'statements/:user/params=:query': 'statements'
     'employees/params=:query': 'users'
     'employees': 'users'
     'analytics': 'analytics'
     'analytics/params=:query': 'analytics'
+
+
+    # Non backboned pages
+    'settings': 'settings'
+    'settings/params=:query': 'settings'
+
+    'organization_account': 'organization_account'
+    'organization_account/params=:query': 'organization_account'
+
+    'policies/:id': 'policies_show'
+    'policies/:id/params=:query': 'policies_show'
 
 
   initialize: ->
@@ -149,6 +162,26 @@ class FinlyF.Routers.Main extends Backbone.Router
     @features()
     $("#primary-navbar a.navbar-menu-li[href^='\\#settlements']").parent().addClass('active')
 
+  statements: (user, query) ->
+    console.log "hitting the route"
+    if typeof query != 'undefined'
+      if query != null
+        params = JSON.parse(query)
+      else
+        params = {}
+    else
+      params = {}
+    view = new FinlyF.Views.Statement({
+      user: user,
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    # summary = $("#backbone-container  .main .summary")
+    # main = $("#backbone-container .settlements-content")
+    # FinlyF.startMainLoader(main)
+    # FinlyF.startMainLoader(summary)
+    @features()
+
   users: (query)->
     # body = $("body")
     # FinlyF.startMainLoader(body)
@@ -184,6 +217,54 @@ class FinlyF.Routers.Main extends Backbone.Router
     @features()
 
     $("#primary-navbar a.navbar-menu-li[href^='\\#analytics']").parent().addClass('active')
+
+  # account: (user, query) ->
+  # settings: (user) ->
+  settings: (query)->
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+
+    view = new FinlyF.Views.SettingsIndex({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
+
+  organization_account: (query) ->
+    console.log "Organization Account"
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+
+    view = new FinlyF.Views.OrganizationAccount({
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
+
+  policies_show: (id, query) ->
+    if typeof query != 'undefined'
+      # console.log "we're here"
+      if query != null
+        params = JSON.parse(query)
+      else
+        params = {
+          view: 'admin'
+        }
+    else
+      params = {
+        view: 'admin'
+      }
+    console.log params
+    view = new FinlyF.Views.Policy({
+      id: id,
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
 
   features: ->
     $(".datepicker").datepicker({

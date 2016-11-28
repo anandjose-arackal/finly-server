@@ -1,31 +1,58 @@
+<div class="row no-margin">
+  <div class="col-sm-6">
+    <h3>My Profile</h3>
+  </div>
+</div>
+<hr />
+<div class="row no-margin">
+  <div class="col-sm-6 no-padding">
+    <div class="row no-margin">
+      <div class="col-sm-5">
+        <label class="control-label">Organization Name:</label>
+      </div>
+      <div class="col-sm-7">
+        <label class="control-label"><%= current_user.company_name %></label>
+      </div>
+    </div>
 
+    <div class="row no-margin">
+      <div class="col-sm-5">
+        <label class="control-label">Name:</label>
+      </div>
+      <div class="col-sm-7">
+        <label class="control-label"><%= current_user.name %></label>
+      </div>
+    </div>
 
-<h4 class="profile_subheading">Organization Name:</h4>
+    <div class="row no-margin">
+      <div class="col-sm-5">
+        <label class="control-label">Email:</label>
+      </div>
+      <div class="col-sm-7">
+        <label class="control-label"><%= current_user.email %></label>
+      </div>
+    </div>
 
-<p class="profile_values"> <%= current_user.company_name %></p>
+    <div class="row no-margin">
+      <div class="col-sm-5">
+        <label class="control-label">Mobile:</label>
+      </div>
+      <div class="col-sm-7">
+        <label class="control-label"><%= current_user.mobile_number %></label>
+      </div>
+    </div>
 
-
-<h4 class="profile_subheading">Address:</h4>
-
-<div class="profile_address">
-  <p class="address1"></p>
+    <div class="row no-margin">
+      <div class="col-sm-5">
+        <label class="control-label">Address:</label>
+      </div>
+      <div class="col-sm-7">
+        <label class="control-label"><%= current_user.mobile_number %></label>
+      </div>
+    </div>
+  </div>
 </div>
 
-<h4 class="profile_subheading">Name:</h4>
+<style type="text/css">
 
-<p class="profile_values"><%= current_user.name %></p>
-
-<h4 class="profile_subheading">Email:</h4>
-
-<p class="profile_values"><%= current_user.email %></p>
-
-
-<h4 class="profile_subheading">Phone Number:</h4>
-
-<p class="profile_values"><%= current_user.mobile_number %></p>
-
-<!--<h4 id="profile_subheading">Mobile:</h4>-->
-<!--<input class="profile_values form-control" name="user[number]" value="">-->
-
-<!--<input type="submit" class="abaButton" id="save_button" value="Update">-->
-
+</style>

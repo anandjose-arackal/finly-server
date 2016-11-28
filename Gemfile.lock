@@ -266,8 +266,6 @@ GEM
     polyamorous (1.3.1)
       activerecord (>= 3.0)
     puma (3.6.0)
-    pundit (1.1.0)
-      activesupport (>= 3.0.0)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
@@ -433,7 +431,6 @@ DEPENDENCIES
   paperclip
   proselytism!
   puma
-  pundit
   rails (= 4.2.6)
   rails-erd
   rake (= 11.3.0)

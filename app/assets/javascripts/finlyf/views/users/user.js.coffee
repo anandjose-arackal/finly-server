@@ -60,7 +60,9 @@ class FinlyF.Views.User extends Backbone.View
     FinlyF.stopMainLoader(@el)
     # console.log("Active Tab: ", @active_tab)
     # $(@el).find(@active_tab).tab('show')
-    $(@el).find('a[href="' + @active_tab + '"]').tab('show');
+    $(@el).find('a[href="' + @active_tab + '"]').tab('show')
+    @requestCardBalance()
+
 
   changeActiveTab: (e) ->
     target = $(e.currentTarget).find('a')
@@ -298,9 +300,11 @@ class FinlyF.Views.User extends Backbone.View
     _this = @
 
     target = e.currentTarget
+    target_user = _this.model.get('user')
     item = {
       type: $(target).attr('data-action-type')
       url: $(target).attr('data-url')
+      target_user_name: target_user.name
     }
     action_type = $(target).attr('data-action-type')
     # modal = ("#modal-mp")
@@ -551,10 +555,14 @@ class FinlyF.Views.User extends Backbone.View
 
   requestCardBalance: (e) ->
     _this = @
-    e.preventDefault()
-    target = e.currentTarget
 
-    $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
+    if e
+      e.preventDefault()
+      target = e.currentTarget
+      $(target).addClass('fa-pulse')
+      # $(target).html("Requesting&nbsp;&nbsp;&nbsp;<i class='fa fa-spinner fa-pulse'></i>")
+
+    card_balance_div = $(@el).find('.card-balance')
 
     $.ajax({
       url: '/cards/details',
@@ -567,11 +575,13 @@ class FinlyF.Views.User extends Backbone.View
       }
       success: (res) ->
         # console.log "Success", res
-        $(target).html("Update Balance")
-        $(target).closest(".card-balance").find(".balance").html("&#8377;&nbsp;&nbsp;" + res.balance)
+        $(card_balance_div).find('.balance').html("&#8377;&nbsp;&nbsp;" + res.balance)
+        $(card_balance_div).find('.btn-card-request-balance').removeClass('fa-spinner fa-pulse').addClass('fa-refresh')
+        $(target).removeClass('fa-pulse')
       error: (err) ->
         console.log "Error", err
-        $(target).html("Request Balance")
+
+        # $(target).html("Request Balance")
     })
 
 

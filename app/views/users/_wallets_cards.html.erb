@@ -2,7 +2,7 @@
   <div class="col-sm-4 no-padding">
     <div class="row no-margin section-title">
       <div class="col-sm-6">
-        <h4>Wallet</h4>
+        <h4>Finly Account</h4>
       </div>
       <div class="col-sm-6 text-right">
         <!-- <button class="btn btn-success btn-sm btn-transfer" data-transfer="wallet-to-card">Transfer to Card</button> -->
@@ -26,7 +26,7 @@
         <h4>Cards</h4>
       </div>
       <div class="col-sm-6 text-right">
-        <!-- <button class="btn btn-success btn-sm btn-transfer" data-transfer="card-to-wallet">Transfer to Wallet</button> -->
+        <!-- <button class="btn btn-success btn-sm btn-transfer" data-transfer="card-to-wallet">Transfer to Finly Account</button> -->
       </div>
     </div>
     <div class="row no-margin" style="padding: 10px;">
@@ -94,7 +94,7 @@
 
 <style type="text/css">
   .section-title{
-    background: #DDDAEA;
+    background: #C5CAE9;
     padding: 0 10px;
   }
 </style>
@@ -225,3 +225,89 @@
     });
   });
 </script>
+
+<style type="text/css">
+  
+/*Unique Styles to be moved to main css file*/
+  .card{
+    width: 400px;
+    position: relative;
+    /*background: papayawhip;*/
+    background: #594da8;
+    color: white;
+    padding: 20px;
+    height: 235px;
+    border-radius: 14px;
+  }
+
+  .card .status{
+    position: absolute;
+    top: 26px;
+  }
+
+  .card .status i{
+    font-size: 20px;
+  }
+
+  .card .status span{
+    font-size: 18px;
+    font-weight: normal;
+  }
+
+  .card .logo{
+    position: absolute;
+    font-family: 'Bree Serif' !important;
+    font-size: 30px;color: white;
+    right: 20px;
+    top: 15px;
+  }
+
+  .card .user-name{
+    position: absolute;
+    top: 74%;
+    left: 40px;
+  }
+
+  .card .visa{
+    position: absolute;
+    right: 19px;
+    bottom: 7px;
+    font-size: 35px;
+  }
+
+  .card .card-type{
+    position: absolute;
+    text-transform: uppercase;
+    top: 42%;
+    left: 40px;
+
+  }
+  .card-number{
+    font-size: 28px;
+    /*margin-top: 29px;*/
+    font-family: monospace;
+    position: absolute;
+    top: 50%;
+    left: 40px;
+  }
+
+  .card-balance{
+    /*margin-top: 30px;*/
+  }
+
+  .card-balance label.balance{
+    display: block;
+    font-size: 25px;
+    color: #2ECC71;
+  }
+  .btn-ghost{
+    width: 150px;
+    background: transparent;
+  }
+
+  .btn-ghost:hover{
+    background: transparent;
+    border: 1px solid #F4F560;
+    color: white;
+  }
+</style>

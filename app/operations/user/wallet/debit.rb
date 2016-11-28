@@ -17,7 +17,7 @@ class User::Wallet::Debit < User::Wallet::Base
   def pre_validate
     super
     if params.blank? or params[:from_account].blank? or params[:to_account].blank? or
-        (params[:from_user].blank? and params[:from_user_id].blank?)
+      (params[:from_user].blank? and params[:from_user_id].blank?)
       add_message :error, 'Invalid request'
     end
   end
@@ -63,54 +63,55 @@ class User::Wallet::Debit < User::Wallet::Base
   def process
 
     case from_account
-      when :wallet
+    when :wallet
 
-        if to_account == :wallet
-          payment_from_attributes = {}
-          payment_from_attributes[:initiating_user] = to_user
-          payment_from_attributes[:receiving_user] = from_user
-          payment_from_attributes[:date] = DateUtils.local_date
-          payment_from_attributes[:note] = params[:note]
-          payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+      if to_account == :wallet
+        
+        payment_from_attributes = {}
+        payment_from_attributes[:initiating_user] = to_user
+        payment_from_attributes[:receiving_user] = from_user
+        payment_from_attributes[:date] = DateUtils.local_date
+        payment_from_attributes[:note] = params[:note]
+        payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-          payment_to_attributes = {}
-          payment_to_attributes[:initiating_user] = from_user
-          payment_to_attributes[:receiving_user] = to_user
-          payment_to_attributes[:date] = DateUtils.local_date
-          payment_to_attributes[:note] = params[:note]
-          payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+        payment_to_attributes = {}
+        payment_to_attributes[:initiating_user] = to_user
+        payment_to_attributes[:receiving_user] = from_user
+        payment_to_attributes[:date] = DateUtils.local_date
+        payment_to_attributes[:note] = params[:note]
+        payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-          if from_user.wallet.subtract_funds(self.amount)
-            to_user.wallet.add_funds(self.amount)
+        if from_user.wallet.subtract_funds(self.amount)
+          to_user.wallet.add_funds(self.amount)
 
-            payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_debit_from_wallet_to_wallet)
-            from_user.payments.create payment_from_attributes
+          payment_from_attributes[:payment_type_id] = PaymentType.id_for(:receive_debit_from_wallet_to_wallet)
+          from_user.payments.create payment_from_attributes
 
-            payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_debit_from_wallet_to_wallet)
-            to_user.payments.create payment_to_attributes
-          else
-            add_message :error, from_user.wallet.errors.full_messages
-          end
-
-        elsif to_account == :virtual_account
-
-          payment_attributes = {}
-          payment_attributes[:initiating_user] = from_user
-          payment_attributes[:receiving_user] = to_user
-          payment_attributes[:date] = DateUtils.local_date
-          payment_attributes[:note] = params[:note]
-          payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
-
-          if from_user.wallet.subtract_funds(self.amount)
-            user.company.account.funds_debited_from_wallet(self.amount)
-
-            payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)
-            to_user.payments.create payment_attributes
-          else
-            add_message :error, to_user.wallet.errors.full_messages
-          end
-
+          payment_to_attributes[:payment_type_id] = PaymentType.id_for(:initiate_debit_from_wallet_to_wallet)
+          to_user.payments.create payment_to_attributes
+        else
+          add_message :error, from_user.wallet.errors.full_messages
         end
+
+      elsif to_account == :virtual_account
+
+        payment_attributes = {}
+        payment_attributes[:initiating_user] = to_user
+        payment_attributes[:receiving_user] = from_user
+        payment_attributes[:date] = DateUtils.local_date
+        payment_attributes[:note] = params[:note]
+        payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+
+        if from_user.wallet.subtract_funds(self.amount)
+          user.company.account.funds_debited_from_wallet(self.amount)
+
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:initiate_debit_from_wallet_to_virtual_account)
+          to_user.payments.create payment_attributes
+        else
+          add_message :error, to_user.wallet.errors.full_messages
+        end
+
+      end
     end
   end
 

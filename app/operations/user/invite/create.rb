@@ -73,15 +73,15 @@ class User::Invite::Create < User::Invite::Base
     # checking validity of user team params
     team_mapping = invite_params[:team_mapping_attributes]
     if team_mapping.blank?
-      messages[:error] << 'User must be assigned a manager and a finance manager to be invited'
+      messages[:error] << 'User must be assigned a team to be invited'
       return false
     end
     unless team_mapping.is_a?(Array) and team_mapping.size > 0
-      messages[:error] << 'User must be assigned a manager and a finance manager to be invited'
+      messages[:error] << 'User must be assigned a team to be invited'
       return false
     end
-
   end
+
 
   def authorize
     # checking if role mapping attributes are compatible
@@ -159,7 +159,6 @@ class User::Invite::Create < User::Invite::Base
       invite_params[:last_name] = ''
       self.invited_users << User.invite!(invite_params, self.user) do |u|
         u.invitation_note = params[:pending_invite][:note]
-        # u.skip_invitation = true
       end
     end
 
