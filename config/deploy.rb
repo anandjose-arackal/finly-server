@@ -3,7 +3,7 @@ lock '3.6.1'
 
 set :application, 'finly-server'
 
-set :repo_url, 'https://vivek_a17:NmrFYbFCKULEbBDR72nV@bitbucket.org/finlycore/finly-server.git'
+set :repo_url, 'https://vivek_a17:h6LeCHEeLQNwac9fqcrD@bitbucket.org/finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :master
 set :deploy_to, '/home/viveka/app'
