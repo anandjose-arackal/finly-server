@@ -28,7 +28,7 @@ class Expense::Index < Expense::Base
 
   def process
     if role_id.blank? or role_id == UserRole.employee_id
-      self.expenses = user.expenses.unreported.includes(:manual_expense).includes(:card_expense)
+      self.expenses = user.expenses
     else
       report_ids = Report::Index.(user, params).reports.map(&:id)
       # adding all card expenses of the users in the team
