@@ -43,7 +43,7 @@ class Settlement::Base < BaseOperation
     cash = user.balance_sheet.cash_in_hand
     return cash if date.blank? or date == DateUtils.local_date
     payments = user.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_to_user.sum(:value)
+    payments_to_user = payments.transferred_cash_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     settlement = payments.settlement.sum(:value)
     reports = user.reports.processed.submitted_after(date)

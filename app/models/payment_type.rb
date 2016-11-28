@@ -14,11 +14,12 @@ class PaymentType < ActiveRecord::Base
   has_many :payments
 
   TYPES = {advance: 1, debt_clearance: 2, reimbursement: 3, settlement: 4,
-           receive_credit_from_virtual_account_to_wallet: 5, receive_credit_from_virtual_account_to_card: 6,
-           initiate_credit_from_wallet_to_wallet: 7, receive_credit_from_wallet_to_wallet: 8,
-           initiate_credit_from_wallet_to_card: 9, receive_credit_from_wallet_to_card: 10,
-           initiate_debit_from_wallet_to_wallet: 11, receive_debit_from_wallet_to_wallet: 12,
-           receive_debit_from_wallet_to_virtual_account: 13}
+           credit_from_virtual_account_to_wallet: 5,
+           credit_from_virtual_account_to_card: 6,
+           credit_from_wallet_to_wallet: 7,
+           credit_from_wallet_to_card: 8,
+           debit_from_wallet_to_wallet: 9,
+           debit_from_wallet_to_virtual_account: 10}
 
   def self.id_for(key)
     TYPES[key]
