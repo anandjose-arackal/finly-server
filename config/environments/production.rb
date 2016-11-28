@@ -105,5 +105,5 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   config.paperclip_defaults = {:url => "/images/:class/:attachment/:id_partition/:style/:filename",
-                               :path => "/images/:class/:attachment/:id_partition/:style/:filename"}
+                               :path => "/images/finly/:class/:attachment/:id_partition/:style/:filename"}
 end
