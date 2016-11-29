@@ -445,21 +445,21 @@ User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
-user = User.find_by(email: 'admin@finlyexpense.io').update_attributes(first_name: "Bob", last_name: "Admin")
-user = User.find_by(email: 'admin@finlyexpense.io')
-user.cards.create(proxy: "S00017740095", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+# user = User.find_by(email: 'admin@finlyexpense.io').update_attributes(first_name: "Bob", last_name: "Admin")
+# user = User.find_by(email: 'admin@finlyexpense.io')
+# user.cards.create(proxy: "S00017740095", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'manager0@finlyexpense.io').update_attributes(first_name: "Suresh", last_name: "Manager")
-user = User.find_by(email: 'manager0@finlyexpense.io')
-user.cards.create(proxy: "S00017740092", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+# user = User.find_by(email: 'manager0@finlyexpense.io').update_attributes(first_name: "Suresh", last_name: "Manager")
+# user = User.find_by(email: 'manager0@finlyexpense.io')
+# user.cards.create(proxy: "S00017740092", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'finance0@finlyexpense.io').update_attributes(first_name: "Ravi", last_name: "FinanceManager")
-user = User.find_by(email: 'finance0@finlyexpense.io')
-user.cards.create(proxy: "S00017740093", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+# user = User.find_by(email: 'finance0@finlyexpense.io').update_attributes(first_name: "Ravi", last_name: "FinanceManager")
+# user = User.find_by(email: 'finance0@finlyexpense.io')
+# user.cards.create(proxy: "S00017740093", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'user0@finlyexpense.io').update_attributes(first_name: "John", last_name: "Employee")
-user = User.find_by(email: 'user0@finlyexpense.io')
-user.cards.create(proxy: "S00017740094", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
+# user = User.find_by(email: 'user0@finlyexpense.io').update_attributes(first_name: "John", last_name: "Employee")
+# user = User.find_by(email: 'user0@finlyexpense.io')
+# user.cards.create(proxy: "S00017740094", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
 
 
