@@ -144,9 +144,12 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 123.0, @result.transaction.transaction_amount_value
     assert_equal 124.0, @result.transaction.billing_amount_value
 
+    payment = @user.payments.atm_withdrawals.order(created_at: :desc).first
     @user.reload
     assert_equal cih + 124.0, @user.cash_in_hand.value
-    assert_equal 124.0, @user.payments.atm_withdrawals.order(created_at: :desc).first.amount_value
+    assert_equal 124.0, payment.amount_value
+    assert_equal @user.id, payment.receiving_user_id
+    assert_equal @user.id, payment.initiating_user_id
   end
 
   test "creating a transaction out of a credit entry in the message queue" do
