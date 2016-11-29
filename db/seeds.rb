@@ -112,9 +112,9 @@ end
 if Event.count == 0
   Event::ACTIONS.each do |item|
     Event.create id: (Event::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
-                 has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
-                 configurable_push_notification: item[:configurable_push_notification],
-                 configurable_mailer: item[:configurable_mailer]
+      has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
+      configurable_push_notification: item[:configurable_push_notification],
+      configurable_mailer: item[:configurable_mailer]
   end
 end
 
@@ -140,14 +140,14 @@ if c.categories.count == 0
 end
 
 if User.count == 0
-  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finly.io",
+  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finlyexpense.io",
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                             {user_role_id: UserRole.employee_id}],
                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finly.io",
+  User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlyexpense.io",
               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
@@ -156,7 +156,7 @@ if User.count == 0
 
   fm = []
   4.times do |pos|
-    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finly.io",
+    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlyexpense.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                 {user_role_id: UserRole.employee_id}],
@@ -166,7 +166,7 @@ if User.count == 0
   end
   m = []
   6.times do |pos|
-    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finly.io",
+    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finlyexpense.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 3},
                                                {user_role_id: UserRole.employee_id}],
@@ -177,7 +177,7 @@ if User.count == 0
   u = []
 
   # creating user0
-  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "user0@finly.io",
+  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "user0@finlyexpense.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    role_mapping_attributes: [{user_role_id: 4},
                                              {user_role_id: UserRole.employee_id}],
@@ -186,7 +186,7 @@ if User.count == 0
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   10.times do |pos|
-    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finly.io",
+    u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlyexpense.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
                                                {user_role_id: UserRole.employee_id}],
@@ -431,29 +431,20 @@ User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
-if AdminUser.count == 0
-  # creating admin panel users who can access admin panel
-  # AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-end
-
-user = User.find_by(email: 'admin@finly.io').update_attributes(first_name: "Bob", last_name: "Admin")
-user = User.find_by(email: 'admin@finly.io')
+user = User.find_by(email: 'admin@finlyexpense.io').update_attributes(first_name: "Bob", last_name: "Admin")
+user = User.find_by(email: 'admin@finlyexpense.io')
 user.cards.create(proxy: "S00017740095", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'manager0@finly.io').update_attributes(first_name: "Suresh", last_name: "Manager")
-user = User.find_by(email: 'manager0@finly.io')
+user = User.find_by(email: 'manager0@finlyexpense.io').update_attributes(first_name: "Suresh", last_name: "Manager")
+user = User.find_by(email: 'manager0@finlyexpense.io')
 user.cards.create(proxy: "S00017740092", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'finance0@finly.io').update_attributes(first_name: "Ravi", last_name: "FinanceManager")
-user = User.find_by(email: 'finance0@finly.io')
+user = User.find_by(email: 'finance0@finlyexpense.io').update_attributes(first_name: "Ravi", last_name: "FinanceManager")
+user = User.find_by(email: 'finance0@finlyexpense.io')
 user.cards.create(proxy: "S00017740093", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
-user = User.find_by(email: 'user0@finly.io').update_attributes(first_name: "John", last_name: "Employee")
-user = User.find_by(email: 'user0@finly.io')
+user = User.find_by(email: 'user0@finlyexpense.io').update_attributes(first_name: "John", last_name: "Employee")
+user = User.find_by(email: 'user0@finlyexpense.io')
 user.cards.create(proxy: "S00017740094", description: "Test physical card for user #{user.id}", product_code: 'NGPRHD', card_type_id: 1, company_id: user.company.id, ending_number: "1234", active: true)
 
 
