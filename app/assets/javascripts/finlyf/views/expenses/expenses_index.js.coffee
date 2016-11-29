@@ -38,6 +38,10 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .remove-uploaded-receipt': 'removeUploadedReceipt'
     'change input#expense-receipt-upload': 'showUploadedReceipt'
 
+    #Global Notifications
+    'click a.btn-load-more-notifications': 'loadMoreNotifications'
+
+
   initialize: (options) ->
     if Backbone.history.getFragment() == ""
       FinlyF.primary_router.navigate("expenses")
@@ -529,3 +533,17 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  loadMoreNotifications: (e) ->
+    e.preventDefault()
+    console.log "we reached here"
+
+    container = $(e.currentTarget).closest('.navbar-notifications')
+
+    FinlyF.fetchNotifications(container, 2, false)
+
+
+
+
+
+

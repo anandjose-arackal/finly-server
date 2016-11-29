@@ -10,6 +10,7 @@ window.FinlyF =
     FinlyF.Global.templates.templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
     FinlyF.Global.templates.templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
     FinlyF.Global.templates.templateUserNavProfile = HandlebarsTemplates['finlyf/global/userNavProfile']
+    FinlyF.Global.templates.templateNotifications = HandlebarsTemplates['finlyf/global/templateNotifications']
 
     user = {
       name: $("#current_user_id").attr('data-user-name')
@@ -21,6 +22,9 @@ window.FinlyF =
 
     @primary_router = new FinlyF.Routers.Main()
     Backbone.history.start()
+
+    # if window.notification_timer
+    #   clearInterval(window.notification_timer)
 
     
 
@@ -39,7 +43,30 @@ window.FinlyF =
     
     # console.log FinlyF.Global.current_user
     
-    
+  fetchNotifications: (container, page, replaceContent) ->
+    console.log "Will fetch notifications now."
+    data = {
+      # view: params.view || 'personal',
+      authenticity_token: $("#authenticity_token").val()
+    }
+    if page
+      data.page = page
+
+    $.ajax({
+      dataType: "json"
+      type : 'get'
+      url: '/notifications'
+      data: data
+      success: (data) ->
+        if replaceContent
+          $(container).find('.navbar-notifications .notifications-list').html(FinlyF.Global.templates.templateNotifications({items: data}))
+        else
+          console.log "should append content"
+          $(container).find('.navbar-notifications .notifications-list').append(FinlyF.Global.templates.templateNotifications({items: data}))
+      error: (err) ->
+        console.log err
+    })
+
 
   structureActions: (el, params)->
     # console.log "Strucure action params", params
@@ -130,14 +157,60 @@ window.FinlyF =
       })
     )
 
-    $(navbar_right).find("#navbar-user-dropdown").on('hide.bs.dropdown', (e) ->
-      console.log "Closing", e
-      target = $(e.currentTarget)
-      if target.hasClass("keepopen") || target.parents(".keepopen").length
-        return false # returning false should stop the dropdown from hiding.
-      else
-        return true
+    # $(navbar_right).find("#navbar-user-dropdown").on('hide.bs.dropdown', (e) ->
+    #   console.log "Closing", e
+    #   target = $(e.currentTarget)
+    #   if target.hasClass("keepopen") || target.parents(".keepopen").length
+    #     return false # returning false should stop the dropdown from hiding.
+    #   else
+    #     return true
+    # )
+
+    ###################################
+    # Notification
+    ###################################
+
+    #### Polling for notification count
+    notification_area = $(navbar_right).find('#navbar-notification-dropdown')
+
+    pollNotificationCount = ->
+      $.ajax({
+        url: '/notifications/unread'
+        dataType: 'json'
+        success: (res) ->
+          if parseInt(res) > 0
+            if typeof FinlyF.notification_count == "undefined"
+              $(notification_area).removeAttr('data-initial').attr('data-replace', true)
+              FinlyF.notification_count = res
+            else
+              if parseInt(res) > FinlyF.notification_count
+                $(notification_area).attr('data-replace', true)
+            $(navbar_right).find('#navbar-notification-count').text(res)
+        error: (err) ->
+          console.log "Err", err
+      })
+
+
+    # pollNotification()
+    if window.notification_timer
+      clearInterval(window.notification_timer)
+    window.notification_timer = setInterval(pollNotificationCount, 20000)
+
+    #First time fetch
+    pollNotificationCount()
+
+
+    ## opening dropdown should start fetching
+    $(navbar_right).find("#navbar-notification-dropdown").on('shown.bs.dropdown', (e) ->
+      _this = this
+      if $(this).attr('data-replace') == "true"
+        $(this).removeAttr('data-replace')
+        FinlyF.fetchNotifications(_this, 1, true)
+      # else if
+
     )
+
+    # Notification Codes ends
 
     #Sidebar
     $(el).find('.sidebar .filter-category-id').val(params.filter_category_id)
@@ -146,6 +219,7 @@ window.FinlyF =
     $(el).find('.sidebar .filter-expense-type-id').val(params.filter_expense_type_id)
 
   navigate: (e, attr)->
+    clearInterval(FinlyF.notification_timer)
     target = e.currentTarget
     path = $(target).attr('data-path')
 
@@ -252,6 +326,12 @@ window.FinlyF =
 
 $(document).ready ->
   FinlyF.initialize()
+
+  # #################
+  #  Clicking inside dropdown with class 'no-hide-bs-dropdown' shouldn't close the dropdown
+  $('.dropdown-menu .no-hide-bs-dropdown').click((e) ->
+    e.stopPropagation()
+  )
   # templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
   # templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
   # balance_data = {}

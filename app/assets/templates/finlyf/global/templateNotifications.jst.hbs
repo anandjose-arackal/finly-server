@@ -1,0 +1,28 @@
+{{#each items}}
+  <li>
+    <a href="{{this.url}}">
+      <div class="navbar-notification">
+        <div class="row no-margin" style="padding: 5px;">
+          <div class="col-xs-12 title no-padding">
+            <div class="col-xs-10 no-padding">
+              {{this.title}}
+            </div>
+            <div class="col-xs-2 text-right notification-meta">
+            {{#if this.read}}
+              <i class="fa fa-circle-o"></i>
+            {{else}}
+              <i class="fa fa-circle"></i>
+            {{/if}}
+            </div>
+          </div>
+          <div class="col-xs-12 body no-padding">
+            {{this.body}}
+          </div>
+          <div class="col-xs-12 notification-meta no-padding">
+            {{this.date}} at {{this.time}}
+          </div>
+        </div>
+      </div>
+    </a>
+  </li>
+{{/each}}

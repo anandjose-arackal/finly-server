@@ -19,7 +19,7 @@ class FinlyF.Views.Expense extends Backbone.View
     'change input#edit-expense-receipt-upload': 'showUploadedReceipt'
 
   initialize: (options) ->
-    console.log "Options", options
+    # console.log "Options", options
     _this = @
     @preview = options.preview
     if options.parent

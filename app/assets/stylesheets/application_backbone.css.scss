@@ -434,6 +434,15 @@ body {
   margin: 0;
 }
 
+.padding-10{
+  padding: 10px;
+}
+
+
+
+
+
+
 .mt-5{
   margin-top: 5px;
 }
@@ -441,6 +450,44 @@ body {
 .currency{
   color: #009688;
 }
+
+.a-alike:hover{
+  // anchor alike
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.navbar-notifications{
+  width: 400px;
+  height: 55vh;
+  overflow-y: auto;
+  padding-top: 0;
+}
+
+.navbar-notifications.dropdown-menu > li > a{
+  padding: 0;
+}
+
+
+.navbar-notification{
+    color: #555;
+    width: 100%;
+    padding: 0 10px;
+    border-bottom: 1px solid #eee;
+}
+.navbar-notification .title {
+    font-weight: bold;
+}
+.notification-meta{
+  color: #aaa;
+  font-size: 12px;
+}
+
+
+
+
+
+// Hopefully Obsolete codes
 
 #headerNavigation li.active a {
   background-color: #46568b;
