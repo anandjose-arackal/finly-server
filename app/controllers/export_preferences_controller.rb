@@ -3,7 +3,7 @@ class ExportPreferencesController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    create_op = Export::Field::Create.new(current_user, params)
+    create_op = Company::ExportPreferences::Create.new(current_user, params)
     @result = create_op.run
     if @result.success?
       messages = @result.messages
@@ -18,7 +18,7 @@ class ExportPreferencesController < ApplicationController
   end
 
   def destroy
-    destroy_op = Export::Field::Destroy.new(current_user, params)
+    destroy_op = Company::ExportPreferences::Destroy.new(current_user, params)
     @result = destroy_op.run
     if @result.success?
       messages = @result.messages
@@ -35,7 +35,7 @@ class ExportPreferencesController < ApplicationController
   end
 
   def update
-    update_op = Export::Field::Update.new(current_user, params)
+    update_op = Company::ExportPreferences::Update.new(current_user, params)
     @result = update_op.run
     if @result.success?
       messages = @result.messages

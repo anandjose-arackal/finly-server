@@ -16,7 +16,7 @@ class UpdateTest < ActiveSupport::TestCase
   end
 
   test "admins can update an existing export field" do
-    update_op = Export::Field::Update.new(@admin, @update_params)
+    update_op = Company::ExportPreferences::Update.new(@admin, @update_params)
     @result = update_op.run
     assert @result.success?
     assert_equal "Changed Name", @result.field.name
@@ -24,7 +24,7 @@ class UpdateTest < ActiveSupport::TestCase
 
   test "non admins cannot update export preferences" do
     original_name = @preference.name
-    update_op = Export::Field::Update.new(@manager, @update_params)
+    update_op =  Company::ExportPreferences::Update.new(@manager, @update_params)
     begin
       @result = update_op.run
     rescue NotAuthorizedException

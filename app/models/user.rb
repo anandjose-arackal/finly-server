@@ -45,8 +45,6 @@
 
 
 
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -108,6 +106,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
+  accepts_nested_attributes_for :cards
 
   delegate :employee_id, to: :profile
   delegate :payroll_id, to: :profile

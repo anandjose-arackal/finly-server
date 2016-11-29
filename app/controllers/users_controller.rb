@@ -88,7 +88,7 @@ class UsersController < ApplicationController
 
   # action that imports from a CSV or Excel file for mass invitations
   def import
-    import_op = User::Invite::Import.new(current_user, params)
+    import_op = Import::Users.new(current_user, params)
     @result = import_op.run
     respond_to do |format|
       format.csv { send_data @result }
