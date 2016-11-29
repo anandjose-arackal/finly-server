@@ -131,7 +131,9 @@ class CreateTransactionTest < ActiveSupport::TestCase
     cih = @user.cash_in_hand.value
     assert_difference 'CardTransaction.count', 1 do
       assert_no_difference '@user.expenses.count' do
-        @result = Card::Transaction::Create.(trans_params)
+        assert_difference '@user.payments.atm_withdrawals.count', 1 do
+          @result = Card::Transaction::Create.(trans_params)
+        end
       end
     end
 
@@ -144,6 +146,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
 
     @user.reload
     assert_equal cih + 124.0, @user.cash_in_hand.value
+    assert_equal 124.0, @user.payments.atm_withdrawals.order(created_at: :desc).first.amount_value
   end
 
   test "creating a transaction out of a credit entry in the message queue" do

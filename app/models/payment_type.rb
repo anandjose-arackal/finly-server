@@ -19,7 +19,8 @@ class PaymentType < ActiveRecord::Base
            credit_from_wallet_to_wallet: 7,
            credit_from_wallet_to_card: 8,
            debit_from_wallet_to_wallet: 9,
-           debit_from_wallet_to_virtual_account: 10}
+           debit_from_wallet_to_virtual_account: 10,
+           atm_withdrawal: 11}
 
   def self.id_for(key)
     TYPES[key]

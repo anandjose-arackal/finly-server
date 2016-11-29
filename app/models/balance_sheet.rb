@@ -37,7 +37,7 @@ class BalanceSheet < ActiveRecord::Base
     end
   end
 
-  def add_cash_in_hand(value, currency=nil)
+  def add_cash_in_hand(value, currency=nil, options = {})
     if value.present? and value.to_f <= 0
       errors.add(:value, 'cannot be less than 0')
       return false

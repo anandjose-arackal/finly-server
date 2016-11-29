@@ -27,9 +27,11 @@ class Payment < ActiveRecord::Base
   has_many :money_request_tracks
 
   accepts_nested_attributes_for :amount
+  delegate :amount_value, to: :amount
 
   default_scope {order date: :desc, created_at: :desc}
 
+  scope :atm_withdrawals, -> {where payment_type_id: PaymentType.id_for(:atm_withdrawal)}
   scope :advance, -> { where payment_type_id: PaymentType.id_for(:advance) }
   scope :reimbursement, -> { where payment_type_id: PaymentType.id_for(:reimbursement) }
   scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:debt_clearance) }
