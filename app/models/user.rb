@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
   validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :maiden_name, length: {maximum: 30}
   validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
+  validates :mobile_number, presence: true, format: Constants::VALID_MOBILE_NUMBER, uniqueness: true
 
   # validate :valid_role
 
