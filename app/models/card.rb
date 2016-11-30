@@ -32,6 +32,8 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
 
+  validates :proxy, uniqueness: true
+
   attr_accessor :balance, :available_card_eligibility
 
   def serial_id

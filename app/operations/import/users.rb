@@ -36,6 +36,8 @@ class Import::Users < Import::Base
   def init
     self.file = params[:file]
     self.result_hash = {}
+    self.sheet = open_spreadsheet(file)
+    self.header = sheet.row(1)
   end
 
   def authorize
@@ -43,12 +45,10 @@ class Import::Users < Import::Base
   end
 
   def validate
-    # check file type
+
   end
 
   def process
-    self.sheet = open_spreadsheet(file)
-    self.header = sheet.row(1)
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       self.params = process_row(row)
@@ -56,7 +56,7 @@ class Import::Users < Import::Base
       params.delete(:error_messages)
       invitee = user.company.users.invite!(params)
       if User.exists?(invitee.id)
-        if error_messages
+        if error_messages.present?
           result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
         else
           result_hash[i] = "Success!"

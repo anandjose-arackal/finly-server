@@ -50,7 +50,7 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :invitable, :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
+         :recoverable, :rememberable, :trackable, :confirmable, :lockable, validate_on_invite: true
 
   devise :database_authenticatable, :validatable, password_length: 8..128
 
@@ -115,13 +115,14 @@ class User < ActiveRecord::Base
   has_paper_trail
 
   validates :company_id, presence: true
-  validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
+  validates :email, uniqueness: {case_sensitive: false}
   validates :name, presence: true
   validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :maiden_name, length: {maximum: 30}
   validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: Constants::VALID_MOBILE_NUMBER, uniqueness: true
 
+  validate :email_format
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
@@ -255,6 +256,11 @@ class User < ActiveRecord::Base
     super && self.active # i.e. super && self.is_active
   end
 
+  # overriding the requirement for emails by devise
+  def email_required?
+    false
+  end
+
   def inactive_message
     "Sorry, this account has been deactivated."
   end
@@ -300,6 +306,10 @@ class User < ActiveRecord::Base
   end
 
   private
+
+  def email_format
+
+  end
   # def valid_role
   #   if self.role_mapping.count == 0
   #     errors.add(:user, "must be assigned a role")
