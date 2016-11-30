@@ -85,8 +85,8 @@ class User < ActiveRecord::Base
 
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
-  has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
 
   has_many :cards
@@ -179,6 +179,10 @@ class User < ActiveRecord::Base
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
   end
 
+  def payments
+    Payment.involving_user(self.id)
+  end
+
   def name
     return nil if first_name.blank? and maiden_name.blank? and last_name.blank?
     name = first_name
@@ -267,7 +271,7 @@ class User < ActiveRecord::Base
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == DateUtils.local_date
     payments = self.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_to_user.sum(:value)
+    payments_to_user = payments.transferred_cash_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     settlement = payments.settlement.sum(:value)
     reports = self.reports.processed.submitted_after(date)
@@ -276,7 +280,7 @@ class User < ActiveRecord::Base
     pending_reimbursement = reports.with_amount.without_payment.sum(:value)
     value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
     # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    min_value = [cash, value].min
+    min_value = [cash.value, value].min
     Amount.new(value: min_value, currency: cash.currency)
   end
 
@@ -284,7 +288,6 @@ class User < ActiveRecord::Base
   alias_method :finance_manager_name, :user_name
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
-
 
   def as_json(options = {})
     json = super(options)

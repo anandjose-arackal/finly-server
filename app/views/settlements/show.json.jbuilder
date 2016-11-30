@@ -21,7 +21,26 @@ json.array! @result.items do |item|
     json.type 'payment'
     json.payment_amount item.amount.value
     json.initiating_user item.initiating_user.name
-    json.payment_type PaymentType.name_for(item.payment_type_id)
+    payment_type_id = item.payment_type_id
+    payment_type_s = PaymentType.name_for(payment_type_id)
+    if([PaymentType.id_for(:credit_from_virtual_account_to_wallet), 
+        PaymentType.id_for(:credit_from_virtual_account_to_card), 
+        PaymentType.id_for(:credit_from_wallet_to_wallet), 
+        PaymentType.id_for(:credit_from_wallet_to_card), 
+        PaymentType.id_for(:debit_from_wallet_to_wallet), 
+        PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id))
+      if @result.selected_user == item.receiving_user
+        payment_type_s = "Receive #{PaymentType.name_for(payment_type_id).downcase}"
+      elsif(@result.selected_user == item.initiating_user)
+        next if [PaymentType.id_for(:credit_from_virtual_account_to_wallet), 
+                  PaymentType.id_for(:credit_from_virtual_account_to_card),
+                  PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id)
+        payment_type_s = "Initiate #{PaymentType.name_for(payment_type_id).downcase}"
+      else
+        next
+      end
+    end
+    json.payment_type payment_type_s
   elsif item.is_a?(MoneyRequest)
     json.type 'money_request'
     if item.final_approver

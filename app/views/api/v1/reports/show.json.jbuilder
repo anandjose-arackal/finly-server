@@ -1,6 +1,10 @@
 json.partial! '/api/v1/reports/report', report: @result.report
-json.manager_name @result.manager.name rescue nil
-json.finance_manager_name @result.finance_manager.name rescue nil
+manager_name = ''
+manager_name = @result.manager.name if @result.manager.present?
+finance_manager_name = ''
+finance_manager_name = @result.finance_manager.name if @result.finance_manager.present?
+json.manager_name manager_name
+json.finance_manager_name @finance_manager_name
 json.total do
   json.value @result.total
   json.currency do
