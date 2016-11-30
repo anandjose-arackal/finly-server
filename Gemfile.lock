@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/activeadmin/activeadmin.git
-  revision: 78324a83fa01d62bbc372bafc2313be5b3837529
+  revision: a932d56b156eaf64beb86cb45f8f801b7933c42e
   specs:
     activeadmin (1.0.0.pre4)
       arbre (~> 1.0, >= 1.0.2)
@@ -210,7 +210,7 @@ GEM
       has_scope (~> 0.6.0.rc)
       railties (>= 3.2, < 5)
       responders
-    jbuilder (2.6.0)
+    jbuilder (2.6.1)
       activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
     jquery-rails (4.2.1)
@@ -266,8 +266,6 @@ GEM
     polyamorous (1.3.1)
       activerecord (>= 3.0)
     puma (3.6.2)
-    pundit (1.1.0)
-      activesupport (>= 3.0.0)
     rack (1.6.5)
     rack-protection (1.5.3)
       rack
@@ -386,73 +384,72 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  activeadmin!
-  animate-rails
-  annotate
+  activeadmin (= 1.0.0.pre4)!
+  animate-rails (= 1.0.10)
+  annotate (= 2.7.1)
   autoprefixer-rails (= 6.5.0.1)
-  awesome_print
-  backbone-on-rails
-  bootbox-rails (~> 0.4)
-  bootstrap-sass
-  bootstrap-will_paginate
-  bullet
-  byebug
-  capistrano
-  capistrano-bundler
-  capistrano-rails
-  capistrano-rbenv
-  capistrano-rvm
-  capistrano3-puma
-  coffee-rails (~> 4.1.0)
-  crono
-  daemons
+  awesome_print (= 1.7.0)
+  backbone-on-rails (= 1.2.0.0)
+  bootbox-rails (= 0.5.0)
+  bootstrap-sass (= 3.3.7)
+  bootstrap-will_paginate (= 0.0.10)
+  bullet (= 5.4.2)
+  byebug (= 9.0.6)
+  capistrano (= 3.6.1)
+  capistrano-bundler (= 1.2.0)
+  capistrano-rails (= 1.2.0)
+  capistrano-rbenv (= 2.0.4)
+  capistrano-rvm (= 0.1.2)
+  capistrano3-puma (= 1.2.1)
+  coffee-rails (= 4.1.1)
+  crono (= 1.0.3)
+  daemons (= 1.2.4)
   deep_cloneable (= 2.2.1)
-  devise
-  devise_invitable
-  faker
-  faraday
-  figaro
-  font-awesome-rails
-  gcm
-  griddler
-  griddler-sendgrid
-  handlebars_assets
-  has_scope
-  hirb
-  hooks
-  imgkit
-  jbuilder (~> 2.0)
-  jquery-rails
-  jquery-ui-rails
-  mocha
-  mysql2 (>= 0.3.13, < 0.5)
+  devise (= 4.2.0)
+  devise_invitable (= 1.7.0)
+  faker (= 1.6.6)
+  faraday (= 0.10.0)
+  figaro (= 1.1.1)
+  font-awesome-rails (= 4.7.0.0)
+  gcm (= 0.1.1)
+  griddler (= 1.3.1)
+  griddler-sendgrid (= 0.0.1)
+  handlebars_assets (= 0.23.1)
+  has_scope (= 0.6.0)
+  hirb (= 0.7.3)
+  hooks (= 0.4.1)
+  imgkit (= 1.6.1)
+  jbuilder (= 2.6.1)
+  jquery-rails (= 4.2.1)
+  jquery-ui-rails (= 5.0.5)
+  mocha (= 1.2.1)
+  mysql2 (= 0.4.5)
   nokogiri (= 1.6.8)
-  opro!
-  paper_trail (~> 5.1.1)
-  paperclip
-  proselytism!
-  puma
-  pundit
+  opro (= 0.5.0)!
+  paper_trail (= 5.1.1)
+  paperclip (= 5.1.0)
+  proselytism (= 0.0.3)!
+  puma (= 3.6.2)
   rails (= 4.2.6)
-  rails-erd
+  rails-erd (= 1.5.0)
   rake (= 11.3.0)
-  remotipart (~> 1.0)
-  require_all
-  rmagick
-  roo
-  roo-xls
-  sass-rails (~> 5.0)
-  sdoc (~> 0.4.0)
-  sendgrid-ruby
-  sidekiq
-  stomp
+  remotipart (= 1.3.1)
+  require_all (= 1.3.3)
+  rmagick (= 2.16.0)
+  roo (= 2.5.1)
+  roo-xls (= 1.0.0)
+  sass-rails (= 5.0.6)
+  sdoc (= 0.4.2)
+  sendgrid-ruby (= 4.0.6)
+  sidekiq (= 4.2.6)
+  stomp (= 1.4.3)
   tzinfo-data
-  uglifier (>= 1.3.0)
-  web-console (~> 2.0)
-  wicked_pdf
-  will_paginate
-  wkhtmltoimage-binary
-  wkhtmltopdf-binary
+  uglifier (= 3.0.3)
+  web-console (= 2.3.0)
+  wicked_pdf (= 1.1.0)
+  will_paginate (= 3.1.5)
+  wkhtmltoimage-binary (= 0.12.2)
+  wkhtmltopdf-binary (= 0.12.3.1)
 
 BUNDLED WITH
    1.13.6
