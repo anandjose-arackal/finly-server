@@ -19,9 +19,8 @@ class User::Wallet::Balance < User::Wallet::Base
     # self.selected_user = params[:for_user].blank?
     if selected_user.blank? and (params[:for_user_id].present? or params[:user_id].present? or params[:id].present?)
       id = (params[:for_user_id] or params[:user_id] or params[:id])
-      op= User::Team::Index.new(user, params)
-      users = op.run
-      self.selected_user = (users.with_id(id).first rescue nil) if op.success? and users.present?
+      users = User::Team::Index.(user, params)
+      self.selected_user = (users.with_id(id).first rescue nil) if users.present?
     end
   end
 

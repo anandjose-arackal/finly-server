@@ -58,7 +58,6 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validate :no_future_date
-  validate :created_by
   # validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
@@ -273,11 +272,11 @@ class Expense < ActiveRecord::Base
   private
 
   # only employees can create an expense
-  def created_by
-    unless self.user.employee?
-      errors.add(:expense, 'can only be created by employees')
-    end
-  end
+  # def created_by
+  #   unless self.user.employee?
+  #     errors.add(:expense, 'can only be created by employees')
+  #   end
+  # end
 
   # cannot add an expense with future date
   def no_future_date

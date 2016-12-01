@@ -25,7 +25,7 @@ class Expense::Manual::Update < Expense::Manual::Base
   def init
     super
     # saving previous expense attributes before updation
-    define_editable_attributes
+    define_editable_attributes if expense
     # setting up the expense params for updation
     self.updated_expense_params = manual_expense_params
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]

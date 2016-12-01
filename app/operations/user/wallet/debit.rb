@@ -29,9 +29,8 @@ class User::Wallet::Debit < User::Wallet::Base
     self.initiating_user = user
     self.target_user = params[:from_user]
     if target_user.blank? and params[:from_user_id].present?
-      op= User::Team::Index.new(user, params)
-      users = op.run
-      self.target_user = (users.with_id(params[:from_user_id]).first rescue nil) if op.success? and users.present?
+      users = User::Team::Index.(user, params)
+      self.target_user = (users.with_id(params[:from_user_id]).first rescue nil) if users.present?
     end
   end
 

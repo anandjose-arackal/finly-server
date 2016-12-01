@@ -154,6 +154,7 @@ if Period.count == 0
   b = Period.create!(name: "Day")
   b = Period.create!(name: "Week")
   b = Period.create!(name: "Month")
+  b = Period.create!(name: "Quarter")
   b = Period.create!(name: "Year")
 end
 
@@ -203,7 +204,7 @@ if User.count == 0
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   fm = []
-  1.times do |pos|
+  4.times do |pos|
     fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlytest.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
@@ -213,7 +214,7 @@ if User.count == 0
 
   end
   m = []
-  1.times do |pos|
+  4.times do |pos|
     m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 3},
@@ -233,7 +234,7 @@ if User.count == 0
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  1.times do |pos|
+  2.times do |pos|
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      role_mapping_attributes: [{user_role_id: 4},
@@ -325,7 +326,7 @@ if Report.count == 0
   c.users.all.each do |user|
 
     # creating open reports
-    3.times.each do
+    1.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -342,7 +343,7 @@ if Report.count == 0
     end
 
     # creating submitted reports
-    3.times.each do
+    1.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -360,7 +361,7 @@ if Report.count == 0
     end
 
     # creating approved reports
-    3.times.each do
+    1.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -408,7 +409,7 @@ end
   User.all.each do |user|
     next unless user.cards.present?
     card = user.cards.first
-    10.times do
+    5.times do
 
       trans_types = ["POS", "Ecom"]
       trans_modes = ["Debit"]
