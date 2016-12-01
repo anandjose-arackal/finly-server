@@ -20,8 +20,22 @@ class CreateInviteTest < ActiveSupport::TestCase
                                       },
                       admin: "1",
                       manager: "0",
-                      finance_manager: "0"
+                      finance_manager: "0",
+                      type: 'email'
                      }
+
+    @mobile_invite_params = {pending_invite: { company_id: 1,
+                                               mobile_number: "8105739684, 8052525252",
+                                               note: "Test note.",
+                                               team_mapping_attributes: {manager_id: @manager.id,
+                                                                         finance_manager_id: @finance_manager.id},
+                                               policy_id: @policy.id
+                                              },
+                             admin: "1",
+                             manager: "0",
+                             finance_manager: "0",
+                             type: 'mobile'
+                            }
   end
 
   test "admins can invite new users into the system with a policy" do
@@ -170,6 +184,10 @@ class CreateInviteTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
+  end
+
+  test "admin can invite a user with just a mobile number into the system" do
+
   end
 
 end

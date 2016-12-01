@@ -965,7 +965,7 @@ ActiveRecord::Schema.define(version: 20161130141946) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.integer  "company_id",             limit: 4,                   null: false
-    t.string   "mobile_number",          limit: 255,                 null: false
+    t.string   "mobile_number",          limit: 255
     t.boolean  "active",                             default: true,  null: false
     t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
