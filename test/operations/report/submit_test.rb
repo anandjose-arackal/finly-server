@@ -3,11 +3,11 @@ require 'test_helper'
 class SubmitTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
-    @employee = User.find(13)
-    @manager0 = User.find_by(email: 'manager0@finlytest.io')
-    @manager3 = User.find_by(email: 'manager3@finlytest.io')
-    @second_employee = User.with_roles.only_employees.second
+    @admin = users(:admin)
+    @employee = users(:employee)
+    @manager0 = users(:manager)
+    @manager3 = users(:second_manager)
+    @second_employee = users(:second_employee)
     @report = @employee.reports.open.first
     @second_employees_report = @second_employee.reports.open.first
   end

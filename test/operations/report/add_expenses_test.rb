@@ -142,8 +142,5 @@ class AddExpensesTest < ActiveSupport::TestCase
     assert ExpenseStatus.unreported_id, @expenses.second.expense_status_id
   end
 
-  test "" do
-
-  end
 
 end

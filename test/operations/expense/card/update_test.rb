@@ -67,7 +67,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "reporting manager can update a user's expense" do
+  test "reporting manager can update a user's  card expense" do
     # stubbing the face that Expense Index returns the expense the manager needs to edit
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
@@ -82,7 +82,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert_equal "Randomness", @result.expense.note
   end
 
-  test "manager who's not in manager view cannot edit team member's expense" do
+  test "manager who's not in manager view cannot edit team member's card expense" do
     # stubbing the face that Expense Index returns the expense the manager needs to edit
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
@@ -99,7 +99,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "non reporting manager cannot update a user's expense" do
+  test "non reporting manager cannot update a user's card expense" do
     # mocking the fact that the expense index does not return the particular expense
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: []}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
@@ -116,7 +116,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "admins can update anyone in the company's expenses" do
+  test "admins can update anyone in the company's card expenses" do
     # stubbing the fact that Expense Index returns the expense the manager needs to edit
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)

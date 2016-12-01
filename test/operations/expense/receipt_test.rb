@@ -105,20 +105,5 @@ class ReceiptTest < ActiveSupport::TestCase
     assert @expense_with_receipt.receipts.empty?
   end
 
-  test "reporting manager can upload a receipt on behalf of the employee" do
-
-  end
-
-  test "manager who is not an approving manager for the user CANNOT update the receipt of an expense" do
-
-  end
-
-  test "admin can update any expense in the company with a receipt" do
-
-  end
-
-  test "admin cannot upload receipt for a user not in the company" do
-
-  end
 
 end

@@ -56,6 +56,5 @@ class DestroyTest < ActiveSupport::TestCase
     end
   end
 
-  test ""
 
 end

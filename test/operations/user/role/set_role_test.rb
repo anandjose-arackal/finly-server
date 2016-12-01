@@ -51,6 +51,4 @@ class SetRoleTest < ActiveSupport::TestCase
 
   end
 
-  test ""
-
 end

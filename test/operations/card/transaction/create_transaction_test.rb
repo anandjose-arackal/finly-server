@@ -237,7 +237,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
 
     assert_not @result.success?
     # extracting the latest transaction
-    latest_trans = CardTransaction.order(created_at: :desc).first
+    latest_trans = @user.card_transactions.order(created_at: :desc).last
     assert_equal 26.2, latest_trans.transaction_amount_value
     assert_equal 28.6, latest_trans.billing_amount_value
     assert_not latest_trans.expensed
@@ -279,8 +279,5 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "" do
-
-  end
 
 end

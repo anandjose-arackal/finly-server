@@ -3,7 +3,7 @@ require 'test_helper'
 class DestroyTest < ActiveSupport::TestCase
 
   def setup
-    @admin = User.first
+    @admin = users(:admin)
     @category = @admin.company.categories.first
   end
 

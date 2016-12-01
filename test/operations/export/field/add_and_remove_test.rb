@@ -5,6 +5,7 @@ class AddAndRemoveTest < ActiveSupport::TestCase
   def setup
     @company = Company.first
     @preference = @company.export_preferences.first
+    debugger
     @admin = users(:admin)
     @manager = users(:manager)
     @export_field_params = {export: {export_field_id: ExportField.type_expense_category_name,

@@ -122,7 +122,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert_equal "Expense cannot be edited at this stage", @result.messages[:error].first
   end
 
-  test "reporting manager can update a user's expense" do
+  test "reporting manager can update a user's manual expense" do
     # stubbing the face that Expense Index returns the expense the manager needs to edit
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
@@ -138,7 +138,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert_equal 1200, @result.expense.amount_value
   end
 
-  test "manager who's not in manager view cannot edit team member's expense" do
+  test "manager who's not in manager view cannot edit team member's manual expense" do
     # stubbing the fact that Expense Index returns the expense the manager needs to edit
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
@@ -155,7 +155,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "non reporting manager cannot update a user's expense" do
+  test "non reporting manager cannot update a user's manual expense" do
     # mocking the fact that the expense index does not return the particular expense
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: []}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
@@ -172,7 +172,7 @@ class UpdateTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "admins can update anyone in the company's expenses" do
+  test "admins can update anyone in the company's manual expenses" do
     # stubbing the fact that Expense Index returns the expense the manager needs to edit
     expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
