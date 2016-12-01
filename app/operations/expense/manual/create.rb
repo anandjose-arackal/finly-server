@@ -4,6 +4,12 @@
 class Expense::Manual::Create < Expense::Manual::Base
   attr_accessor :expense_params, :receipt
 
+  # only employees can create expenses
+
+  def authorized_user_types
+    [:employee]
+  end
+
   def pre_validate
     super
     if params.blank?
@@ -34,8 +40,18 @@ class Expense::Manual::Create < Expense::Manual::Base
     # can't think of anything for now
     if expense_params[:receipt_id].present? and receipt.blank?
       messages[:error] << 'Receipt not found'
+      return false
+    end
+
+    # checking if the report is editable for personal view
+    if personal_view? and expense_params[:report_id].present?
+      report = user.reports.find_by(id: expense_params[:report_id])
+      unless report.editable?
+        messages[:error] << "Expense cannot be added to the report in this state"
+      end
     end
   end
+
 
   def process
     self.expense = user.expenses.build(expense_params)

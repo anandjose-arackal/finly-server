@@ -5,7 +5,7 @@ require_relative '../../../../app/operations/expense/ex_card/create'
 class UpdateCardExpenseTest < ActiveSupport::TestCase
 
   def setup
-    @user = users(:employee)
+    @user = users(:finance_manager)
     @image = File.open(Rails.root + "app/assets/images/1363397.png", "r")
     # creating a card expense first
     @expense = @user.expenses.only_card_expenses.first
@@ -69,7 +69,7 @@ class UpdateCardExpenseTest < ActiveSupport::TestCase
 
   test "reporting manager can update a user's  card expense" do
     # stubbing the face that Expense Index returns the expense the manager needs to edit
-    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@manager, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
     @update_expense_params[:view] = 'manager'
@@ -84,7 +84,7 @@ class UpdateCardExpenseTest < ActiveSupport::TestCase
 
   test "manager who's not in manager view cannot edit team member's card expense" do
     # stubbing the face that Expense Index returns the expense the manager needs to edit
-    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@manager, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
     # no view passed to mimic personal view

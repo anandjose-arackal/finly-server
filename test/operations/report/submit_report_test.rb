@@ -6,7 +6,7 @@ class SubmitReportTest < ActiveSupport::TestCase
     @admin = users(:admin)
     @employee = users(:employee)
     @manager0 = users(:manager)
-    @manager3 = users(:second_manager)
+    @manager3 = users(:third_manager)
     @second_employee = users(:second_employee)
     @report = @employee.reports.open.first
     @second_employees_report = @second_employee.reports.open.first

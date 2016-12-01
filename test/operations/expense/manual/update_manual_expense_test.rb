@@ -124,7 +124,7 @@ class UpdateManualExpenseTest < ActiveSupport::TestCase
 
   test "reporting manager can update a user's manual expense" do
     # stubbing the face that Expense Index returns the expense the manager needs to edit
-    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@manager, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
     @update_params[:view] = 'manager'
@@ -140,7 +140,7 @@ class UpdateManualExpenseTest < ActiveSupport::TestCase
 
   test "manager who's not in manager view cannot edit team member's manual expense" do
     # stubbing the fact that Expense Index returns the expense the manager needs to edit
-    expenses_index_presenter = Expense::Index::ListPresenter.new(@admin, {expenses: Expense.where(id: @expense.id)}, nil)
+    expenses_index_presenter = Expense::Index::ListPresenter.new(@manager, {expenses: Expense.where(id: @expense.id)}, nil)
     Expense::Index.stubs(:call).returns(expenses_index_presenter)
 
     # no view passed to mimic personal view

@@ -3,8 +3,8 @@ require 'test_helper'
 class AutoSubmitReportTest < ActiveSupport::TestCase
 
   def setup
-    @user = User.find_by(email: 'employee@finlytest.io')
-    @manager = User.find_by(email: 'manager@finlytest.io')
+    @user = User.find_by(email: 'employee0@finlytest.io')
+    @manager = User.find_by(email: 'manager0@finlytest.io')
     # @manual_expense = Expense.new(id: 1, user_id: @user.id, expense_type_id: ExpenseType.id_for(:manual), expense_status_id: ExpenseStatus.id_for(:unreported))
     # @card_expense = Expense.new(id: 2, user_id: @user.id, expense_type_id: ExpenseType.id_for(:card), expense_status_id: ExpenseStatus.id_for(:unreported))
     @manual_expense = Expense.only_manual_expenses.first

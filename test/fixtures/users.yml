@@ -54,35 +54,80 @@ admin:
   last_name: "Admin"
   mobile_number: "9899999991"
 
-manager:
-  id: 2
-  email: 'manager@finlytest.io'
-  active: true
-  company_id: 1
-  first_name: "Finly"
-  last_name: "Manager"
-  mobile_number: "9899999992"
-
 finance_manager:
-  id: 3
-  email: 'finance_manager@finlytest.io'
+  id: 2
+  email: 'finance0@finlytest.io'
   active: true
   company_id: 1
   first_name: "Finly"
   last_name: "Finance Manager"
   mobile_number: "9899999993"
 
-employee:
+second_finance_manager:
+  id: 3
+  email: 'finance_manager2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Other_Finance"
+  last_name: "Manager"
+  mobile_number: "9899999922"
+
+third_finance_manager:
   id: 4
-  email: 'employee@finlytest.io'
+  email: 'finance_manager3@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Third_Finance"
+  last_name: "Manager"
+  mobile_number: "9899999952"
+
+manager:
+  id: 5
+  email: 'manager0@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Finly"
+  last_name: "Manager"
+  mobile_number: "9899999992"
+
+second_manager:
+  id: 6
+  email: 'manager2@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Other"
+  last_name: "Manager"
+  mobile_number: "9899999912"
+
+third_manager:
+  id: 7
+  email: 'manager3@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Third"
+  last_name: "Manager"
+  mobile_number: "9899999932"
+
+employee:
+  id: 8
+  email: 'employee0@finlytest.io'
   active: true
   company_id: 1
   first_name: "Finly"
   last_name: "Employee"
   mobile_number: "9899999994"
 
+second_employee:
+  id: 9
+  email: 'employee1@finlytest.io'
+  active: true
+  company_id: 1
+  first_name: "Second"
+  last_name: "Employee"
+  mobile_number: "9899999932"
+
 inactive_employee:
-  id: 7
+  id: 10
   email: 'inactive_employee@finlytest.io'
   active: false
   company_id: 1
@@ -91,7 +136,7 @@ inactive_employee:
   mobile_number: "9899999997"
 
 other_company_admin:
-  id: 5
+  id: 11
   email: 'admin@random.com'
   active: true
   company_id: 2
@@ -99,60 +144,7 @@ other_company_admin:
   last_name: "Admin"
   mobile_number: "9899999995"
 
-other_company_manager:
-  id: 6
-  email: "manager@random.com"
-  active: true
-  company_id: 2
-  first_name: "Random"
-  last_name: "Manager"
-  mobile_number: "9899999996"
 
-second_manager:
-  id: 8
-  email: 'manager2@finlytest.io'
-  active: true
-  company_id: 1
-  first_name: "Other"
-  last_name: "Manager"
-  mobile_number: "9899999912"
-
-second_finance_manager:
-  id: 9
-  email: 'finance_manager2@finlytest.io'
-  active: true
-  company_id: 1
-  first_name: "Other_Finance"
-  last_name: "Manager"
-  mobile_number: "9899999922"
-
-third_manager:
-  id: 10
-  email: 'manager3@finlytest.io'
-  active: true
-  company_id: 1
-  first_name: "Third"
-  last_name: "Manager"
-  mobile_number: "9899999932"
-
-third_finance_manager:
-  id: 11
-  email: 'finance_manager3@finlytest.io'
-  active: true
-  company_id: 1
-  first_name: "Third_Finance"
-  last_name: "Manager"
-  mobile_number: "9899999952"
-
-
-second_employee:
-  id: 12
-  email: 'employee2@finlytest.io'
-  active: true
-  company_id: 1
-  first_name: "Second"
-  last_name: "Employee"
-  mobile_number: "9899999932"
 
 
 

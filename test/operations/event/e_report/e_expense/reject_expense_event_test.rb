@@ -9,8 +9,8 @@ class RejectExpenseEventTest < ActiveSupport::TestCase
     @report = Report.first
     @owner = User.last
     @rejected_expense = Expense.first
-    @first_approver = User.only_managers.first
-    @second_approver = User.only_finance_managers.first
+    @first_approver = users(:manager)
+    @second_approver = users(:finance_manager)
     @report.stubs(:user).returns(@owner)
   end
 

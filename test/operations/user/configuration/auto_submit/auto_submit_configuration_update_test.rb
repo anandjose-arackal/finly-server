@@ -3,8 +3,8 @@ require 'test_helper'
 class AutoSubmitConfigurationUpdateTest < ActiveSupport::TestCase
 
   def setup
-    @current_user = User.first
-    @updating_user = User.last
+    @current_user = users(:employee)
+    @updating_user = users(:manager)
   end
 
   test 'Current User, User ID and update params need to be passed to perform the update' do
