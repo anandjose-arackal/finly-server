@@ -325,7 +325,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
+                                 category_id: random_integer(1, 5), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -342,7 +342,7 @@ if Report.count == 0
       5.times.each do
         e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                  manual_expense_attributes: {merchant: Faker::Company.name},
-                                 category_id: random_integer(1, 8), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
+                                 category_id: random_integer(1, 5), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                  receipts_attributes: [])
         expenses << e
         expenses_ids << e.id
@@ -453,6 +453,10 @@ user.cards.create(proxy: "S00017740094", description: "Test physical card for us
 
 c2 = Company.create(name: "Finly Expense", d_code: "D000000360")
 
+categories = c2.categories.active
+l = categories.first.id
+h = categories.last.id
+
 u = []
 
 manager = User.create(company: c2, first_name: "Manager", last_name: "Overlord", email: "manager@finlyexpense.io",
@@ -499,7 +503,7 @@ u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "
     5.times.each do
       e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                manual_expense_attributes: {merchant: Faker::Company.name},
-                               category_id: random_integer(1, 5), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
+                               category_id: random_integer(l, h), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                receipts_attributes: [])
       expenses << e
       expenses_ids << e.id
@@ -512,10 +516,10 @@ u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "
 
   params = {money_request: {name: "Something",
                             required_by_date: "01-06-2016",
-                            items_attributes: [{category_id: random_integer(1, 5),
+                            items_attributes: [{category_id: random_integer(l, h),
                                                amount_attributes: {value: random_integer(20, 150),
                                                                    currency_id: 1}},
-                                               category_id: random_integer(1, 5),
+                                               category_id: random_integer(l, h),
                                                amount_attributes: {value: random_integer(100, 500),
                                                                    currency_id: 1 }]
                            }
@@ -546,7 +550,7 @@ end
     5.times.each do
       e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                                manual_expense_attributes: {merchant: Faker::Company.name},
-                               category_id: random_integer(1, 5), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
+                               category_id: random_integer(l, h), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                                receipts_attributes: [])
       expenses << e
       expenses_ids << e.id
@@ -558,10 +562,10 @@ end
   # creating junk money requests
   params = {money_request: {name: "Something",
                             required_by_date: "01-06-2016",
-                            items_attributes: [{category_id: random_integer(1, 5),
+                            items_attributes: [{category_id: random_integer(l, h),
                                                 amount_attributes: {value: random_integer(20, 150),
                                                                     currency_id: 1}},
-                                               category_id: random_integer(1, 5),
+                                               category_id: random_integer(l, h),
                                                amount_attributes: {value: random_integer(100, 500),
                                                                    currency_id: 1 }]
   }
@@ -594,7 +598,7 @@ user.cards.create(proxy: "S00017740098", description: "Test physical card for us
                  note: "#{Faker::Lorem.sentence}",
                  date: Faker::Date.between(60.days.ago, DateUtils.local_date),
                  user_id: u[0].id,
-                 category_id: random_integer(1, 5),
+                 category_id: random_integer(l, h),
                  manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
 end
 
@@ -644,7 +648,7 @@ user = u[0]
   5.times.each do
     e = user.expenses.create(amount_attributes: {value: Faker::Commerce.price, currency_id: 1},
                              manual_expense_attributes: {merchant: Faker::Company.name},
-                             category_id: random_integer(1, 5), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
+                             category_id: random_integer(l, h), expense_status_id: 1, expense_type_id: 1, date: DateUtils.local_date,
                              receipts_attributes: [])
     expenses << e
     expenses_ids << e.id
@@ -654,10 +658,10 @@ end
 
 params = {money_request: {name: "Something",
                           required_by_date: "01-06-2016",
-                          items_attributes: [{category_id: random_integer(1, 5),
+                          items_attributes: [{category_id: random_integer(l, h),
                                               amount_attributes: {value: random_integer(20, 150),
                                                                   currency_id: 1}},
-                                             category_id: random_integer(1, 5),
+                                             category_id: random_integer(l, h),
                                              amount_attributes: {value: random_integer(100, 500),
                                                                  currency_id: 1 }]
                         }
