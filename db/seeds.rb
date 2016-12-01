@@ -132,7 +132,7 @@ if Company.count == 0
 else
   c = Company.first
 end
-
+#
 if c.categories.count == 0
   10.times do |i|
     c.categories.create!(name: "Test category #{i+1}")
@@ -210,21 +210,21 @@ if User.count == 0
 
 end
 
-if Policy.non_default.count == 0
-  a = User.first
-  p = Policy::Create.(a, {name: 'Bangalore team'})
-  p = Policy.find_by(name: "Bangalore team")
-  p.configuration.update_attribute(:require_category, true) if p.present?
-  Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
-  # PolicyUserService.new(p).add_user(u[0], false)
-  u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[0].id)
-  p2 = Policy::Create.(a, {name: 'Mumbai team'})
-  p2 = Policy.find_by(name: 'Mumbai team')
-  u.each do |user|
-    Policy::Users::AddUser.(a, {view: 'admin', policy_id: p2.id, :user_id => "#{user.id}"})
-    # PolicyUserService.new(p2).add_user(user, false)
-  end
-end
+# if Policy.non_default.count == 0
+#   a = User.first
+#   p = Policy::Create.(a, {name: 'Bangalore team'})
+#   p = Policy.find_by(name: "Bangalore team")
+#   p.configuration.update_attribute(:require_category, true) if p.present?
+#   Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
+#   # PolicyUserService.new(p).add_user(u[0], false)
+#   u[0].team_mapping.policy(p).default.first.update_attribute(:manager_id, m[0].id)
+#   p2 = Policy::Create.(a, {name: 'Mumbai team'})
+#   p2 = Policy.find_by(name: 'Mumbai team')
+#   u.each do |user|
+#     Policy::Users::AddUser.(a, {view: 'admin', policy_id: p2.id, :user_id => "#{user.id}"})
+#     # PolicyUserService.new(p2).add_user(user, false)
+#   end
+# end
 
 if ExpenseType.count ==0
   ExpenseType.create(id: 1, name: "Manual")
@@ -241,7 +241,7 @@ if ExpenseStatus.count ==0
   ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
   ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
 end
-
+#
 if Expense.count == 0
   # junk manual expenses
   20.times do |i|
@@ -254,8 +254,6 @@ if Expense.count == 0
                    category_id: random_integer(1, 5),
                    manual_expense_attributes: {merchant: "#{Faker::Company.name}"})
   end
-
-
 end
 
 if Receipt.count == 0
@@ -282,30 +280,30 @@ if BudgetPeriod.count == 0
   b = BudgetPeriod.create!(name: "Month")
   b = BudgetPeriod.create!(name: "Year")
 end
-
-p = Policy.find(3)
-if p.rules_count == 0
-  # warning rule that requires a receipt for expenses above 50
-  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
-                              category_id: 1,
-                              rule_type_id: 1,
-                              expense_rule_type_id: 1)
-  # warning rule that requires a note for expense above 50
-  r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
-                              category_id: 1,
-                              rule_type_id: 1,
-                              expense_rule_type_id: 2)
-
-  # setting monthly budget for category 1 as 100 in INR
-  b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
-                             category_id: 1,
-                             budget_period_id: 3,
-                             rule_type_id: 1)
-  # set monthly budget for all expenses as 150 INR
-  b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
-                             budget_period_id: 3,
-                             rule_type_id: 2)
-end
+#
+# p = Policy.find(3)
+# if p.rules_count == 0
+#   # warning rule that requires a receipt for expenses above 50
+#   r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
+#                               category_id: 1,
+#                               rule_type_id: 1,
+#                               expense_rule_type_id: 1)
+#   # warning rule that requires a note for expense above 50
+#   r = p.expense_rules.create!(greater_than_amount_attributes: {value: 50, currency_id: 1},
+#                               category_id: 1,
+#                               rule_type_id: 1,
+#                               expense_rule_type_id: 2)
+#
+#   # setting monthly budget for category 1 as 100 in INR
+#   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
+#                              category_id: 1,
+#                              budget_period_id: 3,
+#                              rule_type_id: 1)
+#   # set monthly budget for all expenses as 150 INR
+#   b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
+#                              budget_period_id: 3,
+#                              rule_type_id: 2)
+# end
 
 if PaymentType.count == 0
   PaymentType::TYPES.each do |key, value|
@@ -400,32 +398,32 @@ if Card.count == 0
   # end
 end
 
-# creating some junk transactions and card expenses for testing
-# if CardTransaction.count == 0
-#   User.all.each do |user|
-#     next unless user.cards.present?
-#     card = user.cards.first
-#     10.times do
-#       random_amount = random(10, 1000)
-#       trans = CardTransaction.create(user_id: user.id,
-#                                      transaction_amount_attributes: {value: random_amount, currency_id: 1},
-#                                      transaction_timestamp: DateUtils.local_date_time,
-#                                      merchant_name: 'Randomness',
-#                                      serial_id: card.proxy)
-#       # junk card expense
-#       Expense.create(amount_attributes: {value: trans.transaction_amount.value, currency_id: 1},
-#                      expense_status_id: 1,
-#                      expense_type_id: 2,
-#                      note: "This is a card expense, hello! #{trans.id}",
-#                      date: trans.transaction_timestamp.to_date,
-#                      user_id: user.id,
-#                      category_id: random_integer(1, 5),
-#                      card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
-#                                                card_transaction_id: trans.id})
-#     end
-#   end
-# end
-
+# # creating some junk transactions and card expenses for testing
+# # if CardTransaction.count == 0
+# #   User.all.each do |user|
+# #     next unless user.cards.present?
+# #     card = user.cards.first
+# #     10.times do
+# #       random_amount = random(10, 1000)
+# #       trans = CardTransaction.create(user_id: user.id,
+# #                                      transaction_amount_attributes: {value: random_amount, currency_id: 1},
+# #                                      transaction_timestamp: DateUtils.local_date_time,
+# #                                      merchant_name: 'Randomness',
+# #                                      serial_id: card.proxy)
+# #       # junk card expense
+# #       Expense.create(amount_attributes: {value: trans.transaction_amount.value, currency_id: 1},
+# #                      expense_status_id: 1,
+# #                      expense_type_id: 2,
+# #                      note: "This is a card expense, hello! #{trans.id}",
+# #                      date: trans.transaction_timestamp.to_date,
+# #                      user_id: user.id,
+# #                      category_id: random_integer(1, 5),
+# #                      card_expense_attributes: {editable_merchant: "#{Faker::Company.name}",
+# #                                                card_transaction_id: trans.id})
+# #     end
+# #   end
+# # end
+#
 # temporary otp verification all numbers in db
 User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
@@ -453,20 +451,21 @@ user.cards.create(proxy: "S00017740094", description: "Test physical card for us
 
 c2 = Company.create(name: "Finly Expense", d_code: "D000000360")
 
+
 categories = c2.categories.active
 l = categories.first.id
 h = categories.last.id
 
 u = []
 
-manager = User.create(company: c2, first_name: "Manager", last_name: "Overlord", email: "manager@finlyexpense.io",
+manager = User.create(company: c2, first_name: "Manager", last_name: "Ravi", email: "manager@finlyexpense.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
                       role_mapping_attributes: [{user_role_id: UserRole.manager_id},
                                                 {user_role_id: UserRole.employee_id}],
                       profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                            address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-finance_manager = User.create(company: c2, first_name: "Lord", last_name: "Finance", email: "finance_manager@finlyexpense.io",
+finance_manager = User.create(company: c2, first_name: "Finance", last_name: "Suresh", email: "finance_manager@finlyexpense.io",
                               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
                               role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                         {user_role_id: UserRole.employee_id}],
@@ -483,6 +482,8 @@ u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "
                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
+p = Policy::Create.(u[0], {view: 'admin', name: "Bangalore team"}).policies.last
+
 
 3.times do |pos|
   u << User.create(company: c2, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlyexpense.io",
@@ -494,6 +495,9 @@ u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "
 
   # creating expenses for these employees
   user = u.last
+
+  # adding user to the policy
+  Policy::Users::AddUser.(u[0], {view: 'admin', policy_id: p.id, :user_id => "#{user.id}"})
   # creating submitted reports
   5.times.each do
     report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
@@ -509,12 +513,13 @@ u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "
       expenses_ids << e.id
     end
     Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
-      Report::Submit.(user, {report_id: report.id})
-    end
+    Report::Update.(user, {id: report.id, policy_id: p.id})
+    Report::Submit.(user, {report_id: report.id})
+  end
 
   # creating advance requests
 
-  params = {money_request: {name: "Something",
+  params = {money_request: {name: "#{Faker::Commerce.product_name}",
                             required_by_date: "01-06-2016",
                             items_attributes: [{category_id: random_integer(l, h),
                                                amount_attributes: {value: random_integer(20, 150),
@@ -542,6 +547,8 @@ end
 
   # creating expenses for these employees
   user = u.last
+
+  Policy::Users::AddUser.(u[0], {view: 'admin', policy_id: p.id, :user_id => "#{user.id}"})
   # creating submitted reports
   5.times.each do
     report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
@@ -557,11 +564,12 @@ end
       expenses_ids << e.id
     end
     Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
+    Report::Update.(user, {id: report.id, policy_id: p.id})
     Report::Submit.(user, {report_id: report.id})
   end
 
   # creating junk money requests
-  params = {money_request: {name: "Something",
+  params = {money_request: {name: "#{Faker::Commerce.product_name}",
                             required_by_date: "01-06-2016",
                             items_attributes: [{category_id: random_integer(l, h),
                                                 amount_attributes: {value: random_integer(20, 150),
@@ -658,7 +666,7 @@ user = u[0]
   Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
 end
 
-params = {money_request: {name: "Something",
+params = {money_request: {name: "#{Faker::Commerce.product_name}",
                           required_by_date: "01-06-2016",
                           items_attributes: [{category_id: random_integer(l, h),
                                               amount_attributes: {value: random_integer(20, 150),
@@ -683,6 +691,3 @@ c.users.each do |user|
 
 end
 
-# creating a policy with same blocking rules and warnings
-
-# p = c.policies.create(name: "Bangalore Team")
