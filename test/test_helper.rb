@@ -12,4 +12,12 @@ class ActiveSupport::TestCase
   # load "#{Rails.root}/db/seeds.rb"
 
   # Add more helper methods to be used by all tests here...
+
+  # def sign_in(user)
+  #   if user.blank? or not user.kind_of?(::User)
+  #     return false
+  #   end
+  #   sign_in user
+  # end
+
 end

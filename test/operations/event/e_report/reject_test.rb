@@ -68,7 +68,7 @@ class RejectTest < ActiveSupport::TestCase
     assert affected_users.include?(@owner)
   end
 
-  test 'behavior when report is not passed' do
+  test 'behavior when report is not passed for reject' do
     response = nil
     event = Event::EReport::Reject.new(@finance_manager, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -77,7 +77,7 @@ class RejectTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed' do
+  test 'behavior when current user is not passed for reject' do
     response = nil
     event = Event::EReport::Reject.new(nil, report: @report)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -86,7 +86,7 @@ class RejectTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed and report is not passed ' do
+  test 'behavior when current user is not passed and report is not passed for reject' do
     response = nil
     event = Event::EReport::Reject.new(nil, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do

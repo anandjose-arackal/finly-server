@@ -32,7 +32,7 @@ class TakeControlTest < ActiveSupport::TestCase
     assert_equal affected_users.size, 2
   end
 
-  test 'behavior when report is not passed' do
+  test 'behavior when report is not passed for take control' do
     response = nil
     event = Event::EReport::TakeControl.new(@admin, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -41,7 +41,7 @@ class TakeControlTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed' do
+  test 'behavior when current user is not passed for take control' do
     response = nil
     event = Event::EReport::TakeControl.new(nil, report: @report)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -50,7 +50,7 @@ class TakeControlTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed and report is not passed ' do
+  test 'behavior when current user is not passed and report is not passed for take control' do
     response = nil
     event = Event::EReport::TakeControl.new(nil, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do

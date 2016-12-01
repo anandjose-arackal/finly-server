@@ -30,7 +30,7 @@ class AddReimbursementTest < ActiveSupport::TestCase
     assert_equal affected_users.size,1
   end
 
-  test 'behavior when payment is not passed' do
+  test 'behavior when payment is not passed for reimbursement' do
     response = nil
     event = Event::ESettlement::AddReimbursement.new(@finance_manager, payment: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -39,7 +39,7 @@ class AddReimbursementTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed' do
+  test 'behavior when current user is not passed for reimbursement' do
     response = nil
     event = Event::ESettlement::AddReimbursement.new(nil, payment: @payment)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -48,7 +48,7 @@ class AddReimbursementTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed and payment is not passed ' do
+  test 'behavior when current user is not passed and payment is not passed for reimbursement' do
     response = nil
     event = Event::ESettlement::AddReimbursement.new(nil, payment: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do

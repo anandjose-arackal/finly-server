@@ -48,7 +48,7 @@ class SubmitTest < ActiveSupport::TestCase
   test 'behavior when report is not sent' do
     response = nil
     event = Event::EReport::Submit.new(@owner)
-    assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
+    assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size for submit' do
       response = event.run
     end
     assert response.failure?
@@ -57,13 +57,13 @@ class SubmitTest < ActiveSupport::TestCase
   test 'behavior when current user is not sent' do
     response = nil
     event = Event::EReport::Submit.new(nil, report: @report)
-    assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
+    assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size for submit' do
       response = event.run
     end
     assert response.failure?
   end
 
-  test 'behavior when current user is not sent and report is not sent ' do
+  test 'behavior when current user is not sent and report is not sent for submit' do
     response = nil
     event = Event::EReport::Submit.new(nil, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do

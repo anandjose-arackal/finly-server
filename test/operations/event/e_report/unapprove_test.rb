@@ -49,7 +49,7 @@ class UnapproveTest < ActiveSupport::TestCase
     assert affected_users.include?(@manager)
   end
 
-  test 'behavior when report is not passed' do
+  test 'behavior when report is not passed for unapprove' do
     response = nil
     event = Event::EReport::Approve.new(@finance_manager, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -58,7 +58,7 @@ class UnapproveTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed' do
+  test 'behavior when current user is not passed for unapprove' do
     response = nil
     event = Event::EReport::Approve.new(nil, report: @report)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -67,7 +67,7 @@ class UnapproveTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed and report is not passed ' do
+  test 'behavior when current user is not passed and report is not passed for unapprove' do
     response = nil
     event = Event::EReport::Approve.new(nil, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do

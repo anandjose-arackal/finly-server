@@ -156,3 +156,11 @@ gem 'animate-rails', '1.0.10'
 gem 'rails-erd', '1.5.0'
 
 # gem 'nprogress-rails'
+
+# gem 'ruby-prof', '0.16.2', group: :test
+
+group :test do
+  gem 'rails-perftest', '0.0.6'
+  gem 'ruby-prof', '0.16.2'
+  gem 'test-unit', '3.2.3'
+end

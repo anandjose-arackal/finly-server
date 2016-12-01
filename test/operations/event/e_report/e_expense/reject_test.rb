@@ -45,7 +45,7 @@ class RejectTest < ActiveSupport::TestCase
     assert affected_users.include?(@owner)
   end
 
-  test 'behavior when report is not passed' do
+  test 'behavior when report is not passed for expense reject' do
     response = nil
     event = Event::EReport::EExpense::Reject.new(@first_approver, report: nil, rejected_expense: @rejected_expense)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -54,7 +54,7 @@ class RejectTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed' do
+  test 'behavior when current user is not passed for expense reject' do
     response = nil
     event = Event::EReport::EExpense::Reject.new(nil, report: @report, rejected_expense: @rejected_expense)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -63,7 +63,7 @@ class RejectTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-    test 'behavior when rejected expense is not passed' do
+    test 'behavior when rejected expense is not passed for expense reject' do
     response = nil
     event = Event::EReport::EExpense::Reject.new(@first_approver, report: @report, rejected_expense: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -72,7 +72,7 @@ class RejectTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user,report and rejected expense is not passed ' do
+  test 'behavior when current user,report and rejected expense is not passed for expense reject' do
     response = nil
     event = Event::EReport::EExpense::Reject.new(nil, report: nil, rejected_expense: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do

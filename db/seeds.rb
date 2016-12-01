@@ -122,6 +122,54 @@ if Currency.count == 0
   Currency.create(id: 1, country: 'India', country_code: 'INR', symbol: '₹')
 end
 
+
+if ExpenseType.count ==0
+  ExpenseType.create(id: 1, name: "Manual")
+  ExpenseType.create(id: 2, name: "Card")
+  ExpenseType.create(id: 3, name: "Distance")
+  ExpenseType.create(id: 4, name: "Time")
+  ExpenseType.create(id: 5, name: "Per Diem")
+end
+
+if ExpenseStatus.count ==0
+  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
+  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
+  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
+  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
+  ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
+end
+
+if ExpenseRuleType.count == 0
+  e = ExpenseRuleType.create!(name: "Require Receipt")
+  e = ExpenseRuleType.create!(name: "Require Note")
+  e = ExpenseRuleType.create!(name: "Disallow Expense")
+end
+
+if RuleType.count == 0
+  e = RuleType.create!(name: "Warning")
+  e = RuleType.create!(name: "Blocking")
+end
+
+if Period.count == 0
+  b = Period.create!(name: "Day")
+  b = Period.create!(name: "Week")
+  b = Period.create!(name: "Month")
+  b = Period.create!(name: "Year")
+end
+
+if PaymentType.count == 0
+  PaymentType::TYPES.each do |key, value|
+    PaymentType.create id: value, name: key
+  end
+end
+
+if CardType.count == 0
+  CardType.create(id: 1, name: 'Physical')
+  CardType.create(id: 2, name: 'Virtual')
+end
+
+##########################
+
 if Amount.count == 0
   Amount.create(id: 1, currency: Currency.first, value: 0)
 end
@@ -226,22 +274,6 @@ if Policy.non_default.count == 0
   end
 end
 
-if ExpenseType.count ==0
-  ExpenseType.create(id: 1, name: "Manual")
-  ExpenseType.create(id: 2, name: "Card")
-  ExpenseType.create(id: 3, name: "Distance")
-  ExpenseType.create(id: 4, name: "Time")
-  ExpenseType.create(id: 5, name: "Per Diem")
-end
-
-if ExpenseStatus.count ==0
-  ExpenseStatus.create(id: 1, name: "Unreported", order: 1)
-  ExpenseStatus.create(id: 2, name: "Unsubmitted", order: 2)
-  ExpenseStatus.create(id: 3, name: "Submitted", order: 3)
-  ExpenseStatus.create(id: 4, name: "Rejected", order: 4)
-  ExpenseStatus.create(id: 5, name: "Cancelled", order: 5)
-end
-
 if Expense.count == 0
   # junk manual expenses
   20.times do |i|
@@ -265,24 +297,6 @@ if Receipt.count == 0
   receipt.save
 end
 
-if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
-end
-
-if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
-end
-
-if BudgetPeriod.count == 0
-  b = BudgetPeriod.create!(name: "Day")
-  b = BudgetPeriod.create!(name: "Week")
-  b = BudgetPeriod.create!(name: "Month")
-  b = BudgetPeriod.create!(name: "Year")
-end
-
 p = Policy.find(3)
 if p.rules_count == 0
   # warning rule that requires a receipt for expenses above 50
@@ -299,18 +313,12 @@ if p.rules_count == 0
   # setting monthly budget for category 1 as 100 in INR
   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
                              category_id: 1,
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 1)
   # set monthly budget for all expenses as 150 INR
   b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 2)
-end
-
-if PaymentType.count == 0
-  PaymentType::TYPES.each do |key, value|
-    PaymentType.create id: value, name: key
-  end
 end
 
 if Report.count == 0
@@ -374,11 +382,6 @@ if Report.count == 0
       end
     end
   end
-end
-
-if CardType.count == 0
-  CardType.create(id: 1, name: 'Physical')
-  CardType.create(id: 2, name: 'Virtual')
 end
 
 if Card.count == 0

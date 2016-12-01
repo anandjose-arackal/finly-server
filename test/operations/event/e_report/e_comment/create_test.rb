@@ -35,7 +35,7 @@ class CommentTest < ActiveSupport::TestCase
     assert_not affected_users.include?(@finance_manager)
   end
 
-  test 'behavior when report is not passed' do
+  test 'behavior when report is not passed for comment create' do
     response = nil
     event = Event::EReport::EComment::Create.new(@finance_manager, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -44,7 +44,7 @@ class CommentTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed' do
+  test 'behavior when current user is not passed for comment create' do
     response = nil
     event = Event::EReport::EComment::Create.new(nil, report: @report)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
@@ -53,7 +53,7 @@ class CommentTest < ActiveSupport::TestCase
     assert response.failure?
   end
 
-  test 'behavior when current user is not passed and report is not passed ' do
+  test 'behavior when current user is not passed and report is not passed for comment create' do
     response = nil
     event = Event::EReport::EComment::Create.new(nil, report: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
