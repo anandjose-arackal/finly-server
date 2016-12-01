@@ -1,7 +1,6 @@
-
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Debit < User::Wallet::Base
-  attr_accessor :from_user, :to_user, :from_account, :to_account, :amount
+  attr_accessor :target_user, :initiating_user, :target_account, :initiating_account, :amount
 
   def authorized_user_types
     if params.present? and params[:from_account].present? and params[:to_account].present?
@@ -25,14 +24,14 @@ class User::Wallet::Debit < User::Wallet::Base
   def init
     super
     self.amount= params[:amount].to_d rescue nil
-    self.from_account = params[:from_account].to_sym rescue nil
-    self.to_account = params[:to_account].to_sym rescue nil
-    self.to_user = user
-    self.from_user = params[:from_user]
-    if from_user.blank? and params[:from_user_id].present?
+    self.target_account = params[:from_account].to_sym rescue nil
+    self.initiating_account = params[:to_account].to_sym rescue nil
+    self.initiating_user = user
+    self.target_user = params[:from_user]
+    if target_user.blank? and params[:from_user_id].present?
       op= User::Team::Index.new(user, params)
       users = op.run
-      self.from_user = (users.with_id(params[:from_user_id]).first rescue nil) if op.success? and users.present?
+      self.target_user = (users.with_id(params[:from_user_id]).first rescue nil) if op.success? and users.present?
     end
   end
 
@@ -41,74 +40,57 @@ class User::Wallet::Debit < User::Wallet::Base
     if self.amount.blank?
       add_message :error, 'Amount cannot be blank'
     end
-    if from_user.blank? or to_user.blank?
+    if target_user.blank? or initiating_user.blank?
       add_message :error, 'User not found'
     end
-    if from_account.blank? or to_account.blank?
+    if target_account.blank? or initiating_account.blank?
       add_message :error, 'Account cannot be blank'
     end
     return if has_errors?
-    if to_account == :card and to_user.cards.blank?
+    if initiating_account == :card and initiating_user.cards.blank?
       add_message :error, 'User is not associated with a card to initiate this transfer'
       return
     end
-    if from_account == :wallet and from_user.wallet.balance_value < self.amount
+    if target_account == :wallet and target_user.wallet.balance_value < self.amount
       add_message :error, 'Insufficient funds to initiate the transfer'
     end
-    unless (from_account == :wallet) and (to_account == :virtual_account or to_account == :wallet)
+    unless (target_account == :wallet) and (initiating_account == :virtual_account or initiating_account == :wallet)
       add_message :error, 'Invalid Request'
     end
   end
 
   def process
 
-    case from_account
+    payment_attributes = {}
+    payment_attributes[:initiating_user] = initiating_user
+    payment_attributes[:receiving_user] = target_user
+    payment_attributes[:date] = DateUtils.local_date
+    payment_attributes[:note] = params[:note]
+    payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+
+    case target_account
     when :wallet
 
-      if to_account == :wallet
+      if initiating_account == :wallet
         
-        payment_from_attributes = {}
-        payment_from_attributes[:initiating_user] = to_user
-        payment_from_attributes[:receiving_user] = from_user
-        payment_from_attributes[:date] = DateUtils.local_date
-        payment_from_attributes[:note] = params[:note]
-        payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+        if target_user.wallet.subtract_funds(self.amount)
+          initiating_user.wallet.add_funds(self.amount)
 
-        payment_to_attributes = {}
-        payment_to_attributes[:initiating_user] = to_user
-        payment_to_attributes[:receiving_user] = from_user
-        payment_to_attributes[:date] = DateUtils.local_date
-        payment_to_attributes[:note] = params[:note]
-        payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
-
-        if from_user.wallet.subtract_funds(self.amount)
-          to_user.wallet.add_funds(self.amount)
-
-          payment_from_attributes[:payment_type_id] = PaymentType.id_for(:receive_debit_from_wallet_to_wallet)
-          from_user.payments.create payment_from_attributes
-
-          payment_to_attributes[:payment_type_id] = PaymentType.id_for(:initiate_debit_from_wallet_to_wallet)
-          to_user.payments.create payment_to_attributes
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_wallet_to_wallet)
+          Payment.create payment_attributes
         else
-          add_message :error, from_user.wallet.errors.full_messages
+          add_message :error, target_user.wallet.errors.full_messages
         end
 
-      elsif to_account == :virtual_account
+      elsif initiating_account == :virtual_account
 
-        payment_attributes = {}
-        payment_attributes[:initiating_user] = to_user
-        payment_attributes[:receiving_user] = from_user
-        payment_attributes[:date] = DateUtils.local_date
-        payment_attributes[:note] = params[:note]
-        payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
-
-        if from_user.wallet.subtract_funds(self.amount)
+        if target_user.wallet.subtract_funds(self.amount)
           user.company.account.funds_debited_from_wallet(self.amount)
 
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:initiate_debit_from_wallet_to_virtual_account)
-          to_user.payments.create payment_attributes
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_wallet_to_virtual_account)
+          Payment.create payment_attributes
         else
-          add_message :error, to_user.wallet.errors.full_messages
+          add_message :error, initiating_user.wallet.errors.full_messages
         end
 
       end

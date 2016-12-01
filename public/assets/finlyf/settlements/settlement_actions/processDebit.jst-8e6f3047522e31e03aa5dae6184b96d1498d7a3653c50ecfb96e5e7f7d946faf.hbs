@@ -1,0 +1,161 @@
+<div class="modal-dialog" role="document" style="width: 60%;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Debit</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row no-margin">
+        <div class="col-sm-12 no-padding" style="border: 1px solid #A0A8DB; border-radius: 2px 2px 0 0; margin-bottom: 10px;">
+          <div class="row no-margin">
+            <h4 class="no-margin" style="background: #A0A8DB; padding: 10px;">Selected User Details</h4>
+          </div>
+          <div class="row no-margin">
+            <div class="col-sm-12 no-padding" style="padding: 10px 0;">
+              <div class="col-sm-6" style="margin-bottom: 10px;">
+                <div class="col-sm-5">User Name:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.name}}</label></div>
+              </div>
+              <div class="col-sm-6" style="margin-bottom: 10px;">
+                <div class="col-sm-5">Mobile Number:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.mobile_number}}</label></div>
+              </div>
+              <div class="col-sm-6">
+                <div class="col-sm-5">Email:</div>
+                <div class="col-sm-7"><label>{{summary.user_details.email}}</label></div>
+              </div>
+            </div>  
+          </div>
+        </div>
+      </div>
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default settlement-step-1 active" data-step="1" data-navigate="1">
+          <div class="panel-heading" role="tab" id="headingOne">
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Please Select Debit Type</span>
+                  
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
+          </div>
+          <div id="collapse-step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+              <div class="settlement-action-types col-sm-6">
+                <ul class="settlement-actions">
+                  {{#if summary.actions.debit_cash_advance}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action' data-action-type="debit_cash_advance"/> Debit Advanced Funds
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw funds back from User's Finly Account to Company Account.
+                        </div>
+                      </div>
+                    </li>
+                  {{/if}}
+
+                  {{#if summary.actions.debit_card_to_wallet}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_wallet" /> Debit from Card to Finly Account
+                      </label>
+                      <label class="hidden">Debit from User's Card to Your Finly Account.</label>
+                    </li> 
+                  {{/if}}
+
+                  {{#if summary.actions.debit_wallet_to_wallet}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from User's Finly Account to Your Finly Account
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from User's Finly Account to My Finly Account.
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+
+                  {{#if summary.actions.debit_wallet_to_virtual_account}}
+                    <li>
+                      <label>
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_virtual_account" /> Debit from User's Finly Account to Company Credits
+                      </label>
+                      <div class="action-definition hidden">
+                        <div class="bs-callout bs-callout-primary">
+                          Withdraw from User's Finly Account Back into Company Account.
+                        </div>
+                      </div>
+                    </li> 
+                  {{/if}}
+                </ul>
+              </div>
+
+              <div class="col-sm-6 settlement-action-definition" data-definition-type="debit">
+                <h4 class="text-center">Withdraw Cash from User.</h4>
+              </div>
+            </div><!-- panel-body -->
+          </div>
+        </div>
+        <div class="panel panel-default settlement-step-2" data-step="2" data-navigate="0">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Please Select Debit Type</span>
+                  
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
+          </div>
+          <div id="collapse-step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              {{!-- Content --}}
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default settlement-step-3" data-step="3" data-navigate="0">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <div class="row no-margin" style="padding: 0 20px;">
+              <div class="col-sm-6 no-padding">
+                <h4 class="step-title">
+                  <i class="fa fa-plus"></i><i class="fa fa-minus"></i>&nbsp;&nbsp;
+                  <span class="title">Confirmation</span>
+                  {{!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-step-1" aria-expanded="true" aria-controls="collapseOne">
+                    Please Select Credit Type
+                  </a> --}}
+                </h4>
+              </div>
+              <div class="col-sm-6 no-padding">
+                <h4 class="text-right"></h4>
+              </div>
+            </div>
+          </div>
+          <div id="collapse-step-3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+              {{!-- Content --}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

@@ -1,10 +1,10 @@
-
 # config valid only for current version of Capistrano
 lock '3.6.1'
 
-
 set :application, 'finly-server'
-set :repo_url, 'git@bitbucket.org:finlycore/finly-server.git'
+
+set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
+
 set :branch, ENV['BRANCH'] || :master
 set :deploy_to, '/home/deploy/finly-server'
 set :pty, true
@@ -30,7 +30,6 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
-
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp

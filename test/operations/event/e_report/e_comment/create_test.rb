@@ -19,7 +19,7 @@ class CommentTest < ActiveSupport::TestCase
     @report.stubs(:comments => stub(:last => ReportComment.new(user: @manager,
                                                                report_comment_action_id: ReportCommentAction.id_for(:report_comment), 
                                                                content: content)))
-    @report.stubs(:associated_users).returns([@owner, @manager, @second_manager, @finance_manager])
+    @report.stubs(:associated_users).returns(User.with_id([@owner.id, @manager.id, @second_manager.id, @finance_manager.id]))
 
     response = nil
     event = Event::EReport::EComment::Create.new(@finance_manager, report: @report)
