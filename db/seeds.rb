@@ -526,7 +526,8 @@ u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "
            }
 
   5.times do
-    mr = MoneyRequest::Create.(user, params)
+    mr = MoneyRequest::Create.(user, params).money_request
+    MoneyRequest::Submit.(user, {id: mr.id})
   end
 
 end
@@ -572,7 +573,8 @@ end
   }
 
   5.times do
-    mr = MoneyRequest::Create.(user, params)
+    mr = MoneyRequest::Create.(user, params).money_request
+    MoneyRequest::Submit.(user, {id: mr.id})
   end
 end
 
