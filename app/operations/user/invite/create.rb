@@ -18,14 +18,14 @@ class User::Invite::Create < User::Invite::Base
     self.type = params[:type]
 
     case type
-      when 'mobile'
-        self.numbers = invite_params[:mobile_number].split(',').collect(&:strip) rescue nil
+      when 'mobile','1'
+        self.numbers = invite_params[:mobile_number].delete(' ').split(',').collect(&:strip) rescue nil
         if self.numbers.present?
           self.numbers.compact!
           self.numbers.uniq!
         end
-      when 'email'
-        self.emails = invite_params[:email].split(',').collect(&:strip) rescue nil
+      when 'email','2'
+        self.emails = invite_params[:email].delete(' ').split(',').collect(&:strip) rescue nil
         if self.emails.present?
           self.emails.compact!
           self.emails.uniq!
@@ -206,7 +206,6 @@ class User::Invite::Create < User::Invite::Base
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
         self.invited_users << User.invite!(invite_params, self.user) do |u|
-          u.invitation_note = params[:pending_invite][:note]
           # todo - explicitly send otp to this particular user
         end
       end
@@ -238,11 +237,11 @@ class User::Invite::Create < User::Invite::Base
   private
 
   def mobile_invite?
-    params[:mobile].present?
+    params[:type] == 'mobile'
   end
 
   def email_invite?
-    params[:email].present?
+    params[:type] == 'email'
   end
 
 end

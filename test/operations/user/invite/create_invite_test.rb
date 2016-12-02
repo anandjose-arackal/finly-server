@@ -38,6 +38,13 @@ class CreateInviteTest < ActiveSupport::TestCase
                             }
   end
 
+  # test "testing mocha expects" do
+  #   u = User.find(2)
+  #   User.expects(:find).with(2).returns(@admin)
+  #   assert_not_equal u.id, @admin.id
+  #   assert_equal @admin.id, User.find(2).id
+  # end
+
   test "admins can invite new users into the system with a policy" do
     user_invite_op = User::Invite::Create.new(@admin, @invite_params)
     assert_difference 'User.count', 1 do
@@ -109,7 +116,7 @@ class CreateInviteTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
-    assert_equal "User already invited: manager@finlytest.io", @result.messages[:error].first
+    assert_equal "Following emails are already invited: manager@finlytest.io", @result.messages[:error].first
   end
 
   test "cannot invite a user without a valid company ID" do
