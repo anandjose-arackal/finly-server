@@ -473,25 +473,25 @@ finance_manager = User.create(company: c2, first_name: "Finance", last_name: "Su
                                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
 u << User.create(company: c2, first_name: "Sam", last_name: "Anderson", email: "sam@finlyexpense.io",
-                password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
-                role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-                                          {user_role_id: UserRole.manager_id},
-                                          {user_role_id: UserRole.finance_manager_id},
-                                          {user_role_id: UserRole.employee_id}],
-                team_mapping_attributes: [{default: true, manager: manager, finance_manager: finance_manager}],
-                profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                     address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                 password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
+                 role_mapping_attributes: [{user_role_id: UserRole.admin_id},
+                                           {user_role_id: UserRole.manager_id},
+                                           {user_role_id: UserRole.finance_manager_id},
+                                           {user_role_id: UserRole.employee_id}],
+                 team_mapping_attributes: [{default: true, manager: manager, finance_manager: finance_manager}],
+                 profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                      address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
 p = Policy::Create.(u[0], {view: 'admin', name: "Bangalore team"}).policies.last
 
 
 3.times do |pos|
   u << User.create(company: c2, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlyexpense.io",
-                  password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
-                  role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-                  team_mapping_attributes: [{default: true, manager: u[0]}],
-                  profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c2.id, mobile_number: random_mobile_number,
+                   role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
+                   team_mapping_attributes: [{default: true, manager: u[0]}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   # creating expenses for these employees
   user = u.last
@@ -519,18 +519,17 @@ p = Policy::Create.(u[0], {view: 'admin', name: "Bangalore team"}).policies.last
 
   # creating advance requests
 
-  params = {money_request: {name: "#{Faker::Commerce.product_name}",
-                            required_by_date: "01-06-2016",
-                            items_attributes: [{category_id: random_integer(l, h),
-                                               amount_attributes: {value: random_integer(20, 150),
-                                                                   currency_id: 1}},
-                                               category_id: random_integer(l, h),
-                                               amount_attributes: {value: random_integer(100, 500),
-                                                                   currency_id: 1 }]
-                           }
-           }
-
   5.times do
+    params = {money_request: {name: "#{Faker::Commerce.product_name}",
+                              required_by_date: "01-06-2016",
+                              items_attributes: [{category_id: random_integer(l, h),
+                                                  amount_attributes: {value: random_integer(20, 150),
+                                                                      currency_id: 1}},
+                                                 category_id: random_integer(l, h),
+                                                 amount_attributes: {value: random_integer(100, 500),
+                                                                     currency_id: 1 }]
+                              }
+              }
     mr = MoneyRequest::Create.(user, params).money_request
     MoneyRequest::Submit.(user, {id: mr.id})
   end
@@ -568,19 +567,18 @@ end
     Report::Submit.(user, {report_id: report.id})
   end
 
-  # creating junk money requests
-  params = {money_request: {name: "#{Faker::Commerce.product_name}",
-                            required_by_date: "01-06-2016",
-                            items_attributes: [{category_id: random_integer(l, h),
-                                                amount_attributes: {value: random_integer(20, 150),
-                                                                    currency_id: 1}},
-                                               category_id: random_integer(l, h),
-                                               amount_attributes: {value: random_integer(100, 500),
-                                                                   currency_id: 1 }]
-  }
-  }
-
   5.times do
+    # creating junk money requests
+    params = {money_request: {name: "#{Faker::Commerce.product_name}",
+                              required_by_date: "01-06-2016",
+                              items_attributes: [{category_id: random_integer(l, h),
+                                                  amount_attributes: {value: random_integer(20, 150),
+                                                                      currency_id: 1}},
+                                                 category_id: random_integer(l, h),
+                                                 amount_attributes: {value: random_integer(100, 500),
+                                                                     currency_id: 1 }]
+                              }
+              }
     mr = MoneyRequest::Create.(user, params).money_request
     MoneyRequest::Submit.(user, {id: mr.id})
   end
@@ -641,7 +639,7 @@ end
                   transaction_type: data[9],
                   serial_id: data[10],
                   product_code: data[11]
-  }
+                  }
 
   trans = Card::Transaction::Create.(trans_params).transaction
 
@@ -666,18 +664,17 @@ user = u[0]
   Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
 end
 
-params = {money_request: {name: "#{Faker::Commerce.product_name}",
-                          required_by_date: "01-06-2016",
-                          items_attributes: [{category_id: random_integer(l, h),
-                                              amount_attributes: {value: random_integer(20, 150),
-                                                                  currency_id: 1}},
-                                             category_id: random_integer(l, h),
-                                             amount_attributes: {value: random_integer(100, 500),
-                                                                 currency_id: 1 }]
-                        }
-          }
-
 15.times do
+  params = {money_request: {name: "#{Faker::Commerce.product_name}",
+                            required_by_date: "01-06-2016",
+                            items_attributes: [{category_id: random_integer(l, h),
+                                                amount_attributes: {value: random_integer(20, 150),
+                                                                    currency_id: 1}},
+                                               category_id: random_integer(l, h),
+                                               amount_attributes: {value: random_integer(100, 500),
+                                                                   currency_id: 1 }]
+                            }
+            }
   mr = MoneyRequest::Create.(user, params)
 end
 
@@ -690,4 +687,3 @@ c.users.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 
 end
-
