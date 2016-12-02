@@ -7,10 +7,10 @@ class CommentTest < ActiveSupport::TestCase
     Sidekiq.redis { |conn| conn.flushdb }
 
     @report = Report.first
-    @owner = User.last
-    @manager = User.only_managers.first
-    @second_manager = User.only_managers.second
-    @finance_manager = User.only_finance_managers.last
+    @owner = users(:employee)
+    @manager = users(:manager)
+    @second_manager = users(:second_manager)
+    @finance_manager = users(:finance_manager)
     @report.stubs(:user).returns(@owner)
   end
 

@@ -3,7 +3,7 @@ require 'test_helper'
 class AutoSubmitConfigurationUpdateTest < ActiveSupport::TestCase
 
   def setup
-    @current_user = users(:employee)
+    @current_user = users(:admin)
     @updating_user = users(:manager)
   end
 

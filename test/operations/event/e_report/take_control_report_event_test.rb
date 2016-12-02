@@ -7,9 +7,9 @@ class TakeControlReportEventTest < ActiveSupport::TestCase
     Sidekiq.redis { |conn| conn.flushdb }
 
     @report = Report.first
-    @owner = User.last
-    @admin = User.only_admins.first
-    @manager = User.only_managers.last
+    @owner = users(:employee)
+    @admin = users(:admin)
+    @manager = users(:manager)
     @report.stubs(:user).returns(@owner)
   end
 

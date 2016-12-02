@@ -65,7 +65,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     report = result.params[:report]
     assert report.present?
     assert report.approved?
-    assert_equal report.controlling_user, nil
+    assert_nil report.controlling_user
   end
 
   test 'if no manager is assigned, auto submitted report should be marked as closed if user has no pending reimbursements' do
@@ -83,7 +83,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     report = result.params[:report]
     assert report.present?
     assert report.closed?
-    assert_equal report.controlling_user, nil
+    assert_nil report.controlling_user
   end
 
   test 'Auto submit should submit all unreported expenses (Manual + Card) of the user if "Only Card Expenses" is not set' do
