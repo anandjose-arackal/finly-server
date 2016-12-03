@@ -89,3 +89,5 @@ Rails.application.configure do
   config.paperclip_defaults = {:url => "/images/:class/:attachment/:id_partition/:style/:filename",
                                :path => "/images/:class/:attachment/:id_partition/:style/:filename"}
 end
+
+ActionController::Base.allow_forgery_protection = false
