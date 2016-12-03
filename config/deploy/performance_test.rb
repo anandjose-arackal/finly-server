@@ -8,7 +8,7 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 server '54.169.130.78', user: 'centos', roles: %w{web app db}
-set :stage, 'production'
+set :stage, 'performance_test'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.3.1' # Edit this if you are using MRI Ruby
