@@ -205,8 +205,10 @@ class User::Invite::Create < User::Invite::Base
         invite_params[:mobile_number] = number
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
+        # send Otp to eah of the numbers
         self.invited_users << User.invite!(invite_params, self.user) do |u|
-          # todo - explicitly send otp to this particular user
+          u.skip_invitation = true
+          self.invited_users << User::Verification::Otp::Create.(u, params)
         end
       end
     end
