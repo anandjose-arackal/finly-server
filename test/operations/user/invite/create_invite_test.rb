@@ -20,9 +20,30 @@ class CreateInviteTest < ActiveSupport::TestCase
                                       },
                       admin: "1",
                       manager: "0",
-                      finance_manager: "0"
+                      finance_manager: "0",
+                      type: 'email'
                      }
+
+    @mobile_invite_params = {pending_invite: { company_id: 1,
+                                               mobile_number: "8105739684, 8052525252",
+                                               note: "Test note.",
+                                               team_mapping_attributes: {manager_id: @manager.id,
+                                                                         finance_manager_id: @finance_manager.id},
+                                               policy_id: @policy.id
+                                              },
+                             admin: "1",
+                             manager: "0",
+                             finance_manager: "0",
+                             type: 'mobile'
+                            }
   end
+
+  # test "testing mocha expects" do
+  #   u = User.find(2)
+  #   User.expects(:find).with(2).returns(@admin)
+  #   assert_not_equal u.id, @admin.id
+  #   assert_equal @admin.id, User.find(2).id
+  # end
 
   test "admins can invite new users into the system with a policy" do
     user_invite_op = User::Invite::Create.new(@admin, @invite_params)
@@ -95,7 +116,7 @@ class CreateInviteTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
-    assert_equal "User already invited: manager@finlytest.io", @result.messages[:error].first
+    assert_equal "Following emails are already invited: manager@finlytest.io", @result.messages[:error].first
   end
 
   test "cannot invite a user without a valid company ID" do
@@ -170,6 +191,10 @@ class CreateInviteTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
+  end
+
+  test "admin can invite a user with just a mobile number into the system" do
+
   end
 
 end

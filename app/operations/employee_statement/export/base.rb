@@ -18,6 +18,10 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
     super()
   end
 
+  def validate
+
+  end
+
 
   def retrieve_transaction_type(transaction)
     if transaction.transaction_type == "Credit"
@@ -30,6 +34,14 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
       else
         return "Online Transaction"
       end
+    end
+  end
+
+  def retrieve_merchant_name(transaction)
+    if transaction.transaction_type == "Debit"
+      return transaction.merchant_name
+    else
+      return "N/A"
     end
   end
 
@@ -49,7 +61,7 @@ class EmployeeStatement::Export::Base < EmployeeStatement::Base
     if expense.expense_status_id == ExpenseStatus.unreported_id or expense.expense_status_id == ExpenseStatus.unsubmitted_id
       return "Unverified"
     elsif expense.expense_status_id == ExpenseStatus.submitted_id
-      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or report.reimbursement_confirmed?
+      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or expense.report.reimbursement_confirmed?
         return "Verified"
       else
         return "Unverified"

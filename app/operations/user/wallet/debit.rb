@@ -75,8 +75,8 @@ class User::Wallet::Debit < User::Wallet::Base
         payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
         payment_to_attributes = {}
-        payment_to_attributes[:initiating_user] = from_user
-        payment_to_attributes[:receiving_user] = to_user
+        payment_to_attributes[:initiating_user] = to_user
+        payment_to_attributes[:receiving_user] = from_user
         payment_to_attributes[:date] = DateUtils.local_date
         payment_to_attributes[:note] = params[:note]
         payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}

@@ -108,7 +108,7 @@ class FinlyF.Views.Statement extends Backbone.View
     target = e.currentTarget
 
     export_type = $(target).attr('data-export-type')
-    url = "/statements/" + @user + '.' + export_type + "?"
+    url = "/export/" + @user + "/statements" + '.' + export_type + "?filter_date_from=" + @params.filter_date_from + "&filter_date_to=" + @params.filter_date_to
     window.open(url,'_blank');
 
   formatDate: (d) ->

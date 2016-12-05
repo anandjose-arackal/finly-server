@@ -19,6 +19,9 @@
 #
 
 
+
+
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -228,6 +231,45 @@ class Expense < ActiveRecord::Base
     expense_status_id == ExpenseStatus.rejected_id
   end
 
+  # method to update report comments
+  def update_report_comments(action_user, editable_attributes = {})
+    if self.report_id
+      report = self.report
+      # check if comment should be added to the report
+      if report.retracted? or report.rejected? or report.processing?
+        editable_attributes.each do |key, value|
+          if key == :receipt
+            if value > self.receipts.count
+              # i.e. if a receipt was removed
+              comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_detach_receipt),
+                                              user_id: action_user.id,
+                                              expense_id: self.id
+              )
+            elsif value < self.receipts.count
+              # i.e. if a receipt was added
+              comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_attach_receipt),
+                                              user_id: action_user.id,
+                                              expense_id: self.id
+              )
+            else
+              # todo implement an update receipt action
+            end
+            next
+          end
+          if self.send(key) != value
+            comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_update),
+                                            user_id: action_user.id,
+                                            updated_field: key.to_s.humanize,
+                                            updated_from: value,
+                                            updated_to: self.send(key),
+                                            expense_id: self.id
+                                            )
+          end
+        end
+      end
+    end
+  end
+
   private
 
   # only employees can create an expense
@@ -244,15 +286,6 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  # # ensuring the report is either open or retracted before allowing editing of expense
-  # def report_status
-  #   if self.report_id
-  #     report = self.report
-  #     unless report.open? or report.retracted? or report.rejected?
-  #       errors.add(:report, 'cannot be edited in this state')
-  #     end
-  #   end
-  # end
 
   def valid_expense_type
     case expense_type_id

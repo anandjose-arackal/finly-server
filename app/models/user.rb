@@ -45,13 +45,12 @@
 
 
 
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :invitable, :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable, :confirmable, :lockable
+         :recoverable, :rememberable, :trackable, :confirmable, :lockable
 
   devise :database_authenticatable, :validatable, password_length: 8..128
 
@@ -88,6 +87,7 @@ class User < ActiveRecord::Base
   has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
+  has_one :auto_submit_config, as: :submitable
 
   has_many :cards
   has_many :card_transactions
@@ -106,6 +106,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
+  accepts_nested_attributes_for :cards
 
   delegate :employee_id, to: :profile
   delegate :payroll_id, to: :profile
@@ -114,13 +115,14 @@ class User < ActiveRecord::Base
   has_paper_trail
 
   validates :company_id, presence: true
-  validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}
+  validates :email, uniqueness: {case_sensitive: false}
   validates :name, presence: true
   validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :maiden_name, length: {maximum: 30}
   validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, length: {is: 10}, format: Constants::VALID_MOBILE_NUMBER, uniqueness: {case_sensitive: false}
+  validates :mobile_number, presence: true, format: Constants::VALID_MOBILE_NUMBER, uniqueness: true
 
+  validate :email_format
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
@@ -177,6 +179,7 @@ class User < ActiveRecord::Base
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
+    self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false).save
   end
 
   def name
@@ -253,6 +256,11 @@ class User < ActiveRecord::Base
     super && self.active # i.e. super && self.is_active
   end
 
+  # overriding the requirement for emails by devise
+  def email_required?
+    false
+  end
+
   def inactive_message
     "Sorry, this account has been deactivated."
   end
@@ -298,6 +306,10 @@ class User < ActiveRecord::Base
   end
 
   private
+
+  def email_format
+
+  end
   # def valid_role
   #   if self.role_mapping.count == 0
   #     errors.add(:user, "must be assigned a role")

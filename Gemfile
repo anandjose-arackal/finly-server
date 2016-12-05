@@ -25,6 +25,8 @@ gem 'mocha'
 gem 'figaro'
 gem 'puma'
 
+gem 'crono'
+
 # gem to import from excel
 gem 'roo'
 gem 'roo-xls'

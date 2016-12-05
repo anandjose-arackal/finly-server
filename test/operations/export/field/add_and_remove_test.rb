@@ -14,7 +14,7 @@ class AddAndRemoveTest < ActiveSupport::TestCase
   end
 
   test "admins creating a new expoert field" do
-    create_field_op = Export::Field::Create.new(@admin, @export_field_params)
+    create_field_op = Company::ExportPreferences::Create.new(@admin, @export_field_params)
     assert_difference '@company.export_preferences.count', 1 do
       @result = create_field_op.run
     end
@@ -25,7 +25,7 @@ class AddAndRemoveTest < ActiveSupport::TestCase
   end
 
   test "non admins cannot create new export fields" do
-    create_field_op = Export::Field::Create.new(@manager, @export_field_params)
+    create_field_op = Company::ExportPreferences::Create.new(@manager, @export_field_params)
     assert_no_difference '@company.export_preferences.count', 1 do
       begin
         @result = create_field_op.run
@@ -37,7 +37,7 @@ class AddAndRemoveTest < ActiveSupport::TestCase
   end
 
   test "admins destroying a particular export field" do
-    destroy_op = Export::Field::Destroy.new(@admin, id: @preference.id)
+    destroy_op = Company::ExportPreferences::Destroy.new(@admin, id: @preference.id)
     assert_difference '@company.export_preferences.count', -1 do
       @result = destroy_op.run
     end
@@ -46,7 +46,7 @@ class AddAndRemoveTest < ActiveSupport::TestCase
   end
 
   test "non admins cannot destroy an export field" do
-    destroy_op = Export::Field::Destroy.new(@manager, {export_field_id: @preference.id})
+    destroy_op = Company::ExportPreferences::Destroy.new(@manager, {export_field_id: @preference.id})
     assert_no_difference '@company.export_preferences.count' do
       begin
         @result = destroy_op.run

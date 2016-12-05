@@ -52,7 +52,42 @@ employee_employee:
 
 inactive_employee_employee:
   id: 8
-  user_id: 7
+  user_id: 8
   user_role_id: 4
+
+9:
+  id: 9
+  user_id: 9
+  user_role_id: 4
+
+10:
+  id: 10
+  user_id: 10
+  user_role_id: 4
+
+11:
+  id: 11
+  user_id: 11
+  user_role_id: 4
+
+12:
+  id: 12
+  user_id: 8
+  user_role_id: 3
+
+13:
+  id: 13
+  user_id: 9
+  user_role_id: 2
+
+14:
+  id: 14
+  user_id: 10
+  user_role_id: 3
+
+15:
+  id: 15
+  user_id: 11
+  user_role_id: 2
 
 #  column: value

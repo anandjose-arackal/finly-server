@@ -148,13 +148,13 @@
         
         <tr role="row">
           <td></td>
-          <td>Paid via Cash/ NEFT</td>
+          <td>Paid to employee via Cash/ NEFT</td>
           <td>{{item.amount_transacted.paid_to_employee}}</td>
         </tr>
         <tr role="row">
           <td></td>
-          <td><span>Received Cash/ NEFT</span></td>
-          <td>{{item.amount_transacted.paid_to_employee}}</td>
+          <td><span>Received from employee via Cash/ NEFT</span></td>
+          <td>{{item.amount_transacted.paid_by_employee}}</td>
         </tr>
         <tr role="row">
           <td></td>
@@ -262,12 +262,12 @@
         <tr role="row">
           <td><strong>Card Expenses in Processing</strong></td>
           <td>Pending Card Expenses</td>
-          <td>{{item.processing_card_expenses.pending_card_expenses}}</td>
+          <td>{{item.processing_expenses.pending_card_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>
           <td>Pending Cash Expenses</td>
-          <td>{{item.processing_card_expenses.pending_card_expenses}}</td>
+          <td>{{item.processing_expenses.pending_cash_expenses}}</td>
         </tr>
         <tr role="row">
           <td></td>

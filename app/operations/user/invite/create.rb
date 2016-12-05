@@ -1,15 +1,11 @@
 # action to invite a new user to the company
-# params:
-# invite:
-#       company_id:
-#       role_mapping_attributes:
-#       team_mapping_attributes:
-#
-
+# types:
+# email: comma separated emails
+# mobile: comma separated mobile numbers
 
 class User::Invite::Create < User::Invite::Base
 
-  attr_accessor :invited_users, :emails, :policy, :policy_id
+  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type
 
   def pre_validate
     if params.blank? or user.blank?
@@ -19,10 +15,23 @@ class User::Invite::Create < User::Invite::Base
 
   def init
     self.invite_params = create_invite_params
-    self.emails = invite_params[:email].split(',').collect(&:strip) rescue nil
-    if self.emails.present?
-      self.emails.compact!
-      self.emails.uniq!
+    self.type = params[:type]
+
+    case type
+      when 'mobile','1'
+        self.numbers = invite_params[:mobile_number].delete(' ').split(',').collect(&:strip) rescue nil
+        if self.numbers.present?
+          self.numbers.compact!
+          self.numbers.uniq!
+        end
+      when 'email','2'
+        self.emails = invite_params[:email].delete(' ').split(',').collect(&:strip) rescue nil
+        if self.emails.present?
+          self.emails.compact!
+          self.emails.uniq!
+        end
+      else
+        # do nothing
     end
   end
 
@@ -37,27 +46,54 @@ class User::Invite::Create < User::Invite::Base
       return false
     end
 
-    if self.emails.blank?
+    if mobile_invite? and self.numbers.blank?
       messages[:error] << 'User email is required for inviting users'
       return false
     end
 
-    violating_emails = []
-    self.emails.each do |email|
-      if (email =~ Constants::VALID_EMAIL_FORMAT).nil?
-        messages[:error] << "#{email} is not a valid email format"
+    if mobile_invite?
+      violating_mobile_numbers = []
+      self.numbers.each do |number|
+        if (number =~ Constants::VALID_MOBILE_NUMBER).nil?
+          messages[:error] << "#{number} is not a valid mobile number"
+          return false
+        end
+        if User.find_by_mobile_number(number).present?
+          violating_mobile_numbers << number
+        end
+      end
+      if violating_mobile_numbers.present?
+        messages[:error] << "Following numbers are already invited: #{violating_mobile_numbers.to_sentence}"
         return false
       end
-      if User.find_by_email(email).present?
-        violating_emails << email
+      if has_errors?
+        return false
       end
     end
-    if violating_emails.present?
-      messages[:error] << "User already invited: #{violating_emails.to_sentence}"
-      return false
-    end
-    if has_errors?
-      return false
+
+    if email_invite?
+      if email_invite? and self.emails.blank?
+        messages[:error] << 'User email is required for inviting users'
+        return false
+      end
+
+      violating_emails = []
+      self.emails.each do |email|
+        if (email =~ Constants::VALID_EMAIL_FORMAT).nil?
+          messages[:error] << "#{email} is not a valid email format"
+          return false
+        end
+        if User.find_by_email(email).present?
+          violating_emails << email
+        end
+      end
+      if violating_emails.present?
+        messages[:error] << "Following emails are already invited: #{violating_emails.to_sentence}"
+        return false
+      end
+      if has_errors?
+        return false
+      end
     end
 
     # checking validity of user role params
@@ -153,18 +189,34 @@ class User::Invite::Create < User::Invite::Base
 
   def process
     self.invited_users = []
-    emails.each do |email|
-      invite_params[:email] = email
-      invite_params[:first_name] = ''
-      invite_params[:last_name] = ''
-      self.invited_users << User.invite!(invite_params, self.user) do |u|
-        u.invitation_note = params[:pending_invite][:note]
+
+    # if it's an email invite, use the same olf technique of invitation
+    if email_invite?
+      emails.each do |email|
+        invite_params[:email] = email
+        invite_params[:first_name] = ''
+        invite_params[:last_name] = ''
+        self.invited_users << User.invite!(invite_params, self.user) do |u|
+          u.invitation_note = params[:pending_invite][:note]
+        end
+      end
+    elsif mobile_invite?
+      numbers.each do |number|
+        invite_params[:mobile_number] = number
+        invite_params[:first_name] = ''
+        invite_params[:last_name] = ''
+        # send Otp to eah of the numbers
+        self.invited_users << User.invite!(invite_params, self.user) do |u|
+          u.skip_invitation = true
+          self.invited_users << User::Verification::Otp::Create.(u, params)
+        end
       end
     end
 
     if invited_users.empty?
       messages[:error] << 'Invites failed. PLease try again'
     end
+    
   end
 
   def post_process
@@ -182,6 +234,16 @@ class User::Invite::Create < User::Invite::Base
       # adding the invitation note to the user
       messages[:success] << 'User successfully invited'
     end
+  end
+
+  private
+
+  def mobile_invite?
+    params[:type] == 'mobile'
+  end
+
+  def email_invite?
+    params[:type] == 'email'
   end
 
 end

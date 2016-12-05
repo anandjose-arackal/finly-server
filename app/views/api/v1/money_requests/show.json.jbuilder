@@ -1,23 +1,10 @@
 json.partial! 'money_request', money_request: @result.money_request
-json.manager_name @result.manager.name rescue nil
-json.finance_manager_name @result.finance_manager.name rescue nil
-json.total do
-  json.value @result.total
-  json.currency do
-    json.extract! Currency.first, :id, :country, :country_code, :symbol
-  end
-end
+json.manager_name @result.manager.present? ? @result.manager.name : ''
+json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
 json.actions do
-  json.take_control @result.actions[:take_control].present?
-  json.review @result.actions[:approve].present?
-  json.unapprove @result.actions[:unapprove].present?
-  json.reimburse @result.actions[:reimburse].present?
-  json.add_expenses @result.actions[:add_expenses].present?
-  json.delete @result.actions[:delete].present?
-  json.retract @result.actions[:retract].present?
-  json.reimbursement_confirm @result.actions[:reimbursement_confirm].present?
-  json.editable @result.actions[:editable].present?
-  json.submit @result.actions[:submit].present?
+  @result.actions.each do |key, value|
+    json.set! key, (value[:url].present? or value[:value].present?)
+  end
 end
 json.categories @result.items.each do |item|
   json.category do
@@ -37,3 +24,23 @@ json.comments @result.comments do |comment|
   json.user_name comment.user.name rescue nil
 end
 json.policies @result.policies, :id, :name
+
+json.forwardable_users do
+  forwardable_users = @result.forwardable_users
+  if forwardable_users.present?
+    json.array! forwardable_users.each do |item|
+      json.user do
+        user = item[:approver]
+        json.id user.id
+        json.name user.name
+        json.email user.email
+      end
+      json.user_role do
+        json.id item[:role_id]
+        json.name UserRole.name_for(item[:role_id])
+      end
+      json.position item[:pos]
+      json.is_reviewer item[:reviewer]
+    end
+  end
+end

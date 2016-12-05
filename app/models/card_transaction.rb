@@ -23,6 +23,7 @@
 #  expensed              :boolean          default(TRUE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
+#  expense_id            :integer
 #
 
 class CardTransaction < ActiveRecord::Base
@@ -41,6 +42,8 @@ class CardTransaction < ActiveRecord::Base
   accepts_nested_attributes_for :transaction_amount
   accepts_nested_attributes_for :card_amount
   accepts_nested_attributes_for :billing_amount
+
+  default_scope {order(transaction_timestamp: :desc)}
 
   scope :debits, -> {where transaction_type: "Debit"}
   scope :credits, -> {where transaction_type: "Credit"}

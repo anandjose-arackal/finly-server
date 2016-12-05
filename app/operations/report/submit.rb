@@ -7,7 +7,17 @@
 class Report::Submit < Report::Base
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
     [:employee]
+  end
+
+  def pre_validate
+    if params.blank?
+      add_message :error, 'Error loading configuration'
+    end
+    if user.blank? and not params[:auto_approve] and not params[:auto_submit]
+      add_message :error, 'User not found'
+    end
   end
 
   def init
@@ -18,12 +28,12 @@ class Report::Submit < Report::Base
   def validate
     # checking report status
     unless report.can_submit?
-      messages[:error] << 'Cannot submit this report'
+      add_message :error, 'Cannot submit this report'
       return false
     end
     # checking if the report has expenses
     unless report.expenses.present?
-      messages[:error] << 'Cannot submit an empty report'
+      add_message :error, 'Cannot submit an empty report'
     end
     # checking for blocking violations
     violations = Report::Violation.(user, report: report)
@@ -34,7 +44,7 @@ class Report::Submit < Report::Base
       end
     end
     if violations_present
-      messages[:error] << 'Reports with blocking violations cannot be submitted'
+      add_message :error, 'Reports with blocking violations cannot be submitted'
     end
   end
 
@@ -64,9 +74,9 @@ class Report::Submit < Report::Base
     # If no manager assigned, auto approve the report
     if manager.blank?
       # call the approve class with the right parameters
-      approve_op = Report::Approve.new(user, {report_id: report.id, auto_approve: true})
+      approve_op = Report::Approve.new(user, {report: report, auto_approve: true})
       unless approve_op.run.success?
-        self.messages[:error] = messages[:error].merge approve_op.errors
+        self.add_message :error, approve_op.messages[:error]
         return false
       end
       report.reload
@@ -92,7 +102,7 @@ class Report::Submit < Report::Base
       end
       return true
     end
-    messages[:error] = report.errors.full_messages
+    add_message :error, report.errors.full_messages
   end
 
   def post_process
@@ -101,7 +111,8 @@ class Report::Submit < Report::Base
 
     Event::EReport::Submit.(user, report: report)
 
-    messages[:success] << "Report Submitted."
+    add_message :success, 'Report Submitted'
+
   end
 
 end

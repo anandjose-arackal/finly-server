@@ -32,9 +32,7 @@ class User::Wallet::Credit < User::Wallet::Base
       if params[:to_user_id].to_i == user.id
         self.to_user = user
       else
-        op= User::Team::Index.new(user, params)
-        users = op.run
-        self.to_user = (users.with_id(params[:to_user_id]).first rescue nil) if op.success? and users.present?
+        self.to_user = User::Team::Index.(user, params).with_id(params[:to_user_id]).first rescue nil
       end
     end
   end
@@ -112,8 +110,8 @@ class User::Wallet::Credit < User::Wallet::Base
       end
     when :wallet
       payment_from_attributes = {}
-      payment_from_attributes[:initiating_user] = to_user
-      payment_from_attributes[:receiving_user] = from_user
+      payment_from_attributes[:initiating_user] = from_user
+      payment_from_attributes[:receiving_user] = to_user
       payment_from_attributes[:date] = DateUtils.local_date
       payment_from_attributes[:note] = params[:note]
       payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}

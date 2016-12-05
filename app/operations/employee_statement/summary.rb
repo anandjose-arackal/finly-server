@@ -16,9 +16,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
   end
 
   def validate
-    if end_date > DateUtils.local_date
-      messages[:error] << "End Date cannot be in the future"
-    end
+
   end
 
   def process
@@ -76,9 +74,9 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     items[:unreported_card_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.unreported_id).joins(:amount).sum(:value)
 
     # items[:total_unverified_card_reversal] todo - need clarification from itzcash
-    items[:processing_card_expenses] = {}
-    items[:processing_card_expenses][:pending_card_expenses] = pending_card_expenses(selected_user)
-    items[:processing_card_expenses][:pending_cash_expenses] = pending_cash_expenses(selected_user)
+    items[:processing_expenses] = {}
+    items[:processing_expenses][:pending_card_expenses] = pending_card_expenses(selected_user)
+    items[:processing_expenses][:pending_cash_expenses] = pending_cash_expenses(selected_user)
   end
 
   def success
@@ -173,8 +171,8 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     unless date
       return result.balance.to_f
     end
-    card_expenses = user.card_transactions.debits.where('transaction_timestamp > ?', start_date).joins(:billing_amount).sum(:value)
-    card_load_amount = user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
+    card_expenses = selected_user.card_transactions.debits.where('transaction_timestamp > ?', start_date).joins(:billing_amount).sum(:value)
+    card_load_amount = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
                                                              PaymentType.id_for(:receive_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
     balance = result.balance.to_f + card_load_amount - card_expenses
     return balance
@@ -182,13 +180,13 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
 
   # todo - revisit this calculation
   def cash_in_hand_on_date(date = nil)
-    balance = user.cash_in_hand.value
+    balance = selected_user.cash_in_hand.value
     unless date
       return balance
     end
-    debt_clearances = user.payments.where('date > ?', end_date).where(payment_type_id: PaymentType.id_for(:debt_clearance)).joins(:amount).sum(:value)
-    added_cash_in_hand = user.payments.where('date > ?', end_date).where(payment_type_id: PaymentType.id_for(:advance)).joins(:amount).sum(:value)
-    accounted_reports = user.reports.where(report_status_id: [ReportStatus.approved_id, ReportStatus.closed_id]).where(accounted: true)
+    debt_clearances = selected_user.payments.where('date > ?', date).where(payment_type_id: PaymentType.id_for(:debt_clearance)).joins(:amount).sum(:value)
+    added_cash_in_hand = selected_user.payments.where('date > ?', date).where(payment_type_id: PaymentType.id_for(:advance)).joins(:amount).sum(:value)
+    accounted_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved_id, ReportStatus.closed_id]).where(accounted: true).where('accounted_at > ?', date)
     report_amount = 0
     accounted_reports.each do |report|
       report_amount += report.total_amount(:only_manual_expenses) - report.reimbursement_amount.value

@@ -129,8 +129,16 @@ end
 if Company.count == 0
   c = Company.create(name: 'Finly', d_code: 'D000000360')
   c.reload
+  Company.create(name: 'Dummy company')
 else
   c = Company.first
+end
+
+
+if Period.count == 0
+  Period::VALUES.each do |key, value|
+    Period.create id: value, name: key
+  end
 end
 
 if c.categories.count == 0
@@ -275,11 +283,12 @@ if RuleType.count == 0
   e = RuleType.create!(name: "Blocking")
 end
 
-if BudgetPeriod.count == 0
-  b = BudgetPeriod.create!(name: "Day")
-  b = BudgetPeriod.create!(name: "Week")
-  b = BudgetPeriod.create!(name: "Month")
-  b = BudgetPeriod.create!(name: "Year")
+if Period.count == 0
+  b = Period.create!(name: "Day")
+  b = Period.create!(name: "Week")
+  b = Period.create!(name: "Month")
+  b = Period.create!(name: "Quarter")
+  b = Period.create!(name: "Year")
 end
 
 p = Policy.find(3)
@@ -298,11 +307,11 @@ if p.rules_count == 0
   # setting monthly budget for category 1 as 100 in INR
   b = p.budget_rules.create!(amount_attributes: {value: 100, currency_id: 1},
                              category_id: 1,
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 1)
   # set monthly budget for all expenses as 150 INR
   b = p.budget_rules.create!(amount_attributes: {value: 150, currency_id: 1},
-                             budget_period_id: 3,
+                             period_id: 3,
                              rule_type_id: 2)
 end
 
@@ -404,10 +413,14 @@ if CardTransaction.count == 0
   User.all.each do |user|
     next unless user.cards.present?
     card = user.cards.first
-    10.times do
+    20.times do
 
+      trans_types = ["POS", "ATM", "Ecom"]
+      trans_modes = ["Debit", "Credit"]
+      from_date = Date.parse("01-01-2016 12:00:00")
+      to_date = DateTime.now
       random_amount = random_integer(50,200) + 0.1234
-      sample_msg_queue_entry = "321744RUPP00035088860000001306,28 Jun 2016 17:32:44,#{random_amount},#{random_amount + random(5,10)},173244,POS,OLCDCB_POSOFFUS,+EYYATTINKARA          THIRUVANANTHA  IN,91,Debit,#{card.proxy},RBLRUP"
+      sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
 
       data = sample_msg_queue_entry.split(",")
 
@@ -459,54 +472,50 @@ User.all.each do |user|
   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
 end
 
-if AdminUser.count == 0
-  # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-  AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
-end
-
-
-
-# creating Finly users and junk transaction data.
-# jouska = Company.create(name: 'Jouska')
-#   jouska.reload
-# # creating Jouska Tech users
-#   veekshith = User.create(name: "Veekshith Rai", email: "veekshith.rai@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                                {user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   vivek = User.create(name: "Vivek Bhat", email: "vivek@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-#                                                {user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   sreeram = User.create(name: "Sreeram N R", email: "sreeram.nr@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   abinash = User.create(name: "Abinash Kumar", email: "kumar.abinash@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-#   bala = User.create(name: "Balakumar Rajaram", email: "balakumar.rajaram@jouska.com",
-#                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: jouska.id, mobile_number: random_string_of_numbers(10),
-#                      role_mapping_attributes: [{user_role_id: UserRole.manager_id},
-#                                                {user_role_id: UserRole.finance_manager_id},
-#                                                {user_role_id: UserRole.employee_id}])
-
-# User.all.each do |user|
-#   user.confirm
-#   user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
-#
-#   number = "S0001774009#{(5 + index)}"
-#   user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-#                     card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+# if AdminUser.count == 0
+#   # creating admin panel users who can access admin panel
+#   AdminUser.create!(email: 'admin@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'sreeram@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+#   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 # end
+# User.all.each do |user|
+#     next unless user.cards.present?
+#     card = user.cards.first
+#     20.times do
+#
+#       trans_types = ["POS", "ATM", "Ecom"]
+#       trans_modes = ["Debit", "Credit"]
+#       from_date = Date.parse("01-01-2016 12:00:00")
+#       to_date = DateTime.now
+#       random_amount = random_integer(50,200) + 0.1234
+#       sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
+#
+#       data = sample_msg_queue_entry.split(",")
+#
+#       # for the split between merchant city and merchant name
+#       name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
+#       merchant_name = name_city[0]
+#       merchant_city = name_city[1]
+#
+#       trans_params = {reference_id: data[0],
+#                       transaction_timestamp: data[1],
+#                       transaction_amount_attributes: {value: data[2], currency_id: 1},
+#                       billing_amount_attributes: {value: data[3], currency_id: 1},
+#                       auth_transaction_id: data[4],
+#                       transaction_mode: data[5],
+#                       itzcash_merchant_key: data[6],
+#                       merchant_name: merchant_name,
+#                       merchant_city: merchant_city,
+#                       response_code: data[8],
+#                       transaction_type: data[9],
+#                       serial_id: data[10],
+#                       product_code: data[11]
+#       }
+#
+#       trans = Card::Transaction::Create.(trans_params).transaction
+#     end
+# end
+
+

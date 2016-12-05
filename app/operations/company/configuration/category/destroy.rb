@@ -31,7 +31,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
   end
 
   def post_process
-    messages[:success] << 'Category destroyed'
+    add_message :success, 'Category destroyed'
   end
 
 end
