@@ -593,10 +593,28 @@ class FinlyF.Views.User extends Backbone.View
     target = e.currentTarget
 
     $(target).attr('disabled', true)
+    user_id = @model.get('id')
 
-    user_id = $(target).attr('data-user-id')
+    modal = $(@el).find('#modal-sub-mp')
+    $(modal).html("")
+    $(modal).modal('show')
 
-    # $.ajax()
+
+    $.ajax({
+      url: '/pending_invites/activate_employee'
+      data: {
+        user_id: user_id
+      },
+      dataType: 'html',
+      success: (res) ->
+        $(modal).html(res)
+
+      error: (err) ->
+        console.log "Err", err
+    })
+
+
+
 
 
 #Features

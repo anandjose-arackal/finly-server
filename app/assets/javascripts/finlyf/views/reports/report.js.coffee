@@ -225,7 +225,7 @@ class FinlyF.Views.Report extends Backbone.View
     report_id = $(e.currentTarget).attr('data-item-id')
     expense_view = new FinlyF.Views.ExpensesIndex({
       indexOnly: true
-      parent: @
+      # parent: @
     })
     $(@el).find("#modal-mp").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
@@ -278,7 +278,7 @@ class FinlyF.Views.Report extends Backbone.View
           $(modal).modal('hide')
           $(modal).html("")
           _this.model.fetch({ data: {view: _this.current_view}})
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
         console.log "Error", err
     })
@@ -422,7 +422,7 @@ class FinlyF.Views.Report extends Backbone.View
           _this.model.fetch({
             data: {view: _this.current_view}
           })
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         else
           _this.model.fetch({
             data: {view: _this.current_view}
@@ -436,7 +436,7 @@ class FinlyF.Views.Report extends Backbone.View
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh-true")
       @model.fetch({ data: {view: _this.current_view }})
-      $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+      # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
     # console.log "Closed Bootstrap modal"
 
   deleteSub: (e) ->
@@ -453,7 +453,7 @@ class FinlyF.Views.Report extends Backbone.View
       success: (res)->
         FinlyF.snapNotify(res.messages)
         _this.model.fetch({ data: {view: _this.current_view}})
-        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
         console.log "Error", err
     })
@@ -471,7 +471,7 @@ class FinlyF.Views.Report extends Backbone.View
       view: @current_view
       report: true #will be removed
       screen: 'report'
-      parent: @
+      # parent: @
     })
     $(@el).find("#modal-mp").html(@templateShowExpense())
     $(@el).find("#modal-mp .modal-content .modal-body .row").html(preview_view.render().el)

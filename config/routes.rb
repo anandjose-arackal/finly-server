@@ -651,6 +651,8 @@ Rails.application.routes.draw do
   post 'import', to: 'users#import', as: :user_import
 
 
+  get 'pending_invites/activate_employee' => 'pending_invites#activate_employee'
+
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
   resources :pending_invites do
     patch 'accept', to: 'pending_invites#accept', as: :accept

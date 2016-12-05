@@ -69,6 +69,14 @@ class PendingInvitesController < ApplicationController
     end
   end
 
+  def activate_employee
+    @user = User.find(params[:user_id])
+    ap @user
+    respond_to do |format|
+      format.html {}
+    end
+  end
+
   private
   def updated_user_invite_params
     params.require(:pending_invite).permit(:email, :company_id, :finance_manager, :manager, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :team_mapping_id)
