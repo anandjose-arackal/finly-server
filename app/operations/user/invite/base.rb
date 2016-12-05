@@ -36,7 +36,7 @@ class User::Invite::Base < BaseOperation
     end
     params[:pending_invite][:team_mapping_attributes][:default] = true
     params[:pending_invite][:team_mapping_attributes] = [params[:pending_invite][:team_mapping_attributes]]
-    params.require(:pending_invite).permit(:email, :company_id, :policy_id, team_mapping_attributes: [:default, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id],
+    params.require(:pending_invite).permit(:email, :mobile, :mobile_number, :company_id, :policy_id, team_mapping_attributes: [:default, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id],
                                role_mapping_attributes: [:user_role_id])
   end
 

@@ -10,7 +10,6 @@ class MsgQueuePoller
 
     loop do
       message = client.receive
-      # puts message.body
 
       puts message.body
 

@@ -193,6 +193,10 @@ class CreateInviteTest < ActiveSupport::TestCase
     assert_not @result.messages[:error].empty?
   end
 
+  test "if users are being invited via mobile number, email doesn't have to be present" do
+
+  end
+
   test "admin can invite a user with just a mobile number into the system" do
 
   end

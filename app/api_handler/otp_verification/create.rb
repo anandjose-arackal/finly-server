@@ -1,5 +1,5 @@
 class OtpVerification::Create < OtpVerification::Base
-  attr_accessor :mobile_number, :status, :code, :otp
+  attr_accessor :mobile_number, :status, :code, :otp, :type
 
   def env_key
     'msg91_generate_otp'
@@ -11,11 +11,17 @@ class OtpVerification::Create < OtpVerification::Base
     end
   end
 
+  def init
+    super()
+    # "invitation" or "verification"
+    self.type = params['type']
+  end
+
   def process
     # post payload as JSON instead of "www-form-urlencoded" encoding:
     self.response = self.connection.post do |req|
       req.url path
-      req.headers['application-Key'] = '-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXa7hV1dQgYede4fqAltJYivA8Cia1IvrW0FzsNaUAUFCyTXDHO1IV5-Q63zwNbzxTFw=='
+      req.headers['application-Key'] = application_key
       req.body = "{ 'countryCode': '91', 'mobileNumber': '#{params[:mobile_number]}', 'getGeneratedOTP': true }"
     end
   end

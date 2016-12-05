@@ -15,11 +15,13 @@ class User::Invite::Create < User::Invite::Base
 
   def init
     self.invite_params = create_invite_params
-    self.type = params[:type]
+    self.type = params[:invite_by]
+    type == 'email' if type.nil?
 
     case type
       when 'mobile','1'
-        self.numbers = invite_params[:mobile_number].delete(' ').split(',').collect(&:strip) rescue nil
+        self.numbers = invite_params[:mobile].delete(' ').split(',').collect(&:strip) rescue nil
+        invite_params.delete(:mobile) # because mobile is not a field in the User model
         if self.numbers.present?
           self.numbers.compact!
           self.numbers.uniq!
@@ -205,16 +207,22 @@ class User::Invite::Create < User::Invite::Base
         invite_params[:mobile_number] = number
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
-        # send Otp to eah of the numbers
+        # invite all users into the system through devise
+        # todo - ultimate jugaad, figure out a way to do this more elegantly
+        invite_params[:email] = "test@test.com"
+        ####################################################################
         self.invited_users << User.invite!(invite_params, self.user) do |u|
           u.skip_invitation = true
-          self.invited_users << User::Verification::Otp::Create.(u, params)
+          u.update_attribute(:email, "")
+          # send welcome message to all invited users
+          WelcomeMessage::Create.(user, {mobile_number: numbers})
         end
+        debugger
       end
     end
 
     if invited_users.empty?
-      messages[:error] << 'Invites failed. PLease try again'
+      messages[:error] << 'Invites failed. Please try again'
     end
     
   end
@@ -239,11 +247,11 @@ class User::Invite::Create < User::Invite::Base
   private
 
   def mobile_invite?
-    params[:type] == 'mobile'
+    params[:invite_by] == 'mobile'
   end
 
   def email_invite?
-    params[:type] == 'email'
+    params[:invite_by] == 'email'
   end
 
 end

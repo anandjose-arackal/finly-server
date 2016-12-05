@@ -12,6 +12,9 @@ default: &default
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
+  msg91_welcome_message:
+    base: "https://control.msg91.com"
+    path: "api/sendhttp.php"
 
 development:
   <<: *default

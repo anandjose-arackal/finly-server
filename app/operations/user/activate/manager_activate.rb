@@ -1,4 +1,4 @@
-class Activate::ManagerActivate < ManagerActivate::Base
-
-
-end
+# class Activate::ManagerActivate < ManagerActivate::Base
+#
+#
+# end

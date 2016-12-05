@@ -115,7 +115,7 @@ class User < ActiveRecord::Base
   has_paper_trail
 
   validates :company_id, presence: true
-  validates :email, uniqueness: {case_sensitive: false}
+  validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
   validates :name, presence: true
   validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
   validates :maiden_name, length: {maximum: 30}
