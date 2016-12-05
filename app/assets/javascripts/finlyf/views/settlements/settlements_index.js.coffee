@@ -60,6 +60,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   templateNavbarMain: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main']
   templateNavbarMainPersonal: HandlebarsTemplates['finlyf/settlements/navbar/navbar_main_personal']
   templateSidebarPersonal: HandlebarsTemplates['finlyf/settlements/sidebar/sidebar_personal']
+  templateNavbarSidebar: HandlebarsTemplates['finlyf/settlements/navbar/navbar_sidebar']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -72,7 +73,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .navbar-view-type': 'changeView'
 
     #Filters
-    'click .btn-filter': 'filter'
     'click .user': 'userSettlements'
 
     # 'click .btn-process-reimburse': 'initReimburse'
@@ -115,6 +115,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     'click .panel-heading .row': 'showAccordionBody'
 
     'click .btn-employee-statement': 'userStatements'
+
+    # Temp Dropdown Filters
+    'click .btn-filter': 'filter'
 
 
   initialize: (options) ->
@@ -217,6 +220,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(@el).html(@templateSkeletonAdmin({item: @params}))
       $(@el).find('.filter-status li a[data-view=payments]').parent().addClass('active')
       $(@el).find(".settlements-index").html(@templateMainPayments())
+      $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar())
 
     # $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     # $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
@@ -1268,3 +1272,40 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(@el).find('.load-more-users').css('display', 'none')
     else
       $(@el).find('.load-more-users').css('display', 'inline')
+
+  filter: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    container = $(target).closest('.dropdown-filters')
+
+    params = {
+      'filter_state': $(container).find(".filter-state").val() || ""
+      'filter_user_type': $(container).find(".filter-user-type").val() || ""
+    }
+
+    if @params.view
+      params.view = @params.view
+
+
+    FinlyF.primary_router.navigate('settlements/params=' + JSON.stringify(params), {trigger: true})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

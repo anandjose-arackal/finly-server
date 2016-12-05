@@ -7,11 +7,14 @@ class FinlyF.Routers.Main extends Backbone.Router
     'expenses/params=:query': 'expenses'
     'reports': 'reports'
     'reports/params=:query': 'reports'
+
+    'reports/:id/params=:query': 'reportShow'
     # 'reports/action=:action': 'reportsAction'
     'receipts': 'receipts'
     'receipts/params=:query': 'receipts'
     'requests': 'requests'
     'requests/params=:query': 'requests'
+    'requests/:id/params=:query': 'requestShow'
     'settlements': 'settlements'
     'settlements/params=:query': 'settlements'
     'settlements/:user': 'settlements_show'
@@ -81,6 +84,23 @@ class FinlyF.Routers.Main extends Backbone.Router
     if params.report_id
       view.showReport(params.report_id)
 
+
+  reportShow: (id, query)->
+    if typeof query != 'undefined'
+      console.log "defined"
+      params = JSON.parse(query)
+    else
+      params = {}
+    console.log "Params from router", params
+    view = new FinlyF.Views.Report({
+      params: params
+      model_id: id
+      # current_view: params.view || 'personal'
+      preview: params.preview || false
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
+
   receipts:(query) ->
     # body = $("body")
     # FinlyF.startMainLoader(body)
@@ -112,6 +132,21 @@ class FinlyF.Routers.Main extends Backbone.Router
     FinlyF.startMainLoader(main)
     @features()
     $("#primary-navbar a.navbar-menu-li[href^='\\#requests']").parent().addClass('active')
+
+  requestShow: (id, query)->
+    console.log "Coming to router"
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+    view = new FinlyF.Views.Request({
+      params: params
+      model_id: id
+      # current_view: params.view || 'personal'
+      preview: params.preview || false
+    })
+    $("#backbone-container").html(view.render().el)
+    @features()
 
   settlements: (query) ->
     # body = $("body")
@@ -258,7 +293,7 @@ class FinlyF.Routers.Main extends Backbone.Router
       params = {
         view: 'admin'
       }
-    console.log params
+    # console.log params
     view = new FinlyF.Views.Policy({
       id: id,
       params: params
@@ -270,3 +305,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     $(".datepicker").datepicker({
       dateFormat: "yy-mm-dd"
     })
+    
+    $('.dropdown-menu .no-hide-bs-dropdown').click((e) ->
+      e.stopPropagation()
+    )

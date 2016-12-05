@@ -1,6 +1,6 @@
 <div class="row" style="height: 100%;">
   <div class="col-sm-8 show-details-panel">
-    <div class="row item-title show-details-title">
+    {{!-- <div class="row item-title show-details-title">
       <div class="col-sm-6">
         <h4 class="item-name">
           <label class="item-attr-preview">{{item.name}}</label>
@@ -8,7 +8,6 @@
         </h4>
       </div>
       <div class="col-sm-6 text-right">
-
         {{#if item.actions.take_control}}
           <button class="btn btn-warning btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
         {{/if}}
@@ -39,9 +38,8 @@
         {{#if item.actions.reimbursement_confirm}}
           <button class="btn btn-sm btn-success btn-report-action" data-url="{{item.actions.reimbursement_confirm}}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;Confirm Reimbursement</button>
         {{/if}}
-        
       </div>
-    </div>
+    </div> --}}
 
     <div class="row item-body">
       <div class="col-sm-7">
@@ -260,10 +258,9 @@
   </div><!-- col-sm-8 -->
 
   <div class="col-sm-4 timeline show-details-panel">
-    <div class="row show-details-title">
+    {{!-- <div class="row show-details-title">
       <div class="col-sm-12 no-padding"></div>
-    </div>
-    <div class="row no-margin" style="margin-top: 60px;"><h4>Timeline</h4></div>
+    </div> --}}
     <div class="row no-margin">
       <div class="col-sm-2 no-padding">
         <span class="roundCircle">{{item.user_initial}}</span>
@@ -335,10 +332,10 @@
   }
 
 
-  .item-body{
+  /*.item-body{
     margin-top: 60px;
   }
-
+*/
 
   .roundCircle{
     border-radius: 50%;
@@ -369,13 +366,13 @@
     font-size: 12px;
   }
 
-  .item-details .expense-category {
+  .expense-category {
     border: 1px solid #cdcdcd;
     margin-bottom: 20px;
     border-radius: 5px;
   }
 
-  .item-details .expense-category:last-child{
+  .expense-category:last-child{
     margin-bottom: 350px;
   }
 </style>

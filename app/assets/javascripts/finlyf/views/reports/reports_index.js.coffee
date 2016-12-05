@@ -103,7 +103,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     _this = @
     #Append all the reports
     @dump = @collection.models.slice()
-    # console.log "Models - ", @collection.models.length
+    # console.log "Models - ", @collecion.models.length
     $(@el).find("#items").html("")
     # @collection.each(@appendItems, @)
     _.each(_this.collection.models, _this.appendItems, _this)
@@ -159,31 +159,36 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     @reportsSelectOptions()
 
   showDetails: (e) ->
-    # bd = $("<div />", {
-    #   class: "finly-backdrop"
-    # }).appendTo('.main')
-    #Returns if clicked on the checkbox
     if $(e.target).hasClass("select-item")
       return
       
-    # main = $(@el).find(".main")
-    # unless $(main).hasClass("preview")
-    #   $(main).addClass("preview")
-    $(@el).find('#item-details').css('bottom', 0)
+    
+    # $(@el).find('#item-details').css('bottom', 0)
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
     model = @collection.get(model_id)
 
-    preview_view = new FinlyF.Views.Report({
-      model_id: model.get('id')
-      preview: true
-      parent: @
-      current_view: @params.view || 'personal'
-    })
+    # preview_view = new FinlyF.Views.Report({
+    #   model_id: model.get('id')
+    #   preview: true
+    #   parent: @
+    #   current_view: @params.view || 'personal'
+    # })
 
-    $(@el).find("#item-details-main").html(preview_view.render().el)
+    # $(@el).find("#item-details-main").html(preview_view.render().el)
+
+    params = {
+      view: @params.view || 'personal'
+      preview: true
+      # parent: @
+      # current_view: @params.view || 'personal'
+    }
+
+    # console.log model_id, params
+    FinlyF.primary_router.navigate('reports/' + model_id.toString() + '/params=' + JSON.stringify(params), {trigger: true})
+
+
     
-    # $(@el).find(".show-detail-title").css("position", "fixed");
 
   showReport: (report_id) ->
     #BEING USED FROM ROUTER
@@ -222,27 +227,33 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   new: ->
     _this = @
 
-    $(@el).find('#item-details').css('bottom', 0)
-    # main = $(@el).find(".main")
-    # unless $(main).hasClass("preview")
-    #   $(main).addClass("preview")
-    $(@el).find("#item-details-main").html("")
+    # $(@el).find('#item-details').css('bottom', 0)
+    # # main = $(@el).find(".main")
+    # # unless $(main).hasClass("preview")
+    # #   $(main).addClass("preview")
+    # $(@el).find("#item-details-main").html("")
 
     model = new FinlyF.Models.Report()
     data = {
       authenticity_token: $("#authenticity_token").val()
     }
+
+    params = {
+      view: @params.view || 'personal'
+      preview: true
+    }
     model.save(data, {
       success: (model, res) ->
-        FinlyF.snapNotify(res.messages)
-        preview_view = new FinlyF.Views.Report({
-          model_id: model.get('id')
-          preview: true
-          parent: _this
-          current_view: _this.params.view || 'personal'
-        })
-        $(_this.el).find("#item-details-main").html(preview_view.render().el)
-        $(_this.el).find('.close-details').attr('data-refresh-true', true)
+        # FinlyF.snapNotify(res.messages)
+        # preview_view = new FinlyF.Views.Report({
+        #   model_id: model.get('id')
+        #   preview: true
+        #   parent: _this
+        #   current_view: _this.params.view || 'personal'
+        # })
+        # $(_this.el).find("#item-details-main").html(preview_view.render().el)
+        # $(_this.el).find('.close-details').attr('data-refresh-true', true)
+        FinlyF.primary_router.navigate('reports/' + model.get('id') + '/params=' + JSON.stringify(params), {trigger: true})
       error: (err) ->
         console.log "Error", err
     })
@@ -293,6 +304,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
       'filter_user_name': $(".sidebar .filter-user").val() || ""
+      'filter_status': @params.filter_status || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }

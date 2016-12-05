@@ -375,9 +375,12 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           params = {
             report_id: report_id
             view: _this.params.view
+            preview: true
           }
           FinlyF.snapNotify(res.messages)
-          FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+
+          FinlyF.primary_router.navigate('reports/' + model_report.get('id') + '/params=' + JSON.stringify(params), {trigger: true})
+          # FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
       error: (err) ->
         console.log "Error", err
     })

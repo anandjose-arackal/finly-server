@@ -26,8 +26,6 @@ window.FinlyF =
     # if window.notification_timer
     #   clearInterval(window.notification_timer)
 
-    
-
     # $.ajax({
     #   url: '/users/' + $("#current_user_id").val()
     #   data:
@@ -217,6 +215,11 @@ window.FinlyF =
     $(el).find('.sidebar .filter-receipt').val(params.filter_receipt)
     $(el).find('.sidebar .filter-amount-type').val(params.filter_amount_type)
     $(el).find('.sidebar .filter-expense-type-id').val(params.filter_expense_type_id)
+
+    # Dropdown Filters for settlements Admin and employees
+    $(el).find(".dropdown-filters .filter-user-type").val(params.filter_user_type)
+    $(el).find(".dropdown-filters .filter-state").val(params.filter_state)
+
 
   navigate: (e, attr)->
     clearInterval(FinlyF.notification_timer)

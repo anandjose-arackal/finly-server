@@ -1,4 +1,7 @@
 class FinlyF.Views.Request extends Backbone.View
+  templateSkeleton: HandlebarsTemplates['finlyf/requests/base/requestShowSkeleton']
+  templateShowNavbar: HandlebarsTemplates['finlyf/requests/navbar/show/navbar']
+
   template: HandlebarsTemplates['finlyf/requests/crud/request']
   templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   templateShow: HandlebarsTemplates['finlyf/requests/crud/show']
@@ -6,11 +9,13 @@ class FinlyF.Views.Request extends Backbone.View
   templateAddCategory: HandlebarsTemplates['finlyf/requests/crud/addRequestCategory']
   templateModalLoadFunds: HandlebarsTemplates['finlyf/requests/modalLoadFunds']
 
+  templateApproveOptions: HandlebarsTemplates['finlyf/requests/actions/modalApproveOptions']
+
   className: 'item col-sm-12'
 
   events:
     'click .select-item': 'toggleSelect'
-    'input [contenteditable=true]': 'updateModel'
+    # 'input [contenteditable=true]': 'updateModel'
     'click .btn-update-item': 'update'
     'click .add-new-expense': 'newExpense'
     'click .add-existing-expense': 'existingExpense'
@@ -23,9 +28,9 @@ class FinlyF.Views.Request extends Backbone.View
     # 'click .btn-submit-item': 'submit'
     # 'click .btn-retract-item': 'retract'
 
-    'click .btn-delete-sub-item': 'deleteSub'
-    'click .btn-view-sub-item': 'viewSub'
-    'click .btn-reject-sub-item': 'rejectSub'
+    # 'click .btn-delete-sub-item': 'deleteSub'
+    # 'click .btn-view-sub-item': 'viewSub'
+    # 'click .btn-reject-sub-item': 'rejectSub'
     'hidden.bs.modal #modal-mp': 'refreshData'
     'keypress .comment-content': 'postCommentByEnter'
     'click .btn-add-request-category': 'addRequestCategory'
@@ -42,30 +47,38 @@ class FinlyF.Views.Request extends Backbone.View
     'click .btn-approve-forward-to': 'approveForwardTo'
 
 
+    'click .btn-go-back': 'goBacktoPreviousPage'
+    'click .btn-approve-options': 'approveOptions'
+
+
   initialize: (options) ->
     console.log "here in requests"
-    @parent = options.parent
+    # @parent = options.parent
     _this = @
-    @preview = options.preview
     data = {}
+
+    if options
+      @preview = options.preview
+      @params = options.params
     if @preview
-      @current_view = options.current_view ##NEED TO ADD THIS IN REPORTS
+      @current_view = options.params.view ##NEED TO ADD THIS IN REPORTS
       if @current_view
         data.view = @current_view
-      $(@el).removeClass("item").addClass("bg-white")
+      $(@el).removeClass("item").addClass("bg-white no-padding")
       @model = new FinlyF.Models.Request({id: options.model_id})
       @model.fetch({data: data})
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
-    @on('expense:selected', @showExpenseSelectOption, @)#REF==3I
+    # @on('expense:selected', @showExpenseSelectOption, @)#REF==3I
     
 
   render: ->
     unless @preview
       $(@el).html(@template({ item: @model.toJSON() }))
     else
-      $(@el).html(@templateShow())
-      $(@el).find("#item-show-details").html(@templateLoadingAnimation())
+      $(@el).html(@templateSkeleton())
+      FinlyF.structureActions(@el, @params)
+      # $(@el).find("#item-show-details").html(@templateLoadingAnimation())
     @
 
   updateModel: (e) ->
@@ -82,8 +95,11 @@ class FinlyF.Views.Request extends Backbone.View
 
   populateDetails: ->
     @model.set('current_view', @current_view)
-    $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
-    $(@el).find("#item-show-details .datepicker").datepicker({ dateFormat: "yy-mm-dd" })
+    $(@el).find(".navbar-full").html(@templateShowNavbar({item: @model.toJSON()}))
+    $(@el).find(".main").html(@templateShowDetails({item: @model.toJSON()}))
+
+    # $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    # $(@el).find("#item-show-details .datepicker").datepicker({ dateFormat: "yy-mm-dd" })
 
   showSaveOption: ->
     $(".btn-update-item").css("display", "inline")
@@ -158,6 +174,8 @@ class FinlyF.Views.Request extends Backbone.View
 
   update: (e) ->
     e.preventDefault()
+    target = e.currentTarget
+    $(target).html("<i class='fa fa-circle-o-notch fa-spin'></i>").attr('disabled', true)
     # {
     #   money_request: {
     #     name: "Mumbai",
@@ -188,7 +206,7 @@ class FinlyF.Views.Request extends Backbone.View
         # console.log res.messages
         FinlyF.snapNotify(res.messages)
         if res.success == true
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           $("#modal-new").modal('hide')
           _this.model.fetch({
             data: {
@@ -221,7 +239,7 @@ class FinlyF.Views.Request extends Backbone.View
     model = new FinlyF.Models.Report(data)
     model.urlRoot = '/money_request/' + money_request_id + '/comment'
     # console.log _this.parent.params.view
-    model.save({view: _this.parent.params.view}, {
+    model.save({view: _this.current_view}, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
@@ -243,6 +261,9 @@ class FinlyF.Views.Request extends Backbone.View
     _this = @
     # @model.set('authenticity_token', $("#authenticity_token").val())
     # console.log $("#authenticity_token").val()
+    params = {
+      view: @current_view
+    }
     @model.destroy({
       data: {
         'authenticity_token': $("#authenticity_token").val()
@@ -250,8 +271,11 @@ class FinlyF.Views.Request extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
+
+        FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
+
         # console.log res
-        _this.parent.trigger('item:destroyed')
+        # _this.parent.trigger('item:destroyed')
       error: (err) ->
         console.log "Error", err
 
@@ -276,7 +300,7 @@ class FinlyF.Views.Request extends Backbone.View
           _this.model.fetch({
             data: {view: _this.current_view}
           })
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           
       error: (err) ->
         console.log "Error", err
@@ -333,6 +357,7 @@ class FinlyF.Views.Request extends Backbone.View
     amount = $(container).find('input[name=amount]').val()
 
     modal = $(@el).find("#modal-mp")
+    approveOptionsModal = $(@el).find("#modal-approve-options")
 
     $.ajax({
       url: url,
@@ -349,10 +374,11 @@ class FinlyF.Views.Request extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
+          $(approveOptionsModal).modal('hide')
           _this.model.fetch({
             data: {view: _this.current_view}
           })
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         else
           $(target).attr('disabled', false).html("Confirm Transfer")
           
@@ -362,6 +388,8 @@ class FinlyF.Views.Request extends Backbone.View
 
   approveForwardTo: (e) ->
     e.preventDefault()
+
+    approveOptionsModal = $(@el).find("#modal-approve-options")
 
     _this = @
     target = e.currentTarget
@@ -379,10 +407,11 @@ class FinlyF.Views.Request extends Backbone.View
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
+          $(approveOptionsModal).modal('hide')
           _this.model.fetch({
             data: {view: _this.current_view}
           })
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           
       error: (err) ->
         console.log "Error", err
@@ -395,7 +424,19 @@ class FinlyF.Views.Request extends Backbone.View
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh-true")
       @model.fetch({ data: {view: _this.current_view }})
-      $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+      # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
     # console.log "Closed Bootstrap modal"
+
+  goBacktoPreviousPage: (e) ->
+    e.preventDefault()
+    Backbone.history.history.back()
+
+  approveOptions: (e) ->
+    e.preventDefault()
+
+    modal = $(@el).find("#modal-approve-options")
+    $(modal).html(@templateApproveOptions({item: @model.toJSON()}))
+    $(modal).modal('show')
+
 
 

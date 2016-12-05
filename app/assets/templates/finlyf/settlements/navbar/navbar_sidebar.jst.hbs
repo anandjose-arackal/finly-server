@@ -1,2 +1,42 @@
-<a class="navbar-brand" href="#" style="font-size: 14px; text-transform: uppercase;">Filters</a>
-<button class="btn-default btn-sm btn" style="position: absolute; right: 10px;">Reset <i class="fa fa-undo"></i></a>
+<div class="row no-margin">
+  <div class="col-xs-12">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filters&nbsp;&nbsp;<span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-filters">
+          <li>
+            <div class="row no-margin">
+              <div class="col-xs-12 no-hide-bs-dropdown">
+                <div class="row no-margin">
+                  <div class="col-sm-4">Status</div>
+                  <div class="col-sm-8">
+                    <select class="filter-state form-control">
+                      <option value="1">Active</option>
+                      <option value="2">Pending</option>
+                      <option value="3">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row no-margin">
+                  <div class="col-sm-4">User Type</div>
+                  <div class="col-sm-8">
+                    <select class="filter-user-type form-control">
+                      <option value="admins">Admins</option>
+                      <option value="managers">Managers</option>
+                      <option value="finance_managers">Finance Managers</option>
+                      <option value="all">Employees</option>
+                    </select>
+                  </div>
+                </div>
+              </div>{{!-- no-hide-bs-modal --}}
+              <div class="col-xs-12">
+                <button class="btn btn-sm btn-primary btn-filter">Filter</button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>

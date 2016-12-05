@@ -18,13 +18,18 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
+
+    'change select[name=invite_by]': 'changeInviteBy'
     'click .btn-invite-employee': 'processEmployeeInvitation'
     'click .btn-confirm-invite-employee': 'inviteEmployee'
 
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
     'keyup .search-user': 'prepareSearch'
-    'submit .navbar-form': 'cancelEvents' 
+    'submit .navbar-form': 'cancelEvents'
+
+    # Temp Dropdown Filters
+    'click .btn-filter': 'filter'
 
   initialize: (options) ->
     _this = @
@@ -201,6 +206,20 @@ class FinlyF.Views.UsersIndex extends Backbone.View
           console.log "Couldn't fetch Successfully."
       })
 
+  changeInviteBy: (e) ->
+    target = e.currentTarget
+
+    invite_by_div = $(target).closest('.invite_by')
+
+    invite_by = $(target).val()
+
+    if invite_by == 'mobile'
+      $(invite_by_div).find('input.input-invite-by-email').addClass('hidden').attr('disabled', true)
+      $(invite_by_div).find('input.input-invite-by-mobile').removeClass('hidden').attr('disabled', false)
+    else if invite_by == 'email'
+      $(invite_by_div).find('input.input-invite-by-mobile').addClass('hidden').attr('disabled', true)
+      $(invite_by_div).find('input.input-invite-by-email').removeClass('hidden').attr('disabled', false)
+
   processEmployeeInvitation: ->
     _this = @
 
@@ -345,3 +364,22 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       $(@el).find('.load-more-users').css('display', 'none')
     else
       $(@el).find('.load-more-users').css('display', 'inline')
+
+
+
+  filter: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    container = $(target).closest('.dropdown-filters')
+
+    params = {
+      'filter_state': $(container).find(".filter-state").val() || ""
+      'filter_user_type': $(container).find(".filter-user-type").val() || ""
+    }
+
+    if @params.view
+      params.view = @params.view
+
+
+    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(params), {trigger: true})

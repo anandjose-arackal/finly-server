@@ -166,19 +166,25 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     # main = $(@el).find(".main")
     # unless $(main).hasClass("preview")
       # $(main).addClass("preview")
-    $(@el).find('#item-details').css('bottom', 0)
+    # $(@el).find('#item-details').css('bottom', 0)
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
     model = @collection.get(model_id)
 
-    preview_view = new FinlyF.Views.Request({
-      model_id: model.get('id')
+    # preview_view = new FinlyF.Views.Request({
+    #   model_id: model.get('id')
+    #   preview: true
+    #   parent: @
+    #   current_view: @params.view || 'personal'
+    # })
+    params = {
+      view: @params.view || 'personal'
       preview: true
-      parent: @
-      current_view: @params.view || 'personal'
-    })
+    }
 
-    $(@el).find("#item-details-main").html(preview_view.render().el)
+    # $(@el).find("#item-details-main").html(preview_view.render().el)
+
+    FinlyF.primary_router.navigate('requests/' + model_id.toString() + '/params=' + JSON.stringify(params), {trigger: true})
 
 
   closeDetails: (e)->
@@ -203,27 +209,34 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
 
   new: ->
     _this = @
-    $(@el).find('#item-details').css('bottom', 0)
+    # $(@el).find('#item-details').css('bottom', 0)
     # main = $(@el).find(".main")
     # unless $(main).hasClass("preview")
     #   $(main).addClass("preview")
-    $(@el).find("#item-details-main").html("")
+    # $(@el).find("#item-details-main").html("")
 
     model = new FinlyF.Models.Request()
     data = {
       authenticity_token: $("#authenticity_token").val()
     }
+
+    params = {
+      view: @params.view || 'personal'
+      preview: true
+    }
+    
     model.save(data, {
       success: (model, res) ->
-        FinlyF.snapNotify(res.messages)
-        preview_view = new FinlyF.Views.Request({
-          model_id: model.get('id')
-          preview: true
-          parent: _this
-          current_view: _this.params.view || 'personal'
-        })
-        $(_this.el).find("#item-details-main").html(preview_view.render().el)
-        $(_this.el).find('.close-details').attr('data-refresh-true', true)
+        # FinlyF.snapNotify(res.messages)
+        # preview_view = new FinlyF.Views.Request({
+        #   model_id: model.get('id')
+        #   preview: true
+        #   parent: _this
+        #   current_view: _this.params.view || 'personal'
+        # })
+        # $(_this.el).find("#item-details-main").html(preview_view.render().el)
+        # $(_this.el).find('.close-details').attr('data-refresh-true', true)
+        FinlyF.primary_router.navigate('requests/' + model.get('id') + '/params=' + JSON.stringify(params), {trigger: true})
       error: (err) ->
         console.log "Error", err
     })

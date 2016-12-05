@@ -358,7 +358,6 @@ ul.settlement-actions li label{
 
 <nav class="navbar navbar-inverse navbar-fixed-top" style="" id="primary-navbar">
   <div class="container-fluid">
-
     <div class="row no-margin no-padding">
       <div class="col-md-2">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -448,14 +447,7 @@ ul.settlement-actions li label{
     <div class="row no-margin no-padding">
       <div class="col-md-3" style="box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset; padding-left: 0; padding-right: 0;">
         <div class="navbar-header navbar-sidebar" style="width: 100%;">
-          <form class="navbar-form" role="search" style="padding-right: 0;">  
-            <div class="input-group" style="width: 100%;">
-              <input type="text" class="search-user input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
-              <div class="input-group-btn">
-                <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
-              </div>
-            </div>
-          </form>
+          {{!-- navbar_sidebar.jst.hbs partial --}}
         </div>
       </div>
       <div class="col-md-9" style="">
@@ -472,7 +464,14 @@ ul.settlement-actions li label{
 
   <div class="col-sm-3 no-padding users sidebar">
     <div class="row no-margin">
-      
+      <form class="navbar-form" role="search" style="padding-right: 0;">  
+        <div class="input-group" style="width: 100%;">
+          <input type="text" class="search-user input-global-search form-control" placeholder="Search" name="q" style="width: 100%;">
+          <div class="input-group-btn">
+            <button class="btn btn-default btn-global-search" type="submit"><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+      </form>
     </div>
 
     <div class="row no-margin" id="users">

@@ -27,6 +27,9 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-confirm-card-status': 'cardStatus'
     'click ul.user-tab-panes li': 'changeActiveTab'
 
+    # Activating employee without email
+    'click .btn-active-employee': 'activateEmployee'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
@@ -583,6 +586,17 @@ class FinlyF.Views.User extends Backbone.View
 
         # $(target).html("Request Balance")
     })
+
+  # Activating employees without email
+  activateEmployee: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    $(target).attr('disabled', true)
+
+    user_id = $(target).attr('data-user-id')
+
+    # $.ajax()
 
 
 #Features

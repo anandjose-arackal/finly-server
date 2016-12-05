@@ -1,8 +1,13 @@
 class FinlyF.Views.Report extends Backbone.View
+
+  templateSkeleton: HandlebarsTemplates['finlyf/reports/base/reportShowSkeleton']
+  templateShowNavbar: HandlebarsTemplates['finlyf/reports/navbar/show/navbar']
+
+
   template: HandlebarsTemplates['finlyf/reports/crud/report']
   templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
-  templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
-  templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
+  # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
+  templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show']
 
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
   templateShowExpense: HandlebarsTemplates['finlyf/reports/expenses/show']
@@ -41,14 +46,20 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-report-action': 'reportAction'
     'click .confirm-add-existing-expense': 'addExistingExpenses'
 
+    'click .btn-go-back': 'goBacktoPreviousPage'
+
   initialize: (options) ->
-    # console.log "we're here in report show"
-    @parent = options.parent
+    # console.log "we're here in report show", options
+    # @parent = options.parent
     _this = @
-    @preview = options.preview
     data = {}
+    
+    if options
+      @params = options.params
+      @preview = options.preview
     if @preview
-      @current_view = options.current_view ##NEED TO ADD THIS IN REPORTS
+      $(@el).removeClass("item col-sm-12 report")
+      @current_view = options.params.view ##NEED TO ADD THIS IN REPORTS
       if @current_view
         data.view = @current_view
       $(@el).removeClass("item").addClass("bg-white")
@@ -63,8 +74,10 @@ class FinlyF.Views.Report extends Backbone.View
     unless @preview
       $(@el).html(@template({ item: @model.toJSON() }))
     else
-      $(@el).html(@templateShow())
-      $(@el).find("#item-show-details").html(@templateLoadingAnimation())
+      $(@el).html(@templateSkeleton())
+      # $(@el).find(".main").html(@templateShow())
+      # $(@el).find("#item-show-details").html(@templateLoadingAnimation())
+      FinlyF.structureActions(@el, @params)
     @
 
   updateModel: (e) ->
@@ -87,7 +100,11 @@ class FinlyF.Views.Report extends Backbone.View
 
   populateDetails: ->
     @model.set('current_view', @current_view)
-    $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    $(@el).find(".navbar-full").html(@templateShowNavbar({item: @model.toJSON()}))
+    # $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    $(@el).find(".main").html(@templateShowDetails({item: @model.toJSON()}))
+
+
     # $(@el).find(".show-detail-title").css("height", "49");
     # $(@el).find(".show-detail-title").css("height", "50");
 
@@ -115,9 +132,9 @@ class FinlyF.Views.Report extends Backbone.View
     $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
-    $("#modal-new").find('.btn-create-expense').on('click', (e) ->
-      _this.createExpense(@);
-    )
+    # $("#modal-new").find('.btn-create-expense').on('click', (e) ->
+    #   _this.createExpense(@);
+    # )
 
     # Since the modal is outside the scope of this view, events need to be manually attached
     modal_new = $("#modal-new")
@@ -161,7 +178,7 @@ class FinlyF.Views.Report extends Backbone.View
     # $(close_button).css('display', 'none')
 
   createExpense: (e) ->
-    # console.log "Creating expense"
+    console.log "Creating expense"
     # if e
     #   console.log "event", e
     #   e.preventDefault()
@@ -184,7 +201,7 @@ class FinlyF.Views.Report extends Backbone.View
         # console.log res.messages
         FinlyF.snapNotify(res.messages)
         if res.success == true
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           $("#modal-new").modal('hide')
           _this.model.fetch({
             data: {
@@ -297,8 +314,10 @@ class FinlyF.Views.Report extends Backbone.View
     # $(target_select).html(select)
 
   update: (e) ->
-    $(e.currentTarget).html("<i class='fa fa-circle-o-notch fa-spin'></i>")
+    e.preventDefault()
     _this = @
+    target = e.currentTarget
+    $(target).html("<i class='fa fa-circle-o-notch fa-spin'></i>").attr('disabled', true)
 
     policy_id = $(@el).find('select.item-policy-edit').val()
     name = $(@el).find('input.item-name-edit').val()
@@ -313,7 +332,6 @@ class FinlyF.Views.Report extends Backbone.View
     model.save(data, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         _this.model.fetch()
       error: (err) ->
         FinlyF.snapNotify(err.messages)
@@ -345,7 +363,7 @@ class FinlyF.Views.Report extends Backbone.View
     model = new FinlyF.Models.Report(data)
     model.urlRoot = '/reports/' + report_id + '/comment'
     # console.log _this.parent.params.view
-    model.save({view: _this.parent.params.view}, {
+    model.save({view: _this.params.view}, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
@@ -372,6 +390,10 @@ class FinlyF.Views.Report extends Backbone.View
     _this = @
     # @model.set('authenticity_token', $("#authenticity_token").val())
     # console.log $("#authenticity_token").val()
+
+    params = {
+      view: @current_view
+    }
     @model.destroy({
       data: {
         'authenticity_token': $("#authenticity_token").val()
@@ -379,8 +401,9 @@ class FinlyF.Views.Report extends Backbone.View
       processData: true
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
+        FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
         # console.log res
-        _this.parent.trigger('item:destroyed')
+        # _this.parent.trigger('item:destroyed')
       error: (err) ->
         console.log "Error", err
 
@@ -553,3 +576,6 @@ class FinlyF.Views.Report extends Backbone.View
     $("#modal-receipt-preview").modal('show')
 
 
+  goBacktoPreviousPage: (e) ->
+    e.preventDefault()
+    Backbone.history.history.back()

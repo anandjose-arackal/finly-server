@@ -33,6 +33,8 @@
                 {{/if}}
               </div>
             {{/if}}
+
+            <button class="btn btn-lg btn-success btn-active-employee">Activate</button>
           </div>
           <form class="form-user-info">
             <div class="row">
@@ -314,9 +316,9 @@
                 <div class="logo">Finly</div>
                 <div class="status">
                   {{#if item.card.active}}
-                    <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label>
+                    <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71; cursor: default;"></i>&nbsp;&nbsp;<span>Active</span></label>
                   {{else}}
-                    <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
+                    <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c; cursor: default;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
                   {{/if}}
                 </div>
                 <div class="card-type">Expense Card</div>
@@ -327,7 +329,7 @@
                   <span class="fourth-four">{{item.card.ending_number}}</span>
                 </div>
                 <div class="user-name">{{item.user.name}}</div>
-                <div class="visa"><i class="fa fa-cc-visa"></i></div>
+                <div class="visa"><i class="fa fa-cc-visa" style="cursor: default;"></i></div>
                 
               </div>
             </div>
@@ -839,6 +841,7 @@
     right: 19px;
     bottom: 7px;
     font-size: 35px;
+    cursor: default;
   }
 
   .card .card-type{
