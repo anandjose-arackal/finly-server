@@ -595,7 +595,8 @@ class FinlyF.Views.User extends Backbone.View
     $(target).attr('disabled', true)
     user_id = @model.get('id')
 
-    modal = $(@el).find('#modal-activate-employee')
+    # modal = $(@el).find('#modal-activate-employee')
+    modal = $('#modal-activate-employee')
     $(modal).html("")
     $(modal).modal('show')
 
@@ -612,6 +613,9 @@ class FinlyF.Views.User extends Backbone.View
       error: (err) ->
         console.log "Err", err
     })
+
+    # Manually attaching even since modal is outside view's el
+    
 
 
 

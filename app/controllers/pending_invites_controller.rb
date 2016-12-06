@@ -72,8 +72,15 @@ class PendingInvitesController < ApplicationController
   def activate_employee
     @states = State::VALUES
     @pending_user = User.find(params[:user_id])
+
+    verified = true if #condition  #Should return boolean
+
     respond_to do |format|
-      format.html {render partial: 'activate_employee'}
+      if verified
+        format.html {render partial: 'activate_employee'}
+      else
+        format.html {render partial: 'verify_mobile'}
+      end
     end
   end
 

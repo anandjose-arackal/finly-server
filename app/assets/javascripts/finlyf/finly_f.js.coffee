@@ -206,8 +206,12 @@ window.FinlyF =
 
     ## opening dropdown should start fetching
     $(navbar_right).find("#navbar-notification-dropdown").on('shown.bs.dropdown', (e) ->
+      console.log "Its working, this is ", this
       _this = this
-      if $(this).attr('data-replace') == "true"
+      if $(this).attr('data-initial') == 'true'
+        $(this).removeAttr('data-initial')
+        FinlyF.fetchNotifications(_this, 1, true)
+      else if $(this).attr('data-replace') == "true"
         $(this).removeAttr('data-replace')
         FinlyF.fetchNotifications(_this, 1, true)
       # else if
