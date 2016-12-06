@@ -29,7 +29,6 @@ class User::Invite::Create < User::Invite::Base
       when 'email','2'
         self.emails = invite_params[:email].delete(' ').split(',').collect(&:strip) rescue nil
         invite_params.delete(:mobile) # because mobile is not a field in the User model
-        
         if self.emails.present?
           self.emails.compact!
           self.emails.uniq!
@@ -219,7 +218,6 @@ class User::Invite::Create < User::Invite::Base
           # send welcome message to all invited users
           WelcomeMessage::Create.(user, {mobile_number: numbers})
         end
-        debugger
       end
     end
 

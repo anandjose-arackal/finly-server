@@ -21,7 +21,7 @@ class OtpVerification::Create < OtpVerification::Base
     # post payload as JSON instead of "www-form-urlencoded" encoding:
     self.response = self.connection.post do |req|
       req.url path
-      req.headers['application-Key'] = application_key
+      req.headers['application-Key'] = Constants::VERIFICATION_API_KEY
       req.body = "{ 'countryCode': '91', 'mobileNumber': '#{params[:mobile_number]}', 'getGeneratedOTP': true }"
     end
   end
