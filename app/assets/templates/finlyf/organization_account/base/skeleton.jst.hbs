@@ -263,6 +263,29 @@ hr{
           </ul>
           
           <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown" id="navbar-notification-dropdown" data-initial="true">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"  style="font-size: 18px; font-weight: normal;"><i class="fa fa-inbox"></i><span class="badge badge-danger" id="navbar-notification-count"></span></a>
+              <ul class="dropdown-menu no-hide-bs-dropdown" style="padding-top: 0;">
+                <div class="navbar-notifications-header">
+                  <li>
+                    <div class="row no-margin padding-10" style="background: #eee;">
+                      <div class="col-xs-6 no-padding"><span style="color: #454545; font-size: 15px; font-weight: bold;">Notifications</span></div>
+                      <div class="col-xs-6 text-right no-padding"><a href="#" class="btn-mark-notifications-read">Mark All as Read</a></div>
+                    </div>
+                  </li>
+                </div>
+                <div class="navbar-notifications">
+                  <div class="notifications-list">
+                    
+                  </div>
+                  <div class="navbar-notifications-footer">
+                    <li class="text-center">
+                      <button class="btn btn-default btn-load-more-notifications">Load More</button>
+                    </li>
+                  </div>
+                </div>
+              </ul>
+            </li>
             <li class="dropdown" id="navbar-user-dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 12px 10px 8px 10px;">
                 <img src="/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>

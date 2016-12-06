@@ -1,0 +1,138 @@
+<div class="modal-dialog" role="document" style="width: 60%; margin-top: 113px;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Activate Employee</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row no-margin">
+        <form id="newUserRegistration" action="<%= pending_invite_accept_path(pending_invite_id: @pending_user.id) %>" method="post" data-remote='true'>
+
+          <input name="_method" type="hidden" value="patch">
+          <input name="authenticity_token" value="<%= form_authenticity_token%>" type="hidden">
+          <input name="user[invitation_token]" type="hidden" value="<%=params[:invitation_token]%>">
+          <input name="type" type="hidden" value="accept">
+
+            <div style="width: 600px;padding: 20px 40px 40px 80px; background-color: white; margin:30px auto;border: 1px solid #d8d8d8">
+
+              <div>
+                <h4 style="color: #465c8b; font-weight: 300; font-size: 20px">Welcome To Finly Expenses! </h4>
+              </div>
+              
+
+
+              <label style="font-weight: 500">Company Name: </label>
+              <div>
+                <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" disabled>
+              </div>
+
+              <label style="font-weight: 500">Email: </label>
+              <div>
+                <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" disabled>
+              </div>
+
+              <label style="font-weight: 500">Password: </label>
+              <div>
+                <input type="password" class="form-control user-password" name="user[password]">
+              </div>
+              <label style="font-weight: 500">Confirm Password: </label>
+              <div>
+                <input type="password" class="form-control" name="user[password_confirmation]">
+              </div>
+              <label style="font-weight: 500">Mobile Number: </label>
+              <div>
+                <div class="input-group" style="width: 80%;">
+                  <span class="input-group-addon" id="basic-addon1">+91</span>
+                  <input type="number" class="form-control" name="user[mobile_number]">
+                </div>
+              </div>
+
+              <!-- <h4>User Details</h4> -->
+              <div style="width: 80%;">
+                <hr />
+              </div>
+
+              <label style="font-weight: 500">First Name: </label>
+              <div>
+                <input type="text" class="form-control" name="user[first_name]" value="">
+              </div>
+
+              <label style="font-weight: 500">Middle Name(Optional): </label>
+              <div>
+                <input type="text" class="form-control" name="user[maiden_name]" value="">
+              </div>
+
+              <label style="font-weight: 500">Last Name: </label>
+              <div>
+                <input type="text" class="form-control" name="user[last_name]" value="">
+              </div>
+
+              
+
+              <label style="font-weight: 500">Date of Birth:</label>
+              <div>
+                <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]">
+              </div>
+
+              <label style="font-weight: 500">Gender:</label>
+              <div>
+                <label style="margin-right: 20px; margin-top: 0;">
+                  <input type="radio" name="user[profile_attributes][gender]" value="m" style="display: inline;">&nbsp;Male
+                </label>
+                <label style="margin-top: 0;">
+                  <input type="radio" name="user[profile_attributes][gender]" value="f" style="display: inline;">&nbsp;Female
+                </label>
+              </div>
+
+              <label style="font-weight: 500">Address Line 1:</label>
+              <div>
+                <input type="text" class="form-control" name="user[profile_attributes][address_1]">
+              </div>
+
+              <label style="font-weight: 500">Address Line 2:</label>
+              <div>
+                <input type="text" class="form-control" name="user[profile_attributes][address_2]">
+              </div>
+
+              <label style="font-weight: 500">City:</label>
+              <div>
+                <input type="text" class="form-control" name="user[profile_attributes][city]">
+              </div>
+
+              <label style="font-weight: 500">State:</label>
+              <div>
+                <select class="form-control" name="user[profile_attributes][state_id]">
+                  <% @states.each do |state| %>
+                    <option value="<%= state[:code] %>"><%= state[:name] %></option>
+                  <% end %>
+                </select>
+              </div>
+
+              <label style="font-weight: 500">Pin Code:</label>
+              <div>
+                <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
+              </div>
+
+              <div>
+                <button id="submitButton" style="border-radius: 1px; height: 40px"> SUBMIT</button>
+              </div>
+
+            </div>
+
+        </form>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+
+
+
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".datepicker").datepicker({dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true});
+
+    $(".user-password").popover({ trigger: 'focus', content: "Password should be 8 characters long." });
+  });
+</script>

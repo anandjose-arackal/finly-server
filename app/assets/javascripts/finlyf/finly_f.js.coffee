@@ -6,6 +6,12 @@ window.FinlyF =
   Collections: {}
   Views: {}
   Routers: {}
+  Config: {
+    notification: {
+      poll_time: 60 #in seconds
+      per_page: 10 #
+    }
+  }
   initialize: ->
     FinlyF.Global.templates.templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
     FinlyF.Global.templates.templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
@@ -42,6 +48,7 @@ window.FinlyF =
     # console.log FinlyF.Global.current_user
     
   fetchNotifications: (container, page, replaceContent) ->
+    console.log arguments
     console.log "Will fetch notifications now."
     data = {
       # view: params.view || 'personal',
@@ -59,7 +66,6 @@ window.FinlyF =
         if replaceContent
           $(container).find('.navbar-notifications .notifications-list').html(FinlyF.Global.templates.templateNotifications({items: data}))
         else
-          console.log "should append content"
           $(container).find('.navbar-notifications .notifications-list').append(FinlyF.Global.templates.templateNotifications({items: data}))
       error: (err) ->
         console.log err
@@ -192,7 +198,7 @@ window.FinlyF =
     # pollNotification()
     if window.notification_timer
       clearInterval(window.notification_timer)
-    window.notification_timer = setInterval(pollNotificationCount, 20000)
+    window.notification_timer = setInterval(pollNotificationCount, FinlyF.Config.notification.poll_time * 1000)
 
     #First time fetch
     pollNotificationCount()
@@ -219,6 +225,45 @@ window.FinlyF =
     # Dropdown Filters for settlements Admin and employees
     $(el).find(".dropdown-filters .filter-user-type").val(params.filter_user_type)
     $(el).find(".dropdown-filters .filter-state").val(params.filter_state)
+
+    # Generalized events
+    #### Load more and append notifications
+    $(navbar_right).find('.btn-load-more-notifications').on('click', (e) ->
+      e.preventDefault()
+      target = e.currentTarget
+
+      $(target).attr('disabled', true).html("<i class='fa fa-spinner fa-spin'></i>")
+      # console.log "we reached here"
+
+      container = $(e.currentTarget).closest('.navbar-notifications').parent()
+
+      $.when(FinlyF.fetchNotifications(container, 2, false)).then(->
+        $(target).attr('disabled', false).text('Load More')
+      )
+      e.stopPropagation()
+    )
+
+    #### Mark all as read
+    $(navbar_right).find('.btn-mark-notifications-read').on('click', (e) ->
+      e.preventDefault()
+      $.ajax({
+        url: '/notifications/mark_all_read',
+        dataType: 'json',
+        success: (res) ->
+          console.log res
+          if res.success == true
+            FinlyF.mark_all_read(navbar_right)
+        error: (err) ->
+          console.log "Err", err
+      })
+      e.stopPropagation()
+    )
+
+  mark_all_read: (container) ->
+    notifications = $(container).find('.navbar-notifications .notifications-list .read-status')
+    for notification in notifications
+      if $(notification).find('i').hasClass('fa-circle')
+          $(notification).find('i').removeClass('fa-circle').addClass('fa-circle-o')
 
 
   navigate: (e, attr)->

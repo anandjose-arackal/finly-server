@@ -39,7 +39,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'change input#expense-receipt-upload': 'showUploadedReceipt'
 
     #Global Notifications
-    'click a.btn-load-more-notifications': 'loadMoreNotifications'
+    # 'click .btn-load-more-notifications': 'loadMoreNotifications'
 
 
   initialize: (options) ->
@@ -537,13 +537,17 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     e.preventDefault()
     FinlyF.changeView(e)
 
-  loadMoreNotifications: (e) ->
-    e.preventDefault()
-    console.log "we reached here"
+  # loadMoreNotifications: (e) ->
+  #   e.preventDefault()
+  #   target = e.currentTarget
 
-    container = $(e.currentTarget).closest('.navbar-notifications')
+  #   $(target).attr('disabled', true).html("<i class='fa fa-spinner fa-spin'></i>")
+  #   # console.log "we reached here"
 
-    FinlyF.fetchNotifications(container, 2, false)
+  #   container = $(e.currentTarget).closest('.navbar-notifications').parent()
+
+  #   FinlyF.fetchNotifications(container, 2, false)
+  #   e.stopPropagation()
 
 
 

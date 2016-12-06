@@ -28,6 +28,8 @@ class User::Invite::Create < User::Invite::Base
         end
       when 'email','2'
         self.emails = invite_params[:email].delete(' ').split(',').collect(&:strip) rescue nil
+        invite_params.delete(:mobile) # because mobile is not a field in the User model
+        
         if self.emails.present?
           self.emails.compact!
           self.emails.uniq!

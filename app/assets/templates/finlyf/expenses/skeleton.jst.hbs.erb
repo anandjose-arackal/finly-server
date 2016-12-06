@@ -259,12 +259,12 @@
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown" id="navbar-notification-dropdown" data-initial="true">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"  style="font-size: 18px; font-weight: normal;"><i class="fa fa-inbox"></i><span class="badge badge-danger" id="navbar-notification-count"></span></a>
-              <ul class="dropdown-menu" style="padding-top: 0;">
+              <ul class="dropdown-menu no-hide-bs-dropdown" style="padding-top: 0;">
                 <div class="navbar-notifications-header">
                   <li>
                     <div class="row no-margin padding-10" style="background: #eee;">
                       <div class="col-xs-6 no-padding"><span style="color: #454545; font-size: 15px; font-weight: bold;">Notifications</span></div>
-                      <div class="col-xs-6 text-right no-padding"><a class="no-hide-bs-dropdown btn-mark-notifications-read">Mark All as Read</a></div>
+                      <div class="col-xs-6 text-right no-padding"><a href="#" class="btn-mark-notifications-read">Mark All as Read</a></div>
                     </div>
                   </li>
                 </div>
@@ -273,14 +273,8 @@
                     
                   </div>
                   <div class="navbar-notifications-footer">
-                    <li>
-                      <a href="#" class="btn-load-more-notifications no-hide-bs-dropdown">
-                        <div class="row no-margin">
-                          <div class="col-xs-12 text-center padding-10">
-                            <span class="a-alike">Load More</span>
-                          </div>
-                        </div>
-                      </a>
+                    <li class="text-center">
+                      <button class="btn btn-default btn-load-more-notifications">Load More</button>
                     </li>
                   </div>
                 </div>

@@ -701,7 +701,8 @@ Rails.application.routes.draw do
 
   get 'notifications' => 'notifications#index'
 
-  get 'notifications/unread' => 'notifications/unread'
+  get 'notifications/unread' => 'notifications#unread'
+  get 'notifications/mark_all_read' => 'notifications#mark_all_read'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -70,10 +70,10 @@ class PendingInvitesController < ApplicationController
   end
 
   def activate_employee
-    @user = User.find(params[:user_id])
-    ap @user
+    @states = State::VALUES
+    @pending_user = User.find(params[:user_id])
     respond_to do |format|
-      format.html {}
+      format.html {render partial: 'activate_employee'}
     end
   end
 

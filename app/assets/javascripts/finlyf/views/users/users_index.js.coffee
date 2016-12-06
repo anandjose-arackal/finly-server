@@ -214,9 +214,11 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     invite_by = $(target).val()
 
     if invite_by == 'mobile'
+      $(invite_by_div).find("input.invite-by-type").val('mobile')
       $(invite_by_div).find('input.input-invite-by-email').addClass('hidden').attr('disabled', true)
       $(invite_by_div).find('input.input-invite-by-mobile').removeClass('hidden').attr('disabled', false)
     else if invite_by == 'email'
+      $(invite_by_div).find("input.invite-by-type").val('email')
       $(invite_by_div).find('input.input-invite-by-mobile').addClass('hidden').attr('disabled', true)
       $(invite_by_div).find('input.input-invite-by-email').removeClass('hidden').attr('disabled', false)
 
