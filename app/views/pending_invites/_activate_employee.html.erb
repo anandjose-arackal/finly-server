@@ -6,7 +6,7 @@
     </div>
     <div class="modal-body">
       <div class="row no-margin">
-        <form id="newUserRegistration" action="<%= pending_invite_accept_path(pending_invite_id: @pending_user.id) %>" method="post" data-remote='true'>
+        <form id="newUserRegistration" action="<%= manager_activation_sign_up_path(user_id: @pending_user.id) %>" method="post" data-remote='true'>
 
           <input name="_method" type="hidden" value="patch">
           <input name="authenticity_token" value="<%= form_authenticity_token%>" type="hidden">

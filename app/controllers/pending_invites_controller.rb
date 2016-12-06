@@ -71,7 +71,11 @@ class PendingInvitesController < ApplicationController
     @states = State::VALUES
     @pending_user = User.find(params[:user_id])
 
-    verified = true unless @pending_user.otp_verified
+    if @pending_user.otp_verified
+      verified = true
+    else
+      verified = false
+    end
 
     respond_to do |format|
       if verified
@@ -83,9 +87,15 @@ class PendingInvitesController < ApplicationController
     end
   end
 
-  def sign_up
-    @result = User::Activate::ManagerSignUp.(current_user, params)
-    respond
+  # params["user"] = {"invitation_token"=>"", "email"=>"", "mobile_number"=>"8105739684", "first_name"=>"Sreeram", "maiden_name"=>"", "last_name"=>"Ramasubramanian", "profile_attributes"=>{"date_of_birth"=>"2006-03-01", "gender"=>"m", "address_1"=>"zsdzsdf", "address_2"=>"sdvsdvsa", "city"=>"sdvasdvsad", "state_id"=>"S18", "pin_code"=>"560003"}}, "type"=>"accept", "user_id"=>"10", "id"=>"sign_up"}
+
+  def manager_sign_up
+    @result = User::ManagerActivate::ManagerSignUp.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
+    end
   end
 
   private

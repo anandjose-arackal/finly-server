@@ -1,4 +1,4 @@
-class ManagerActivate::SendOtp < ManagerActivate::Base
+class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
   attr_accessor :selected_user
 
@@ -24,20 +24,23 @@ class ManagerActivate::SendOtp < ManagerActivate::Base
       messages[:error] << 'Mobile number not found'
       return
     end
-    unless user.mobile_number.match(Constants::VALID_MOBILE_NUMBER).present?
+    unless selected_user.mobile_number.match(Constants::VALID_MOBILE_NUMBER).present?
       messages[:error] << 'Invalid Mobile Number'
     end
-    if user.otp.present? and user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
+    if selected_user.otp.present? and user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
+      # i.e. if the otp was sent < 60 seconds ago, don't resend it again
       seconds_remaining = ((user.otp_sent_at + OTP_RESEND_TIMER.seconds) - DateTime.now).to_i
       messages[:error] << "You will have to wait for another #{seconds_remaining} seconds before requesting for another OTP"
     end
   end
 
   def process
-    response = OtpVerification::Create.(user, mobile_number: user.mobile_number)
+    response = OtpVerification::Create.(user, mobile_number: selected_user.mobile_number)
     if response.success?
       otp = response.otp
-      user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_count: (user.otp_count+1))
+      # have to save it without validation because update_attributes considers validations
+      selected_user.assign_attributes(otp: otp, otp_sent_at: DateTime.now, otp_count: (selected_user.otp_count+1))
+      selected_user.save(validate: false)
     else
       messages[:error] = response.messages[:error]
     end

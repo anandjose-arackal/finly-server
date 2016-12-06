@@ -1,4 +1,4 @@
-# class Activate::Base < BaseOperation
-#
-#
-# end
+class User::ManagerActivate::Base < BaseOperation
+
+
+end

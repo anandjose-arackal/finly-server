@@ -305,6 +305,10 @@ class User < ActiveRecord::Base
     find_by(mobile_number: conditions[:email]) || find_by(email: conditions[:email])
   end
 
+  def invited_via_mobile?
+    self.invitation_not_accepted and self.email.blank?
+  end
+
   private
 
   def email_format

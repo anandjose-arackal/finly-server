@@ -11,9 +11,6 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
       messages[:error] << 'Verification cannot be blank'
       return
     end
-    if params[:verification_code].length < 6 or params[:verification_code].length > 6 or user.otp != params[:verification_code]
-      messages[:error] << 'Invalid verification code'
-    end
   end
 
   def init
@@ -24,8 +21,16 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
     end
   end
 
+  def validate
+    if params[:verification_code].length < 6 or params[:verification_code].length > 6 or selected_user.otp != params[:verification_code]
+      messages[:error] << 'Invalid verification code'
+    end
+  end
+
   def process
-    selected_user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+    # skipping validations because users from the mobile number invite flow won't have their details filled in yet
+    selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+    selected_user.save(validate: false)
   end
 
 end

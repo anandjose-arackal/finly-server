@@ -3,17 +3,9 @@
 
 require 'securerandom'
 
-class Activate::ManagerSignUp < ManagerActivate::Base
+class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
 
   attr_accessor :invited_user, :accept_params
-
-  def self.call(params)
-    super(nil, params)
-  end
-
-  def initialize(user, params)
-    super(nil, params)
-  end
 
   def authorized_user_types
     [:manager, :company_admin]
@@ -27,9 +19,15 @@ class Activate::ManagerSignUp < ManagerActivate::Base
 
   def init
     self.accept_params = user_params
+    self.invited_user = User.find_by(mobile_number: accept_params[:mobile_number])
   end
 
   def validate
+
+    if invited_user.blank?
+      add_message :error, "User has not been invited"
+    end
+
     param = accept_params
 
     if param.blank?
@@ -104,16 +102,20 @@ class Activate::ManagerSignUp < ManagerActivate::Base
   end
 
   def pre_process
-    # assign a password to the user, and send him the password on mobile. Then save it as a the password to be sent
-    temp_password = generate_random_string(5)
+    # assign a password to the user, and send him the password on mobile. Then save it as the temporary password to be sent
+    temp_password = generate_random_string(4)
     accept_params[:password] = accept_params[:password_confirmation] = temp_password
+    accept_params[:default_password] = true
     message = "Your temporary password is: #{temp_password}. You will be asked to change it upon signing in"
-    # sending the one time password as an SMS
-    WelcomeMessage::Create.(user, {mobile_number: numbers, message: message})
+    # sending the one time password as an SMS. Mobile number is to be sent as an array of mobile numbers
+    WelcomeMessage::Create.(user, {mobile_number: [invited_user.mobile_number], message: message})
   end
 
   def process
-    self.invited_user = User.accept_invitation!(accept_params)
+    unless invited_user.update_attributes(accept_params) and invited_user.accept_invitation!
+      add_message :error, invited_user.errors.full_messages
+      return false
+    end
     unless invited_user.present? and invited_user.id.present? and invited_user.valid?
       add_message :error, invited_user.errors.full_messages
     end
@@ -122,7 +124,7 @@ class Activate::ManagerSignUp < ManagerActivate::Base
   def post_process
     # send welcome mail
 
-    message[:success] << "User successfully activated!"
+    messages[:success] << "User successfully activated!"
   end
 
   def success
@@ -138,7 +140,7 @@ class Activate::ManagerSignUp < ManagerActivate::Base
 
   private
 
-  def generate_random_string(length = 8)
+  def generate_random_string(length = 5)
     SecureRandom.hex(length)
   end
 
