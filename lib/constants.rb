@@ -19,7 +19,7 @@ module Constants
 
   VERIFICATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXa7hV1dQgYede4fqAltJYivA8Cia1IvrW0FzsNaUAUFCyTXDHO1IV5-Q63zwNbzxTFw=="
 
-  INVITATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXayCwFWmM0zwoMwaBcMbNlQA0U_wBnz1AjOcjMay1VbI7bl0STMKIVQVrVVOnRe0ahA=="
+  # INVITATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXayCwFWmM0zwoMwaBcMbNlQA0U_wBnz1AjOcjMay1VbI7bl0STMKIVQVrVVOnRe0ahA=="
 
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 

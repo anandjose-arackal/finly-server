@@ -57,9 +57,7 @@ class PendingInvitesController < ApplicationController
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?
       sign_in @result.accepted_user, :bypass => true
-      # bypass_sign_in(@result.accepted_user)
-      # redirect_to root_url
-      # respond
+
       respond_to do |format|
         format.js { render js: "window.location = '#{root_url}';"}
         # format.js { render js: "window.location = '#{root_url}';"}
@@ -72,16 +70,21 @@ class PendingInvitesController < ApplicationController
   def activate_employee
     @states = State::VALUES
     @pending_user = User.find(params[:user_id])
-
-    verified = true if #condition  #Should return boolean
+    verified = true unless @pending_user.otp_verified
 
     respond_to do |format|
       if verified
         format.html {render partial: 'activate_employee'}
       else
+        User::ManagerActivate::SendOtp.(current_user, params) # todo - handle failure
         format.html {render partial: 'verify_mobile'}
       end
     end
+  end
+
+  def sign_up
+    @result = User::Activate::ManagerSignUp.(current_user, params)
+    respond
   end
 
   private

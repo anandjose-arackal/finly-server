@@ -2,6 +2,7 @@
 
 class WelcomeMessage::Create < BaseHandler
 
+  attr_accessor :message
 
   def pre_validate
     if params.blank? or params[:mobile_number].blank?
@@ -15,6 +16,8 @@ class WelcomeMessage::Create < BaseHandler
 
   def init
     super()
+    self.message = params[:message]
+    self.message = "You have been invited to use Finly. Please contact your manager to activate your account" if message.nil?
   end
 
   def process
@@ -23,7 +26,7 @@ class WelcomeMessage::Create < BaseHandler
       req.url path
       req.params = {authkey: authentication_key,
                     mobiles: mobile_numbers,
-                    message: "You have been invited to use Finly. Please contact your manager to activate your account",
+                    message: message,
                     sender: "FINLYX",
                     route: 4,
                     country: 91,

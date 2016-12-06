@@ -590,6 +590,8 @@ Rails.application.routes.draw do
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
 
+  get 'users/activate', to: 'manager_activation#send_otp'
+
   post 'cards/details' => 'cards#details', as: :card_details
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
