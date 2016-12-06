@@ -11,10 +11,6 @@ class PendingInvitesController < ApplicationController
   end
 
   def create
-    # # jugaad to test invite flow
-    # params[:mobile_number] = params[:email]
-    # params.delete(:email)
-    # #### jugaad end
 
     @result = User::Invite::Create.(current_user, params)
     if @result.present? and @result.success?

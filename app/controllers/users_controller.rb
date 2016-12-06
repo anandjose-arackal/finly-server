@@ -41,6 +41,19 @@ class UsersController < ApplicationController
   #   @result = User::Profile.(current_user, params)
   # end
 
+  def edit_default_password
+
+  end
+
+  def update_default_password
+    @result = User::ManagerActivate::ReplaceDefaultPassword.(current_user, params)
+    if @result.success?
+      sign_in @result.user, :bypass => true
+      redirect_to root_url
+    else
+      redirect_to request.referrer
+    end
+  end
 
 
   #Created for asynchronously loading files for backbone

@@ -654,6 +654,9 @@ Rails.application.routes.draw do
 
   get 'pending_invites/activate_employee' => 'pending_invites#activate_employee'
   patch 'pending_invites/manager_sign_up', to: 'pending_invites#manager_sign_up', as: :manager_activation_sign_up
+  post 'users/update_default_password', to: 'users#update_default_password', as: :update_default_password
+  get 'edit_default_password', to: 'users#edit_default_password', as: :edit_default_password
+
 
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
   resources :pending_invites do

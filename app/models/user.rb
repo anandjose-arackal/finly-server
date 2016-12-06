@@ -3,7 +3,7 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
-#  email                  :string(255)      default(""), not null
+#  email                  :string(255)      default("")
 #  encrypted_password     :string(255)      default(""), not null
 #  reset_password_token   :string(255)
 #  reset_password_sent_at :datetime
@@ -41,6 +41,7 @@
 #  first_name             :string(255)      not null
 #  maiden_name            :string(255)
 #  last_name              :string(255)      not null
+#  default_password       :boolean
 #
 
 
@@ -49,6 +50,7 @@ class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
+
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :confirmable, :lockable
 

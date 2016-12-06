@@ -22,7 +22,9 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  auto_submit                  :boolean          default(FALSE), not null
 #  auto_approve                 :boolean          default(FALSE), not null
+#  accounted_at                 :date
 #
+
 
 
 

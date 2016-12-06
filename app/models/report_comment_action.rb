@@ -9,6 +9,7 @@
 #
 
 
+
 class ReportCommentAction < ActiveRecord::Base
 
   ACTIONS = {report_comment: 1, report_retract: 2, report_submit: 3, report_approve: 4, report_auto_approve: 5,

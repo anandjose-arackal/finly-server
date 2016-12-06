@@ -38,12 +38,12 @@ Rails.application.configure do
   # config.action_mailer.delivery_method = :test
   # config.action_mailer.default_url_options = { host: 'localhost:3000'}
 
-  config.action_mailer.default_url_options = { host: "192.168.81.136:3000" }
+  config.action_mailer.default_url_options = { host: "localhost" }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
       address:              'smtp.sendgrid.net',
       port:                 587,
-      domain:               '192.168.81.136:3000',
+      domain:               'localhost',
       user_name:            'vivekagb',
       password:             'idAr5APhk61X',
       # ssl:                  true,

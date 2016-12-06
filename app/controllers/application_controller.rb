@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
 
   before_action :whitelisted_emails
   before_action :verify_otp
+  # before_action :check_first_time_login
 
   # before_action :superadmin_accounts if :superadmin_controller?
 
@@ -205,6 +206,12 @@ class ApplicationController < ActionController::Base
       params[:type] = 'verification'
       User::Verification::Otp::Create.(current_user, params)
       redirect_to verify_mobile_path
+    end
+  end
+
+  def check_first_time_login
+    if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
+      redirect_to edit_default_password_path
     end
   end
 
