@@ -589,16 +589,20 @@ class FinlyF.Views.User extends Backbone.View
 
   # Activating employees without email
   activateEmployee: (e) ->
-    e.preventDefault()
-    target = e.currentTarget
+    modal = $('#modal-activate-employee')
+    $(modal).html("")
+    if e
+      e.preventDefault()
+      target = e.currentTarget
 
-    $(target).attr('disabled', true)
+      $(target).attr('disabled', true)
+      $(modal).modal('show')
+
+    _this = @
     user_id = @model.get('id')
 
     # modal = $(@el).find('#modal-activate-employee')
-    modal = $('#modal-activate-employee')
-    $(modal).html("")
-    $(modal).modal('show')
+    
 
 
     $.ajax({
@@ -609,13 +613,55 @@ class FinlyF.Views.User extends Backbone.View
       dataType: 'html',
       success: (res) ->
         $(modal).html(res)
+        if e
+          _this.attachVerifyEvent(modal)
+        else
+          _this.attachSignUpEvent(modal)
 
       error: (err) ->
         console.log "Err", err
     })
 
+  attachVerifyEvent: (modal) ->
+    _this = @
     # Manually attaching even since modal is outside view's el
-    
+    $(modal).find(".btn-verify").on('click', (e) ->
+      e.preventDefault()
+      $.ajax({
+        url: "/otp/verify",
+        type: "POST",
+        dataType: "json",
+        data: {
+          user_id: _this.model.get('id'),
+          authenticity_token: $("#authenticity_token").val(),
+          verification_code: $("#user_otp").val()
+        },
+        success: (res) ->
+          FinlyF.snapNotify(res.messages)
+          if res.success == true
+            # $(modal).modal('hide')
+            _this.activateEmployee()
+
+          # else
+          #   console.log("Error")
+        error: (err) ->
+          console.log("Err", err)
+      })
+    ) 
+
+  attachSignUpEvent: (modal) ->
+    _this = @
+
+    $(modal).find("#submitButton").on('click', (e) ->
+      e.preventDefault()
+      $.ajax({
+        url: $(modal).find('#newUserRegistration').attr('action')
+        type: 'PATCH'
+        data: $(modal).find('#newUserRegistration').serialize()
+        success: (res) ->
+          FinlyF.snapNotify(res.messages)
+      })
+    )
 
 
 

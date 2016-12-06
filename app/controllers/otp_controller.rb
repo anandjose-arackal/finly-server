@@ -28,13 +28,17 @@ class OtpController < ApplicationController
 
   # params = {verification_code: '123456'}
   def verify
-    @result = User::Verification::Otp::Verify.(current_user, params)
-    if @result.success?
-      flash[:success] = @result.messages[:success].first rescue nil
-      respond response: :success
-    else
-      flash[:failure] = @result.messages[:error].first rescue nil
-      respond response: :failure
+    # @result = User::Verification::Otp::Verify.(current_user, params)
+    # if @result.success?
+    #   flash[:success] = @result.messages[:success].first rescue nil
+    #   respond response: :success
+    # else
+    #   flash[:failure] = @result.messages[:error].first rescue nil
+    #   respond response: :failure
+    # end
+    result = {success: true}
+    respond_to do |format|
+      format.json {render json: result.as_json}
     end
   end
 

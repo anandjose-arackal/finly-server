@@ -96,73 +96,74 @@
       })
     });
 
-    $(".btn-verify").on('click', function(e){
-      e.preventDefault();
-      $.ajax({
-        url: "<%= verify_otp_path %>",
-        type: "POST",
-        dataType: "json",
-        data: {
-          authenticity_token: $("#authenticity_token").val(),
-          verification_code: $("#user_otp").val()
-        },
-        success: function(res){
-          snapNotify(res.messages);
-          // console.log("Success", res);
-          if(res.success === true){
-            window.location = window.location.protocol + '//' + window.location.host;
-          } else {
-            console.log("Error");
-          }
-        },
-        error: function(err){
-          console.log("Err", err);
-        }
-      })
-    })
+    // $(".btn-verify").on('click', function(e){
+    //   e.preventDefault();
+    //   $.ajax({
+    //     url: "<%= verify_otp_path %>",
+    //     type: "POST",
+    //     dataType: "json",
+    //     data: {
+    //       user_id: <%= @pending_user.id %>,
+    //       authenticity_token: $("#authenticity_token").val(),
+    //       verification_code: $("#user_otp").val()
+    //     },
+    //     success: function(res){
+    //       snapNotify(res.messages);
+    //       // console.log("Success", res);
+    //       if(res.success === true){
+    //         // window.location = window.location.protocol + '//' + window.location.host;
+    //       } else {
+    //         console.log("Error");
+    //       }
+    //     },
+    //     error: function(err){
+    //       console.log("Err", err);
+    //     }
+    //   })
+    // })
     
-    $(".edit-mobile-number").on('click', function(e){
-      e.preventDefault();
-      target = e.currentTarget;
-      $(target).html("Update&nbsp;&nbsp;<i class='fa fa-check-circle'></i>").removeClass("edit-mobile-number btn-warning").addClass("update-mobile-number btn-success");
-      $(target).closest('.form-group').find('input').attr('readonly', false);
-      $(this).unbind();
-      attachUpdateEvents();
-    });
+    // $(".edit-mobile-number").on('click', function(e){
+    //   e.preventDefault();
+    //   target = e.currentTarget;
+    //   $(target).html("Update&nbsp;&nbsp;<i class='fa fa-check-circle'></i>").removeClass("edit-mobile-number btn-warning").addClass("update-mobile-number btn-success");
+    //   $(target).closest('.form-group').find('input').attr('readonly', false);
+    //   $(this).unbind();
+    //   attachUpdateEvents();
+    // });
 
-    function attachUpdateEvents(){
-      $(".update-mobile-number").on('click', function(e){
-        e.preventDefault();
-        target = e.currentTarget;
-        mobile_number = $("#user_mobile_number").val();
+    // function attachUpdateEvents(){
+    //   $(".update-mobile-number").on('click', function(e){
+    //     e.preventDefault();
+    //     target = e.currentTarget;
+    //     mobile_number = $("#user_mobile_number").val();
 
-        $.ajax({
-          url: '<%= update_mobile_number_path %>',
-          dataType: 'json',
-          type: "POST",
-          data: {
-            authenticity_token: $("#authenticity_token").val(),
-            user: {
-              mobile_number: mobile_number
-            }
-          },
-          success: function(res){
-            FinlyF.snapNotify(res.messages);
-            // console.log("Success", res);
-            if(res.success === true){
-              // console.log("Success is tru")
-              // new_mobile_number = res.mobile_number
-              // window.location.reload()
-            } else {
-              // console.log("Nothing")
-            }
-          },
-          error: function(err){
-            console.log("Error h", err);
-          }
-        })
+    //     $.ajax({
+    //       url: '<%= update_mobile_number_path %>',
+    //       dataType: 'json',
+    //       type: "POST",
+    //       data: {
+    //         authenticity_token: $("#authenticity_token").val(),
+    //         user: {
+    //           mobile_number: mobile_number
+    //         }
+    //       },
+    //       success: function(res){
+    //         FinlyF.snapNotify(res.messages);
+    //         // console.log("Success", res);
+    //         if(res.success === true){
+    //           // console.log("Success is tru")
+    //           // new_mobile_number = res.mobile_number
+    //           // window.location.reload()
+    //         } else {
+    //           // console.log("Nothing")
+    //         }
+    //       },
+    //       error: function(err){
+    //         console.log("Error h", err);
+    //       }
+    //     })
 
-      });
-    }
+    //   });
+    // }
   });
 </script>

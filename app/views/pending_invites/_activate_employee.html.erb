@@ -28,22 +28,14 @@
 
               <label style="font-weight: 500">Email: </label>
               <div>
-                <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" disabled>
+                <input type="text" class="form-control" name="user[email]" value="">
               </div>
-
-              <label style="font-weight: 500">Password: </label>
-              <div>
-                <input type="password" class="form-control user-password" name="user[password]">
-              </div>
-              <label style="font-weight: 500">Confirm Password: </label>
-              <div>
-                <input type="password" class="form-control" name="user[password_confirmation]">
-              </div>
+              
               <label style="font-weight: 500">Mobile Number: </label>
               <div>
                 <div class="input-group" style="width: 80%;">
                   <span class="input-group-addon" id="basic-addon1">+91</span>
-                  <input type="number" class="form-control" name="user[mobile_number]">
+                  <input type="number" class="form-control" name="user[mobile_number]" value="<%= @pending_user.mobile_number %>">
                 </div>
               </div>
 

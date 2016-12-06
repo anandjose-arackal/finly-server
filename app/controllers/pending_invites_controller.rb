@@ -73,7 +73,7 @@ class PendingInvitesController < ApplicationController
     @states = State::VALUES
     @pending_user = User.find(params[:user_id])
 
-    verified = true if #condition  #Should return boolean
+    verified = true if true#condition  #Should return boolean
 
     respond_to do |format|
       if verified
