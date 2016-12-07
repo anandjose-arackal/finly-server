@@ -4,7 +4,7 @@ json.user do
   json.mobile_number @result.selected_user.mobile_number
   json.current_user_id @result.user.id
   json.editable (@result.user.company_admin? and params[:view] == 'admin')
-  json.activateable @result.user.manager_activateable?
+  json.activateable @result.selected_user.manager_activateable?
 end
 json.role do
   json.admin @result.roles[:admin]
