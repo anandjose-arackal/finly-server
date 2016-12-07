@@ -13,8 +13,7 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
 
   def init
     self.update_param = update_params
-    return if update_param.blank?
-    id = (update_param[:id] or update_param[:user_id])
+    id = (params[:user][:id] or params[:user][:user_id])
     self.selected_user = User::Team::Index.(user, params).with_id(id).first rescue nil
   end
 
@@ -27,10 +26,7 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
       add_message :error, 'Error updating configuration'
       return
     end
-    p = update_param
-    p.delete(:id) if p.has_key?(:id)
-    p.delete(:user_id) if p.has_key?(:user_id)
-    if p.blank?
+    if update_param.blank?
       add_message :error, 'Nothing to update'
     end
   end
@@ -44,7 +40,7 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
 
   protected
   def update_params
-    self.params.require(:user).permit(:id, :user_id, :enabled, :period_id, :default_note, :default_policy_id)
+    self.params.require(:user).permit(:enabled, :period_id, :default_note, :default_policy_id)
   end
 
 end
