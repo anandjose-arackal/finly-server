@@ -99,3 +99,32 @@ end
 json.wallet do
   json.balance @result.wallet.balance_value
 end
+json.auto_submit_config do
+  json.extract! @result.auto_submit_config, :enabled, :limit_to_card_expenses, :default_memo
+  json.period do
+    json.id @result.auto_submit_config.period_id
+    period_name = nil
+    if @result.auto_submit_config.period_id.present?
+      period_name = @result.auto_submit_config.period.name
+    end
+    json.name period_name
+  end
+  json.policy do
+    json.id @result.auto_submit_config.default_policy_id
+    policy_name = nil
+    if @result.auto_submit_config.default_policy_id.present?
+      policy_name = @result.auto_submit_config.default_policy.name
+    end
+    json.name policy_name
+  end
+end
+json.policies do
+  json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+json.periods do
+  json.array! @result.periods do |period|
+    json.extract! period, :id, :name
+  end
+end

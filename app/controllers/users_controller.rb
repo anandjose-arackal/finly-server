@@ -138,6 +138,9 @@ class UsersController < ApplicationController
       when 'state'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'
+      when 'auto_submit'
+        operation = User::Configuration::AutoSubmit::Update.(current_user, params)
+        success_message = 'Configuration updated'
       else
         # do nothing, ha!
     end
