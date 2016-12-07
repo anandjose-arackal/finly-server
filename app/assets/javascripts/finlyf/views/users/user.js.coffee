@@ -595,15 +595,20 @@ class FinlyF.Views.User extends Backbone.View
       e.preventDefault()
       target = e.currentTarget
 
-      $(target).attr('disabled', true)
+      # $(target).attr('disabled', true)
       $(modal).modal('show')
 
     _this = @
     user_id = @model.get('id')
 
-    # modal = $(@el).find('#modal-activate-employee')
-    
 
+    # Issue -> datepicker change year & month featuer were not working inside modal
+    enforceModalFocusFn = $.fn.modal.Constructor.prototype.enforceFocus
+    $.fn.modal.Constructor.prototype.enforceFocus = ->
+    $(modal).on('hidden.bs.modal', ->
+      $.fn.modal.Constructor.prototype.enforceFocus = enforceModalFocusFn
+    )
+    # Issue ends
 
     $.ajax({
       url: '/pending_invites/activate_employee'

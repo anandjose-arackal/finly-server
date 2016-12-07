@@ -31,10 +31,12 @@
                 {{#if item.actions.activate}}
                   <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
                 {{/if}}
+                {{#if item.user.activateable}}
+                  <button class="btn btn-lg btn-success btn-active-employee">Activate</button>
+                {{/if}}
               </div>
             {{/if}}
 
-            <button class="btn btn-lg btn-success btn-active-employee">Activate</button>
           </div>
           <form class="form-user-info">
             <div class="row">
