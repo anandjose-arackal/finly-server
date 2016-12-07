@@ -614,8 +614,16 @@ class FinlyF.Views.User extends Backbone.View
       success: (res) ->
         $(modal).html(res)
         if e
-          _this.attachVerifyEvent(modal)
+          console.log "an event is present."
+          if $(modal).find("input[name=activate_employee_with_details]").length
+            # console.log $(modal).find("input[name=activate_employee_with_deatils]").html()
+            # console.log "will attach signup event"
+            _this.attachSignUpEvent(modal)
+          else
+            # console.log "will attach verification event"
+            _this.attachVerifyEvent(modal)
         else
+          # console.log "will attach signup event"
           _this.attachSignUpEvent(modal)
 
       error: (err) ->
@@ -650,16 +658,28 @@ class FinlyF.Views.User extends Backbone.View
     ) 
 
   attachSignUpEvent: (modal) ->
+    console.log "Attaching Event", $(modal).find("#submitButton")
     _this = @
 
     $(modal).find("#submitButton").on('click', (e) ->
       e.preventDefault()
+      console.log "button was clicked."
+      target = e.currentTarget
+      $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;")
       $.ajax({
         url: $(modal).find('#newUserRegistration').attr('action')
         type: 'PATCH'
         data: $(modal).find('#newUserRegistration').serialize()
         success: (res) ->
           FinlyF.snapNotify(res.messages)
+          if res.success == true
+            $(modal).modal('hide')
+            _this.parent.trigger('refresh')
+          else
+            $(target).removeAttr('disabled').text('Submit')
+        error: (err) ->
+          console.log "Err", err
+          $(target).removeAttr('disabled').text('Submit')
       })
     )
 
