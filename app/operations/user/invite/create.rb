@@ -212,10 +212,10 @@ class User::Invite::Create < User::Invite::Base
         self.invited_users << User.invite!(invite_params, self.user) do |u|
           u.skip_invitation = true
           u.update_attribute(:email, "")
-          # send welcome message to all invited users
-          WelcomeMessage::Create.(user, {mobile_number: numbers})
         end
       end
+      # send welcome message to all invited users
+      WelcomeMessage::Create.(user, {mobile_number: numbers})
       # manually confirming everyone since there is no email by default and devise marks that as unconfirmed
       invited_users.each do |user|
         user.confirm

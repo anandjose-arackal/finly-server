@@ -14,7 +14,7 @@ class User::Invite::Destroy < User::Invite::Base
 
   def init
     id = params[:id] or params[:invited_user_id]
-    self.invited_user = User.invitation_not_accepted.find_by_id(id)
+    self.invited_user = User.filter_state(2).find_by_id(id)
   end
 
   def validate
