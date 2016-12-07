@@ -51,10 +51,16 @@ class Import::Users < Import::Base
   def process
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
+      type = retrieve_invite_type(row)
       self.params = process_row(row)
       error_messages = params[:error_messages]
       params.delete(:error_messages)
-      invitee = user.company.users.invite!(params)
+      if type == 'email'
+        invitee = user.company.users.invite!(params)
+      elsif type == 'mobile'
+
+      end
+
       if User.exists?(invitee.id)
         if error_messages.present?
           result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
@@ -74,6 +80,18 @@ class Import::Users < Import::Base
 
 
   private
+
+  def retrieve_invite_type(row)
+    if row[import_fields[:email]].present?
+      return 'email'
+    elsif
+      row[import_fields[:mobile_number]].present?
+      return 'mobile'
+    else
+      # default case is email
+      return 'email'
+    end
+  end
 
   def generate_response_csv
     CSV.generate(headers: true) do |csv|

@@ -157,8 +157,8 @@ class User < ActiveRecord::Base
         # Name nil is to ensure user has signed up
         where(active: true).where.not(first_name: nil)
       when '2', 2
-        # Pending
-        self.invitation_not_accepted
+        # Pending - i.e. where name is an empty string
+        where(first_name: "")
       when '3', 3
         # Inactive
         # Name nil is to ensure user has signed up

@@ -208,16 +208,17 @@ class User::Invite::Create < User::Invite::Base
         invite_params[:mobile_number] = number
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
-        # invite all users into the system through devise
-        # todo - ultimate jugaad, figure out a way to do this more elegantly
-        invite_params[:email] = "test@test.com"
-        ####################################################################
+
         self.invited_users << User.invite!(invite_params, self.user) do |u|
           u.skip_invitation = true
           u.update_attribute(:email, "")
           # send welcome message to all invited users
           WelcomeMessage::Create.(user, {mobile_number: numbers})
         end
+      end
+      # manually confirming everyone since there is no email by default and devise marks that as unconfirmed
+      invited_users.each do |user|
+        user.confirm
       end
     end
 
