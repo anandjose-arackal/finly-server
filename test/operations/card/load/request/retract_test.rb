@@ -4,6 +4,7 @@ class RetractTest < ActiveSupport::TestCase
 
   def setup
     @user= User.find_by_email('user0@finlytest.io')
+    @random_user=  @user.company.users.last
     @c = Card.create(ending_number: '1234', proxy: '1234', user: @user)
     @request = MoneyRequest::Create.(@user, {id: @c.id, money_request: {amount_attributes: {value: 50, currency_id: Currency.first.id}}}).money_request
   end
@@ -36,7 +37,7 @@ class RetractTest < ActiveSupport::TestCase
     assert @request.user.id, @user.id
     rescued = false
     begin
-      MoneyRequest::Retract.(User.last, id: @request.id)
+      MoneyRequest::Retract.(@random_user, id: @request.id)
     rescue
       rescued = true
     end
