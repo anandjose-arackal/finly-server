@@ -150,19 +150,20 @@ class User < ActiveRecord::Base
     where "first_name like ? or maiden_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', maiden_name, ' ', last_name) like ? or email like ?",
           "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
   end
+
   scope :filter_state, -> (state) do
     case (state)
       when '1', 1
         # Active
         # Name nil is to ensure user has signed up
-        where(active: true).where.not(first_name: nil)
+        where(active: true).where(invitation_token: nil).where.not(first_name: [nil, ""])
       when '2', 2
-        # Pending - i.e. where name is an empty string
-        where(first_name: "")
+        # Pending - i.e. where name is an empty string or when there is an invitation token
+        where('first_name = ? OR invitation_token IS NOT ?',"",nil)
       when '3', 3
         # Inactive
         # Name nil is to ensure user has signed up
-        where(active: false).where.not(first_name: nil)
+        where(active: false).where.not(first_name: [nil, ""])
     end
   end
 
@@ -294,7 +295,6 @@ class User < ActiveRecord::Base
   alias_method :finance_manager_name, :user_name
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
-
 
   def as_json(options = {})
     json = super(options)
