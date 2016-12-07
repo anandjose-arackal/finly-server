@@ -14,23 +14,16 @@
           <input name="user[invitation_token]" type="hidden" value="<%=params[:invitation_token]%>">
           <input name="type" type="hidden" value="accept">
 
-            <div style="width: 600px;padding: 20px 40px 40px 80px; background-color: white; margin:30px auto;border: 1px solid #d8d8d8">
-
-              <div>
-                <h4 style="color: #465c8b; font-weight: 300; font-size: 20px">Welcome To Finly Expenses! </h4>
-              </div>
-              
-
-
+            <div style="padding: 20px;width: 80%;margin-left: 10%;">
               <label style="font-weight: 500">Company Name: </label>
               <div>
                 <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" disabled>
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Email: </label>
               <div>
                 <input type="text" class="form-control" name="user[email]" value="">
-              </div>
+              </div><br />
               
               <label style="font-weight: 500">Mobile Number: </label>
               <div>
@@ -38,7 +31,7 @@
                   <span class="input-group-addon" id="basic-addon1">+91</span>
                   <input type="number" class="form-control" name="user[mobile_number]" value="<%= @pending_user.mobile_number %>" readonly>
                 </div>
-              </div>
+              </div><br />
 
               <!-- <h4>User Details</h4> -->
               <div style="width: 80%;">
@@ -48,24 +41,24 @@
               <label style="font-weight: 500">First Name: </label>
               <div>
                 <input type="text" class="form-control" name="user[first_name]" value="">
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Middle Name(Optional): </label>
               <div>
                 <input type="text" class="form-control" name="user[maiden_name]" value="">
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Last Name: </label>
               <div>
                 <input type="text" class="form-control" name="user[last_name]" value="">
-              </div>
+              </div><br />
 
               
 
               <label style="font-weight: 500">Date of Birth:</label>
               <div>
                 <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]">
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Gender:</label>
               <div>
@@ -75,22 +68,22 @@
                 <label style="margin-top: 0;">
                   <input type="radio" name="user[profile_attributes][gender]" value="f" style="display: inline;">&nbsp;Female
                 </label>
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Address Line 1:</label>
               <div>
                 <input type="text" class="form-control" name="user[profile_attributes][address_1]">
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Address Line 2:</label>
               <div>
                 <input type="text" class="form-control" name="user[profile_attributes][address_2]">
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">City:</label>
               <div>
                 <input type="text" class="form-control" name="user[profile_attributes][city]">
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">State:</label>
               <div>
@@ -99,12 +92,12 @@
                     <option value="<%= state[:code] %>"><%= state[:name] %></option>
                   <% end %>
                 </select>
-              </div>
+              </div><br />
 
               <label style="font-weight: 500">Pin Code:</label>
               <div>
                 <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
-              </div>
+              </div><br />
 
               <div style="margin-top: 15px;">
                 <button id="submitButton" class="btn btn-success btn-sm"> SUBMIT</button>
@@ -135,14 +128,14 @@
     // must be no-op'd or the following error results 
     // "Uncaught RangeError: Maximum call stack size exceeded"
     // But then when the nested modal is hidden we reset modal.enforceFocus
-    var enforceModalFocusFn = $.fn.modal.Constructor.prototype.enforceFocus;
+    // var enforceModalFocusFn = $.fn.modal.Constructor.prototype.enforceFocus;
 
-    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+    // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 
-    $confModal.on('hidden', function() {
-        $.fn.modal.Constructor.prototype.enforceFocus = enforceModalFocusFn;
-    });
+    // $confModal.on('hidden', function() {
+    //     $.fn.modal.Constructor.prototype.enforceFocus = enforceModalFocusFn;
+    // });
 
-    $confModal.modal({ backdrop : false });
+    // $confModal.modal({ backdrop : false });
   });
 </script>
