@@ -64,6 +64,8 @@ class FinlyF.Views.Request extends Backbone.View
       @current_view = options.params.view ##NEED TO ADD THIS IN REPORTS
       if @current_view
         data.view = @current_view
+      if @params.ref
+        data.ref = @params.ref
       $(@el).removeClass("item").addClass("bg-white no-padding")
       @model = new FinlyF.Models.Request({id: options.model_id})
       @model.fetch({data: data})
