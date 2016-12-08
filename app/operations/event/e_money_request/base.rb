@@ -1,4 +1,4 @@
-class Event::EMoneyRequest::Base < Event::SetNotification
+class Event::EMoneyRequest::Base < Event::SetNotifier
   attr_accessor :money_request
 
   def pre_validate

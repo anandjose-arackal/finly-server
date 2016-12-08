@@ -339,7 +339,7 @@ if Report.count == 0
   c.users.all.each do |user|
 
     # creating open reports
-    1.times.each do
+    5.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -356,7 +356,7 @@ if Report.count == 0
     end
 
     # creating submitted reports
-    1.times.each do
+    5.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -374,7 +374,7 @@ if Report.count == 0
     end
 
     # creating approved reports
-    1.times.each do
+    5.times.each do
       report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
@@ -457,6 +457,8 @@ if CardTransaction.count == 0
     end
 
   end
+end
+
 # end
 
 

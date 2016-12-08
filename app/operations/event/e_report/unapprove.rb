@@ -12,6 +12,10 @@ class Event::EReport::Unapprove < Event::EReport::Base
     [self.report.controlling_user, self.report.tracks.last.modified_user]
   end
 
+  def notification_affected_users
+    [report.controlling_user, report.tracks.last.modified_user]
+  end
+
   def send_push_notification(user)
     return if user.id == report.controlling_user_id
     message = "#{self.report.controlling_user.name} unapproved the report: #{self.report.name}"
@@ -19,7 +23,17 @@ class Event::EReport::Unapprove < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.retract_id,
+                                             action_user_id: self.user.id,
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time
+    )
+    notification.save
   end
 
   def mailer_subject(user)

@@ -1,5 +1,7 @@
-json.array!(@nots) do |noti|
-  json.extract! noti, :title, :body, :read
-  json.date Time.now.strftime("%y %b %d")
-  json.time Time.now.strftime("%l:%M %p")
+json.array!(@notifications) do |notif|
+  json.extract! notif, :read
+  json.body "Sample body" #notif.generate_body(current_user)
+  json.title notif.generate_title
+  json.date notif.timestamp.strftime("%y %b %d")
+  json.time notif.timestamp.strftime("%l:%M %p")
 end

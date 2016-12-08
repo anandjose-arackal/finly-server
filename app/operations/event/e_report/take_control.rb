@@ -9,6 +9,10 @@ class Event::EReport::TakeControl < Event::EReport::Base
     [self.report.controlling_user, self.report.controlling_for_user]
   end
 
+  def notification_affected_users
+    [report.user, report.controlling_for_user]
+  end
+
   def send_push_notification(user)
     return if user.id == report.controlling_user_id
     message = "#{self.report.controlling_user.name} has taken control of the report : #{self.report.name}"
@@ -16,7 +20,17 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.take_control_id,
+                                             action_user_id: (report.tracks.last.action_user.id rescue nil),
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time
+    )
+    notification.save
   end
 
   def mailer_subject(user)

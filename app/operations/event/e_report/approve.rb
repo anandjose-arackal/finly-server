@@ -24,6 +24,14 @@ class Event::EReport::Approve < Event::EReport::Base
     end
   end
 
+  def notification_affected_users
+    if approved
+      [report.user]
+    else
+      [report.controlling_user]
+    end
+  end
+
   def send_push_notification(user)
     if approved
       return unless user == report.user
@@ -36,21 +44,17 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def set_notification(user)
-    # # here only report owner gets a notification if it's approved, so...
-    # unless user.id == report.user_id
-    #   notification = Notification.build(user: user,
-    #                                     notification_type_id: NotificationType.report_id,
-    #                                     action_type_id: NotificationActionType.approve_id,
-    #                                     action_user_id: report.tracks.last.action_user.id,
-    #                                     object_id: report.id,
-    #                                     object_type: "Report",
-    #                                     path_object_id: report.id,
-    #                                     path_object_type: "Report",
-    #                                     read: false,
-    #                                     timestamp: DateUtils.local_date_time
-    #                                     )
-    #   notification.save
-    # end
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                              action_type_id: NotificationActionType.approve_id,
+                                              action_user_id: (report.tracks.last.action_user.id rescue nil),
+                                              object_id: report.id,
+                                              object_type: "Report",
+                                              path_object_id: report.id,
+                                              path_object_type: "Report",
+                                              read: false,
+                                              timestamp: DateUtils.local_date_time
+                                             )
+    notification.save
   end
 
   def mailer_subject(user)

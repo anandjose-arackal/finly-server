@@ -1,7 +1,7 @@
 class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
 
   def event_id
-    Event.money_request_unapprove_id
+    NotifierType.money_request_unapprove_id
   end
 
   def affected_users

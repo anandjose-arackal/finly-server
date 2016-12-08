@@ -13,7 +13,7 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
   end
 
   def event_id
-    Event.money_request_comment_id
+    NotifierType.money_request_comment_id
   end
 
   def affected_users

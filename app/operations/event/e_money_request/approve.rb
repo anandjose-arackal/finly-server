@@ -30,7 +30,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
   end
 
   def event_id
-    Event.money_request_approve_id
+    NotifierType.money_request_approve_id
   end
 
   def affected_users
@@ -41,6 +41,14 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
       [self.money_request.tracks.last.action_user, self.money_request.user]
     else
       [self.money_request.tracks.last.action_user, self.money_request.controlling_user]
+    end
+  end
+
+  def notification_affected_users
+    if approved
+      [money_request.user]
+    else
+      [money_request.user, money_request.controlling_user]
     end
   end
 

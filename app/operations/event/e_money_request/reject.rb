@@ -14,7 +14,7 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
   end
 
   def event_id
-    Event.money_request_reject_id
+    NotifierType.money_request_reject_id
   end
 
   def affected_users

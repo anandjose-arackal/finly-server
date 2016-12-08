@@ -8,6 +8,10 @@ class Event::EReport::Submit < Event::EReport::Base
     [self.report.user, self.report.controlling_user]
   end
 
+  def notification_affected_users
+    [report.controlling_user]
+  end
+
   def send_push_notification(user)
     return if user.id == report.user.id
     message = "#{self.report.user.name} has submitted the report: #{self.report.name}"
@@ -15,7 +19,17 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.submit_id,
+                                             action_user_id: report.user_id,
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time
+    )
+    notification.save
   end
 
   def mailer_subject(user)

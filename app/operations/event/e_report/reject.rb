@@ -21,6 +21,10 @@ class Event::EReport::Reject < Event::EReport::Base
     self.report.associated_users self.user
   end
 
+  def notification_affected_users
+    report.associated_users(user)
+  end
+
   def send_push_notification(user)
     return unless user.id == report.user_id
     message = "#{rejecting_user.name} rejected the report: #{self.report.name}"
@@ -28,21 +32,18 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-    # # only owner needs to get a notification
-    # unless user.id == report.user_id
-    #   notification = Notification.build(user: user,
-    #                                     notification_type_id: NotificationType.report_id,
-    #                                     action_type_id: NotificationActionType.reject_id,
-    #                                     action_user_id: report.tracks.last.action_user.id,
-    #                                     object_id: report.id,
-    #                                     object_type: "Report",
-    #                                     path_object_id: report.id,
-    #                                     path_object_type: "Report",
-    #                                     read: false,
-    #                                     timestamp: DateUtils.local_date_time
-    #                                     )
-    #   notification.save
-    # end
+    notification = user.notifications.build(user: user,
+                                            notification_type_id: NotificationType.report_id,
+                                            action_type_id: NotificationActionType.reject_id,
+                                            action_user_id: report.tracks.last.action_user.id,
+                                            object_id: report.id,
+                                            object_type: "Report",
+                                            path_object_id: report.id,
+                                            path_object_type: "Report",
+                                            read: false,
+                                            timestamp: DateUtils.local_date_time
+                                            )
+    notification.save
   end
 
   def mailer_subject(user)

@@ -21,6 +21,10 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
     self.report.associated_users self.user
   end
 
+  def notification_affected_users
+    report.associated_users
+  end
+
   def send_push_notification(user)
     return unless user.id == report.user_id
     message = "Expense rejected : #{self.rejected_expense}"
@@ -28,7 +32,17 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create(notification_type_id: NotificationType.expense_id,
+                                             action_type_id: NotificationActionType.reject_id,
+                                             action_user_id: self.user.id,
+                                             object_id: rejected_expense.id,
+                                             object_type: "Expense",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time
+    )
+    notification.save
   end
 
   def mailer_subject(user)

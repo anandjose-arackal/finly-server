@@ -1,7 +1,7 @@
 class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
 
   def event_id
-    Event.money_request_take_control_id
+    NotifierType.money_request_take_control_id
   end
 
   def affected_users

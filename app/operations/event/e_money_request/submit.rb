@@ -1,7 +1,7 @@
 class Event::EMoneyRequest::Submit < Event::EMoneyRequest::Base
 
   def event_id
-    Event.money_request_submit_id
+    NotifierType.money_request_submit_id
   end
 
   def affected_users

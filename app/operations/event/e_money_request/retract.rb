@@ -1,7 +1,7 @@
 class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
 
   def event_id
-    Event.money_request_retract_id
+    NotifierType.money_request_retract_id
   end
 
   def affected_users
@@ -15,6 +15,7 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
   end
 
   def set_notification(user)
+
   end
 
   def mailer_subject(user)
