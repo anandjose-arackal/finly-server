@@ -12,18 +12,17 @@ class Event::SetNotifier < Event::Base
   end
 
   def push_notification_affected_users
-
+    affected_users
   end
 
   def mailer_affected_users
-
+    affected_users
   end
 
   def notification_affected_users
-
+    affected_users
   end
 
-  
   def send_push_notification(user)
 
   end
@@ -37,20 +36,32 @@ class Event::SetNotifier < Event::Base
   end
 
   def process
-    users = affected_users
-    return if users.blank?
-    unless users.is_a?(ActiveRecord::Relation) or users.is_a?(Array)
-      users = [users]
+    # todo - have to ensure *_affected_users always returns an array of users
+
+    # sending mailers
+    users = mailer_affected_users
+    users.each do |user|
+      next if user.blank? or not user.is_a?(User)
+      user_event_configuration = load_configuration(user)
+      if allow_mailer(user_event_configuration)
+        send_mailer(user)
+      end
     end
+
+    # sending push notifications
+    users = push_notification_affected_users
     users.each do |user|
       next if user.blank? or not user.is_a?(User)
       user_event_configuration = load_configuration(user)
       if allow_push_notification(user_event_configuration)
         send_push_notification(user)
       end
-      if allow_mailer(user_event_configuration)
-        send_mailer(user)
-      end
+    end
+
+    # sending notifications
+    users = notification_affected_users
+    users.each do |user|
+      next if user.blank? or not user.is_a?(User)
       set_notification(user)
     end
   end

@@ -16,7 +16,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def init
     super
-    define_editable_attributes
+    define_editable_attributes if expense
     # id = (params[:expense_id] or params[:id])
     # self.expense = user.expenses.find_by(id: id)
     self.updated_expense_params = update_card_expense_params

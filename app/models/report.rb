@@ -69,7 +69,7 @@ class Report < ActiveRecord::Base
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
   scope :processing, -> { where report_status_id: ReportStatus.processing_id }
-  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
+  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }

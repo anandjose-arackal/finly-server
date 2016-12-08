@@ -131,7 +131,7 @@ class ReportComment < ActiveRecord::Base
           ReportCommentAction.id_for(:report_reimbursement_confirmed)
         validate_attributes [:user_id]
       when ReportCommentAction.id_for(:report_update)
-        validate_attributes [:user_id, :updated_field]
+        validate_attributes [:user_id, :updated_field, :updated_from, :updated_to]
       when ReportCommentAction.id_for(:report_reimbursed)
         validate_attributes [:user_id, :payment]
       when ReportCommentAction.id_for(:report_attach_receipt)

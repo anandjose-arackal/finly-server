@@ -19,6 +19,11 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   def affected_users
     users = self.report.associated_users
     users.reject { |r| r == self.user }
+
+  end
+
+  def notification_affected_users
+    affected_users
   end
 
   def send_push_notification(user)
@@ -29,7 +34,17 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.comment_id,
+                                             action_user_id: self.user.id,
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time
+    )
+    notification.save
   end
 
   def mailer_subject(user)

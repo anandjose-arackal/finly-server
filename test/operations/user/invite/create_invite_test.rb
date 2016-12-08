@@ -109,7 +109,7 @@ class CreateInviteTest < ActiveSupport::TestCase
   end
 
   test "cannot invite user whose email id already exists in the system" do
-    @invite_params[:pending_invite][:email] = "manager@finlytest.io"
+    @invite_params[:pending_invite][:email] = "manager0@finlytest.io"
     user_invite_op = User::Invite::Create.new(@admin, @invite_params)
     assert_no_difference 'User.count' do
       @result = user_invite_op.run

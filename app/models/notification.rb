@@ -37,6 +37,10 @@ class Notification < ActiveRecord::Base
 
   scope :unread, -> {where read: false}
 
+  validates :timestamp, presence: true
+  validates :user_id, presence: true
+  validates :notification_type_id, presence: true
+
   def generate_title
     content = ""
     content += self.object_type
@@ -53,12 +57,14 @@ class Notification < ActiveRecord::Base
         action = " retracted"
       when NotificationActionType.unapprove_id
         action = " unapproved"
+      when NotificationActionType.take_control_id
+        action = " taken control of"
       when NotificationActionType.credit_reimbursement_id
         action = " reimbursement credited"
       when NotificationActionType.update_id
         action = " updated"
       when NotificationActionType.comment_id
-        action = "comment added"
+        action = " has a new comment"
       when NotificationActionType.cash_withdrawal_id
         action = " in hand withdrawn"
       when NotificationActionType.cash_load_id
@@ -67,6 +73,10 @@ class Notification < ActiveRecord::Base
         action = " withdrawn from ATM"
       when NotificationActionType.credit_advance_request_id
         action = " credited"
+      when NotificationActionType.credit_id
+        action += " credited"
+      when NotificationActionType.debit_id
+        action += "debited"
       else
         # do nothing
     end
@@ -75,10 +85,18 @@ class Notification < ActiveRecord::Base
   end
 
 
-  def generate_body
+  def generate_body(user = nil)
     content = ""
-    action_user_name = User.find_by(id: self.action_user_id)
-    content += action_user_name
+
+    action_user = User.find_by(id: self.action_user_id)
+    if user and user.id == action_user.id
+      user_name = "You"
+    else
+      user_name = action_user.name
+    end
+
+    content += user_name
+    # preposition selector
     if action_user_id == user_id
       prep = " have"
     else
@@ -91,7 +109,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.approve_id
         action = " approved a"
       when NotificationActionType.reject_id
-        action = " rejected a"
+        action = " rejected an expense in"
       when NotificationActionType.retract_id
         action = " retracted a"
       when NotificationActionType.unapprove_id
@@ -114,6 +132,9 @@ class Notification < ActiveRecord::Base
         action = " credited an advance request of"
     end
 
+    # preposition selector
+    prep = ""
+
     # adding action
     content += action
 
@@ -125,11 +146,10 @@ class Notification < ActiveRecord::Base
     # adding amount
     content += amount if amount_value
 
+    # adding object
+    content += " " + object_type
 
-    case self.object_type
-      when "Expense"
 
-    end
   end
 
   def generate_link
@@ -137,11 +157,11 @@ class Notification < ActiveRecord::Base
   end
 
   def generate_date
-
+    return timestamp.strftime("%d %b %y")
   end
 
   def generate_time
-
+    return timestamp.strftime("%I:%M %p")
   end
 
 end

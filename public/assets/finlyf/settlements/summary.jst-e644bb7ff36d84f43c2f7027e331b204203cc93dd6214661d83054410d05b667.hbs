@@ -1,0 +1,57 @@
+<div class="col-sm-12 no-padding" style="height: 100%; padding: 10px 0;">
+  <div class="col-sm-6" style="height: 100%;border-right: 1px solid #bbb;">
+    <div class="row no-margin" style="height: 35%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Pending Reimbursement:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_reimbursement}}</label>
+      </div>
+    </div>
+
+    <div class="row no-margin" style="height: 35%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Advance Request:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_money_request}}</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6" style="height: 100%;">
+    <div class="row no-margin" style="height: 35%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Cash in Hand:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.cash_in_hand}}</label>
+
+      </div>
+    </div>
+
+    <div class="row no-margin" style="height: 35%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Card Balance:</span>
+      </div>
+      {{#if item.card_balance}}
+        <div class="col-sm-4">
+          <label class="settlement-summary-value">&#8377;&nbsp;{{item.card_balance}}</label>
+        </div>
+      {{else}}
+        <div class="col-sm-4">
+          <label class="settlement-summary-value">Not Assigned</label>
+        </div>
+      {{/if}}
+    </div>
+    <div class="row no-margin" style="height: 35%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Finly Account Balance:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.wallet_balance}}</label>
+      </div>
+    </div>
+  </div>
+
+</div>
