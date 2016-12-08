@@ -20,7 +20,7 @@
 
 require 'roo'
 class Import::Users < Import::Base
-  attr_accessor :file, :result_hash, :header, :import_fields, :sheet
+  attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee
 
   def authorized_user_types
     [:company_admin]
@@ -56,9 +56,14 @@ class Import::Users < Import::Base
       error_messages = params[:error_messages]
       params.delete(:error_messages)
       if type == 'email'
-        invitee = user.company.users.invite!(params)
+        self.invitee = user.company.users.invite!(params)
       elsif type == 'mobile'
-
+        self.invitee = user.company.users.invite!(params, user) do |u|
+          u.skip_invitation
+          u.update_attribute(:email, "")
+          # send welcome message to invitee
+          WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
+        end
       end
 
       if User.exists?(invitee.id)
@@ -78,14 +83,12 @@ class Import::Users < Import::Base
     self.response = generate_response_csv
   end
 
-
   private
 
   def retrieve_invite_type(row)
     if row[import_fields[:email]].present?
       return 'email'
-    elsif
-      row[import_fields[:mobile_number]].present?
+    elsif row[import_fields[:mobile_number]].present?
       return 'mobile'
     else
       # default case is email

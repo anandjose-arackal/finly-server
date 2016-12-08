@@ -68,7 +68,8 @@ class User::Show < User::Base
     def load_actions
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
-      if self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?
+      if (self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?) or
+        (selected_user.first_name == "" )
         actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
         actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
       else
