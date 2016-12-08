@@ -34,6 +34,14 @@ class Card < ActiveRecord::Base
 
   validates :proxy, uniqueness: true
 
+  # before_save do
+  #   if self.proxy
+  #     self.ending_number = proxy.last(4)
+  #   else
+  #     self.ending_number = ""
+  #   end
+  # end
+
   attr_accessor :balance, :available_card_eligibility
 
   def serial_id

@@ -412,14 +412,14 @@ section {
       <div class="modal-body"> 
         <div class="row no-margin">
           <div class="col-sm-12 text-right">
-            <a href="#" class="btn btn-warning btn-sm" target="_blank">Download Empty Excel File</a>
+            <a href="/assets/sample_import_format.xls" class="btn btn-warning btn-sm">Download Empty Excel File</a>
           </div>
         </div>
 
         <div class="row no-margin">
           <div class="col-sm-12">
-            <form id="form-import-employees" enctype="multipart/form-data">
-              <input type="file" name="blahblah">
+            <form id="form-import-employees" enctype="multipart/form-data" action="/import.csv">
+              <input type="file" name="file">
               <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
             </form>
           </div>

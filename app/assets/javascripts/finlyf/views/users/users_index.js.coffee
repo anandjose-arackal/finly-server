@@ -311,8 +311,33 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
   importEmployees: (e) ->
     e.preventDefault()
+    target = e.currentTarget
+    url = $(target).attr('action')
 
-    
+    # $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;").attr('disabled', 'disabled')
+    formData = new FormData(target)
+
+    $.ajax({
+      url: url,
+      type: "POST",
+      dataType: 'csv',
+      data: formData,
+      success: (res) ->
+        console.log res
+        # FinlyF.snapNotify(res.messages)
+        # if res.success == true
+        #   $("#modal-new").modal('hide')
+        #   _this.refetchCollection()
+        # else
+        #   $(target).html("Create")
+        #   $(target).attr('disabled', false)
+      error: (err) ->
+        console.log "Error", err 
+        # $(target).attr('disabled', false)
+      cache: false,
+      contentType: false,
+      processData: false
+    })
 
 
 
