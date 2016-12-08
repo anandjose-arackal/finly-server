@@ -1,4 +1,4 @@
-class Event::EReport::Base < Event::SetNotification
+class Event::EReport::Base < Event::SetNotifier
   attr_accessor :report
 
   def pre_validate
@@ -49,7 +49,7 @@ class Event::EReport::Base < Event::SetNotification
     end
   end
 
-  class Event::EReport::Base::MailerPresenter < Event::SetNotification::MailerPresenter
+  class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :report, :user, :body_val, :subject_val, :button_val
 
     def initialize(user, report, subject, body, button_name)

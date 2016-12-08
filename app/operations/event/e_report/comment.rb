@@ -12,7 +12,7 @@ class Event::EReport::EComment < Event::EReport::Base
   end
 
   def event_id
-    Event.report_comment_id
+    NotifierType.report_comment_id
   end
 
   def affected_users
@@ -28,7 +28,10 @@ class Event::EReport::EComment < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    # here also, only the owner needs to get a notification
+    # unless user == report.user_id
+    #
+    # end
   end
 
   def mailer_subject(user)

@@ -1,7 +1,7 @@
 class Event::EReport::Retract < Event::EReport::Base
 
   def event_id
-    Event.report_retract_id
+    NotifierType.report_retract_id
   end
 
   def affected_users
@@ -15,6 +15,7 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def set_notification(user)
+    # here controlling user needs to get a notification
 
   end
 

@@ -1,7 +1,7 @@
 class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
 
   def event_id
-    Event.settlement_add_cash_advance_id
+    NotifierType.settlement_add_cash_advance_id
   end
 
   def send_push_notification(user)

@@ -1,4 +1,4 @@
-class Event::ESettlement::Base < Event::SetNotification
+class Event::ESettlement::Base < Event::SetNotifier
   attr_accessor :payment
 
   def pre_validate
@@ -39,7 +39,7 @@ class Event::ESettlement::Base < Event::SetNotification
     'View Payment'
   end
 
-  class Event::ESettlement::Base::MailerPresenter < Event::SetNotification::MailerPresenter
+  class Event::ESettlement::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :payment, :user, :body_val, :subject_val, :button_val
 
     def initialize(user, payment, subject, body, button_name)

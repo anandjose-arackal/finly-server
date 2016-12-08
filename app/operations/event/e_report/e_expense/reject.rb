@@ -14,7 +14,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def event_id
-    Event.report_expense_reject_id
+    NotifierType.report_expense_reject_id
   end
 
   def affected_users

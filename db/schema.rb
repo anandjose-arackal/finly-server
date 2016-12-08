@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161206075953) do
+ActiveRecord::Schema.define(version: 20161207144223) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -323,28 +323,6 @@ ActiveRecord::Schema.define(version: 20161206075953) do
     t.string   "symbol",       limit: 255
   end
 
-  create_table "event_configurations", force: :cascade do |t|
-    t.integer  "user_id",                 limit: 4, null: false
-    t.integer  "event_id",                limit: 4, null: false
-    t.boolean  "allow_push_notification"
-    t.boolean  "allow_mailer"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-  end
-
-  add_index "event_configurations", ["event_id"], name: "index_event_configurations_on_event_id", using: :btree
-  add_index "event_configurations", ["user_id"], name: "index_event_configurations_on_user_id", using: :btree
-
-  create_table "events", force: :cascade do |t|
-    t.string   "name",                           limit: 255, null: false
-    t.boolean  "has_push_notification",                      null: false
-    t.boolean  "has_mailer",                                 null: false
-    t.boolean  "configurable_push_notification",             null: false
-    t.boolean  "configurable_mailer",                        null: false
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-  end
-
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -567,6 +545,65 @@ ActiveRecord::Schema.define(version: 20161206075953) do
   add_index "new_card_requests", ["company_id"], name: "index_new_card_requests_on_company_id", using: :btree
   add_index "new_card_requests", ["requesting_user_id"], name: "index_new_card_requests_on_requesting_user_id", using: :btree
   add_index "new_card_requests", ["status_id"], name: "index_new_card_requests_on_status_id", using: :btree
+
+  create_table "notification_action_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "notification_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.integer  "notification_type_id", limit: 4
+    t.integer  "user_id",              limit: 4
+    t.integer  "action_user_id",       limit: 4
+    t.integer  "amount_id",            limit: 4
+    t.integer  "object_id",            limit: 4
+    t.string   "object_type",          limit: 255
+    t.integer  "path_object_id",       limit: 4
+    t.string   "path_object_type",     limit: 255
+    t.integer  "action_type_id",       limit: 4
+    t.string   "changed_from",         limit: 255
+    t.string   "changed_to",           limit: 255
+    t.datetime "timestamp"
+    t.boolean  "read",                               default: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.text     "link",                 limit: 65535
+  end
+
+  add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
+  add_index "notifications", ["action_user_id"], name: "index_notifications_on_action_user_id", using: :btree
+  add_index "notifications", ["amount_id"], name: "index_notifications_on_amount_id", using: :btree
+  add_index "notifications", ["notification_type_id"], name: "index_notifications_on_notification_type_id", using: :btree
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
+
+  create_table "notifier_type_configurations", force: :cascade do |t|
+    t.integer  "user_id",                 limit: 4, null: false
+    t.integer  "event_id",                limit: 4, null: false
+    t.boolean  "allow_push_notification"
+    t.boolean  "allow_mailer"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "notifier_type_configurations", ["event_id"], name: "index_notifier_type_configurations_on_event_id", using: :btree
+  add_index "notifier_type_configurations", ["user_id"], name: "index_notifier_type_configurations_on_user_id", using: :btree
+
+  create_table "notifier_types", force: :cascade do |t|
+    t.string   "name",                           limit: 255, null: false
+    t.boolean  "has_push_notification",                      null: false
+    t.boolean  "has_mailer",                                 null: false
+    t.boolean  "configurable_push_notification",             null: false
+    t.boolean  "configurable_mailer",                        null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+  end
 
   create_table "opro_auth_grants", force: :cascade do |t|
     t.string   "code",                    limit: 255
@@ -1041,8 +1078,6 @@ ActiveRecord::Schema.define(version: 20161206075953) do
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_tags", "companies"
-  add_foreign_key "event_configurations", "events"
-  add_foreign_key "event_configurations", "users"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -1073,6 +1108,10 @@ ActiveRecord::Schema.define(version: 20161206075953) do
   add_foreign_key "money_requests", "users"
   add_foreign_key "new_card_requests", "card_types"
   add_foreign_key "new_card_requests", "companies"
+  add_foreign_key "notifications", "notification_types"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "notifier_type_configurations", "notifier_types", column: "event_id"
+  add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
   add_foreign_key "policies", "companies"

@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: event_configurations
+# Table name: notifier_type_configurations
 #
 #  id                      :integer          not null, primary key
 #  user_id                 :integer          not null
@@ -11,17 +11,10 @@
 #  updated_at              :datetime         not null
 #
 
+class NotifierTypeConfiguration < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :notifier_type
 
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  user_id: 
-  event_id: 
-  allow_push_notification: false
-  allow_mailer: false
-
-two:
-  user_id: 
-  event_id: 
-  allow_push_notification: false
-  allow_mailer: false
+  scope :with_event, ->(id) { where event_id: id }
+  scope :with_user, ->(id) { where user_id: id }
+end

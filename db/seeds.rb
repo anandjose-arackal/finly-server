@@ -71,6 +71,18 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create id: 11, name: 'Closed'
 end
 
+if Notification.count == 0
+  NotificationType::VALUES.each do |k, v|
+    NotificationType.create id: v, name: k
+  end
+end
+
+if NotificationActionType.count == 0
+  NotificationActionType::VALUES.each do |k, v|
+    NotificationActionType.create id: v, name: k
+  end
+end
+
 if ReportCommentAction.count == 0
   ReportCommentAction::ACTIONS.each do |key, value|
     ReportCommentAction.create id: value, name: key
@@ -109,12 +121,12 @@ if State.count == 0
   end
 end
 
-if Event.count == 0
-  Event::ACTIONS.each do |item|
-    Event.create id: (Event::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
-                 has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
-                 configurable_push_notification: item[:configurable_push_notification],
-                 configurable_mailer: item[:configurable_mailer]
+if NotifierType.count == 0
+  NotifierType::ACTIONS.each do |item|
+    NotifierType.create id: (NotifierType::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
+                        has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
+                        configurable_push_notification: item[:configurable_push_notification],
+                        configurable_mailer: item[:configurable_mailer]
   end
 end
 
