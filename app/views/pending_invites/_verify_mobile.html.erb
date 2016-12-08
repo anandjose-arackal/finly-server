@@ -83,6 +83,7 @@
         dataType: "JSON",
         type: "POST",
         data: {
+          user_id: <%= @pending_user.id %>,
           authenticity_token: $("#authenticity_token").val()
         },
         success: function(res){

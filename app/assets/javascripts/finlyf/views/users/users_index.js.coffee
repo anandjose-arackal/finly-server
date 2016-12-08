@@ -23,6 +23,10 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .btn-invite-employee': 'processEmployeeInvitation'
     'click .btn-confirm-invite-employee': 'inviteEmployee'
 
+    'click .btn-import-employees': 'processImport'
+    'submit #form-import-employees': 'importEmployees'
+    # 'ajax:success #form-import-employees': 'importEmployees'
+
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
     'keyup .search-user': 'prepareSearch'
@@ -298,6 +302,51 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         $(target).attr('disabled', false)
     })
 
+
+  processImport: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    modal = $(@el).find("#modal-import-employees")
+    $(modal).modal('show')
+    $(modal).find("input[name=authenticity_token]").val($("#authenticity_token").val())
+
+  importEmployees: (e) ->
+    # console.log "Success", e
+    # target = e.currentTarget
+
+    # $(target).find('input[type=submit]').attr('disabled', true).val('Submitted!')
+    # e.preventDefault()
+    # target = e.currentTarget
+    # url = $(target).attr('action')
+
+    # # $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;").attr('disabled', 'disabled')
+    # formData = new FormData(target)
+
+    # $.ajax({
+    #   url: url,
+    #   type: "POST",
+    #   dataType: 'csv',
+    #   data: formData,
+    #   success: (res) ->
+    #     console.log res
+    #     # FinlyF.snapNotify(res.messages)
+    #     # if res.success == true
+    #     #   $("#modal-new").modal('hide')
+    #     #   _this.refetchCollection()
+    #     # else
+    #     #   $(target).html("Create")
+    #     #   $(target).attr('disabled', false)
+    #   error: (err) ->
+    #     console.log "Error", err 
+    #     # $(target).attr('disabled', false)
+    #   cache: false,
+    #   contentType: false,
+    #   processData: false
+    # })
+
+
+
   filterState: (e) ->
     e.preventDefault()
     target = e.currentTarget
@@ -377,7 +426,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     params = {
       'filter_state': $(container).find(".filter-state").val() || ""
-      'filter_user_type': $(container).find(".filter-user-type").val() || ""
+      'filter_role': $(container).find(".filter-role").val() || ""
     }
 
     if @params.view

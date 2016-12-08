@@ -182,13 +182,16 @@ class Import::Users < Import::Base
                                          gender: row[import_fields[:gender]],
                                          city: row[import_fields[:city]]
                                         },
-                    cards_attributes: [{proxy: row[import_fields[:card_serial_id]],
+                    error_messages: errors
+                  }
+                                
+    if row[import_fields[:card_serial_id]].present?
+      user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
                                       card_type_id: 1,
                                       product_code: "NGPRHD",
                                       ending_number: row[import_fields[:card_serial_id]].last(4)
-                                      }],
-                    error_messages: errors
-                  }
+                                      }]
+    end
     return user_params
   end
 

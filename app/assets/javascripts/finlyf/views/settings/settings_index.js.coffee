@@ -7,6 +7,10 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
   events:
     'click .navigate-tab li a': 'navigateTab'
     'submit form#changePassword': 'changePassword'
+    'click .btn-iframe-modal': 'openiFrame'
+
+    'click .btn-card-update-status': 'prepareUpdateCardStatus'
+    'click .btn-confirm-card-status': 'updateCardStatus'
     
   initialize: (options) ->
     console.log "init, ", options
@@ -89,3 +93,53 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
         else
           ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'})
     })
+
+  openiFrame: (e) ->
+    target = e.currentTarget
+    src = $(target).attr('data-src')
+
+    modal = $(@el).find('#modal-iframe')
+    $(modal).find('iframe').attr('src', src)
+
+  prepareUpdateCardStatus: (e) ->
+    @current_card_status = $(e.currentTarget).attr('data-card-status-type')
+    modal = $(@el).find("#modal-confirm-card-status")
+    $(modal).find(".btn-confirm-card-status").attr('data-card-status-type', @current_card_status)
+
+    $(modal).modal('show')
+
+  updateCardStatus: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    _this = @
+    target_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spin fa-spinner'></i>&nbsp;&nbsp;")
+    modal = $(target).closest('.modal')
+  
+    $.ajax({
+      url: '/cards/update_status',
+      type: "POST",
+      dataType: 'json',
+      data: {
+        view: 'personal',
+        user_id: $("#current_user_id").val(),
+        status_type: _this.current_card_status,
+        password: $(target).closest('.modal-body').find('input[type=password]').val()
+      },
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          _this.fetchTabContent()
+          $(target).removeAttr('disabled').text(target_text)
+          $(target).closest('.modal-body').find('input[type=password]').val("")
+        else
+          $(target).removeAttr('disabled').text(target_text)
+      error: (err) ->
+        $(target).removeAttr('disabled').text(target_text)
+        console.log("ERror", err)
+    })
+
+
+
+

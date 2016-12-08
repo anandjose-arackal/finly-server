@@ -102,10 +102,15 @@ class UsersController < ApplicationController
   def import
     import_op = Import::Users.new(current_user, params)
     @result = import_op.run
+    # debugger
     respond_to do |format|
-      format.csv { send_data @result }
+      format.csv { send_data @result, :type => 'text/csv; charset=iso-8859-1; header=present', :disposition => "attachment;data=result.csv" }
     end
   end
+
+  # def sample_file
+    
+  # end
 
   # params = {
   #   target_user_id: 1,
