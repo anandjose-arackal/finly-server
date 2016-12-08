@@ -622,13 +622,13 @@ class FinlyF.Views.User extends Backbone.View
           console.log "an event is present."
           if $(modal).find("input[name=activate_employee_with_details]").length
             # console.log $(modal).find("input[name=activate_employee_with_deatils]").html()
-            # console.log "will attach signup event"
+            console.log "will attach signup event"
             _this.attachSignUpEvent(modal)
           else
-            # console.log "will attach verification event"
+            console.log "will attach verification event"
             _this.attachVerifyEvent(modal)
         else
-          # console.log "will attach signup event"
+          console.log "will attach signup event"
           _this.attachSignUpEvent(modal)
 
       error: (err) ->

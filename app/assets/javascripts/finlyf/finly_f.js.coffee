@@ -227,7 +227,7 @@ window.FinlyF =
     $(el).find('.sidebar .filter-expense-type-id').val(params.filter_expense_type_id)
 
     # Dropdown Filters for settlements Admin and employees
-    $(el).find(".dropdown-filters .filter-user-type").val(params.filter_user_type)
+    $(el).find(".dropdown-filters .filter-role").val(params.filter_role)
     $(el).find(".dropdown-filters .filter-state").val(params.filter_state)
 
     # Generalized events

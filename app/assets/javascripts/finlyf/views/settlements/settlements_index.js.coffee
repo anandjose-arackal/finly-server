@@ -1281,7 +1281,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     params = {
       'filter_state': $(container).find(".filter-state").val() || ""
-      'filter_user_type': $(container).find(".filter-user-type").val() || ""
+      'filter_role': $(container).find(".filter-role").val() || ""
     }
 
     if @params.view

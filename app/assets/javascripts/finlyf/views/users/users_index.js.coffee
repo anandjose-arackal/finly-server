@@ -23,6 +23,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .btn-invite-employee': 'processEmployeeInvitation'
     'click .btn-confirm-invite-employee': 'inviteEmployee'
 
+    'click .btn-import-employees': 'processImport'
+    'submit #form-import-employees': 'importEmployees'
+
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
     'keyup .search-user': 'prepareSearch'
@@ -298,6 +301,21 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         $(target).attr('disabled', false)
     })
 
+
+  processImport: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    modal = $(@el).find("#modal-import-employees")
+    $(modal).modal('show')
+
+  importEmployees: (e) ->
+    e.preventDefault()
+
+    
+
+
+
   filterState: (e) ->
     e.preventDefault()
     target = e.currentTarget
@@ -377,7 +395,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     params = {
       'filter_state': $(container).find(".filter-state").val() || ""
-      'filter_user_type': $(container).find(".filter-user-type").val() || ""
+      'filter_role': $(container).find(".filter-role").val() || ""
     }
 
     if @params.view

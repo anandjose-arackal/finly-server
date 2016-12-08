@@ -401,3 +401,30 @@ section {
 </div>
 <div class="modal fade" tabindex="-1" role="dialog" id="modal-activate-employee" data-backdrop="true">
 </div><!-- /.modal -->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-import-employees" data-backdrop="true">
+  <div class="modal-dialog" role="document" style="width: 40%; margin-top: 113px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Invite Employees by Importing Excel File</h4>
+      </div>
+      <div class="modal-body"> 
+        <div class="row no-margin">
+          <div class="col-sm-12 text-right">
+            <a href="#" class="btn btn-warning btn-sm" target="_blank">Download Empty Excel File</a>
+          </div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-12">
+            <form id="form-import-employees" enctype="multipart/form-data">
+              <input type="file" name="blahblah">
+              <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /.modal -->
