@@ -89,7 +89,8 @@
 }
 
 .receipt-container{
-  height: 100%;
+  /*height: 100%;*/
+  margin-bottom: 10px;
 }
 
 .item.col-sm-3 .receipt-container .receipt-image, .receipt .receipt-container .receipt-image{
@@ -108,7 +109,7 @@
   position:fixed;
   background: #fff;
   background: #F5F6F9;
-  /*position: relative;*/
+  position: relative;
   height: calc(100% - 100px);
   overflow-y: scroll;
   z-index: 4;
@@ -333,14 +334,14 @@
 
             <li class="dropdown" id="navbar-user-dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 12px 10px 8px 10px;">
-                <img src="/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
+                <img src="/common/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu">
                 <li>
                   <div class="navbar-user-dropdown navbar-user-dropdown-profile">
                     <div class="row">
                       <div class="col-xs-4" style="padding: 0;padding-left: 20px;">
-                        <img src="/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
+                        <img src="/common/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
                       </div>
                       <div class="col-xs-8">
                         <p class="text-left"><strong class="navbar-user-dropdown-name"></strong></p>
@@ -417,7 +418,7 @@
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">
-    <div class="modal-dialog" role="document" style="width: 60%;">
+    <div class="modal-dialog" role="document" style="">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -427,6 +428,10 @@
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-receipt-preview">
+    
   </div><!-- /.modal -->
 
   

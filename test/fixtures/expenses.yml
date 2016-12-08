@@ -21,18 +21,19 @@
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  amount_id: 
-  expense_status_id: 
-  note: MyText
-  date: 2016-06-29 19:46:48
-  user_id: 
-  expense_type_id: 
+#one:
+#  amount_id:
+#  expense_status_id:
+#  note: MyText
 
-two:
-  amount_id: 
-  expense_status_id: 
-  note: MyText
-  date: 2016-06-29 19:46:48
-  user_id: 
-  expense_type_id: 
+#  date: 2016-06-29 19:46:48
+#  user_id:
+#  expense_type_id:
+#
+#two:
+#  amount_id:
+#  expense_status_id:
+#  note: MyText
+#  date: 2016-06-29 19:46:48
+#  user_id:
+#  expense_type_id:

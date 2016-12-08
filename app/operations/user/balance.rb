@@ -60,16 +60,16 @@ class User::Balance < User::Base
     end
 
     # Cash In Hand
-    self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
-    self.balances[:current_user_cash_in_hand] = user.balance_sheet.cash_in_hand.value rescue nil if params[:current_user_cash_in_hand] or params[:current_user_all]
+    self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
+    self.balances[:current_user_cash_in_hand] = user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Reimbursement
-    self.balances[:target_user_pending_reimbursement] = target_user.balance_sheet.pending_reimbursement.value if params[:target_user_pending_reimbursement] or params[:target_user_all]
-    self.balances[:current_user_pending_reimbursement] = user.balance_sheet.pending_reimbursement.value if params[:current_user_pending_reimbursement] or params[:current_user_all]
+    self.balances[:target_user_pending_reimbursement] = target_user.balance_sheet.pending_reimbursement.amount_value if params[:target_user_pending_reimbursement] or params[:target_user_all]
+    self.balances[:current_user_pending_reimbursement] = user.balance_sheet.pending_reimbursement.amount_value if params[:current_user_pending_reimbursement] or params[:current_user_all]
 
     # Pending Cash Advance
-    self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.value if params[:target_user_pending_advance_request] or params[:target_user_all]
-    self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.value if params[:current_user_pending_advance_request] or params[:current_user_all]
+    self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_advance_request] or params[:target_user_all]
+    self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.amount_value if params[:current_user_pending_advance_request] or params[:current_user_all]
 
   end
 

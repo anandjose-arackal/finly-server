@@ -21,6 +21,8 @@ class PolicyConfiguration < ActiveRecord::Base
   belongs_to :policy
   belongs_to :report_currency, class_name: 'Currency'
 
+  has_paper_trail
+
   scope :for_policy, ->(policy_id) { find_by id: policy_id }
 
   validates :policy_id, presence: true, uniqueness: true

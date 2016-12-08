@@ -5,12 +5,11 @@ module Constants
   VALID_GENDER = /[MmFf]/i
 
   # todo - needs to be edited once we get the account details.
-  ITZCASH_EMAIL_ID = 'something@itzcash.com'
+  ITZCASH_EMAIL_ID = 'sreeram.nr@finly.io'
 
-  # todo - remove admin after testing
   SUPERADMIN_ACCOUNTS = ['sreeram@finlytest.io', 'vivek@finlytest.io', 'veekshith@finlytest.io', 'bala@finlytest.io', 'admin@finlytest.io']
 
-  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
+  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 

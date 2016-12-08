@@ -1,24 +1,22 @@
-<% @result.categories.each do |category| %>
-    <div class="row" style="padding-left: 20px; padding-right: 10px">
-      <div class="col-md-11" style="font-size: 12px; font-weight: 500">
-        <%= category.name %>
-      </div>
-      <form data-remote data-turboboost method="post" id="deleteCategory<%= category.id %>" action="<%= category_path(category) %>">
-        <input name="_method" type="hidden" value="delete"/>
-        <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
-        <input name="category_id" type="hidden" value="<%= category.id %>">
-        <div onclick="$('#deleteCategory<%= category.id %>').submit()" class="col-md-1 fa fa-close" style="cursor: pointer"></div>
-      </form>
+<div class="col-sm-12">
+ <% @result.categories.each do |category| %>
+  <div class="row" style="padding-left: 20px; padding-right: 10px">
+    <div class="col-md-11" style="font-size: 12px; font-weight: 500">
+      <%= category.name %>
     </div>
+    <i class="fa fa-close btn-delete-category" data-url="<%= category_path(category) %>"></i>
+  </div>
 
-    <hr style="margin-top: 10px; margin-bottom: 10px;">
-<% end %>
+  <hr style="margin-top: 10px; margin-bottom: 10px;">
+<% end %> 
+</div>
 
 
-<form data-remote data-turboboost method="post" action="<%= categories_path %>" style="margin-top: 30px;">
+
+<form id="form-add-category" action="<%= categories_path %>" style="margin-top: 30px;">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
   <input type="text" class="form-control" name="category[name]" id="newCategory" placeholder="Add new category name" style="display: inline-block;width: 35%; border-radius: 1px">
-  <button class="green-button" id="add_new_category" style="margin-left: 80px;height: 30px; line-height: 30px" type="submit" onclick="setHeight()">
+  <button class="green-button btn-add-category" id="add_new_category" style="margin-left: 80px;height: 30px; line-height: 30px" type="submit">
     ADD NEW CATEGORY
   </button>
 </form>

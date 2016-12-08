@@ -11,8 +11,6 @@ class Card::Transaction::Create < BaseOperation
 
   end
 
-
-
   def initialize(params, messages={})
     self.params = params
     self.messages = messages
@@ -23,6 +21,7 @@ class Card::Transaction::Create < BaseOperation
     self.user = self.card.user rescue nil
     self.type = params[:transaction_type]
     self.mode = params[:transaction_mode]
+    params[:user_id] = user.id if user
   end
 
   def authorize
@@ -39,14 +38,13 @@ class Card::Transaction::Create < BaseOperation
     case type
       when "Debit"
         case mode
-          when "POS"
+          when "POS", "Ecom"
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
               messages[:error] = transaction.errors.full_messages
               return false
             end
-
             # create the associated card expense for this transaction
             @result = Expense::ExCard::Create.(transaction, card)
             unless @result.success?
@@ -56,6 +54,8 @@ class Card::Transaction::Create < BaseOperation
               transaction.save
               return false
             end
+            transaction.expense = @result.expense
+            transaction.save
             return true
           when "ATM"
             # create a transaction out of it
@@ -65,8 +65,16 @@ class Card::Transaction::Create < BaseOperation
               return false
             end
             # add to cash in hand
-            unless user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
-              messages[:error] = "Could not add credited amount to cash in hand. Try again"
+            if user.payments.create(amount_attributes: {value: params[:billing_amount_attributes][:value], currency_id: 1},
+                                    date: DateUtils.local_date,
+                                    payment_type_id: PaymentType.id_for(:atm_withdrawal),
+                                    note: "Atm Withdrawal",
+                                    initiating_user: user,
+                                    receiving_user: user)
+              user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
+              return true
+            else
+              messages[:error] = "Could not add credited amount to cash in hand"
               transaction.expensed = false
               transaction.error_message = @result.messages[:error]
               transaction.save

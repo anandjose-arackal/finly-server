@@ -1,6 +1,5 @@
 require 'roo'
-# todo - come back to this once you get details about the fields of speadsheet
-
+# todo - come back to this once you get details about the fields of spreadsheet
 
 class Card::Assign::ImportCards < Card::Assign::Base
 

@@ -1,6 +1,6 @@
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Credit < User::Wallet::Base
-  attr_accessor :from_user, :to_user, :from_account, :to_account, :amount, :to_user_payment, :from_user_payment
+  attr_accessor :initiating_user, :target_user, :initiating_account, :target_account, :amount, :payment
 
   def authorized_user_types
     if params.present? and params[:from_account].present? and params[:to_account].present?
@@ -16,7 +16,7 @@ class User::Wallet::Credit < User::Wallet::Base
   def pre_validate
     super
     if params.blank? or params[:from_account].blank? or params[:to_account].blank? or
-        (params[:to_user].blank? and params[:to_user_id].blank?)
+      (params[:to_user].blank? and params[:to_user_id].blank?)
       add_message :error, 'Invalid request'
     end
   end
@@ -24,17 +24,16 @@ class User::Wallet::Credit < User::Wallet::Base
   def init
     super
     self.amount= params[:amount].to_d rescue nil
-    self.from_account = params[:from_account].to_sym rescue nil
-    self.to_account = params[:to_account].to_sym rescue nil
-    self.from_user = user
-    self.to_user = params[:to_user]
-    if to_user.blank? and params[:to_user_id].present?
+    self.initiating_account = params[:from_account].to_sym rescue nil
+    self.target_account = params[:to_account].to_sym rescue nil
+    self.initiating_user = user
+    self.target_user = params[:to_user]
+    if target_user.blank? and params[:to_user_id].present?
       if params[:to_user_id].to_i == user.id
-        self.to_user = user
+        self.target_user = user
       else
-        op= User::Team::Index.new(user, params)
-        users = op.run
-        self.to_user = (users.with_id(params[:to_user_id]).first rescue nil) if op.success? and users.present?
+        users = User::Team::Index.(user, params)
+        self.target_user = (users.with_id(params[:to_user_id]).first rescue nil) if users.present?
       end
     end
   end
@@ -44,24 +43,24 @@ class User::Wallet::Credit < User::Wallet::Base
     if self.amount.blank?
       add_message :error, 'Amount cannot be blank'
     end
-    if from_user.blank? or to_user.blank?
+    if initiating_user.blank? or target_user.blank?
       add_message :error, 'User not found'
     end
-    if from_account.blank? or to_account.blank?
+    if initiating_account.blank? or target_account.blank?
       add_message :error, 'Account cannot be blank'
     end
     return if has_errors?
-    if to_account == :card and to_user.cards.blank?
+    if target_account == :card and target_user.cards.blank?
       add_message :error, 'User is not associated with a card to initiate this transfer'
       return
     end
-    if from_account == :wallet and from_user.wallet.balance_value < self.amount
+    if initiating_account == :wallet and initiating_user.wallet.balance_value < self.amount
       add_message :error, 'Insufficient funds to initiate the transfer'
     end
-    unless (from_account == :virtual_account or from_account == :wallet) and (to_account == :card or to_account == :wallet)
+    unless (initiating_account == :virtual_account or initiating_account == :wallet) and (target_account == :card or target_account == :wallet)
       add_message :error, 'Invalid Request'
     end
-    if from_account == :virtual_account
+    if initiating_account == :virtual_account
       balance_presenter = Company::VirtualAccount::Balance.(user, params)
       if balance_presenter.success?
         balance_amount = balance_presenter.balance
@@ -72,107 +71,85 @@ class User::Wallet::Credit < User::Wallet::Base
         add_message :error, balance_presenter.messages[:error]
       end
     end
-    if to_account == :card and self.amount > 50000
+    if target_account == :card and self.amount > 50000
       add_message :error, 'Cannot transfer the given amount. Please reduce the amount and try again'
     end
   end
 
   def process
+    payment_attributes = {}
+    payment_attributes[:initiating_user] = initiating_user
+    payment_attributes[:receiving_user] = target_user
+    payment_attributes[:date] = DateUtils.local_date
+    payment_attributes[:note] = params[:note]
+    payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-    case from_account
-      when :virtual_account
-        payment_attributes = {}
-        payment_attributes[:initiating_user] = from_user
-        payment_attributes[:receiving_user] = to_user
-        payment_attributes[:date] = DateUtils.local_date
-        payment_attributes[:note] = params[:note]
-        payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
+    case initiating_account
+    when :virtual_account
+      if target_account == :wallet
 
-        if to_account == :wallet
+        if target_user.wallet.add_funds(self.amount)
+          user.company.account.funds_credited_to_wallet(self.amount)
 
-          if to_user.wallet.add_funds(self.amount)
-            user.company.account.funds_credited_to_wallet(self.amount)
-
-            payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)
-            self.to_user_payment = to_user.payments.create payment_attributes
-          else
-            add_message :error, to_user.wallet.errors.full_messages
-          end
-
-        elsif to_account == :card
-
-          credit_presenter = ItzCash::Credit.(to_user, params)
-          unless credit_presenter.success?
-            add_message :error, credit_presenter.messages[:error]
-            return
-          end
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_virtual_account_to_card)
-          self.to_user_payment =to_user.payments.create payment_attributes
-
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_wallet)
+          self.payment = Payment.create payment_attributes
+        else
+          add_message :error, target_user.wallet.errors.full_messages
         end
-      when :wallet
-        payment_from_attributes = {}
-        payment_from_attributes[:initiating_user] = to_user
-        payment_from_attributes[:receiving_user] = from_user
-        payment_from_attributes[:date] = DateUtils.local_date
-        payment_from_attributes[:note] = params[:note]
-        payment_from_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-        payment_to_attributes = {}
-        payment_to_attributes[:initiating_user] = from_user
-        payment_to_attributes[:receiving_user] = to_user
-        payment_to_attributes[:date] = DateUtils.local_date
-        payment_to_attributes[:note] = params[:note]
-        payment_to_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
-        if to_account == :wallet
+      elsif target_account == :card
 
-          if from_user.wallet.subtract_funds(self.amount)
-            to_user.wallet.add_funds(self.amount)
-            payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)
-            self.from_user_payment =from_user.payments.create payment_from_attributes
-
-            payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_wallet)
-            self.to_user_payment =to_user.payments.create payment_to_attributes
-
-            add_message :success, 'Credit successful'
-          else
-            add_message :error, from_user.wallet.errors.full_messages
-          end
-
-        elsif to_account == :card
-
-          credit_presenter = ItzCash::Credit.(to_user, params)
-          if credit_presenter.success?
-            from_user.wallet.subtract_funds(self.amount)
-
-            payment_from_attributes[:payment_type_id] = PaymentType.id_for(:initiate_credit_from_wallet_to_card)
-            self.from_user_payment =from_user.payments.create payment_from_attributes
-
-            payment_to_attributes[:payment_type_id] = PaymentType.id_for(:receive_credit_from_wallet_to_card)
-            self.to_user_payment =to_user.payments.create payment_to_attributes
-
-            add_message :success, 'Credit successful'
-          else
-            add_message :error, credit_presenter.messages[:error]
-          end
-
+        credit_presenter = ItzCash::Credit.(target_user, params)
+        unless credit_presenter.success?
+          add_message :error, credit_presenter.messages[:error]
+          return
         end
+        payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_card)
+        self.payment = Payment.create payment_attributes
+
+      end
+    when :wallet
+
+      if target_account == :wallet
+        if initiating_user.wallet.subtract_funds(self.amount)
+          target_user.wallet.add_funds(self.amount)
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_wallet)
+          self.payment = Payment.create payment_attributes
+
+          add_message :success, 'Credit successful'
+        else
+          add_message :error, initiating_user.wallet.errors.full_messages
+        end
+
+      elsif target_account == :card
+
+        credit_presenter = ItzCash::Credit.(target_user, params)
+        if credit_presenter.success?
+          initiating_user.wallet.subtract_funds(self.amount)
+
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_card)
+          self.payment = Payment.create payment_attributes
+
+          add_message :success, 'Credit successful'
+        else
+          add_message :error, credit_presenter.messages[:error]
+        end
+
+      end
     end
-    
+
   end
 
   def success
-    params[:to_user_payment] = self.to_user_payment
-    params[:from_user_payment] = self.from_user_payment
+    params[:payment] = self.payment
     User::Wallet::Credit::SuccessPresenter.new(user, params, messages)
   end
 
   class User::Wallet::Credit::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :to_user_payment, :from_user_payment
+    attr_accessor :payment
 
     def init
-      self.from_user_payment = params[:from_user_payment]
-      self.to_user_payment = params[:to_user_payment]
+      self.payment = params[:from_user_payment]
     end
   end
 

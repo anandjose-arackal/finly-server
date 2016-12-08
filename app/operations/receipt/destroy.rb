@@ -21,6 +21,13 @@ class Receipt::Destroy < Receipt::Base
     end
   end
 
+  def validate
+    if receipt.parent
+      messages[:error] << "Receipt that is associated with an expense or report cannot be deleted."
+      return false
+    end
+  end
+
   def process
     unless receipt.destroy
       messages[:error] << "DB Error. Try again."

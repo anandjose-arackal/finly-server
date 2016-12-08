@@ -46,6 +46,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -56,6 +57,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :validatable, password_length: 8..128
 
   attr_accessor :view, :invitation_note
+  attr_reader :raw_invitation_token
 
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
@@ -72,7 +74,6 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
-  has_many :cards
 
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
@@ -85,9 +86,10 @@ class User < ActiveRecord::Base
 
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
-  has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
+  has_one :auto_submit_config, as: :submitable
 
   has_many :cards
   has_many :card_transactions
@@ -177,6 +179,11 @@ class User < ActiveRecord::Base
     self.team_mapping.build(default: true).save if self.team_mapping.count == 0
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
+    self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false).save
+  end
+
+  def payments
+    Payment.involving_user(self.id)
   end
 
   def name
@@ -267,7 +274,7 @@ class User < ActiveRecord::Base
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == DateUtils.local_date
     payments = self.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_to_user.sum(:value)
+    payments_to_user = payments.transferred_cash_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     settlement = payments.settlement.sum(:value)
     reports = self.reports.processed.submitted_after(date)
@@ -276,7 +283,7 @@ class User < ActiveRecord::Base
     pending_reimbursement = reports.with_amount.without_payment.sum(:value)
     value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
     # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    min_value = [cash, value].min
+    min_value = [cash.value, value].min
     Amount.new(value: min_value, currency: cash.currency)
   end
 
@@ -284,7 +291,6 @@ class User < ActiveRecord::Base
   alias_method :finance_manager_name, :user_name
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
-
 
   def as_json(options = {})
     json = super(options)

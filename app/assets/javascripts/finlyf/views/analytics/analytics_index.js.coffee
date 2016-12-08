@@ -75,6 +75,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
+    FinlyF.stopMainLoader()
+
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")

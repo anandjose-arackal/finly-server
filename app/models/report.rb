@@ -20,9 +20,9 @@
 #  accounted                    :boolean          default(FALSE), not null
 #  archived                     :boolean          default(FALSE), not null
 #  is_deleted                   :boolean          default(FALSE), not null
+#  auto_submit                  :boolean          default(FALSE), not null
+#  auto_approve                 :boolean          default(FALSE), not null
 #
-
-
 
 
 
@@ -49,6 +49,7 @@ class Report < ActiveRecord::Base
   validates :status, presence: true
   validate :is_employee
   validate :has_expenses
+  validate :controller_has_role
 
   default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
@@ -66,7 +67,7 @@ class Report < ActiveRecord::Base
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
   scope :processing, -> { where report_status_id: ReportStatus.processing_id }
-  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
+  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
@@ -109,6 +110,7 @@ class Report < ActiveRecord::Base
   def associated_users(user_before = nil, ordered = false)
     return nil if self.tracks.blank?
     trackings = tracks.without_take_control_action
+
     if user_before.present?
       track = trackings.find_by(action_user_id: user_before.id)
       unless track.blank?
@@ -288,14 +290,22 @@ class Report < ActiveRecord::Base
 
   def require_reimbursement?
     report_total = total_amount
-    latest_expense = latest_expense
+    latest_exp = latest_expense
     date = nil
-    date = latest_expense.date if latest_expense.present?
+    date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
   end
 
   private
+
+  def controller_has_role
+    if controlling_user_id.present?
+      unless controlling_user_role_id.present?
+        errors.add(:report, 'cannot be processed')
+      end
+    end
+  end
 
   def is_employee
     unless self.user.employee?

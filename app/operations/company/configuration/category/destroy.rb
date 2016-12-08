@@ -18,8 +18,8 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
       messages[:error] << 'Category not found'
       return false
     end
-    if category.name == 'Personal' or category.name == 'Other'
-      messages[:error] << "Cannot destroy 'Personal' and 'Other' categories"
+    if category.name == "Other" or category.name == "Personal"
+      messages[:error] << "Cannot destroy 'Other' or 'Personal' categories"
       return false
     end
   end
@@ -31,7 +31,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
   end
 
   def post_process
-    messages[:success] << 'Category destroyed'
+    add_message :success, 'Category destroyed'
   end
 
 end

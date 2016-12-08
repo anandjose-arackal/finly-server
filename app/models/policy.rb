@@ -13,6 +13,7 @@
 #
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -33,6 +34,7 @@ class Policy < ActiveRecord::Base
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
   scope :with_id, -> (id) { where id: id }
+  scope :not_deleted, -> {where is_deleted: false}
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules

@@ -23,13 +23,14 @@
 #  expensed              :boolean          default(TRUE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
+#  expense_id            :integer
 #
 
 class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 
-  has_one :card_expense
+  belongs_to :expense
 
   belongs_to :transaction_amount, class_name: "Amount", dependent: :destroy
   belongs_to :card_amount, class_name: "Amount", dependent: :destroy
@@ -41,5 +42,10 @@ class CardTransaction < ActiveRecord::Base
   accepts_nested_attributes_for :transaction_amount
   accepts_nested_attributes_for :card_amount
   accepts_nested_attributes_for :billing_amount
+
+  default_scope {order(transaction_timestamp: :desc)}
+
+  scope :debits, -> {where transaction_type: "Debit"}
+  scope :credits, -> {where transaction_type: "Credit"}
 
 end

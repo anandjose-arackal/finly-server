@@ -1,18 +1,13 @@
 <div class="row no-margin text-right" style="height: 60px;">
-  {{#if item.view}}
-    {{#if_eq item.view 'personal'}}
-      {{#if item.editable}}
-        <button class="btn btn-edit-expense btn-sm btn-warning"><i class='fa fa-edit'></i>&nbsp;&nbsp;Edit</button>
-      {{/if}}
-    {{/if_eq}}
-  {{else}}
+  {{#if item.editable}}
     <button class="btn btn-edit-expense btn-sm btn-warning"><i class='fa fa-edit'></i>&nbsp;&nbsp;Edit</button>
   {{/if}}
-  {{#unless item.report_preview}} 
-    {{#if_not_eq item.expense_type_id 2}}
-      <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
-    {{/if_not_eq}}
-  {{/unless}}
+  {{#if item.deletable}}
+    <button class="btn btn-delete-expense btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+  {{/if}}
+  {{#if item.allow_upload_receipt}}
+    <button class="btn btn-upload-expense-receipt btn-sm btn-warning"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit Receipt</button>
+  {{/if}}
 </div>
 
 <div class="row no-margin expense-violations">
@@ -41,6 +36,7 @@
 </div>
 
 <form id="form-update-item" enctype="multipart/form-data">
+<input type="hidden" name="view" value="{{item.view}}" />
 <div class="row no-margin" style="">
   <div class="col-sm-7 no-padding">
     <div class="row no-margin item-attribute">
@@ -99,7 +95,7 @@
 
   </div>
 
-  <div class="col-sm-5 no-padding">
+  <div class="receipt-area col-sm-5 no-padding">
     <div class="item-receipt text-center item-attr-preview">
       {{#each item.receipts}}
         <img src="{{this.image_url}}" class="receipt-image img-responsive" style="max-width: 200px; max-height: 200px; display: inline;" />
@@ -111,15 +107,19 @@
     </div>
 
     <div class="item-receipt item-attr-edit text-center">
-      <label for="edit-expense-receipt-upload">
-        {{#if item.receipts}}
-          <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
-        {{else}}
-          <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
-        {{/if}}
+      {{#if item.receipts}}
+        <i class="detach-uploaded-receipt fa fa-times-circle" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
+        <label for="edit-expense-receipt-upload">
 
-      </label>
-      <input type="file" id="edit-expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" onchange="document.getElementById('edit-preview-image').src = window.URL.createObjectURL(this.files[0])" />
+        <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+        </label>
+      {{else}}
+        <label for="edit-expense-receipt-upload">
+        <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+        </label>
+      {{/if}}
+
+      <input type="file" id="edit-expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" />
     </div>
     
   </div>

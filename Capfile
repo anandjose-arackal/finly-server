@@ -16,7 +16,7 @@ require "capistrano/deploy"
 #   https://github.com/capistrano/passenger
 #
 
-# todo - find a better way to switch between rvm and rbenv when deploying to production with diff environments
+
 # require 'capistrano/rvm'
 require 'capistrano/rbenv'
 # require 'capistrano/chruby'

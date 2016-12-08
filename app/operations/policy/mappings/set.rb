@@ -4,10 +4,10 @@ class Policy::Mappings::Set < Policy::Base
 
   def pre_validate
     if user.blank? or (params[:user_id].blank? and params[:id].blank?)
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
     end
     unless params[:user_manager_mapping].present?
-      messages[:error] << 'Nothing to update'
+      add_message :error, 'Nothing to update'
     end
   end
 
@@ -20,7 +20,7 @@ class Policy::Mappings::Set < Policy::Base
         admin_policy_id = user.admin_policies.pluck(:id)
         params[:user_manager_mapping].each do |key, mapping|
           unless admin_policy_id.include?(mapping[:mapping_id])
-            messages[:error] << 'You do not have the permission to make the following update'
+            add_message :error, 'You do not have the permission to make the following update'
             raise_unauthorized_exception
           end
         end
@@ -35,7 +35,7 @@ class Policy::Mappings::Set < Policy::Base
       #   self.updating_user = team.with_id(user_id).first rescue nil
     end
     # unless updating_user
-    #   messages[:error] << "Cannot find user to update mapping."
+    #   add_message :error, "Cannot find user to update mapping."
     # end
   end
 
@@ -60,11 +60,11 @@ class Policy::Mappings::Set < Policy::Base
       amount_value = updated_params['greater_than_amount_attributes']['value'] rescue nil
       # mind = blown - this was causing the same amount multiple times error
       if amount_value.blank? or amount_value.to_f <= 0
-        messages[:error] << 'Error setting configuration. Amount value cannot be 0'
+        add_message :error, 'Error setting configuration. Amount value cannot be 0'
         next
       end
       if updated_params[:manager_id].blank? and updated_params[:finance_manager_id].blank? and updated_params[:approves_to_id].blank? and updated_params[:approves_finance_to_id].blank?
-        messages[:error] << 'Error setting configuration. Manager cannot be blank'
+        add_message :error, 'Error setting configuration. Manager cannot be blank'
       end
       v = self.mappings.policy(policy_id).exact_amount(currency_id, amount_value)
       v = v.without_id(mapping_id) if mapping_id.present?
@@ -75,7 +75,7 @@ class Policy::Mappings::Set < Policy::Base
         end
       end
       if present
-        messages[:error] << 'A configuration for the given amount has already been defined!'
+        add_message :error, 'A configuration for the given amount has already been defined!'
         break
       end
     end
@@ -95,7 +95,7 @@ class Policy::Mappings::Set < Policy::Base
       if id.present?
         updating_map = self.mappings.with_id(id).first rescue nil
         if updating_map.blank?
-          messages[:error] << 'Error updating configuration'
+          add_message :error, 'Error updating configuration'
           return
         end
         if updated_params.present?

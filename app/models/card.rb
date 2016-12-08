@@ -24,6 +24,8 @@ class Card < ActiveRecord::Base
   belongs_to :company
   belongs_to :disabled_by_role, class_name: 'UserRole'
   belongs_to :disabled_by_user, class_name: 'User'
+  has_many :transactions, class_name: "CardTransaction"
+
 
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }

@@ -1,0 +1,98 @@
+<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
+
+<div class="modal-dialog" style="width: 50%;">
+  <div class="modal-content" style="border-radius: 1px">
+    <div class="modal-header" style="background-color: #e9e9e9 ">
+
+      <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title" style="text-align: center;text-transform: uppercase;font-weight: 400;border-bottom: #d8d8d8">Add
+        New Budget Rule for this Policy</h4>
+    </div>
+    <div class="modal-body" style="padding: 0 35px 35px 35px">
+      <div class="row no-margin">
+        <form id="form-create-rule" name="submitNewRuleForm" action="<%= policy_add_rule_path(@result.policy, view: params[:view]) %>">
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+
+          <div class="col-sm-12 no-padding">
+            <h4>Create Rule by Selecting Required Options Below</h4>
+            <div class="row"><hr /></div>
+          </div>
+
+          <div class="col-sm-12 no-padding">
+            <div class="row no-margin">
+              <div class="col-sm-4 no-padding">
+                <h5 style="font-size: 16px;">Budget Amount</h5>
+                <input class="form-control" name="budget_rule[amount_attributes[value]]" type="text" placeholder="0.00">
+
+                <input name="budget_rule[amount_attributes[currency_id]]" value="1" type="hidden" placeholder="0.00">
+              </div>
+
+              <div class="col-sm-8">
+                <h5 style="font-size: 16px;">Per</h5>
+                <div class="row no-margin">
+                  <div class="col-sm-3 no-padding">
+                    <label>
+                      <input type="radio" name="budget_rule[budget_period_id]" value="1">&nbsp;&nbsp;Day
+                    </label>    
+                  </div>
+                  <div class="col-sm-3 no-padding">
+                    <label>
+                      <input type="radio" name="budget_rule[budget_period_id]" value="2">&nbsp;&nbsp;Week
+                    </label>    
+                  </div>
+
+                  <div class="col-sm-3 no-padding">
+                    <label>
+                      <input type="radio" name="budget_rule[budget_period_id]" value="3">&nbsp;&nbsp;Month
+                    </label>    
+                  </div>
+
+                  <div class="col-sm-3 no-padding">
+                    <label>
+                      <input type="radio" name="budget_rule[budget_period_id]" value="4">&nbsp;&nbsp;Year
+                    </label>    
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row"><hr /></div>
+          </div>
+
+          <div class="col-sm-12 no-padding">
+            <h5 style="font-size: 16px;">Select Category<span>&nbsp;(OPTIONAL)</span></h5>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="row no-margin">
+              <div class="col-sm-4">
+                <label>
+                  <input type="radio" name="budget_rule[category_id]" value="">&nbsp;&nbsp;All
+                </label>    
+              </div>
+
+              <% @result.categories.each do |cat| %>
+                <div class="col-sm-4">
+                  <label>
+                    <input type="radio" name="budget_rule[category_id]" value="<%= cat.id %>">&nbsp;&nbsp;<%= cat.category_name %>
+                  </label>    
+                </div>
+              <% end %>
+            </div>
+
+            <div class="row"><hr /></div>
+          </div>
+
+          <% if params[:rule_type] == 'warning' %>
+            <input type="hidden" name="budget_rule[rule_type_id]" value="1">
+            <button type="submit" class="btn btn-primary btn-sm btn-create-rule"> Create Warning Rule</button>
+          <% elsif params[:rule_type] == 'blocking' %>
+            <input type="hidden" name="budget_rule[rule_type_id]" value="2">
+            <button type="submit" class="btn btn-primary btn-sm btn-create-rule"> Create Blocking Rule</button>
+          <% end %>
+        </form>  
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

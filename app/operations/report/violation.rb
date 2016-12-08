@@ -26,12 +26,12 @@ class Report::Violation < Report::Base
   attr_accessor :no_policy, :warning_messages, :policy
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    nil
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << "User or params not found."
+    if params.blank? or params[:report].blank?
+      add_message :error, 'Report not found'
     end
   end
 

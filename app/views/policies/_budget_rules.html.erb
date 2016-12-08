@@ -1,177 +1,139 @@
-<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
-<button id="createNewRule" data-toggle="modal" data-target="#createNewBudgetRuleModal">Create New Rule
-</button>
-<% end %>
-
-<div>
-
-  <div id="warningDiv">
-    <div class="header">
-      <img src="<%= image_url("warn_rule") %>">WARNING RULES
-    </div>
-
-    <div style="padding: 20px 20px 0 20px">
-
-      <% @result.policy.budget_rules.each do |rule| %>
-        <% if rule.rule_type_id == 1 %>
-
-              <!-- deleting a particular rule or warning -->
-
-              <div style="margin-bottom: 15px" class="row">
-                <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
-                <span class="col-md-10"><%= rule_in_words rule%></span>
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <h4>Budget Rules</h4>
+  </div>
+</div>
+<div class="row no-margin">
+  <div class="col-sm-6 no-padding" style="padding: 10px;">
+    <div class="warning-rules" style="background: white; padding: 10px;">
+      <div class="row no-margin">
+        <div class="col-sm-6 no-padding"><img src="<%= image_url('warn_rule') %>" style="height: 35px; margin-right: 20px;">WARNING RULES</div>
+        <div class="col-sm-6 text-right">
+          <% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
+            <button class="btn-new-rule btn btn-primary btn-sm" data-rule-type="warning" data-rule-category="budget">Create New Rule</button>
+          <% end %>         
+        </div>
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;" /></div>
+      </div>
+      <div class="row no-margin">
+        <% warning_rules_count = 0 %>
+        <% @result.policy.budget_rules.each do |rule| %>
+          <% if rule.rule_type_id == 1 %>
+            <% warning_rules_count += 1 %>
+            <!-- deleting a particular rule or warning -->
+            <div class="col-sm-12 no-padding">
+              <div class="col-sm-1">
+                <i style="font-size: 18px; color:#93c178" class="fa fa-check"></i>
+              </div>
+              <div class="col-sm-10">
+                <%= rule_in_words rule %>
+              </div>
+              <div class="col-sm-1 text-right">
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy, view: params[:view]), :html => { :method => :delete, :remote => true } do |f| %>
+                  <form action="<%= policy_remove_rule_path(@result.policy, view: params[:view]) %>" class="form-remove-rule">
                     <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                    <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
+                    <input name="budget_rule_id" type="hidden" value="<%= rule.id %>">
                     <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
                       <i class="fa fa-times" role="button"></i>
                     <% end %>
-                  <% end %>
-
+                  </form>
                 <% end %>
               </div>
+            </div>
+          <% end %>
         <% end %>
-      <% end %>
-
-
-      <p id="budgetWarningPara" onclick="budgetWarningDescToggle()" style="color: #6664c7;
-          font-weight: 500;
-          font-size: 13px;
-          border-top: 1px solid rgba(0,0,0,0.1);
-          cursor: pointer;
-          padding-top: 10px ;"> What is a warning rule?</p>
-      <p id="budgetWarningParaDesc" style="color: #666;
-          font-size: 13px;
-          padding-top: 6px ;display: none">Expenses that violate warning rules can be added to the report, but you
-        probably
-        shouldn’t.
-        Before you submit the report
-        Finly will display the warnings, and the expense will be badged with a warning icon.</p>
+        <% unless warning_rules_count > 0 %>
+          <div class="col-sm-12">
+            <p>No warning rules found for this policy. To create a new rule click <b>Create New Rule</b> button above.</p>
+          </div>
+        <% end %>
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-12"><hr style="margin-top: 10px; margin-bottom: 10px;" /></div>
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-12">
+          <p data-toggle="collapse" data-target="#collapseBudgetWarningDefinition" aria-expanded="false" style="cursor: pointer;">
+            What is a warning rule?
+          </p>
+          <div class="collapse" id="collapseBudgetWarningDefinition">
+            <div class="alert alert-info">
+              Expenses that violate warning rules can be added to the report, but you
+              probably
+              shouldn’t.
+              Before you submit the report
+              Finly will display the warnings, and the expense will be badged with a warning icon.  
+            </div>
+          </div>
+        </div>
+      </div>  
     </div>
   </div>
-  <div id="blockingDiv" style="float: right">
-    <div class="header">
-      <img src="<%= image_url("block_rule") %>">BLOCKING RULES
-    </div>
-    <div style="padding: 20px 20px 0 20px">
 
-      <% @result.policy.budget_rules.each do |rule| %>
-        <% if rule.rule_type_id == 2 %>
-              <!-- deleting a particular rule or warning -->
-
-              <div style="margin-bottom: 15px" class="row">
-                <i style="font-size: 18px; color:#93c178" class="fa fa-check col-md-1"></i>
-                <span class="col-md-10"><%= rule_in_words rule%></span>
+  <div class="col-sm-6 no-padding" style="padding: 10px;">
+    <div class="warning-rules" style="background: white; padding: 10px;">
+      <div class="row no-margin">
+        <div class="col-sm-6 no-padding"><img src="<%= image_url('block_rule') %>" style="height: 35px; margin-right: 20px;">BLOCKING RULES</div>
+        <div class="col-sm-6 text-right">
+          <% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
+            <button class="btn-new-rule btn btn-primary btn-sm" data-rule-type="blocking" data-rule-category="budget">Create New Rule</button>
+          <% end %>         
+        </div>
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;" /></div>
+      </div>
+      <div class="row no-margin">
+        <% blocking_rules_count = 0 %>
+        <% @result.policy.budget_rules.each do |rule| %>
+          <% if rule.rule_type_id == 2 %>
+            <% blocking_rules_count += 1 %>
+            <!-- deleting a particular rule or warning -->
+            <div class="col-sm-12 no-padding">
+              <div class="col-sm-1">
+                <i style="font-size: 18px; color:#93c178" class="fa fa-check"></i>
+              </div>
+              <div class="col-sm-10">
+                <%= rule_in_words rule %>
+              </div>
+              <div class="col-sm-1">
                 <% if current_user.admin? or current_user.policy_admin?(@result.policy) %>
-                  <%= form_for @result.policy, url: policy_remove_rule_path(@result.policy, view: params[:view]), :html => { :method => :delete, :remote => true } do |f| %>
+                  <form action="<%= policy_remove_rule_path(@result.policy, view: params[:view]) %>" class="form-remove-rule">
                     <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-                    <input name="budget_rule_id" type="hidden" value="<%=rule.id%>">
+                    <input name="budget_rule_id" type="hidden" value="<%= rule.id %>">
                     <%= button_tag( :class => "btn btn-sm btn-danger", style: "margin: 0;", data: { confirm: 'Are you sure you want to remove this rule?' }) do %>
                       <i class="fa fa-times" role="button"></i>
                     <% end %>
-                  <% end %>
+                  </form>
                 <% end %>
               </div>
+            </div>
+          <% end %>
         <% end %>
-      <% end %>
-
-      <p id="budgetBlockingPara" onclick="budgetBlockingDescToggle()" style="color: #6664c7;
-          font-weight: 500;
-          font-size: 13px;
-          border-top: 1px solid rgba(0,0,0,0.1);
-          cursor: pointer;
-          padding-top: 10px; "> What is a blocking rule?</p>
-
-      <p id="budgetBlockingParaDesc" style="color: #666;
-          font-size: 13px;
-          padding-top: 6px ;display: none">You can’t submit reports with expenses that violate blocking rules. The
-        blocks will be displayed in the report.</p>
-    </div>
-  </div>
-
-
-</div>
-
-<% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
-
-<div class="modal fade" id="createNewBudgetRuleModal" role="dialog">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content" style="border-radius: 1px">
-      <div class="modal-header" style="background-color: #e9e9e9 ">
-
-        <button type="button" class="close" style="opacity: 0.7" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" style="text-align: center;text-transform: uppercase;font-weight: 400;border-bottom: #d8d8d8">Add
-          New Budget Rule for this Policy</h4>
+        <% unless blocking_rules_count > 0 %>
+          <div class="col-sm-12">
+            <p>No blocking rules found for this policy. To create a new rule click <b>Create New Rule</b> button above.</p>
+          </div>
+        <% end %>
       </div>
-      <div class="modal-body" style="padding: 0 35px 35px 35px">
-
-        <form data-remote="true" name="submitNewRuleForm" action="<%= policy_add_rule_path(@result.policy, view: params[:view]) %>" method="post">
-          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-
-
-          <h5>For the Category:</h5>
-
-          <div id="categoriesBudget">
-            <input type="radio" name="budget_rule[category_id]" value="">All <br>
-              <% @result.categories.each do |cat| %>
-                 <input type="radio" name="budget_rule[category_id]" value="<%= cat.id %>"><%= cat.category_name %> <br>
-              <% end %>
-          </div>
-
-          <h5>Budget Amount is:</h5>
-
-          <input name="budget_rule[amount_attributes[value]]" type="text" placeholder="0.00">
-
-          <input name="budget_rule[amount_attributes[currency_id]]" value="1" type="hidden" placeholder="0.00">
-
-          <div id="newRulePeriod">
-            <h5>Per:</h5>
-            <input type="radio" name="budget_rule[budget_period_id]" value="1">Day <br>
-            <input type="radio" name="budget_rule[budget_period_id]" value="2">Week<br>
-            <input type="radio" name="budget_rule[budget_period_id]" value="3">Month<br>
-            <input type="radio" name="budget_rule[budget_period_id]" value="4">Year<br>
-          </div>
-
-          <div id="newRuleTypeChooser" style="display:block">
-            <h5>Block or Warning? </h5>
-            <input type="radio" name="budget_rule[rule_type_id]" value="2" checked>Blocking <br>
-            <input type="radio" name="budget_rule[rule_type_id]" value="1">Warning<br>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-sm" id="createPolicy"> Create</button>
-
-        </form>
+      <div class="row no-margin">
+        <div class="col-sm-12"><hr style="margin-top: 10px; margin-bottom: 10px;" /></div>
       </div>
+      <div class="row no-margin">
+        <div class="col-sm-12">
+          <p data-toggle="collapse" data-target="#collapseBudgetBlockingDefinition" aria-expanded="false" style="cursor: pointer;">
+            What is a blocking rule?
+          </p>
+          <div class="collapse" id="collapseBudgetBlockingDefinition">
+            <div class="alert alert-info">
+              You can’t submit reports with expenses that violate blocking rules. The
+              blocks will be displayed in the report.
+            </div>
+          </div>
+        </div>
+      </div>  
     </div>
   </div>
 </div>
-<% end %>
-
-
-
-<script>
-
-  $(document).ready(function () {
-//    $('form#usersPolicyList').submit();
-  });
-
-  function budgetWarningDescToggle() {
-    $('#budgetWarningParaDesc').toggle();
-  }
-
-  function budgetBlockingDescToggle() {
-    $('#budgetBlockingParaDesc').toggle();
-  }
-
-
-  function checkIfUsersAreSelected() {
-    if ($("input:checkbox:checked").length > 0) {
-    }
-    else {
-      $('#removePolicyMembersAlert').modal('show');
-
-    }
-  }
-
-</script>

@@ -40,6 +40,7 @@ class Expense < ActiveRecord::Base
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
+  has_one :card_transaction
 
   accepts_nested_attributes_for :amount, :manual_expense, :card_expense
   accepts_nested_attributes_for :receipts
@@ -57,8 +58,7 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validate :no_future_date
-  validate :created_by
-  validate :report_status
+  # validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
 
@@ -85,7 +85,7 @@ class Expense < ActiveRecord::Base
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_user_or_report, ->(user_id, report_id) { where('report_id IN (?) OR user_id IN (?)', report_id, user_id) }
+  # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) {where expense_type_id: type_id}
 
   # scopes for the filters
@@ -230,14 +230,53 @@ class Expense < ActiveRecord::Base
     expense_status_id == ExpenseStatus.rejected_id
   end
 
+  # method to update report comments
+  def update_report_comments(action_user, editable_attributes = {})
+    if self.report_id
+      report = self.report
+      # check if comment should be added to the report
+      if report.retracted? or report.rejected? or report.processing?
+        editable_attributes.each do |key, value|
+          if key == :receipt
+            if value > self.receipts.count
+              # i.e. if a receipt was removed
+              comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_detach_receipt),
+                                              user_id: action_user.id,
+                                              expense_id: self.id
+              )
+            elsif value < self.receipts.count
+              # i.e. if a receipt was added
+              comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_attach_receipt),
+                                              user_id: action_user.id,
+                                              expense_id: self.id
+              )
+            else
+              # todo implement an update receipt action
+            end
+            next
+          end
+          if self.send(key) != value
+            comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_update),
+                                            user_id: action_user.id,
+                                            updated_field: key.to_s.humanize,
+                                            updated_from: value,
+                                            updated_to: self.send(key),
+                                            expense_id: self.id
+                                            )
+          end
+        end
+      end
+    end
+  end
+
   private
 
   # only employees can create an expense
-  def created_by
-    unless self.user.employee?
-      errors.add(:expense, 'can only be created by employees')
-    end
-  end
+  # def created_by
+  #   unless self.user.employee?
+  #     errors.add(:expense, 'can only be created by employees')
+  #   end
+  # end
 
   # cannot add an expense with future date
   def no_future_date
@@ -246,15 +285,6 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  # ensuring the report is either open or retracted before allowing editing of expense
-  def report_status
-    if self.report_id
-      report = self.report
-      unless report.open? or report.retracted? or report.rejected?
-        errors.add(:report, 'cannot be edited in this state')
-      end
-    end
-  end
 
   def valid_expense_type
     case expense_type_id

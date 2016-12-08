@@ -3,7 +3,7 @@
 # Table name: amounts
 #
 #  id          :integer          not null, primary key
-#  value       :float(24)
+#  value       :decimal(64, 12)
 #  currency_id :integer          not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null

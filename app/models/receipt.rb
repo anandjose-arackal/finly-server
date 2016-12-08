@@ -29,17 +29,14 @@ class Receipt < ActiveRecord::Base
 
   validates :image, presence: true
 
-  validate :validate_expense_user
+  # validate :validate_expense_user
 
-  has_attached_file :image, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}, default_url: "/assets/:style/missing.png"
+  has_attached_file :image, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"},
+    default_url: "/assets/:style/missing.png"
   validates_attachment :image, content_type: {
-      content_type: [
-          'image/jpg', 'image/jpeg', 'image/png', 'image/gif',
-          'application/pdf', 'application/rtf', 'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      ]
+      content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
   }
-  
+
   scope :with_id, ->(id) { where id: id }
   scope :without_parent, -> { where(parent_id: nil) }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
@@ -64,12 +61,13 @@ class Receipt < ActiveRecord::Base
 
   private
 
-  def validate_expense_user
-    if self.user && self.parent
-      if self.user.id != self.parent.user.id
-        errors.add(:base, "Parent expense does not belong to current user.")
-      end
-    end
-  end
+
+  # def validate_expense_user
+  #   if self.user && self.parent
+  #     if self.user.id != self.parent.user.id
+  #       errors.add(:base, "Parent expense does not belong to current user.")
+  #     end
+  #   end
+  # end
 
 end

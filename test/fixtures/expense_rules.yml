@@ -17,11 +17,21 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  amount_id: 
-  category_id: 
-  days_after: 1
+  greater_than_amount_attributes:
+                    value: 100
+                    currency_id: 1
+  category_id: 1
+  days_after: 10
+  rule_type_id: 1
+  expense_rule_type_id: 1
+  policy: test_policy
 
 two:
-  amount_id: 
-  category_id: 
-  days_after: 1
+  greater_than_amount_attributes:
+                    value: 100
+                    currency_id: 1
+  category_id: 2
+  days_after: 15
+  rule_type_id: 2
+  expense_rule_type_id: 1
+  policy: test_policy

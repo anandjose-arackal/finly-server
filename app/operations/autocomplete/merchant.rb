@@ -13,11 +13,17 @@ class Autocomplete::Merchant < BaseOperation
   end
 
   def process
-    expense_ids = Expense::Index.(user, params).unreported_expenses.pluck(:id)
+    expense_ids = Expense::Index.(user, params).expenses.pluck(:id)
 
     # todo - see if there's a better way to do this.
     self.response = ManualExpense.merchant_like(query, expense_ids)
     self.response += CardExpense.merchant_like(query, expense_ids)
+  end
+
+  def post_process
+    if response.empty?
+      self.response = ["No matches"]
+    end
   end
 
 end

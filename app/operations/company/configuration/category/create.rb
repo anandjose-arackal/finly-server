@@ -9,7 +9,8 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
 
   def init
     super
-    self.category = self.categories.with_name(category_params[:name]).first rescue nil
+    # here we need all categories, not just inactive ones
+    self.category = user.company.categories.with_name(category_params[:name]).first rescue nil
   end
 
   def process
@@ -24,7 +25,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   end
 
   def post_process
-    messages[:success] << "Category added."
+    messages[:success] << "Category added"
   end
 
   private

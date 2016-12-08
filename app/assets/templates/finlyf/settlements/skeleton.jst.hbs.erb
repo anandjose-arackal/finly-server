@@ -104,19 +104,21 @@
   position: relative;
   height: calc(100% - 100px);
   overflow-y: scroll;
+  margin-top: 33px;
 }
 
 
 .main{
   z-index: 4;
-  position:fixed;
-  /*overflow-y: scroll;*/
+  position: fixed;
+  overflow-y: scroll;
   background: rgb(252, 252, 252) none repeat scroll 0% 0%;
   background: #F5F6F9;
-  max-height: calc(100% - 53px); 
+  max-height: calc(100% - 103px);
   padding: 0px;
   box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
-  height: calc(100% - 100px);
+  height: calc(100% - 103px);
+  margin-top: 33px;
 }
 .main.preview .col-md-8{
   /*display: none;*/
@@ -212,6 +214,12 @@
   font-size: 18px;
 }
 
+.secondary-navbar{
+  margin-top: 53px;
+  border-color: transparent;
+  z-index: 5;
+}
+
 
 </style>
 
@@ -250,14 +258,14 @@
 
             <li class="dropdown" id="navbar-user-dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 12px 10px 8px 10px;">
-                <img src="/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
+                <img src="/common/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu">
                 <li>
                   <div class="navbar-user-dropdown navbar-user-dropdown-profile">
                     <div class="row">
                       <div class="col-xs-4" style="padding: 0;padding-left: 20px;">
-                        <img src="/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
+                        <img src="/common/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
                       </div>
                       <div class="col-xs-8">
                         <p class="text-left"><strong class="navbar-user-dropdown-name"></strong></p>
@@ -304,11 +312,27 @@
   </div><!-- /.container-fluid -->
 </nav>
 
+<nav class="navbar navbar-default navbar-fixed-top secondary-navbar" style="">
+  <div class="container-fluid">
+    <div class="row no-margin no-padding">
+      <div class="col-md-2" style="box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+        <div class="navbar-header">
+          <a class="navbar-brand">My Profile Details</a>
+        </div>
+      </div>
+      <div class="col-md-10" style="">
+        <div class="navbar-collapse collapse navbar-main">
+          
+        </div><!--/.nav-collapse -->    
+      </div>
+    </div>
+  </div><!--/.container-fluid -->
+</nav>
+
 
 <div class="container-fluid container-main" style="position: relative; height: 100%; padding-left: 0; padding-right: 0; width: 100%;">
-
-  <div class="col-sm-8 col-sm-offset-2 main">
-
+  <div class="col-sm-2 sidebar"></div>
+  <div class="col-sm-10 main col-sm-offset-2">
     <div class="summary row no-margin" style="background: #C5CAE9;color: #555;; margin-bottom: 0px; height: 150px;padding-top: 20px;">
       <div class="col-sm-12 no-padding" style="height: 100%; padding: 10px 0;">
         <div class="col-sm-6" style="height: 100%;border-right: 1px solid #bbb;">
@@ -354,7 +378,7 @@
       </div>
     </div>  
     
-    <div class="row no-margin" style="height: calc(100% - 150px);">
+    <div class="row no-margin settlements-content" style="height: calc(100% - 150px);">
       <div class="container-fluid"> 
         <ul class="nav nav-pills filter-status">
           <li class="{{#if_eq item.view_to_load 'payments'}}active{{/if_eq}}"><a href="#" data-view="payments">Settlements History</a></li>

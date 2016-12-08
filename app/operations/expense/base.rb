@@ -17,19 +17,21 @@ class Expense::Base < BaseOperation
   end
 
   def success
-    Expense::Base::Presenter.new(user, {expense: self.expense}, self.messages)
+    Expense::Base::Presenter.new(user, {expense: self.expense, view: params[:view]}, self.messages)
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation
+    attr_accessor :expense, :violation, :editable, :view
 
     def init
       self.expense = params[:expense]
+      self.view = params[:view]
       self.violation = retrieve_violation
+      self.editable = retrieve_editable
     end
 
     def retrieve_violation
-      violations = {blocking_present: false, wanring_present: false, items: []}
+      violations = {blocking_present: false, warning_present: false, items: []}
       if expense.report_id and expense.report.policy
         violations = Report::Violation.(user, report: expense.report)
         items = violations[expense.id]
@@ -40,6 +42,17 @@ class Expense::Base < BaseOperation
         violations[:items] = items
       end
       violations
+    end
+
+    def retrieve_editable
+      unless view.blank? or view == 'personal'
+        if expense.report_id and expense.report.processing? and expense.report.controlling_user.id == user.id
+          return true
+        else
+          return false
+        end
+      end
+      false
     end
   end
 

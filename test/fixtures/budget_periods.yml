@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: budget_periods
+# Table name: periods
 #
 #  id         :integer          not null, primary key
 #  name       :string(255)

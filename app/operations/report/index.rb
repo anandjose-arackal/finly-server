@@ -42,14 +42,14 @@ class Report::Index < Report::Base
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
-        self.reports = Report.from(sql)
+        self.reports = Report.from([Arel.sql(sql)])
       when UserRole.finance_manager_id
         controlling_report_query = user.controlling_reports.non_owner(user.id)
         interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
-        self.reports = Report.from(sql)
+        self.reports = Report.from([Arel.sql(sql)])
       when UserRole.auditor_id
         # todo auditor
       else

@@ -45,6 +45,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_not @result.transaction.error_message
     assert_equal 23.2, @result.transaction.transaction_amount_value
     assert_equal 25.3, @result.transaction.billing_amount_value
+    assert_equal @user.id, @result.transaction.user.id
 
     # checking the expense created out of the transaction
     @c_expense = @user.expenses.order(created_at: :desc).first
@@ -52,6 +53,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 2.1, @c_expense.surcharge_value
     assert_equal "Other", @c_expense.category_name
     assert_equal ExpenseType.card_expense_id, @c_expense.expense_type_id
+    assert_equal @c_expense.id, @result.transaction.expense.id
 
   end
 
@@ -93,6 +95,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_not @result.transaction.error_message
     assert_equal 23.2, @result.transaction.transaction_amount_value
     assert_equal 23.2, @result.transaction.billing_amount_value
+    assert_equal @user.id, @result.transaction.user.id
 
     # checking the expense created out of the transaction
     @c_expense = @user.expenses.order(created_at: :desc).first
@@ -100,6 +103,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 0, @c_expense.surcharge_value
     assert_equal "Other", @c_expense.category_name
     assert_equal ExpenseType.card_expense_id, @c_expense.expense_type_id
+    assert_equal @c_expense.id, @result.transaction.expense.id
 
   end
 
@@ -131,7 +135,9 @@ class CreateTransactionTest < ActiveSupport::TestCase
     cih = @user.cash_in_hand.value
     assert_difference 'CardTransaction.count', 1 do
       assert_no_difference '@user.expenses.count' do
-        @result = Card::Transaction::Create.(trans_params)
+        assert_difference '@user.payments.atm_withdrawals.count', 1 do
+          @result = Card::Transaction::Create.(trans_params)
+        end
       end
     end
 
@@ -142,8 +148,12 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 123.0, @result.transaction.transaction_amount_value
     assert_equal 124.0, @result.transaction.billing_amount_value
 
+    payment = @user.payments.atm_withdrawals.order(created_at: :desc).first
     @user.reload
     assert_equal cih + 124.0, @user.cash_in_hand.value
+    assert_equal 124.0, payment.amount_value
+    assert_equal @user.id, payment.receiving_user_id
+    assert_equal @user.id, payment.initiating_user_id
   end
 
   test "creating a transaction out of a credit entry in the message queue" do
@@ -187,6 +197,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert_equal 123.0, @result.transaction.transaction_amount_value
     assert_equal 124.0, @result.transaction.billing_amount_value
     assert_equal "Credit", @result.transaction.transaction_type
+    assert_equal @user.id, @result.transaction.user.id
   end
 
   test "if the expense creation fails, the transaction is marked as not expensed" do
@@ -226,7 +237,7 @@ class CreateTransactionTest < ActiveSupport::TestCase
 
     assert_not @result.success?
     # extracting the latest transaction
-    latest_trans = CardTransaction.order(created_at: :desc).first
+    latest_trans = @user.card_transactions.order(created_at: :desc).last
     assert_equal 26.2, latest_trans.transaction_amount_value
     assert_equal 28.6, latest_trans.billing_amount_value
     assert_not latest_trans.expensed
@@ -268,8 +279,5 @@ class CreateTransactionTest < ActiveSupport::TestCase
     assert @rescued
   end
 
-  test "" do
-
-  end
 
 end
