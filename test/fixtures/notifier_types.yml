@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: events
+# Table name: notifier_types
 #
 #  id                             :integer          not null, primary key
 #  name                           :string(255)      not null

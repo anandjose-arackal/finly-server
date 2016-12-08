@@ -1,7 +1,7 @@
 class Event::EReport::Submit < Event::EReport::Base
 
   def event_id
-    Event.report_submit_id
+    NotifierType.report_submit_id
   end
 
   def affected_users

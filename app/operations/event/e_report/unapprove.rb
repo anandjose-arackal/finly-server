@@ -1,7 +1,7 @@
 class Event::EReport::Unapprove < Event::EReport::Base
 
   def event_id
-    Event.report_unapprove_id
+    NotifierType.report_unapprove_id
   end
 
   def affected_users

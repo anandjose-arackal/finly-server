@@ -13,7 +13,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def event_id
-    Event.report_comment_id
+    NotifierType.report_comment_id
   end
 
   def affected_users

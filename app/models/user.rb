@@ -46,6 +46,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -102,8 +103,9 @@ class User < ActiveRecord::Base
   has_many :manager_money_requests, -> { distinct }, source: :money_request, through: :manager_money_request_tracks
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
+  has_many :notifications
 
-  has_many :event_configurations
+  has_many :notifier_type_configurations
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping

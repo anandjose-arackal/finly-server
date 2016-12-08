@@ -13,7 +13,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def event_id
-    Event.report_approve_id
+    NotifierType.report_approve_id
   end
 
   def affected_users
@@ -36,7 +36,21 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    # # here only report owner gets a notification if it's approved, so...
+    # unless user.id == report.user_id
+    #   notification = Notification.build(user: user,
+    #                                     notification_type_id: NotificationType.report_id,
+    #                                     action_type_id: NotificationActionType.approve_id,
+    #                                     action_user_id: report.tracks.last.action_user.id,
+    #                                     object_id: report.id,
+    #                                     object_type: "Report",
+    #                                     path_object_id: report.id,
+    #                                     path_object_type: "Report",
+    #                                     read: false,
+    #                                     timestamp: DateUtils.local_date_time
+    #                                     )
+    #   notification.save
+    # end
   end
 
   def mailer_subject(user)
