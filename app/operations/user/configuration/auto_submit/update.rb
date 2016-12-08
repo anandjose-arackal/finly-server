@@ -40,7 +40,7 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
 
   protected
   def update_params
-    self.params.require(:user).permit(:enabled, :period_id, :default_note, :default_policy_id)
+    self.params.require(:user).permit(:enabled, :limit_to_card_expenses, :period_id, :default_memo, :default_policy_id)
   end
 
 end

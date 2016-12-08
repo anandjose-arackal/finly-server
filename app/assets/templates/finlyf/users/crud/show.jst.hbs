@@ -6,7 +6,7 @@
       <li><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Account &amp; Cards</a></li>
       {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
       <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
-      <li><a href="#tab-user-auto-submit-report" data-toggle="tab">Auto Reporting</a> </li>
+      <li><a href="#tab-user-auto-submit-report" data-toggle="tab">Auto Submit</a> </li>
     </ul>
   </div>
 
@@ -744,6 +744,107 @@
             </div>
           </div><!-- .policy -->
           {{/each}}
+        </section>
+      </div>
+
+      <div class="tab-pane" id="tab-user-auto-submit-report">
+        <section class="user-info">
+          <div class="row">
+            <div class="col-sm-6">
+              <h4>Configuration for Auto Submission of Reports</h4>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-sm btn-warning btn-edit-user"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+            </div>
+          </div>
+          <form class="form-auto-report">
+            <input type="hidden" name="type" value="auto_submit">
+            <div class="row">
+              <div class="col-sm-3">Enabled:</div>
+              <div class="col-sm-9">
+                  {{#if item.auto_submit_config.enabled}}
+                    <label class="item-attr-preview">
+                    Yes
+                    </label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[enabled]" value="1" checked="checked">&nbsp;&nbsp;Yes</label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[enabled]" value="0">&nbsp;&nbsp;No </label>
+                  {{else}}
+                    <label class="item-attr-preview">
+                    No
+                    </label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[enabled]" value="1">&nbsp;&nbsp;Yes</label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[enabled]" value="0" checked="checked">&nbsp;&nbsp;No </label>
+                  {{/if}}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-3">Limit to Card Expenses:</div>
+              <div class="col-sm-9">
+                  {{#if item.auto_submit_config.limit_to_card_expenses}}
+                    <label class="item-attr-preview">
+                      Yes
+                    </label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[limit_to_card_expenses]" value="1" checked="checked">&nbsp;&nbsp;Yes</label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[limit_to_card_expenses]" value="0">&nbsp;&nbsp;No </label>
+                  {{else}}
+                    <label class="item-attr-preview">
+                      No
+                    </label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[limit_to_card_expenses]" value="1">&nbsp;&nbsp;Yes</label>
+                    <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="user[limit_to_card_expenses]" value="0" checked="checked">&nbsp;&nbsp;No </label>
+                  {{/if}}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-3">Period:</div>
+              <div class="col-sm-9">
+                <label class="item-attr-preview">{{item.auto_submit_config.period.name}}</label>
+                <select class="item-attr-edit" name="user[period_id]">
+                  <option value="1" {{#if_eq auto_submit_config.period.id 1}}selected="selected"{{/if_eq}}>Day</option>
+                  <option value="2" {{#if_eq auto_submit_config.period.id 2}}selected="selected"{{/if_eq}}>Week</option>
+                  <option value="4" {{#if_eq auto_submit_config.period.id 3}}selected="selected"{{/if_eq}}>Month</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-3">Default Note:</div>
+              <div class="col-sm-9">
+                <label class="item-attr-preview">
+                  {{#if item.auto_submit_config.default_note}}
+                    {{item.auto_submit_config.default_note}}
+                  {{else}}
+                    Not Set
+                  {{/if}}
+                </label>
+                <textarea class="form-control item-attr-edit" name="user[deafult_note]">
+                  {{#if item.auto_submit_config.default_note}}
+                    {{item.auto_submit_config.default_note}}
+                  {{/if}}
+                </textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-3">Default Policy:</div>
+              <div class="col-sm-9">
+                <label class="item-attr-preview">
+                  {{#if item.auto_submit_config.policy.name}}
+                    {{item.auto_submit_config.policy.name}}
+                  {{else}}
+                    Not Set
+                  {{/if}}
+                </label>
+                <select name="user[default_policy_id]" class="form-control item-attr-edit">
+                  {{#each item.policies}}
+                  <option value="{{this.id}}" {{#if_eq item.auto_submit_config.policy.id this.id }}selected="selected"{{/if_eq}}>{{this.name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </form>
         </section>
       </div>
     </div><!-- /tab-content -->
