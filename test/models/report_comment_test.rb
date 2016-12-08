@@ -59,7 +59,8 @@ class ReportCommentTest < ActiveSupport::TestCase
 
     # User ID and Content is required for adding a new comment
     assert_not ReportComment.new(content: 'test', report_comment_action_id: ReportCommentAction.report_comment_id, report: @report).valid?
-    assert_not ReportComment.new(user: u, report_comment_action_id: ReportCommentAction.report_comment_id, report: @report).valid?
+    rc = ReportComment.new(user: u, report_comment_action_id: ReportCommentAction.report_comment_id, report: @report)
+    assert_not rc.valid?
     assert ReportComment.new(user: u, content: 'test', report_comment_action_id: ReportCommentAction.report_comment_id, report: @report).valid?
   end
 

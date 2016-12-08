@@ -87,8 +87,8 @@ class User < ActiveRecord::Base
 
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
-  has_many :payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable
 
@@ -187,6 +187,10 @@ class User < ActiveRecord::Base
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false).save
   end
 
+  def payments
+    Payment.involving_user(self.id)
+  end
+
   def name
     return nil if first_name.blank? and maiden_name.blank? and last_name.blank?
     name = first_name
@@ -280,7 +284,7 @@ class User < ActiveRecord::Base
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == DateUtils.local_date
     payments = self.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_to_user.sum(:value)
+    payments_to_user = payments.transferred_cash_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     settlement = payments.settlement.sum(:value)
     reports = self.reports.processed.submitted_after(date)
