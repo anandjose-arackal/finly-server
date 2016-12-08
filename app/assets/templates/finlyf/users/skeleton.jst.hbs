@@ -418,7 +418,9 @@ section {
 
         <div class="row no-margin">
           <div class="col-sm-12">
-            <form id="form-import-employees" enctype="multipart/form-data" action="/import.csv">
+            <form id="form-import-employees" enctype="multipart/form-data" action="/import.csv" data-remote="true">
+              <input type="hidden" name="_type" value="POST">
+              <input type="hidden" name="authenticity_token">
               <input type="file" name="file">
               <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
             </form>

@@ -25,6 +25,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     'click .btn-import-employees': 'processImport'
     'submit #form-import-employees': 'importEmployees'
+    # 'ajax:success #form-import-employees': 'importEmployees'
 
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
@@ -308,36 +309,41 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     modal = $(@el).find("#modal-import-employees")
     $(modal).modal('show')
+    $(modal).find("input[name=authenticity_token]").val($("#authenticity_token").val())
 
   importEmployees: (e) ->
-    e.preventDefault()
-    target = e.currentTarget
-    url = $(target).attr('action')
+    # console.log "Success", e
+    # target = e.currentTarget
 
-    # $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;").attr('disabled', 'disabled')
-    formData = new FormData(target)
+    # $(target).find('input[type=submit]').attr('disabled', true).val('Submitted!')
+    # e.preventDefault()
+    # target = e.currentTarget
+    # url = $(target).attr('action')
 
-    $.ajax({
-      url: url,
-      type: "POST",
-      dataType: 'csv',
-      data: formData,
-      success: (res) ->
-        console.log res
-        # FinlyF.snapNotify(res.messages)
-        # if res.success == true
-        #   $("#modal-new").modal('hide')
-        #   _this.refetchCollection()
-        # else
-        #   $(target).html("Create")
-        #   $(target).attr('disabled', false)
-      error: (err) ->
-        console.log "Error", err 
-        # $(target).attr('disabled', false)
-      cache: false,
-      contentType: false,
-      processData: false
-    })
+    # # $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;").attr('disabled', 'disabled')
+    # formData = new FormData(target)
+
+    # $.ajax({
+    #   url: url,
+    #   type: "POST",
+    #   dataType: 'csv',
+    #   data: formData,
+    #   success: (res) ->
+    #     console.log res
+    #     # FinlyF.snapNotify(res.messages)
+    #     # if res.success == true
+    #     #   $("#modal-new").modal('hide')
+    #     #   _this.refetchCollection()
+    #     # else
+    #     #   $(target).html("Create")
+    #     #   $(target).attr('disabled', false)
+    #   error: (err) ->
+    #     console.log "Error", err 
+    #     # $(target).attr('disabled', false)
+    #   cache: false,
+    #   contentType: false,
+    #   processData: false
+    # })
 
 
 
