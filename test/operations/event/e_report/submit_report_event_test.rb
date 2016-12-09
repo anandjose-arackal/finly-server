@@ -10,7 +10,7 @@ class SubmitReportEventTest < ActiveSupport::TestCase
     @report.stubs(:user).returns(@owner)
   end
 
-  test 'successfull mailer sent with controlling user' do
+  test 'successful mailer sent with controlling user' do
     # Returns manager as controlling user
     @report.stubs(:controlling_user).returns(@manager)
 
@@ -28,7 +28,7 @@ class SubmitReportEventTest < ActiveSupport::TestCase
     assert affected_users.include?(@manager)
   end
 
-  test 'successfull mailer sent without controlling user' do
+  test 'successful mailer sent without controlling user' do
     @report.stubs(:controlling_user).returns(nil)
 
     response = nil
