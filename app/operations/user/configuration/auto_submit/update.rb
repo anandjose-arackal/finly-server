@@ -6,14 +6,14 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
   end
 
   def pre_validate
-    if params.blank? or user.blank? or params[:user].blank? or (params[:user][:id].blank? and params[:user][:user_id].blank?)
+    if params.blank? or user.blank? or (params[:id].blank? and params[:user_id].blank?)
       add_message :error, 'User not found'
     end
   end
 
   def init
     self.update_param = update_params
-    id = (params[:user][:id] or params[:user][:user_id])
+    id = (params[:id] or params[:user_id])
     self.selected_user = User::Team::Index.(user, params).with_id(id).first rescue nil
   end
 
