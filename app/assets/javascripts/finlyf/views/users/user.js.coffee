@@ -27,6 +27,11 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-confirm-card-status': 'cardStatus'
     'click ul.user-tab-panes li': 'changeActiveTab'
 
+    'change input[type=radio].auto-submit-enabled': 'toggleAutoSubmitFields'
+
+    'click .btn-edit-auto-submit': 'editAutoSubmit'
+    'click .btn-update-auto-submit': 'updateAutoSubmit'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
@@ -61,6 +66,7 @@ class FinlyF.Views.User extends Backbone.View
     # console.log("Active Tab: ", @active_tab)
     # $(@el).find(@active_tab).tab('show')
     $(@el).find('a[href="' + @active_tab + '"]').tab('show')
+    @toggleAutoSubmitFields()
     @requestCardBalance()
 
 
@@ -82,6 +88,16 @@ class FinlyF.Views.User extends Backbone.View
 
     #change edit button to update
     $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').text('Update')
+
+  editAutoSubmit: (e) ->
+    target = $(e.currentTarget)
+    container = $(target).closest('section')
+    $(container).find('.item-attr-preview').addClass('hide')
+    $(container).find('.item-attr-edit').addClass('show')
+    #edit
+
+    #change edit button to update
+    $(target).addClass('success btn-update-auto-submit').removeClass('warning btn-edit-auto-submit').text('Update') 
 
   editPolicy: (e) ->
     target = $(e.currentTarget)
@@ -139,7 +155,7 @@ class FinlyF.Views.User extends Backbone.View
     target = $(e.currentTarget)
     form = $(target).closest('section').find('form')
     values = {}
-    $(form).find(':disabled').removeAttr('disabled');
+    $(form).find(':disabled').removeAttr('disabled')
     # _.each($(container).find('form').serializeArray(), (input) ->
     _.each($(form).serializeArray(), (input) ->
       values[ input.name ] = input.value
@@ -156,7 +172,7 @@ class FinlyF.Views.User extends Backbone.View
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
-          if parseInt($("#current_user_id").val()) == parseInt(_this.model.get('id'))
+          if parseInt($("#current_user_id").val()) == parseInt(_this.model.get('id')) && $(target).attr('data-refresh-page') == 'true'
             #REFRESH THE ENTIRE PAGE IF CURRENT USER MODIFIED HIS ROLES
             flag = confirm("You have changed your roles. You need to reload the page.")
             if flag
@@ -177,6 +193,38 @@ class FinlyF.Views.User extends Backbone.View
       error: (err) ->
         console.log "Err", err
     })
+
+
+
+  updateAutoSubmit: (e) ->
+    _this = @
+    e.preventDefault()
+    target = $(e.currentTarget)
+    form = $(target).closest('section').find('form')
+    values = {}
+    
+    _.each($(form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    values.view = @params.view
+    
+    model = new FinlyF.Models.User({id: @model.get('id')})
+    model.save(values, {
+      data: values,
+      processData: true
+      success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
+      error: (err) ->
+        console.log "Err", err
+    })
+
+
 
   newCondition: (e) ->
     _this = @
@@ -583,6 +631,20 @@ class FinlyF.Views.User extends Backbone.View
 
         # $(target).html("Request Balance")
     })
+
+  toggleAutoSubmitFields: (e) ->
+    auto_submit_div = $(@el).find("#tab-user-auto-submit-report")
+    auto_submit_fields_div = $(auto_submit_div).find('.row.auto-submit-fields')
+    if e
+      target = e.currentTarget
+    else
+      target = $(auto_submit_div).find('input.auto-submit-enabled:checked')
+      # console.log target
+
+    if parseInt($(target).val()) == 0
+      $(auto_submit_fields_div).find('.item-attr-edit').attr('disabled', true)
+    else
+      $(auto_submit_fields_div).find('.item-attr-edit').removeAttr('disabled')
 
 
 #Features
