@@ -11,7 +11,6 @@ class Event::EReport::Approve < Event::EReport::Base
     end
     unless user.present? or params[:auto_approve]
       add_message :error, 'User not found'
-      return
     end
   end
 
