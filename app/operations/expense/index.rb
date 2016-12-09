@@ -76,7 +76,7 @@ class Expense::Index < Expense::Base
         if params[:view] == 'personal' or params[:view].nil?
           self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
         else
-          self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
+          self.paginated_expenses = expenses.only_card_expenses.paginate(page: params[:page], per_page: 30)
         end
       end
       self.categories = user.company.active_categories

@@ -59,32 +59,32 @@
 
               <label style="font-weight: 500">Date of Birth:</label>
               <div>
-                <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]" <% unless @pending_user.profile.date_of_birth.blank? %> value="<%= @pending_user.profile.date_of_birth %>" <% end %>>
+                <input type="text" class="datepicker form-control" readonly name="user[profile_attributes][date_of_birth]" <% unless @pending_user.profile.date_of_birth.blank? %> value="<%= @pending_user.profile.date_of_birth %>" <% end %>>
               </div><br />
 
               <label style="font-weight: 500">Gender:</label>
               <div>
                 <label style="margin-right: 20px; margin-top: 0;">
-                  <input type="radio" name="user[profile_attributes][gender]" value="m" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'm' %> selected="selected" <% end %>>&nbsp;Male
+                  <input type="radio" name="user[profile_attributes][gender]" readonly value="m" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'm' %> selected="selected" <% end %>>&nbsp;Male
                 </label>
                 <label style="margin-top: 0;">
-                  <input type="radio" name="user[profile_attributes][gender]" value="f" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'f' %> <% end %>>&nbsp;Female
+                  <input type="radio" name="user[profile_attributes][gender]" readonly value="f" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'f' %> <% end %>>&nbsp;Female
                 </label>
               </div><br />
 
               <label style="font-weight: 500">Address Line 1:</label>
               <div>
-                <input type="text" class="form-control" name="user[profile_attributes][address_1]" <% unless @pending_user.profile.address_1.blank? %> value="<%= @pending_user.profile.address_1 %>"  <% end %>>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][address_1]" <% unless @pending_user.profile.address_1.blank? %> value="<%= @pending_user.profile.address_1 %>"  <% end %>>
               </div><br />
 
               <label style="font-weight: 500">Address Line 2:</label>
               <div>
-                <input type="text" class="form-control" name="user[profile_attributes][address_2]" <% unless @pending_user.profile.address_2.blank? %> value="<%= @pending_user.profile.address_2 %>" <% end %>>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][address_2]" <% unless @pending_user.profile.address_2.blank? %> value="<%= @pending_user.profile.address_2 %>" <% end %>>
               </div><br />
 
               <label style="font-weight: 500">City:</label>
               <div>
-                <input type="text" class="form-control" name="user[profile_attributes][city]" <% unless @pending_user.profile.city.blank? %> value="<%= @pending_user.profile.city %>" <% end %>>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][city]" <% unless @pending_user.profile.city.blank? %> value="<%= @pending_user.profile.city %>" <% end %>>
               </div><br />
 
               <label style="font-weight: 500">State:</label>
@@ -97,7 +97,7 @@
 
               <label style="font-weight: 500">Pin Code:</label>
               <div>
-                <input type="text" class="form-control" name="user[profile_attributes][pin_code]" <% unless @pending_user.profile.pin_code.blank? %> value="<%= @pending_user.profile.pin_code %>" <% end %>>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][pin_code]" <% unless @pending_user.profile.pin_code.blank? %> value="<%= @pending_user.profile.pin_code %>" <% end %>>
               </div><br />
 
               <% else %>

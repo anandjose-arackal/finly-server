@@ -96,7 +96,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
     end
 
     # todo sending notifications
-    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
+    Event::EMoneyRequest::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:cash)
       messages[:success] << 'Successfully approved the advance request'

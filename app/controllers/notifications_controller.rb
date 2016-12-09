@@ -24,7 +24,11 @@ class NotificationsController < ApplicationController
 
   def mark_all_read
     @notifications = current_user.notifications
-    @notifications.update_all(read: true)
+    if @notifications.update_all(read: true)
+      @result = {success: true}
+    else
+      @result = {success: false}
+    end
     respond_to do |format|
       format.json { render json: @result.as_json }
     end

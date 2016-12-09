@@ -462,10 +462,9 @@ end
 # end
 
 
-
 # temporary otp verification all numbers in db
 User.all.each do |user|
-  user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+  user.otp_confirm
 end
 
 # if AdminUser.count == 0

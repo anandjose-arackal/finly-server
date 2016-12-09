@@ -1,5 +1,7 @@
 class Import::Cards < Import::Base
 
+  attr_accessor :card_params
+
   def authorized_user_types
     [:company_admin]
   end
@@ -29,29 +31,22 @@ class Import::Cards < Import::Base
   def process
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
-      type = retrieve_invite_type(row)
-      self.params = process_row(row)
-      error_messages = params[:error_messages]
-      params.delete(:error_messages)
+      type = retrieve_import_type(row)
+      self.card_params = process_row(row)
+      error_messages = card_params[:error_messages]
+      card_params.delete(:error_messages)
       if type == 'email'
-        self.invitee = user.company.users.invite!(params)
+        u = self.user.company.users.find_by(email: row[:import_fields[:email]])
+        card = u.cards.create(card_params)
       elsif type == 'mobile'
-        self.invitee = user.company.users.invite!(params, user) do |u|
-          u.skip_invitation
-          u.update_attribute(:email, "")
-          # send welcome message to invitee
-          WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
-        end
+        u = self.user.company.users.find_by(mobile_number: row[:import_fields[:mobile_number]])
+        card = u.cards.create(card_params)
       end
 
-      if User.exists?(invitee.id)
-        if error_messages.present?
-          result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
-        else
-          result_hash[i] = "Success!"
-        end
+      if Card.exists?(card.id) and not error_messages
+        result_hash[i] = "Card assigned!"
       else
-        result_hash[i] = invitee.errors.full_messages.to_sentence
+        result_hash[i] = error_messages
       end
     end
   end
@@ -63,7 +58,7 @@ class Import::Cards < Import::Base
 
   private
 
-  def retrieve_invite_type(row)
+  def retrieve_import_type(row)
     if row[import_fields[:email]].present?
       return 'email'
     elsif row[import_fields[:mobile_number]].present?
@@ -74,108 +69,29 @@ class Import::Cards < Import::Base
     end
   end
 
-
-
   # generating the parameters that enable the user to be invited
   def process_row(row)
     errors = []
 
-    # creating role mapping attributes
-    role_mapping_attributes = [{user_role_id: UserRole.employee_id}]
-    if row[import_fields[:manager_role]] and row[import_fields[:manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.manager_id}
-    end
-    if row[import_fields[:finance_manager_role]] and row[import_fields[:finance_manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.finance_manager_id}
-    end
-    if row[import_fields[:admin_role]] and row[import_fields[:admin_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.admin_id}
-    end
-
-    manager = finance_manager = approves_to = approves_finance_to = nil
-    # creating team mapping attributes
-    if row[import_fields[:reporting_manager]]
-      manager = User.find_by(email: row[import_fields[:reporting_manager]]) rescue nil
-      unless manager and manager.manager?
-        errors << "Reporting Manager not found"
-        manager = nil
-      end
-    end
-    if row[import_fields[:reporting_finance_manager]]
-      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]]) rescue nil
-      unless finance_manager and finance_manager.finance_manager?
-        errors << "Reporting Finance Manager not found"
-        finance_manager = nil
-      end
-    end
-    if row[import_fields[:approves_to]]
-      approves_to = User.find_by(email: row[import_fields[:approves_to]]) rescue nil
-      unless approves_to and approves_to.manager?
-        errors << "Approves to not found / isn't a manager"
-        approves_to = nil
-      end
-    end
-    if row[import_fields[:approves_finance_to]]
-      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]]) rescue nil
-      unless approves_finance_to and approves_finance_to.finance_manager?
-        errors << "Approves finance to not found / isn't a finance manager"
-        approves_finance_to = nil
-      end
-    end
-
-    user_params = { first_name: row[import_fields[:first_name]],
-                    last_name: row[import_fields[:last_name]],
-                    email: row[import_fields[:email]],
-                    mobile_number: row[import_fields[:mobile_number]],
-                    role_mapping_attributes: role_mapping_attributes,
-                    team_mapping_attributes: [{default: true, manager: manager,
-                                               finance_manager: finance_manager,
-                                               approves_to: approves_to,
-                                               approves_finance_to: approves_finance_to
-                                              }],
-                    profile_attributes: {address_1: row[import_fields[:address_1]],
-                                         address_2: row[import_fields[:address_2]],
-                                         pin_code: row[import_fields[:pin_code]],
-                                         date_of_birth: row[import_fields[:dob]],
-                                         state_id: row[import_fields[:state_id]],
-                                         gender: row[import_fields[:gender]],
-                                         city: row[import_fields[:city]]
-                    },
-                    error_messages: errors
-    }
-
     # i.e. add cards only when the user
     if row[import_fields[:card_serial_id]].present?
-      user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
-                                         card_type_id: 1,
-                                         product_code: "NGPRHD",
-                                         ending_number: row[import_fields[:card_serial_id]].last(4)
-                                        }]
+      self.card_params = {proxy: row[import_fields[:card_serial_id]],
+                           card_type_id: 1,
+                           product_code: "NGPRHD",
+                           ending_number: row[import_fields[:card_serial_id]].last(4)
+                          }
+    else
+      errors << "Card not found"
+      card_params[:error_messages] = errors
     end
     return user_params
   end
 
   def import_fields
     {
-        :first_name => 0,
-        :last_name => 1,
-        :email => 2,
-        :mobile_number => 3,
-        :dob => 4,
-        :address_1 => 5,
-        :address_2 => 6,
-        :pin_code => 7,
-        :state_id => 8,
-        :city => 9,
-        :gender => 10,
-        :manager_role => 11,
-        :finance_manager_role => 12,
-        :admin_role => 13,
-        :reporting_manager => 14,
-        :reporting_finance_manager => 15,
-        :approves_to => 16,
-        :approves_finance_to => 17,
-        :card_serial_id => 18
+        :email => 0,
+        :mobile_number => 1,
+        :card_serial_id => 2
     }
   end
 end

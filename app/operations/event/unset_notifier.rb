@@ -8,7 +8,7 @@ class Event::UnsetNotifier < Event::Base
   end
 
   def process
-
+    notification.update_attributes(read: true)
   end
 
 end

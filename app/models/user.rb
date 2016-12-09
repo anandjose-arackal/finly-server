@@ -92,7 +92,7 @@ class User < ActiveRecord::Base
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable
 
-  has_many :cards
+  has_many :cards, dependent: :destroy
   has_many :card_transactions
 
   has_many :money_requests
@@ -158,14 +158,14 @@ class User < ActiveRecord::Base
       when '1', 1
         # Active
         # Name nil is to ensure user has signed up
-        where(active: true).where(invitation_token: nil).where.not(first_name: [nil, ""])
+        where(active: true).where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true)
       when '2', 2
         # Pending - i.e. where name is an empty string or when there is an invitation token
-        where('first_name = ? OR invitation_token IS NOT ?',"",nil)
+        where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true)
       when '3', 3
         # Inactive
         # Name nil is to ensure user has signed up
-        where(active: false).where.not(first_name: [nil, ""])
+        where(active: false).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true)
     end
   end
 
@@ -314,7 +314,11 @@ class User < ActiveRecord::Base
   end
 
   def manager_activateable?
-    self.invitation_token.blank? and self.email.blank?
+    self.invitation_token.blank? and self.email.blank? and self.mobile_only_invite == true
+  end
+
+  def otp_confirm
+    self.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
   end
 
   private

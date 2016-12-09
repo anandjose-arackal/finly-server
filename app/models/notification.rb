@@ -26,6 +26,7 @@ class Notification < ActiveRecord::Base
   belongs_to :user
   belongs_to :action_type, class_name: "NotificationActionType"
   belongs_to :action_user, class_name: "User"
+  belongs_to :amount
 
   scope :user, -> {where(notification_type_id: NotificationType.id_for(:user))}
   scope :payment, -> {where(notification_type_id: NotificationType.id_for(:payment))}
@@ -35,7 +36,13 @@ class Notification < ActiveRecord::Base
   scope :settlement, -> {where(notification_type_id: NotificationType.id_for(:settlement))}
   scope :advance_request, -> {where(notification_type_id: NotificationType.id_for(:advance_request))}
 
+  accepts_nested_attributes_for :amount
+
   scope :unread, -> {where read: false}
+
+  def self.default_scope
+    order(created_at: :desc)
+  end
 
   validates :timestamp, presence: true
   validates :user_id, presence: true
@@ -43,7 +50,25 @@ class Notification < ActiveRecord::Base
 
   def generate_title
     content = ""
-    content += self.object_type
+    object = ""
+    case object_type
+      when "Report"
+        object = "Report"
+      when "Advance Request"
+        object = "Report"
+      when "Expense"
+        object = "Expense"
+      when "Card"
+        object = "Card"
+      when "Wallet"
+        object = "Wallet"
+      when "Payment"
+        object = "Cash"
+      else
+        # do nothing
+    end
+
+    content += object
 
     action = ""
     case self.action_type_id
@@ -57,8 +82,10 @@ class Notification < ActiveRecord::Base
         action = " retracted"
       when NotificationActionType.unapprove_id
         action = " unapproved"
+      when NotificationActionType.auto_approve_id
+        action += "auto-approved"
       when NotificationActionType.take_control_id
-        action = " taken control of"
+        action = " taken control of by Admin"
       when NotificationActionType.credit_reimbursement_id
         action = " reimbursement credited"
       when NotificationActionType.update_id
@@ -89,7 +116,7 @@ class Notification < ActiveRecord::Base
     content = ""
 
     action_user = User.find_by(id: self.action_user_id)
-    if user and user.id == action_user.id
+    if user and action_user and user.id == action_user.id
       user_name = "You"
     else
       user_name = action_user.name
@@ -114,10 +141,15 @@ class Notification < ActiveRecord::Base
         action = " retracted a"
       when NotificationActionType.unapprove_id
         action = " unapproved a"
+      when NotificationActionType.auto_approve_id
+        content = "" # resetting the content because there is no action user here
+        action += "Finly auto-approved a"
       when NotificationActionType.credit_reimbursement_id
-        action = " credited reimbursement for a"
+        action = " credited a reimbursement of"
       when NotificationActionType.update_id
         action = " updated a"
+      when NotificationActionType.take_control_id
+        action = " taken control of a"
       when NotificationActionType.comment_id
         action = " commented on a"
       when NotificationActionType.cash_withdrawal_id
@@ -126,14 +158,17 @@ class Notification < ActiveRecord::Base
         action = " loaded an amount of"
       when NotificationActionType.atm_withdrawal_id
         action = " withdrawn an amount of"
-      when NotificationActionType.credit_advance_request_id
+      when NotificationActionType.credit_reimbursement_id
         action = " credited a reimbursement of"
       when NotificationActionType.credit_advance_request_id
         action = " credited an advance request of"
+      when NotificationActionType.credit_id
+        action = " credited an amount of"
+      when NotificationActionType.debit_id
+        action = "debited an amount of"
+      else
+        action = ""
     end
-
-    # preposition selector
-    prep = ""
 
     # adding action
     content += action
@@ -146,9 +181,40 @@ class Notification < ActiveRecord::Base
     # adding amount
     content += amount if amount_value
 
-    # adding object
-    content += " " + object_type
+    object = ""
+    object_name = ""
+    case object_type
+      when "Report"
+        if action_type_id == NotificationActionType.reimbursement_id
+          object = " for a report"
+        else
+          object = " report"
+        end
+        r = Report.find_by(id: self.object_id)
+        object_name = " named #{r.name}"
+      when "Advance Request"
+        object = "n advance request"
+        mr = MoneyRequest.find_by(id: self.object_id)
+        object_name = " named #{mr.name}"
+      when "Expense"
+        object = " expense"
+        e = Expense.find_by(id: self.object_id)
+        object_name = " at #{e.merchant_name}"
+      when "Card"
+        object = " to your card"
+        c = Card.find_by(id: self.object_id)
+        object_name = " with serial ID #{c.proxy}"
+      when "Wallet"
+        object = " to your Finly account"
+      when "Payment"
+        object = " to your cash in hand"
+      else
+        # do nothing
+    end
 
+    # adding object and corresponding name
+    content += object + object_name
+    return content
 
   end
 

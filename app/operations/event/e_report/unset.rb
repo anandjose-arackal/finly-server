@@ -1,5 +1,6 @@
-class Event::EReport::Unset < Event::UnsetNotifier
 
+
+class Event::EReport::Unset < Event::UnsetNotifier
 
 
 

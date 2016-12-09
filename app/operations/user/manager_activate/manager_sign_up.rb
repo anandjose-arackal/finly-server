@@ -106,24 +106,27 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     temp_password = generate_random_string(4)
     accept_params[:password] = accept_params[:password_confirmation] = temp_password
     accept_params[:default_password] = true
-    message = "Your temporary password is: #{temp_password}. You will be asked to change it upon signing in"
+    message = "Your temporary password is: #{temp_password}. You will be asked to change it upon signing in. Please do not share this information with anyone"
     # sending the one time password as an SMS. Mobile number is to be sent as an array of mobile numbers
     WelcomeMessage::Create.(user, {mobile_number: [invited_user.mobile_number], message: message})
   end
 
+
   def process
-    unless invited_user.update_attributes(accept_params) and invited_user.accept_invitation!
+    unless invited_user.update_attributes(accept_params)
       add_message :error, invited_user.errors.full_messages
       return false
     end
     unless invited_user.present? and invited_user.id.present? and invited_user.valid?
       add_message :error, invited_user.errors.full_messages
     end
+    invited_user.accept_invitation!
+    invited_user.confirm
+    invited_user.update_attributes(mobile_only_invite: false)
   end
 
   def post_process
     # send welcome mail
-
     messages[:success] << "User successfully activated!"
   end
 

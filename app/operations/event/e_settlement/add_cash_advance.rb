@@ -9,7 +9,19 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
+                                              action_type_id: NotificationActionType.cash_load_id,
+                                              action_user_id: payment.initiating_user.id,
+                                              object_id: payment.id,
+                                              object_type: "Payment",
+                                              path_object_id: payment.id,
+                                              path_object_type: "Payment",
+                                              read: false,
+                                              timestamp: DateUtils.local_date_time,
+                                              amount_attributes: {value: payment.amount.value,
+                                                                  currency_id: 1}
+                                            )
+    notification.save
   end
 
   def mailer_subject(user)
