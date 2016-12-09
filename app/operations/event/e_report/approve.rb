@@ -1,15 +1,31 @@
 class Event::EReport::Approve < Event::EReport::Base
-  attr_accessor :approved, :approving_user
+  attr_accessor :approved, :approving_user, :auto_approve
+
+  def pre_validate
+    if params.blank? or params[:report].blank?
+      add_message :error, 'Report not found'
+      return
+    end
+    unless params[:report].is_a?(::Report)
+      add_message :error, 'Error loading report'
+    end
+    unless user.present? or params[:auto_approve]
+      add_message :error, 'User not found'
+    end
+  end
 
   def init
     super
     self.approving_user = self.report.tracks.last.action_user
     self.approved = (report.approved? or report.closed?) if report.present?
+    self.auto_approve = params[:auto_approve]
   end
 
   def validate
     super
-    self.approving_user.present?
+    unless self.approving_user.present? or auto_approve
+      add_message :error, 'User not found'
+    end
   end
 
   def event_id
@@ -18,6 +34,9 @@ class Event::EReport::Approve < Event::EReport::Base
 
   def affected_users
     if approved
+      if auto_approve
+        return [self.report.user]
+      end
       [self.report.tracks.last.action_user, self.report.user]
     else
       [self.report.tracks.last.action_user, self.report.controlling_user]
@@ -35,7 +54,11 @@ class Event::EReport::Approve < Event::EReport::Base
   def send_push_notification(user)
     if approved
       return unless user == report.user
-      message = "Report approved: #{self.report.name}"
+      if auto_approve
+        message = "Report auto-approved: #{self.report.name}"
+      else
+        message = "Report approved: #{self.report.name}"
+      end
     else
       return unless user == report.controlling_user
       message = "Report is awaiting your approval: #{self.report.name}"
@@ -63,7 +86,11 @@ class Event::EReport::Approve < Event::EReport::Base
       "Report approved : #{self.report.name}"
     else
       if approved and user.id == self.report.user.id
-        "Congratulations! Your report #{report.name} has been approved"
+        if auto_approve
+          return "Congratulations! Your report #{report.name} has been auto-approved"
+        else
+          return "Congratulations! Your report #{report.name} has been approved"
+        end
       else
         "#{approving_user.name} has approved the report: #{self.report.name}"
       end
@@ -76,7 +103,11 @@ class Event::EReport::Approve < Event::EReport::Base
       message = "You have successfully approved the report : #{self.report.name}"
     else
       if approved and user.id == report.user.id
-        message = "Congratulations! Your report #{report.name} has been approved"
+        if auto_approve
+          message = "Congratulations! Your report #{report.name} has been auto-approved"
+        else
+          message = "Congratulations! Your report #{report.name} has been approved"
+        end
         if report.reimbursement_pending?
           message = "#{message} and is awaiting reimbursement!"
         else

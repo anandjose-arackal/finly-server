@@ -71,7 +71,9 @@ class MoneyRequest::Submit < MoneyRequest::Base
     # adding comment regarding the change in status of this money request
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
 
-    messages[:success] << 'Money Request Submitted'
+    add_message :success, 'Money Request Submitted'
+
+    Event::EMoneyRequest::Submit.(user, money_request: money_request)
   end
 
 end

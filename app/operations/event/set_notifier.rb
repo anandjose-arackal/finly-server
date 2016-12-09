@@ -43,7 +43,7 @@ class Event::SetNotifier < Event::Base
     users.each do |user|
       next if user.blank? or not user.is_a?(User)
       user_event_configuration = load_configuration(user)
-      if allow_mailer(user_event_configuration)
+      if allow_mailer(user, user_event_configuration)
         send_mailer(user)
       end
     end
@@ -53,7 +53,7 @@ class Event::SetNotifier < Event::Base
     users.each do |user|
       next if user.blank? or not user.is_a?(User)
       user_event_configuration = load_configuration(user)
-      if allow_push_notification(user_event_configuration)
+      if allow_push_notification(user, user_event_configuration)
         send_push_notification(user)
       end
     end
@@ -99,7 +99,7 @@ class Event::SetNotifier < Event::Base
     user.event_configurations.with_event(event_id).first rescue nil
   end
 
-  def allow_mailer(configuration)
+  def allow_mailer(user, configuration)
     event = self.event
     return false unless has_mailer?
     return false if user.blank? or not user.is_a?(User)
@@ -108,7 +108,7 @@ class Event::SetNotifier < Event::Base
     true
   end
 
-  def allow_push_notification(configuration)
+  def allow_push_notification(user, configuration)
     event = self.event
     return false unless has_push_notification?
     return false if user.blank? or not user.is_a?(User)

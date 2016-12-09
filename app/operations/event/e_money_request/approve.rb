@@ -56,7 +56,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     if approved
       return unless user == money_request.user
       if auto_approve
-        message = "Report auto-approved: #{self.money_request.name}"
+        message = "Advance Request auto-approved: #{self.money_request.name}"
       else
         message = "Advance Request approved: #{self.money_request.name}"
       end
