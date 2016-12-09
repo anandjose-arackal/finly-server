@@ -319,7 +319,6 @@ class FinlyF.Views.Request extends Backbone.View
       amount: _this.model.get('total')
     }
     
-
     modal = $(@el).find("#modal-mp")
     $(modal).html(@templateModalLoadFunds({item: item}))
     $(modal).modal('show')
