@@ -83,7 +83,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.unapprove_id
         action = " unapproved"
       when NotificationActionType.auto_approve_id
-        action += "auto-approved"
+        action += " auto-approved"
       when NotificationActionType.take_control_id
         action = " taken control of by Admin"
       when NotificationActionType.credit_reimbursement_id
@@ -119,7 +119,10 @@ class Notification < ActiveRecord::Base
     if user and action_user and user.id == action_user.id
       user_name = "You"
     else
-      user_name = action_user.name
+      user_name = action_user.name rescue nil
+      if user_name.nil?
+        user_name = "Finly"
+      end
     end
 
     content += user_name
@@ -129,6 +132,7 @@ class Notification < ActiveRecord::Base
     else
       prep = " has"
     end
+
     content += prep # short for preposition
     case self.action_type_id
       when NotificationActionType.submit_id
@@ -143,7 +147,7 @@ class Notification < ActiveRecord::Base
         action = " unapproved a"
       when NotificationActionType.auto_approve_id
         content = "" # resetting the content because there is no action user here
-        action += "Finly auto-approved a"
+        action = "Finly auto-approved a"
       when NotificationActionType.credit_reimbursement_id
         action = " credited a reimbursement of"
       when NotificationActionType.update_id
@@ -185,7 +189,7 @@ class Notification < ActiveRecord::Base
     object_name = ""
     case object_type
       when "Report"
-        if action_type_id == NotificationActionType.reimbursement_id
+        if action_type_id == NotificationActionType.credit_reimbursement_id
           object = " for a report"
         else
           object = " report"
@@ -221,7 +225,7 @@ class Notification < ActiveRecord::Base
   def generate_link(user, view = nil)
 
     base = Constants::BASE_URL
-    suffix = "/params={\"view\":#{view},\"preview\":true,\"ref\":1,\"n_id\":#{self.id}}"
+    suffix = "/params={\"view\":" + "#{view || "\"personal\""}" + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}}"
     path = ""
     case self.path_object_type
       when "Report"

@@ -4,4 +4,5 @@ json.array!(@notifications) do |notif|
   json.title notif.generate_title
   json.date notif.timestamp.strftime("%y %b %d")
   json.time notif.timestamp.strftime("%l:%M %p")
+  json.link notif.generate_link(current_user)
 end

@@ -67,8 +67,13 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def set_notification(user)
+    if auto_approve
+      notify_type = NotificationActionType.auto_approve_id
+    else
+      notify_type = NotificationActionType.approve_id
+    end
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                              action_type_id: NotificationActionType.approve_id,
+                                              action_type_id: notify_type,
                                               action_user_id: (report.tracks.last.action_user.id rescue nil),
                                               object_id: report.id,
                                               object_type: "Report",

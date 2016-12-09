@@ -18,7 +18,7 @@ class NotificationActionType < ActiveRecord::Base
              credit_advance_request: 16,
              credit_reimbursement: 17,
              credit_cash_advance: 18,
-             take_control: 19
+             take_control: 19,
             }
 
   self.class.instance_eval do

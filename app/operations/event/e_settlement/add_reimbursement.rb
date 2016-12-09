@@ -9,21 +9,21 @@ class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
   end
 
   def set_notification(user)
-    # payment.reports.each do |report|
-    #   notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
-    #                                             action_type_id: NotificationActionType.credit_reimbursement_id,
-    #                                             action_user_id: payment.initiating_user.id,
-    #                                             object_id: report.id,
-    #                                             object_type: "Report",
-    #                                             path_object_id: report.id,
-    #                                             path_object_type: "Report",
-    #                                             read: false,
-    #                                             timestamp: DateUtils.local_date_time,
-    #                                             amount_attributes: {value: payment.amount.value,
-    #                                                                 currency_id: 1}
-    #   )
-    #   notification.save
-    # end
+    payment.reports.each do |report|
+      notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
+                                                action_type_id: NotificationActionType.credit_reimbursement_id,
+                                                action_user_id: payment.initiating_user.id,
+                                                object_id: report.id,
+                                                object_type: "Report",
+                                                path_object_id: report.id,
+                                                path_object_type: "Report",
+                                                read: false,
+                                                timestamp: DateUtils.local_date_time,
+                                                amount_attributes: {value: report.reimbursement_amount.value,
+                                                                    currency_id: 1}
+                                              )
+      notification.save
+    end
   end
 
   def mailer_subject(user)
