@@ -25,6 +25,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
     'click .btn-import-employees': 'processImport'
     'submit #form-import-employees': 'importEmployees'
+
+    'click .btn-import-card-mapping': 'processImportCardMapping'
+    'submit #form-import-card-mapping': 'importCardMapping'
     # 'ajax:success #form-import-employees': 'importEmployees'
 
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
@@ -345,7 +348,13 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     #   processData: false
     # })
 
+  processImportCardMapping: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
 
+    modal = $(@el).find("#modal-import-card-mapping")
+    $(modal).modal('show')
+    $(modal).find("input[name=authenticity_token]").val($("#authenticity_token").val())
 
   filterState: (e) ->
     e.preventDefault()
