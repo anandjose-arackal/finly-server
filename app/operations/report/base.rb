@@ -26,11 +26,6 @@ class Report::Base < BaseOperation
     end
   end
 
-  def pre_process
-    if params[:ref] == '1' and params[:n_id].present?
-      Event::EReport::Unset.(user, params)
-    end
-  end
 
   # added here because in most cases we will be returning the report itself
   def success
