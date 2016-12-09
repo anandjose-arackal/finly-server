@@ -25,6 +25,18 @@ module Constants
 
   #########################
 
+  if Rails.env.development?
+    url = "http://localhost:3000/#"
+  elsif Rails.env.production?
+    url = "https://www.finly.io/#"
+  elsif Rails.env.itzcash_uat?
+    url = "http://180.179.138.175/#"
+  else
+    url = ""
+  end
+
+  BASE_URL = url
+
 
   class Constants::ItzCash
 

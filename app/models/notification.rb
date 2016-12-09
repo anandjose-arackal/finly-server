@@ -152,8 +152,37 @@ class Notification < ActiveRecord::Base
 
   end
 
-  def generate_link
-    
+  def generate_link(user, view = nil)
+
+    base = Constants::BASE_URL
+    suffix = "/params={\"view\":#{view},\"preview\":true,\"ref\":1,\"n_id\":#{self.id}}"
+    path = ""
+    case self.path_object_type
+      when "Report"
+        path = "reports/#{self.path_object_id}"
+      when "Settlement"
+        path = "settlements/"
+        if view == 'personal' or view.nil?
+          path += "#{user.id}"
+        end
+      when "Card"
+        if view == 'personal' or view.nil?
+          path = "settings"
+        else
+          path = "employees"
+        end
+      when "User"
+        if view == 'personal' or view.nil?
+          # do nothing
+        else
+          path = "employees"
+        end
+      else
+        # do nothing
+    end
+
+    return base + path + suffix
+
   end
 
   def generate_date
