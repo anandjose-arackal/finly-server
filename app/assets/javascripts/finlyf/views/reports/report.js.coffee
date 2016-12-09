@@ -64,6 +64,8 @@ class FinlyF.Views.Report extends Backbone.View
         data.view = @current_view
       if @params.ref
         data.ref = @params.ref
+      if @params.n_id
+        data.n_id = @params.n_id
       $(@el).removeClass("item").addClass("bg-white")
       @model = new FinlyF.Models.Report({id: options.model_id})
       @model.fetch({data: data})

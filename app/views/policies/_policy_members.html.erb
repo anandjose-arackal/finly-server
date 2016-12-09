@@ -38,7 +38,12 @@
       <% default_mapping = user[:default_mapping] %>
       <div class="row no-margin assigned-user" data-user-id="<%= user[:user].id %>" style="padding: 5px 0; border-bottom: 1px solid #efefef;">
         <div class="col-sm-1 no-padding"><input type="checkbox" class="select-assigned-user"></div>
-        <div class="col-sm-3 no-padding"><%= user[:user].email %></div>
+        <div class="col-sm-3 no-padding">
+          Name: <label><%= user[:user].name.blank? ? "Not Set" : user[:user].name %></label><br />
+          Email: <label><%= user[:user].email.blank? ? "Not Set" : user[:user].email %></label><br />
+          Mobile: <label><%= user[:user].mobile_number.blank? ? "Not Set" : user[:user].mobile_number  %></label>
+            
+        </div>
         <div class="col-sm-2 no-padding"><%= default_mapping.manager.email if default_mapping.manager_id.present? %></div>
         <div class="col-sm-2 no-padding"><%= default_mapping.finance_manager.email if default_mapping.finance_manager_id.present? %></div>
 

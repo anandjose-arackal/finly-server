@@ -22,8 +22,9 @@
             <div class="row no-margin">
               <div class="col-md-1"><input type="checkbox" id="select-invitable-users"></div>
               <div class="col-md-3">User Name</div>
-              <div class="col-md-4">Email Id</div>
-              <div class="col-md-4">Manager</div>
+              <div class="col-md-3">Email Id</div>
+              <div class="col-md-2">Mobile Number</div>
+              <div class="col-md-3">Manager</div>
             </div>
             <div id="invitable-users">
               <% if @result.users_with_manager_email.present? %>
@@ -31,9 +32,10 @@
                   <% user = item[:user] %>
                   <div class="row no-margin invitable-user" data-user-id="<%= user.id %>">
                     <div class="col-md-1"><input class="select-invitable-user" type="checkbox" name="add_user_id" value="<%= user.id %>"></div>
-                    <div class="col-md-3"><%= user.name %></div>
-                    <div class="col-md-4"><%= user.email %></div>
-                    <div class="col-md-4"><%= item[:manager] %></div>
+                    <div class="col-md-3"><%= user.name.blank? ? "Not Set" : user.name %></div>
+                    <div class="col-md-3"><%= user.email.blank? ? "Not Set" : user.email %></div>
+                    <div class="col-md-2"><%= user.mobile_number.blank? ? "Not Set" : user.mobile_number %></div>
+                    <div class="col-md-3"><%= item[:manager] %></div>
                   </div>
                 <% end %>
               <% end %>
