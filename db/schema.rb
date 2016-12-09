@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161207144223) do
+ActiveRecord::Schema.define(version: 20161208185145) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -770,6 +770,12 @@ ActiveRecord::Schema.define(version: 20161207144223) do
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
   add_index "receipts", ["receipt_email_id"], name: "index_receipts_on_receipt_email_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
+
+  create_table "referrers", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "report_comment_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false

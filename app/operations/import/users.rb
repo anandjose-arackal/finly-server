@@ -96,26 +96,7 @@ class Import::Users < Import::Base
     end
   end
 
-  def generate_response_csv
-    CSV.generate(headers: true) do |csv|
-      self.header << "Result"
-      csv << header
-      (2..sheet.last_row).each do |i|
-        row = sheet.row(i)
-        row << result_hash[i]
-        csv << row
-      end
-    end
-  end
 
-  def open_spreadsheet(file)
-    case File.extname(file.original_filename)
-      when ".csv" then Roo::Csv.new(file.path)
-      when ".xls" then Roo::Excel.new(file.path)
-      when ".xlsx" then Roo::Excelx.new(file.path)
-      else raise "Unknown file type: #{file.original_filename}"
-    end
-  end
 
   # generating the parameters that enable the user to be invited
   def process_row(row)
@@ -184,7 +165,8 @@ class Import::Users < Import::Base
                                         },
                     error_messages: errors
                   }
-                                
+
+    # i.e. add cards only when the user
     if row[import_fields[:card_serial_id]].present?
       user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
                                       card_type_id: 1,

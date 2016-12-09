@@ -1,7 +1,7 @@
 class NotificationsController < ApplicationController
 
   def index
-    @notifications = current_user.notifications
+    @notifications = current_user.notifications.paginate(page: params[:page])
     # @nots = []
     #
     # 10.times do |x|
@@ -23,7 +23,8 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_read
-    @result = {:success => true}
+    @notifications = current_user.notifications
+    @notifications.update_all(read: true)
     respond_to do |format|
       format.json { render json: @result.as_json }
     end
