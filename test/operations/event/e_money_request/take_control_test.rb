@@ -9,7 +9,7 @@ class TakeControlTest < ActiveSupport::TestCase
     @money_request = MoneyRequest.new
     @owner = User.last
     @admin = User.only_admins.first
-    @manager = User.only_managers.last
+    @manager = User.only_managers.where.not(id: [@owner.id, @admin.id]).last
     @money_request.stubs(:user).returns(@owner)
   end
 
