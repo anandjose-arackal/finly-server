@@ -19,7 +19,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
       return false
     end
     if category.name == "Other" or category.name == "Personal"
-      messages[:error] << "Cannot destroy 'Other' or 'Personal' categories"
+      messages[:error] << "Cannot remove 'Other' or 'Personal' categories"
       return false
     end
   end
