@@ -21,7 +21,7 @@ class MoneyRequest::Comment::Create < MoneyRequest::Base
   end
 
   def post_process
-
+    Event::EMoneyRequest::EComment::Create.(self.user, money_request: self.money_request)
   end
 
 end

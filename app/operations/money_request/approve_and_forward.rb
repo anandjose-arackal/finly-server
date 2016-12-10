@@ -58,7 +58,7 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
 
   def post_process
     # todo sending notifications
-    Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
+    Event::EMoneyRequest::Approve.(self.user, money_request: self.money_request)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:card)
       add_message :success, 'Successfully approved and forwarded the advance request'
