@@ -23,7 +23,6 @@ class BudgetRule < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
 
-  delegate :period, to: :period
   delegate :type, to: :rule_type
   delegate :amount_value, to: :amount
   delegate :category_name, to: :category
