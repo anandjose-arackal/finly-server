@@ -175,4 +175,8 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert_equal report.memo, default_memo_value
   end
 
+  test 'Auto-submit should only submit unreported expenses' do
+
+  end
+
 end

@@ -38,7 +38,7 @@ class ReportComment < ActiveRecord::Base
     comment = nil
     name = nil
     if self.user.present? and u.present? and u.id == self.user_id
-      name = "You"
+      name = 'You'
     elsif self.user.present?
       name = self.user.name
     end
@@ -52,6 +52,8 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:report_submit)
         # Report submit
         comment = "#{name} submitted the report"
+      when ReportCommentAction.id_for(:report_auto_submit)
+        comment = 'Report auto-submitted'
       when ReportCommentAction.id_for(:report_approve)
         # Report approve
         comment = "#{name} approved the report"

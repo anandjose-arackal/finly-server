@@ -3,11 +3,11 @@ class ReportAutoSubmit < ActiveJob::Base
   def perform
     today = Date.today
     interval = :daily
-    if today.beginning_of_year
+    if today.beginning_of_year == today
       interval = :yearly
-    elsif today.beginning_of_quarter
+    elsif today.beginning_of_quarter == today
       interval = :quarterly
-    elsif today.beginning_of_month
+    elsif today.beginning_of_month == today
       interval = :monthly
     elsif today.friday?
       interval = :weekly
