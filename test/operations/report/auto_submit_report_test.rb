@@ -38,6 +38,9 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
 
   test 'Successful submission' do
     @user.auto_submit_config.stubs(:enabled).returns(true)
+    # To ensure only unreported expenses are used
+    Expense::Index.expects(:call).with(@user, has_entry(filter_status_id: ExpenseStatus.id_for(:unreported))).returns(Expense::Index::ListPresenter.new(@user, {expenses: @expenses}))
+
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
@@ -87,7 +90,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
   end
 
   test 'Auto submit should submit all unreported expenses (Manual + Card) of the user if "Only Card Expenses" is not set' do
-    @user.auto_submit_config.stubs(:enabled).returns(true)
+    @user.auto_submit_config.stubs(:enabled => true, :limit_to_card_expenses => false)
     assert @user.auto_submit_config.enabled
     assert_not @user.auto_submit_config.limit_to_card_expenses
     result = nil
@@ -173,10 +176,6 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert_equal report.controlling_user, @manager
     assert_equal report.policy_id, 1
     assert_equal report.memo, default_memo_value
-  end
-
-  test 'Auto-submit should only submit unreported expenses' do
-
   end
 
 end
