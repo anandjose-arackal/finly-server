@@ -46,8 +46,6 @@ class Report::AutoSubmit < Report::Base
 
   def post_process
     return if self.report.blank?
-    # adding comment regarding the change in status of this report
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
 
     Event::EReport::Submit.(user, report: report)
 
@@ -116,7 +114,6 @@ class Report::AutoSubmit < Report::Base
                            report_tracking_action_id: ReportTrackingAction.submit_id,
                            report_status_id: ReportStatus.processing_id, memo: memo
       report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
-      report.comments.create
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
       end
