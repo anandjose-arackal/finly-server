@@ -16,12 +16,12 @@ class MoneyRequest::Comment::Create < MoneyRequest::Base
     content = (params[:comment] or params[:content])
     comment = money_request.comments.build(comment_action_id: MoneyRequestCommentAction.id_for(:comment), user_id: user.id, content: content)
     unless comment.save
-      self.messages = comment.errors.full_messages
+      add_message :error, comment.errors.full_messages
     end
   end
 
   def post_process
-
+    Event::EMoneyRequest::EComment::Create.(self.user, money_request: self.money_request)
   end
 
 end

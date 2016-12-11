@@ -54,4 +54,9 @@ class MoneyRequest::Retract < MoneyRequest::Base
       messages[:error] = money_request.errors.full_messages
     end
   end
+
+  def post_process
+    Event::EMoneyRequest::Retract.(self.user, money_request: self.money_request)
+  end
+
 end

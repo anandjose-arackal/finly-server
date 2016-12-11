@@ -40,7 +40,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
   end
 
   def post_process
-
+    Event::EMoneyRequest::TakeControl.(self.user, money_request: self.money_request)
   end
 
 end
