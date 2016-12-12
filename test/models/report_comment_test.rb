@@ -18,6 +18,7 @@
 #
 
 
+
 require 'test_helper'
 
 class ReportCommentTest < ActiveSupport::TestCase

@@ -1,6 +1,6 @@
 class User::Team::Mappings::Set < User::Team::Mappings::Base
   attr_accessor :updating_mapping, :policy, :updating_records, :records_marked_for_destroy,
-    :updating_policy_config, :updating_policy_records
+                :updating_policy_config, :updating_policy_records
 
   def authorized_user_types
     [:company_admin]
@@ -156,16 +156,18 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   def load_updating_policy_config
     self.updating_policy_records = []
     policy_user_mappings = updating_user.policy_user_mappings
-    self.updating_policy_config.each do |map|
-      policy_id = map[:policy_id]
-      admin = (StringUtils.to_bool(map[:admin]) or false)
-      policy_mapping = policy_user_mappings.with_policy(policy_id).first rescue nil if policy_id.present?
-      if policy_id.blank? or policy_mapping.blank?
-        add_message :error, 'Error updating configuration'
-        return
+    if self.updating_policy_config.present?
+      self.updating_policy_config.each do |map|
+        policy_id = map[:policy_id]
+        admin = (StringUtils.to_bool(map[:admin]) or false)
+        policy_mapping = policy_user_mappings.with_policy(policy_id).first rescue nil if policy_id.present?
+        if policy_id.blank? or policy_mapping.blank?
+          add_message :error, 'Error updating configuration'
+          return
+        end
+        policy_mapping.assign_attributes(admin: admin)
+        self.updating_policy_records << policy_mapping
       end
-      policy_mapping.assign_attributes(admin: admin)
-      self.updating_policy_records << policy_mapping
     end
   end
 

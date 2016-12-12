@@ -1,4 +1,4 @@
-class EMoneyRequest::Unset < EMoneyRequest::Base
+class Event::EMoneyRequest::Unset < Event::EMoneyRequest::Base
 
 
 end
