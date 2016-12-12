@@ -264,10 +264,10 @@ window.FinlyF =
     )
 
   mark_all_read: (container) ->
-    notifications = $(container).find('.navbar-notifications .notifications-list .read-status')
+    notifications = $(container).find('.navbar-notifications .notifications-list .navbar-notification')
     for notification in notifications
-      if $(notification).find('i').hasClass('fa-circle')
-          $(notification).find('i').removeClass('fa-circle').addClass('fa-circle-o')
+      if $(notification).hasClass('unread')
+          $(notification).removeClass('unread')
 
 
   navigate: (e, attr)->

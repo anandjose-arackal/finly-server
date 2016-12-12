@@ -459,7 +459,8 @@ body {
 
 .navbar-notifications{
   width: 400px;
-  height: 55vh;
+  min-height: 80px;
+  max-height: 60vh;
   overflow-y: auto;
   padding-top: 0;
 }
@@ -468,12 +469,19 @@ body {
   padding: 0;
 }
 
+.navbar-notifications-header{
+  background: #FFC107;
+}
 
 .navbar-notification{
     color: #555;
     width: 100%;
     padding: 0 10px;
     border-bottom: 1px solid #eee;
+}
+.navbar-notification.unread{
+  // background: #ebf5fb;
+  background: #F0F4C3;
 }
 .navbar-notification .title {
     font-weight: bold;
