@@ -16,7 +16,7 @@ class Report::AutoSubmit < Report::Base
     return unless self.selected_user.present?
     self.auto_submit_config = selected_user.auto_submit_config
     if auto_submit_config.enabled
-      self.processing_expenses = Expense::Index.(selected_user).expenses
+      self.processing_expenses = Expense::Index.(selected_user, filter_status_id: ExpenseStatus.id_for(:unreported)).expenses
       self.processing_expenses = self.processing_expenses.only_card_expenses if self.processing_expenses.present? and auto_submit_config.limit_to_card_expenses
     end
   end
@@ -46,8 +46,6 @@ class Report::AutoSubmit < Report::Base
 
   def post_process
     return if self.report.blank?
-    # adding comment regarding the change in status of this report
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
 
     Event::EReport::Submit.(user, report: report)
 
@@ -111,11 +109,11 @@ class Report::AutoSubmit < Report::Base
                                 controlling_for_user_id: nil, controlling_user_role_id: manager_role_id,
                                 controlling_for_user_role_id: nil,
                                 memo: memo, submitted_at: submitted_at
-      track = report.tracks.build action_user: user, modified_user_id: report.controlling_user_id,
-                                  modified_user_role_id: manager_role_id,
-                                  report_tracking_action_id: ReportTrackingAction.submit_id,
-                                  report_status_id: ReportStatus.processing_id, memo: memo
-      track.save
+      report.tracks.create action_user: user, modified_user_id: report.controlling_user_id,
+                           modified_user_role_id: manager_role_id,
+                           report_tracking_action_id: ReportTrackingAction.submit_id,
+                           report_status_id: ReportStatus.processing_id, memo: memo
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
       end

@@ -1,4 +1,4 @@
-json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id
+json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id, :auto_submit
 json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status

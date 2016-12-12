@@ -38,7 +38,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :activateable
+                  :periods, :auto_submit_config, :activateable
 
     def init
       self.selected_user = params[:selected_user]
@@ -56,10 +56,25 @@ class User::Show < User::Base
       self.card = params[:card]
       # debugger
       # self.activateable = selected_user.manager_activateable?
+      self.auto_submit_config = self.selected_user.auto_submit_config
+      self.periods = Period.all
     end
 
     private
-
+    # def retrieve_mapping(policy)
+    #   policy_id = policy.id rescue nil
+    #   company_default_mapping = team_mapping.policy(policy_id)
+    #   default_mapping = company_default_mapping.default
+    #   conditional_manager = company_default_mapping.non_default.manager
+    #   conditional_finance_manager = company_default_mapping.non_default.finance_manager
+    #   conditional_approves_to = company_default_mapping.non_default.approves_to
+    #   conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
+    #   {company_default: policy.nil?, policy: policy, default: default_mapping,
+    #    conditional_manager: conditional_manager,
+    #    conditional_finance_manager: conditional_finance_manager,
+    #    conditional_approves_to: conditional_approves_to,
+    #    conditional_approves_finance_to: conditional_approves_finance_to}
+    # end
 
     def get_managers
 
@@ -69,7 +84,7 @@ class User::Show < User::Base
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
       if (self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?) or
-        (selected_user.first_name == "" )
+        (selected_user.first_name.blank? )
         actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
         actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
       else
