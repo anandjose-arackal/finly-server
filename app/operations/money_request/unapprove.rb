@@ -7,19 +7,14 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << 'User or params not passed'
+      add_message :error, 'User or params not passed'
     end
   end
-
-  # def init
-  #   id = (params[:money_request_id] or params[:id])
-  #   self.money_request = MoneyRequest.find_by(id: id)
-  # end
 
   def authorize
     super
     if money_request.user_id == user.id
-      messages[:error] << 'You cannot unapprove your own money_request'
+      add_message :error, 'You cannot unapprove your own money_request'
       raise_unauthorized_exception
     end
   end
@@ -28,12 +23,12 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
     # checking if this user can unapprove this money_request at this stage
     associated_users = money_request.associated_users money_request.controlling_user
     unless associated_users.present? and associated_users.with_id(user.id).present?
-      messages[:error] << 'User has not yet reviewed the money_request to unapprove it'
+      add_message :error, 'User has not yet reviewed the money_request to unapprove it'
       return false
     end
 
     unless money_request.can_unapprove?
-      messages[:error] << 'The money_request cannot be unapproved at this stage'
+      add_message :error, 'The money_request cannot be unapproved at this stage'
     end
   end
 
@@ -59,16 +54,17 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
                                   status_id: MoneyRequestStatus.id_for(:processing)
       return
     end
-    messages[:error] = money_request.errors.full_messages
+    add_message :error, money_request.errors.full_messages
   end
 
   def post_process
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
-    # Recalculate settlement when money_request is unapproved from an approved/closed state
-    Settlement::MoneyRequest::Unapproved.(user, money_request: money_request)
 
-    if prev_status.id == MoneyRequestStatus.id_for(:approved)
-      # Event::MoneyRequest::Unapprove.(self.user, money_request: self.money_request)
+    if prev_status.approved?
+      Event::MoneyRequest::Unapprove.(self.user, money_request: self.money_request)
+
+      # Recalculate settlement when money_request is unapproved from an approved/closed state
+      Settlement::MoneyRequest::Unapproved.(user, money_request: money_request)
     end
   end
 

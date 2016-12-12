@@ -11,7 +11,7 @@ class Report::Unapprove < Report::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << 'User or params not passed'
+      add_message :error, 'User or params not passed'
     end
   end
 
@@ -26,7 +26,7 @@ class Report::Unapprove < Report::Base
   def authorize
     super
     if report.user_id == user.id
-      messages[:error] << 'You cannot unapprove your own report'
+      add_message :error, 'You cannot unapprove your own report'
       raise_unauthorized_exception
     end
   end
@@ -35,12 +35,12 @@ class Report::Unapprove < Report::Base
     # checking if this user can unapprove this report at this stage
     associated_users = report.associated_users report.controlling_user
     unless associated_users.present? and associated_users.with_id(user.id).present?
-      messages[:error] << 'User has not yet reviewed the report to unapprove it'
+      add_message :error, 'User has not yet reviewed the report to unapprove it'
       return false
     end
 
     unless report.can_unapprove?
-      messages[:error] << 'The report cannot be unapproved at this stage'
+      add_message :error, 'The report cannot be unapproved at this stage'
     end
   end
 
@@ -64,16 +64,18 @@ class Report::Unapprove < Report::Base
                            report_status_id: ReportStatus.processing_id
       return
     end
-    messages[:error] = report.errors.full_messages
+    add_message :error, report.errors.full_messages
   end
 
   def post_process
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_unapprove)
     # Recalculate settlement when report is unapproved from an approved/closed state
     if prev_status.approved? or prev_status.closed?
-      Settlement::Report::Unapproved.(user, report: report, from_user: self.from_user)
+      Settlement::Report::Unapproved.(user, report: report)
+
+      Event::EReport::Unapprove.(self.user, report: report)
     end
 
-    messages[:success] << 'Report unapproved'
+    add_message :success, 'Report unapproved'
   end
 end

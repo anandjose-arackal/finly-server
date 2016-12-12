@@ -103,7 +103,7 @@ class BaseOperation
   end
 
   def has_errors?
-    self.messages[:error].present?
+    self.messages[:error].present? or self.messages[:failure].present?
   end
 
   def processing?

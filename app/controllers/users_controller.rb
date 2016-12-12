@@ -35,7 +35,6 @@ class UsersController < ApplicationController
     respond
   end
 
-
   # def profile
   #   ap params
   #   @result = User::Profile.(current_user, params)
@@ -108,24 +107,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # def sample_file
-    
-  # end
-
-  # params = {
-  #   target_user_id: 1,
-  #   target_user_wallet: true,
-  #   target_user_card: true,
-  #   target_user_cash_in_hand: true,
-  #   target_user_pending_reimbursement: true,
-  #   target_user_pending_advance_request: true,
-  #   current_user_wallet: true,
-  #   current_user_card: true,
-  #   current_user_cash_in_hand: true,
-  #   current_user_pending_reimbursement: true,
-  #   current_user_pending_advance_request: true,
-  #   virtual_account: true
-  # }
   def balance
     @result = User::Balance.(current_user, params)
     respond
@@ -155,6 +136,9 @@ class UsersController < ApplicationController
       when 'state'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'
+      when 'auto_submit'
+        operation = User::Configuration::AutoSubmit::Update.new(current_user, params)
+        success_message = 'Configuration updated'
       else
         # do nothing, ha!
     end
