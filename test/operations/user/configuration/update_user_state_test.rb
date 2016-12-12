@@ -12,10 +12,13 @@ class UpdateUserStateTest < ActiveSupport::TestCase
                             id: @employee.id}
   end
 
-  test "admins can deactivate or activate a user" do
+  test 'admins can deactivate or activate a user' do
     # mocking the return value for users
     index_users = User.where(id: @employee.id)
     User::Team::Index.stubs(:call).returns(index_users)
+    User.any_instance.stubs(:cards).returns(Card.all)
+    User::PrepaidCard::Unblock.expects(:call).with(@admin, has_entry(:user_deactivation => true)).at_least_once.returns(nil)
+    User::PrepaidCard::Block.expects(:call).with(@admin, has_entry(:user_deactivation => true)).at_least_once.returns(nil)
 
     update_state_op = User::Configuration::UpdateState.new(@admin, @update_state_params)
     assert_difference 'User.active.count', -1 do
@@ -23,9 +26,17 @@ class UpdateUserStateTest < ActiveSupport::TestCase
     end
     assert @result.success?
     assert_not @employee.reload.active?
+
+    @update_state_params[:active] = true
+    update_state_op = User::Configuration::UpdateState.new(@admin, @update_state_params)
+    assert_difference 'User.active.count', 1 do
+      @result = update_state_op.run
+    end
+    assert @result.success?
+    assert @employee.reload.active?
   end
 
-  test "non admins cannot deactivate or activate a user" do
+  test 'non admins cannot deactivate or activate a user' do
     # mocking the return value for users
     index_users = User.where(id: @employee.id)
     User::Team::Index.stubs(:call).returns(index_users)
