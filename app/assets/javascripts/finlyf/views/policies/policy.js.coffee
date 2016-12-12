@@ -223,11 +223,11 @@ class FinlyF.Views.Policy extends Backbone.View
         @selected_invitable_users.push(user_id)
         flag = true
 
-    console.log "Selected Users", @selected_invitable_users
+    # console.log "Selected Users", @selected_invitable_users
     if flag == true
-      $(button).removeClass('hidden')
+      $(button).removeAttr('disabled')
     else
-      $(button).addClass('hidden')
+      $(button).attr('disabled', true)
 
   
 
@@ -276,11 +276,11 @@ class FinlyF.Views.Policy extends Backbone.View
         @selected_assigned_users.push(user_id)
         flag = true
 
-    console.log "Selected Users", @selected_assigned_users
+    # console.log "Selected Users", @selected_assigned_users
     if flag == true
-      $(button).removeClass('hidden')
+      $(button).removeAttr('disabled')
     else
-      $(button).addClass('hidden')
+      $(button).attr('disabled', true)
 
   unAssignUsersfromPolicy: (e) ->
     e.preventDefault()

@@ -1,7 +1,7 @@
 class NotificationsController < ApplicationController
 
   def index
-    @notifications = current_user.notifications.paginate(page: params[:page])
+    @notifications = current_user.notifications.paginate(page: params[:page], :per_page => 10)
     # @nots = []
     #
     # 10.times do |x|
@@ -11,7 +11,7 @@ class NotificationsController < ApplicationController
     #     read: false
     #   }
     #   @nots.push(noti)
-    # end
+    # endend
   end
 
   def unread

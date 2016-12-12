@@ -5,7 +5,7 @@
 <div class="row no-margin">
   <div class="col-sm-12">
     <button id="btn-assign-users-to-policy" class="btn btn-primary btn-sm">Assign Users to Policy</button>
-    <button id="btn-unassign-users-to-policy" class="btn btn-danger btn-sm hidden" data-url="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>">UnAssign Selected Users</button>  
+    <button id="btn-unassign-users-to-policy" class="btn btn-danger btn-sm" disabled="disabled" data-url="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>">UnAssign Selected Users</button>  
   </div>
 </div>
   

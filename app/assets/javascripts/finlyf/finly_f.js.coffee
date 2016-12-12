@@ -48,8 +48,8 @@ window.FinlyF =
     # console.log FinlyF.Global.current_user
     
   fetchNotifications: (container, page, replaceContent) ->
-    console.log arguments
-    console.log "Will fetch notifications now."
+    # console.log $(container).html()
+    # console.log "Will fetch notifications now."
     data = {
       # view: params.view || 'personal',
       authenticity_token: $("#authenticity_token").val()
@@ -62,11 +62,17 @@ window.FinlyF =
       type : 'get'
       url: '/notifications'
       data: data
-      success: (data) ->
-        if replaceContent
-          $(container).find('.navbar-notifications .notifications-list').html(FinlyF.Global.templates.templateNotifications({items: data}))
+      success: (res) ->
+        if res.length < 10
+          console.log "Decisions"
+
+          $(container).find('.btn-load-more-notifications').attr('disabled', true).text("No More Notifications")
         else
-          $(container).find('.navbar-notifications .notifications-list').append(FinlyF.Global.templates.templateNotifications({items: data}))
+          $(container).find('.btn-load-more-notifications').removeAttr('disabled').text("Load More").attr('data-page', page + 1)
+        if replaceContent
+          $(container).find('.navbar-notifications .notifications-list').html(FinlyF.Global.templates.templateNotifications({items: res}))
+        else
+          $(container).find('.navbar-notifications .notifications-list').append(FinlyF.Global.templates.templateNotifications({items: res}))
       error: (err) ->
         console.log err
     })
@@ -206,7 +212,7 @@ window.FinlyF =
 
     ## opening dropdown should start fetching
     $(navbar_right).find("#navbar-notification-dropdown").on('shown.bs.dropdown', (e) ->
-      console.log "Its working, this is ", this
+      # console.log "Its working, this is ", this
       _this = this
       if $(this).attr('data-initial') == 'true'
         $(this).removeAttr('data-initial')
@@ -240,9 +246,10 @@ window.FinlyF =
       # console.log "we reached here"
 
       container = $(e.currentTarget).closest('.navbar-notifications').parent()
+      page = parseInt($(target).attr('data-page') || 0)
 
-      $.when(FinlyF.fetchNotifications(container, 2, false)).then(->
-        $(target).attr('disabled', false).text('Load More')
+      $.when(FinlyF.fetchNotifications(container, page, false)).then(->
+        # $(target).attr('disabled', false).text('Load More')
       )
       e.stopPropagation()
     )
