@@ -206,6 +206,7 @@ class FinlyF.Views.Request extends Backbone.View
       url: '/money_request/' + _this.model.get('id')
       type: "PUT",
       data: formData,
+      dataType: 'json',
       success: (res) ->
         # console.log res.messages
         FinlyF.snapNotify(res.messages)
@@ -217,8 +218,11 @@ class FinlyF.Views.Request extends Backbone.View
               view: _this.current_view
             }
           })
+        else
+          $(target).removeAttr('disabled').text('Update')
       error: (err) ->
         console.log "Error", err 
+        $(target).removeAttr('disabled').text('Update')
       cache: false,
       contentType: false,
       processData: false
