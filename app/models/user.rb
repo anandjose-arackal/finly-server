@@ -42,7 +42,9 @@
 #  maiden_name            :string(255)
 #  last_name              :string(255)      not null
 #  default_password       :boolean
+#  mobile_only_invite     :boolean          default(FALSE)
 #
+
 
 
 

@@ -16,6 +16,7 @@
 #
 
 
+
 class PolicyConfiguration < ActiveRecord::Base
   include PolicyVersion
   belongs_to :policy

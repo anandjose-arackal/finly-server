@@ -19,10 +19,6 @@
 #
 
 
-
-
-
-
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -35,7 +31,7 @@ class Expense < ActiveRecord::Base
   belongs_to :category
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
-  belongs_to :surcharge, class_name: "Amount"
+  belongs_to :surcharge, class_name: 'Z'
 
   has_many :receipts, as: :parent
 
@@ -43,7 +39,9 @@ class Expense < ActiveRecord::Base
   has_one :card_expense, dependent: :destroy
   has_one :card_transaction
 
-  accepts_nested_attributes_for :amount, :manual_expense, :card_expense
+  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :manual_expense
+  accepts_nested_attributes_for :card_expense
   accepts_nested_attributes_for :receipts
 
 
@@ -87,7 +85,7 @@ class Expense < ActiveRecord::Base
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
-  scope :filter_expense_type_id, ->(type_id) {where expense_type_id: type_id}
+  scope :filter_expense_type_id, ->(type_id) { where expense_type_id: type_id }
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
@@ -242,14 +240,14 @@ class Expense < ActiveRecord::Base
             if value > self.receipts.count
               # i.e. if a receipt was removed
               comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_detach_receipt),
-                                              user_id: action_user.id,
-                                              expense_id: self.id
+                                               user_id: action_user.id,
+                                               expense_id: self.id
               )
             elsif value < self.receipts.count
               # i.e. if a receipt was added
               comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_attach_receipt),
-                                              user_id: action_user.id,
-                                              expense_id: self.id
+                                               user_id: action_user.id,
+                                               expense_id: self.id
               )
             else
               # todo implement an update receipt action
@@ -258,12 +256,12 @@ class Expense < ActiveRecord::Base
           end
           if self.send(key) != value
             comment = report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_update),
-                                            user_id: action_user.id,
-                                            updated_field: key.to_s.humanize,
-                                            updated_from: value,
-                                            updated_to: self.send(key),
-                                            expense_id: self.id
-                                            )
+                                             user_id: action_user.id,
+                                             updated_field: key.to_s.humanize,
+                                             updated_from: value,
+                                             updated_to: self.send(key),
+                                             expense_id: self.id
+            )
           end
         end
       end

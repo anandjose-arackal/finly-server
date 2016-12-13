@@ -60,7 +60,12 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} approved the report"
       when ReportCommentAction.id_for(:report_auto_approve)
         # Report auto_approve
-        comment = 'Report auto-approved as no manager is assigned to the user'
+        if self.report.present? and u.present? and u.id == self.report.user_id
+          name = 'you'
+        elsif self.user_id.present?
+          name = self.user.name
+        end
+        comment = "Report auto-approved as no manager is assigned to #{name}"
       when ReportCommentAction.id_for(:report_reject)
         # Report reject
         comment = "#{name} rejected the report"

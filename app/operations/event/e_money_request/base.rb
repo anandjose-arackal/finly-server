@@ -46,7 +46,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
     end
   end
 
-  class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotification::MailerPresenter
+  class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :money_request, :user, :body_val, :subject_val, :button_val
 
     def initialize(user, money_request, subject, body, button_name)
