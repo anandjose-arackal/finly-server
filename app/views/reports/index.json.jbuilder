@@ -1,5 +1,8 @@
 json.array!(@result.paginated_reports) do |report|
   json.extract! report, :id, :name, :status, :status_name
+  json.user do
+    json.extract! report.user, :id, :name
+  end
   if report.memo
     if report.memo[21]
       json.memo report.memo[0, 20] + "..."
