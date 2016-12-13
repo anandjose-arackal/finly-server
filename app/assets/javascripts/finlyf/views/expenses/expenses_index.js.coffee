@@ -48,12 +48,14 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     if options
       @params = options.params || {}
       @params.view = @params.view || 'personal'
+      @current_view = @params.view
       if options.indexOnly
         @indexOnly = true
       if options.parent
         @parent = options.parent
     else
       @params = {}
+      @current_view = 'personal'
     @params.page = 1
     # console.log "Params from view", @params
     # console.log "Step x. Init View"
@@ -77,6 +79,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
     unless @indexOnly
+      # console.log "Params ", @params
       $(@el).html(@templateSkeleton({item: @params}))
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
 
@@ -97,7 +100,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           value: $(option).attr('value')
           text: $(option).text()
         }).appendTo(category_select)
-      $(@el).find(".main").html(@templateMain({ item: {indexOnly: false }}))#REF==1I
+      $(@el).find(".main").html(@templateMain({ item: {indexOnly: false, view: @current_view}}))#REF==1I
       FinlyF.structureActions(@el, @params)
     else
       $(@el).html(@templateSkeletonIndexOnly())
@@ -131,6 +134,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     view_item = new FinlyF.Views.Expense({
       model: item
       parent: @
+      view: @current_view
     })
     $(@el).find("#items").append(view_item.render().el)
 
@@ -218,6 +222,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(main).addClass("preview")
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
+    console.log "Model id", model_id
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.Expense({
@@ -393,9 +398,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         if $(item).find('.select-item').prop('checked')
           flag = true
       if flag == true
-        $(@el).find('.secondary-navbar .btn-create-report').css('display', 'inline')
+        $(@el).find('.secondary-navbar .btn-create-report').removeAttr('disabled')
       else
-        $(@el).find('.secondary-navbar .btn-create-report').css('display', 'none')
+        $(@el).find('.secondary-navbar .btn-create-report').attr('disabled', true)
     else#unless
       @parent.trigger('expense:selected')#REF==3I
 

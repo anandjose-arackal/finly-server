@@ -7,7 +7,7 @@ class FinlyF.Views.Expense extends Backbone.View
   className: 'item col-md-12'
 
   events:
-    'click .select-item': 'toggleSelect'
+    'click .select-item.expense': 'toggleSelect'
     # 'input [contenteditable=true]': 'updateModel'
     'click img.receipt-image': 'previewReceipt'
     'click .btn-edit-expense': 'edit'
@@ -22,6 +22,8 @@ class FinlyF.Views.Expense extends Backbone.View
     # console.log "Options", options
     _this = @
     @preview = options.preview
+    if options
+      @current_view = options.view
     if options.parent
       @parent = options.parent
 
@@ -69,6 +71,7 @@ class FinlyF.Views.Expense extends Backbone.View
   render: ->
     unless @preview
       $(@el).addClass('no-padding')
+      @model.set('view', @current_view)
       $(@el).html(@template({ item: @model.toJSON() }))
     else
       $(@el).html(@templateShow())

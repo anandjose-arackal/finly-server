@@ -4,11 +4,11 @@
       <li><button class="btn navbar-btn-refresh btn-success"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</button></li>
       {{#unless item.view}}
         <li><button class="btn btn-sm btn-primary btn-new">New Expense</button></li> 
-        <li><button class="btn btn-sm btn-primary btn-create-report" style="display: none;">Create Report</button></li> 
+        <li><button class="btn btn-sm btn-primary btn-create-report" disabled="disabled">Create Report</button></li> 
       {{else}}
         {{#if_eq item.view 'personal'}}
           <li><button class="btn btn-sm btn-primary btn-new">New Expense</button></li> 
-          <li><button class="btn btn-sm btn-primary btn-create-report" style="display: none;">Create Report</button></li> 
+          <li><button class="btn btn-sm btn-primary btn-create-report" disabled="disabled">Create Report</button></li> 
         {{/if_eq}}
       {{/unless}}
     </ul>

@@ -1,16 +1,16 @@
 {{#if item.view}}
   {{#if_not_eq item.view 'personal'}}
-    <div class="col-md-4">
-      <div class="col-sm-2">
-        <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+    <div class="col-md-4 no-padding">
+      <div class="col-sm-2 no-padding">
+        <input class="select-item" type="hidden" data-item-id="{{item.id}}" />
         {{#if_eq item.expense_type_id 2}}
           <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
         {{else}}
           <i class="fa fa-money" style="margin-left: 30%;"></i>
         {{/if_eq}}
       </div>
-      <div class="col-sm-5">{{item.date}}</div>
-      <div class="col-sm-5">{{item.merchant_name}}</div>
+      <div class="col-sm-4">{{item.date}}</div>
+      <div class="col-sm-6">{{item.merchant_name}}</div>
     </div>
 
     <div class="col-md-8">
@@ -21,7 +21,7 @@
     </div>
   {{else}}
     <div class="col-sm-1 no-padding">
-      <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+      <input class="select-item expense" type="checkbox" data-item-id="{{item.id}}" />
       {{#if_eq item.expense_type_id 2}}
         <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
       {{else}}
@@ -37,7 +37,7 @@
   {{/if_not_eq}}
 {{else}}
   <div class="col-sm-1 no-padding">
-    <input class="select-item" type="checkbox" data-item-id="{{item.id}}" />
+    <input class="select-item expense" type="checkbox" data-item-id="{{item.id}}" />
       {{#if_eq item.expense_type_id 2}}
         <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
       {{else}}

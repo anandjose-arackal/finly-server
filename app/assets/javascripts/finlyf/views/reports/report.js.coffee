@@ -16,7 +16,7 @@ class FinlyF.Views.Report extends Backbone.View
   className: 'item col-sm-12 report'
 
   events:
-    'click .select-item': 'toggleSelect'
+    'click .select-item.report': 'toggleSelect'
     'input [contenteditable=true]': 'updateModel'
     'click .btn-update-item': 'update'
     'click .add-new-expense': 'newExpense'
@@ -50,7 +50,8 @@ class FinlyF.Views.Report extends Backbone.View
 
   initialize: (options) ->
     # console.log "we're here in report show", options
-    # @parent = options.parent
+    if options.parent
+      @parent = options.parent
     _this = @
     data = {}
     
@@ -229,7 +230,7 @@ class FinlyF.Views.Report extends Backbone.View
     report_id = $(e.currentTarget).attr('data-item-id')
     expense_view = new FinlyF.Views.ExpensesIndex({
       indexOnly: true
-      # parent: @
+      parent: @
     })
     $(@el).find("#modal-mp").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
