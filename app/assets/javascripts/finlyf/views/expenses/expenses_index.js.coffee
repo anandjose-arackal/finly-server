@@ -34,6 +34,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .btn-reset-filters': 'resetFilters'
     #Filters
     'keyup .filter-merchant': 'autoComplete'
+    'keyup .filter-field': 'autoCompleteUser'
     'click .btn-filter-expenses': 'filter'
     'click .remove-uploaded-receipt': 'removeUploadedReceipt'
     'change input#expense-receipt-upload': 'showUploadedReceipt'
@@ -425,6 +426,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       'filter_receipt': $(".sidebar .filter-receipt").val() || ""
       'filter_expense_type_id': $(".sidebar .filter-expense-type-id").val() || ""
+      'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_name': $(".sidebar .filter-user").val() || ""
     }
 
     filter_amount_value = $(".sidebar .filter-amount-value").val()
@@ -504,6 +507,41 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         })
       select: (event, ui) ->
         # console.log "Selected."
+    })
+
+  autoCompleteUser: (e) ->
+    _this = @
+    target = $(e.currentTarget)
+    query = $(target).val()
+    field = $(target).attr('data-field')
+
+    $(target).autocomplete({
+      minLength: 2,
+      source: (request, response) ->
+        $.ajax({
+          dataType: "json"
+          type : 'get'
+          url: '/autocomplete/' + field
+          data:
+            view: _this.params.view
+            remote: "true"
+            filter_search: query
+          success: (data) ->
+            response(data)
+          error: (err) ->
+            console.log err
+        })
+
+      focus: (event, ui) ->
+        $(event.target).val(ui.item.label)
+        $(event.target).attr('data-item-id', ui.item.value)
+        return false
+
+      select: (event, ui) ->
+        $(event.target).val(ui.item.label)
+        $(event.target).attr('data-item-id', ui.item.value)
+        return false
+
     })
 
   itemDeleted: (e) ->

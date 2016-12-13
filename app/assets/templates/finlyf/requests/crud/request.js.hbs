@@ -1,25 +1,80 @@
 {{!-- item = report --}}
-<div class="col-md-4">
-  {{!-- <div class="col-sm-2">
-  </div> --}}
-  
-  <input class="select-item" type="hidden" data-item-id="{{item.id}}" />
-  <div class="col-sm-5">{{item.date}}</div>
-  <div class="col-sm-7">{{item.name}}</div>
-</div>
+{{#if item.view}}
+  {{#if_not_eq item.view 'personal'}}
+    <div class="col-md-4">
+      {{!-- <div class="col-sm-2">
+      </div> --}}
+      
+      <input class="select-item" type="hidden" data-item-id="{{item.id}}" />
+      <div class="col-sm-5">{{item.date}}</div>
+      <div class="col-sm-7">{{item.name}}</div>
+    </div>
 
-<div class="col-md-8">
-  <div class="col-sm-3 text-center">
-  {{#switch item.status_name}}
-    {{#case 'Open'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
-    {{#case 'Approved'}}<span class="label label-success">{{item.status_name}}</span>{{/case}}
-    {{#case 'Rejected'}}<span class="label label-danger">{{item.status_name}}</span>{{/case}}
-    {{#case 'Retracted'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
-    {{#case 'Processing'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
-    {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status_name}}</span>{{/case}}
-  {{/switch}}
+    <div class="col-md-8">
+      <div class="col-sm-3">{{item.user_name}}</div>
+      <div class="col-sm-2 text-center">
+      {{#switch item.status_name}}
+        {{#case 'Open'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+        {{#case 'Approved'}}<span class="label label-success">{{item.status_name}}</span>{{/case}}
+        {{#case 'Rejected'}}<span class="label label-danger">{{item.status_name}}</span>{{/case}}
+        {{#case 'Retracted'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+        {{#case 'Processing'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
+        {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status_name}}</span>{{/case}}
+      {{/switch}}
+      </div>
+      <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
+      <div class="col-sm-2">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
+      <div class="col-sm-3">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
+    </div>
+  {{else}}
+    <div class="col-md-4">
+      {{!-- <div class="col-sm-2">
+      </div> --}}
+      
+      <input class="select-item" type="hidden" data-item-id="{{item.id}}" />
+      <div class="col-sm-5">{{item.date}}</div>
+      <div class="col-sm-7">{{item.name}}</div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="col-sm-3 text-center">
+      {{#switch item.status_name}}
+        {{#case 'Open'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+        {{#case 'Approved'}}<span class="label label-success">{{item.status_name}}</span>{{/case}}
+        {{#case 'Rejected'}}<span class="label label-danger">{{item.status_name}}</span>{{/case}}
+        {{#case 'Retracted'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+        {{#case 'Processing'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
+        {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status_name}}</span>{{/case}}
+      {{/switch}}
+      </div>
+      <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
+      <div class="col-sm-3">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
+      <div class="col-sm-4">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
+    </div>
+  {{/if_not_eq}}
+{{else}}
+  <div class="col-md-4">
+    {{!-- <div class="col-sm-2">
+    </div> --}}
+    
+    <input class="select-item" type="hidden" data-item-id="{{item.id}}" />
+    <div class="col-sm-5">{{item.date}}</div>
+    <div class="col-sm-7">{{item.name}}</div>
   </div>
-  <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
-  <div class="col-sm-3">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
-  <div class="col-sm-4">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
-</div>
+
+  <div class="col-md-8">
+    <div class="col-sm-3 text-center">
+    {{#switch item.status_name}}
+      {{#case 'Open'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+      {{#case 'Approved'}}<span class="label label-success">{{item.status_name}}</span>{{/case}}
+      {{#case 'Rejected'}}<span class="label label-danger">{{item.status_name}}</span>{{/case}}
+      {{#case 'Retracted'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
+      {{#case 'Processing'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
+      {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status_name}}</span>{{/case}}
+    {{/switch}}
+    </div>
+    <div class="col-sm-2 text-right">&#8377;&nbsp;{{item.total}}</div>
+    <div class="col-sm-3">{{#if item.policy}}{{item.policy}}{{else}}--{{/if}}</div>
+    <div class="col-sm-4">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
+  </div>
+{{/if}}

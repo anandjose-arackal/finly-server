@@ -52,14 +52,15 @@ class FinlyF.Views.Request extends Backbone.View
 
 
   initialize: (options) ->
-    console.log "here in requests"
+    # console.log "here in requests"
     # @parent = options.parent
     _this = @
     data = {}
 
     if options
       @preview = options.preview
-      @params = options.params
+      @params = options.params || {}
+      @current_view = options.view || @params.view || 'personal'
     if @preview
       @current_view = options.params.view ##NEED TO ADD THIS IN REPORTS
       if @current_view
@@ -78,6 +79,7 @@ class FinlyF.Views.Request extends Backbone.View
 
   render: ->
     unless @preview
+      @model.set('view', @current_view)
       $(@el).html(@template({ item: @model.toJSON() }))
     else
       $(@el).html(@templateSkeleton())

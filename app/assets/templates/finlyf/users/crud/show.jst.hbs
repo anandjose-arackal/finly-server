@@ -444,21 +444,16 @@
       </div> --}}
       <div class="tab-pane" id="tab-user-policies">
         <section class="user-policies">
-          <div class="row no-margin">
-            <div class="col-sm-6">
-              <h4>POLICIES</h4>
-            </div>
-          </div>
           {{#each item.mapping}}
           <div class="policy section-card" style="margin-bottom: 15px;">
             <div class="row policy-name no-margin section-header">
               <div class="col-sm-6">
                 <h4>
                   {{#if this.company_default}}
-                    Default
+                    Policy: Default
                   {{else}}
                     <input type="hidden" name="user_manager_mapping[0][mapping][policy_id]" value="{{this.policy.id}}">
-                    {{this.policy.name}}{{!-- (PolicyName 0) --}}
+                    Policy: {{this.policy.name}}{{!-- (PolicyName 0) --}}
                   {{/if}}
                 </h4>
               </div>
@@ -869,7 +864,7 @@
                               Not Set
                             {{/if}}
                           </label>
-                          <textarea class="form-control item-attr-edit" name="user[deafult_memo]">{{#if item.auto_submit_config.default_memo}}{{item.auto_submit_config.default_note}}{{/if}}</textarea>
+                          <textarea class="form-control item-attr-edit" name="user[default_memo]">{{#if item.auto_submit_config.default_memo}}{{item.auto_submit_config.default_note}}{{/if}}</textarea>
                         </div>
                       </div>
                       <br />

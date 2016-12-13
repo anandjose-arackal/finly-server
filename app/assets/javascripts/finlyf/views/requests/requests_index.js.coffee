@@ -31,11 +31,13 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     'click .btn-filter': 'filter'
 
   initialize: (options) ->
-    console.log "here in requests"
+    # console.log "here in requests"
     if options
       @params = options.params || {}
     else
       @params = {}
+    @params.view = @params.view || 'personal'
+    @current_view = @params.view
     @params.page = 1
     # console.log "Params from view", @params
     # console.log "Step x. Init View"
@@ -61,7 +63,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
-    $(@el).find(".main").html(@templateMain())
+    $(@el).find(".main").html(@templateMain(item: @params))
     FinlyF.structureActions(@el, @params)
     @
 
@@ -116,7 +118,7 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
   appendItems: (item) ->
     # console.log "appending"
     #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Request({ model: item })
+    view_item = new FinlyF.Views.Request({ model: item, view: @current_view })
     $(@el).find("#items").append(view_item.render().el)
     # console.log view_item.el
 

@@ -56,11 +56,15 @@ class FinlyF.Views.Report extends Backbone.View
     data = {}
     
     if options
-      @params = options.params
+      @params = options.params || {}
       @preview = options.preview
+    else
+      @params = {}
+
+    @params.view = @params.view || options.view || 'personal'
     if @preview
       $(@el).removeClass("item col-sm-12 report")
-      @current_view = options.params.view ##NEED TO ADD THIS IN REPORTS
+      @current_view = options.params.view || 'personal' ##NEED TO ADD THIS IN REPORTS
       if @current_view
         data.view = @current_view
       if @params.ref
@@ -70,6 +74,8 @@ class FinlyF.Views.Report extends Backbone.View
       $(@el).removeClass("item").addClass("bg-white")
       @model = new FinlyF.Models.Report({id: options.model_id})
       @model.fetch({data: data})
+    else
+      @current_view = @params.view || 'personal'
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
     @on('expense:selected', @showExpenseSelectOption, @)#REF==3I
@@ -77,6 +83,7 @@ class FinlyF.Views.Report extends Backbone.View
 
   render: ->
     unless @preview
+      @model.set('view', @current_view)
       $(@el).html(@template({ item: @model.toJSON() }))
     else
       $(@el).html(@templateSkeleton())
