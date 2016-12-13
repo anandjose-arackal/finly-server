@@ -14,7 +14,7 @@
 class CardExpense < ActiveRecord::Base
   belongs_to :card_transaction
   belongs_to :expense # foreign key would be expense_id
-  belongs_to :surcharge, class_name: "Amount"
+  belongs_to :surcharge, class_name: 'Amount'
 
   accepts_nested_attributes_for :surcharge
 
