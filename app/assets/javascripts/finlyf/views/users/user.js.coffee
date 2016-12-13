@@ -121,6 +121,7 @@ class FinlyF.Views.User extends Backbone.View
     _this = @
     e.preventDefault()
     target = $(e.currentTarget)
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;")
     policy = $(target).closest('.policy')
     form = $(policy).find('form')
     values = {}
@@ -141,14 +142,19 @@ class FinlyF.Views.User extends Backbone.View
         FinlyF.snapNotify(res.messages)
         # console.log res
         if res.success == true
-          console.log "now it will fetch ", _this.params.view
+          # console.log "now it will fetch ", _this.params.view
+
+          $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
           _this.model.fetch({
             data: {
               view: _this.params.view
             }
           })
+        else
+          $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
       error: (err) ->
         console.log "Err", err
+        $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
     }) 
 
 
@@ -638,6 +644,7 @@ class FinlyF.Views.User extends Backbone.View
   toggleAutoSubmitFields: (e) ->
     auto_submit_div = $(@el).find("#tab-user-auto-submit-report")
     auto_submit_fields_div = $(auto_submit_div).find('.row.auto-submit-fields')
+    auto_submit_disabled_message = $(auto_submit_div).find('.auto-submit-disabled-message')
     if e
       target = e.currentTarget
     else
@@ -645,9 +652,13 @@ class FinlyF.Views.User extends Backbone.View
       # console.log target
 
     if parseInt($(target).val()) == 0
-      $(auto_submit_fields_div).find('.item-attr-edit').attr('disabled', true)
+      # $(auto_submit_fields_div).find('.item-attr-edit').attr('disabled', true)
+      $(auto_submit_fields_div).slideUp('slow')
+      $(auto_submit_disabled_message).slideDown()
     else
-      $(auto_submit_fields_div).find('.item-attr-edit').removeAttr('disabled')
+      # $(auto_submit_fields_div).find('.item-attr-edit').removeAttr('disabled')
+      $(auto_submit_fields_div).slideDown('slow')
+      $(auto_submit_disabled_message).slideUp()
 
   # Activating employees without email
   activateEmployee: (e) ->
