@@ -30,11 +30,17 @@ json.date @result.report.created_at.strftime('%d %b %Y')
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
+  comment_u_id = nil
+  comment_u_name = 'System'
+  comment_initials = 'S'
   if comment.user.respond_to?(:id, :name)
-    json.comment_user_id comment.user.id
-    json.comment_user_name comment.user.name
-    json.comment_user_initial comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
+    comment_u_id = comment.user.id
+    comment_u_name = comment.user.name
+    comment_initials = comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
   end
+  json.comment_user_id comment_u_id
+  json.comment_user_name comment_u_name
+  json.comment_user_initial comment_initials
 end
 categorized_expense = @result.expenses_category_sorted
 json.expense_sections categorized_expense do |category|
