@@ -81,6 +81,10 @@ class ItzCash::Credit < ItzCash::Base
     super
   end
 
+  def success?
+    super or (self.response_code.present? and (self.response_code.to_f == 300 or self.response_code.to_f == 301))
+  end
+
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
 

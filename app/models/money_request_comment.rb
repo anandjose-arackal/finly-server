@@ -40,10 +40,16 @@ class MoneyRequestComment < ActiveRecord::Base
   def generate(u=nil)
     comment = nil
     name = nil
+    name_rec = nil
     if self.user.present? and u.present? and u.id == self.user_id
-      name = "You"
+      name = 'You'
     elsif self.user.present?
       name = self.user.name
+    end
+    if u.present? and self.money_request.user_id == u.id
+      name_rec = 'your'
+    else
+      name_rec = "#{self.money_request.user.name}'s"
     end
     case comment_action_id
       when MoneyRequestCommentAction.id_for(:retract)
@@ -66,6 +72,18 @@ class MoneyRequestComment < ActiveRecord::Base
         comment = "#{name} commented : #{content}"
       when MoneyRequestCommentAction.id_for(:update)
         comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
+      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_wallet)
+        payment_id = payment.id rescue nil
+        comment = "#{name} credited #{name_rec} wallet with Payment ID : #{payment_id}"
+        if payment.note.present?
+          comment += " , note : #{payment.note}"
+        end
+      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_card), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_card)
+        payment_id = payment.id rescue nil
+        comment = "#{name} credited #{name_rec} card with Payment ID : #{payment_id}"
+        if payment.note.present?
+          comment += " , note : #{payment.note}"
+        end
       when MoneyRequestCommentAction.id_for(:credited)
         payment_id = payment.id rescue nil
         comment = "#{name} credited the advance request with Payment ID : #{payment_id}"

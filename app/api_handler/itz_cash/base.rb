@@ -7,7 +7,7 @@ class ItzCash::Base < BaseHandler
   end
 
   def success?
-    super and self.response_code.present? and self.response_code.to_f == 0
+    super and self.response_code.present? and (self.response_code.to_f == 0)
   end
 
   def failure
