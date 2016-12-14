@@ -345,7 +345,8 @@ class FinlyF.Views.Policy extends Backbone.View
     _this = @
     form = e.currentTarget
     modal = $(form).closest('.modal')
-
+    button = $(form).find("button.btn-update-policy-member-settings")
+    $(button).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr('disabled', true)
     user_id = $(form).find("button.btn-update-policy-member-settings").attr('data-user-id')
     
 
@@ -360,8 +361,11 @@ class FinlyF.Views.Policy extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
+        else
+          $(button).html("Update").removeAttr('disabled')
       error: (err) ->
         console.log "Err", err
+        $(button).html("Update").removeAttr('disabled')
     })
 
   newCondition: (e) ->

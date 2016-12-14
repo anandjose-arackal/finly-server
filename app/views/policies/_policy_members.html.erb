@@ -1,70 +1,81 @@
-<div class="row no-margin">
-  <div class="col-sm-12"><h4>Policy Members</h4></div>
-</div>
-
-<div class="row no-margin">
-  <div class="col-sm-12">
-    <button id="btn-assign-users-to-policy" class="btn btn-primary btn-sm">Assign Users to Policy</button>
-    <button id="btn-unassign-users-to-policy" class="btn btn-danger btn-sm" disabled="disabled" data-url="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>">UnAssign Selected Users</button>  
+<div class="section-card">
+  
+  <div class="row no-margin section-header">
+    <div class="col-sm-12"><h4>Policy Members</h4></div>
   </div>
-</div>
-  
-  
-<div class="row no-margin">
-  <!--  <form data-remote data-turboboost  data-confirm="Are you sure you want to remove these users?" id="removeusersFromPolicyForm"
-          action="" method="post">
 
-      <input name="_method" type="hidden" value="delete"/>
-      <input name="authenticity_token" value="< %= form_authenticity_token %>" hidden="hidden">
-
-      <input id="removeUsersFromPolicyIds" name="existing_users_id" type="hidden">
-      padding: 10px 15px 5px;background: white;border-bottom: 1px solid #eee;
-    </form>-->
-
-  <div class="col-sm-12" style="background: white; border-bottom: 2px solid #efefef;">
-    <div class="row no-margin" style="padding: 10px 0;">
-      <div class="col-sm-1 no-padding">
-        <input type="checkbox" id="select-assigned-users" />
-      </div>
-      <div class="col-sm-3 no-padding"><label>User</label></div>
-      <div class="col-sm-2 no-padding"><label>Manager</label></div>
-      <div class="col-sm-2 no-padding"><label>Finance Manager</label></div>
-      <div class="col-sm-2 no-padding"><label>Details</label></div>
-      <div class="col-sm-2 no-padding text-right"><label>Actions</label></div>
+  <div class="row no-margin">
+    <div class="col-sm-12">
+      <button id="btn-assign-users-to-policy" class="btn btn-primary btn-sm">Add Users to Policy</button>
+      <button id="btn-unassign-users-to-policy" class="btn btn-danger btn-sm" disabled="disabled" data-url="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>">Remove Selected Users</button>  
     </div>
   </div>
-  <div class="col-sm-12" id="assigned-users" style="background: white;">
-    <% @result.users.each do |user| %>
-      <% default_mapping = user[:default_mapping] %>
-      <div class="row no-margin assigned-user" data-user-id="<%= user[:user].id %>" style="padding: 5px 0; border-bottom: 1px solid #efefef;">
-        <div class="col-sm-1 no-padding"><input type="checkbox" class="select-assigned-user"></div>
-        <div class="col-sm-3 no-padding">
-          Name: <label><%= user[:user].name.blank? ? "Not Set" : user[:user].name %></label><br />
-          Email: <label><%= user[:user].email.blank? ? "Not Set" : user[:user].email %></label><br />
-          Mobile: <label><%= user[:user].mobile_number.blank? ? "Not Set" : user[:user].mobile_number  %></label>
-            
-        </div>
-        <div class="col-sm-2 no-padding"><%= default_mapping.manager.email if default_mapping.manager_id.present? %></div>
-        <div class="col-sm-2 no-padding"><%= default_mapping.finance_manager.email if default_mapping.finance_manager_id.present? %></div>
-
-        <div class="col-sm-2 no-padding">
-          <% if user[:admin] %>
-            <p>Policy Admin</p>
-          <% end %>
-          <% if default_mapping.approves_to_id.present? %>
-            <p>Approves To <%= default_mapping.approves_to.email %></p>
-          <% end %>
-          <% if default_mapping.approves_finance_to_id.present? %>
-            <p>Approves Finance To <%= default_mapping.approves_finance_to.email %></p>
-          <% end %>
-        </div>
-        <div class="col-sm-2 no-padding text-right">
-          <i style="cursor: pointer; font-size: 20px" class="fa fa-cog policy-member-settings" data-user-id="<%= user[:user].id %>"></i>
+    
+  <div class="row no-margin">
+    <div class="col-sm-12"><hr /></div>
+  </div> 
+  <div class="row no-margin">
+    <div class="col-sm-12">
+      <div class="col-sm-12" style="background: white; border-bottom: 2px solid #efefef;">
+        <div class="row no-margin" style="padding: 10px 0;">
+          <div class="col-sm-1 no-padding">
+            <input type="checkbox" id="select-assigned-users" />
+          </div>
+          <div class="col-sm-3 no-padding"><label>User</label></div>
+          <div class="col-sm-2 no-padding"><label>Manager</label></div>
+          <div class="col-sm-2 no-padding"><label>Finance Manager</label></div>
+          <div class="col-sm-2 no-padding"><label>Details</label></div>
+          <div class="col-sm-2 no-padding text-right"><label>Actions</label></div>
         </div>
       </div>
-    <% end %>  
+      <div class="col-sm-12" id="assigned-users" style="background: white;">
+        <% @result.users.each do |user| %>
+          <% default_mapping = user[:default_mapping] %>
+          <div class="row no-margin assigned-user" data-user-id="<%= user[:user].id %>" style="padding: 5px 0; border-bottom: 1px solid #efefef;">
+            <div class="col-sm-1 no-padding"><input type="checkbox" class="select-assigned-user"></div>
+            <div class="col-sm-3 no-padding">
+              Name: <label><%= user[:user].name.blank? ? "Not Set" : user[:user].name %></label><br />
+              Email: <label><%= user[:user].email.blank? ? "Not Set" : user[:user].email %></label><br />
+              Mobile: <label><%= user[:user].mobile_number.blank? ? "Not Set" : user[:user].mobile_number  %></label>
+                
+            </div>
+            <div class="col-sm-2 no-padding"><%= default_mapping.manager.email if default_mapping.manager_id.present? %></div>
+            <div class="col-sm-2 no-padding"><%= default_mapping.finance_manager.email if default_mapping.finance_manager_id.present? %></div>
+
+            <div class="col-sm-2 no-padding">
+              <% if user[:admin] %>
+                <p>Policy Admin</p>
+              <% end %>
+              <% if default_mapping.approves_to_id.present? %>
+                <p>Approves To <%= default_mapping.approves_to.email %></p>
+              <% end %>
+              <% if default_mapping.approves_finance_to_id.present? %>
+                <p>Approves Finance To <%= default_mapping.approves_finance_to.email %></p>
+              <% end %>
+            </div>
+            <div class="col-sm-2 no-padding text-right">
+              <i style="cursor: pointer; font-size: 20px" class="fa fa-cog policy-member-settings" data-user-id="<%= user[:user].id %>"></i>
+            </div>
+          </div>
+        <% end %>  
+      </div>
+      
+      </div>  
+
+    </div>
+    <!--  <form data-remote data-turboboost  data-confirm="Are you sure you want to remove these users?" id="removeusersFromPolicyForm"
+            action="" method="post">
+
+        <input name="_method" type="hidden" value="delete"/>
+        <input name="authenticity_token" value="< %= form_authenticity_token %>" hidden="hidden">
+
+        <input id="removeUsersFromPolicyIds" name="existing_users_id" type="hidden">
+        padding: 10px 15px 5px;background: white;border-bottom: 1px solid #eee;
+      </form>-->
+
+    
   </div>
-  
-  </div>
+
+
 </div>
 

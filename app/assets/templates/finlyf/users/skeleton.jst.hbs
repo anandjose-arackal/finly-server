@@ -450,11 +450,28 @@ section {
             <form id="form-import-employees" enctype="multipart/form-data" action="/import.csv" data-remote="true">
               <input type="hidden" name="_type" value="POST">
               <input type="hidden" name="authenticity_token">
-              <input type="file" name="file">
+              <input type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="file">
               <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
             </form>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /.modal -->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-confirm-with-password" data-backdrop="true">
+  <div class="modal-dialog" role="document" style="width: 40%; margin-top: 113px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Confirm Activation or Deactivation</h4>
+      </div>
+      <div class="modal-body"> 
+        <div class="row no-margin">
+          <div class="col-sm-12 activate-with-password-template">
+
+          </div> 
       </div>
     </div>
   </div>

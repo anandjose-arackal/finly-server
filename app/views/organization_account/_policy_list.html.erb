@@ -1,64 +1,82 @@
-<div style="margin-top: 20px;background: white;
-    padding: 15px;border: 1px solid #d8d8d8; width: 650px;float: left">
-  <p style="font-size: 24px;
-      font-weight: 600;
-      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Company Policy List</p>
 
-  <hr>
-
-  <% unless @result.policies.present? %>
-      <div>
-        <p> No Policies to Display.</p>
+<div class="row no-margin">
+  
+  <div class="col-sm-8 no-padding">
+    <div class="section-card">
+      <div class="row no-margin section-header" style="margin-bottom: 15px;">
+        <div class="col-sm-12">
+          <h4>Company Policy List</h4>
+        </div>
       </div>
-  <% end %>
 
+      <div class="row no-margin">
+        
+        <div class="col-sm-12">
+          
+          <% unless @result.policies.present? %>
+            <div>
+              <p> No Policies to Display.</p>
+            </div>
+          <% end %>
 
-  <div id="policyListTable">
-    <ul style="list-style-type: none; padding-left: 0;">
-      <% @result.policies.each do |policy| %>
-        <li class="policy">
-          <div class="row no-margin">
-            <div class="col-sm-8" style="font-size: 21px;line-height: 42px;">
-              <%= link_to policy.name, "#policies/" + policy.id.to_s + '/params={"view": "admin"}' %>
-            </div>
-            <div class="col-sm-3">
-              <a id="showReportsButton" class="btn btn-primary btn-md" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>
-            </div>
-            <!-- 
-            <div class="col-sm-1">
-              <button class="btn btn-sm btn-danger btn-delete-policy" data-url="<%#= policy_path(policy) %>"><i class="fa fa-trash-o"></i></button>
-            </div>
-            -->
-            
-            
+          <div id="policyListTable">
+            <ul style="list-style-type: none; padding-left: 0;">
+              <% @result.policies.each do |policy| %>
+                <li class="policy">
+                  <div class="row no-margin">
+                    <div class="col-sm-8" style="font-size: 21px;line-height: 42px;">
+                      <%= link_to policy.name, "#policies/" + policy.id.to_s + '/params={"view": "admin"}' %>
+                    </div>
+                    <div class="col-sm-3">
+                      <a id="showReportsButton" class="btn btn-primary btn-md" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>
+                    </div>
+                    <!-- 
+                    <div class="col-sm-1">
+                      <button class="btn btn-sm btn-danger btn-delete-policy" data-url="<%#= policy_path(policy) %>"><i class="fa fa-trash-o"></i></button>
+                    </div>
+                    -->
+                    
+                    
+                  </div>
+                </li>
+              <% end %>  
+            </ul>
           </div>
-        </li>
-      <% end %>  
-    </ul>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <div class="col-sm-4">
+    <div class="section-card">
+      <div class="row no-margin section-header">
+        <div class="col-sm-12">
+          <h4>Add New Policy</h4>
+        </div>
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-12 text-right" style="padding-top: 15px;">
+          <form data-turboboost id="form-add-policy"  action="<%= policies_path(view: 'admin') %>">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-</div>
-<div style="margin: 20px 0px 0px 680px;background: white;
-    padding: 15px;border: 1px solid #d8d8d8; width: 270px; position: fixed">
-  <p style="font-size: 24px;
-      font-weight: 600;
-      font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Add new policy</p>
-  <hr>
-  <form data-turboboost id="form-add-policy"  action="<%= policies_path(view: 'admin') %>">
-    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+            <input type="text" class="form-control" name="name" placeholder="Enter name of policy">
 
-    <input type="text" id="policyName" name="name" style="height: 40px;
-        padding: 10px;" placeholder="Enter name of policy">
+            <!--<p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy-->
+              <!--applied to: </p>-->
+            <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
+            <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
 
-    <!--<p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy-->
-      <!--applied to: </p>-->
-    <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
-    <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
+            <input type="submit" class="btn btn-success btn-sm" value="Create">
+          </form>    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>   
 
-    <input type="submit" class="btn btn-success btn-sm" value="Create">
-  </form>
-</div>
+
+
+
 
 <style type="text/css">
   .policy{

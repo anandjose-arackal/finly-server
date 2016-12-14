@@ -1,87 +1,102 @@
-<div class="row no-margin">
-  <div class="col-sm-12 no-padding">
-    <div class="row no-margin">
-      <p>Please choose the format of the csv, and the respective column names you want to export.</p>
-      <hr style="margin-top: 20px">
-    </div>
+<div class="section-card">
+  
+  <div class="row no-margin section-header">
+    <div class="col-sm-12"><h4>Report Export Format</h4></div>
+  </div>
+  <div class="row no-margin">
+    <div class="col-sm-12 no-padding" style="padding-top: 15px;">
+      <div class="row no-margin">
+        <div class="col-sm-10">
+          <p>Please choose the format of the csv, and the respective column names you want to export.</p>
+          <hr style="margin-top: 20px">  
+        </div>
+        
+      </div>
 
-    <% @result.export_preferences.each_with_index do |export_preference, index| %>
-    <div class="row no-margin">
-      <div class="col-sm-12">
-        <p style="font-weight: 700; font-weight: 15px"> Column <%= index + 1 %>: </p>
-        <form class="form-update-export-preferences" action="<%= export_preference_path(export_preference)%>">
-          <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+      <% @result.export_preferences.each_with_index do |export_preference, index| %>
+      <div class="row no-margin">
+        <div class="col-sm-12">
+          <p style="font-weight: 700; font-weight: 15px"> Column <%= index + 1 %>: </p>
+          <form class="form-update-export-preferences" action="<%= export_preference_path(export_preference)%>">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+            <div class="row no-margin">
+              <div class="col-sm-1"><span>Export</span></div>
+
+              <div class="col-sm-2">
+                <select class="select-export-preference-columns form-control selectors" name="export[export_field_id]">
+                  <% @result.export_fields.each do |export_field| %>
+                      <option value="<%= export_field.id %>"
+                      <% if export_preference.export_field_id == export_field.id %>
+                      selected
+                      <% end %>
+                      ><%= export_field.name %></option>
+                  <% end %>
+                </select>      
+              </div>
+
+              <div class="col-sm-1 text-center"><span>as</span></div>
+
+              <div class="col-sm-2">
+                <input type="text" name="export[name]" class="input-export-preference-name form-control" placeholder="Column Name" value="<%= export_preference.name %>">
+              </div>
+
+              <div class="col-sm-1">
+                <button class="btn btn-success hidden btn-update-export-preference" type="submit">Update</button>
+              </div>
+
+              <div class="col-sm-1">
+                <button class="btn btn-danger btn-delete-export-preference" data-url="<%= export_preference_path(export_preference) %>">
+                  <i class="fa fa-trash-o"></i>
+                </button>
+              </div>
+            </div>
+            <hr>
+
+          </form>
+        </div>
+      </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row no-margin">
+    <div class="col-sm-12">
+      <div style="background-color: lavender;padding: 15px;">
+        <form id="form-add-export-column" action="<%= export_preferences_path %>" style="margin-bottom: 30px">
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+
           <div class="row no-margin">
             <div class="col-sm-1"><span>Export</span></div>
 
             <div class="col-sm-2">
-              <select class="select-export-preference-columns form-control selectors" name="export[export_field_id]">
+              <select class="form-control selectors" name="export[export_field_id]">
+                <option style="display:none" value="" selected="selected"></option>
                 <% @result.export_fields.each do |export_field| %>
-                    <option value="<%= export_field.id %>"
-                    <% if export_preference.export_field_id == export_field.id %>
-                    selected
-                    <% end %>
-                    ><%= export_field.name %></option>
+                  <option value="<%= export_field.id %>"><%= export_field.name %></option>
                 <% end %>
-              </select>      
+              </select>
             </div>
 
             <div class="col-sm-1 text-center"><span>as</span></div>
 
             <div class="col-sm-2">
-              <input type="text" name="export[name]" class="input-export-preference-name form-control" placeholder="Column Name" value="<%= export_preference.name %>">
+              <input type="text" name="export[name]" class=" form-control exportNameInput" placeholder="Column Name" >
             </div>
 
-            <div class="col-sm-1">
-              <button class="btn btn-success hidden btn-update-export-preference" type="submit">Update</button>
-            </div>
-
-            <div class="col-sm-1">
-              <button class="btn btn-danger btn-delete-export-preference" data-url="<%= export_preference_path(export_preference) %>">
-                <i class="fa fa-trash-o"></i>
+            <div class="col-sm-3">
+              <button class="green-button" id="addNewColumn" type="submit" style="margin-left: 70px; padding: 7px 10px 7px 10px;"> ADD NEW COLUMN
               </button>
             </div>
+
           </div>
-          <hr>
 
         </form>
-      </div>
+      </div>     
     </div>
-    <% end %>
   </div>
 </div>
 
 
-<div style="background-color: lavender;
-    padding: 15px;">
-  <form id="form-add-export-column" action="<%= export_preferences_path %>" style="margin-bottom: 30px">
-    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
 
-    <div class="row no-margin">
-      <div class="col-sm-1"><span>Export</span></div>
-
-      <div class="col-sm-2">
-        <select class="form-control selectors" name="export[export_field_id]">
-          <option style="display:none" value="" selected="selected"></option>
-          <% @result.export_fields.each do |export_field| %>
-            <option value="<%= export_field.id %>"><%= export_field.name %></option>
-          <% end %>
-        </select>
-      </div>
-
-      <div class="col-sm-1 text-center"><span>as</span></div>
-
-      <div class="col-sm-2">
-        <input type="text" name="export[name]" class=" form-control exportNameInput" placeholder="Column Name" >
-      </div>
-
-      <div class="col-sm-3">
-        <button class="green-button" id="addNewColumn" type="submit" style="margin-left: 70px; padding: 7px 10px 7px 10px;"> ADD NEW COLUMN
-        </button>
-      </div>
-
-    </div>
-
-  </form>
-</div>

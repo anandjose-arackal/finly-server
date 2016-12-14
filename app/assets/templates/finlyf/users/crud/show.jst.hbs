@@ -25,13 +25,13 @@
                     <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
                   {{/if}}
                   {{#if item.actions.resend_invite}}
-                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
+                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="false" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
                   {{/if}}
                   {{#if item.actions.deactivate}}
-                    <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
+                    <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
                   {{/if}}
                   {{#if item.actions.activate}}
-                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
+                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
                   {{/if}}
                   {{#if item.user.activateable}}
                     <button class="btn btn-lg btn-success btn-active-employee">Activate</button>

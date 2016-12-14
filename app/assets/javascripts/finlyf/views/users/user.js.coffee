@@ -9,6 +9,8 @@ class FinlyF.Views.User extends Backbone.View
   # templateShowDetails: HandlebarsTemplates['finlyf/users/crud/showDetails']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
+  templateModalConfirmWithPW: HandlebarsTemplates['finlyf/users/actions/modalConfirmWithPW']
+
   className: 'user col-md-12'
 
   events:
@@ -47,6 +49,10 @@ class FinlyF.Views.User extends Backbone.View
         data: @params
       })
       @model.on('sync', @populateDetails, @)
+
+    @userActionData = {
+      data: {}
+    } #Saving user information before user action
 
   render: ->
     switch @page
@@ -100,7 +106,7 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('success btn-update-auto-submit').removeClass('warning btn-edit-auto-submit').text('Update')
+    $(target).addClass('btn-success btn-update-auto-submit').removeClass('btn-warning btn-edit-auto-submit').text('Update')
 
   editPolicy: (e) ->
     target = $(e.currentTarget)
@@ -209,6 +215,7 @@ class FinlyF.Views.User extends Backbone.View
     _this = @
     e.preventDefault()
     target = $(e.currentTarget)
+    $(target).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr('disabled', true)
     form = $(target).closest('section').find('form')
     values = {}
 
@@ -229,8 +236,11 @@ class FinlyF.Views.User extends Backbone.View
               view: _this.params.view
             }
           })
+        else
+          $(target).html("Update").removeAttr('disabled')
       error: (err) ->
         console.log "Err", err
+        $(target).html("Update").removeAttr('disabled')
     })
 
 
@@ -292,42 +302,81 @@ class FinlyF.Views.User extends Backbone.View
     else
       $(conditional).remove()
 
-
   userAction: (e) ->
     _this = @
     target = e.currentTarget
+
+    button_text = $(target).text()
     url = $(target).attr('data-url')
     type = $(target).attr('data-method')
     data = {}
-    data_presence = $(target).attr('data-presence')
-    if data_presence
-      data.type = $(target).attr('data-type')
-      if $(target).attr('data-state-active')
-        if $(target).attr('data-state-active') == 'true'
-          data.active = true
-        else
-          data.active = false
-    else
-      data = {}
+    data.type = $(target).attr('data-type')
 
     data.view = @params.view
+    data_presence = $(target).attr('data-presence') 
+    if data_presence == "true" #For activating and deactivating users only
+      if $(target).attr('data-require-password') == "true"
+        item = {}
+        if $(target).attr('data-state-active')
+          if $(target).attr('data-state-active') == 'true'
+            data.active = true
+            item.action_type = "Activate"
+          else
+            data.active = false
+            item.action_type = "Deactivate"
 
-    $.ajax({
-      url: url,
-      type: type,
-      data: data,
-      dataType: 'json',
-      success: (res) ->
-        # console.log "Suc", res
-        FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.parent.trigger('refresh')
-          # _this.model.fetch({
-          #   view: _this.params.view
-          # })
-      error: (err) ->
-        console.log "Err", err.messages
-    })
+          item.user = {
+            name: @model.get('user').name
+          }
+
+          @userActionData.data = data
+          @userActionData.url = url
+          @userActionData.type = type
+          # Show up password confirmation modal
+          @confirmWithPW(item)
+      else
+        $(target).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr("disabled", true)
+        $.ajax({
+          url: url,
+          type: type,
+          data: data,
+          dataType: 'json',
+          success: (res) ->
+            # console.log "Suc", res
+            FinlyF.snapNotify(res.messages)
+            if res.success == true
+              _this.parent.trigger('refresh')
+              # _this.model.fetch({
+              #   view: _this.params.view
+              # })
+            else
+              $(target).html(button_text).removeAttr("disabled")
+          error: (err) ->
+            console.log "Err", err.messages
+            $(target).html(button_text).removeAttr("disabled")
+        })
+    else
+      $(target).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr("disabled", true)
+        
+      $.ajax({
+        url: url,
+        type: type,
+        data: data,
+        dataType: 'json',
+        success: (res) ->
+          # console.log "Suc", res
+          FinlyF.snapNotify(res.messages)
+          if res.success == true
+            _this.parent.trigger('refresh')
+            # _this.model.fetch({
+            #   view: _this.params.view
+            # })
+          else
+            $(target).html(button_text).removeAttr("disabled")
+        error: (err) ->
+          console.log "Err", err.messages
+          $(target).html(button_text).removeAttr("disabled")
+      })
     # # console.log "working"
     # target = e.currentTarget
     # url = $(target).attr('data-url')
@@ -351,6 +400,47 @@ class FinlyF.Views.User extends Backbone.View
     #   error: (err) ->
     #     console.log "Err", err
     # })
+
+  confirmWithPW: (item) ->
+    modal = $("#modal-confirm-with-password")
+    $(modal).modal('show')
+
+    _this = @
+    $(modal).find(".activate-with-password-template").html(@templateModalConfirmWithPW({item: item}))
+    $(modal).find(".btn-confirm-with-pw").on('click', (e) ->
+      e.preventDefault()
+      target = e.currentTarget
+      button_text = $(target).text()
+
+      $(target).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr("disabled", true)
+
+      password = $(modal).find("input[type=password]").val()
+      data = _this.userActionData.data
+      data.password = password
+      url = _this.userActionData.url
+      type = _this.userActionData.type
+
+      $.ajax({
+        url: url,
+        type: type,
+        data: data,
+        dataType: 'json',
+        success: (res) ->
+          # console.log "Suc", res
+          FinlyF.snapNotify(res.messages)
+          if res.success == true
+            $(modal).modal('hide')
+            _this.parent.trigger('refresh')
+            # _this.model.fetch({
+            #   view: _this.params.view
+            # })
+          else
+            $(target).html(button_text).removeAttr("disabled")
+        error: (err) ->
+          $(target).html(button_text).removeAttr("disabled")
+          console.log "Err", err.messages
+      })
+    )
 
   prepareCardAction: (e) ->
     e.preventDefault()
