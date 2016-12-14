@@ -208,6 +208,7 @@ class User::Invite::Create < User::Invite::Base
         invite_params[:mobile_number] = number
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
+        invite_params[:mobile_only_invite] = true
 
         self.invited_users << User.invite!(invite_params, self.user) do |u|
           u.skip_invitation = true
