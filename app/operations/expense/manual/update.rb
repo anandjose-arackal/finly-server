@@ -68,7 +68,7 @@ class Expense::Manual::Update < Expense::Manual::Base
   def validate
     if expense.report_id and personal_view?
       unless expense.report.editable?
-        messages[:error] << "Expense cannot be edited at this stage"
+        messages[:error] << 'Expense cannot be edited at this stage'
       end
     end
   end
@@ -83,8 +83,9 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def post_process
     # add comment in report if expense is added within report
-    expense.update_report_comments(user, editable_attrs)
-    messages[:success] << "Expense updated."
+    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+
+    add_message :success, 'Expense updated'
   end
 
   private
@@ -96,7 +97,7 @@ class Expense::Manual::Update < Expense::Manual::Base
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count
-                          }
+    }
   end
 
 end

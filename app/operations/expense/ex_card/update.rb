@@ -68,9 +68,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def post_process
     # add report comment
-    expense.update_report_comments(user, editable_attrs)
+    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
-    messages[:success] << "Expense updated"
+    messages[:success] << 'Expense updated'
   end
 
   private
