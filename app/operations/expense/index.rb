@@ -29,7 +29,12 @@ class Expense::Index < Expense::Base
   def process
     if role_id.blank? or role_id == UserRole.employee_id
       self.expenses = user.expenses
+    elsif params.present? and params[:controller].present? and params[:controller] == 'expenses' and params[:action] == 'index'
+      # If viewed from expense index screen
+      team_user_ids = User::Index.(user, params).team.map(&:id)
+      self.expenses = Expense.with_user(team_user_ids).only_card_expenses.unreported.uniq
     else
+      # For all expenses
       report_ids = Report::Index.(user, params).reports.map(&:id)
       # adding all card expenses of the users in the team
       team_user_ids = User::Index.(user, params).team.map(&:id)

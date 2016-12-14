@@ -45,12 +45,13 @@ class Expense::Base < BaseOperation
     end
 
     def retrieve_editable
-      unless view.blank? or view == 'personal'
-        if expense.report_id and expense.report.processing? and expense.report.controlling_user.id == user.id
+      if personal_view?
+        if expense.report_id.blank? or expense.report.editable?
           return true
-        else
-          return false
         end
+      end
+      if expense.report_id.present? and expense.report.processing? and expense.report.controlling_user.id == user.id
+        return true
       end
       false
     end
