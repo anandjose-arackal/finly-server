@@ -316,7 +316,7 @@ class User < ActiveRecord::Base
   end
 
   def manager_activateable?
-    self.invitation_token.blank? and self.email.blank? and self.mobile_only_invite == true
+    self.invitation_token.blank? and self.email.blank? and self.mobile_only_invite
   end
 
   def otp_confirm
