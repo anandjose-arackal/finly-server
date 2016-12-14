@@ -38,7 +38,7 @@
           {{/if}}
 
           {{#if item.actions.reject}}
-            <button class="btn btn-sm btn-danger btn-report-action" data-url="{{item.actions.reject}}">Reject</button>
+            <button class="btn btn-sm btn-danger" id="btnRejectReport" data-toggle="modal" data-target="#modal-confirm-reject" data-url="{{item.actions.reject}}">Reject</button>
           {{/if}}
 
           {{#if item.actions.reimbursement_confirm}}

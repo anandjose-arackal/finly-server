@@ -29,7 +29,7 @@ class FinlyF.Views.Report extends Backbone.View
 
     'click .receipt': 'previewReceipt'
 
-    'click .btn-delete-item': 'delete'
+    'click .btn-confirm-delete-report': 'confirmDelete'
     'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
     # 'click .btn-submit-item': 'submit'
@@ -44,6 +44,7 @@ class FinlyF.Views.Report extends Backbone.View
 
     #reports
     'click .btn-report-action': 'reportAction'
+    'click .btn-confirm-reject-report': 'rejectReport'
     'click .confirm-add-existing-expense': 'addExistingExpenses'
 
     'click .btn-go-back': 'goBacktoPreviousPage'
@@ -397,9 +398,15 @@ class FinlyF.Views.Report extends Backbone.View
       $(e.currentTarget).closest('.form-new-comment').find('.btn-post-comment').click()
       return false
 
+  # delete: (e) ->
+  #   modal = $(@el).find('#modal-confirm-delete')
+  #   $(modal).modal('show')
 
-  delete: (e) ->
+  confirmDelete: (e) ->
     _this = @
+    target = e.currentTarget
+
+    modal = $(target).closest('#modal-confirm-delete')
     # @model.set('authenticity_token', $("#authenticity_token").val())
     # console.log $("#authenticity_token").val()
 
@@ -412,8 +419,15 @@ class FinlyF.Views.Report extends Backbone.View
       }
       processData: true
       success: (model, res) ->
+        $(modal).modal('hide')
+
+        # Hack for removing backdrop
+        $('body').removeClass('modal-open')
+        $('.modal-backdrop').remove()
+        
         FinlyF.snapNotify(res.messages)
         FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+
         # console.log res
         # _this.parent.trigger('item:destroyed')
       error: (err) ->
@@ -422,6 +436,10 @@ class FinlyF.Views.Report extends Backbone.View
     })
 
   reportAction: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
     _this = @
     url = $(e.currentTarget).attr('data-url')
     $.ajax({
@@ -430,18 +448,64 @@ class FinlyF.Views.Report extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
+        # if res.success == true
+        #   _this.model.fetch({
+        #     data: {view: _this.current_view}
+        #   })
+        #   # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        # else
+        #   _this.model.fetch({
+        #     data: {view: _this.current_view}
+        #   })
+        _this.model.fetch({
+          data: {view: _this.current_view}
+        })
+      error: (err) ->
+        console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
+    })
+
+  rejectReport: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
+    _this = @
+
+    url = $(@el).find('#btnRejectReport').attr("data-url")
+
+    console.log "Url ", url
+
+    modal = $(target).closest('#modal-confirm-reject')
+
+    data = {
+      reject_note: $(modal).find("textarea.reject-note").val()
+    }
+
+    $.ajax({
+      url: url,
+      type: 'patch',
+      dataType: 'json',
+      data: data,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
         if res.success == true
+          $(modal).modal('hide')
           _this.model.fetch({
             data: {view: _this.current_view}
           })
           # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         else
-          _this.model.fetch({
-            data: {view: _this.current_view}
-          })
+          $(target).removeAttr('disabled').html(button_text)
+          # _this.model.fetch({
+          #   data: {view: _this.current_view}
+          # })
+        
       error: (err) ->
         console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
     })
+
 
   refreshData: (e)->
     _this = @

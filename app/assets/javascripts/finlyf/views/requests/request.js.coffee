@@ -22,7 +22,8 @@ class FinlyF.Views.Request extends Backbone.View
     'click .btn-create-expense': 'createExpense'
     'click .btn-post-comment': 'postComment'
 
-    'click .btn-delete-item': 'delete'
+    'click .btn-delete-request': 'delete'
+    'click .btn-confirm-delete-request': 'confirmDelete'
     'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
     # 'click .btn-submit-item': 'submit'
@@ -38,7 +39,7 @@ class FinlyF.Views.Request extends Backbone.View
 
     #reports
     # 'click .dropdown .btn': 'showDropDown'
-    'click .btn-report-action': 'reportAction'
+    'click .btn-report-action': 'requestAction'
     'click .confirm-add-existing-expense': 'addExistingExpenses'
 
     #money requests actinos
@@ -49,6 +50,8 @@ class FinlyF.Views.Request extends Backbone.View
 
     'click .btn-go-back': 'goBacktoPreviousPage'
     'click .btn-approve-options': 'approveOptions'
+    'click #btnRejectRequest': 'processRejectRequest'
+    'click .btn-confirm-reject-request': 'rejectRequest'
 
 
   initialize: (options) ->
@@ -102,7 +105,7 @@ class FinlyF.Views.Request extends Backbone.View
   populateDetails: ->
     @model.set('current_view', @current_view)
     $(@el).find(".navbar-full").html(@templateShowNavbar({item: @model.toJSON()}))
-    $(@el).find(".main").html(@templateShowDetails({item: @model.toJSON()}))
+    $(@el).find(".main").html(@templateShow({item: @model.toJSON()}))
 
     # $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
     $(@el).find(".datepicker").datepicker({ dateFormat: "yy-mm-dd" })
@@ -268,7 +271,17 @@ class FinlyF.Views.Request extends Backbone.View
 
   delete: (e) ->
     e.preventDefault()
+    modal = $(@el).find("#modal-confirm-delete")
+    $(modal).modal('show')
+
+  confirmDelete: (e) ->
+    e.preventDefault()
     _this = @
+
+    target = e.currentTarget
+    modal = $(target).closest('#modal-confirm-delete')
+
+
     # @model.set('authenticity_token', $("#authenticity_token").val())
     # console.log $("#authenticity_token").val()
     params = {
@@ -280,6 +293,12 @@ class FinlyF.Views.Request extends Backbone.View
       }
       processData: true
       success: (model, res) ->
+        $(modal).modal('hide')
+
+        # Hack for removing backdrop
+        $('body').removeClass('modal-open')
+        $('.modal-backdrop').remove()
+
         FinlyF.snapNotify(res.messages)
 
         FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
@@ -291,9 +310,12 @@ class FinlyF.Views.Request extends Backbone.View
 
     })
 
-  reportAction: (e) ->
+  requestAction: (e) ->
     # console.log "hi"
     e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
     _this = @
     url = $(e.currentTarget).attr('data-url')
     $.ajax({
@@ -310,10 +332,13 @@ class FinlyF.Views.Request extends Backbone.View
           _this.model.fetch({
             data: {view: _this.current_view}
           })
+        else
+          $(target).removeAttr('disabled').html(button_text)
           # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           
       error: (err) ->
         console.log "Error", err
+        $(target).removeAttr('disabled').html(button_text)
     })
 
   prepareTransfer: (e) ->
@@ -424,6 +449,54 @@ class FinlyF.Views.Request extends Backbone.View
           
       error: (err) ->
         console.log "Error", err
+    })
+
+  processRejectRequest: (e) ->
+    e.preventDefault()
+
+    modal = $(@el).find('#modal-confirm-reject')
+    $(modal).modal('show')
+
+  rejectRequest: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
+    _this = @
+
+
+    origin_button = $("#btnRejectRequest")
+    url = $(origin_button).attr("data-url")
+
+    modal = $(target).closest('#modal-confirm-reject')
+
+    data = {
+      reject_note: $(modal).find("textarea.reject-note").val()
+      type: $(origin_button).attr('data-action-type')
+    }
+
+    $.ajax({
+      url: url,
+      type: 'patch',
+      dataType: 'json',
+      data: data,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        else
+          $(target).removeAttr('disabled').html(button_text)
+          # _this.model.fetch({
+          #   data: {view: _this.current_view}
+          # })
+        
+      error: (err) ->
+        console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
     })
 
 

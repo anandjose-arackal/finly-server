@@ -486,6 +486,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
+    _this = @
     target = $(e.currentTarget)
     query = $(target).val()
 
@@ -499,6 +500,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           data: 
             remote: "true"
             query: query
+            view: _this.params.view
             # area: 'central'
           success: (data) ->
             response(data)
