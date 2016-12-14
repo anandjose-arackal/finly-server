@@ -164,6 +164,7 @@ class Expense < ActiveRecord::Base
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
+  scope :filter_user_id, ->(id) { where user_id: id }
 
   delegate :category_name, to: :category
 
