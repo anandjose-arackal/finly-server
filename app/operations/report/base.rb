@@ -91,7 +91,7 @@ class Report::Base < BaseOperation
     def load_actions
       actions = {}
       if admin_view?
-        if self.report.can_take_control? and not self.report.controlling_user?(user) and not self.report.user.id == user.id
+        if self.report.can_take_control? and not self.report.controlling_user?(user) #and not self.report.user.id == user.id
           actions[:take_control] = {url: Rails.application.routes.url_helpers.report_take_control_path(report_id: report.id, view: params[:view])}
         elsif self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
