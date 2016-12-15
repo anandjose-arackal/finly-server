@@ -524,6 +524,10 @@ body {
   margin-bottom: 10px;
 }
 
+
+.borderless td, .borderless th {
+  border: none;
+}
 // Hopefully Obsolete codes
 
 #headerNavigation li.active a {

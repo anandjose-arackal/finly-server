@@ -37,6 +37,8 @@ class FinlyF.Views.User extends Backbone.View
     # Activating employee without email
     'click .btn-active-employee': 'activateEmployee'
 
+    # 'shown.bs.modal #modal-import-employees': 'addAuthKey'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
