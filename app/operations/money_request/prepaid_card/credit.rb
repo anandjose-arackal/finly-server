@@ -80,11 +80,12 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       track_attributes[:action_user] = user
       track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:credited)
       track_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
-      track_attributes[:payment] = result.to_user_payment
+      track_attributes[:payment] = result.payment
       money_request.tracks.create track_attributes
 
+      action_id = "credited_from_#{from_account}_to_#{to_account}"
       money_request.comments.create money_request_id: money_request.id,
-                                    user: user, comment_action_id: MoneyRequestCommentAction.id_for(:credited), payment: result.to_user_payment
+                                    user: user, comment_action_id: MoneyRequestCommentAction.id_for(action_id.to_sym), payment: result.payment
     end
   end
 

@@ -32,9 +32,9 @@ class CardTransaction < ActiveRecord::Base
 
   belongs_to :expense
 
-  belongs_to :transaction_amount, class_name: "Amount", dependent: :destroy
-  belongs_to :card_amount, class_name: "Amount", dependent: :destroy
-  belongs_to :billing_amount, class_name: "Amount", dependent: :destroy
+  belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
+  belongs_to :card_amount, class_name: 'Amount', dependent: :destroy
+  belongs_to :billing_amount, class_name: 'Amount', dependent: :destroy
 
   delegate :transaction_amount_value, to: :transaction_amount
   delegate :billing_amount_value, to: :billing_amount
@@ -45,7 +45,7 @@ class CardTransaction < ActiveRecord::Base
 
   default_scope {order(transaction_timestamp: :desc)}
 
-  scope :debits, -> {where transaction_type: "Debit"}
-  scope :credits, -> {where transaction_type: "Credit"}
+  scope :debits, -> {where transaction_type: 'Debit'}
+  scope :credits, -> {where transaction_type: 'Credit'}
 
 end

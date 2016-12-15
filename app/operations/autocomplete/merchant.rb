@@ -18,11 +18,12 @@ class Autocomplete::Merchant < BaseOperation
     # todo - see if there's a better way to do this.
     self.response = ManualExpense.merchant_like(query, expense_ids)
     self.response += CardExpense.merchant_like(query, expense_ids)
+    self.response.uniq! if self.response.present?
   end
 
   def post_process
     if response.empty?
-      self.response = ["No matches"]
+      self.response = ['No matches']
     end
   end
 

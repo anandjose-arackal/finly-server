@@ -19,7 +19,6 @@
 #
 
 
-
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -131,7 +130,13 @@ class Expense < ActiveRecord::Base
   # }
 
   scope :filter_status_id, -> (status_id) { where expense_status_id: status_id }
-  scope :filter_search, -> (value) { joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant like ? OR note like ?', "%#{value}%", "%#{value}%") }
+  scope :filter_search, -> (value) do
+    expense_ids = ManualExpense.where('merchant like ?', "%#{value}%").pluck(:expense_id)
+    expense_ids += CardExpense.where('editable_merchant like ?', "%#{value}%").pluck(:expense_id)
+
+    where('id IN (?) OR note like ?', expense_ids, "%#{value}%",)
+    # joins(:card_expense).joins(:manual_expense).joins(:amount).select('expenses.*').where('editable_merchant like ? or merchant like ? OR note like ?', "%#{value}%", "%#{value}%", "%#{value}%")
+  end
 
   scope :filter_receipt, -> (value) do
     expense_ids = Receipt.where(parent_type: Expense).uniq.pluck(:parent_id)
@@ -159,6 +164,7 @@ class Expense < ActiveRecord::Base
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
+  scope :filter_user_id, ->(id) { where user_id: id }
 
   delegate :category_name, to: :category
 

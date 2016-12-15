@@ -129,6 +129,11 @@ class Report < ActiveRecord::Base
         user_ids << controlling_user_id
       end
     end
+
+    # if user_before == self.user
+    #   user_ids << user_before.id
+    # end
+
     if user_ids.size > 0
       # Order is MySQL Specific
       user_ids = user_ids.reverse!

@@ -65,7 +65,7 @@ class MoneyRequest::Reject < MoneyRequest::Base
                                   status_id: status, memo: memo,
                                   user_request_role_id: user_role
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:reject),
-                                    rejected_to_id: reject_to_user.id, content: memo
+                                    rejected_to_id: reject_to_user.id, content: params[:reject_note]
       return
     end
     add_message :error, money_request.errors.full_messages

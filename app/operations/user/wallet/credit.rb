@@ -149,7 +149,7 @@ class User::Wallet::Credit < User::Wallet::Base
     attr_accessor :payment
 
     def init
-      self.payment = params[:from_user_payment]
+      self.payment = params[:payment]
     end
   end
 

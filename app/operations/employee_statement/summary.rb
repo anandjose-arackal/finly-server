@@ -1,5 +1,6 @@
 
 class EmployeeStatement::Summary < EmployeeStatement::Base
+  include MathUtil
 
   attr_accessor :items
 
@@ -25,18 +26,18 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
 
     # Virtual account details
     items[:user_account_status_details] = {}
-    items[:user_account_status_details][:account_load] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet),
-                                                                          PaymentType.id_for(:receive_credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
-    items[:user_account_status_details][:account_withdrawal] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
-                                                                                PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
-    items[:user_account_status_details][:account_transfer_to_other_accounts] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:initiate_credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
-    items[:user_account_status_details][:account_transfer_to_other_cards] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).non_personal.where(payment_type_id: [PaymentType.id_for(:initiate_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
+    items[:user_account_status_details][:account_load] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
+                                                                          PaymentType.id_for(:credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
+    items[:user_account_status_details][:account_withdrawal] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_wallet),
+                                                                                PaymentType.id_for(:debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
+    items[:user_account_status_details][:account_transfer_to_other_accounts] = precision_value selected_user.initiating_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
+    items[:user_account_status_details][:account_transfer_to_other_cards] = precision_value selected_user.initiating_payments.where('date > ? AND date <= ?', start_date, end_date).non_personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card)]).joins(:amount).sum(:value)
 
     # transferred to card
     items[:transferred_to_card] = {}
-    items[:transferred_to_card][:from_own_account] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).personal.where(payment_type_id: PaymentType.id_for(:receive_credit_from_wallet_to_card)).joins(:amount).sum(:value)
-    items[:transferred_to_card][:from_other_accounts] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).non_personal.where(payment_type_id: PaymentType.id_for(:receive_credit_from_wallet_to_card)).joins(:amount).sum(:value)
-    items[:transferred_to_card][:from_company_account] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: PaymentType.id_for(:receive_credit_from_virtual_account_to_card)).joins(:amount).sum(:value)
+    items[:transferred_to_card][:from_own_account] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).personal.where(payment_type_id: PaymentType.id_for(:credit_from_wallet_to_card)).joins(:amount).sum(:value)
+    items[:transferred_to_card][:from_other_accounts] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).non_personal.where(payment_type_id: PaymentType.id_for(:credit_from_wallet_to_card)).joins(:amount).sum(:value)
+    items[:transferred_to_card][:from_company_account] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: PaymentType.id_for(:credit_from_virtual_account_to_card)).joins(:amount).sum(:value)
 
     # amount spent from card
     load_card_transactions
@@ -53,11 +54,11 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     items[:opening_cash_in_hand] = cash_in_hand_on_date(start_date)
 
     items[:amount_transacted] = {}
-    items[:amount_transacted][:card_load] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
-                                                                       PaymentType.id_for(:receive_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
-    items[:amount_transacted][:paid_to_employee] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:advance),
+    items[:amount_transacted][:card_load] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_card),
+                                                                       PaymentType.id_for(:credit_from_wallet_to_card)]).joins(:amount).sum(:value)
+    items[:amount_transacted][:paid_to_employee] = precision_value selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:advance),
                                                                               PaymentType .id_for(:reimbursement)]).joins(:amount).sum(:value)
-    items[:amount_transacted][:paid_by_employee] = selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debt_clearance)]).joins(:amount).sum(:value) # todo - check if this should include settlement
+    items[:amount_transacted][:paid_by_employee] = precision_value selected_user.payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debt_clearance)]).joins(:amount).sum(:value) # todo - check if this should include settlement
 
     items[:total_verified_expenses] = {}
     items[:total_verified_expenses][:verified_card_expenses] = verified_card_expenses(selected_user)
@@ -68,10 +69,10 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
 
     # table 3
     items[:declined_expenses] = {}
-    items[:declined_expenses][:declined_card_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
-    items[:declined_expenses][:declined_cash_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_manual_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
+    items[:declined_expenses][:declined_card_expenses] = precision_value selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
+    items[:declined_expenses][:declined_cash_expenses] = precision_value selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_manual_expenses.where(expense_status_id: ExpenseStatus.rejected_id).joins(:amount).sum(:value)
 
-    items[:unreported_card_expenses] = selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.unreported_id).joins(:amount).sum(:value)
+    items[:unreported_card_expenses] = precision_value selected_user.expenses.where('date > ? AND date <= ?', start_date, end_date).only_card_expenses.where(expense_status_id: ExpenseStatus.unreported_id).joins(:amount).sum(:value)
 
     # items[:total_unverified_card_reversal] todo - need clarification from itzcash
     items[:processing_expenses] = {}
@@ -87,22 +88,22 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
 
   def load_card_transactions
     items[:spent_from_card] = {}
-    items[:spent_from_card][:atm] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
-    items[:spent_from_card][:pos] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
-    items[:spent_from_card][:online] = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
+    items[:spent_from_card][:atm] = precision_value selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "ATM").joins(:billing_amount).sum(:value)
+    items[:spent_from_card][:pos] = precision_value selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "POS").joins(:billing_amount).sum(:value)
+    items[:spent_from_card][:online] = precision_value selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date).where(transaction_mode: "Ecom").joins(:billing_amount).sum(:value) # todo - find out if this is different from online
   end
 
   def user_account_balance(date = nil)
     balance = selected_user.wallet.balance_amount
     unless date
-      return balance
+      return precision_value balance
     end
-    debits = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_debit_from_wallet_to_wallet),
-                                                            PaymentType.id_for(:receive_debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
-    credits = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_wallet_to_wallet),
-                                                             PaymentType.id_for(:receive_credit_from_virtual_account_to_wallet)]).joins(:amount).sum(:value)
+    debits = selected_user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_wallet),
+                                                            PaymentType.id_for(:debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
+    credits = selected_user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_wallet),
+                                                             PaymentType.id_for(:credit_from_virtual_account_to_wallet)]).joins(:amount).sum(:value)
     balance = balance + debits - credits
-    return balance
+    precision_value balance
   end
 
   def verified_card_expenses(user = nil)
@@ -115,7 +116,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       card_ex = report.expenses.only_card_expenses.where('date > ? AND date <= ?', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_ex
     end
-    total
+    precision_value total
   end
 
   def verified_cash_expenses(user = nil)
@@ -128,7 +129,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       card_manual = report.expenses.only_manual_expenses.where('date > ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_manual
     end
-    total
+    precision_value total
   end
 
   def pending_card_expenses(user = nil)
@@ -141,7 +142,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       card_ex = report.expenses.only_card_expenses.where('date > ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_ex
     end
-    return total
+    precision_value total
   end
 
   def pending_cash_expenses(user = nil)
@@ -154,7 +155,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       manual_ex = report.expenses.only_manual_expenses.where('date > ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += manual_ex
     end
-    return total
+    precision_value  total
   end
 
   # returns card balance on a particular day
@@ -172,10 +173,10 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       return result.balance.to_f
     end
     card_expenses = selected_user.card_transactions.debits.where('transaction_timestamp > ?', start_date).joins(:billing_amount).sum(:value)
-    card_load_amount = selected_user.payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:receive_credit_from_virtual_account_to_card),
-                                                             PaymentType.id_for(:receive_credit_from_wallet_to_card)]).joins(:amount).sum(:value)
+    card_load_amount = selected_user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_card),
+                                                             PaymentType.id_for(:credit_from_wallet_to_card)]).joins(:amount).sum(:value)
     balance = result.balance.to_f + card_load_amount - card_expenses
-    return balance
+    precision_value  balance
   end
 
   # todo - revisit this calculation
@@ -192,7 +193,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       report_amount += report.total_amount(:only_manual_expenses) - report.reimbursement_amount.value
     end
     balance = balance + debt_clearances - added_cash_in_hand + report_amount
-    return balance
+    precision_value  balance
   end
 
 end
