@@ -88,9 +88,9 @@ class User::Show < User::Base
       else
         # If user has signed up and is not viewing themselves
         if self.selected_user.active and selected_user.id != user.id
-          actions[:disable] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+          actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         elsif !selected_user.active and selected_user.id != user.id
-          actions[:enable] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+          actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         end
       end
 
