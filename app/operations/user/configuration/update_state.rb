@@ -58,9 +58,9 @@ class User::Configuration::UpdateState < BaseOperation
   def update_card
     return unless to_user.cards.present?
     if to_user.active
-      User::PrepaidCard::Unblock.(self.user, selected_user: to_user, user_deactivation: true, password: params[:password])
+      User::PrepaidCard::Unblock.(self.user, user: to_user, user_deactivation: true, password: params[:password])
     else
-      User::PrepaidCard::Block.(self.user, selected_user: to_user, user_deactivation: true, password: params[:password])
+      User::PrepaidCard::Block.(self.user, user: to_user, user_deactivation: true, password: params[:password])
     end
   end
 end
