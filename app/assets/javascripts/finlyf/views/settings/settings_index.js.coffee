@@ -104,6 +104,13 @@ class FinlyF.Views.SettingsIndex extends Backbone.View
   prepareUpdateCardStatus: (e) ->
     @current_card_status = $(e.currentTarget).attr('data-card-status-type')
     modal = $(@el).find("#modal-confirm-card-status")
+    modal_title = $(modal).find('.modal-title')
+
+    if parseInt(@current_card_status) == 1
+      $(modal_title).text("Unblock Card")
+    else if parseInt(@current_card_status) == 0
+      $(modal_title).text("Block Card")
+
     $(modal).find(".btn-confirm-card-status").attr('data-card-status-type', @current_card_status)
 
     $(modal).modal('show')

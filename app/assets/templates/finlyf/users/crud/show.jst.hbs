@@ -34,7 +34,7 @@
                     <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
                   {{/if}}
                   {{#if item.user.activateable}}
-                    <button class="btn btn-lg btn-success btn-active-employee">Activate</button>
+                    <button class="btn btn-sm btn-success btn-active-employee">Activate</button>
                   {{/if}}
                 </div>
               {{/if}}
@@ -328,11 +328,11 @@
         {{#if item.card.assigned}}
         <section class="user-cards">
           <div class="section-card">
-            <div class="row section-header">
+            <div class="row no-margin section-header">
               <div class="col-sm-6"><h4 style="margin-bottom: 20px;">Assigned Cards</h4></div>
             </div>
 
-            <div class="row">
+            <div class="row no-margin" style="padding-bottom: 15px;">
               <div class="col-sm-6">
                 <div class="card text-center">
                   <div class="logo">Finly</div>

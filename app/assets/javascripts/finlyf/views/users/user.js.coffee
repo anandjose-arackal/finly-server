@@ -320,7 +320,7 @@ class FinlyF.Views.User extends Backbone.View
         if $(target).attr('data-state-active')
           if $(target).attr('data-state-active') == 'true'
             data.active = true
-            item.action_type = "Activate"
+            item.action_type = "Activate"#REF==4I
           else
             data.active = false
             item.action_type = "Deactivate"
@@ -404,6 +404,12 @@ class FinlyF.Views.User extends Backbone.View
   confirmWithPW: (item) ->
     modal = $("#modal-confirm-with-password")
     $(modal).modal('show')
+
+    if item.action_type == "Activate"  #REF==4O
+      $(modal).find('.modal-title').text("Activate User")
+    else if item.action_type == "Deactivate"
+      $(modal).find('.modal-title').text("Deativate User")
+
 
     _this = @
     $(modal).find(".activate-with-password-template").html(@templateModalConfirmWithPW({item: item}))
@@ -651,11 +657,21 @@ class FinlyF.Views.User extends Backbone.View
     target = e.currentTarget
     _this = @
 
-    modal = $("#modal-sub-mp")
     status = $(target).attr('data-card-status-type')
+    if parseInt(status) == 0
+      title = "Block Card"
+    else if parseInt(status) == 1
+      title = "Unblock Card"
+
+
+    modal = $("#modal-sub-mp")
+    data = {
+      status: status
+      title: title
+    }
 
     $(modal).modal('show')
-    $(modal).html(@templateCardStatus({status: status}))
+    $(modal).html(@templateCardStatus({item: data}))
 
   cardStatus: (e) ->
     e.preventDefault()

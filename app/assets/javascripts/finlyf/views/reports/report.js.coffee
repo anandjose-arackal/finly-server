@@ -18,7 +18,6 @@ class FinlyF.Views.Report extends Backbone.View
   events:
     'click .select-item.report': 'toggleSelect'
     'input [contenteditable=true]': 'updateModel'
-    'click .btn-update-item': 'update'
     'click .add-new-expense': 'newExpense'
     'click .remove-uploaded-receipt': 'removeUploadedReceipt'
     'change input#expense-receipt-upload': 'showUploadedReceipt'
@@ -298,6 +297,11 @@ class FinlyF.Views.Report extends Backbone.View
 
 
   edit: (e) ->
+    e.preventDefault()
+
+    target = e.currentTarget
+    navbar_right = $(target).closest('.navbar-right')
+    $(navbar_right).find('button.btn-report-action').attr('disabled', true)
     #Warning!!! Dirty codes ahead!
     $(e.currentTarget).addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
 
@@ -328,6 +332,11 @@ class FinlyF.Views.Report extends Backbone.View
 
   update: (e) ->
     e.preventDefault()
+
+    target = e.currentTarget
+    # navbar_right = $(target).closest('.navbar-right')
+    # $(navbar_right).find('button.btn-report-action').removeAttr('disabled')
+    
     _this = @
     target = e.currentTarget
     $(target).html("<i class='fa fa-circle-o-notch fa-spin'></i>").attr('disabled', true)

@@ -506,9 +506,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         console.log "Couldn't fetch Successfully."
     })
 
+    selected_user = @collectionUsers.get(@user_id)
     item = {
-      name: $(target).text()
+      name: selected_user.get('name')
       id: @user_id
+      email: selected_user.get('email')
+      mobile: selected_user.get('mobile_number')
     }
     $(@el).find(".navbar-main").html(@templateNavbarMain({item: item}))
 

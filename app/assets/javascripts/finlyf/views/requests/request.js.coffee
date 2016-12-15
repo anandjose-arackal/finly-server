@@ -16,7 +16,6 @@ class FinlyF.Views.Request extends Backbone.View
   events:
     'click .select-item': 'toggleSelect'
     # 'input [contenteditable=true]': 'updateModel'
-    'click .btn-update-item': 'update'
     'click .add-new-expense': 'newExpense'
     'click .add-existing-expense': 'existingExpense'
     'click .btn-create-expense': 'createExpense'
@@ -168,6 +167,9 @@ class FinlyF.Views.Request extends Backbone.View
 
   edit: (e) ->
     e.preventDefault()
+    target = e.currentTarget
+    navbar_right = $(target).closest('.navbar-right')
+    $(navbar_right).find('button.btn-report-action').attr('disabled', true)
     #Warning!!! Dirty codes ahead!
     $(e.currentTarget).addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
 
@@ -184,6 +186,8 @@ class FinlyF.Views.Request extends Backbone.View
   update: (e) ->
     e.preventDefault()
     target = e.currentTarget
+    # navbar_right = $(target).closest('.navbar-right')
+
     $(target).html("<i class='fa fa-circle-o-notch fa-spin'></i>").attr('disabled', true)
     # {
     #   money_request: {
@@ -348,8 +352,9 @@ class FinlyF.Views.Request extends Backbone.View
     target = e.currentTarget
     item = {
       url: $(target).attr("data-url")
-      action_type: $(target).attr("data-action-type")
+      type: $(target).attr("data-action-type")
       amount: _this.model.get('total')
+      target_user_name: _this.model.get('user_name')
     }
     
     modal = $(@el).find("#modal-mp")

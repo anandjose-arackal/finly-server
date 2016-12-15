@@ -6,47 +6,68 @@
     </div>
     <div class="modal-body">
 
-      {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
-        <div class="dropdown">
-          <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            Approve &amp; Transfer
-            <span class="caret"></span>
-          </button>
-
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            {{#if item.actions.credit_card_from_wallet}}
-              <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">User's Card from Your Finly Account</a> </li>
-            {{/if}}
-            {{#if item.actions.credit_card_from_virtual_account}}
-              <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">User's Card from Company Credits</a> </li>
-            {{/if}}
-           <li class="divider"></li>
-            {{#if item.actions.credit_wallet_from_wallet}}
-              <li><a class="btn-transfer" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">User's Finly Account from Your Finly Account</a> </li>
-            {{/if}}
-            {{#if item.actions.credit_wallet_from_virtual_account}}
-              <li><a class="btn-transfer" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">User's Finly Account from Company Credits</a> </li>
-            {{/if}}
-          </ul>
+      <div class="row no-margin">
+        <div class="col-sm-12">
+          <h4>Instuctions</h4>
+          <p>
+            <b>Find me in assets/templates/finlyf/requests/actions/modalApproveOptions.jst.hbs</b>
+          </p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         </div>
-      {{/ifCond}}
-
-
-      {{#if item.actions.approve_and_forward_to}}
-      <div class="dropdown">
-        <button class="btn btn-sm btn-success"  data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-          Approve &amp; Forward to
-          <span class="caret"></span>
-        </button>
-
-        <ul class="dropdown-menu" aria-labelledby="dLabel">
-          {{#each item.forwardable_users}}
-            <li><a class="btn-approve-forward-to" href="#" data-forward-to="{{this.user.id}}" data-url="{{../item.actions.approve_and_forward_to}}" data-action-type="approve_and_forward_to">{{this.user.name}}({{this.user_role.name}})</a></li>
-          {{/each}}
-
-        </ul>
       </div>
-      {{/if}}
+
+      <div class="row no-margin">
+        <div class="col-sm-12">
+          {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
+            <div class="dropdown">
+              <button class="btn btn-sm btn-success" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                Approve &amp; Transfer
+                <span class="caret"></span>
+              </button>
+
+              <ul class="dropdown-menu" aria-labelledby="dLabel">
+                {{#if item.actions.credit_card_from_wallet}}
+                  <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">User's Card from Your Finly Account</a> </li>
+                {{/if}}
+                {{#if item.actions.credit_card_from_virtual_account}}
+                  <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">User's Card from Company Credits</a> </li>
+                {{/if}}
+               <li class="divider"></li>
+                {{#if item.actions.credit_wallet_from_wallet}}
+                  <li><a class="btn-transfer" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">User's Finly Account from Your Finly Account</a> </li>
+                {{/if}}
+                {{#if item.actions.credit_wallet_from_virtual_account}}
+                  <li><a class="btn-transfer" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">User's Finly Account from Company Credits</a> </li>
+                {{/if}}
+              </ul>
+            </div>
+          {{/ifCond}}
+
+
+          {{#if item.actions.approve_and_forward_to}}
+          <div class="dropdown">
+            <button class="btn btn-sm btn-success"  data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              Approve &amp; Forward to
+              <span class="caret"></span>
+            </button>
+
+            <ul class="dropdown-menu" aria-labelledby="dLabel">
+              {{#each item.forwardable_users}}
+                <li><a class="btn-approve-forward-to" href="#" data-forward-to="{{this.user.id}}" data-url="{{../item.actions.approve_and_forward_to}}" data-action-type="approve_and_forward_to">{{this.user.name}}({{this.user_role.name}})</a></li>
+              {{/each}}
+
+            </ul>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+
+      
     </div>
   </div>
 </div>
