@@ -120,14 +120,16 @@ class Notification < ActiveRecord::Base
       user_name = "You"
     else
       user_name = action_user.name rescue nil
-      if user_name.nil?
-        user_name = "Finly"
+      if user_name.nil? and action_type_id == NotificationActionType.auto_approve_id
+        user_name = "Your"
       end
     end
 
     content += user_name
     # preposition selector
-    if action_user_id == user_id
+    if action_user_id.nil?
+      prep = ""
+    elsif action_user_id == user_id
       prep = " have"
     else
       prep = " has"
@@ -146,8 +148,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.unapprove_id
         action = " unapproved a"
       when NotificationActionType.auto_approve_id
-        content = "" # resetting the content because there is no action user here
-        action = "Finly auto-approved a"
+        action = ""
       when NotificationActionType.credit_reimbursement_id
         action = " credited a reimbursement of"
       when NotificationActionType.update_id
@@ -195,11 +196,14 @@ class Notification < ActiveRecord::Base
           object = " report"
         end
         r = Report.find_by(id: self.object_id)
-        object_name = " named #{r.name}"
+        object_name = " : \"#{r.name}\""
+        if action_type_id == NotificationActionType.auto_approve_id
+          object_name += " has been auto approved"
+        end
       when "Advance Request"
         object = "n advance request"
         mr = MoneyRequest.find_by(id: self.object_id)
-        object_name = " named #{mr.name}"
+        object_name = " : \"#{mr.name}\""
       when "Expense"
         object = " expense"
         e = Expense.find_by(id: self.object_id)

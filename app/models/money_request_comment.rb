@@ -19,6 +19,7 @@
 
 
 
+
 # todo rename rejected_to_id to modified_user_id
 class MoneyRequestComment < ActiveRecord::Base
 
@@ -63,11 +64,17 @@ class MoneyRequestComment < ActiveRecord::Base
       when MoneyRequestCommentAction.id_for(:auto_approve)
         comment = 'Request auto-approved as no manager is assigned to the user'
       when MoneyRequestCommentAction.id_for(:reject)
-        comment = "#{name} rejected the report"
+        comment = "#{name} rejected the advance request"
+        if self.content.present?
+          comment += " with a note: '#{self.content}'"
+        end
       when MoneyRequestCommentAction.id_for(:unapprove)
-        comment = "#{name} unapproved the report"
+        comment = "#{name} unapproved the advance request"
       when MoneyRequestCommentAction.id_for(:take_control)
-        comment = "#{name} took control of the report"
+        comment = "#{name} took control of the advance request"
+        if self.content.present?
+          comment += " with a note: '#{self.content}'"
+        end
       when MoneyRequestCommentAction.id_for(:comment)
         comment = "#{name} commented : #{content}"
       when MoneyRequestCommentAction.id_for(:update)

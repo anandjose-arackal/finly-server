@@ -1,4 +1,4 @@
-json.array!(@notifications) do |notif|
+json.array!(@result.notifications) do |notif|
   json.extract! notif, :read
   json.body notif.generate_body(current_user)
   json.title notif.generate_title

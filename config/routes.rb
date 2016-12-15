@@ -653,7 +653,9 @@ Rails.application.routes.draw do
   # get 'sample_import_file', to: 'users#sample_file', as: :sample_import_file
 
 
-  get 'pending_invites/activate_employee' => 'pending_invites#activate_employee'
+  get 'pending_invites/initiate_activation', to: 'pending_invites#initiate_activation', as: :initiate_activation
+  get 'pending_invites/activate_employee' => 'pending_invites#activate_employee', as: :activate_employee
+  get 'pending_invites/send_otp', to: 'pending_invites#send_otp', as: :send_otp
   patch 'pending_invites/manager_sign_up', to: 'pending_invites#manager_sign_up', as: :manager_activation_sign_up
   post 'users/update_default_password', to: 'users#update_default_password', as: :update_default_password
   get 'edit_default_password', to: 'users#edit_default_password', as: :edit_default_password

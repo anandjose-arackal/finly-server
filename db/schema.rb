@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161209111907) do
+ActiveRecord::Schema.define(version: 20161215113552) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -281,6 +281,21 @@ ActiveRecord::Schema.define(version: 20161209111907) do
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
+
+  create_table "company_funds_load_requests", force: :cascade do |t|
+    t.integer  "company_id",           limit: 4
+    t.integer  "requested_by_user_id", limit: 4,     null: false
+    t.string   "reference_id",         limit: 255,   null: false
+    t.date     "date",                               null: false
+    t.integer  "amount_id",            limit: 4
+    t.text     "remark",               limit: 65535
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "company_funds_load_requests", ["amount_id"], name: "index_company_funds_load_requests_on_amount_id", using: :btree
+  add_index "company_funds_load_requests", ["company_id"], name: "index_company_funds_load_requests_on_company_id", using: :btree
+  add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
     t.integer  "company_id", limit: 4,                  null: false
@@ -1084,6 +1099,8 @@ ActiveRecord::Schema.define(version: 20161209111907) do
   add_foreign_key "company_accounts", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_funds_load_requests", "amounts"
+  add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"

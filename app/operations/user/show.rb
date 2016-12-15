@@ -90,7 +90,7 @@ class User::Show < User::Base
         if self.selected_user.active and selected_user.id != user.id
           actions[:deactivate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         elsif !selected_user.active and selected_user.id != user.id
-          actions[:manager_activate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+          actions[:activate] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
         end
       end
 

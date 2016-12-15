@@ -28,6 +28,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -120,7 +121,7 @@ class Report < ActiveRecord::Base
       end
       user_ids = trackings.map(&:action_user_id)
     else
-      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id)).uniq
+      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
     end
     if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
       if controlling_for_user_id.present?
@@ -130,9 +131,12 @@ class Report < ActiveRecord::Base
       end
     end
 
-    # if user_before == self.user
-    #   user_ids << user_before.id
-    # end
+    # User IDs was blank when an admin was taking control of his own report and rejecting it. This is the fix
+    if user_ids.present?
+      user_ids.uniq!
+    else
+      user_ids = [self.user_id]
+    end
 
     if user_ids.size > 0
       # Order is MySQL Specific

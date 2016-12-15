@@ -63,23 +63,30 @@ class PendingInvitesController < ApplicationController
     end
   end
 
+
+  def initiate_activation
+    @pending_user = User.find(params[:user_id])
+    respond_to do |format|
+      format.html {render partial: 'verify_mobile'}
+    end
+  end
+
+
+  def send_otp
+    @result = User::ManagerActivate::SendOtp.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
+    end
+  end
+
   def activate_employee
     @states = State::VALUES
     @pending_user = User.find(params[:user_id])
 
-    if @pending_user.otp_verified
-      verified = true
-    else
-      verified = false
-    end
-
     respond_to do |format|
-      if verified
-        format.html {render partial: 'activate_employee'}
-      else
-        User::ManagerActivate::SendOtp.(current_user, params) # todo - handle failure
-        format.html {render partial: 'verify_mobile'}
-      end
+      format.html {render partial: 'activate_employee'}
     end
   end
 
