@@ -1,34 +1,19 @@
 class NotificationsController < ApplicationController
 
   def index
-    @notifications = current_user.notifications.paginate(page: params[:page], :per_page => 10)
-    # @nots = []
-    #
-    # 10.times do |x|
-    #   noti = {
-    #     title: "Title #{x} - #{rand(0..99)}",
-    #     body: "This is a body #{x}   #{rand(0..99)}",
-    #     read: false
-    #   }
-    #   @nots.push(noti)
-    # endend
+    @result = Notification::Index.(current_user, params)
   end
 
   def unread
-    # returns the unread notifications of the current user
-    @unread = current_user.notifications.unread.count rescue 0
+    # calls notifications index itself because it's the same sql query
+    @result = Notification::Index.(current_user, params)
     respond_to do |format|
-      format.json {render json: @unread}
+      format.json {render json: @result.unread_count}
     end
   end
 
   def mark_all_read
-    @notifications = current_user.notifications
-    if @notifications.update_all(read: true)
-      @result = {success: true}
-    else
-      @result = {success: false}
-    end
+    @result = Notification::MarkAllRead.(current_user, params)
     respond_to do |format|
       format.json { render json: @result.as_json }
     end
