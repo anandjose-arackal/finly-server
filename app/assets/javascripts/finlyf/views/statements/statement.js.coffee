@@ -58,7 +58,7 @@ class FinlyF.Views.Statement extends Backbone.View
 
   fetchTabData: ->
     $(@el).find(".navbar-main").html(@templateNavbarMain({item: @params}))
-    $(@el).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
     _this = @
     switch @params.statement_type
       when 'summary'

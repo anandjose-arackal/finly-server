@@ -350,7 +350,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     $(@el).find('#modal-settlements .modal-content').html(@templateAddPayment({item: item}))
     $(@el).find('#modal-settlements').modal('show')
-    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
   addPayment: (e) ->
     _this = @
@@ -402,7 +402,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     console.log "requested_funds", requested_money
     $(@el).find('#modal-settlements .modal-content').html(@templateMoneyRequest())
     $(@el).find('#modal-settlements').modal('show')
-    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "dd-mm-yy"})
     $(@el).find('#modal-settlements .modal-content .requested_money').text(requested_money)
 
     target = $(@el).find('#modal-settlements .modal-content .settlement-modal-reports')
@@ -474,7 +474,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     console.log "cash in hand", cash_in_hand
     $(@el).find('#modal-settlements .modal-content').html(@templateSettleDebts())
     $(@el).find('#modal-settlements').modal('show')
-    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "dd-mm-yy"})
     $(@el).find('#modal-settlements .modal-content .cash_in_hand').text(cash_in_hand)
     e.preventDefault()
     _this = @
@@ -502,7 +502,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     pending_reimbursement = parseFloat($(@el).find('.summary input[name=pending_reimbursement]').val())
     $(@el).find('#modal-settlements .modal-content').html(@templateReimburse())
     $(@el).find('#modal-settlements').modal('show')
-    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find("#modal-settlements .datepicker").datepicker({dateFormat: "dd-mm-yy"})
     $(@el).find('#modal-settlements .modal-content .pending_reimbursement').text(pending_reimbursement)
     e.preventDefault()
     _this = @

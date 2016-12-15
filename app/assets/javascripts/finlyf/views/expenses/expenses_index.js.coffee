@@ -113,7 +113,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           value: $(option).attr('value')
           text: $(option).text()
         }).appendTo(category_select)
-      $(@el).find('.main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
+      $(@el).find('.index-only-main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
   processItems: ->
@@ -263,7 +263,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       }).appendTo(category_select) 
     
     $("#modal-new").modal('show')
-    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
   showUploadedReceipt: (e) ->
     file = e.currentTarget

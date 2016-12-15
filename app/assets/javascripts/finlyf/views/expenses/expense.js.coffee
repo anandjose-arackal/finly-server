@@ -136,7 +136,7 @@ class FinlyF.Views.Expense extends Backbone.View
 
     $(category_select).val(@model.get('category_id'))
     $(@el).find(".datepicker").datepicker({
-      dateFormat: "yy-mm-dd"
+      dateFormat: "dd-mm-yy"
     })
 
 

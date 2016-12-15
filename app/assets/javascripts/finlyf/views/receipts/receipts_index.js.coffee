@@ -293,7 +293,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       }).appendTo(category_select)
     $("#modal-new").attr('data-backdrop', true)
     $("#modal-new").modal('show')
-    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
     $("#modal-new .modal-body #preview-image").attr('src', selected_receipt.get('url'))
     $("#modal-new .modal-body textarea[name=expense\\[note\\]]").val(selected_receipt.get('note'))

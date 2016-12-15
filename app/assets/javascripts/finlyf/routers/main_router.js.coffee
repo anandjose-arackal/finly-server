@@ -303,7 +303,7 @@ class FinlyF.Routers.Main extends Backbone.Router
 
   features: ->
     $(".datepicker").datepicker({
-      dateFormat: "yy-mm-dd"
+      dateFormat: "dd-mm-yy"
     })
     
     $('.dropdown-menu .no-hide-bs-dropdown').click((e) ->

@@ -961,7 +961,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
             $(modal_body).find('.settlement-step-2 .virtual_account_balance').html("&#8377;&nbsp;" + res.virtual_account)
             $(modal_body).find('.settlement-step-2 .target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
         })
-    $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(modal_body).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
   confirmAction: (e) ->
     # @settlementActionData = {}
@@ -1107,7 +1107,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitWalletToVirtualAccountConfirm({summary: summary}))
     # console.log _this.settlementActionData
-    $(modal_body).find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(modal_body).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
   submitAction: (e) ->
     e.preventDefault()

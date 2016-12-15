@@ -108,7 +108,7 @@ class FinlyF.Views.Request extends Backbone.View
     $(@el).find(".main").html(@templateShow({item: @model.toJSON()}))
 
     # $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
-    $(@el).find(".datepicker").datepicker({ dateFormat: "yy-mm-dd" })
+    $(@el).find(".datepicker").datepicker({ dateFormat: "dd-mm-yy" })
 
   showSaveOption: ->
     $(".btn-update-item").css("display", "inline")

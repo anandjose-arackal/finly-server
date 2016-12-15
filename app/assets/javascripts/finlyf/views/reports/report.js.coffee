@@ -144,7 +144,7 @@ class FinlyF.Views.Report extends Backbone.View
     
     $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')
-    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
     # $("#modal-new").find('.btn-create-expense').on('click', (e) ->
     #   _this.createExpense(@);
     # )
@@ -243,7 +243,7 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
     $(@el).find("#modal-mp").modal('show')
-    $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
   showExpenseSelectOption: ->
     # console.log "Here we are"
@@ -552,7 +552,7 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp").html(@templateShowExpense())
     $(@el).find("#modal-mp .modal-content .modal-body .row").html(preview_view.render().el)
     $(@el).find("#modal-mp").modal('show')
-    $("#modal-mp").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $("#modal-mp").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
 
   rejectSub: (e) ->
