@@ -13,7 +13,7 @@ class Company::AddBalance < Company::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "Invalid input. Please try again"
+      messages[:error] << 'Invalid input. Please try again'
     end
   end
 
@@ -22,16 +22,14 @@ class Company::AddBalance < Company::Base
   end
 
   def init
-    self.transaction_details = {}
-    self.transaction_details[:amount] = params[:amount]
-    self.transaction_details[:reference_id] = params[:reference_id]
-    self.transaction_details[:date] = params[:date]
-    self.transaction_details[:remarks] = params[:remark]
-    self.transaction_details[:company] = Company.find_by(id: params[:company_id]).name
+    self.transaction_details = param
+    self.transaction_details[:amount_attributes][:currency_id] = Currency.first.id rescue nil
   end
 
   def validate
-
+    if self.transaction_details.blank?
+      add_message :error, 'Nothing to update'
+    end
   end
 
   def authorize
@@ -41,16 +39,24 @@ class Company::AddBalance < Company::Base
   end
 
   def process
-    #currently we don't keep track of company balance, so nothing to do
-
+    load_funds_request = self.user.company.fund_load_requests.build transaction_details
+    unless load_funds_request.save
+      add_message :error, load_funds_request.errors.full_messages
+    end
   end
 
   def post_process
     # triggerring mailer so that itzCash is notified
+    transaction_details[:company] = self.user.company.name
     CompanyMailer.delay.balance_update(transaction_details)
   end
 
   def success
     BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
+  end
+
+  private
+  def param
+    params.permit(:reference_id, :date, :remark, :amount_attributes => [:value, :currency_id])
   end
 end
