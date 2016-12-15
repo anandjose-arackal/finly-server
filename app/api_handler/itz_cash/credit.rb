@@ -81,6 +81,10 @@ class ItzCash::Credit < ItzCash::Base
     super
   end
 
+  def success_response_code
+    [0, 2, 300, 301]
+  end
+
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
 

@@ -6,8 +6,12 @@ class ItzCash::Base < BaseHandler
     self.response_code = parsed_response[0] if self.parsed_response.present?
   end
 
+  def success_response_code
+    [0]
+  end
+
   def success?
-    super and self.response_code.present? and self.response_code.to_f == 0
+    super and self.response_code.present? and (success_response_code.include?(self.response_code.to_f))
   end
 
   def failure
