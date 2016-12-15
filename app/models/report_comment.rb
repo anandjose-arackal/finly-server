@@ -79,6 +79,9 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:report_take_control)
         # Report take control
         comment = "#{name} took control of the report"
+        if self.content.present?
+          comment += " with a note: '#{self.content}'"
+        end
       when ReportCommentAction.id_for(:report_update)
         # Report update
         comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"

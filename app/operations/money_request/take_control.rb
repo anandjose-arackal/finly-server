@@ -33,7 +33,7 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
                                   status_id: money_request.status_id, memo: memo
       money_request.comments.create user: user, 
                                     comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
-                                    content: memo
+                                    content: params[:take_control_note]
       return
     end
     self.messages = money_request.errors.full_messages
