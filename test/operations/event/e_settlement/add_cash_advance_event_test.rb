@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'sidekiq/testing'
 
-class AddCashAdvance_eventTest < ActiveSupport::TestCase
+class AddCashAdvanceEventTest < ActiveSupport::TestCase
 
   def setup
     Sidekiq.redis { |conn| conn.flushdb }

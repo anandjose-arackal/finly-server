@@ -1,6 +1,6 @@
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Debit < User::Wallet::Base
-  attr_accessor :target_user, :initiating_user, :target_account, :initiating_account, :amount
+  attr_accessor :target_user, :initiating_user, :target_account, :initiating_account, :amount, :payment
 
   def authorized_user_types
     if params.present? and params[:from_account].present? and params[:to_account].present?
@@ -16,7 +16,7 @@ class User::Wallet::Debit < User::Wallet::Base
   def pre_validate
     super
     if params.blank? or params[:from_account].blank? or params[:to_account].blank? or
-      (params[:from_user].blank? and params[:from_user_id].blank?)
+        (params[:from_user].blank? and params[:from_user_id].blank?)
       add_message :error, 'Invalid request'
     end
   end
@@ -68,32 +68,36 @@ class User::Wallet::Debit < User::Wallet::Base
     payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
     case target_account
-    when :wallet
+      when :wallet
 
-      if initiating_account == :wallet
-        
-        if target_user.wallet.subtract_funds(self.amount)
-          initiating_user.wallet.add_funds(self.amount)
+        if initiating_account == :wallet
 
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_wallet_to_wallet)
-          Payment.create payment_attributes
-        else
-          add_message :error, target_user.wallet.errors.full_messages
+          if target_user.wallet.subtract_funds(self.amount)
+            initiating_user.wallet.add_funds(self.amount)
+
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_wallet_to_wallet)
+            self.payment = Payment.create payment_attributes
+          else
+            add_message :error, target_user.wallet.errors.full_messages
+          end
+
+        elsif initiating_account == :virtual_account
+
+          if target_user.wallet.subtract_funds(self.amount)
+            user.company.account.funds_debited_from_wallet(self.amount)
+
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_wallet_to_virtual_account)
+            self.payment = Payment.create payment_attributes
+          else
+            add_message :error, initiating_user.wallet.errors.full_messages
+          end
+
         end
-
-      elsif initiating_account == :virtual_account
-
-        if target_user.wallet.subtract_funds(self.amount)
-          user.company.account.funds_debited_from_wallet(self.amount)
-
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_wallet_to_virtual_account)
-          Payment.create payment_attributes
-        else
-          add_message :error, initiating_user.wallet.errors.full_messages
-        end
-
-      end
     end
+  end
+
+  def post_process
+    Event::EWallet::Debit.(self.user, payment: self.payment)
   end
 
 end
