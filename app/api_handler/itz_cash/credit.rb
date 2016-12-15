@@ -81,8 +81,8 @@ class ItzCash::Credit < ItzCash::Base
     super
   end
 
-  def success?
-    super or (self.response_code.present? and (self.response_code.to_f == 300 or self.response_code.to_f == 301))
+  def success_response_code
+    [0, 2, 300, 301]
   end
 
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
