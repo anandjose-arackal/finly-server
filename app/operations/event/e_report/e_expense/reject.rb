@@ -33,7 +33,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
 
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.expense_id,
-                                             action_type_id: NotificationActionType.reject_id,
+                                             action_type_id: NotificationActionType.notify_reject_id,
                                              action_user_id: self.user.id,
                                              object_id: rejected_expense.id,
                                              object_type: "Expense",

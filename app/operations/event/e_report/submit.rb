@@ -20,7 +20,7 @@ class Event::EReport::Submit < Event::EReport::Base
 
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.submit_id,
+                                             action_type_id: NotificationActionType.notify_submit_id,
                                              action_user_id: report.user_id,
                                              object_id: report.id,
                                              object_type: "Report",

@@ -71,7 +71,7 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create id: 11, name: 'Closed'
 end
 
-if Notification.count == 0
+if NotificationType.count == 0
   NotificationType::VALUES.each do |k, v|
     NotificationType.create id: v, name: k
   end
@@ -336,6 +336,7 @@ if p.rules_count == 0
 end
 
 if Report.count == 0
+
   c.users.all.each do |user|
 
     # creating open reports

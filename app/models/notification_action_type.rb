@@ -10,25 +10,26 @@
 
 class NotificationActionType < ActiveRecord::Base
 
-  VALUES = { submit: 1,
-             approve: 2,
-             reject: 3,
-             retract: 4,
-             unapprove: 5,
-             reimbursement: 6,
-             update: 7,
-             comment: 8,
-             card_load: 9,
-             credit: 10,
-             debit: 11,
-             cash_withdrawal: 12,
-             cash_load: 13,
-             atm_withdrawal: 14,
-             auto_approve: 15,
-             credit_advance_request: 16,
-             credit_reimbursement: 17,
-             credit_cash_advance: 18,
-             take_control: 19,
+  VALUES = { notify_submit: 1,
+             notify_approve: 2,
+             notify_reject: 3,
+             notify_retract: 4,
+             notify_unapprove: 5,
+             notify_reimbursement: 6,
+             notify_update: 7,
+             notify_comment: 8,
+             notify_card_load: 9,
+             notify_credit: 10,
+             notify_debit: 11,
+             notify_cash_withdrawal: 12,
+             notify_cash_load: 13,
+             notify_atm_withdrawal: 14,
+             notify_auto_approve: 15,
+             notify_credit_advance_request: 16,
+             notify_credit_reimbursement: 17,
+             notify_credit_cash_advance: 18,
+             notify_take_control: 19,
+             notify_awaiting_approval: 20
             }
 
   self.class.instance_eval do
@@ -39,6 +40,8 @@ class NotificationActionType < ActiveRecord::Base
     end
   end
 
-
+  def self.id_for(action)
+    VALUES[action]
+  end
 
 end
