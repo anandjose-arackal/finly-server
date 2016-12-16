@@ -1,4 +1,4 @@
-<div class="modal-dialog" role="document" style="width: 60%; margin-top: 60px;">
+<div class="modal-dialog" role="document" style="width: 45%; margin-top: 60px;">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -10,15 +10,24 @@
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
           <div class="form-group">
-            <label class="control-label" style="display: block;">Mobile Number</label>
-            <input id="user_mobile_number" class="form-control otp" type="number" name="user[mobile_number]" style="width: 50%;" value="<%= @pending_user.mobile_number %>" readonly>
+            <div class="row">
+              <div class="col-sm-3"><label class="control-label" style="display: block;">Mobile Number</label></div>
+              <div class="col-sm-6">
+                <input id="user_mobile_number" class="form-control otp" type="number" name="user[mobile_number]" value="<%= @pending_user.mobile_number %>" readonly>
+              </div>
+              <div class="col-sm-3"><button class="btn btn-warning btn-send-otp no-margin">Send OTP</button></div>  
+            </div>
           </div>
 
-          <div class="verification" disabled="disabled">
+          <div class="verification">
             <div class="form-group">
-              <label class="control-label" style="display: block;">One Time Password:</label>
-              <input id="user_otp" class="form-control otp" type="number" name="otp" style="width: 50%;">
-              <button class="btn btn-default resend-otp" disabled="disabled">Resend OTP In: <span>00:00</span></button>
+              <div class="row">
+                <div class="col-sm-3"><label class="control-label" style="display: block;">OTP:</label></div>
+                <div class="col-sm-6">
+                  <input id="user_otp" class="form-control otp" type="number" name="otp">
+                </div>
+                <div class="col-sm-3"><button class="hidden btn btn-default resend-otp no-margin" disabled="disabled">Resend OTP In: <span>00:00</span></button></div>  
+              </div>
             </div>
 
             <div class="form-group text-center">
@@ -39,12 +48,17 @@
   $(document).ready(function(){
     Timer = {
       initialize: function(){
+        console.log("Starting init");
         this.button = $(".resend-otp");
         this.time = 10;
-        this.startTimer();
+        if(this.timer){
+          clearInterval(this.timer);
+        }
+        // this.startTimer();
       },
       
       startTimer: function(){
+        console.log("starting timer");
         $(this.button).html("Resend OTP In: <span>00:00</span>").removeClass("btn-success").addClass('btn-default')
         _this = this;
         this.time = 60;
@@ -75,6 +89,30 @@
     }
 
     Timer.initialize();
+
+    $(".btn-send-otp").on('click', function(e){
+      $(this).attr('disabled', true).html("<i class='fa fa-check-o'></i>&nbsp;&nbsp;OTP Sent");
+      e.preventDefault();
+      $.ajax({
+        url: "<%= send_otp_path %>",
+        dataType: "JSON",
+        // type: "POST",
+        data: {
+          user_id: <%= @pending_user.id %>,
+          authenticity_token: $("#authenticity_token").val()
+        },
+        success: function(res){
+          if(res.success === true) {
+            $("div.verification").find('.resend-otp').removeClass('hidden')
+            Timer.startTimer();
+          }
+          // console.log("Success", res);
+        },
+        error: function(err){
+          console.log("Error", err)
+        }
+      })
+    })
 
     $(".resend-otp").on('click', function(e){
       e.preventDefault();

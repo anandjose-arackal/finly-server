@@ -39,6 +39,7 @@ class Company::AddBalance < Company::Base
   end
 
   def process
+    transaction_details[:requested_by_user_id] = self.user.id
     load_funds_request = self.user.company.fund_load_requests.build transaction_details
     unless load_funds_request.save
       add_message :error, load_funds_request.errors.full_messages

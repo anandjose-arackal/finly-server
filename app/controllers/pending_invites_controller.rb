@@ -79,14 +79,23 @@ class PendingInvitesController < ApplicationController
     else
       respond response: :failure
     end
+
+    # respond_to do |format|
+    #   format.json {render json: {success: true}}
+    # end
   end
 
   def activate_employee
     @states = State::VALUES
     @pending_user = User.find(params[:user_id])
 
+
     respond_to do |format|
-      format.html {render partial: 'activate_employee'}
+      if @pending_user.otp_verified?
+        format.html {render partial: 'activate_employee'}
+      else
+        format.html {render partial: 'verify_mobile'}
+      end
     end
   end
 
