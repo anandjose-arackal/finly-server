@@ -102,9 +102,64 @@
   <h4 class="text-center success-notice">This window will auto close in <span id="count-down-time">20</span> seconds.</h4>
 </div>
 
+<div id="ohsnap"></div>
+<div id="ohsnap-priority"></div>
+
 <script type="text/javascript">
   $(document).ready(function(e){
-    $("input[name=date]").datepicker({dateFormat: "yy-mm-dd"});
+    snapNotify = function(obj){
+      // console.log "From snap", obj
+      ohSnapX()
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            ohSnap(message, {
+              color: color,
+              'duration': '9000',
+              'container-id': container
+            });
+          }
+        }
+      }
+    }
+
+
+    $("input[name=date]").datepicker({dateFormat: "dd-mm-yy"});
     // successTemplate = HandlebarsTemplates['abinash'];
     // $("input[name=date]").datepicker({
     //   beforeShow: function(input, inst){
@@ -115,6 +170,8 @@
 
     $(".btn-submit").on('click', function(e){
       e.preventDefault();
+      target = this;
+      $(this).html("&nbsp;&nbsp;<i class='fa fa-spin fa-spinner'></i>&nbsp;&nbsp;").attr('disabled', true)
       formData = new FormData($('form#form-submit-request')[0])
 
       amount = $("form#form-submit-request input[name=amount]").val()
@@ -138,6 +195,9 @@
               time = time - 1;
               $("#count-down-time").text(time);
             }, 1000)
+          } else {
+            snapNotify(res.messages);
+            $(target).text('Submit').removeAttr('disabled')
           }
 
           // FinlyF.snapNotify(res.messages);
@@ -145,10 +205,13 @@
         },
         error: function(err){
           console.log("Error", err);
+          $(target).text('Submit').removeAttr('disabled')
+
         },
         cache: false,
         contentType: false,
         processData: false
+
       })
     });
   });
@@ -171,4 +234,7 @@
   .success-notice{
     color: white;
   }
-
+#ohsnap-priority{
+  position: fixed;
+}
+</style>
