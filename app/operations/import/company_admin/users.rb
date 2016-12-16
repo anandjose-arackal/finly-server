@@ -1,26 +1,4 @@
-# operation to mass import user details onto the system
-# Sheet columns:
-  # First name:
-  # Last name:
-  # Email:
-  # Mobile number:
-  # Date of birth:
-  # Address:
-  # PIN Code:
-  # Manager? : Y/N based on whether the user is a manager
-  # Finance Manager? : Y/N based on whether the user is a finance manager
-  # Admin? : Y/N based on whether the user is a admin
-  # Reporting manager: Email id of the reporting manager
-  # Reporting finance manager: Email id of the reporting finance manager
-  # Approves to: Email id of the approves to user
-  # Approves finance to: Email id of the approves finance to user
-  # Card serial ID: Serial ID of the card being assigned to the user
-
-# roo is the gem that lets us import csv's and xls's
-
-require 'roo'
-class Import::Users < Import::Base
-  attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee
+class Import::CompanyAdmin::Users < Import::Superadmin::Users
 
   def authorized_user_types
     [:company_admin]
@@ -146,62 +124,32 @@ class Import::Users < Import::Base
       end
     end
 
-    user_params = { first_name: row[import_fields[:first_name]],
-                    last_name: row[import_fields[:last_name]],
-                    email: row[import_fields[:email]],
+    user_params = { email: row[import_fields[:email]],
                     mobile_number: row[import_fields[:mobile_number]],
                     role_mapping_attributes: role_mapping_attributes,
                     team_mapping_attributes: [{default: true, manager: manager,
-                                                              finance_manager: finance_manager,
-                                                              approves_to: approves_to,
-                                                              approves_finance_to: approves_finance_to
-                                             }],
-                    profile_attributes: {address_1: row[import_fields[:address_1]],
-                                         address_2: row[import_fields[:address_2]],
-                                         pin_code: row[import_fields[:pin_code]],
-                                         date_of_birth: row[import_fields[:dob]],
-                                         state_id: row[import_fields[:state_id]],
-                                         gender: row[import_fields[:gender]],
-                                         city: row[import_fields[:city]]
-                                        },
+                                               finance_manager: finance_manager,
+                                               approves_to: approves_to,
+                                               approves_finance_to: approves_finance_to
+                                              }],
                     error_messages: errors
                   }
 
-    # i.e. add cards only when the user
-    if row[import_fields[:card_serial_id]].present?
-      user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
-                                      card_type_id: 1,
-                                      product_code: "NGPRHD",
-                                      ending_number: row[import_fields[:card_serial_id]].last(4)
-                                      }]
-    end
     return user_params
   end
 
   def import_fields
-    { 
-      :first_name => 0,
-      :last_name => 1,
-      :email => 2,
-      :mobile_number => 3,
-      :dob => 4,
-      :address_1 => 5,
-      :address_2 => 6,
-      :pin_code => 7,
-      :state_id => 8,
-      :city => 9,
-      :gender => 10,
-      :manager_role => 11,
-      :finance_manager_role => 12,
-      :admin_role => 13,
-      :reporting_manager => 14,
-      :reporting_finance_manager => 15,
-      :approves_to => 16,
-      :approves_finance_to => 17,
-      :card_serial_id => 18
-   }
+    {
+        :email => 0,
+        :mobile_number => 1,
+        :manager_role => 2,
+        :finance_manager_role => 3,
+        :admin_role => 4,
+        :reporting_manager => 5,
+        :reporting_finance_manager => 6,
+        :approves_to => 7,
+        :approves_finance_to => 8,
+    }
   end
 
 end
-
-

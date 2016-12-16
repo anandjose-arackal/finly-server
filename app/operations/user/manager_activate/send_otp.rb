@@ -29,7 +29,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
     end
     if selected_user.otp.present? and selected_user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
       # i.e. if the otp was sent < 60 seconds ago, don't resend it again
-      seconds_remaining = ((user.otp_sent_at + OTP_RESEND_TIMER.seconds) - DateTime.now).to_i
+      seconds_remaining = ((selected_user.otp_sent_at + OTP_RESEND_TIMER.seconds) - DateTime.now).to_i
       messages[:error] << "You will have to wait for another #{seconds_remaining} seconds before requesting for another OTP"
     end
   end

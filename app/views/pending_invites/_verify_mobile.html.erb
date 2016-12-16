@@ -6,7 +6,7 @@
     </div>
     <div class="modal-body">
       <div class="row no-margin">
-        <form>
+        <form data-user-id="<%= @pending_user.id %>">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
           <div class="form-group">
@@ -26,7 +26,7 @@
                 <div class="col-sm-6">
                   <input id="user_otp" class="form-control otp" type="number" name="otp">
                 </div>
-                <div class="col-sm-3"><button class="hidden btn btn-default resend-otp no-margin" disabled="disabled">Resend OTP In: <span>00:00</span></button></div>  
+                <div class="col-sm-3"><button class="hidden btn btn-default resend-otp no-margin" disabled="disabled">Resend OTP In: <span>00:59</span></button></div>  
               </div>
             </div>
 
@@ -42,167 +42,3 @@
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  
-  $(document).ready(function(){
-    Timer = {
-      initialize: function(){
-        console.log("Starting init");
-        this.button = $(".resend-otp");
-        this.time = 10;
-        if(this.timer){
-          clearInterval(this.timer);
-        }
-        // this.startTimer();
-      },
-      
-      startTimer: function(){
-        console.log("starting timer");
-        $(this.button).html("Resend OTP In: <span>00:00</span>").removeClass("btn-success").addClass('btn-default')
-        _this = this;
-        this.time = 60;
-        this.timer = setInterval(function(){
-          $(_this.button).attr('disabled', 'disabled');
-          // console.log("Time is", _this.time);
-          if(_this.time === 0){
-            _this.showResend();
-          }
-          if(_this.time.toString().length == 1){
-            $(_this.button).find('span').text("00:0" + _this.time.toString());
-          } else {
-            $(_this.button).find('span').text("00:" + _this.time.toString());
-          }
-          _this.time = _this.time - 1;
-        }, 1000);
-      },
-
-      showResend: function(){
-        _this = this;
-        $(_this.button).attr('disabled', false).html("Resend OTP").addClass('btn-success');
-        clearInterval(_this.timer);
-      },
-
-      disableVerification: function(){
-        // $("")
-      }
-    }
-
-    Timer.initialize();
-
-    $(".btn-send-otp").on('click', function(e){
-      $(this).attr('disabled', true).html("<i class='fa fa-check-o'></i>&nbsp;&nbsp;OTP Sent");
-      e.preventDefault();
-      $.ajax({
-        url: "<%= send_otp_path %>",
-        dataType: "JSON",
-        // type: "POST",
-        data: {
-          user_id: <%= @pending_user.id %>,
-          authenticity_token: $("#authenticity_token").val()
-        },
-        success: function(res){
-          if(res.success === true) {
-            $("div.verification").find('.resend-otp').removeClass('hidden')
-            Timer.startTimer();
-          }
-          // console.log("Success", res);
-        },
-        error: function(err){
-          console.log("Error", err)
-        }
-      })
-    })
-
-    $(".resend-otp").on('click', function(e){
-      e.preventDefault();
-      $.ajax({
-        url: "<%= resend_otp_path %>",
-        dataType: "JSON",
-        type: "POST",
-        data: {
-          user_id: <%= @pending_user.id %>,
-          authenticity_token: $("#authenticity_token").val()
-        },
-        success: function(res){
-          console.log("Success", res);
-          Timer.startTimer();
-
-        },
-        error: function(err){
-          console.log("Error", err)
-        }
-      })
-    });
-
-    // $(".btn-verify").on('click', function(e){
-    //   e.preventDefault();
-    //   $.ajax({
-    //     url: "<%= verify_otp_path %>",
-    //     type: "POST",
-    //     dataType: "json",
-    //     data: {
-    //       user_id: <%= @pending_user.id %>,
-    //       authenticity_token: $("#authenticity_token").val(),
-    //       verification_code: $("#user_otp").val()
-    //     },
-    //     success: function(res){
-    //       snapNotify(res.messages);
-    //       // console.log("Success", res);
-    //       if(res.success === true){
-    //         // window.location = window.location.protocol + '//' + window.location.host;
-    //       } else {
-    //         console.log("Error");
-    //       }
-    //     },
-    //     error: function(err){
-    //       console.log("Err", err);
-    //     }
-    //   })
-    // })
-    
-    // $(".edit-mobile-number").on('click', function(e){
-    //   e.preventDefault();
-    //   target = e.currentTarget;
-    //   $(target).html("Update&nbsp;&nbsp;<i class='fa fa-check-circle'></i>").removeClass("edit-mobile-number btn-warning").addClass("update-mobile-number btn-success");
-    //   $(target).closest('.form-group').find('input').attr('readonly', false);
-    //   $(this).unbind();
-    //   attachUpdateEvents();
-    // });
-
-    // function attachUpdateEvents(){
-    //   $(".update-mobile-number").on('click', function(e){
-    //     e.preventDefault();
-    //     target = e.currentTarget;
-    //     mobile_number = $("#user_mobile_number").val();
-
-    //     $.ajax({
-    //       url: '<%= update_mobile_number_path %>',
-    //       dataType: 'json',
-    //       type: "POST",
-    //       data: {
-    //         authenticity_token: $("#authenticity_token").val(),
-    //         user: {
-    //           mobile_number: mobile_number
-    //         }
-    //       },
-    //       success: function(res){
-    //         FinlyF.snapNotify(res.messages);
-    //         // console.log("Success", res);
-    //         if(res.success === true){
-    //           // console.log("Success is tru")
-    //           // new_mobile_number = res.mobile_number
-    //           // window.location.reload()
-    //         } else {
-    //           // console.log("Nothing")
-    //         }
-    //       },
-    //       error: function(err){
-    //         console.log("Error h", err);
-    //       }
-    //     })
-
-    //   });
-    // }
-  });
-</script>

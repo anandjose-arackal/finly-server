@@ -21,7 +21,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
 
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.take_control_id,
+                                             action_type_id: NotificationActionType.notify_take_control_id,
                                              action_user_id: (report.tracks.last.action_user.id rescue nil),
                                              object_id: report.id,
                                              object_type: "Report",

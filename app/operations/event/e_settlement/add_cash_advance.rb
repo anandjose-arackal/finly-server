@@ -10,7 +10,7 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
 
   def set_notification(user)
     notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
-                                              action_type_id: NotificationActionType.cash_load_id,
+                                              action_type_id: NotificationActionType.notify_cash_load_id,
                                               action_user_id: payment.initiating_user.id,
                                               object_id: payment.id,
                                               object_type: "Payment",
