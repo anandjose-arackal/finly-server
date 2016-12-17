@@ -69,7 +69,13 @@ class ExternalUrlController < ApplicationController
 
   def payment
     user = nil
-    if current_user.manager?
+    id = params[:id]
+    redirect_to root_path if id.blank?
+    if current_user.id == id.to_i
+      redirect_to "#{root_url}#settlements/#{id}"
+      return
+    end
+    if user.blank? and current_user.manager?
       params[:view] = 'manager'
       result = User::Show.(current_user, params)
       if result.success?
@@ -92,8 +98,6 @@ class ExternalUrlController < ApplicationController
     end
     if user.present?
       redirect_to "#{root_url}#settlements/params={\"view\":\"#{params[:view]}\"}"
-    else
-      redirect_to root_path
     end
   end
 
