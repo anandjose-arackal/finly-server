@@ -15,7 +15,7 @@
       <div class="col-sm-4">
         <ul class="nav navbar-nav navbar-right">
           {{#if item.actions.take_control}}
-            <button class="btn btn-warning btn-sm btn-report-action" data-action-type="take_control" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+            <button class="btn btn-warning btn-sm" id="btnTakeControlRequest" data-action-type="take_control" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
           {{/if}}
 
           {{#if item.actions.submit}}

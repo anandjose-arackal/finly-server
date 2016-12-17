@@ -37,6 +37,8 @@ class FinlyF.Views.User extends Backbone.View
     # Activating employee without email
     'click .btn-active-employee': 'activateEmployee'
 
+    # 'shown.bs.modal #modal-import-employees': 'addAuthKey'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
@@ -798,7 +800,7 @@ class FinlyF.Views.User extends Backbone.View
       success: (res) ->
         $(modal).html(res)
         if e
-          console.log "an event is present."
+          # console.log "an event is present."
           if $(modal).find("input[name=activate_employee_with_details]").length
             # console.log $(modal).find("input[name=activate_employee_with_deatils]").html()
             # console.log "will attach signup event"
@@ -806,6 +808,7 @@ class FinlyF.Views.User extends Backbone.View
           else
             # console.log "will attach verification event"
             _this.attachVerifyEvent(modal)
+            _this.attachOPTTimerEvent(modal)
         else
           # console.log "will attach signup event"
           _this.attachSignUpEvent(modal)
@@ -840,6 +843,104 @@ class FinlyF.Views.User extends Backbone.View
           console.log("Err", err)
       })
     )
+
+    # $(modal).on('shown.bs.modal', (e) ->
+
+    # )
+
+  attachOPTTimerEvent: (modal) ->
+    _this = @
+
+    $(modal).find(".btn-send-otp").on('click', (e) ->
+      # $(this).attr('disabled', true).html("<i class='fa fa-check-o'></i>&nbsp;&nbsp;OTP Sent");
+      e.preventDefault()
+      target = e.currentTarget
+      $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spin fa-spinner'></i>&nbsp;&nbsp;")
+      # e.preventDefault();
+      $.ajax({
+        url: "/pending_invites/send_otp"
+        dataType: "JSON"
+        # // type: "POST",
+        data: {
+          user_id: $(modal).find("form").attr('data-user-id'),
+          authenticity_token: $("#authenticity_token").val()
+        },
+        success: (res) ->
+          if res.success == true
+            $(target).attr('disabled', true).html("<i class='fa fa-check-o'></i>&nbsp;&nbsp;OTP Sent")
+            FinlyF.snapNotify(res.messages)
+            $(modal).find('.resend-otp').removeClass('hidden')
+            # Timer.startTimer()
+            _this.otpTimer(modal)
+
+          
+          # // console.log("Success", res);
+        error: (err) ->
+          console.log("Error", err)
+      })
+    )
+
+    $(modal).find(".resend-otp").on('click', (e) ->
+      e.preventDefault()
+      $.ajax({
+        url: "/otp/resend"
+        dataType: "JSON"
+        type: "POST"
+        data: {
+          user_id: $(modal).find("form").attr('data-user-id'),
+          authenticity_token: $("#authenticity_token").val()
+        },
+        success: (res) ->
+          FinlyF.snapNotify(res.messages)
+          # console.log("Success", res)
+          _this.otpTimer(modal)
+        error: (err) ->
+          console.log("Error", err)
+      })
+    )
+
+  otpTimer: (modal) ->
+    # console.log "Starting timer"
+    if @otptimer
+      clearInterval(@otptimer)
+    _this = @
+    button = $(modal).find('.resend-otp')
+    @otptimer_time = 59
+    $(button).html("Resend OTP In: <span>00:59</span>").removeClass('btn-success').addClass('btn-default')
+    @otptimer = setInterval( ->
+      # $(button).attr('disabled', 'disabled')
+      if _this.otptimer_time == 0
+        _this.otptimer_terminate(button)
+      if _this.otptimer_time.toString().length == 1
+        $(button).find('span').text("00:0" + _this.otptimer_time.toString())
+      else
+        $(button).find('span').text("00:" + _this.otptimer_time.toString())
+      _this.otptimer_time = _this.otptimer_time - 1
+    , 1000)
+
+  otptimer_terminate: (button) ->
+    $(button).attr('disabled', false).html("Resend OTP").addClass('btn-success')
+    clearInterval(@otptimer)
+
+    # startTimer: function(){
+    #   console.log("starting timer");
+    #   $(this.button).html("Resend OTP In: <span>00:00</span>").removeClass("btn-success").addClass('btn-default')
+    #   _this = this;
+    #   this.time = 60;
+    #   this.timer = setInterval(function(){
+    #     $(_this.button).attr('disabled', 'disabled');
+    #     // console.log("Time is", _this.time);
+    #     if(_this.time === 0){
+    #       _this.showResend();
+    #     }
+    #     if(_this.time.toString().length == 1){
+    #       $(_this.button).find('span').text("00:0" + _this.time.toString());
+    #     } else {
+    #       $(_this.button).find('span').text("00:" + _this.time.toString());
+    #     }
+    #     _this.time = _this.time - 1;
+    #   }, 1000);
+    # },
 
   attachSignUpEvent: (modal) ->
     console.log "Attaching Event", $(modal).find("#submitButton")

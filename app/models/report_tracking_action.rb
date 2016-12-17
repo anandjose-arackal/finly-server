@@ -11,48 +11,27 @@
 
 class ReportTrackingAction < ActiveRecord::Base
 
-  def self.create_id
-    1
+
+  VALUES = { create: 1,
+             retract: 2,
+             submit: 3,
+             approve: 4,
+             auto_approve: 5,
+             reject: 6,
+             unapprove: 7,
+             take_control: 8,
+             reimbursed: 9,
+             reimbursement_confirmed: 10,
+             closed: 11
+            }
+
+  self.class.instance_eval do
+    VALUES.each do |key, value|
+      define_method "#{key}_id" do
+        value
+      end
+    end
   end
 
-  def self.retract_id
-    2
-  end
-
-  def self.submit_id
-    3
-  end
-
-  def self.approve_id
-    4
-  end
-
-  def self.auto_approve_id
-    5
-  end
-
-  def self.reject_id
-    6
-  end
-
-  def self.unapprove_id
-    7
-  end
-
-  def self.take_control_id
-    8
-  end
-
-  def self.reimbursed_id
-    9
-  end
-
-  def self.reimbursement_confirmed_id
-    10
-  end
-
-  def self.closed_id
-    11
-  end
 
 end

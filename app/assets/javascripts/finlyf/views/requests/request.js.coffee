@@ -53,6 +53,11 @@ class FinlyF.Views.Request extends Backbone.View
     'click .btn-confirm-reject-request': 'rejectRequest'
 
 
+
+    'click #btnTakeControlRequest': 'processTakeControl'
+    'click .btn-confirm-take-control': 'takeControl'
+
+
   initialize: (options) ->
     # console.log "here in requests"
     # @parent = options.parent
@@ -504,7 +509,53 @@ class FinlyF.Views.Request extends Backbone.View
         $(target).removeAttr('disabled').html(button_text)
     })
 
+  processTakeControl: (e) ->
+    e.preventDefault()
 
+    modal = $(@el).find('#modal-confirm-take-control')
+    $(modal).modal('show')
+
+  takeControl: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
+    _this = @
+
+
+    origin_button = $("#btnTakeControlRequest")
+    url = $(origin_button).attr("data-url")
+
+    modal = $(target).closest('#modal-confirm-take-control')
+
+    data = {
+      take_control_note: $(modal).find("textarea.take-control-note").val()
+      type: $(origin_button).attr('data-action-type')
+    }
+
+    $.ajax({
+      url: url,
+      type: 'patch',
+      dataType: 'json',
+      data: data,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        else
+          $(target).removeAttr('disabled').html(button_text)
+          # _this.model.fetch({
+          #   data: {view: _this.current_view}
+          # })
+        
+      error: (err) ->
+        console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
+    })
 
   refreshData: (e)->
     _this = @

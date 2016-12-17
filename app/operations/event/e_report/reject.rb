@@ -34,7 +34,7 @@ class Event::EReport::Reject < Event::EReport::Base
   def set_notification(user)
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.report_id,
-                                            action_type_id: NotificationActionType.reject_id,
+                                            action_type_id: NotificationActionType.notify_reject_id,
                                             action_user_id: report.tracks.last.action_user.id,
                                             object_id: report.id,
                                             object_type: "Report",

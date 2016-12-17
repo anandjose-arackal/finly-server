@@ -67,10 +67,14 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def set_notification(user)
-    if auto_approve
-      notify_type = NotificationActionType.auto_approve_id
+    if approved
+      if auto_approve
+        notify_type = NotificationActionType.id_for(:notify_auto_approve)
+      else
+        notify_type = NotificationActionType.id_for(:notify_approve)
+      end
     else
-      notify_type = NotificationActionType.approve_id
+      notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
                                               action_type_id: notify_type,

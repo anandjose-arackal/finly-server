@@ -11,7 +11,7 @@ class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
   def set_notification(user)
     payment.reports.each do |report|
       notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
-                                                action_type_id: NotificationActionType.credit_reimbursement_id,
+                                                action_type_id: NotificationActionType.notify_credit_reimbursement_id,
                                                 action_user_id: payment.initiating_user.id,
                                                 object_id: report.id,
                                                 object_type: "Report",

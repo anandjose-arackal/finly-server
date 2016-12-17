@@ -20,7 +20,7 @@ class Policy::Rules::Base < Policy::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "No user or policy passed."
+      messages[:error] << "No user or policy passed"
     end
   end
 

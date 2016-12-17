@@ -409,10 +409,10 @@ section {
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Invite Employees by Importing Excel File</h4>
       </div>
-      <div class="modal-body"> 
+      <div class="modal-body" style="padding-top: 0;"> 
         <div class="row no-margin">
           <div class="col-sm-12 text-right">
-            <a href="/assets/sample_import_format.xls" class="btn btn-warning btn-sm">Download Empty Excel File</a>
+            <a href="/assets/sample_import_format.xls" class="btn btn-warning btn-sm">Download Template</a>
           </div>
         </div>
 
@@ -422,8 +422,10 @@ section {
               <input type="hidden" name="_type" value="POST">
               <input type="hidden" name="authenticity_token">
 
-              <input type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="file">
-              <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
+              <input class="form-control" style="border: none;box-shadow: none;padding: 0;" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="file">
+              <div class="form-group text-center">
+                <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
+              </div>
             </form>
           </div>
         </div>

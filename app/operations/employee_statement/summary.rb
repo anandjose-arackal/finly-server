@@ -28,6 +28,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     items[:user_account_status_details] = {}
     items[:user_account_status_details][:account_load] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
                                                                           PaymentType.id_for(:credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
+    # debugger
     items[:user_account_status_details][:account_withdrawal] = precision_value selected_user.receiving_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_wallet),
                                                                                 PaymentType.id_for(:debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
     items[:user_account_status_details][:account_transfer_to_other_accounts] = precision_value selected_user.initiating_payments.where('date > ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)

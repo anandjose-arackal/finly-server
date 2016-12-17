@@ -24,7 +24,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
 
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.retract_id,
+                                             action_type_id: NotificationActionType.notify_unapprove_id,
                                              action_user_id: self.user.id,
                                              object_id: report.id,
                                              object_type: "Report",

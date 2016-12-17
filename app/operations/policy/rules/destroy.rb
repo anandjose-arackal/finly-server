@@ -18,7 +18,7 @@ class Policy::Rules::Destroy < Policy::Rules::Base
 
   def validate
     unless rule
-      messages[:error] << "Rule not found."
+      messages[:error] << "Rule not found"
       return false
     end
   end
@@ -30,7 +30,7 @@ class Policy::Rules::Destroy < Policy::Rules::Base
   end
 
   def post_process
-    messages[:success] << "Rule destroyed."
+    messages[:success] << "Rule destroyed"
   end
 
   def success
