@@ -98,20 +98,35 @@ class MoneyRequest < ActiveRecord::Base
   before_save :handle_nil_amount
   before_create :create_items
 
-  # Used to retrieve all the users associated with this money request. If user before is provided,
-  # it provides a list of all users who interacted with the money request before this given user. Mainly used for reject_to
-  def associated_users(user_before = nil, ordered = false)
-    return nil if tracks.blank?
+  # Used to retrieve all the users associated with this report. If user before is provided,
+  # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  # Pass params[:inlcude_roles] = true to get list of users with roles
+  def associated_users(user_before = nil, params={})
+    return nil if self.tracks.blank?
     trackings = tracks.without_take_control_action
+
     if user_before.present?
       track = trackings.with_action_user(user_before.id).first
       unless track.blank?
         trackings = trackings.created_before(track.created_at)
       end
-      user_ids = trackings.map(&:action_user_id)
-    else
-      user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
     end
+
+    if params.present? and params[:include_roles]
+      association_map = {}
+      trackings.each do |track|
+        [[track.action_user, track.action_user_role_id], [track.modified_user, track.modified_user_role_id]].each do |item|
+          if association_map[item[0]].blank?
+            association_map[item[0]] = {roles: []}
+          end
+          map = association_map[item[0]]
+          map[:roles] << item[1] unless map[:roles].include?(item[1])
+        end
+      end
+      return association_map
+    end
+
+    user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
     if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
       if controlling_for_user_id.present?
         user_ids << controlling_for_user_id
@@ -131,7 +146,8 @@ class MoneyRequest < ActiveRecord::Base
       # Order is MySQL Specific
       user_ids = user_ids.reverse!
       user_ids.reject! { |id| id.blank? }
-      return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
+      users = User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
+      return users
     end
     nil
   end

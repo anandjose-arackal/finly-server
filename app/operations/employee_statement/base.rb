@@ -21,7 +21,6 @@ class EmployeeStatement::Base < BaseOperation
     load_selected_user
     if params[:filter_date_from]
       self.start_date = DateTime.parse(params[:filter_date_from])
-      debugger
     else
       self.start_date = DateTime.parse("01-01-1990") # arbitrarily chosen as the lower bound date
     end

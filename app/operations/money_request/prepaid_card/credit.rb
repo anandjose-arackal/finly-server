@@ -67,6 +67,9 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
         add_message :error, result.messages[:error]
         return
       end
+
+      role_id = money_request.controlling_user_role_id
+
       update_attributes = {}
       update_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
       update_attributes[:controlling_user_id] = nil
@@ -78,6 +81,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
 
       track_attributes = {}
       track_attributes[:action_user] = user
+      track_attributes[:action_user_role_id] = role_id
       track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:credited)
       track_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
       track_attributes[:payment] = result.payment

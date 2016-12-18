@@ -40,11 +40,11 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
 
     track_params = {}
     track_params[:action_user] = self.user
+    track_params[:action_user_role_id] = curr_user_role
     track_params[:modified_user] = to_user
     track_params[:modified_user_role_id] = to_user_role_id
     track_params[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:approve_and_forward)
     track_params[:status_id] = MoneyRequestStatus.id_for(:processing)
-    track_params[:user_request_role_id] = curr_user_role
     self.money_request.tracks.create track_params
 
     # user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)

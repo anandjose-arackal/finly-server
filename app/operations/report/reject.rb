@@ -29,8 +29,8 @@ class Report::Reject < Report::Base
       self.status = ReportStatus.rejected_id
       self.reject_to_user_role_id = UserRole.id_for(:employee)
     end
-      # self.reject_to_user = self.report.user
-      # self.status = ReportStatus.rejected_id
+    # self.reject_to_user = self.report.user
+    # self.status = ReportStatus.rejected_id
   end
 
   def authorize
@@ -53,16 +53,18 @@ class Report::Reject < Report::Base
 
   def process
     user_role = User::Team::Review::UserRole.(user, self.report)
-    if report.update_attributes report_status_id: status, controlling_user_id: reject_to_user.id,
+    if report.update_attributes report_status_id: status,
+                                controlling_user_id: reject_to_user.id,
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: reject_to_user_role_id,
                                 controlling_for_user_role_id: nil, memo: params[:memo]
-      track = report.tracks.build action_user: user, modified_user_id: reject_to_user.id,
+      report.tracks.create action_user: user,
+                                  action_user_role_id: user_role,
+                                  modified_user_id: reject_to_user.id,
                                   modified_user_role_id: reject_to_user_role_id,
                                   report_tracking_action_id: ReportTrackingAction.reject_id,
-                                  report_status_id: status, memo: params[:memo],
-                                  user_report_role_id: user_role
-      track.save
+                                  report_status_id: status,
+                                  memo: params[:memo]
       # Reset expenses status to unsubmitted if report is rejected
       if status == ReportStatus.rejected_id
         report.expenses.each do |expense|

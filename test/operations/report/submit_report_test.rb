@@ -12,7 +12,7 @@ class SubmitReportTest < ActiveSupport::TestCase
     @second_employees_report = @second_employee.reports.open.first
   end
 
-  test "successfully submitting a report with amount less than 1000" do
+  test 'successfully submitting a report with amount less than 1000' do
 
     # report with amount < 1000
     Report.any_instance.stubs(:total_amount).returns(800)
@@ -25,7 +25,7 @@ class SubmitReportTest < ActiveSupport::TestCase
     assert_equal @report.controlling_user_id, @manager0.id
   end
 
-  test "successfully submitting a report with amount greater than 1000" do
+  test 'successfully submitting a report with amount greater than 1000' do
 
     # report with amount > 1000
     Report.any_instance.stubs(:total_amount).returns(1200)

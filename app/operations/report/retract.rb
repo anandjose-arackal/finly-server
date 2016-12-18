@@ -43,10 +43,14 @@ class Report::Retract < Report::Base
     prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
     role_id = UserRole.id_for(:employee)
     if report.update_attributes report_status_id: ReportStatus.retracted_id,
-                                controlling_user_id: user.id, controlling_for_user_id: nil,
-                                controlling_user_role_id: role_id, controlling_for_user_role_id: nil,
+                                controlling_user_id: user.id,
+                                controlling_for_user_id: nil,
+                                controlling_user_role_id: role_id,
+                                controlling_for_user_role_id: nil,
                                 memo: nil, submitted_at: nil, auto_submit: false
-      track = report.tracks.build action_user: user, modified_user: prev_controlling_user,
+      track = report.tracks.build action_user: user,
+                                  action_user_role_id: role_id,
+                                  modified_user: prev_controlling_user,
                                   modified_user_role_id: prev_controlling_user_role,
                                   report_tracking_action_id: ReportTrackingAction.retract_id,
                                   report_status_id: ReportStatus.retracted_id

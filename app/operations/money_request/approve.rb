@@ -75,11 +75,11 @@ class MoneyRequest::Approve < MoneyRequest::Base
       else
         track_attributes = {}
         track_attributes[:action_user] = user
+        track_attributes[:action_user_role_id] = curr_user_role
         track_attributes[:modified_user_id] = money_request.controlling_user_id
         track_attributes[:modified_user_role_id] = to_user_role_id
         track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:approve)
         track_attributes[:status_id] = status
-        track_attributes[:user_request_role_id] = curr_user_role
         money_request.tracks.create track_attributes
         self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
       end

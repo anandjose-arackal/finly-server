@@ -27,10 +27,13 @@ class MoneyRequest::TakeControl < MoneyRequest::Base
                                        controlling_user_role_id: UserRole.id_for(:admin),
                                        controlling_for_user_role_id: money_request.controlling_user_role_id, 
                                        memo: memo
-      money_request.tracks.create action_user: user, modified_user_id: money_request.controlling_for_user_id,
+      money_request.tracks.create action_user: user,
+                                  action_user_role_id: UserRole.id_for(:admin),
+                                  modified_user_id: money_request.controlling_for_user_id,
                                   modified_user_role_id: money_request.controlling_for_user_role_id,
                                   money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control),
-                                  status_id: money_request.status_id, memo: memo
+                                  status_id: money_request.status_id,
+                                  memo: memo
       money_request.comments.create user: user, 
                                     comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
                                     content: params[:take_control_note]

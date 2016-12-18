@@ -26,11 +26,20 @@ class Report::MarkAsReimbursed < Report::Base
   end
 
   def process
-    if report.update_attributes controlling_user: nil, controlling_for_user: nil, controlling_user_role_id: nil,
+    if report.update_attributes controlling_user: nil,
+                                controlling_for_user: nil,
+                                controlling_user_role_id: nil,
                                 controlling_for_user_role_id: nil,
-                                report_status_id: ReportStatus.reimbursed_id, memo: nil, reimbursement: payment
-      report.tracks.create action_user: user, report_tracking_action_id: ReportTrackingAction.reimbursed_id,
-                                  report_status_id: ReportStatus.reimbursed_id, payment: self.payment
+                                report_status_id: ReportStatus.reimbursed_id,
+                                memo: nil,
+                                reimbursement: payment
+      # todo test this logic
+      role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
+      report.tracks.create action_user: user,
+                           action_user_role_id: role_id,
+                           report_tracking_action_id: ReportTrackingAction.reimbursed_id,
+                           report_status_id: ReportStatus.reimbursed_id,
+                           payment: self.payment
     end
   end
 
