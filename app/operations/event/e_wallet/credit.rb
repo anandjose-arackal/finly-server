@@ -24,7 +24,11 @@ class Event::EWallet::Credit < Event::EWallet::Base
 
   def mailer_subject(user)
     if user.id == self.payment.initiating_user_id
-      "You have credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{to_account_s}"
+      from_s = "your #{from_account_s}"
+      if to_account == :virtual_account
+        from_s = 'Company Credits'
+      end
+      "You have credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{to_account_s} from #{from_s}"
     elsif user.id == self.payment.receiving_user_id
       "You have received a credit of ₹#{self.payment.amount.value} in your #{to_account_s}"
     end
@@ -32,7 +36,11 @@ class Event::EWallet::Credit < Event::EWallet::Base
 
   def mailer_body(user)
     if user.id == self.payment.initiating_user_id
-      "You have successfully credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{to_account_s}"
+      from_s = "your #{from_account_s}"
+      if to_account == :virtual_account
+        from_s = 'Company Credits'
+      end
+      "You have successfully credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{to_account_s} from #{from_s}"
     elsif user.id == self.payment.receiving_user_id
       "You have received a credit of ₹#{self.payment.amount.value} from #{payment.initiating_user.name} in your #{to_account_s}"
     end

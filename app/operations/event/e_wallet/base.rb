@@ -103,8 +103,14 @@ class Event::EWallet::Base < Event::SetNotifier
     if from_account_s == 'wallet'
       self.from_account_s = 'Finly Account'
     end
+    if from_account_s == 'virtual_account'
+      self.from_account_s = 'Company Credits'
+    end
     if to_account_s == 'wallet'
       self.to_account_s = 'Finly Account'
+    end
+    if to_account_s == 'virtual_account'
+      self.to_account_s = 'Company Credits'
     end
   end
 
