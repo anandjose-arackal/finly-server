@@ -14,8 +14,24 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user)
-
+  def set_notification(user, role = nil)
+    if money_request.controlling_for_user_id == user.id
+      view_role_id = money_request.controlling_for_user_role_id
+    else
+      view_role_id = nil
+    end
+    notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
+                                             action_type_id: NotificationActionType.notify_take_control_id,
+                                             action_user_id: (money_request.tracks.last.action_user.id rescue nil),
+                                             object_id: money_request.id,
+                                             object_type: "Advance Request",
+                                             path_object_id: money_request.id,
+                                             path_object_type: "Advance Request",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: view_role_id
+    )
+    notification.save
   end
 
   def mailer_subject(user)

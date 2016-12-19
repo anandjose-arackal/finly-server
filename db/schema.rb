@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161215191418) do
+ActiveRecord::Schema.define(version: 20161219032113) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -503,6 +503,7 @@ ActiveRecord::Schema.define(version: 20161215191418) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.integer  "action_id",                        limit: 4
+    t.integer  "action_user_role_id",              limit: 4
   end
 
   add_index "money_request_tracks", ["action_user_id"], name: "index_money_request_tracks_on_action_user_id", using: :btree
@@ -590,6 +591,7 @@ ActiveRecord::Schema.define(version: 20161215191418) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
+    t.integer  "view_role_id",         limit: 4
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
@@ -844,6 +846,7 @@ ActiveRecord::Schema.define(version: 20161215191418) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.integer  "payment_id",                limit: 4
+    t.integer  "action_user_role_id",       limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
@@ -932,7 +935,7 @@ ActiveRecord::Schema.define(version: 20161215191418) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2016-12-16', null: false
+    t.date     "date_of_birth",                   default: '2016-12-19', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

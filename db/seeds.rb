@@ -231,7 +231,7 @@ if User.count == 0
   u = []
 
   # creating user0
-  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee00@finlytest.io",
+  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@finlytest.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    role_mapping_attributes: [{user_role_id: 4},
                                              {user_role_id: UserRole.employee_id}],

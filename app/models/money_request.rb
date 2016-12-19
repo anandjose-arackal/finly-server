@@ -120,7 +120,7 @@ class MoneyRequest < ActiveRecord::Base
             association_map[item[0]] = {roles: []}
           end
           map = association_map[item[0]]
-          map[:roles] << item[1] unless map[:roles].include?(item[1])
+          map[:roles] << item[1] unless map[:roles].include?(item[1]) and not item[1].nil?
         end
       end
       return association_map
