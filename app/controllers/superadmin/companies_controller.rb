@@ -10,15 +10,6 @@ class Superadmin::CompaniesController < ApplicationController
     @result = Company::Show.(current_user, params)
   end
 
-  def import
-    import_op = Import::Superadmin::Users.new(current_user, params)
-    @result = import_op.run
-    debugger
-    respond_to do |format|
-      format.csv { send_data @result, :type => 'text/csv; charset=iso-8859-1; header=present', :disposition => "attachment;data=result.csv" }
-    end
-  end
-
   def create
     @result = Company::Create.(current_user, params)
     # temporary rendering for html testing.

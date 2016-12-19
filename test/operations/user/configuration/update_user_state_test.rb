@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UpdateUserStateTest < ActiveSupport::TestCase
+class   UpdateUserStateTest < ActiveSupport::TestCase
 
   def setup
     @admin = users(:admin)
@@ -9,7 +9,8 @@ class UpdateUserStateTest < ActiveSupport::TestCase
     @inactive_employee = users(:inactive_employee)
     @update_state_params = {view: 'admin',
                             active: false,
-                            id: @employee.id}
+                            id: @employee.id,
+                            password: "hapitoe007"}
   end
 
   test 'admins can deactivate or activate a user' do
@@ -19,6 +20,7 @@ class UpdateUserStateTest < ActiveSupport::TestCase
     User.any_instance.stubs(:cards).returns(Card.all)
     User::PrepaidCard::Unblock.expects(:call).with(@admin, has_entry(:user_deactivation => true)).at_least_once.returns(nil)
     User::PrepaidCard::Block.expects(:call).with(@admin, has_entry(:user_deactivation => true)).at_least_once.returns(nil)
+
 
     update_state_op = User::Configuration::UpdateState.new(@admin, @update_state_params)
     assert_difference 'User.active.count', -1 do

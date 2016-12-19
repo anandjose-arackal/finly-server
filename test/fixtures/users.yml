@@ -55,6 +55,7 @@ admin:
   first_name: "Finly"
   last_name: "Admin"
   mobile_number: "9899999991"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 finance_manager:
   id: 2
@@ -64,6 +65,7 @@ finance_manager:
   first_name: "Finly"
   last_name: "Finance Manager"
   mobile_number: "9899999993"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 second_finance_manager:
   id: 3
@@ -73,6 +75,7 @@ second_finance_manager:
   first_name: "Other_Finance"
   last_name: "Manager"
   mobile_number: "9899999922"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 third_finance_manager:
   id: 4
@@ -82,6 +85,7 @@ third_finance_manager:
   first_name: "Third_Finance"
   last_name: "Manager"
   mobile_number: "9899999952"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 manager:
   id: 5
@@ -91,6 +95,7 @@ manager:
   first_name: "Finly"
   last_name: "Manager"
   mobile_number: "9899999992"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 second_manager:
   id: 6
@@ -100,6 +105,7 @@ second_manager:
   first_name: "Other"
   last_name: "Manager"
   mobile_number: "9899999912"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 third_manager:
   id: 7
@@ -109,6 +115,7 @@ third_manager:
   first_name: "Third"
   last_name: "Manager"
   mobile_number: "9899999932"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 employee:
   id: 8
@@ -118,6 +125,7 @@ employee:
   first_name: "Finly"
   last_name: "Employee"
   mobile_number: "9899999994"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 second_employee:
   id: 9
@@ -127,6 +135,7 @@ second_employee:
   first_name: "Second"
   last_name: "Employee"
   mobile_number: "9899999932"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 inactive_employee:
   id: 10
@@ -136,6 +145,7 @@ inactive_employee:
   first_name: "InactiveFinly"
   last_name: "Employee"
   mobile_number: "9899999997"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 other_company_admin:
   id: 11
@@ -145,6 +155,7 @@ other_company_admin:
   first_name: "Random"
   last_name: "Admin"
   mobile_number: "9899999995"
+  encrypted_password: <%= User.new.send(:password_digest, 'hapitoe007') %>
 
 
 
