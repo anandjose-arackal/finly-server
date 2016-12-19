@@ -650,6 +650,7 @@ Rails.application.routes.draw do
   # routes for testing import
   # get 'mass_import', to: 'users#mass_import', as: :mass_import
   post 'import', to: 'users#import', as: :user_import
+  post 'superadmin_import', to: 'superadmin/companies#import', as: :superadmin_import
   # get 'sample_import_file', to: 'users#sample_file', as: :sample_import_file
 
 

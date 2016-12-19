@@ -8,7 +8,7 @@ class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
 
   end
 
-  def set_notification(user)
+  def set_notification(user, role)
     notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
                                               action_type_id: NotificationActionType.notify_cash_withdrawal_id,
                                               action_user_id: payment.initiating_user.id,
