@@ -203,8 +203,21 @@ $brand-warning: #FFC107;
 // $brand-warning: #FFA000;
 $brand-danger: #FF5722;
 $brand-info: #00BCD4;
+
 @import "bootstrap";
 @import "bootstrap-sprockets";
+
+.navbar-inverse{
+  border: none;
+}
+
+#primary-navbar{
+  background: #3F51B5;
+} 
+
+#primary-navbar.admin{
+  background: #FF5722;
+}
 
 .bs-callout {
     padding: 10px 20px;

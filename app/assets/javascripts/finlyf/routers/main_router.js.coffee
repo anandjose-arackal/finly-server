@@ -36,6 +36,7 @@ class FinlyF.Routers.Main extends Backbone.Router
 
     'policies/:id': 'policies_show'
     'policies/:id/params=:query': 'policies_show'
+    'faq': 'faq'
 
 
   initialize: ->
@@ -300,6 +301,10 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+
+  faq: ->
+    view = new FinlyF.Views.FAQ()
+    $("#backbone-container").html(view.render().el)
 
   features: ->
     $(".datepicker").datepicker({
