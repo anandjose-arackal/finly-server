@@ -16,7 +16,7 @@ class DestroyInviteTest < ActiveSupport::TestCase
                       admin: "1",
                       manager: "0",
                       finance_manager: "0",
-                      invite_by: email
+                      invite_by: 'email'
                     }
     @invite_op = User::Invite::Create.(@admin, @invite_params)
     @new_user = @invite_op.invite.first

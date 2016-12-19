@@ -15,7 +15,8 @@ class ResendInviteTest < ActiveSupport::TestCase
                                       },
                       admin: "1",
                       manager: "0",
-                      finance_manager: "0"
+                      finance_manager: "0",
+                      invite_by: 'email'
                      }
     @new_user = User::Invite::Create.(@admin, @invite_params).invite.first
   end
