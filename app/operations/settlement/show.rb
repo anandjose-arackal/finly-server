@@ -26,6 +26,13 @@ class Settlement::Show < Settlement::Base
     self.type[view_to_load.to_sym] = true
   end
 
+  def post_process
+    super()
+    if params[:ref] == '1' and params[:n_id].present?
+      Event::EMoneyRequest::Unset.(user, params)
+    end
+  end
+
   def success
     params[:selected_user] = selected_user
     params[:reports] = reports

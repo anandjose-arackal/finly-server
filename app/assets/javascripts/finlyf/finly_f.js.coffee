@@ -8,7 +8,7 @@ window.FinlyF =
   Routers: {}
   Config: {
     notification: {
-      poll_time: 60 #in seconds
+      poll_time: 120 #in seconds
       per_page: 10 #
     }
   }

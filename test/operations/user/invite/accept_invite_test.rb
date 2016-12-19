@@ -15,7 +15,8 @@ class AcceptInviteTest < ActiveSupport::TestCase
                                       },
                                        admin: "1",
                                        manager: "0",
-                                       finance_manager: "0"
+                                       finance_manager: "0",
+                                       invite_by: 'email'
                       }
     @invited_user = User::Invite::Create.(@admin, @invite_params).invite.first
     invitation_token = @invited_user.raw_invitation_token
@@ -25,7 +26,7 @@ class AcceptInviteTest < ActiveSupport::TestCase
                                     mobile_number: "8105739684",
                                     first_name: "Hello",
                                     last_name: "World",
-                                    profile_attributes: { date_of_birth: "2006-01-01",
+                                    profile_attributes: { date_of_birth: "01-01-2006",
                                                           gender: "m",
                                                           address_1: "Malleshwaram",
                                                           address_2: "Bangalore",

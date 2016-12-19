@@ -9,7 +9,7 @@ class Event::EWallet::Credit < Event::EWallet::Base
   end
 
   def notification_affected_users
-
+    [payment.receiving_user]
   end
 
   def send_push_notification(user)
@@ -18,8 +18,22 @@ class Event::EWallet::Credit < Event::EWallet::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user)
-
+  def set_notification(user, role)
+    notification = user.notifications.create(notification_type_id: NotificationType.wallet_id,
+                                             action_type_id: NotificationActionType.notify_credit_id,
+                                             action_user_id: payment.initiating_user_id,
+                                             object_id: payment.id,
+                                             object_type: "Wallet",
+                                             path_object_id: payment.id,
+                                             path_object_type: "Wallet",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: nil,
+                                             amount_attributes: {value: payment.amount_value,
+                                                                 currency_id: 1
+                                                                }
+                                            )
+    notification.save
   end
 
   def mailer_subject(user)

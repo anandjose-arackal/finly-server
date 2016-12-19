@@ -21,7 +21,7 @@ class CreateInviteTest < ActiveSupport::TestCase
                       admin: "1",
                       manager: "0",
                       finance_manager: "0",
-                      type: 'email'
+                      invite_by: 'email'
                      }
 
     @mobile_invite_params = {pending_invite: { company_id: 1,
@@ -34,7 +34,7 @@ class CreateInviteTest < ActiveSupport::TestCase
                              admin: "1",
                              manager: "0",
                              finance_manager: "0",
-                             type: 'mobile'
+                             invite_by: 'mobile'
                             }
   end
 
@@ -116,7 +116,7 @@ class CreateInviteTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
-    assert_equal "Following emails are already invited: manager@finlytest.io", @result.messages[:error].first
+    assert_equal "Following emails are already invited: manager0@finlytest.io", @result.messages[:error].first
   end
 
   test "cannot invite a user without a valid company ID" do

@@ -18,7 +18,7 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
   end
 
   def affected_users
-    self.money_request.associated_users self.user
+    self.money_request.associated_users self.user, include_roles: true
   end
 
   def send_push_notification(user)
@@ -27,8 +27,20 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user)
-
+  def set_notification(user, role)
+    notification = user.notifications.build(user: user,
+                                            notification_type_id: NotificationType.advance_request_id,
+                                            action_type_id: NotificationActionType.notify_reject_id,
+                                            action_user_id: money_request.tracks.last.action_user.id,
+                                            object_id: money_request.id,
+                                            object_type: "Advance Request",
+                                            path_object_id: money_request.id,
+                                            path_object_type: "Advance Request",
+                                            read: false,
+                                            timestamp: DateUtils.local_date_time,
+                                            view_role_id: role[:roles].first
+    )
+    notification.save
   end
 
   def mailer_subject(user)

@@ -23,7 +23,7 @@ class Import::Superadmin::Users < Import::Base
   attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee
 
   def authorized_user_types
-    [:company_admin]
+
   end
 
   def pre_validate
@@ -41,7 +41,9 @@ class Import::Superadmin::Users < Import::Base
   end
 
   def authorize
-
+    unless Constants::SUPERADMIN_ACCOUNTS.include?(user.email)
+      raise_unauthorized_exception
+    end
   end
 
   def validate
@@ -56,9 +58,9 @@ class Import::Superadmin::Users < Import::Base
       error_messages = params[:error_messages]
       params.delete(:error_messages)
       if type == 'email'
-        self.invitee = user.company.users.invite!(params)
+        self.invitee = User.invite!(params)
       elsif type == 'mobile'
-        self.invitee = user.company.users.invite!(params, user) do |u|
+        self.invitee = User.invite!(params, user) do |u|
           u.skip_invitation
           u.update_attribute(:email, "")
           u.update_attribute(:mobile_only_invite, true)
@@ -164,6 +166,7 @@ class Import::Superadmin::Users < Import::Base
                                          gender: row[import_fields[:gender]],
                                          city: row[import_fields[:city]]
                                         },
+                    company_id: row[import_fields[:company_id]],
                     error_messages: errors
                   }
 
@@ -198,7 +201,8 @@ class Import::Superadmin::Users < Import::Base
       :reporting_finance_manager => 15,
       :approves_to => 16,
       :approves_finance_to => 17,
-      :card_serial_id => 18
+      :card_serial_id => 18,
+      :company_id => 19
    }
   end
 

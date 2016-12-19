@@ -14,8 +14,24 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user)
-
+  def set_notification(user, role)
+    if money_request.controlling_user_id == user.id
+      view_role_id = money_request.controlling_user_role_id
+    else
+      view_role_id = money_request.tracks.last.modified_user_role_id
+    end
+    notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
+                                             action_type_id: NotificationActionType.notify_unapprove_id,
+                                             action_user_id: self.user.id,
+                                             object_id: money_request.id,
+                                             object_type: "Advance Request",
+                                             path_object_id: money_request.id,
+                                             path_object_type: "Advance Request",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: view_role_id
+    )
+    notification.save
   end
 
   def mailer_subject(user)

@@ -66,7 +66,7 @@ class DestroyCategoryTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
-    assert_equal "Cannot destroy 'Other' or 'Personal' categories", @result.messages[:error].first
+    assert_equal "Cannot remove 'Other' or 'Personal' categories", @result.messages[:error].first
 
     # trying to destroy 'Personal' category
     @category = @company.categories.find_by(name: 'Personal')
@@ -77,7 +77,7 @@ class DestroyCategoryTest < ActiveSupport::TestCase
     end
     assert_not @result.success?
     assert_not @result.messages[:error].empty?
-    assert_equal "Cannot destroy 'Other' or 'Personal' categories", @result.messages[:error].first
+    assert_equal "Cannot remove 'Other' or 'Personal' categories", @result.messages[:error].first
   end
 
   test "" do
