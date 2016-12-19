@@ -44,11 +44,15 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
       role_id = UserRole.id_for(:finance_manager)
     end
     memo = (params[:note] or params[:memo] or money_request.memo)
-    if money_request.update_attributes controlling_user_id: user.id, controlling_for_user_id: nil,
-                                       controlling_user_role_id: role_id, controlling_for_user_role_id: nil,
+    if money_request.update_attributes controlling_user_id: user.id,
+                                       controlling_for_user_id: nil,
+                                       controlling_user_role_id: role_id,
+                                       controlling_for_user_role_id: nil,
                                        memo: memo,
                                        status_id: MoneyRequestStatus.id_for(:processing)
-      money_request.tracks.create action_user: user, modified_user: prev_controlling_user,
+      money_request.tracks.create action_user: user,
+                                  action_user_role_id: role_id,
+                                  modified_user: prev_controlling_user,
                                   modified_user_role_id: prev_controlling_user_role,
                                   money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:unapprove),
                                   status_id: MoneyRequestStatus.id_for(:processing)

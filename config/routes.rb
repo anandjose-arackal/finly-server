@@ -701,6 +701,7 @@ Rails.application.routes.draw do
   # get 'features', to: 'static_pages#features'
 
   get 'external/reports/:id' => 'external_url#report', as: :external_url_report
+  get 'external/requests/:id' => 'external_url#money_request', as: :external_url_money_request
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
 
   get 'analytics' => 'analytics#show'

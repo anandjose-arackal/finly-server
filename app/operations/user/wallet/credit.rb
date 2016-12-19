@@ -145,6 +145,10 @@ class User::Wallet::Credit < User::Wallet::Base
     User::Wallet::Credit::SuccessPresenter.new(user, params, messages)
   end
 
+  def post_process
+    Event::EWallet::Credit.(self.user, payment: self.payment)
+  end
+
   class User::Wallet::Credit::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment
 

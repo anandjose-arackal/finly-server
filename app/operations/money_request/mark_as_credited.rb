@@ -17,18 +17,27 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
   end
 
   def process
-    if money_request.update_attributes controlling_user: nil, controlling_for_user: nil, controlling_user_role_id: nil,
-        controlling_for_user_role_id: nil,
-        status_id: MoneyRequestStatus.id_for(:credited), payment: self.payment
-      money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:credited),
-        status_id: MoneyRequestStatus.id_for(:credited), payment: self.payment
+    if money_request.update_attributes controlling_user: nil,
+                                       controlling_for_user: nil,
+                                       controlling_user_role_id: nil,
+                                       controlling_for_user_role_id: nil,
+                                       status_id: MoneyRequestStatus.id_for(:credited),
+                                       payment: self.payment
+      role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
+      money_request.tracks.create action_user: user,
+                                  action_user_role_id: role_id,
+                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:credited),
+                                  status_id: MoneyRequestStatus.id_for(:credited),
+                                  payment: self.payment
     end
   end
 
   def post_process
     if success?
       money_request.comments.create money_request_id: money_request.id,
-        user: user, comment_action_id: MoneyRequestCommentAction.id_for(:credited), payment: self.payment
+                                    user: user,
+                                    comment_action_id: MoneyRequestCommentAction.id_for(:credited),
+                                    payment: self.payment
     end
   end
 end

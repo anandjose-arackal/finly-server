@@ -27,11 +27,15 @@ class Report::Create < Report::Base
 
   def process
     role_id = UserRole.id_for(:employee)
-    self.report = for_user.reports.build report_status_id: ReportStatus.open_id, controlling_user: for_user,
-                                     controlling_user_role_id: role_id, policy_id: params[:policy_id],
-                                     name: params[:name]
+    self.report = for_user.reports.build report_status_id: ReportStatus.open_id,
+                                         controlling_user: for_user,
+                                         controlling_user_role_id: role_id,
+                                         policy_id: params[:policy_id],
+                                         name: params[:name]
     if report.save
-      report.tracks.create action_user: for_user, modified_user: for_user,
+      report.tracks.create action_user: for_user,
+                           action_user_role_id: role_id,
+                           modified_user: for_user,
                            modified_user_role_id: role_id,
                            report_tracking_action_id: ReportTrackingAction.create_id,
                            report_status_id: ReportStatus.open_id
