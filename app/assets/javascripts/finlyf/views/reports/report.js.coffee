@@ -52,6 +52,8 @@ class FinlyF.Views.Report extends Backbone.View
 
     'click .btn-go-back': 'goBacktoPreviousPage'
 
+    'shown.bs.modal #modal-mp': 'fixHeight'
+
   initialize: (options) ->
     # console.log "we're here in report show", options
     if options.parent
@@ -247,6 +249,8 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
     $(@el).find("#modal-mp").modal('show')
     $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "dd-mm-yy"})
+
+    
 
   showExpenseSelectOption: ->
     # console.log "Here we are"
@@ -708,3 +712,13 @@ class FinlyF.Views.Report extends Backbone.View
   goBacktoPreviousPage: (e) ->
     e.preventDefault()
     Backbone.history.history.back()
+
+  fixHeight: (e) ->
+    # console.log $(e.currentTarget).find(".container-main.container-expenses").height()
+
+    # Fixing height issue
+    modal = e.currentTarget
+
+    container_height = $(modal).find(".container-main.container-expenses").height()
+    # console.log "Container height", container_height
+    $(modal).find(".index-only-main").height(container_height - 5)

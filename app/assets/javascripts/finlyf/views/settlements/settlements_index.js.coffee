@@ -1034,17 +1034,20 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.actionData = @settlementActionData
 
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditMoneyRequestConfirm({summary: summary}))
-      when 'credit_card_from_card'
-        $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
-        _this.settlementActionData.c_card_from_card.amount = $(container).find('input[name=amount]').val()
 
-        summary.userData = @selectedUserSummary
-        summary.actionData = @settlementActionData
+      ## Temporarily Disabled
+      # when 'credit_card_from_card'
+      #   $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
+      #   _this.settlementActionData.c_card_from_card.amount = $(container).find('input[name=amount]').val()
 
-        $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditCardFromCardConfirm({summary: @selectedUserSummary}))
+      #   summary.userData = @selectedUserSummary
+      #   summary.actionData = @settlementActionData
+
+      #   $(modal_body).find('.settlement-step-3 .panel-body').html(@tCreditCardFromCardConfirm({summary: @selectedUserSummary}))
       when 'credit_card_from_wallet'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         _this.settlementActionData.c_card_from_wallet.amount = $(container).find('input[name=amount]').val()
+        _this.settlementActionData.c_card_from_wallet.note = $(container).find('textarea.note').val()  
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
@@ -1053,6 +1056,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       when 'credit_wallet_from_wallet'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         _this.settlementActionData.c_wallet_from_wallet.amount = $(container).find('input[name=amount]').val()
+        _this.settlementActionData.c_wallet_from_wallet.note = $(container).find('textarea.note').val()
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
@@ -1061,6 +1065,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       when 'credit_card_from_virtual_account'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         _this.settlementActionData.c_card_from_virtual_account.amount = $(container).find('input[name=amount]').val()
+        _this.settlementActionData.c_card_from_virtual_account.note = $(container).find('textarea.note').val()
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
@@ -1068,6 +1073,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       when 'credit_wallet_from_virtual_account'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         _this.settlementActionData.c_wallet_from_virtual_account.amount = $(container).find('input[name=amount]').val()
+        _this.settlementActionData.c_wallet_from_virtual_account.note = $(container).find('textarea.note').val()
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
@@ -1081,30 +1087,38 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCashAdvanceConfirm({summary: summary}))
-      when 'debit_card_to_card' 
-        $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
-        _this.settlementActionData.d_card_to_card.amount = $(container).find('input[name=amount]').val()
 
-        summary.userData = @selectedUserSummary
-        summary.actionData = @settlementActionData
-        $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToCardConfirm({summary: summary}))
-      when 'debit_card_to_wallet'
-        $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
-        _this.settlementActionData.d_card_to_wallet.amount = $(container).find('input[name=amount]').val()
+      ## Disabled Feature
+      # when 'debit_card_to_card' 
+      #   $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
+      #   _this.settlementActionData.d_card_to_card.amount = $(container).find('input[name=amount]').val()
 
-        summary.userData = @selectedUserSummary
-        summary.actionData = @settlementActionData
-        $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToWalletConfirm({summary: summary}))
+      #   summary.userData = @selectedUserSummary
+      #   summary.actionData = @settlementActionData
+      #   $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToCardConfirm({summary: summary}))
+
+      ## Disabled Feature
+      # when 'debit_card_to_wallet'
+      #   $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
+      #   _this.settlementActionData.d_card_to_wallet.amount = $(container).find('input[name=amount]').val()
+
+      #   summary.userData = @selectedUserSummary
+      #   summary.actionData = @settlementActionData
+      #   $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitCardToWalletConfirm({summary: summary}))
+
       when 'debit_wallet_to_wallet'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         _this.settlementActionData.d_wallet_to_wallet.amount = $(container).find('input[name=amount]').val()
+        _this.settlementActionData.d_wallet_to_wallet.note = $(container).find('textarea.note').val()
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-3 .panel-body').html(@tDebitWalletToWalletConfirm({summary: summary}))
+
       when 'debit_wallet_to_virtual_account'
         $(modal_body).find(".settlement-step-3 .panel-heading .step-title .title").text("Authorize Payment")
         _this.settlementActionData.d_wallet_to_virtual_account.amount = $(container).find('input[name=amount]').val()
+        _this.settlementActionData.d_wallet_to_virtual_account.note = $(container).find('textarea.note').val()
 
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
@@ -1171,25 +1185,31 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.amount = _this.settlementActionData.c_card_from_card.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
+        data.note = _this.settlementActionData.c_card_from_card.note
 
       when 'credit_card_from_wallet'
         data.amount = _this.settlementActionData.c_card_from_wallet.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
+        data.note = _this.settlementActionData.c_card_from_wallet.note
 
       when 'credit_wallet_from_wallet'
         data.amount = _this.settlementActionData.c_wallet_from_wallet.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
+        data.note = _this.settlementActionData.c_wallet_from_wallet.note
+
       when 'credit_card_from_virtual_account'
         data.amount = _this.settlementActionData.c_card_from_virtual_account.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
+        data.note = _this.settlementActionData.c_card_from_virtual_account.note
 
       when 'credit_wallet_from_virtual_account'
         data.amount = _this.settlementActionData.c_wallet_from_virtual_account.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.to_user_id = _this.user_id
+        data.note = _this.settlementActionData.c_wallet_from_virtual_account.note
 
       when 'debit_cash_advance'
         data.payment = {
@@ -1207,19 +1227,21 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         data.amount = _this.settlementActionData.d_wallet_to_wallet.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.from_user_id = _this.user_id 
-      when 'debit_card_to_company_credits'
-        data.amount = _this.settlementActionData.d_card_to_company_credits.amount
-        data.password = $(container).find('input[type=password][name=password]').val()
-        data.from_user_id = _this.user_id
+        data.note = _this.settlementActionData.d_wallet_to_wallet.note
+
+      # when 'debit_card_to_company_credits'
+      #   data.amount = _this.settlementActionData.d_card_to_company_credits.amount
+      #   data.password = $(container).find('input[type=password][name=password]').val()
+      #   data.from_user_id = _this.user_id
       when 'debit_wallet_to_virtual_account'
         data.amount = _this.settlementActionData.d_wallet_to_virtual_account.amount
         data.password = $(container).find('input[type=password][name=password]').val()
         data.from_user_id = _this.user_id
+        data.note = _this.settlementActionData.d_wallet_to_virtual_account.note
         # console.log data
 
     # console.log data
     summary = $(@el).find(".summary")
-    FinlyF.startMainLoader(summary)
     $.ajax({
       url: url,
       data: data,
@@ -1228,6 +1250,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
+          FinlyF.startMainLoader(summary)
+          console.log "Shouldn't get inside."
           $(_this.el).find("#modal-settlements").modal('hide')
 
           #update  summary and reports list
