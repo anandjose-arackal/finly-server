@@ -98,14 +98,14 @@ class Notification < ActiveRecord::Base
         action = " in hand withdrawn"
       when NotificationActionType.notify_cash_load_id
         action = " in hand loaded"
-      when NotificationActionType.anotify_tm_withdrawal_id
+      when NotificationActionType.notify_atm_withdrawal_id
         action = " withdrawn from ATM"
       when NotificationActionType.notify_credit_advance_request_id
         action = " credited"
       when NotificationActionType.notify_credit_id
         action += " credited"
       when NotificationActionType.notify_debit_id
-        action += "debited"
+        action += " debited"
       else
         # do nothing
     end
@@ -144,7 +144,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.notify_approve_id
         action = " approved a"
       when NotificationActionType.notify_reject_id
-        action = " rejected an expense in"
+        action = " rejected a"
       when NotificationActionType.notify_retract_id
         action = " retracted a"
       when NotificationActionType.notify_unapprove_id
@@ -229,7 +229,11 @@ class Notification < ActiveRecord::Base
         c = Card.find_by(id: self.object_id)
         object_name = " with serial ID #{c.proxy}"
       when "Wallet"
-        object = " to your Finly account"
+        if action_type_id == NotificationActionType.notify_credit_id
+          object = " to your Finly account"
+        else
+          object = " from your Finly account"
+        end
       when "Payment"
         object = " to your cash in hand"
       else
@@ -242,19 +246,34 @@ class Notification < ActiveRecord::Base
 
   end
 
-  def generate_link(user, view = nil)
+  def generate_link(user)
 
     base = Constants::BASE_URL
-    suffix = "/params={\"view\":" + "#{view || "\"personal\""}" + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}}"
+    view = ""
+    # debugger
+    case view_role_id
+      when 3
+        view = "\"manager\""
+      when 2
+        view = "\"finance_manager\""
+      when 1
+        view = "\"admin\""
+      else
+        view = "\"personal\""
+    end
+    suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}"
     path = ""
     case self.path_object_type
       when "Report"
         path = "reports/#{self.path_object_id}"
-      when "Settlement"
+      when "Advance Request"
+        path = "requests/#{self.path_object_id}"
+      when "Settlement", "Wallet"
         path = "settlements/"
-        if view == 'personal' or view.nil?
+        if view == "\"personal\"" or view.nil?
           path += "#{user.id}"
         end
+        suffix += ",\"view_to_load\":\"payments\""
       when "Card"
         if view == 'personal' or view.nil?
           path = "settings"
@@ -270,6 +289,7 @@ class Notification < ActiveRecord::Base
       else
         # do nothing
     end
+    suffix += "}"
 
     return base + path + suffix
 

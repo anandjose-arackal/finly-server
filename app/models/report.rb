@@ -127,7 +127,7 @@ class Report < ActiveRecord::Base
             association_map[item[0]] = {roles: []}
           end
           map = association_map[item[0]]
-          map[:roles] << item[1] unless map[:roles].include?(item[1])
+          map[:roles] << item[1] unless map[:roles].include?(item[1]) and not item[1].nil?
         end
       end
       return association_map
@@ -162,7 +162,6 @@ class Report < ActiveRecord::Base
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
-
 
   def status_id
     self.report_status_id

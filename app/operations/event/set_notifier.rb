@@ -31,7 +31,7 @@ class Event::SetNotifier < Event::Base
 
   end
 
-  def set_notification(user)
+  def set_notification(user, role = nil)
 
   end
 
@@ -65,9 +65,9 @@ class Event::SetNotifier < Event::Base
     # sending notifications
     users = notification_affected_users
     if users.present?
-      users.each do |user|
+      users.each do |user, role|
         next if user.blank? or not user.is_a?(User)
-        set_notification(user)
+        set_notification(user, role)
       end
     end
   end
@@ -107,6 +107,7 @@ class Event::SetNotifier < Event::Base
 
   def allow_mailer(user, configuration)
     event = self.event
+    # debugger
     return false unless has_mailer?
     return false if user.blank? or not user.is_a?(User)
     return false unless event.configurable_mailer

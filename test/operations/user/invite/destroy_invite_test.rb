@@ -15,9 +15,11 @@ class DestroyInviteTest < ActiveSupport::TestCase
                                       },
                       admin: "1",
                       manager: "0",
-                      finance_manager: "0"
+                      finance_manager: "0",
+                      invite_by: email
                     }
-    @new_user = User::Invite::Create.(@admin, @invite_params).invite.first
+    @invite_op = User::Invite::Create.(@admin, @invite_params)
+    @new_user = @invite_op.invite.first
   end
 
   test "successfully destroying an invite by a company admin" do

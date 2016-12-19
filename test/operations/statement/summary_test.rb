@@ -14,4 +14,20 @@ class SummaryTest < ActiveSupport::TestCase
 
   end
 
+  test "crediting an amount to the wallet reflects in the user's statement" do
+
+  end
+
+  test "debiting an amount from the wallet also shows up in the user's statement" do
+
+  end
+
+  test "creating an atm transactions reflects in the user's statement" do
+
+  end
+
+  test "reimburseing a report shows up right in the user's statement" do
+
+  end
+
 end
