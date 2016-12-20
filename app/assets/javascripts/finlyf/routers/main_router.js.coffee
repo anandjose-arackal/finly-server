@@ -37,6 +37,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     'policies/:id': 'policies_show'
     'policies/:id/params=:query': 'policies_show'
     'faq': 'faq'
+    'faq/params=:query': 'faq'
 
 
   initialize: ->
@@ -269,7 +270,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     @features()
 
   organization_account: (query) ->
-    console.log "Organization Account"
+    # console.log "Organization Account"
     if typeof query != 'undefined'
       params = JSON.parse(query)
     else
@@ -302,9 +303,17 @@ class FinlyF.Routers.Main extends Backbone.Router
     $("#backbone-container").html(view.render().el)
     @features()
 
-  faq: ->
-    view = new FinlyF.Views.FAQ()
+  faq: (query) ->
+    if typeof query != 'undefined'
+      params = JSON.parse(query)
+    else
+      params = {}
+
+    view = new FinlyF.Views.FAQ({
+      params: params
+    })
     $("#backbone-container").html(view.render().el)
+    @features()
 
   features: ->
     $(".datepicker").datepicker({

@@ -37,7 +37,7 @@
         <% item.select do |key, value| %>
           <% if value == '#settings' %>
             <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
-          <% elsif value =~ /organization_account/i %>
+          <% elsif value =~ /organization_account/i || value =~ /faq/i %>
             <li><a class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% else %>
             <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>

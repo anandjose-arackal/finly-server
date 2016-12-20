@@ -1,15 +1,17 @@
 class FinlyF.Views.FAQ extends Backbone.View
   template: HandlebarsTemplates['finlyf/faq/skeleton']
 
-  initialize: ->
-    @params = {}
-    @params.view = 'personal'
+  initialize: (options) ->
+    @params = options.params
+    @params.view = @params.view || 'personal'
+
 
   render: ->
     $(@el).html(@template())
     loader_div = $(@el).find('.container-main')
     FinlyF.startMainLoader(loader_div)
     @populateFAQ()
+    console.log "Params", @params
     FinlyF.structureActions(@el, @params)
     @
 
