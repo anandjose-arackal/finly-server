@@ -48,7 +48,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     if approved
       [money_request.user]
     else
-      [money_request.user, money_request.controlling_user]
+      [money_request.controlling_user]
     end
   end
 
@@ -67,7 +67,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role)
+  def set_notification(user)
     if approved
       if auto_approve
         notify_type = NotificationActionType.id_for(:notify_auto_approve)

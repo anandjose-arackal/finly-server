@@ -19,7 +19,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
     if report.controlling_for_user_id == user.id
       view_role_id = report.controlling_for_user_role_id
     else

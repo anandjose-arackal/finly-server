@@ -134,7 +134,7 @@ class MoneyRequest::Base < BaseOperation
             actions[:approve] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
           end
           actions[:reject] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
-        elsif (self.money_request.can_unapprove?) and self.money_request.associated_users(self.money_request.controlling_user).include?(user)
+        elsif (self.money_request.can_unapprove?) and MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.controlling_user).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
         end
       else

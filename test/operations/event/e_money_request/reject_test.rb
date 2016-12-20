@@ -18,6 +18,7 @@ class RejectTest < ActiveSupport::TestCase
     @money_request.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @money_request.stubs(:rejected?).returns(true)
     @money_request.expects(:associated_users).with(@manager).twice.returns([@owner, @manager])
+    @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EMoneyRequest::Reject.new(@manager, money_request: @money_request)
@@ -35,6 +36,7 @@ class RejectTest < ActiveSupport::TestCase
     @money_request.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @money_request.stubs(:rejected?).returns(true)
     @money_request.expects(:associated_users).with(@second_manager).twice.returns([@owner, @second_manager, @manager])
+    @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EMoneyRequest::Reject.new(@second_manager, money_request: @money_request)
@@ -53,6 +55,7 @@ class RejectTest < ActiveSupport::TestCase
     @money_request.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @money_request.stubs(:rejected?).returns(true)
     @money_request.expects(:associated_users).with(@finance_manager).twice.returns([@owner, @finance_manager, @second_manager, @manager])
+    @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EMoneyRequest::Reject.new(@finance_manager, money_request: @money_request)

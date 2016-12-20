@@ -21,7 +21,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def validate
     # checking if this user can unapprove this money_request at this stage
-    associated_users = money_request.associated_users money_request.controlling_user
+    associated_users = Report::AssociatedUsers.(self.user, money_request: self.money_request, user_before: money_request.controlling_user)
     unless associated_users.present? and associated_users.with_id(user.id).present?
       add_message :error, 'User has not yet reviewed the money_request to unapprove it'
       return false
@@ -65,7 +65,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
 
     if prev_status.approved?
-      Event::MoneyRequest::Unapprove.(self.user, money_request: self.money_request)
+      Event::EMoneyRequest::Unapprove.(self.user, money_request: self.money_request)
 
       # Recalculate settlement when money_request is unapproved from an approved/closed state
       Settlement::MoneyRequest::Unapproved.(user, money_request: money_request)

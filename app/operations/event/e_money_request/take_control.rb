@@ -14,7 +14,7 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
     if money_request.controlling_for_user_id == user.id
       view_role_id = money_request.controlling_for_user_role_id
     else
