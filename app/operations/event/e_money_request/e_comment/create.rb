@@ -17,7 +17,7 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
   end
 
   def affected_users
-    users = self.money_request.associated_users nil, include_roles: true
+    users = MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request)
     users.reject { |r| r == self.user }
   end
 

@@ -5,7 +5,7 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
   end
 
   def affected_users
-    self.money_request.associated_users self.money_request.tracks.last.modified_user
+    MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.tracks.last.modified_user)
   end
 
   def send_push_notification(user)

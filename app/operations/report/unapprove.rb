@@ -33,7 +33,7 @@ class Report::Unapprove < Report::Base
 
   def validate
     # checking if this user can unapprove this report at this stage
-    associated_users = report.associated_users report.controlling_user
+    associated_users = Report::AssociatedUsers.(self.user, report: self.report, user_before: report.controlling_user)
     unless associated_users.present? and associated_users.with_id(user.id).present?
       add_message :error, 'User has not yet reviewed the report to unapprove it'
       return false

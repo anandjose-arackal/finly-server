@@ -17,7 +17,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def affected_users
-    users = self.report.associated_users(nil, include_roles: true)
+    users = Report::AssociatedUsers.(self.user, report: self.report)
     users.reject { |r| r == self.user }
   end
 

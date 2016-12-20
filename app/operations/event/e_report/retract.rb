@@ -5,7 +5,7 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def affected_users
-    self.report.associated_users self.report.tracks.last.modified_user
+    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
   end
 
   def notification_affected_users

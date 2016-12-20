@@ -21,7 +21,7 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
 
   def validate
     # checking if this user can unapprove this money_request at this stage
-    associated_users = money_request.associated_users money_request.controlling_user
+    associated_users = Report::AssociatedUsers.(self.user, money_request: self.money_request, user_before: money_request.controlling_user)
     unless associated_users.present? and associated_users.with_id(user.id).present?
       add_message :error, 'User has not yet reviewed the money_request to unapprove it'
       return false
