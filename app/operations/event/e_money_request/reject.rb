@@ -18,6 +18,10 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
   end
 
   def affected_users
+    self.money_request.associated_users self.user
+  end
+
+  def notification_affected_users
     self.money_request.associated_users self.user, include_roles: true
   end
 

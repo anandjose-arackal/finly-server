@@ -26,7 +26,6 @@ class Report::Base < BaseOperation
     end
   end
 
-
   # added here because in most cases we will be returning the report itself
   def success
     present_report

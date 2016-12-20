@@ -98,6 +98,8 @@ class MoneyRequest < ActiveRecord::Base
   before_save :handle_nil_amount
   before_create :create_items
 
+  attr_accessor :cache_users
+
   # Used to retrieve all the users associated with this report. If user before is provided,
   # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
   # Pass params[:inlcude_roles] = true to get list of users with roles

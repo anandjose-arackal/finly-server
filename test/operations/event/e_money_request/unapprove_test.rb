@@ -16,7 +16,7 @@ class UnapproveTest < ActiveSupport::TestCase
   test 'unapproving money_request when money_request was in processing state' do
     @money_request.stubs(:processing?).returns(true)
     @money_request.stubs(:controlling_user).returns(@manager)
-    @money_request.stubs(:tracks => stub(:last => stub(:modified_user => @finance_manager)))
+    @money_request.stubs(:tracks => stub(:last => stub(:modified_user => @finance_manager, modified_user_role_id: nil)))
 
     response = nil
     event = Event::EMoneyRequest::Unapprove.new(@manager, money_request: @money_request)
@@ -35,7 +35,7 @@ class UnapproveTest < ActiveSupport::TestCase
   test 'unapproving money_request when money_request is in approved state' do
     @money_request.stubs(:approved?).returns(true)
     @money_request.stubs(:controlling_user).returns(@manager)
-    @money_request.stubs(:tracks => stub(:last => stub(:modified_user => nil)))
+    @money_request.stubs(:tracks => stub(:last => stub(:modified_user => nil, modified_user_role_id: nil)))
 
     response = nil
     event = Event::EMoneyRequest::Unapprove.new(@manager, money_request: @money_request)
