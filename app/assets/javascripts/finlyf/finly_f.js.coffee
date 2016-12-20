@@ -80,6 +80,10 @@ window.FinlyF =
 
   structureActions: (el, params)->
     # console.log "Strucure action params", params
+    unless params.view == 'personal'
+      $("body").addClass("admin")
+    else
+      $("body").removeClass("admin")
     # Append user profile to the navbar dropdown
     profile_div = $(el).find(".navbar-user-dropdown-profile")
     # $(profile_div).html(FinlyF.Global.templates.templateUserNavProfile({user: FinlyF.Global.current_user}))

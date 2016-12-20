@@ -83,6 +83,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     @features()
     $("#primary-navbar a.navbar-menu-li[href^='\\#reports']").parent().addClass('active')
 
+    # Need to remove this
     if params.report_id
       view.showReport(params.report_id)
 
@@ -102,6 +103,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a.navbar-menu-li[href^='\\#reports']").parent().addClass('active')
 
   receipts:(query) ->
     # body = $("body")
@@ -149,6 +151,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     })
     $("#backbone-container").html(view.render().el)
     @features()
+    $("#primary-navbar a.navbar-menu-li[href^='\\#requests']").parent().addClass('active')
 
   settlements: (query) ->
     # body = $("body")

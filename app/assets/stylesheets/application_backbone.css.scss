@@ -201,8 +201,9 @@ $brand-primary: #3F51B5;
 $brand-success: #4CAF50;
 $brand-warning: #FFC107;
 // $brand-warning: #FFA000;
-$brand-danger: #FF5722;
+$brand-danger: #F44336;
 $brand-info: #00BCD4;
+
 
 @import "bootstrap";
 @import "bootstrap-sprockets";
@@ -216,9 +217,10 @@ $brand-info: #00BCD4;
 #primary-navbar{
   background: #3F51B5;
 } 
-
-#primary-navbar.admin{
-  background: #FF5722;
+.admin{
+  #primary-navbar{
+    background: #F44336;
+  }
 }
 
 .navbar-inverse .navbar-nav > li > a {
@@ -228,18 +230,18 @@ $brand-info: #00BCD4;
 
 .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
   background-color: transparent;
-  border-color: #F4F560;
+  border-color: #FFF;
 }
 
 .nav .open > a, .nav .open > a:hover, .nav .open > a:focus{
-  border-color: #F4F560;
+  border-color: #FFF;
 }
 
 .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
   /*color: #fff;*/
   /*font-weight: bold;*/
   border-bottom: 3px solid #CD925A;
-  border-bottom: 3px solid #F4F560;
+  border-bottom: 3px solid #FFF;
   background-color: transparent;
 }
 
@@ -250,8 +252,7 @@ $brand-info: #00BCD4;
     padding: 10px 20px;
     margin: 0 0 10px 0;
     border: 1px solid #eee;
-    border-left-width: 5px;
-    border-radius: 3px;
+    border-left-width: 5px; border-radius: 3px;
 }
 .bs-callout h4 {
     margin-top: 0;
@@ -456,7 +457,11 @@ $header-grey: #efefef;
 
 #primary-navbar.navbar-inverse .navbar-nav > li.active > a, #primary-navbar.navbar-inverse .navbar-nav > li > a:hover{
   color: #fff;
-  border-bottom-color: #F4F560;
+  border-bottom-color: #fff;
+}
+
+#primary-navbar.navbar-inverse .navbar-nav > li.dropdown.open > a {
+  border-bottom-color: #fff;
 }
 
 
