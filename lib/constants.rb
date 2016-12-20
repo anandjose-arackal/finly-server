@@ -28,7 +28,8 @@ module Constants
   if Rails.env.development?
     url = "http://localhost:3000/#"
   elsif Rails.env.production?
-    url = "https://www.finly.io/#"
+    url = "https://52.76.54.96/#" # todo - will be changed for final deployment
+    # url = "https://www.finly.io/#"
   elsif Rails.env.itzcash_uat?
     url = "http://180.179.138.175/#"
   else
