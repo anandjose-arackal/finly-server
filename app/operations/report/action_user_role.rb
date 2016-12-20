@@ -35,7 +35,8 @@ class Report::ActionUserRole < Report::Base
   end
 
   def process
-    # Cache is loaded when associated users is called
+    # Cache is loaded when associated users is called. Note: If associated_users is called with user_before, the same values are going to be held in the cache
+
     return if load_from_cache
 
     tracking = self.report.tracks
@@ -63,7 +64,7 @@ class Report::ActionUserRole < Report::Base
   def load_from_cache
     cache = report.cache_users
     if cache.present? and cache[selected_user_id].present? and report.cache_users[selected_user_id][:interacted_roles].present?
-      self.roles = report.cache_users[:interacted_roles]
+      self.roles = report.cache_users[selected_user_id][:interacted_roles]
       return true
     end
     false

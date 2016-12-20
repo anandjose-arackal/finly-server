@@ -35,7 +35,7 @@ class MoneyRequest::ActionUserRole < MoneyRequest::Base
   end
 
   def process
-    # Cache is loaded when associated users is called
+    # Cache is loaded when associated users is called. Note: If associated_users is called with user_before, the same values are going to be held in the cache
     return if load_from_cache
 
     tracking = self.money_request.tracks
@@ -63,7 +63,7 @@ class MoneyRequest::ActionUserRole < MoneyRequest::Base
   def load_from_cache
     cache = money_request.cache_users
     if cache.present? and cache[selected_user_id].present? and money_request.cache_users[selected_user_id][:interacted_roles].present?
-      self.roles = money_request.cache_users[:interacted_roles]
+      self.roles = money_request.cache_users[selected_user_id][:interacted_roles]
       return true
     end
     false

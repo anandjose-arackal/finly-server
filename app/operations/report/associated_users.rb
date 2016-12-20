@@ -46,6 +46,8 @@ class Report::AssociatedUsers < Report::Base
     end
 
     # Caching to save associated user roles in model attr_accessor incase user role is triggered after associated_users
+    # todo handle configuration for cache to track if user_before was used or not.
+    # # # todo Because if user_before was used, then the cached data is going to be only for those users. If UserRole is called, then it returns from this cached data
     cache_user_roles tracking, :interacted_roles
 
     user_ids = (tracking.map(&:action_user_id) + tracking.map(&:modified_user_id))
