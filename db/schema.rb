@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161217064320) do
+ActiveRecord::Schema.define(version: 20161219075225) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -496,17 +496,16 @@ ActiveRecord::Schema.define(version: 20161217064320) do
     t.integer  "modified_user_id",                 limit: 4
     t.integer  "money_request_tracking_action_id", limit: 4
     t.integer  "status_id",                        limit: 4
-    t.integer  "action_user_role_id",              limit: 4
     t.integer  "modified_user_role_id",            limit: 4
     t.integer  "payment_id",                       limit: 4
     t.string   "memo",                             limit: 255
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.integer  "action_id",                        limit: 4
+    t.integer  "action_user_role_id",              limit: 4
   end
 
   add_index "money_request_tracks", ["action_user_id"], name: "index_money_request_tracks_on_action_user_id", using: :btree
-  add_index "money_request_tracks", ["action_user_role_id"], name: "index_money_request_tracks_on_action_user_role_id", using: :btree
   add_index "money_request_tracks", ["modified_user_id"], name: "index_money_request_tracks_on_modified_user_id", using: :btree
   add_index "money_request_tracks", ["modified_user_role_id"], name: "index_money_request_tracks_on_modified_user_role_id", using: :btree
   add_index "money_request_tracks", ["money_request_id"], name: "index_money_request_tracks_on_money_request_id", using: :btree
@@ -590,6 +589,7 @@ ActiveRecord::Schema.define(version: 20161217064320) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
+    t.integer  "view_role_id",         limit: 4
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
@@ -838,16 +838,15 @@ ActiveRecord::Schema.define(version: 20161217064320) do
     t.integer  "modified_user_id",          limit: 4
     t.integer  "report_tracking_action_id", limit: 4
     t.integer  "report_status_id",          limit: 4,   null: false
-    t.integer  "action_user_role_id",       limit: 4
     t.integer  "modified_user_role_id",     limit: 4
     t.string   "memo",                      limit: 255
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.integer  "payment_id",                limit: 4
+    t.integer  "action_user_role_id",       limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
-  add_index "report_tracks", ["action_user_role_id"], name: "index_report_tracks_on_action_user_role_id", using: :btree
   add_index "report_tracks", ["modified_user_id"], name: "index_report_tracks_on_modified_user_id", using: :btree
   add_index "report_tracks", ["modified_user_role_id"], name: "index_report_tracks_on_modified_user_role_id", using: :btree
   add_index "report_tracks", ["report_id"], name: "index_report_tracks_on_report_id", using: :btree
@@ -932,7 +931,7 @@ ActiveRecord::Schema.define(version: 20161217064320) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2016-12-18', null: false
+    t.date     "date_of_birth",                   default: '2016-12-20', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

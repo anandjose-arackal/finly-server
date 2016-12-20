@@ -55,7 +55,7 @@ class Notification < ActiveRecord::Base
       when "Report"
         object = "Report"
       when "Advance Request"
-        object = "Report"
+        object = "Advance Request"
       when "Expense"
         object = "Expense"
       when "Card"

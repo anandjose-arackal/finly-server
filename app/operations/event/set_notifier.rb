@@ -65,9 +65,9 @@ class Event::SetNotifier < Event::Base
     # sending notifications
     users = notification_affected_users
     if users.present?
-      users.each do |user, role|
+      users.each do |user|
         next if user.blank? or not user.is_a?(User)
-        set_notification(user, role)
+        set_notification(user)
       end
     end
   end

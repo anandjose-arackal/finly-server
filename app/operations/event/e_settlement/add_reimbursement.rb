@@ -8,7 +8,7 @@ class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
 
   end
 
-  def set_notification(user, role)
+  def set_notification(user)
     payment.reports.each do |report|
       notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
                                                 action_type_id: NotificationActionType.notify_credit_reimbursement_id,
