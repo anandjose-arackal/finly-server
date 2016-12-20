@@ -38,7 +38,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: role[:roles].first
+                                             view_role_id: roles.first
     )
     notification.save
   end
