@@ -7,6 +7,8 @@ class FinlyF.Views.FAQ extends Backbone.View
 
   render: ->
     $(@el).html(@template())
+    loader_div = $(@el).find('.container-main')
+    FinlyF.startMainLoader(loader_div)
     @populateFAQ()
     FinlyF.structureActions(@el, @params)
     @
@@ -17,6 +19,7 @@ class FinlyF.Views.FAQ extends Backbone.View
       url: '/faqs'
       dataType: 'html'
       success: (res) ->
+        FinlyF.stopMainLoader()
         $(_this.el).find(".main.main-faqs").html(res)
       error: (err) ->
         console.log "Error", err
