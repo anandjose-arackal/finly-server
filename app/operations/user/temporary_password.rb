@@ -41,6 +41,8 @@ class User::TemporaryPassword < BaseOperation
     message = "Your temporary password is: #{temp_password}. You will be asked to change it upon signing in. Please do not share this information with anyone"
     # sending the one time password as an SMS. Mobile number is to be sent as an array of mobile numbers
     WelcomeMessage::Create.(user, {mobile_number: [selected_user.mobile_number], message: message})
+
+    add_message :success, "You will get a message with instructions"
   end
 
   def generate_random_string(length = 5)

@@ -10,9 +10,11 @@ class PasswordsController < Devise::PasswordsController
     else
       @result = User::TemporaryPassword.(params)
       if @result.success?
-        respond reponse: :success
+        flash[:notice] = @result.messages[:success].to_sentence
+        redirect_to new_user_session_path
       else
-        respond reponse: :failure
+        flash[:error] = @result.messages[:error].to_sentence
+        redirect_to request.referrer
       end
     end
   end

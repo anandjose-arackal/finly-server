@@ -5,7 +5,8 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
   end
 
   def affected_users
-    MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.tracks.last.modified_user)
+    users = MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.tracks.last.modified_user)
+    users.reject { |r| r == self.user}
   end
 
   def send_push_notification(user)
@@ -14,7 +15,7 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
                                              action_type_id: NotificationActionType.notify_retract_id,
                                              action_user_id: money_request.user_id,

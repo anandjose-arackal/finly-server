@@ -60,6 +60,7 @@ class MoneyRequest::ActionUserRole < MoneyRequest::Base
   end
 
   protected
+
   def load_from_cache
     cache = money_request.cache_users
     if cache.present? and cache[selected_user_id].present? and money_request.cache_users[selected_user_id][:interacted_roles].present?

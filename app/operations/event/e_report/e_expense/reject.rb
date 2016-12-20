@@ -27,7 +27,8 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role)
+  def set_notification(user)
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.expense_id,
                                              action_type_id: NotificationActionType.notify_reject_id,
                                              action_user_id: self.user.id,
