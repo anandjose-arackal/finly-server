@@ -17,13 +17,13 @@ class RejectTest < ActiveSupport::TestCase
   test 'successful reject from first approver who is a manager' do
     @money_request.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @money_request.stubs(:rejected?).returns(true)
-    @money_request.expects(:associated_users).with(@manager).twice.returns([@owner, @manager])
-    @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
+    MoneyRequest::AssociatedUsers.stubs(:call).with(@manager, has_key([:money_request, :user_before])).returns([@owner, @manager])
+    MoneyRequest::AssociatedUsers.stubs(:call).with(@finance_manager, has_key([:money_request, :user_before])).returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EMoneyRequest::Reject.new(@manager, money_request: @money_request)
     # Ensure 2 mailers have been triggered
-    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',2 do
+    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 2 do
       response = event.run
     end
     assert response.success?
@@ -35,13 +35,15 @@ class RejectTest < ActiveSupport::TestCase
   test 'successful reject from second approver who is a manager' do
     @money_request.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @money_request.stubs(:rejected?).returns(true)
-    @money_request.expects(:associated_users).with(@second_manager).twice.returns([@owner, @second_manager, @manager])
-    @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
+    MoneyRequest::AssociatedUsers.stubs(:call).with(@second_manager, :money_request => @money_request, :user_before => @second_manager).returns([@owner, @manager])
+    MoneyRequest::AssociatedUsers.stubs(:call).with(@finance_manager, :money_request => @money_request, :user_before => @second_manager).returns([@owner, @finance_manager, @second_manager, @manager])
+    # @money_request.expects(:associated_users).with(@second_manager).twice.returns([@owner, @second_manager, @manager])
+    # @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EMoneyRequest::Reject.new(@second_manager, money_request: @money_request)
     # Ensure 3 mailers have been triggered
-    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',3 do
+    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 3 do
       response = event.run
     end
     assert response.success?
@@ -54,13 +56,15 @@ class RejectTest < ActiveSupport::TestCase
   test 'successful reject from finance manager' do
     @money_request.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @money_request.stubs(:rejected?).returns(true)
-    @money_request.expects(:associated_users).with(@finance_manager).twice.returns([@owner, @finance_manager, @second_manager, @manager])
-    @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
+    # MoneyRequest::AssociatedUsers.expects(:associated_users).with(finance_manager, :money_request => @money_request, :user_before => @second_manager).returns([@owner, @manager])
+    MoneyRequest::AssociatedUsers.stubs(:call).with(@finance_manager, :money_request => @money_request, :user_before => @second_manager).returns([@owner, @finance_manager, @second_manager, @manager])
+    # @money_request.expects(:associated_users).with(@finance_manager).twice.returns([@owner, @finance_manager, @second_manager, @manager])
+    # @money_request.expects(:associated_users).with(@finance_manager, {:include_roles => true}).once.returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EMoneyRequest::Reject.new(@finance_manager, money_request: @money_request)
     # Ensure 3 mailers have been triggered
-    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',4 do
+    assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 4 do
       response = event.run
     end
     assert response.success?

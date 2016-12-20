@@ -90,7 +90,7 @@ class ReportComment < ActiveRecord::Base
         payment_id = payment.id rescue nil
         comment = "#{name} reimbursed the report with Payment ID : #{payment_id}"
         if payment.note.present?
-          comment += " , note : #{payment.note}"
+          comment += " , with a note : #{payment.note}"
         end
       when ReportCommentAction.id_for(:report_reimbursement_confirmed)
         # Report reimbursement confirmed
