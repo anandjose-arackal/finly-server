@@ -16,7 +16,7 @@ class Company::Preview < BaseOperation
   end
 
   def post_process
-    messages[:success] = "Thank you for the request! We will contact you soon."
+    messages[:success] = "Thank you for the request! We will contact you soon"
     # trigger mailer acknowledging the preview request.
     DemoMailer.delay.preview_welcome(preview_company)
   end

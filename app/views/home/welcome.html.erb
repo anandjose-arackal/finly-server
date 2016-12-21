@@ -229,7 +229,7 @@
         success: function(res){
           // console.log(res);
           if(res.success === true){
-            ohSnap("Successfully requested for a demo. Thank you.", {color: 'green', 'duration': '6000'});
+            ohSnap("Thank you for the request! We will contact you soon", {color: 'green', 'duration': '6000'});
           } else {
             snapNotify(res.messages)
             // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
