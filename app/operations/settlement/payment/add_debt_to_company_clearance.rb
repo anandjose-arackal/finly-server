@@ -59,7 +59,9 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def process
     balance_sheet = to_user.balance_sheet
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.id_for(:debt_clearance), date: payment_params[:date], note: payment_params[:note],
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
+                                          payment_type_id: PaymentType.id_for(:debt_clearance),
+                                          date: payment_params[:date], note: payment_params[:note],
                                   amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
     if self.payment.save and balance_sheet.subtract_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
       return true

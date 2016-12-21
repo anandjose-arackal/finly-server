@@ -15,6 +15,7 @@ class ReportAutoSubmit < ActiveJob::Base
 
     # Handling it for user level auto submit configuration
     auto_submit_configs = AutoSubmitConfig.enabled.includes_submitable.user_level.send(interval)
+
     auto_submit_configs.each do |config|
       user = config.submitable
       Report::AutoSubmit.(nil, user: user)

@@ -4,7 +4,7 @@ class Notification::Index < Notification::Base
 
   def pre_validate
     if user.blank?
-      add_message :error, "Invalid parameters"
+      add_message :error, 'User not found'
     end
   end
 
