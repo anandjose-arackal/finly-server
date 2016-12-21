@@ -12,6 +12,7 @@ set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 # set :rails_env, "itzcash_uat"
+set :rails_env, "staging"
 set :rvm_type, :user
 set :rvm_ruby_version, 'ruby-2.3.0' # Edit this if you are using MRI Ruby
 
