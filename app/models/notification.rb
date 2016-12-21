@@ -319,6 +319,8 @@ class Notification < ActiveRecord::Base
     owner = object.user
     if self.action_type_id == NotificationActionType.notify_auto_approve_id
       return ""
+    elsif self.action_user_id == owner.id
+      return " a"
     elsif self.user_id == owner.id
      return " your"
     else
