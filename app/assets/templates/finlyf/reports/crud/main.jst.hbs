@@ -1,16 +1,48 @@
 <div class="main-header row no-margin">
-  <div class="col-md-4">
-    {{!-- <div class="col-sm-2"><input class="main-select-all" type="checkbox" /></div> --}}
-    <div class="col-sm-5">Date</div>
-    <div class="col-sm-7">Name</div>
-  </div>
+  {{#if item.view}}
+    {{#if_not_eq item.view 'personal'}}
+      <div class="col-md-4">
+        <div class="col-sm-1 no-padding"><input class="main-select-all" type="checkbox" /></div>
+        <div class="col-sm-4">Date</div>
+        <div class="col-sm-7">Name</div>
+      </div>
 
-  <div class="col-md-8">
-    <div class="col-sm-3 text-center">Status</div>
-    <div class="col-sm-2 text-right">Expenditure</div>
-    <div class="col-sm-3">Policy</div>
-    <div class="col-sm-4">Memo</div>
-  </div>
+      <div class="col-md-8">
+        <div class="col-sm-3">User</div>
+        <div class="col-sm-2 text-center">Status</div>
+        <div class="col-sm-2 text-right">Expenditure</div>
+        <div class="col-sm-2">Policy</div>
+        <div class="col-sm-3">Memo</div>
+      </div>
+    {{else}}
+      <div class="col-md-4">
+        <div class="col-sm-1 no-padding"><input class="main-select-all" type="checkbox" /></div>
+        <div class="col-sm-4">Date</div>
+        <div class="col-sm-7">Name</div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="col-sm-3 text-center">Status</div>
+        <div class="col-sm-2 text-right">Expenditure</div>
+        <div class="col-sm-3">Policy</div>
+        <div class="col-sm-4">Memo</div>
+      </div>
+    {{/if_not_eq}}
+  {{else}}
+    <div class="col-md-4">
+      <div class="col-sm-1 no-padding"><input class="main-select-all" type="checkbox" /></div>
+      <div class="col-sm-4">Date</div>
+      <div class="col-sm-7">Name</div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="col-sm-3 text-center">Status</div>
+      <div class="col-sm-2 text-right">Expenditure</div>
+      <div class="col-sm-3">Policy</div>
+      <div class="col-sm-4">Memo</div>
+    </div>
+  {{/if}}
+  
 </div>
 
 <div id="items" class="row no-margin">

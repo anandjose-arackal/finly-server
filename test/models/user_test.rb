@@ -3,7 +3,7 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
-#  email                  :string(255)      default(""), not null
+#  email                  :string(255)      default("")
 #  encrypted_password     :string(255)      default(""), not null
 #  reset_password_token   :string(255)
 #  reset_password_sent_at :datetime
@@ -23,7 +23,6 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  company_id             :integer          not null
-#  name                   :string(255)
 #  mobile_number          :string(255)
 #  active                 :boolean          default(TRUE), not null
 #  invitation_token       :string(255)
@@ -34,7 +33,18 @@
 #  invited_by_id          :integer
 #  invited_by_type        :string(255)
 #  invitations_count      :integer          default(0)
+#  otp                    :string(255)
+#  otp_sent_at            :datetime
+#  otp_verified_at        :datetime
+#  otp_verified           :boolean          default(FALSE), not null
+#  otp_count              :integer          default(0), not null
+#  first_name             :string(255)      not null
+#  maiden_name            :string(255)
+#  last_name              :string(255)      not null
+#  default_password       :boolean
+#  mobile_only_invite     :boolean          default(FALSE)
 #
+
 
 require 'test_helper'
 

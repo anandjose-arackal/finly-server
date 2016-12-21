@@ -3,11 +3,11 @@ module ReportOperationTestHelper
   # adds dummy expenses to a new report and returns the report. optional amount if the report total needs to be a certain amount
   def create_report(user, amount = nil)
     expense_params = {expense: {amount: 90,
-                                 merchant: "Olacabs",
-                                 note: "Sup dawg",
+                                 merchant: 'Olacabs',
+                                 note: 'Sup dawg',
                                  expense_status_id: 1,
                                  expense_type_id: 1,
-                                 date: Date.today,
+                                 date: DateUtils.local_date,
                                  currency_id: 1,
                                  category_id: 1 }
     }

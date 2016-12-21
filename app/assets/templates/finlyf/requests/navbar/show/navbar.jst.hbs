@@ -1,0 +1,56 @@
+<div class="row no-margin no-padding">
+  <div class="col-sm-8" style="box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset">
+    <div class="">
+      <div class="col-sm-4 no-padding">
+        <ul class="nav navbar-nav navbar-left">
+          <button class="btn-go-back btn btn-default btn-sm"><i class="fa fa-step-backward"></i>&nbsp;Go Back to Advance Requests</button>
+        </ul>
+      </div>
+      <div class="col-sm-4 text-center">
+        <h4 class="item-name">
+          <label class="item-attr-preview" style="margin-top: 5px;">{{item.name}}</label>
+          <input type="text" class="form-control text-center item-name-edit item-attr-edit" value="{{item.name}}" placeholder="Advance Request Name" style="font-size: 18px;font-weight: bold;" name="money_request[name]">
+        </h4>
+      </div>
+      <div class="col-sm-4">
+        <ul class="nav navbar-nav navbar-right">
+          {{#if item.actions.take_control}}
+            <button class="btn btn-warning btn-sm" id="btnTakeControlRequest" data-action-type="take_control" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+          {{/if}}
+
+          {{#if item.actions.submit}}
+            {{#if item.actions.editable}}
+              <button class="btn bnt-warning btn-sm btn-edit-item">Edit&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
+            {{/if}}
+            <button class="btn btn-sm btn-report-action btn-success" data-action-type="submit" data-url="{{item.actions.submit}}">Submit&nbsp;&nbsp;<i class="fa fa-check-square"></i></button>
+          {{/if}}
+
+          {{#if item.actions.retract}}
+            <button class="btn btn-sm btn-report-action btn-danger" data-action-type="retract" data-url="{{item.actions.retract}}">Retract&nbsp;&nbsp;<i class="fa fa-undo"></i></button>
+          {{/if}}
+
+          {{#if item.actions.approve}}
+            <button class="btn btn-sm btn-success btn-report-action" data-action-type="approve" data-url="{{item.actions.approve}}">Approve</button>
+          {{/if}}
+
+          {{#if item.actions.unapprove}}
+            <button class="btn btn-sm btn-danger btn-report-action" data-action-type="unapprove" data-url="{{item.actions.unapprove}}">Unapprove</button>
+          {{/if}}
+
+          {{#if item.actions.reject}}
+            <button class="btn btn-sm btn-danger" data-action-type="reject" id="btnRejectRequest" data-url="{{item.actions.reject}}">Reject</button>
+          {{/if}}
+
+          {{#or item.actions.credit_card_from_virtual_account item.actions.credit_card_from_wallet}}
+            <button class="btn btn-sm btn-success btn-approve-options">Approve</button>
+          {{/or}}
+        </ul>   
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4" style="background: #F6F7FC; height: 50px;">
+    <div class="navbar-header navbar-sidebar">
+      <h4>Timeline</h4>
+    </div>
+  </div>
+</div>

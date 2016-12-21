@@ -1,0 +1,40 @@
+# == Schema Information
+#
+# Table name: card_load_request_tracks
+#
+#  id                           :integer          not null, primary key
+#  card_load_request_id         :integer          not null
+#  action_user_id               :integer
+#  card_load_tracking_action_id :integer
+#  status_id                    :integer
+#  user_request_role_id         :integer
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  action_id                    :integer
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  controlling_user_id: 1
+  status_id: 1
+  received_from_id: 1
+  forwarding_to_id: 1
+  previous_tracking_id: 1
+  next_tracking_id: 1
+  action_id: 1
+  request_id: 1
+  memo: MyText
+
+two:
+  user_id: 1
+  controlling_user_id: 1
+  status_id: 1
+  received_from_id: 1
+  forwarding_to_id: 1
+  previous_tracking_id: 1
+  next_tracking_id: 1
+  action_id: 1
+  request_id: 1
+  memo: MyText

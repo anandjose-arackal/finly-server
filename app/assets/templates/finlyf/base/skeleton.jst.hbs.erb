@@ -6,7 +6,7 @@
   border-bottom: none;
   background: #46568b;
   background: #423689;
-  background: #594DA8;
+  background: #3F51B5;
 }
 .navbar-inverse .navbar-nav > li > a {
     color: white;
@@ -89,7 +89,8 @@
 }
 
 .receipt-container{
-  height: 100%;
+  /*height: 100%;*/
+  margin-bottom: 10px;
 }
 
 .item.col-sm-3 .receipt-container .receipt-image, .receipt .receipt-container .receipt-image{
@@ -156,7 +157,7 @@
   z-index: 100;
   background: #fff;
   box-shadow: 0 0 30px 0 rgba(0,0,0,.1);
-  transition: all 0.5s;
+  transition: all 0.3s;
   position: fixed;
   margin-top: -10px;
   display: block;
@@ -195,7 +196,7 @@
 }
 
 .btn-finly-default:hover{
-  background: #594DA8;
+  background: #3F51B5;
   color: white;
 }
 
@@ -270,7 +271,7 @@
     /*background: white;*/
     background: rgba(0, 0, 0, 0.5);
     /*box-shadow: 0 0 30px 0 rgba(0,0,0,.1);*/
-    transition: all 0.5s;
+    /*transition: all 0.5s;*/
     position: fixed;
     margin-top: -60px;
     display: block;
@@ -327,14 +328,78 @@
               </ul>
             </li>
           </ul>
+
           
           <ul class="nav navbar-nav navbar-right">
-            
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></a>
-              <ul class="navbar-cog dropdown-menu">
-
-                <li><a href="/users/sign_out" data-method="delete">Log out</a></li>
+            <li class="dropdown" id="navbar-notification-dropdown" data-initial="true">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"  style="font-size: 18px; font-weight: normal;"><i class="fa fa-inbox"></i><span class="badge badge-danger" id="navbar-notification-count"></span></a>
+              <ul class="dropdown-menu no-hide-bs-dropdown" style="padding-top: 0;">
+                <div class="navbar-notifications-header">
+                  <li>
+                    <div class="row no-margin padding-10">
+                      <div class="col-xs-6 no-padding"><span style="color: #454545; font-size: 15px; font-weight: bold;">Notifications</span></div>
+                      <div class="col-xs-6 text-right no-padding"><a href="#" class="btn-mark-notifications-read">Mark All as Read</a></div>
+                    </div>
+                  </li>
+                </div>
+                <div class="navbar-notifications">
+                  <div class="notifications-list">
+                    
+                  </div>
+                  <div class="navbar-notifications-footer">
+                    <li class="text-center">
+                      <button class="btn btn-default btn-load-more-notifications">Load More</button>
+                    </li>
+                  </div>
+                </div>
+              </ul>
+            </li>
+            <li class="dropdown" id="navbar-user-dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 12px 10px 8px 10px;">
+                <img src="/common/images/profile_pic.png" class="img-circle" style="height: 30px;padding: 0;margin: 0;">&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <div class="navbar-user-dropdown navbar-user-dropdown-profile">
+                    <div class="row">
+                      <div class="col-xs-4" style="padding: 0;padding-left: 20px;">
+                        <img src="/common/images/profile_pic.png" class="img-responsive" style="width: 100%;" />
+                      </div>
+                      <div class="col-xs-8">
+                        <p class="text-left"><strong class="navbar-user-dropdown-name"></strong></p>
+                        <p class="text-left small navbar-user-dropdown-email"></p>
+                        <p class="text-left li-my-account"></p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="divider" style="margin: 0;"></li>
+                <li>
+                  <div class="navbar-user-dropdown">
+                    <div class="row">
+                      <div class="col-xs-12 navbar-balance" style="min-height: 100px;">
+                        <div title="Loading..." class="loading-animations">
+                          <div class="loading-animation" style="animation-delay: -1.3s;"></div>
+                          <div class="loading-animation" style="animation-delay: -1.2s"></div>
+                          <div class="loading-animation" style="animation-delay: -1.1s"></div>
+                          <div class="loading-animation" style="animation-delay: -1s"></div>
+                          <div class="loading-animation" style="animation-delay: -0.9s"></div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <div class="navbar-user-dropdown navbar-user-dropdown-action">
+                    <div class="row">
+                      <div class="col-xs-12 navbar-cog">
+                        <a href="/users/sign_out" class="btn btn-danger btn-block" data-method="delete">Log out</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
               </ul>
             </li>
           </ul>
@@ -375,7 +440,7 @@
   </div>
 
   <div class="modal fade" tabindex="-1" role="dialog" id="modal-new">
-    <div class="modal-dialog" role="document" style="width: 60%;">
+    <div class="modal-dialog" role="document" style="">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -385,6 +450,10 @@
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-receipt-preview">
+    
   </div><!-- /.modal -->
 
   

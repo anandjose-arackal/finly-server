@@ -7,6 +7,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  active     :boolean          default(TRUE), not null
+#  d_code     :string(255)
 #
 
 class Company < ActiveRecord::Base
@@ -20,12 +21,14 @@ class Company < ActiveRecord::Base
   has_one :configuration, class_name: 'CompanyConfiguration', dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :export_preferences, dependent: :destroy
+  has_one :account, class_name: 'CompanyAccount'
+  has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
 
   accepts_nested_attributes_for :configuration
 
   after_create :init_config_present
 
-  validates :name, presence: TRUE
+  validates :name, presence: true
 
   def default_policy
     self.policies.default
@@ -60,11 +63,14 @@ class Company < ActiveRecord::Base
 
   def init_config_present
     self.build_configuration.save unless self.configuration.present?
+
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
-    DEFAULT_CATEGORIES.each do |category|
+    Constants::DEFAULT_CATEGORIES.each do |category|
       self.categories.create(name: category)
     end
-  end
-end
 
+    self.build_account.save if self.account.blank?
+  end
+
+end

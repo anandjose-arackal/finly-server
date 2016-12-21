@@ -14,7 +14,7 @@
 #     currency_id:
 #     category_id: if it's a category specific budget
 #     rule_type_id: blocking or warning
-#     budget_period_id: the id based on the period of the budget - day, week, month, year
+#     period_id: the id based on the period of the budget - day, week, month, year
 #
 
 class Policy::Rules::Create < Policy::Rules::Base
@@ -26,7 +26,7 @@ class Policy::Rules::Create < Policy::Rules::Base
 
   def validate
     super()
-    if rule_parameters.blank?
+    if rule_params.blank?
       messages[:error] << "Rule attributes not provided"
       return false
     end

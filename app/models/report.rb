@@ -2,23 +2,29 @@
 #
 # Table name: reports
 #
-#  id                      :integer          not null, primary key
-#  name                    :string(255)      not null
-#  user_id                 :integer          not null
-#  report_status_id        :integer          not null
-#  policy_id               :integer
-#  submitted_at            :datetime
-#  controlling_user_id     :integer
-#  controlling_for_user_id :integer
-#  memo                    :string(255)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  reimbursement_id        :integer
-#  reimbursement_amount_id :integer
-#  accounted               :boolean          default(FALSE), not null
-#  archived                :boolean          default(FALSE), not null
-#  is_deleted              :boolean          default(FALSE), not null
+#  id                           :integer          not null, primary key
+#  name                         :string(255)      not null
+#  user_id                      :integer          not null
+#  report_status_id             :integer          not null
+#  policy_id                    :integer
+#  submitted_at                 :datetime
+#  controlling_user_id          :integer
+#  controlling_user_role_id     :integer
+#  controlling_for_user_id      :integer
+#  controlling_for_user_role_id :integer
+#  memo                         :string(255)
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  reimbursement_id             :integer
+#  reimbursement_amount_id      :integer
+#  accounted                    :boolean          default(FALSE), not null
+#  archived                     :boolean          default(FALSE), not null
+#  is_deleted                   :boolean          default(FALSE), not null
+#  auto_submit                  :boolean          default(FALSE), not null
+#  auto_approve                 :boolean          default(FALSE), not null
+#  accounted_at                 :date
 #
+
 
 class Report < ActiveRecord::Base
   include MathUtil
@@ -28,11 +34,14 @@ class Report < ActiveRecord::Base
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
   belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
   has_many :tracks, class_name: 'ReportTrack', dependent: :destroy
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
+  # Payment made as reimbursment
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursement_amount, class_name: 'Amount'
 
@@ -40,8 +49,9 @@ class Report < ActiveRecord::Base
   validates :status, presence: true
   validate :is_employee
   validate :has_expenses
+  validate :controller_has_role
 
-  default_scope { order(report_status_id: :asc,submitted_at: :desc,created_at: :desc) }
+  default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
@@ -50,20 +60,21 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
-  scope :open, -> {where report_status_id: ReportStatus.open_id }
+  scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
   scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
   scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
-  scope :processing, -> {where report_status_id: ReportStatus.processing_id }
-  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id] }
+  scope :processing, -> { where report_status_id: ReportStatus.processing_id }
+  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
+  scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
   scope :include_user, -> { includes :user }
-  scope :without_payment, ->{ where reimbursement_id: nil }
+  scope :without_payment, -> { where reimbursement_id: nil }
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -81,12 +92,12 @@ class Report < ActiveRecord::Base
       date_to = "2100-01-01" if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date + 1 if date_to.present?
-      # date_to = Date.today if date_to.blank?
+      # date_to = DateUtils.local_date if date_to.blank?
       reports = arel_table
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
     end
   end
-  scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
+  scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   delegate :status_name, to: :status
 
@@ -94,33 +105,61 @@ class Report < ActiveRecord::Base
 
   before_destroy :clear_expenses
 
-  # Used to retrieve all the users associated with this report. If user before is provided,
-  # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
-  def associated_users(user_before = nil, ordered = false)
-    return nil if self.tracks.blank?
-    trackings = tracks.without_take_control_action
-    if user_before.present?
-      track = trackings.find_by(action_user_id: user_before.id)
-      unless track.blank?
-        trackings = trackings.created_before(track.created_at)
-      end
-    end
-    user_ids = trackings.map(&:action_user_id).uniq
-    if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
-      if controlling_for_user_id.present?
-        user_ids << controlling_for_user_id
-      else
-        user_ids << controlling_user_id
-      end
-    end
-    if user_ids.size > 0
-      # Order is MySQL Specific
-      user_ids = user_ids.reverse!
-      user_ids.reject! { |id| id.blank? }
-      return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
-    end
-    nil
-  end
+  attr_accessor :cache_users
+
+  # # Used to retrieve all the users associated with this report. If user before is provided,
+  # # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  # # Pass params[:inlcude_roles] = true to get list of users with roles
+  # def associated_users(user_before = nil, params={})
+  #   return nil if self.tracks.blank?
+  #   trackings = tracks.without_take_control_action
+  #
+  #   if user_before.present?
+  #     track = trackings.find_by(action_user_id: user_before.id)
+  #     unless track.blank?
+  #       trackings = trackings.created_before(track.created_at)
+  #     end
+  #   end
+  #
+  #   if params.present? and params[:include_roles]
+  #     association_map = {}
+  #     trackings.each do |track|
+  #       [[track.action_user, track.action_user_role_id], [track.modified_user, track.modified_user_role_id]].each do |item|
+  #         if association_map[item[0]].blank?
+  #           association_map[item[0]] = {roles: []}
+  #         end
+  #         map = association_map[item[0]]
+  #         map[:roles] << item[1] unless map[:roles].include?(item[1]) and not item[1].nil?
+  #       end
+  #     end
+  #     return association_map
+  #   end
+  #
+  #   user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
+  #   if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
+  #     if controlling_for_user_id.present?
+  #       user_ids << controlling_for_user_id
+  #     else
+  #       user_ids << controlling_user_id
+  #     end
+  #   end
+  #
+  #   # User IDs was blank when an admin was taking control of his own report and rejecting it. This is the fix
+  #   if user_ids.present?
+  #     user_ids.uniq!
+  #   else
+  #     user_ids = [self.user_id]
+  #   end
+  #
+  #   if user_ids.size > 0
+  #     # Order is MySQL Specific
+  #     user_ids = user_ids.reverse!
+  #     user_ids.reject! { |id| id.blank? }
+  #     users = User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
+  #     return users
+  #   end
+  #   nil
+  # end
 
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
@@ -207,9 +246,19 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
-  def total_amount
-    return precision_value(self.expenses.with_amount.sum(:value)) if self.expenses.present?
-    0
+
+  def total_amount(options=[])
+    return 0 unless self.expenses.present?
+    temp_expenses = self.expenses
+    if options.present?
+      options = [options] unless options.kind_of?(Array)
+      if options.present?
+        options.each do |item|
+          temp_expenses = self.expenses.send(item.to_sym) if item.present? and self.expenses.respond_to?(item.to_sym)
+        end
+      end
+    end
+    precision_value(temp_expenses.with_amount.sum(:value))
   end
 
   def controlling_user?(user)
@@ -265,14 +314,23 @@ class Report < ActiveRecord::Base
 
   def require_reimbursement?
     report_total = total_amount
-    latest_expense = latest_expense
+    latest_exp = latest_expense
     date = nil
-    date = latest_expense.date if latest_expense.present?
+    date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
   end
 
   private
+
+  def controller_has_role
+    if controlling_user_id.present?
+      unless controlling_user_role_id.present?
+        errors.add(:report, 'cannot be processed')
+      end
+    end
+  end
+
   def is_employee
     unless self.user.employee?
       errors.add(:User, 'is not allowed to create reports')

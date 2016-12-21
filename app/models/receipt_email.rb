@@ -14,6 +14,7 @@
 #  updated_at  :datetime         not null
 #
 
+
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
   has_many :receipt_email_attachments

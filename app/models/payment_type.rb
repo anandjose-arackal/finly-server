@@ -8,23 +8,27 @@
 #  updated_at :datetime         not null
 #
 
+
+
+
 class PaymentType < ActiveRecord::Base
   has_many :payments
 
-  def self.advance_id
-    1
+  TYPES = {advance: 1, debt_clearance: 2, reimbursement: 3, settlement: 4,
+           credit_from_virtual_account_to_wallet: 5,
+           credit_from_virtual_account_to_card: 6,
+           credit_from_wallet_to_wallet: 7,
+           credit_from_wallet_to_card: 8,
+           debit_from_wallet_to_wallet: 9,
+           debit_from_wallet_to_virtual_account: 10,
+           atm_withdrawal: 11}
+
+  def self.id_for(key)
+    TYPES[key]
   end
 
-  def self.debt_clearance_id
-    2
-  end
-
-  def self.reimbursement_id
-    3
-  end
-
-  def self.settlement_id
-    4
+  def self.name_for(id)
+    TYPES.key(id).to_s.humanize rescue nil
   end
 
 end

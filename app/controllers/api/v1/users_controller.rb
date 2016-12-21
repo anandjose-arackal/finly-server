@@ -7,15 +7,13 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
   respond_to :json
 
   def index
-
+    @result = User::Index.(current_user, params)
+    respond
   end
 
   def show
-
-  end
-
-  def update
-
+    @result = User::Show.(current_user, params)
+    respond
   end
 
 end

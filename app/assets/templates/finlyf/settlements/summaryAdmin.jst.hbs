@@ -1,40 +1,78 @@
-<div class="col-sm-10 col-sm-offset-1">
-  <div class="col-sm-3 text-center">
-    <h4 class="text-center">Pending Reimbursement</h4>
-    <h4 class="summary_pending_reimbursement text-center">{{item.pending_reimbursement}}</h4>
-    <input type="hidden" name="pending_reimbursement" value="{{item.pending_reimbursement}}">
-    
+<div class="col-sm-12 no-padding" style="height: 100%; padding: 10px 0;">
+  <div class="col-sm-6" style="height: 100%;border-right: 1px solid #bbb;">
+    <div class="row no-margin" style="height: 25%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Pending Reimbursement:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_reimbursement}}</label>
+        <input type="hidden" name="pending_reimbursement" value="{{item.pending_reimbursement}}">
+      </div>
+    </div>
+
+    <div class="row no-margin" style="height: 25%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Advance Request:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_money_request}}</label>
+        <input type="hidden" name="pending_money_request" value="{{item.pending_money_request}}">
+      </div>
+    </div>
+    <div class="row no-margin text-center" style="height: 25%;">
+      &nbsp;
+      
+    </div>
+    <div class="row no-margin text-center" style="height: 25%;">
+      <button class="btn btn-success btn-sm btn-summary-action btn-credit">Credit</button>      
+      
+    </div>
   </div>
 
-  <div class="col-sm-3 text-center">
-    <h4 class="text-center">Cash in Hand</h4>
-    <h4 class="summary_cash_id_hand text-center">{{item.cash_in_hand}}</h4>
-    <input type="hidden" name="cash_in_hand" value="{{item.cash_in_hand}}">
-    
+  <div class="col-sm-6" style="height: 100%;">
+    <div class="row no-margin" style="height: 25%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Cash in Hand:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.cash_in_hand}}</label>
+
+        <input type="hidden" name="cash_in_hand" value="{{item.cash_in_hand}}">
+      </div>
+    </div>
+
+    <div class="row no-margin" style="height: 25%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Card Balance:</span>
+      </div>
+      <div class="col-sm-4">
+      {{#if item.card_balance}}
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.card_balance}}</label>
+      {{else}}
+        <label class="settlement-summary-value">Not Assigned</label>
+      {{/if}}
+      </div>
+    </div>
+    <div class="row no-margin" style="height: 25%;">
+      <div class="col-sm-8">
+        <span class="settlement-summary-type">Finly Account Balance:</span>
+      </div>
+      <div class="col-sm-4">
+        <label class="settlement-summary-value">&#8377;&nbsp;{{item.wallet_balance}}</label>
+      </div>
+    </div>
+
+    <div class="row no-margin text-center" style="height: 25%;">
+      <button class="btn btn-sm btn-warning btn-summary-action btn-debit">Debit</button>
+    </div>
   </div>
 
-  <div class="col-sm-3">
-    <h4 class="text-center">Pending Money Request</h4>
-    <h4 class="text-center summary-pending-money-request">{{item.pending_money_request}}</h4>
-    <input type="hidden" name="pending_money_request" value="{{item.pending_money_request}}">
-  </div>
-
-  <div class="col-sm-3 text-center summary-actions">
-    {{#if item.actions.add_cash_advance}}
-      <button class="btn btn-sm btn-success btn-process-payment btn-report-summary-action">Add Payment</button>
-    {{/if}}
-    {{#if item.actions.add_reimbursement}}
-      <button class="btn btn-sm btn-warning btn-process-reimburse btn-report-summary-action" data-url="{{item.actions.add_reimbursement}}">Reimburse</button>
-    {{/if}}
-    {{#if item.actions.settle}}
-      <button class="btn btn-sm btn-warning btn-process-debt btn-report-summary-action" data-url="{{item.actions.settle}}">Settle Debt</button>
-    {{/if}}
-    {{#if item.actions.credit_money_request}}
-      <button class="btn btn-sm btn-success btn-process-money-request btn-report-summary-action" data-url="{{item.actions.credit_money_request}}">Credit Money Request</button>
-    {{/if}}
-  </div>
 </div>
 <style type="text/css">
+
+  .settlement-summary-type, .settlement-summary-value{
+    font-size: 18px;
+  }
 
 .summary-actions{
   margin-top: -15px;
@@ -43,6 +81,6 @@
   width: 150px;
   margin-top: 5px;
   margin-bottom: 5px;
-  display: block;
+  /*display: block;*/
 }
 </style>

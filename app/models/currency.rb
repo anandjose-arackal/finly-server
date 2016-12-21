@@ -5,10 +5,11 @@
 #  id           :integer          not null, primary key
 #  country      :string(255)
 #  country_code :string(255)
-#  symbol       :string(255)
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  symbol       :string(255)
 #
+
 
 class Currency < ActiveRecord::Base
   has_many :amounts

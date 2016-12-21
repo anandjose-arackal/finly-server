@@ -1,5 +1,5 @@
 class BaseHandler
-  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout, :parsed_response
+  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout
 
   def self.call(user, params={})
     self.new(user, params).run
@@ -12,12 +12,25 @@ class BaseHandler
     clear_messages
   end
 
+  def env_key
+
+  end
+
   def base_url
-    params[:base_url] if params.present?
+    if params.present? and params[:base_url].present?
+      (params[:base_url] or params['base_url'])
+    elsif env_key.present?
+      ENV["#{env_key}_base"]
+    else
+      nil
+    end
   end
 
   def path
-
+    key = self.env_key
+    if key.present?
+      ENV["#{key}_path"]
+    end
   end
 
   def post_params
@@ -86,8 +99,10 @@ class BaseHandler
     return unless p.present?
     begin
       self.response = self.connection.post p, param
+      puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
+      messages[:error] << 'Request timed out. Please try again'
     end
   end
 
@@ -97,7 +112,7 @@ class BaseHandler
   end
 
   def parse
-    self.parsed_response = self.response.body.split(',') rescue []
+
   end
 
   # This would be sent as a return value
@@ -118,11 +133,11 @@ class BaseHandler
   end
 
   def success?
-    self.process_complete and not has_errors? and not self.timeout and self.response.status == 200
+    self.process_complete and not has_errors? and not self.timeout and not self.response.blank? and self.response.status == 200 
   end
 
   def failure?
-    self.process_complete and has_errors?
+    self.process_complete and (has_errors? or self.timeout or self.response.nil? or not self.response.status == 200)
   end
 
   # Used to present the data to the UI
@@ -209,6 +224,7 @@ class BaseHandler
 
   def load_connection(url = base_url)
     self.connection = Faraday.new(:url => url) do |faraday|
+      # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger # log requests to STDOUT
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP

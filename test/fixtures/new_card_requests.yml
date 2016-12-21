@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: new_card_requests
+#
+#  id                 :integer          not null, primary key
+#  company_id         :integer
+#  requesting_user_id :integer
+#  card_type_id       :integer
+#  status_id          :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  company_id: 
+  user_id: 
+  card_type_id: 
+  card_request_status_id: 
+
+two:
+  company_id: 
+  user_id: 
+  card_type_id: 
+  card_request_status_id: 

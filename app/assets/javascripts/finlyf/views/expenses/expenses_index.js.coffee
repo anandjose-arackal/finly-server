@@ -34,20 +34,29 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     'click .btn-reset-filters': 'resetFilters'
     #Filters
     'keyup .filter-merchant': 'autoComplete'
+    'keyup .filter-field': 'autoCompleteUser'
     'click .btn-filter-expenses': 'filter'
+    'click .remove-uploaded-receipt': 'removeUploadedReceipt'
+    'change input#expense-receipt-upload': 'showUploadedReceipt'
+
+    #Global Notifications
+    # 'click .btn-load-more-notifications': 'loadMoreNotifications'
+
 
   initialize: (options) ->
     if Backbone.history.getFragment() == ""
       FinlyF.primary_router.navigate("expenses")
     if options
-
       @params = options.params || {}
+      @params.view = @params.view || 'personal'
+      @current_view = @params.view
       if options.indexOnly
         @indexOnly = true
       if options.parent
         @parent = options.parent
     else
       @params = {}
+      @current_view = 'personal'
     @params.page = 1
     # console.log "Params from view", @params
     # console.log "Step x. Init View"
@@ -71,6 +80,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
     unless @indexOnly
+      # console.log "Params ", @params
       $(@el).html(@templateSkeleton({item: @params}))
       $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
 
@@ -91,7 +101,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           value: $(option).attr('value')
           text: $(option).text()
         }).appendTo(category_select)
-      $(@el).find(".main").html(@templateMain({ item: {indexOnly: false }}))#REF==1I
+      $(@el).find(".main").html(@templateMain({ item: {indexOnly: false, view: @current_view}}))#REF==1I
       FinlyF.structureActions(@el, @params)
     else
       $(@el).html(@templateSkeletonIndexOnly())
@@ -103,7 +113,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           value: $(option).attr('value')
           text: $(option).text()
         }).appendTo(category_select)
-      $(@el).find('.main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
+      $(@el).find('.index-only-main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
   processItems: ->
@@ -112,6 +122,8 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
+
+    FinlyF.stopMainLoader()
 
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
@@ -123,6 +135,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     view_item = new FinlyF.Views.Expense({
       model: item
       parent: @
+      view: @current_view
     })
     $(@el).find("#items").append(view_item.render().el)
 
@@ -148,6 +161,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         _this.dump.length = 0
         _this.dump = _this.collection.models.slice()
         _this.resetPageCount({selector: '.main .load-more', page: 1})
+        _this.expenseSelectOptions()
 
       error: ->
         console.log "Couldn't fetch successfully."
@@ -209,12 +223,15 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(main).addClass("preview")
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
+    console.log "Model id", model_id
     model = @collection.get(model_id)
 
     preview_view = new FinlyF.Views.Expense({
       model_id: model.get('id')
       preview: true
+      view: @params.view
       parent: @
+      screen: 'expenses'
     })
 
     $(@el).find("#item-details-main").html(preview_view.render().el)
@@ -246,7 +263,36 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       }).appendTo(category_select) 
     
     $("#modal-new").modal('show')
-    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
+
+  showUploadedReceipt: (e) ->
+    file = e.currentTarget
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # input = $(target).find('input[type=file]#expense-receipt-upload')
+    close_button = $(target).find('.remove-uploaded-receipt')
+    image = $(target).find("img#preview-image")
+    image_url = window.URL.createObjectURL(file.files[0])
+    $(image).attr('src', image_url)
+    $(close_button).removeClass('hidden')
+    # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
+
+  removeUploadedReceipt: (e) ->
+    e.preventDefault()
+    $(e.currentTarget).addClass('hidden')
+    console.log "Will remove the receipt!"
+    # /assets/images/receipt-placeholder.png
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # close_button = $(target).find('.remove-uploaded-receipt')
+    input = $(target).find('input[type=file]#expense-receipt-upload')
+    image = $(target).find("img#preview-image")
+
+    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    input.replaceWith(input.val('').clone(true))
+
+    # $(close_button).css('display', 'none')
+
 
   create: (e)->
     _this = @
@@ -310,6 +356,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
   createReport: ->
     #  "report"=>{"expense_id"=>"15,36,39"}}
+    _this = @
     items = $(@el).find('#items .item')
     expenses = []
     flag = false
@@ -333,9 +380,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           report_id = model.get('id')
           params = {
             report_id: report_id
+            view: _this.params.view
+            preview: true
           }
           FinlyF.snapNotify(res.messages)
-          FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+
+          FinlyF.primary_router.navigate('reports/' + model_report.get('id') + '/params=' + JSON.stringify(params), {trigger: true})
+          # FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
       error: (err) ->
         console.log "Error", err
     })
@@ -348,9 +399,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         if $(item).find('.select-item').prop('checked')
           flag = true
       if flag == true
-        $(@el).find('.secondary-navbar .btn-create-report').css('display', 'inline')
+        $(@el).find('.secondary-navbar .btn-create-report').removeAttr('disabled')
       else
-        $(@el).find('.secondary-navbar .btn-create-report').css('display', 'none')
+        $(@el).find('.secondary-navbar .btn-create-report').attr('disabled', true)
     else#unless
       @parent.trigger('expense:selected')#REF==3I
 
@@ -360,6 +411,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   filter: (e) ->
+    loader_div = $(@el).find('.main')
+    FinlyF.startMainLoader(loader_div)
+
     if e
       e.preventDefault()
       target = $(e.currentTarget)
@@ -371,6 +425,9 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       'filter_receipt': $(".sidebar .filter-receipt").val() || ""
+      'filter_expense_type_id': $(".sidebar .filter-expense-type-id").val() || ""
+      'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
+      'filter_user_name': $(".sidebar .filter-user").val() || ""
     }
 
     filter_amount_value = $(".sidebar .filter-amount-value").val()
@@ -395,9 +452,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           data: params,
           success: ->
             _this.toggleLoadMore(_this.collection)
+
+            
             # console.log "Fetched all the data"
           error: ->
             console.log "Couldn't fetch Successfully."
+          done: ->
+            FinlyF.stopMainLoader()
         })
 
   globalSearch: (e) ->
@@ -425,6 +486,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     FinlyF.primary_router.navigate('expenses/params=' + JSON.stringify(params), {trigger: true})
 
   autoComplete: (e) ->
+    _this = @
     target = $(e.currentTarget)
     query = $(target).val()
 
@@ -438,6 +500,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
           data: 
             remote: "true"
             query: query
+            view: _this.params.view
             # area: 'central'
           success: (data) ->
             response(data)
@@ -446,6 +509,41 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
         })
       select: (event, ui) ->
         # console.log "Selected."
+    })
+
+  autoCompleteUser: (e) ->
+    _this = @
+    target = $(e.currentTarget)
+    query = $(target).val()
+    field = $(target).attr('data-field')
+
+    $(target).autocomplete({
+      minLength: 2,
+      source: (request, response) ->
+        $.ajax({
+          dataType: "json"
+          type : 'get'
+          url: '/autocomplete/' + field
+          data:
+            view: _this.params.view
+            remote: "true"
+            filter_search: query
+          success: (data) ->
+            response(data)
+          error: (err) ->
+            console.log err
+        })
+
+      focus: (event, ui) ->
+        $(event.target).val(ui.item.label)
+        $(event.target).attr('data-item-id', ui.item.value)
+        return false
+
+      select: (event, ui) ->
+        $(event.target).val(ui.item.label)
+        $(event.target).attr('data-item-id', ui.item.value)
+        return false
+
     })
 
   itemDeleted: (e) ->
@@ -483,3 +581,21 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  # loadMoreNotifications: (e) ->
+  #   e.preventDefault()
+  #   target = e.currentTarget
+
+  #   $(target).attr('disabled', true).html("<i class='fa fa-spinner fa-spin'></i>")
+  #   # console.log "we reached here"
+
+  #   container = $(e.currentTarget).closest('.navbar-notifications').parent()
+
+  #   FinlyF.fetchNotifications(container, 2, false)
+  #   e.stopPropagation()
+
+
+
+
+
+

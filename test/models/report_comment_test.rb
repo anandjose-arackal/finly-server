@@ -17,6 +17,8 @@
 #  payment_id               :integer
 #
 
+
+
 require 'test_helper'
 
 class ReportCommentTest < ActiveSupport::TestCase

@@ -11,5 +11,15 @@
 #  default    :boolean          default(FALSE), not null
 #  is_deleted :boolean          default(FALSE), not null
 #
+#
+#test_policy:
+#  id: 1
+#  name: "Test Policy"
+#  company: finly
+#  owner_id: 1
+#  default: false
+#  is_deleted: false
+
+
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

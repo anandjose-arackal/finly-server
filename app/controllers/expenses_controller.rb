@@ -18,13 +18,22 @@ class ExpensesController < ApplicationController
   end
 
   def update
-    @result = Expense::Manual::Update.(current_user, params)
+    case params[:type]
+      when '1'
+        @result = Expense::Manual::Update.(current_user, params)
+      when '2'
+        @result = Expense::ExCard::Update.(current_user, params)
+    end
     respond response: :success
   end
 
   def destroy
-    @result = Expense::Manual::Destroy.(current_user, params)
-    respond response: :success
+    @result = Expense::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond(response: :failure, message: @result.messages[:error])
+    end
   end
 
   def add_receipt

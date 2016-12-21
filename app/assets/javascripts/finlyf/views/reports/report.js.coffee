@@ -1,24 +1,34 @@
 class FinlyF.Views.Report extends Backbone.View
+
+  templateSkeleton: HandlebarsTemplates['finlyf/reports/base/reportShowSkeleton']
+  templateShowNavbar: HandlebarsTemplates['finlyf/reports/navbar/show/navbar']
+
+
   template: HandlebarsTemplates['finlyf/reports/crud/report']
   templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
-  templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
-  templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
+  # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
+  templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show']
 
   templateNewExpense: HandlebarsTemplates['finlyf/expenses/new']
   templateShowExpense: HandlebarsTemplates['finlyf/reports/expenses/show']
   templateExistingExpense: HandlebarsTemplates['finlyf/reports/expenses/existingExpenses']
-  className: 'item col-sm-12'
+  templateReceiptPreview: HandlebarsTemplates['finlyf/reports/extras/previewReceipt']
+  className: 'item col-sm-12 report'
 
   events:
-    'click .select-item': 'toggleSelect'
+    'click .select-item.report': 'toggleSelect'
     'input [contenteditable=true]': 'updateModel'
-    'click .btn-update-item': 'update'
     'click .add-new-expense': 'newExpense'
+    'click .remove-uploaded-receipt': 'removeUploadedReceipt'
+    'change input#expense-receipt-upload': 'showUploadedReceipt'
+
     'click .add-existing-expense': 'existingExpense'
     'click .btn-create-expense': 'createExpense'
     'click .btn-post-comment': 'postComment'
 
-    'click .btn-delete-item': 'delete'
+    'click .receipt': 'previewReceipt'
+
+    'click .btn-confirm-delete-report': 'confirmDelete'
     'click .btn-edit-item': 'edit'
     'click .btn-update-item': 'update'
     # 'click .btn-submit-item': 'submit'
@@ -33,21 +43,45 @@ class FinlyF.Views.Report extends Backbone.View
 
     #reports
     'click .btn-report-action': 'reportAction'
+    'click .btn-confirm-reject-report': 'rejectReport'
+
+    'click .btn-confirm-take-control': 'takeControl'
+
+
     'click .confirm-add-existing-expense': 'addExistingExpenses'
 
+    'click .btn-go-back': 'goBacktoPreviousPage'
+
+    'shown.bs.modal #modal-mp': 'fixHeight'
+
   initialize: (options) ->
-    console.log "we're here in report show"
-    @parent = options.parent
+    # console.log "we're here in report show", options
+    if options.parent
+      @parent = options.parent
     _this = @
-    @preview = options.preview
     data = {}
+    
+    if options
+      @params = options.params || {}
+      @preview = options.preview
+    else
+      @params = {}
+
+    @params.view = @params.view || options.view || 'personal'
     if @preview
-      @current_view = options.current_view ##NEED TO ADD THIS IN REPORTS
+      $(@el).removeClass("item col-sm-12 report")
+      @current_view = options.params.view || 'personal' ##NEED TO ADD THIS IN REPORTS
       if @current_view
         data.view = @current_view
+      if @params.ref
+        data.ref = @params.ref
+      if @params.n_id
+        data.n_id = @params.n_id
       $(@el).removeClass("item").addClass("bg-white")
       @model = new FinlyF.Models.Report({id: options.model_id})
       @model.fetch({data: data})
+    else
+      @current_view = @params.view || 'personal'
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
     @on('expense:selected', @showExpenseSelectOption, @)#REF==3I
@@ -55,10 +89,13 @@ class FinlyF.Views.Report extends Backbone.View
 
   render: ->
     unless @preview
+      @model.set('view', @current_view)
       $(@el).html(@template({ item: @model.toJSON() }))
     else
-      $(@el).html(@templateShow())
-      $(@el).find("#item-show-details").html(@templateLoadingAnimation())
+      $(@el).html(@templateSkeleton())
+      # $(@el).find(".main").html(@templateShow())
+      # $(@el).find("#item-show-details").html(@templateLoadingAnimation())
+      FinlyF.structureActions(@el, @params)
     @
 
   updateModel: (e) ->
@@ -77,10 +114,17 @@ class FinlyF.Views.Report extends Backbone.View
       $(@el).addClass('selected')
     else
       $(@el).removeClass('selected')
+    @parent.trigger('item:selected')
 
   populateDetails: ->
     @model.set('current_view', @current_view)
-    $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    $(@el).find(".navbar-full").html(@templateShowNavbar({item: @model.toJSON()}))
+    # $(@el).find("#item-show-details").html(@templateShowDetails({item: @model.toJSON()}))
+    $(@el).find(".main").html(@templateShowDetails({item: @model.toJSON()}))
+
+
+    # $(@el).find(".show-detail-title").css("height", "49");
+    # $(@el).find(".show-detail-title").css("height", "50");
 
   showSaveOption: ->
     $(".btn-update-item").css("display", "inline");
@@ -90,7 +134,7 @@ class FinlyF.Views.Report extends Backbone.View
     data = {
       report_id: $(e.currentTarget).attr('data-item-id')
     }
-    $("#modal-new").attr("data-backdrop", false)
+    $("#modal-new").attr("data-backdrop", true)
     $("#modal-new .modal-body").html(@templateNewExpense({data: data}))
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
 
@@ -103,20 +147,67 @@ class FinlyF.Views.Report extends Backbone.View
         text: $(option).text()
       }).appendTo(category_select) 
     
+    $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')
-    $("#modal-new").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
-    $("#modal-new").find('.btn-create-expense').on('click', (e) ->
-      _this.createExpense(@);
+    $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
+    # $("#modal-new").find('.btn-create-expense').on('click', (e) ->
+    #   _this.createExpense(@);
+    # )
+
+    # Since the modal is outside the scope of this view, events need to be manually attached
+    modal_new = $("#modal-new")
+    $(modal_new).find(".remove-uploaded-receipt").on('click', (e) ->
+      _this.removeUploadedReceipt(e)
+    )
+    $(modal_new).find("input#expense-receipt-upload").on('change', (e) ->
+      _this.showUploadedReceipt(e)
     )
 
+
+  # New expense
+  showUploadedReceipt: (e) ->
+    console.log "Hello", e
+    file = e.currentTarget
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # input = $(target).find('input[type=file]#expense-receipt-upload')
+    close_button = $(target).find('.remove-uploaded-receipt')
+    image = $(target).find("img#preview-image")
+    image_url = window.URL.createObjectURL(file.files[0])
+    $(image).attr('src', image_url)
+    $(close_button).removeClass('hidden')
+    # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
+
+  # New expense
+  removeUploadedReceipt: (e) ->
+    e.preventDefault()
+    $(e.currentTarget).addClass('hidden')
+    console.log "Will remove the receipt!"
+    # /assets/images/receipt-placeholder.png
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # close_button = $(target).find('.remove-uploaded-receipt')
+    input = $(target).find('input[type=file]#expense-receipt-upload')
+    image = $(target).find("img#preview-image")
+
+    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    input.replaceWith(input.val('').clone(true))
+
+    # $(close_button).css('display', 'none')
+
   createExpense: (e) ->
-    # console.log "Creating expense"
+    console.log "Creating expense"
     # if e
     #   console.log "event", e
     #   e.preventDefault()
 
+    # console.log "E is", e
 
     # e.preventDefault()
+    # target = e.currentTarget
+
+    $(e).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;")
+    $(e).attr('disabled', 'disabled')
     
     _this = @
     formData = new FormData($('#modal-new form#new-item')[0])
@@ -128,15 +219,20 @@ class FinlyF.Views.Report extends Backbone.View
         # console.log res.messages
         FinlyF.snapNotify(res.messages)
         if res.success == true
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
           $("#modal-new").modal('hide')
           _this.model.fetch({
             data: {
               view: _this.current_view
             }
           })
+        else
+          $(e).html("Create")
+          $(e).attr('disabled', false) 
       error: (err) ->
         console.log "Error", err 
+        $(e).html("Create")
+        $(e).attr('disabled', false)
       cache: false,
       contentType: false,
       processData: false
@@ -152,7 +248,9 @@ class FinlyF.Views.Report extends Backbone.View
     $(@el).find("#modal-mp").html(@templateExistingExpense())
     $(@el).find("#modal-mp .modal-content .modal-body").html(expense_view.render().el)
     $(@el).find("#modal-mp").modal('show')
-    $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $(@el).find("#modal-mp .datepicker").datepicker({dateFormat: "dd-mm-yy"})
+
+    
 
   showExpenseSelectOption: ->
     # console.log "Here we are"
@@ -200,13 +298,18 @@ class FinlyF.Views.Report extends Backbone.View
           $(modal).modal('hide')
           $(modal).html("")
           _this.model.fetch({ data: {view: _this.current_view}})
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
         console.log "Error", err
     })
 
 
   edit: (e) ->
+    e.preventDefault()
+
+    target = e.currentTarget
+    navbar_right = $(target).closest('.navbar-right')
+    $(navbar_right).find('button.btn-report-action').attr('disabled', true)
     #Warning!!! Dirty codes ahead!
     $(e.currentTarget).addClass('btn-update-item btn-success').removeClass('btn-edit-item btn-warning').html("Update  <i class='fa fa-check'></i>")
 
@@ -236,8 +339,15 @@ class FinlyF.Views.Report extends Backbone.View
     # $(target_select).html(select)
 
   update: (e) ->
-    $(e.currentTarget).html("<i class='fa fa-circle-o-notch fa-spin'></i>")
+    e.preventDefault()
+
+    target = e.currentTarget
+    # navbar_right = $(target).closest('.navbar-right')
+    # $(navbar_right).find('button.btn-report-action').removeAttr('disabled')
+    
     _this = @
+    target = e.currentTarget
+    $(target).html("<i class='fa fa-circle-o-notch fa-spin'></i>").attr('disabled', true)
 
     policy_id = $(@el).find('select.item-policy-edit').val()
     name = $(@el).find('input.item-name-edit').val()
@@ -252,7 +362,6 @@ class FinlyF.Views.Report extends Backbone.View
     model.save(data, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
-        $("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
         _this.model.fetch()
       error: (err) ->
         FinlyF.snapNotify(err.messages)
@@ -272,7 +381,7 @@ class FinlyF.Views.Report extends Backbone.View
     # $(e.currentTarget).addClass('btn-edit-item btn-warning').removeClass('btn-update-item btn-success').html("Edit  <i class='fa fa-edit'></i>")
 
   postComment: (e) ->
-    $(e.currentTarget).text('Posting...')
+    $(e.currentTarget).text('Posting...').attr('disabled', true)
     _this = @
     target = $(e.currentTarget)
     report_id = $(target).attr('data-item-id')
@@ -284,7 +393,7 @@ class FinlyF.Views.Report extends Backbone.View
     model = new FinlyF.Models.Report(data)
     model.urlRoot = '/reports/' + report_id + '/comment'
     # console.log _this.parent.params.view
-    model.save({view: _this.parent.params.view}, {
+    model.save({view: _this.params.view}, {
       success: (model, res) ->
         FinlyF.snapNotify(res.messages)
         if res.success == true
@@ -294,7 +403,7 @@ class FinlyF.Views.Report extends Backbone.View
             }
           })
         else
-          $(e.currentTarget).text('Post')
+          $(e.currentTarget).text('Post').attr('disabled', false)
       error: (err) ->
         console.log "Error", err
         $(e.currentTarget).text('Post')
@@ -306,26 +415,48 @@ class FinlyF.Views.Report extends Backbone.View
       $(e.currentTarget).closest('.form-new-comment').find('.btn-post-comment').click()
       return false
 
+  # delete: (e) ->
+  #   modal = $(@el).find('#modal-confirm-delete')
+  #   $(modal).modal('show')
 
-  delete: (e) ->
+  confirmDelete: (e) ->
     _this = @
+    target = e.currentTarget
+
+    modal = $(target).closest('#modal-confirm-delete')
     # @model.set('authenticity_token', $("#authenticity_token").val())
     # console.log $("#authenticity_token").val()
+
+    params = {
+      view: @current_view
+    }
     @model.destroy({
       data: {
         'authenticity_token': $("#authenticity_token").val()
       }
       processData: true
       success: (model, res) ->
+        $(modal).modal('hide')
+
+        # Hack for removing backdrop
+        $('body').removeClass('modal-open')
+        $('.modal-backdrop').remove()
+        
         FinlyF.snapNotify(res.messages)
+        FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+
         # console.log res
-        _this.parent.trigger('item:destroyed')
+        # _this.parent.trigger('item:destroyed')
       error: (err) ->
         console.log "Error", err
 
     })
 
   reportAction: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
     _this = @
     url = $(e.currentTarget).attr('data-url')
     $.ajax({
@@ -334,25 +465,111 @@ class FinlyF.Views.Report extends Backbone.View
       dataType: 'json',
       success: (res) ->
         FinlyF.snapNotify(res.messages)
-        if res.success == true
-          _this.model.fetch({
-            data: {view: _this.current_view}
-          })
-          $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        else
-          _this.model.fetch({
-            data: {view: _this.current_view}
-          })
+        # if res.success == true
+        #   _this.model.fetch({
+        #     data: {view: _this.current_view}
+        #   })
+        #   # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        # else
+        #   _this.model.fetch({
+        #     data: {view: _this.current_view}
+        #   })
+        _this.model.fetch({
+          data: {view: _this.current_view}
+        })
       error: (err) ->
         console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
     })
+
+  rejectReport: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
+    _this = @
+
+    url = $(@el).find('#btnRejectReport').attr("data-url")
+
+    console.log "Url ", url
+
+    modal = $(target).closest('#modal-confirm-reject')
+
+    data = {
+      reject_note: $(modal).find("textarea.reject-note").val()
+    }
+
+    $.ajax({
+      url: url,
+      type: 'patch',
+      dataType: 'json',
+      data: data,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        else
+          $(target).removeAttr('disabled').html(button_text)
+          # _this.model.fetch({
+          #   data: {view: _this.current_view}
+          # })
+        
+      error: (err) ->
+        console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
+    })
+
+  takeControl: (e) ->
+    e.preventDefault()
+
+    target = e.currentTarget
+    button_text = $(target).text()
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa-spin fa-spinner fa'></i>&nbsp;&nbsp;")
+    _this = @
+
+    url = $(@el).find('#btnTakeControlReport').attr("data-url")
+
+    modal = $(target).closest('#modal-confirm-take-control')
+
+    data = {
+      take_control_note: $(modal).find("textarea.take-control-note").val()
+    }
+
+    $.ajax({
+      url: url,
+      type: 'patch',
+      dataType: 'json',
+      data: data,
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+          _this.model.fetch({
+            data: {view: _this.current_view}
+          })
+          # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        else
+          $(target).removeAttr('disabled').html(button_text)
+          # _this.model.fetch({
+          #   data: {view: _this.current_view}
+          # })
+        
+      error: (err) ->
+        console.log "error", err
+        $(target).removeAttr('disabled').html(button_text)
+    })
+
 
   refreshData: (e)->
     _this = @
     target = e.currentTarget
     if $(target).find(".modal-content").attr("data-refresh-true")
       @model.fetch({ data: {view: _this.current_view }})
-      $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+      # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
     # console.log "Closed Bootstrap modal"
 
   deleteSub: (e) ->
@@ -369,7 +586,7 @@ class FinlyF.Views.Report extends Backbone.View
       success: (res)->
         FinlyF.snapNotify(res.messages)
         _this.model.fetch({ data: {view: _this.current_view}})
-        $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
+        # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
       error: (err) ->
         console.log "Error", err
     })
@@ -385,12 +602,14 @@ class FinlyF.Views.Report extends Backbone.View
       model_id: expense_id
       preview: true
       view: @current_view
-      report: true
+      report: true #will be removed
+      screen: 'report'
+      # parent: @
     })
     $(@el).find("#modal-mp").html(@templateShowExpense())
     $(@el).find("#modal-mp .modal-content .modal-body .row").html(preview_view.render().el)
     $(@el).find("#modal-mp").modal('show')
-    $("#modal-mp").find(".datepicker").datepicker({dateFormat: "yy-mm-dd"})
+    $("#modal-mp").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
 
   rejectSub: (e) ->
@@ -477,6 +696,29 @@ class FinlyF.Views.Report extends Backbone.View
         console.log err
     })
 
+  previewReceipt: (e) ->
+    target = e.currentTarget
+
+    image_url = $(target).find("img").attr('src')
+
+    item = {
+      url: image_url
+    }
+
+    $("#modal-receipt-preview").html(@templateReceiptPreview({item: item}))
+    $("#modal-receipt-preview").modal('show')
 
 
+  goBacktoPreviousPage: (e) ->
+    e.preventDefault()
+    Backbone.history.history.back()
 
+  fixHeight: (e) ->
+    # console.log $(e.currentTarget).find(".container-main.container-expenses").height()
+
+    # Fixing height issue
+    modal = e.currentTarget
+
+    container_height = $(modal).find(".container-main.container-expenses").height()
+    # console.log "Container height", container_height
+    $(modal).find(".index-only-main").height(container_height - 5)

@@ -14,7 +14,9 @@ class CreateMoneyRequests < ActiveRecord::Migration
       t.date :required_by_date
       t.integer :status_id, references: 'money_request_status', index: true, foreign_key: true, null: false
       t.integer :controlling_user_id, references: 'user', index: true, foreign_key: true
+      t.integer :controlling_user_role_id, :references => "user_role", index: true, foreign_key: true
       t.integer :controlling_for_user_id, references: 'user', index: true, foreign_key: true
+      t.integer :controlling_for_user_role_id, :references => "user_role", index: true, foreign_key: true
       t.integer :loaded_by, references: 'user', index: true, foreign_key: true
       t.datetime :loaded_at
       t.datetime :submitted_at, limit: 6

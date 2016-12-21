@@ -3,7 +3,9 @@ json.user do
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number
   json.current_user_id @result.user.id
+  json.gender @result.selected_user.profile.gender rescue nil
   json.editable (@result.user.company_admin? and params[:view] == 'admin')
+  json.activateable @result.selected_user.manager_activateable?
 end
 json.role do
   json.admin @result.roles[:admin]
@@ -81,3 +83,50 @@ end
   end
 end
 json.actions @result.actions
+json.card do
+  card = @result.card
+  assigned = card.present?
+  json.assigned assigned
+  if assigned
+    json.extract! card, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility
+    json.disabled_by do
+      json.name card.disabled_by_user.name rescue nil
+      role_name = nil
+      role_name = UserRole.name_for(card.disabled_by_role_id) if card.disabled_by_role_id.present?
+      json.role role_name
+    end
+  end
+end
+
+json.wallet do
+  json.balance @result.wallet.balance_value
+end
+json.auto_submit_config do
+  json.extract! @result.auto_submit_config, :enabled, :limit_to_card_expenses, :default_memo
+  json.period do
+    json.id @result.auto_submit_config.period_id
+    period_name = nil
+    if @result.auto_submit_config.period_id.present?
+      period_name = @result.auto_submit_config.period.name
+    end
+    json.name period_name
+  end
+  json.policy do
+    json.id @result.auto_submit_config.default_policy_id
+    policy_name = nil
+    if @result.auto_submit_config.default_policy_id.present?
+      policy_name = @result.auto_submit_config.default_policy.name
+    end
+    json.name policy_name
+  end
+end
+json.policies do
+  json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+json.periods do
+  json.array! @result.periods do |period|
+    json.extract! period, :id, :name
+  end
+end

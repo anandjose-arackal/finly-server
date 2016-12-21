@@ -1,7 +1,7 @@
 <div id="backbone-container">
 </div>
 
-<input type="hidden" id="current_user_id" value="<%= current_user.id %>">
+<input type="hidden" id="current_user_id" value="<%= current_user.id %>" data-user-name="<%= current_user.name %>" data-user-email="<%= current_user.email %>">
 
 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 <input name="utf8" id="form_utf8" type="hidden" value="&#x2713;"/>
@@ -17,13 +17,13 @@
 
   <ul id="menu-nav-views-dropdown">
     <% if current_user.admin? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="admin">Admin View</a></li>
+      <li><a href='#reports/params={"view":"admin"}' class="navbar-view-type" data-view-type="admin">Admin View</a></li>
     <% end %>
     <% if current_user.finance_manager? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
+      <li><a href='#reports/params={"view":"finance_manager"}' class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
     <% end %>
     <% if current_user.manager? %>
-      <li><a href="#" class="navbar-view-type" data-view-type="manager">Manager View</a></li>
+      <li><a href='#reports/params={"view":"manager"}' class="navbar-view-type" data-view-type="manager">Manager View</a></li>
     <% end %>
     <% if current_user.employee? %>
       <li><a href="#" class="navbar-view-type" data-view-type="personal">Personal View</a></li>
@@ -35,40 +35,42 @@
     <% if current_user.admin? %>
       <% views["admin"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
+          <% elsif value =~ /organization_account/i || value =~ /faq/i %>
+            <li><a class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% else %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
     <% elsif current_user.finance_manager? %>
       <% views["finance_manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
           <% else %>
-            <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
     <% elsif current_user.manager? %>
       <% views["manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
           <% else %>
-            <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
     <% elsif current_user.employee? %>
       <% views["personal"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
-          <% if value == '/users/' %>
-            <li><a target="_blank" class="navbar-menu-li non-backbone-link" data-path="<%= value + current_user.id.to_s + '/profile' %>" href="<%= value + current_user.id.to_s + '/profile' %>"><%= key %></a></li>
+          <% if value == '#settings' %>
+            <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
           <% else %>
-            <li><a target="_blank" class="navbar-menu-li" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+            <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
           <% end %>
         <% end %>
       <% end %>
@@ -123,3 +125,29 @@
 <div id="ohsnap"></div>
 <div id="ohsnap-priority"></div>
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-balance">
+  <div class="modal-dialog" role="document" style="width: 40%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">My Balance</h4>
+      </div>
+      <div class="modal-body" data-user-id="<%= current_user.id %>">
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade in" tabindex="-1" role="dialog" id="modal-global-transfer">
+  <div class="modal-dialog" role="document" style="width: 40%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Load Funds into Card</h4>
+      </div>
+      <div class="modal-body">
+        
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>

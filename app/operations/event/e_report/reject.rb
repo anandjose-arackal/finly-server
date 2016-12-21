@@ -3,20 +3,22 @@ class Event::EReport::Reject < Event::EReport::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.action_user
+    self.rejecting_user = self.report.tracks.last.action_user rescue nil
   end
 
   def validate
     super
-    self.rejecting_user.present?
+    unless self.rejecting_user.present?
+      add_message :error, 'User not found'
+    end
   end
 
   def event_id
-    Event.report_reject_id
+    NotifierType.report_reject_id
   end
 
   def affected_users
-    [rejecting_user, self.report.controlling_user]
+    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
   end
 
   def send_push_notification(user)
@@ -26,19 +28,32 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    notification = user.notifications.build(user: user,
+                                            notification_type_id: NotificationType.report_id,
+                                            action_type_id: NotificationActionType.notify_reject_id,
+                                            action_user_id: report.tracks.last.action_user.id,
+                                            object_id: report.id,
+                                            object_type: "Report",
+                                            path_object_id: report.id,
+                                            path_object_type: "Report",
+                                            read: false,
+                                            timestamp: DateUtils.local_date_time,
+                                            view_role_id: roles.first
+                                            )
+    notification.save
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user.id
+    unless user == self.rejecting_user
       "#{rejecting_user.name} has rejected the report: #{self.report.name}"
     else
-      "Report rejected : #{self.report.name}"
+      "You rejected the report : #{self.report.name}"
     end
   end
 
   def mailer_body(user)
-    if user.id == report.controlling_user.id
+    unless user == self.rejecting_user
       "#{rejecting_user.name} has rejected the report: '#{self.report.name}'"
     else
       "You have rejected the report : #{self.report.name}"

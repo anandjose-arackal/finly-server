@@ -1,11 +1,15 @@
 class Event::EReport::Submit < Event::EReport::Base
 
   def event_id
-    Event.report_submit_id
+    NotifierType.report_submit_id
   end
 
   def affected_users
     [self.report.user, self.report.controlling_user]
+  end
+
+  def notification_affected_users
+    [report.controlling_user]
   end
 
   def send_push_notification(user)
@@ -15,7 +19,18 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.notify_submit_id,
+                                             action_user_id: report.user_id,
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: report.controlling_user_role_id
+                                            )
+    notification.save
   end
 
   def mailer_subject(user)

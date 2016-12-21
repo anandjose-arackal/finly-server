@@ -7,7 +7,7 @@ class User::Index < User::Base
     if operation.success?
       self.users = result
     else
-      messages[:error] << (operation.messages[:error] + operation.messages[:failure])
+      add_message :error, (operation.messages[:error] + operation.messages[:failure])
     end
   end
 
@@ -17,7 +17,7 @@ class User::Index < User::Base
   end
 
   class User::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :team, :users_type_count, :users_status_count, :pending_invites_count
+    attr_accessor :team, :users_type_count, :users_status_count, :pending_invites_count, :paginated_team
 
     has_scope :filter_search
     has_scope :filter_role
@@ -29,7 +29,7 @@ class User::Index < User::Base
         self.users_type_count = self.team.joins(:role_mapping).group(:user_role_id).count
         self.users_status_count = self.team.group(:active).count
         self.pending_invites_count = self.team.pending.count
-        self.team = self.team.paginate(page: params[:page], per_page: 30)
+        self.paginated_team = self.team.paginate(page: params[:page], per_page: 30)
       end
     end
   end

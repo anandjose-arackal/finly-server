@@ -18,19 +18,26 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:amount] and params[:payment][:amount].to_i < 0
-      messages[:error] << "Reimbursement amount cannot be negative."
+    if params[:payment][:amount] and params[:payment][:amount].to_d <= 0
+      add_message :error, 'Reimbursement amount cannot be less than or equal to 0'
       return
     end
     if params[:report_ids].blank?
-      messages[:error] << "No reports to reimburse."
+      add_message :error, 'No reports to reimburse'
     end
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate this transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    # end
   end
 
   def init
     id = (params[:id] or params[:to_user_id])
     self.to_user = user.company.users.find_by(id: id)
-    self.reports = to_user.reports.where(id: params[:report_ids]) if to_user
+    self.reports = to_user.reports.with_id(params[:report_ids]) if to_user
   end
 
   def authorize
@@ -56,14 +63,16 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
     validate_date payment_params[:date]
 
     # is this really necessary
-    total_amount = precision_value(reports.with_amount.sum(:value))
+    total_amount = precision_value(reports.with_amount.sum(:value)).to_f
     unless total_amount == precision_value(payment_params[:amount]).to_f
-      messages[:error] << "Reimbursement amount does not match report totals."
+      add_message :error, 'Reimbursement amount does not match report totals'
     end
   end
 
   def process
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.reimbursement_id, date: payment_params[:date], note: payment_params[:note],
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
+                                          payment_type_id: PaymentType.id_for(:reimbursement),
+                                          date: payment_params[:date], note: payment_params[:note],
                                   amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement precision_value(payment_params[:amount]), payment_params[:currency_id]
@@ -72,11 +81,13 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
       end
       return true
     end
-    self.messages[:error] = payment.errors.full_messages + balance_sheet.errors.full_messages
+    add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
     payment.destroy
   end
 
   def post_process
-    messages[:success] << "Reports reimbursed."
+    add_message :success, 'Reports reimbursed'
+
+    Event::ESettlement::AddReimbursement.(user, payment: self.payment)
   end
 end

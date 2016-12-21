@@ -17,9 +17,8 @@ class UsersController < ApplicationController
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
     @result = User::Index.(current_user, params)
-
     respond_to do |format|
-      format.json { render json: @result.team.as_json }
+      format.json { render json: @result.paginated_team.as_json }
     end
   end
 
@@ -36,34 +35,80 @@ class UsersController < ApplicationController
     respond
   end
 
-  # placeholder action for importing file
-  def mass_import
+  # def profile
+  #   ap params
+  #   @result = User::Profile.(current_user, params)
+  # end
+
+  def edit_default_password
 
   end
 
-  def profile
+  def update_default_password
+    @result = User::ManagerActivate::ReplaceDefaultPassword.(current_user, params)
+    if @result.success?
+      sign_in @result.user, :bypass => true
+      redirect_to root_url
+    else
+      redirect_to request.referrer
+    end
+  end
+
+
+  #Created for asynchronously loading files for backbone
+  def user_profile
     @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'my_profile'}
+    end
   end
+
+  def user_balance
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'wallets_cards'}
+    end
+  end
+
+  def user_security
+    @result = User::Profile.(current_user, params)
+    respond_to do |format|
+      format.html { render partial: 'change_password'}
+    end
+  end
+
 
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
     @result = update_password_op.run
     if @result.success?
       sign_in @result.user, :bypass => true
-      flash[:success] = @result.messages[:success]
+      # flash[:success] = @result.messages[:success].first rescue nil
     else
-      flash[:error] = @result.messages[:error]
+      # flash[:error] = @result.messages[:error].first rescue nil
     end
-    redirect_to request.referrer
+    # redirect_to request.referrer
+    # redirect_to request.referrer
+    respond
+  end
+
+  # placeholder action for importing file
+  def mass_import
+
   end
 
   # action that imports from a CSV or Excel file for mass invitations
   def import
-    import_op = User::Invite::Import.new(current_user, params)
+    import_op = Import::CompanyAdmin::Users.new(current_user, params)
     @result = import_op.run
     respond_to do |format|
-      format.csv { send_data @result }
+      format.csv { send_data @result, :type => 'text/csv; charset=iso-8859-1; header=present', :disposition => "attachment;data=result.csv" }
     end
+  end
+
+  def balance
+    @result = User::Balance.(current_user, params)
+    respond
   end
 
   private
@@ -80,7 +125,7 @@ class UsersController < ApplicationController
         success_message = 'Password updated'
       when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
-        success_message = 'User team updated.'
+        success_message = 'User team updated'
       when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = 'Role updated'
@@ -90,6 +135,9 @@ class UsersController < ApplicationController
       when 'state'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'
+      when 'auto_submit'
+        operation = User::Configuration::AutoSubmit::Update.new(current_user, params)
+        success_message = 'Configuration updated'
       else
         # do nothing, ha!
     end

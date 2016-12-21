@@ -3,7 +3,7 @@ class ExportPreferencesController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    create_op = Export::Field::Create.new(current_user, params)
+    create_op = Company::ExportPreferences::Create.new(current_user, params)
     @result = create_op.run
     if @result.success?
       messages = @result.messages
@@ -18,7 +18,7 @@ class ExportPreferencesController < ApplicationController
   end
 
   def destroy
-    destroy_op = Export::Field::Destroy.new(current_user, params)
+    destroy_op = Company::ExportPreferences::Destroy.new(current_user, params)
     @result = destroy_op.run
     if @result.success?
       messages = @result.messages
@@ -27,6 +27,7 @@ class ExportPreferencesController < ApplicationController
       # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
       respond_to do |format|
         format.js {}
+        format.json {}
       end
     else
       flash[:error] = @result.messages[:error]
@@ -34,8 +35,8 @@ class ExportPreferencesController < ApplicationController
   end
 
   def update
-    destroy_op = Export::Field::Update.new(current_user, params)
-    @result = destroy_op.run
+    update_op = Company::ExportPreferences::Update.new(current_user, params)
+    @result = update_op.run
     if @result.success?
       messages = @result.messages
       @result = Company::Configuration::Show.(current_user, params)
@@ -43,6 +44,7 @@ class ExportPreferencesController < ApplicationController
       # render partial: 'organization_account/export_preferences', replace: '#exportPreferencesDiv'
       respond_to do |format|
         format.js {}
+        format.json {}
       end
     else
       flash[:error] = @result.messages[:error]

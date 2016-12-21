@@ -1,0 +1,62 @@
+# == Schema Information
+#
+# Table name: card_transactions
+#
+#  id                    :integer          not null, primary key
+#  user_id               :integer
+#  card_id               :integer
+#  merchant_name         :string(255)
+#  transaction_type      :string(255)
+#  post_data             :text(65535)
+#  transaction_amount_id :integer
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  reference_id          :string(255)
+#  auth_transaction_id   :string(255)
+#  transaction_mode      :string(255)
+#  itzcash_merchant_key  :string(255)
+#  merchant_city         :string(255)
+#  response_code         :string(255)
+#  serial_id             :string(255)
+#  product_code          :string(255)
+#  transaction_timestamp :datetime
+#  expensed              :boolean          default(TRUE)
+#  error_message         :text(65535)
+#  billing_amount_id     :integer
+#  expense_id            :integer
+#
+
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 
+  card_id: 
+  channel: MyString
+  merchant_category_code: MyString
+  merchant_id: 1
+  merchant_name: MyString
+  network: MyString
+  terminal_id: 1
+  trace_number: MyString
+  transaction_currency_code: MyString
+  transaction_type: MyString
+  card_currency_code: MyString
+  post_data: MyText
+  bank_network: MyString
+
+two:
+  user_id: 
+  card_id: 
+  channel: MyString
+  merchant_category_code: MyString
+  merchant_id: 1
+  merchant_name: MyString
+  network: MyString
+  terminal_id: 1
+  trace_number: MyString
+  transaction_currency_code: MyString
+  transaction_type: MyString
+  card_currency_code: MyString
+  post_data: MyText
+  bank_network: MyString

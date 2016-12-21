@@ -10,7 +10,7 @@ class User::Team::FinalFinanceManager < User::Team::Base
     end
 
     if params[:report].present? and params[:money_request].present?
-      messages[:error] << 'You can only request for finance manager for either report or card load request'
+      messages[:error] << 'You can only request for finance manager for either report or advance request'
     end
   end
 
@@ -24,7 +24,7 @@ class User::Team::FinalFinanceManager < User::Team::Base
     m = User::Team::Approver.(user, params)
     while m.present?
       params[:type] = :approves_finance_to
-      m = User::Team::Approver.(user, params)
+      m = User::Team::Approver.(m, params)
     end
     self.response = m
   end

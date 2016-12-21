@@ -3,6 +3,9 @@
   <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
 
     <h3>Company: <%=@result.company.name%></h3>
+
+    <button class="btn btn-sm btn-warning btn-import-employees" onclick="showInviteModal()">Import Employees</button>
+
     <h3>Add a new admin</h3>
 
       <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_new_admin_path(@result.company) %>" method="post">
@@ -30,3 +33,46 @@
 
   </div>
 </div>
+
+<!-- import modal -->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-import-employees" data-backdrop="true">
+  <div class="modal-dialog" role="document" style="width: 40%; margin-top: 113px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Invite Employees by Importing Excel File</h4>
+      </div>
+      <div class="modal-body" style="padding-top: 0;">
+        <div class="row no-margin">
+          <div class="col-sm-12 text-right">
+            <a href="/assets/sample_import_format.xls" class="btn btn-warning btn-sm">Download Template</a>
+          </div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-12">
+            <form id="form-import-employees" enctype="multipart/form-data" action="/superadmin_import.csv" data-remote="true">
+              <input type="hidden" name="_type" value="POST">
+              <input type="hidden" name="authenticity_token">
+
+              <input class="form-control" style="border: none;box-shadow: none;padding: 0;" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="file">
+              <div class="form-group text-center">
+                <input type="submit" value="Upload" class="btn btn-sm btn-success"/>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  function showInviteModal()
+  {
+    $('#modal-import-employees').modal('show');
+  }
+
+</script>

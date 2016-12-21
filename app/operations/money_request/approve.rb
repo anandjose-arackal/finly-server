@@ -2,6 +2,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
   attr_accessor :auto_approve
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve])
     [:manager, :finance_manager, :admin]
   end
 
@@ -12,6 +13,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
     if user.blank?
       messages[:error] << 'User not found'
     end
+
   end
 
   def init
@@ -33,25 +35,52 @@ class MoneyRequest::Approve < MoneyRequest::Base
     unless money_request.processing? or params[:auto_approve]
       messages[:error] << 'Cannot approve this request as it is not in processing state'
     end
+    validate_payment_mode
+  end
+
+  def validate_payment_mode
+    unless money_request.payment_mode_id == PaymentMode.id_for(:cash)
+      messages[:error] << 'Error approving advance request. Use approve and forward action'
+    end
   end
 
   def process
-    manager = User::Team::Review::NextReviewer.(money_request)
+    presenter = User::Team::Review::NextReviewer.(money_request)
+    manager = presenter.user
+    to_user_role_id = presenter.role_id
     status = MoneyRequestStatus.id_for(:processing)
     if auto_approve or manager.blank?
       status = MoneyRequestStatus.id_for(:approved)
     end
     manager_id = manager.id rescue nil
-    user_role = User::Team::Review::UserRole.((money_request.controlling_for_user or money_request.controlling_user), self.money_request)
-    memo = (params[:note] or params[:memo] or money_request.memo)
-    if money_request.update_attributes status_id: status, controlling_user_id: manager_id, controlling_for_user_id: nil, memo: memo
+    curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
+    update_attributes = {}
+    update_attributes[:status_id] = status
+    update_attributes[:controlling_user_id] = manager_id
+    update_attributes[:controlling_for_user_id] = nil
+    update_attributes[:controlling_user_role_id] = to_user_role_id
+    update_attributes[:controlling_for_user_role_id] = nil
+    update_attributes[:memo] = self.params[:memo]
+    update_attributes[:submitted_at] = DateTime.now if auto_approve
+    if money_request.update_attributes update_attributes
       if auto_approve
-        money_request.tracks.create action_user: nil, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:auto_approve),
-                                    status_id: status
+        track_attributes = {}
+        track_attributes[:action_user] = nil
+        track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:auto_approve)
+        track_attributes[:status_id] = status
+        track_attributes[:modified_user] = nil
+        track_attributes[:modified_user_role_id] = nil
+        money_request.tracks.create track_attributes
         self.money_request.comments.create comment_action_id: MoneyRequestCommentAction.id_for(:auto_approve)
       else
-        money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
-                                    status_id: status, user_request_role_id: user_role
+        track_attributes = {}
+        track_attributes[:action_user] = user
+        track_attributes[:action_user_role_id] = curr_user_role
+        track_attributes[:modified_user_id] = money_request.controlling_user_id
+        track_attributes[:modified_user_role_id] = to_user_role_id
+        track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:approve)
+        track_attributes[:status_id] = status
+        money_request.tracks.create track_attributes
         self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
       end
       return true
@@ -62,11 +91,15 @@ class MoneyRequest::Approve < MoneyRequest::Base
   def post_process
     # todo computing settlements
     unless money_request.processing?
-      Settlement::MoneyRequest::Approved.(user, money_request: money_request)
+      Settlement::MoneyRequest::Approved.(user, money_request: money_request, auto_approve: auto_approve)
       money_request.reload
     end
 
     # todo sending notifications
-    # Event::MoneyRequest::Approve.(self.user, money_request: self.money_request)
+    Event::EMoneyRequest::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
+
+    if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:cash)
+      messages[:success] << 'Successfully approved the advance request'
+    end
   end
 end

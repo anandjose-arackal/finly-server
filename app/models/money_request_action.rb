@@ -8,5 +8,6 @@
 #  updated_at :datetime         not null
 #
 
+
 class MoneyRequestAction < ActiveRecord::Base
 end

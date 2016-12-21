@@ -1,0 +1,26 @@
+# == Schema Information
+#
+# Table name: notifier_types
+#
+#  id                             :integer          not null, primary key
+#  name                           :string(255)      not null
+#  has_push_notification          :boolean          not null
+#  has_mailer                     :boolean          not null
+#  configurable_push_notification :boolean          not null
+#  configurable_mailer            :boolean          not null
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#
+
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  push_notification: false
+  mailer: false
+
+two:
+  name: MyString
+  push_notification: false
+  mailer: false

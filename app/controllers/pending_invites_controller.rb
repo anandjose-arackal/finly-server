@@ -3,14 +3,15 @@ class PendingInvitesController < ApplicationController
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
+    @states = State::VALUES
     # i.e. if user has already signed in, redirect to login page
     unless @pending_user and @pending_user.invitation_token
       redirect_to new_user_session_path
     end
   end
 
-
   def create
+
     @result = User::Invite::Create.(current_user, params)
     if @result.present? and @result.success?
       respond(response: :success)
@@ -47,17 +48,65 @@ class PendingInvitesController < ApplicationController
   end
 
   def accept
+    # ap params
+    # fail
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?
       sign_in @result.accepted_user, :bypass => true
-      # bypass_sign_in(@result.accepted_user)
-      # redirect_to root_url
-      # respond
+
       respond_to do |format|
         format.js { render js: "window.location = '#{root_url}';"}
+        # format.js { render js: "window.location = '#{root_url}';"}
       end
     else
       respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+
+  def initiate_activation
+    @pending_user = User.find(params[:user_id])
+    respond_to do |format|
+      format.html {render partial: 'verify_mobile'}
+    end
+  end
+
+
+  def send_otp
+    @result = User::ManagerActivate::SendOtp.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
+    end
+
+    # respond_to do |format|
+    #   format.json {render json: {success: true}}
+    # end
+  end
+
+  def activate_employee
+    @states = State::VALUES
+    @pending_user = User.find(params[:user_id])
+
+    if @pending_user.otp_verified?
+      respond_to do |format|
+        format.html {render partial: 'activate_employee'}
+      end
+    else
+      # calling the initiate activation method
+      initiate_activation
+    end
+  end
+
+  # params["user"] = {"invitation_token"=>"", "email"=>"", "mobile_number"=>"8105739684", "first_name"=>"Sreeram", "maiden_name"=>"", "last_name"=>"Ramasubramanian", "profile_attributes"=>{"date_of_birth"=>"2006-03-01", "gender"=>"m", "address_1"=>"zsdzsdf", "address_2"=>"sdvsdvsa", "city"=>"sdvasdvsad", "state_id"=>"S18", "pin_code"=>"560003"}}, "type"=>"accept", "user_id"=>"10", "id"=>"sign_up"}
+
+  def manager_sign_up
+    @result = User::ManagerActivate::ManagerSignUp.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
     end
   end
 

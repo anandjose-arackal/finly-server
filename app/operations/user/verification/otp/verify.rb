@@ -1,0 +1,36 @@
+class User::Verification::Otp::Verify < User::Verification::Otp::Base
+
+  attr_accessor :selected_user
+
+  def pre_validate
+    if user.blank?
+      messages[:error] << 'User not found'
+      return
+    end
+    if params.blank? or params[:verification_code].blank?
+      messages[:error] << 'Verification cannot be blank'
+      return
+    end
+  end
+
+  def init
+    if params[:user_id]
+      self.selected_user = user.company.users.find_by(id: params[:user_id])
+    else
+      self.selected_user = user
+    end
+  end
+
+  def validate
+    if params[:verification_code].length < 6 or params[:verification_code].length > 6 or selected_user.otp != params[:verification_code]
+      messages[:error] << 'Invalid verification code'
+    end
+  end
+
+  def process
+    # skipping validations because users from the mobile number invite flow won't have their details filled in yet
+    selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+    selected_user.save(validate: false)
+  end
+
+end

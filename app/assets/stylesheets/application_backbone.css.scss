@@ -26,6 +26,45 @@
   display: inline-block;
 }
 
+.main-loader{
+  position: relative;
+  // animation: color_change 4s infinite;
+}
+// .main-loader::before{
+//   content: "";
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   width: 100%;
+//   height: 100vh;
+//   background-color: rgba(255, 255, 255, 0.4);
+//   filter: blur(20px);
+// }
+
+.main-loader::after{
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  opacity: 0.8;
+  z-index: 1001;
+  background: white;
+  background-image: url(/assets/images/ajax-loader.gif);
+  background-repeat: no-repeat;
+  background-size: 30px;
+  background-position: center;
+  bottom: 0;
+}
+@keyframes color_change {
+  0% { background-color: rgba(241, 196, 15, 0.2) }
+  25% { background-color: rgba(39, 174, 96, 0.2) }
+  50% { background-color: rgba(231, 76, 60, 0.2) }
+  75% { background-color: rgba(142, 68, 173, 0.2) }
+  100% { background-color: rgba(41, 128, 185, 0.2) }
+}
+
 //Loading animation
 .loading-animations {
   margin: 100px auto;
@@ -35,9 +74,13 @@
   font-size: 10px;
 }
 
+.navbar-balance .loading-animations{
+  margin: 30px auto;
+}
+
 .loading-animation {
   /* border-radius: 6px; */
-  background-color: #594da8;
+  background-color: #3F51B5;
   height: 80%;
   width: 6px;
   margin-right: 1px;
@@ -55,7 +98,7 @@
   -webkit-transform: scaleY(.5);
   -moz-transform: scaleY(.5);
   transform: scaleY(.5);
-  background-color: #594da8;
+  background-color: #3F51B5;
   }
   20% {
     -webkit-transform: scaleY(1);
@@ -153,13 +196,189 @@
 
 // Home css scss content ends
 
+
+$brand-primary: #3F51B5;
+$brand-success: #4CAF50;
+$brand-warning: #FFC107;
+// $brand-warning: #FFA000;
+$brand-danger: #F44336;
+$brand-info: #00BCD4;
+
+
 @import "bootstrap";
 @import "bootstrap-sprockets";
+
+.navbar-inverse{
+  color: white;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+#primary-navbar{
+  background: #3F51B5;
+} 
+.admin{
+  #primary-navbar{
+    background: #F44336;
+    background: #E91E63;
+  }
+
+  #primary-navbar.navbar-inverse .navbar-nav > li > a {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #fff;
+    background-color: #F44336;
+    background-color: #E91E63;
+    font-weight: bold;
+  }
+
+  .user.active {
+    background-color: #F44336;
+    background-color: #E91E63;
+    color: white;
+    font-weight: bold;
+  }
+
+  .user:hover{
+    background: #FAC8D9;
+  }
+
+  .user.active:hover{
+    background: #E91E63;
+  }
+
+  #navbar-notification-count.badge-danger{
+    background: #3F51B5;
+  }
+
+  .navbar-notification.unread{
+    background: #FDE7EE;
+  }
+}
+
+.user.active{
+  background: #3F51B5;
+  color: white;
+  font-weight: bold;
+}
+
+.user.active:hover{
+  background: #3F51B5;
+}
+
+.user:hover{
+  background: #C4CAEB;
+  cursor: pointer;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: white;
+  border-bottom: 3px solid transparent;
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+  background-color: transparent;
+  border-color: #FFF;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus{
+  border-color: #FFF;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  /*color: #fff;*/
+  /*font-weight: bold;*/
+  border-bottom: 3px solid #CD925A;
+  border-bottom: 3px solid #FFF;
+  background-color: transparent;
+}
+
+
+
+// Used in settlements actions
+.bs-callout {
+    padding: 10px 20px;
+    margin: 0 0 10px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px; border-radius: 3px;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+.bs-callout code {
+    border-radius: 3px;
+}
+.bs-callout+.bs-callout {
+    margin-top: -5px;
+}
+.bs-callout-default {
+    border-left-color: #777;
+}
+.bs-callout-default h4 {
+    color: #777;
+}
+.bs-callout-primary {
+    border-left-color: #428bca;
+}
+.bs-callout-primary h4 {
+    color: #428bca;
+}
+.bs-callout-success {
+    border-left-color: #5cb85c;
+}
+.bs-callout-success h4 {
+    color: #5cb85c;
+}
+.bs-callout-danger {
+    border-left-color: #d9534f;
+}
+.bs-callout-danger h4 {
+    color: #d9534f;
+}
+.bs-callout-warning {
+    border-left-color: #f0ad4e;
+}
+.bs-callout-warning h4 {
+    color: #f0ad4e;
+}
+.bs-callout-info {
+    border-left-color: #5bc0de;
+}
+.bs-callout-info h4 {
+    color: #5bc0de;
+}
+
+
+// Vertical Divider
+.navbar .divider-vertical {
+    height: 50px;
+    margin: 0 9px;
+    border-right: 1px solid #ffffff;
+    border-left: 1px solid #f2f2f2;
+}
+
+.navbar-inverse .divider-vertical {
+    border-right-color: #222222;
+    border-left-color: #111111;
+}
+
+@media (max-width: 767px) {
+    .navbar-collapse .nav > .divider-vertical {
+        display: none;
+     }
+}
+// Vertical Divider
 
 
 .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
   color: #fff;
-  background-color: #594da8;
+  background-color: #3F51B5;
 }
 //Customization over bootstrap
 .form-control{
@@ -178,10 +397,25 @@
     background: #F8F8F8;
   }
 
-  .col-sm-2{
+  .col-sm-2, .col-sm-3{
     background: #F3F3F3;
+    box-shadow: -5px 0px 15px -10px rgba(0, 0, 0, 0.125) inset;
   }
 }
+
+.navbar-user-dropdown{
+  width: 305px;
+  padding: 10px;
+  padding-bottom: 0px;
+  color: #565656;
+}
+
+.navbar-user-dropdown-action{
+  padding: 10px;
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
 
 .container-main{
   background: #E7E7E7;
@@ -202,6 +436,27 @@
   }
 }
 
+
+//Buttons
+.btn-wd-100{
+  width: 100px;
+}
+
+
+//backboned css
+//balance modal transfer flow arrow
+.transfer-flow{
+  position: absolute;
+  margin-left: 47%;
+  top: 36px;
+  font-size: 20px;
+}
+
+label.grey-text{
+  color: #888;
+  text-transform: uppercase;
+  font-weight: normal;
+}
 
 $background-blue: #f5f6f9;
 $button-green: #93c178;
@@ -238,7 +493,6 @@ $header-grey: #efefef;
 
 
 #primary-navbar.navbar-inverse .navbar-nav > li > a {
-  color: #ccc;
   color: rgba(255, 255, 255, 0.5);
   border-bottom: 3px solid transparent;
   text-transform: uppercase;
@@ -252,7 +506,11 @@ $header-grey: #efefef;
 
 #primary-navbar.navbar-inverse .navbar-nav > li.active > a, #primary-navbar.navbar-inverse .navbar-nav > li > a:hover{
   color: #fff;
-  border-bottom-color: #F4F560;
+  border-bottom-color: #fff;
+}
+
+#primary-navbar.navbar-inverse .navbar-nav > li.dropdown.open > a {
+  border-bottom-color: #fff;
 }
 
 
@@ -269,6 +527,110 @@ body {
 .no-margin{
   margin: 0;
 }
+
+.padding-10{
+  padding: 10px;
+}
+
+
+
+
+
+
+.mt-5{
+  margin-top: 5px;
+}
+
+.currency{
+  color: #009688;
+}
+
+.a-alike:hover{
+  // anchor alike
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.navbar-notifications{
+  width: 400px;
+  min-height: 80px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-top: 0;
+}
+
+.navbar-notifications.dropdown-menu > li > a{
+  padding: 0;
+}
+
+.navbar-notifications-header{
+  background: #fff;
+  border-bottom: 1px solid #bbb;
+  border-bottom: 3px double #bbb;
+}
+
+.navbar-notification{
+    color: #565656;
+    width: 100%;
+    padding: 0 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.navbar-notification.unread{
+  // background: #ebf5fb;
+  // background: #F0F4C3;
+  background: #EAECF8;
+}
+.navbar-notification .title {
+    font-weight: bold;
+}
+.notification-meta{
+  color: #aaa;
+  font-size: 12px;
+}
+
+
+.container-fluid{
+  padding: 0;
+}
+
+
+// Will be removed in future versions of the codes
+.dropdown-filters{
+  width: 350px;
+}
+
+
+
+.section-card{
+  border-radius: 5px;
+  border: 1px solid #C5CAE9;
+  margin-bottom: 15px;
+}
+
+.section-header{
+  background: #C5CAE9;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: 15px;
+}
+
+
+.badge-danger{
+  background: #ee3900;
+  margin-top: -15px;
+  margin-left: -3px;    
+}
+
+.navbar-text{
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+
+.borderless td, .borderless th {
+  border: none;
+}
+// Hopefully Obsolete codes
 
 #headerNavigation li.active a {
   background-color: #46568b;
@@ -319,7 +681,7 @@ body {
 }
 
 .loginmodal-container input[type=text], input[type=password] {
-  height: 64px;
+  // height: 64px;
   font-size: 14px;
   font-weight: 100;
   width: 100%;

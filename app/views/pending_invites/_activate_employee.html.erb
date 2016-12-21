@@ -1,0 +1,184 @@
+<div class="modal-dialog" role="document" style="width: 60%; margin-top: 60px;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">Activate Employee</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row no-margin">
+        <form id="newUserRegistration" action="<%= manager_activation_sign_up_path(user_id: @pending_user.id) %>">
+          <input type="hidden" name="activate_employee_with_details" /><!-- user.js.coffee activateEmployee > ajax > success -->
+
+          <input name="_method" type="hidden" value="patch">
+          <input name="authenticity_token" value="<%= form_authenticity_token%>" type="hidden">
+          <input name="user[invitation_token]" type="hidden" value="<%=params[:invitation_token]%>">
+          <input name="type" type="hidden" value="accept">
+
+            <div style="padding: 20px;width: 80%;margin-left: 10%;">
+              <label style="font-weight: 500">Company Name: </label>
+              <div>
+                <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" disabled>
+              </div><br />
+
+              <label style="font-weight: 500">Email: (Optional)</label>
+              <div>
+                <input type="text" class="form-control" name="user[email]" value="">
+              </div><br />
+              
+              <label style="font-weight: 500">Mobile Number: </label>
+              <div>
+                <div class="input-group" style="width: 100%;">
+                  <span class="input-group-addon" id="basic-addon1">+91</span>
+                  <input type="number" class="form-control" name="user[mobile_number]" value="<%= @pending_user.mobile_number %>" readonly>
+                </div>
+              </div><br />
+
+              <!-- <h4>User Details</h4> -->
+              <div style="width: 80%;">
+                <hr />
+              </div>
+
+              <label style="font-weight: 500">First Name: </label>
+              <div>
+                <input type="text" class="form-control" name="user[first_name]" <% unless @pending_user.first_name.blank? %>
+                 value="<%= @pending_user.first_name %>" readonly 
+               <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">Middle Name(Optional): </label>
+              <div>
+                <input type="text" class="form-control" name="user[maiden_name]"  <% unless @pending_user.maiden_name.blank? %> value="<%= @pending_user.maiden_name %>" readonly <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">Last Name: </label>
+              <div>
+                <input type="text" class="form-control" name="user[last_name]" <% unless @pending_user.last_name.blank? %> value="<%= @pending_user.last_name %>" readonly <% end %>>
+              </div><br />
+
+              <% if @pending_user.profile %>              
+
+              <label style="font-weight: 500">Date of Birth:</label>
+              <div>
+                <input type="text" class="datepicker form-control" readonly name="user[profile_attributes][date_of_birth]" <% unless @pending_user.profile.date_of_birth.blank? %> value="<%= @pending_user.profile.date_of_birth %>" <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">Gender:</label>
+              <div>
+                <label style="margin-right: 20px; margin-top: 0;">
+                  <input type="radio" name="user[profile_attributes][gender]" readonly value="m" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'm' %> selected="selected" <% end %>>&nbsp;Male
+                </label>
+                <label style="margin-top: 0;">
+                  <input type="radio" name="user[profile_attributes][gender]" readonly value="f" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'f' %> <% end %>>&nbsp;Female
+                </label>
+              </div><br />
+
+              <label style="font-weight: 500">Address Line 1:</label>
+              <div>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][address_1]" <% unless @pending_user.profile.address_1.blank? %> value="<%= @pending_user.profile.address_1 %>"  <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">Address Line 2:</label>
+              <div>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][address_2]" <% unless @pending_user.profile.address_2.blank? %> value="<%= @pending_user.profile.address_2 %>" <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">City:</label>
+              <div>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][city]" <% unless @pending_user.profile.city.blank? %> value="<%= @pending_user.profile.city %>" <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">State:</label>
+              <div>
+                <% unless @pending_user.profile.state_id.blank? %>
+                  <% selected_state = @pending_user.profile.state_id %>
+                <% end %>
+                <%= select_tag "user[profile_attributes][state_id]", options_for_select(@states.collect {|s| [ s[:name], s[:code] ] }, selected_state || "" )%>
+              </div><br />
+
+              <label style="font-weight: 500">Pin Code:</label>
+              <div>
+                <input type="text" class="form-control" readonly name="user[profile_attributes][pin_code]" <% unless @pending_user.profile.pin_code.blank? %> value="<%= @pending_user.profile.pin_code %>" <% end %>>
+              </div><br />
+
+              <% else %>
+                <label style="font-weight: 500">Date of Birth:</label>
+                <div>
+                  <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]">
+                </div><br />
+
+                <label style="font-weight: 500">Gender:</label>
+                <div>
+                  <label style="margin-right: 20px; margin-top: 0;">
+                    <input type="radio" name="user[profile_attributes][gender]" value="m" style="display: inline;">&nbsp;Male
+                  </label>
+                  <label style="margin-top: 0;">
+                    <input type="radio" name="user[profile_attributes][gender]" value="f" style="display: inline;">&nbsp;Female
+                  </label>
+                </div><br />
+
+                <label style="font-weight: 500">Address Line 1:</label>
+                <div>
+                  <input type="text" class="form-control" name="user[profile_attributes][address_1]">
+                </div><br />
+
+                <label style="font-weight: 500">Address Line 2:</label>
+                <div>
+                  <input type="text" class="form-control" name="user[profile_attributes][address_2]">
+                </div><br />
+
+                <label style="font-weight: 500">City:</label>
+                <div>
+                  <input type="text" class="form-control" name="user[profile_attributes][city]">
+                </div><br />
+
+                <label style="font-weight: 500">State:</label>
+                <div>
+                  <%= select_tag "user[profile_attributes][state_id]", options_for_select(@states.collect {|s| [ s[:name], s[:code] ] })%>
+                </div><br />
+
+                <label style="font-weight: 500">Pin Code:</label>
+                <div>
+                  <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
+                </div><br />
+              <% end %>
+
+              <div style="margin-top: 15px;">
+                <button id="submitButton" class="btn btn-success btn-sm"> SUBMIT</button>
+              </div>
+
+            </div>
+
+        </form>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+
+
+
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".datepicker").datepicker({
+      dateFormat: "dd-mm-yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "-100:+0"
+    });
+
+    // Since confModal is essentially a nested modal it's enforceFocus method
+    // must be no-op'd or the following error results 
+    // "Uncaught RangeError: Maximum call stack size exceeded"
+    // But then when the nested modal is hidden we reset modal.enforceFocus
+    // var enforceModalFocusFn = $.fn.modal.Constructor.prototype.enforceFocus;
+
+    // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
+    // $confModal.on('hidden', function() {
+    //     $.fn.modal.Constructor.prototype.enforceFocus = enforceModalFocusFn;
+    // });
+
+    // $confModal.modal({ backdrop : false });
+  });
+</script>

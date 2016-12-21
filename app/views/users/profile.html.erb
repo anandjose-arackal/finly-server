@@ -17,9 +17,13 @@
   <!--<li data-switch="#bank_account"><a href="#" data-turbolinks="false">Bank Account-->
     <!--<i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>-->
   <!--</li>-->
+  <li data-switch="#wallets_cards"><a href="#" data-turbolinks="false">Finly Account &amp; Cards
+    <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
+  </li>
   <li data-switch="#change_password"><a href="#" data-turbolinks="false">Change Password
     <i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>
   </li>
+
   <!--<li data-switch="#accounting"><a href="#" data-turbolinks="false">Accounting-->
     <!--<i class="fa fa-angle-right fa-fw arrow" aria-hidden="true"></i></a>-->
   <!--</li>-->
@@ -51,13 +55,11 @@
   </div>
 
 
-  <div class="divsections" id="cards_assigned" style="display: none">
+  <div class="divsections" id="wallets_cards" style="display: none">
 
-    <h3 id="divsection_heading">Cards Assigned</h3>
+    <h3 id="divsection_heading">Finly Accounts &amp; Cards</h3>
 
-
-    <hr style="margin-top: 20px">
-
+    <%= render 'wallets_cards.html.erb' %>
 
   </div>
 
@@ -130,9 +132,96 @@
   });
 
 
+  $(document).ready(function(){
+  })
+
 </script>
 <style type="text/css">
   body{
     margin-top: -17px;
+  }
+
+
+/*Unique Styles to be moved to main css file*/
+  .card{
+    width: 400px;
+    position: relative;
+    /*background: papayawhip;*/
+    background: #3F51B5;
+    color: white;
+    padding: 20px;
+    height: 235px;
+    border-radius: 14px;
+  }
+
+  .card .status{
+    position: absolute;
+    top: 26px;
+  }
+
+  .card .status i{
+    font-size: 20px;
+  }
+
+  .card .status span{
+    font-size: 18px;
+    font-weight: normal;
+  }
+
+  .card .logo{
+    position: absolute;
+    font-family: 'Bree Serif' !important;
+    font-size: 30px;color: white;
+    right: 20px;
+    top: 15px;
+  }
+
+  .card .user-name{
+    position: absolute;
+    top: 74%;
+    left: 40px;
+  }
+
+  .card .visa{
+    position: absolute;
+    right: 19px;
+    bottom: 7px;
+    font-size: 35px;
+  }
+
+  .card .card-type{
+    position: absolute;
+    text-transform: uppercase;
+    top: 42%;
+    left: 40px;
+
+  }
+  .card-number{
+    font-size: 28px;
+    /*margin-top: 29px;*/
+    font-family: monospace;
+    position: absolute;
+    top: 50%;
+    left: 40px;
+  }
+
+  .card-balance{
+    /*margin-top: 30px;*/
+  }
+
+  .card-balance label.balance{
+    display: block;
+    font-size: 25px;
+    color: #2ECC71;
+  }
+  .btn-ghost{
+    width: 150px;
+    background: transparent;
+  }
+
+  .btn-ghost:hover{
+    background: transparent;
+    border: 1px solid #F4F560;
+    color: white;
   }
 </style>

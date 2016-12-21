@@ -25,6 +25,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     'click .navbar-view-type': 'changeView'
 
     'click .btn-reset-filters': 'resetFilters'
+    'click .btn-report-export': 'exportReports'
     
 
     #Filters
@@ -36,6 +37,8 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       @params = options.params || {}
     else
       @params = {}
+    @params.view = @params.view || 'personal'
+    @current_view = @params.view
     @params.page = 1
     # console.log "Params from view", @params
     # console.log "Step x. Init View"
@@ -52,6 +55,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     })
     @collection.on('reset', @processItems, @)
     @on('item:destroyed', @itemDeleted, @)
+    @on('item:selected', @reportsSelectOptions, @)
 
   render: ->
     $(@el).html(@templateSkeleton())
@@ -61,7 +65,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
-    $(@el).find(".main").html(@templateMain())
+    $(@el).find(".main").html(@templateMain({item: @params}))
     FinlyF.structureActions(@el, @params)
     @
 
@@ -101,7 +105,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     _this = @
     #Append all the reports
     @dump = @collection.models.slice()
-    # console.log "Models - ", @collection.models.length
+    # console.log "Models - ", @collecion.models.length
     $(@el).find("#items").html("")
     # @collection.each(@appendItems, @)
     _.each(_this.collection.models, _this.appendItems, _this)
@@ -110,11 +114,13 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
+    
+    FinlyF.stopMainLoader()
 
   appendItems: (item) ->
     # console.log "appending"
     #Creating view for each report and appending them
-    view_item = new FinlyF.Views.Report({ model: item })
+    view_item = new FinlyF.Views.Report({ model: item, parent: @, view: @current_view })
     $(@el).find("#items").append(view_item.render().el)
     # console.log view_item.el
 
@@ -152,31 +158,39 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       for item in items
         $(item).removeClass("selected")
         $(item).find(".select-item").prop("checked", false)
+    @reportsSelectOptions()
 
   showDetails: (e) ->
-    # bd = $("<div />", {
-    #   class: "finly-backdrop"
-    # }).appendTo('.main')
-    #Returns if clicked on the checkbox
     if $(e.target).hasClass("select-item")
       return
       
-    # main = $(@el).find(".main")
-    # unless $(main).hasClass("preview")
-    #   $(main).addClass("preview")
-    $(@el).find('#item-details').css('bottom', 0)
+    
+    # $(@el).find('#item-details').css('bottom', 0)
 
     model_id = $(e.currentTarget).find(".select-item").attr('data-item-id')
     model = @collection.get(model_id)
 
-    preview_view = new FinlyF.Views.Report({
-      model_id: model.get('id')
-      preview: true
-      parent: @
-      current_view: @params.view || 'personal'
-    })
+    # preview_view = new FinlyF.Views.Report({
+    #   model_id: model.get('id')
+    #   preview: true
+    #   parent: @
+    #   current_view: @params.view || 'personal'
+    # })
 
-    $(@el).find("#item-details-main").html(preview_view.render().el)
+    # $(@el).find("#item-details-main").html(preview_view.render().el)
+
+    params = {
+      view: @params.view || 'personal'
+      preview: true
+      # parent: @
+      # current_view: @params.view || 'personal'
+    }
+
+    # console.log model_id, params
+    FinlyF.primary_router.navigate('reports/' + model_id.toString() + '/params=' + JSON.stringify(params), {trigger: true})
+
+
+    
 
   showReport: (report_id) ->
     #BEING USED FROM ROUTER
@@ -215,27 +229,33 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   new: ->
     _this = @
 
-    $(@el).find('#item-details').css('bottom', 0)
-    # main = $(@el).find(".main")
-    # unless $(main).hasClass("preview")
-    #   $(main).addClass("preview")
-    $(@el).find("#item-details-main").html("")
+    # $(@el).find('#item-details').css('bottom', 0)
+    # # main = $(@el).find(".main")
+    # # unless $(main).hasClass("preview")
+    # #   $(main).addClass("preview")
+    # $(@el).find("#item-details-main").html("")
 
     model = new FinlyF.Models.Report()
     data = {
       authenticity_token: $("#authenticity_token").val()
     }
+
+    params = {
+      view: @params.view || 'personal'
+      preview: true
+    }
     model.save(data, {
       success: (model, res) ->
-        FinlyF.snapNotify(res.messages)
-        preview_view = new FinlyF.Views.Report({
-          model_id: model.get('id')
-          preview: true
-          parent: _this
-          current_view: _this.params.view || 'personal'
-        })
-        $(_this.el).find("#item-details-main").html(preview_view.render().el)
-        $(_this.el).find('.close-details').attr('data-refresh-true', true)
+        # FinlyF.snapNotify(res.messages)
+        # preview_view = new FinlyF.Views.Report({
+        #   model_id: model.get('id')
+        #   preview: true
+        #   parent: _this
+        #   current_view: _this.params.view || 'personal'
+        # })
+        # $(_this.el).find("#item-details-main").html(preview_view.render().el)
+        # $(_this.el).find('.close-details').attr('data-refresh-true', true)
+        FinlyF.primary_router.navigate('reports/' + model.get('id') + '/params=' + JSON.stringify(params), {trigger: true})
       error: (err) ->
         console.log "Error", err
     })
@@ -259,6 +279,17 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     # console.log "will navigate"
     FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
 
+  reportsSelectOptions: (e) ->
+    items = $(@el).find('#items .item.report')
+    flag = false
+    for item in items
+      if $(item).find('.select-item').prop('checked')
+        flag = true
+    if flag == true
+      $(@el).find('.secondary-navbar .btn-export-options').css('display', 'inline')
+    else
+      $(@el).find('.secondary-navbar .btn-export-options').css('display', 'none')
+
   resetFilters: ->
     params = {}
     params.view = @params.view
@@ -275,6 +306,7 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
       'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
       'filter_user_id': $(".sidebar .filter-user").attr('data-item-id') || ""
       'filter_user_name': $(".sidebar .filter-user").val() || ""
+      'filter_status': @params.filter_status || ""
       # 'filter_category_id': $(".sidebar .filter-category-id").val() || ""
       # 'filter_receipt': $(".sidebar .filter-receipt").val() || ""
     }
@@ -365,6 +397,21 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  exportReports: (e) ->
+    e.preventDefault()
+    export_type = $(e.currentTarget).attr('data-export-type')
+    items = $(@el).find("#items .item.report")
+    reports = []
+    for item in items
+      selected_item = $(item).find('input.select-item')
+      if $(selected_item).prop('checked')
+        reports.push($(selected_item).attr('data-item-id'))
+
+    url = "/export/report." + export_type + "?report_id=" + reports.join(",") + "&view=" + (@params.view || 'personal')
+    console.log url
+    win = window.open(url, '_blank')
+    win.focus()
 
   # keyMappings: (e) ->
   #   console.log "Loggin keys", e.keyCode

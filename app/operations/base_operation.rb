@@ -103,7 +103,7 @@ class BaseOperation
   end
 
   def has_errors?
-    self.messages[:error].present?
+    self.messages[:error].present? or self.messages[:failure].present?
   end
 
   def processing?
@@ -152,7 +152,7 @@ class BaseOperation
     end
 
     def personal_view?
-      is_view?(:employee) or is_view?(:personal)
+      is_view?(:employee) or is_view?(:personal) or params[:view].blank?
     end
 
     def is_view?(type)
@@ -211,6 +211,16 @@ class BaseOperation
       end
     end
     raise_unauthorized_exception
+  end
+
+  def add_message(type, message)
+    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
+    clear_messages if self.messages.blank?
+    if message.is_a?(Array)
+      messages[type].concat message
+    elsif message.is_a?(String)
+      messages[type] << message
+    end
   end
 
   def raise_unauthorized_exception

@@ -1,4 +1,4 @@
-json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id
+json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id, :auto_submit
 json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status
@@ -30,18 +30,24 @@ json.date @result.report.created_at.strftime('%d %b %Y')
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
+  comment_u_id = nil
+  comment_u_name = 'System'
+  comment_initials = 'S'
   if comment.user.respond_to?(:id, :name)
-    json.comment_user_id comment.user.id
-    json.comment_user_name comment.user.name
-    json.comment_user_initial comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
+    comment_u_id = comment.user.id
+    comment_u_name = comment.user.name
+    comment_initials = comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
   end
+  json.comment_user_id comment_u_id
+  json.comment_user_name comment_u_name
+  json.comment_user_initial comment_initials
 end
 categorized_expense = @result.expenses_category_sorted
 json.expense_sections categorized_expense do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :merchant_name, :amount_value
+    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id
     if expense.note
       if expense.note.length < 29
         json.note expense.note
@@ -53,6 +59,7 @@ json.expense_sections categorized_expense do |category|
     json.date expense.date.strftime('%d %b %y')
     json.violations do
       items = @result.violations[expense.id]
+      # debugger
       json.blocking_present (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
       json.warning_present (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
       json.items items

@@ -6,14 +6,14 @@ class MoneyRequest::Retract < MoneyRequest::Base
 
   def pre_validate
     super
-    id = (params[:id] or params[:report_id])
+    id = (params[:id] or params[:money_request_id])
     if id.blank?
       messages[:error] << 'Error loading request'
     end
   end
 
   def init
-    id = (params[:id] or params[:report_id])
+    id = (params[:id] or params[:money_request_id])
     self.money_request = user.money_requests.with_id(id).first rescue nil
   end
 
@@ -36,14 +36,31 @@ class MoneyRequest::Retract < MoneyRequest::Base
   end
 
   def process
+    prev_controlling_user = (money_request.controlling_for_user or money_request.controlling_user)
+    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.money_request)
+    role_id = UserRole.id_for(:employee)
     memo = (params[:note] or params[:memo] or money_request.memo)
-    if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:retracted), controlling_user_id: user.id,
-                                           controlling_for_user_id: nil, memo: memo, submitted_at: nil
-      money_request.tracks.create action_user: user, money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:retract),
-                                      status_id: MoneyRequestStatus.id_for(:retracted), user_request_role_id: UserRole.id_for(:employee)
+    if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:retracted),
+                                       controlling_user_id: user.id,
+                                       controlling_for_user_id: nil,
+                                       controlling_user_role_id: role_id,
+                                       controlling_for_user_role_id: nil,
+                                       memo: memo,
+                                       submitted_at: nil
+      money_request.tracks.create action_user: user,
+                                  action_user_role_id: UserRole.id_for(:employee),
+                                  modified_user: prev_controlling_user,
+                                  modified_user_role_id: prev_controlling_user_role,
+                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:retract),
+                                  status_id: MoneyRequestStatus.id_for(:retracted)
       money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)
     else
       messages[:error] = money_request.errors.full_messages
     end
   end
+
+  def post_process
+    Event::EMoneyRequest::Retract.(self.user, money_request: self.money_request)
+  end
+
 end

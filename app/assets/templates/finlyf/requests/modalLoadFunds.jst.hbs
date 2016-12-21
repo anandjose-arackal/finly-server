@@ -1,0 +1,104 @@
+<div class="modal-dialog" role="document" style="width: 60%; margin-top: 113px;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title">
+        {{#switch item.type}}
+          {{#case 'credit_wallet_from_virtual_account'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Finly Account{{/case}}
+          {{#case 'credit_card_from_virtual_account'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Card{{/case}}
+          {{#case 'credit_wallet_from_wallet'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Finly Account{{/case}}
+          {{#case 'credit_card_from_wallet'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Card{{/case}}
+        {{/switch}}
+      </h4>
+    </div>
+    <div class="modal-body">
+      <div class="row no-margin">
+        {{#switch item.type}}
+          {{#case 'credit_card_from_wallet'}}
+            <div class="col-sm-3 col-sm-offset-2">
+              <label class="grey-text">From:</label>
+              <h4 class="no-margin">Your&nbsp;Finly&nbsp;Account&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 current_user_wallet_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+
+            <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+            <div class="col-sm-2 col-sm-offset-2">
+              <label class="grey-text">To:</label>
+              <h4 class="no-margin">User's&nbsp;Card&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 target_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+          {{/case}}
+
+          {{#case 'credit_card_from_virtual_account'}}
+            <div class="col-sm-3 col-sm-offset-2">
+              <label class="grey-text">From:</label>
+              <h4 class="no-margin">Company&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 virtual_account_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+
+            <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+            <div class="col-sm-2 col-sm-offset-2">
+              <label class="grey-text">To:</label>
+              <h4 class="no-margin">User's&nbsp;Card&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 target_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+          {{/case}}
+
+          {{#case 'credit_wallet_from_wallet'}}
+            <div class="col-sm-3 col-sm-offset-2">
+              <label class="grey-text">From:</label>
+              <h4 class="no-margin">Your&nbsp;Finly&nbsp;Account&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 current_user_wallet_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+
+            <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+            <div class="col-sm-2 col-sm-offset-2">
+              <label class="grey-text">To:</label>
+              <h4 class="no-margin">User's&nbsp;Finly&nbsp;Account&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 target_user_wallet_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+          {{/case}}
+
+          {{#case 'credit_wallet_from_virtual_account'}}
+            <div class="col-sm-3 col-sm-offset-2">
+              <label class="grey-text">From:</label>
+              <h4 class="no-margin">Company&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 virtual_account_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+
+            <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+            <div class="col-sm-2 col-sm-offset-2">
+              <label class="grey-text">To:</label>
+              <h4 class="no-margin">User's&nbsp;Finly&nbsp;Account&nbsp;Balance</h4>
+              <h3 class="no-margin mt-5 target_user_wallet_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+            </div>
+          {{/case}}
+        {{/switch}}
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-10 col-sm-offset-1"><hr /></div>
+      </div>
+      <div class="row no-margin">
+        <div class="col-sm-8 col-sm-offset-2">
+          <div class="form-group">
+            <label class="control-form">Amount:</label>
+            <input type="number" name="amount" class="form-control card-funds-amount" value="{{item.amount}}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label class="control-form">Password:</label>
+            <input type="password" name="password" class="form-control password"/>
+          </div>
+
+          <div class="form-group text-center">
+            <button class="btn btn-success btn-confirm-transfer" data-url="{{item.url}}" data-action-type="{{item.action_type}}">Confirm Transfer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

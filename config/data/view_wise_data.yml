@@ -7,11 +7,16 @@ admin:
       - Company Employees: employees
       - Advance Requests: requests
       - Company Reports: reports
+      - Company Expenses: expenses
+
     cog:
-      - Organization Account: '/organization_account?view=admin'
+      - Organization Account: '#organization_account/params={"view":"admin"}'
+      - Notify NEFT Transfer: '/companies/notify'
       # - Policies: '/policies'
-      - My Account: '/users/'
+      - My Account: '#settings'
       # - Expense Policies: '/policies?view=admin'
+      # - My Balance: '#modal-balance'
+      - FAQ: '#faq/params={"view":"admin"}'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
 personal:
@@ -24,7 +29,9 @@ personal:
       - Receipts: receipts
       - Expenses: expenses
     cog:
-      - My Account: '/users/'
+      - My Account: '#settings'
+      # - My Balance: '#modal-balance'
+      - FAQ: '#faq/params={"view":"personal"}'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
@@ -37,8 +44,12 @@ manager:
       - Team Members: employees
       - Team Advance Requests: requests
       - Team Reports: reports
+      - Team Expenses: expenses
+
     cog:
-      - My Account: '/users/'
+      - My Account: '#settings'
+      # - My Balance: '#modal-balance'
+      - FAQ: '#faq/params={"view":"manager"}'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
@@ -48,12 +59,16 @@ finance_manager:
 #      - Team Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
-      - Settlements: settlements
+      - Team Settlements: settlements
       - Team Members: employees
       - Team Advance Requests: requests
       - Team Reports: reports
+      - Team Expenses: expenses
+
 
     cog:
-      - My Account: '/users/'
+      - My Account: '#settings'
+      # - My Balance: '#modal-balance'
+      - FAQ: '#faq/params={"view":"finance"}'
       - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'  

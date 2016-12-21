@@ -1,0 +1,78 @@
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="row no-margin">
+      <h4>Summary:</h4>
+    </div>
+
+    {{!-- <div class="row no-margin">
+      <div class="col-sm-3 text-right">Initiating User:</div>
+      <div class="col-sm-8"><label>You</label></div>
+    </div>
+ --}}
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Receiving User:</div>
+      <div class="col-sm-8"><label>{{summary.userData.user_details.name}}</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Type of Payment:</div>
+      <div class="col-sm-8"><label>Credit</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Action:</div>
+      <div class="col-sm-8"><label>Advance Request</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Number of Advance Requests:</div>
+      <div class="col-sm-8"><label>{{summary.actionData.selectedReportNames.length}}</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Advance Requests:</div>
+      <div class="col-sm-8">
+        <label>
+          {{summary.actionData.selectedReportNames}}
+        </label>
+      </div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Total Amount:</div>
+      <div class="col-sm-8"><label class="currency">&#8377;&nbsp;{{summary.actionData.selectedReportsTotal}}</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="alert alert-info">
+        <strong>Note:</strong> The transfer of funds in this transaction is done outside of Finly Expense Management system and is only being logged in Finly.
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="row"><div class="col-sm-12 no-padding"><hr /></div></div>
+
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="form-group">
+      <label class="control-label">Note</label>
+      <textarea class="form-control" name="payment[note]"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">Date</label>
+      <input class="form-control datepicker" type="text" name="payment[date]">
+    </div>
+
+    <div class="form-group">
+      <label class="control-form">Password:</label>
+      <input type="password" name="password" class="form-control password"/>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-sm btn-primary confirm-report-action step-3-action" data-url="{{summary.userData.actions.credit_money_request}}" data-action-type="credit_money_request">Credit</button>
+    </div>
+  </div>
+</div>

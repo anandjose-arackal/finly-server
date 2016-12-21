@@ -15,8 +15,15 @@
  *= require jquery-ui
  *= require animate
  *= require_self
- *= require_tree .
+ *= require_tree "."
+ *= stub 'application_static'
+ *= stub 'application_backbone'
 */
+
+@font-face {
+  font-family: "Bree Serif";
+  src: font_url('bree_regular.otf') format("opentype");
+}
 
 @import "bootstrap";
 @import "bootstrap-sprockets";
@@ -25,7 +32,7 @@
 // Oh snap codes
 
 .alert-red {
-  color: white;
+  color: white; 
   background-color: #DA4453;
 }
 #ohsnap .alert-green {
@@ -50,7 +57,7 @@
   bottom: 0;
   left: auto;
   margin-top: 60px;
-  position: absolute;
+  position: fixed;
   z-index: 1051;
   width: 33%;
   margin-right: auto;

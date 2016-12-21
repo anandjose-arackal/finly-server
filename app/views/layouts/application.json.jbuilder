@@ -1,5 +1,5 @@
 if @result.present?
-  unless @result.is_a?(BaseOperation::BasePresenter)
+  unless @result.class.method_defined?(:success?) and @result.class.method_defined?(:failure?)
     json.success false
     return
   end

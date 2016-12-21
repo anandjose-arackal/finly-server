@@ -1,15 +1,17 @@
 class Event::EReport::Retract < Event::EReport::Base
 
   def event_id
-    Event.report_retract_id
+    NotifierType.report_retract_id
   end
 
   def affected_users
-    # manager = params[:from_user]
-    # users = [self.user]
-    # users << manager if manager.present?
-    # users
-    [self.user]
+    users = Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    users.reject { |r| r == self.user}
+  end
+
+  def notification_affected_users
+    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    users.reject { |r| r == self.user}
   end
 
   def send_push_notification(user)
@@ -18,12 +20,23 @@ class Event::EReport::Retract < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user)
-
+  def set_notification(user, role = nil)
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.notify_retract_id,
+                                             action_user_id: report.user_id,
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: report.controlling_user_role_id
+                                            )
+    notification.save
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user_id
+    if user.id == report.user.id
       "Report retracted : #{self.report.name}"
     else
       "#{report.user.name} has retracted the report: #{self.report.name}"

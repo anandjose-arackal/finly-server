@@ -11,23 +11,22 @@
       <div>
         <h4 style="color: #465c8b; font-weight: 300; font-size: 20px">Welcome To Finly Expenses! </h4>
       </div>
-      <label style="margin-top: 20px; font-weight: 500">Name: </label>
-      <div>
-        <input type="text" class="form-control" style="background-color: white" name="user[name]">
-      </div>
+      
 
 
       <label style="font-weight: 500">Company Name: </label>
       <div>
-        <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" readonly>
+        <input type="text" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" disabled>
       </div>
+
       <label style="font-weight: 500">Email: </label>
       <div>
-        <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" readonly>
+        <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" disabled>
       </div>
+
       <label style="font-weight: 500">Password: </label>
       <div>
-        <input type="password" class="form-control" name="user[password]">
+        <input type="password" class="form-control user-password" name="user[password]">
       </div>
       <label style="font-weight: 500">Confirm Password: </label>
       <div>
@@ -37,8 +36,122 @@
       <div>
         <div class="input-group" style="width: 80%;">
           <span class="input-group-addon" id="basic-addon1">+91</span>
-          <input type="number" class="form-control" name="user[mobile_number]">
+
+          <input type="number" class="form-control" name="user[mobile_number]"
+          <% if @pending_user.mobile_number %>
+            value="<%= @pending_user.mobile_number %>"
+            readonly
+          <% end %>
+          >
+
         </div>
+      </div>
+
+      <!-- <h4>User Details</h4> -->
+      <div style="width: 80%;">
+        <hr />
+      </div>
+
+      <label style="font-weight: 500">First Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[first_name]"
+         <% if @pending_user.first_name.present? %>
+            value="<%= @pending_user.first_name %>"
+            readonly
+            >
+         <% end %>
+      </div>
+
+      <label style="font-weight: 500">Middle Name(Optional): </label>
+      <div>
+        <input type="text" class="form-control" name="user[maiden_name]" value="">
+      </div>
+
+      <label style="font-weight: 500">Last Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[last_name]"
+        <% if @pending_user.last_name.present? %>
+           value="<%= @pending_user.last_name %>"
+           readonly
+        <% end %>
+        >
+      </div>
+
+      <label style="font-weight: 500">Date of Birth:</label>
+      <div>
+        <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]"
+        <% if @pending_user.profile and @pending_user.profile.date_of_birth %>
+          value="<%= @pending_user.profile.date_of_birth %>"
+          readonly
+        <% end %>
+        >
+      </div>
+
+      <label style="font-weight: 500">Gender:</label>
+      <div>
+        <label style="margin-right: 20px; margin-top: 0;">
+          <input type="radio" name="user[profile_attributes][gender]"
+                 <% if @pending_user.profile and @pending_user.profile.gender == 'm' %>
+                 checked="checked"
+                 <% end %>
+          value="m" style="display: inline;">&nbsp;Male
+        </label>
+        <label style="margin-top: 0;">
+          <input type="radio" name="user[profile_attributes][gender]"
+                 <% if @pending_user.profile and @pending_user.profile.gender == 'f' %>
+                 checked="checked"
+                 <% end %>
+          value="f" style="display: inline;">&nbsp;Female
+        </label>
+      </div>
+
+      <label style="font-weight: 500">Address Line 1:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][address_1]"
+               <% if @pending_user.profile and @pending_user.profile.address_1 %>
+               value="<%= @pending_user.profile.address_1%>"
+               readonly
+               <% end %>
+          >
+      </div>
+
+      <label style="font-weight: 500">Address Line 2:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][address_2]"
+               <% if @pending_user.profile and @pending_user.profile.address_2 %>
+               value="<%= @pending_user.profile.address_2%>"
+               readonly
+               <% end %>
+        >
+      </div>
+
+      <label style="font-weight: 500">City:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][city]"
+               <% if @pending_user.profile and @pending_user.profile.city %>
+               value="<%= @pending_user.profile.city %>"
+               readonly
+               <% end %>
+        >
+      </div>
+
+      <label style="font-weight: 500">State:</label>
+      <div>
+        <select class="form-control" name="user[profile_attributes][state_id]">
+          <% @states.each do |state| %>
+            <option value="<%= state[:code] %>"><%= state[:name] %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <label style="font-weight: 500">Pin Code:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][pin_code]"
+               <% if @pending_user.profile and @pending_user.profile.pin_code %>
+               value="<%= @pending_user.profile.pin_code %>"
+               readonly
+               <% end %>
+        >
       </div>
 
       <div>
@@ -54,7 +167,7 @@
     margin-top: 20px;
   }
 
-  input.form-control {
+  input.form-control , select.form-control{
     padding: 5px;
     width: 80%;
     /*background-color: #eff8f3;*/
@@ -91,6 +204,17 @@
 </style>
 
 <script type="text/javascript">
+  $(document).ready(function(){
+    $(".datepicker").datepicker({
+      dateFormat: "dd-mm-yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "-100:+0"
+    });
+
+    $(".user-password").popover({ trigger: 'focus', content: "Password should be 8 characters long." });
+  })
+
   snapNotify = function(obj) {
     var color, container, message, messages, results, type;
     console.log(obj);

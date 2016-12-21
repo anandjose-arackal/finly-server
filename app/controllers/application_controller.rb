@@ -6,12 +6,13 @@ class ApplicationController < ActionController::Base
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  include Pundit
 
   protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
   before_action :whitelisted_emails
+  before_action :verify_otp
+  # before_action :check_first_time_login
 
   # before_action :superadmin_accounts if :superadmin_controller?
 
@@ -198,4 +199,20 @@ class ApplicationController < ActionController::Base
       redirect_to root_url
     end
   end
+
+  def verify_otp
+    if logged_in? and not current_user.otp_verified and not params[:controller] == 'otp' and not
+    params[:controller].include?('devise') and not params[:controller] == 'pending_invites'
+      params[:type] = 'verification'
+      User::Verification::Otp::Create.(current_user, params)
+      redirect_to verify_mobile_path
+    end
+  end
+
+  def check_first_time_login
+    if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
+      redirect_to edit_default_password_path
+    end
+  end
+
 end

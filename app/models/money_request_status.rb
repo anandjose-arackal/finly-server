@@ -8,6 +8,8 @@
 #  updated_at :datetime         not null
 #
 
+
+
 class MoneyRequestStatus < ActiveRecord::Base
 
   VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6}
@@ -17,6 +19,12 @@ class MoneyRequestStatus < ActiveRecord::Base
       define_method "#{key}_id" do
         value
       end
+    end
+  end
+
+  VALUES.each do |key, value|
+    define_method "#{key}?" do
+      self.id == value
     end
   end
 

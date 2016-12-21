@@ -42,40 +42,14 @@ class Report::Index < Report::Base
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
-        self.reports = Report.from(sql)
-
-        # todo jugaad, not required in itzcash_api_integration branch
-        if self.reports.present?
-          manager_ids = []
-          self.reports.each do |report|
-            if User::Team::IsApprover.(user, report: report, type: :manager)
-              manager_ids << report.id
-            end
-          end
-          self.reports = self.reports.with_id(manager_ids)
-        end
-      # todo jugaad end
-
+        self.reports = Report.from([Arel.sql(sql)])
       when UserRole.finance_manager_id
         controlling_report_query = user.controlling_reports.non_owner(user.id)
         interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
-        self.reports = Report.from(sql)
-
-        # todo jugaad, not required in itzcash_api_integration branch
-        if self.reports.present?
-          finance_ids = []
-          self.reports.each do |report|
-            if User::Team::IsApprover.(user, report: report, type: :finance_manager)
-              finance_ids << report.id
-            end
-          end
-          self.reports = self.reports.with_id(finance_ids)
-        end
-      # todo jugaad end
-
+        self.reports = Report.from([Arel.sql(sql)])
       when UserRole.auditor_id
         # todo auditor
       else
@@ -85,7 +59,7 @@ class Report::Index < Report::Base
 
   def post_process
     if self.reports.present?
-      self.reports = self.reports.exclude_deleted rescue self.reports
+      self.reports = self.reports.exclude_deleted.includes(:expenses, :policy, :status) rescue self.reports
     end
   end
 
@@ -107,7 +81,7 @@ class Report::Index < Report::Base
       self.reports = params[:reports]
       get_counts
       if self.reports.present?
-        self.reports = apply_scopes(self.reports, params)
+          self.reports = apply_scopes(self.reports, params)
         self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
       end
     end

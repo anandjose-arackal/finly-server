@@ -1,25 +1,42 @@
-<ul class="nav navbar-nav">
-  {{#if_not_eq item.view 'finance'}}
-    <li class=""><button class="btn-success btn btn-sm btn-invite-employee" href="#">Invite Employee</button></li>
-  {{/if_not_eq}}
-  {{!-- <li class=""><button class="btn navbar-btn btn-sm btn-pending-employees" href="#">Link</button></li> --}}
-</ul>
+<div class="row no-margin">
+  <div class="col-xs-12">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filters&nbsp;&nbsp;<span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-filters" style="right: auto;">
+          <li>
+            <div class="row no-margin">
+              <div class="col-xs-12 no-hide-bs-dropdown">
+                <div class="row no-margin">
+                  <div class="col-sm-4">Status</div>
+                  <div class="col-sm-8">
+                    <select class="filter-state form-control">
+                      <option value="1">Active</option>
+                      <option value="2">Pending</option>
+                      <option value="3">Inactive</option>
+                    </select>
+                  </div>
+                </div>
 
-<ul class="nav navbar-nav navbar-right" style="margin-right: 0;">
-  <li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-      <span class="current-filter-state">
-      {{#switch item.filter_state}}
-        {{#case 1}}Active{{/case}}
-        {{#case 2}}Pending{{/case}}
-        {{#case 3}}Inactive{{/case}}
-      {{/switch}}
-      </span>&nbsp;&nbsp;<span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu menu-nav-views-dropdown">
-      <li><a href="#" class="filter-state" data-filter-state="1">Active</a></li>
-      <li><a href="#" class="filter-state" data-filter-state="2">Pending</a></li>
-      <li><a href="#" class="filter-state" data-filter-state="3">Inactive</a></li>
+                <div class="row no-margin">
+                  <div class="col-sm-4">User Type</div>
+                  <div class="col-sm-8">
+                    <select class="filter-role form-control">
+                      <option value="">Employees</option>
+                      <option value="1">Admins</option>
+                      <option value="3">Managers</option>
+                      <option value="2">Finance Managers</option>
+                    </select>
+                  </div>
+                </div>
+              </div>{{!-- no-hide-bs-modal --}}
+              <div class="col-xs-12">
+                <button class="btn btn-sm btn-primary btn-filter">Filter</button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </li>
     </ul>
-  </li>
-</ul>
+  </div>
+</div>

@@ -15,6 +15,9 @@
 #  policy_id              :integer
 #
 
+
+
+
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 
@@ -96,6 +99,7 @@ class UserManagerMapping < ActiveRecord::Base
   end
 
   private
+
   def valid_default
     if default and greater_than_amount.present?
       errors.add(:cannot, 'set greater than amount for default configuration')

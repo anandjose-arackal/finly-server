@@ -13,18 +13,33 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     'click .filter-state': 'filterState'
     'click .navbar-view-type': 'changeView'
 
+    'click .load-more-users': 'loadMoreUsers'
+
 
     'click .navbar-menu-li': 'navigate'
     'click .user': 'showDetails'
+
+    'change select[name=invite_by]': 'changeInviteBy'
     'click .btn-invite-employee': 'processEmployeeInvitation'
     'click .btn-confirm-invite-employee': 'inviteEmployee'
+
+    'click .btn-import-employees': 'processImport'
+    'submit #form-import-employees': 'importEmployees'
+
+    'click .btn-import-card-mapping': 'processImportCardMapping'
+    'submit #form-import-card-mapping': 'importCardMapping'
+    # 'ajax:success #form-import-employees': 'importEmployees'
 
     'change #modal-mp .conditional-container input[type=radio]': 'showOptionalManagers'
 
     'keyup .search-user': 'prepareSearch'
-    'submit .navbar-form': 'cancelEvents' 
+    'submit .navbar-form': 'cancelEvents'
+
+    # Temp Dropdown Filters
+    'click .btn-filter': 'filter'
 
   initialize: (options) ->
+    _this = @
     @params = options.params
     unless @params.filter_state
       @params.filter_state = 1
@@ -32,7 +47,10 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     @collection.fetch({
       reset: true,
       data: @params
+      success: ->
+        _this.toggleLoadMoreUsers(_this.collection)
     })
+    @dump = []
     @collection.on('reset', @processUsers, @)
     @on('refresh', @refetchCollection, @)
 
@@ -43,32 +61,37 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     FinlyF.structureActions(@el, @params) 
     @
 
-  loadMore: (e) ->
-    _this = @
-    target = $(e.currentTarget)
-    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
-    $(target).find('span').text('Loading....')
-    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+  # loadMore: (e) ->
+  #   _this = @
+  #   target = $(e.currentTarget)
+  #   $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+  #   $(target).find('span').text('Loading....')
+  #   @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
 
-    @collection.fetch({
-      data: _this.params,
-      reset: false,
-      success: ->
-        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
-        $(target).find('span').text('Load More')
-        _this.resetPageCount({target: target, page: _this.params.page })
+  #   @collection.fetch({
+  #     data: _this.params,
+  #     reset: false,
+  #     success: ->
+  #       _this.toggleLoadMoreUsers(_this.collection)
+  #       $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+  #       $(target).find('span').text('Load More')
+  #       _this.resetPageCount({target: target, page: _this.params.page })
 
-        _this.dump = (_this.dump.concat(_this.collection.models.slice())).slice()
-        _this.collection.reset(_this.dump)
+  #       _this.dump = (_this.dump.concat(_this.collection.models.slice())).slice()
+  #       _this.collection.reset(_this.dump)
 
-      error: ->
-        console.log "Couldn't fetch Successfully."
-    })
+  #     error: ->
+  #       console.log "Couldn't fetch Successfully."
+  #   })
 
   processUsers: ->
     # console.log "processing users"
     @dump = @collection.models.slice()
     $(@el).find("#users").html("")
+
+    # Stop main loader
+    main = $(@el).find('.sidebar')
+    FinlyF.stopMainLoader(main)
 
     @collection.each(@appendUsers, @)
 
@@ -88,6 +111,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
     if $(spinner).hasClass("fa-spin")
       $(spinner).removeClass("fa-spin")
+    
+    FinlyF.stopMainLoader()
 
   showDetails: (e) ->
     $(e.currentTarget).siblings().removeClass('active')
@@ -106,6 +131,9 @@ class FinlyF.Views.UsersIndex extends Backbone.View
     })
 
     $(@el).find("#user-details").html(preview_view.render().el)
+    # Load main loader
+    main = $(@el).find("#user-details .user-details")
+    FinlyF.startMainLoader(main)
 
   refetchCollection: (e) ->
     #REFRESH
@@ -115,7 +143,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       target = e.currentTarget
       $(target).find("i").addClass("fa-spin")
 
-    # @params.page = 1
+    @params.page = 1
     # console.log @params
     @collection.fetch({
       reset: true,
@@ -129,6 +157,30 @@ class FinlyF.Views.UsersIndex extends Backbone.View
 
       error: ->
         console.log "Couldn't fetch successfully."
+    })
+
+  loadMoreUsers: (e) ->
+    e.preventDefault()
+    _this = @
+    target = $(e.currentTarget)
+    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+    $(target).find('span').text('Loading....')
+    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+
+    @collection.fetch({
+      data: _this.params,
+      reset: false,
+      success: ->
+        _this.toggleLoadMoreUsers(_this.collection)
+        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+        $(target).find('span').text('Load More')
+        _this.resetPageCount({target: target, page: _this.params.page })
+
+        _this.dump= (_this.dump.concat(_this.collection.models.slice())).slice()
+        _this.collection.reset(_this.dump)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
     })
 
   filterStatus: (e) ->
@@ -161,6 +213,22 @@ class FinlyF.Views.UsersIndex extends Backbone.View
           console.log "Couldn't fetch Successfully."
       })
 
+  changeInviteBy: (e) ->
+    target = e.currentTarget
+
+    invite_by_div = $(target).closest('.invite_by')
+
+    invite_by = $(target).val()
+
+    if invite_by == 'mobile'
+      $(invite_by_div).find("input.invite-by-type").val('mobile')
+      $(invite_by_div).find('input.input-invite-by-email').addClass('hidden').attr('disabled', true)
+      $(invite_by_div).find('input.input-invite-by-mobile').removeClass('hidden').attr('disabled', false)
+    else if invite_by == 'email'
+      $(invite_by_div).find("input.invite-by-type").val('email')
+      $(invite_by_div).find('input.input-invite-by-mobile').addClass('hidden').attr('disabled', true)
+      $(invite_by_div).find('input.input-invite-by-email').removeClass('hidden').attr('disabled', false)
+
   processEmployeeInvitation: ->
     _this = @
 
@@ -178,6 +246,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         else
           FinlyF.snapNotify(res.messages)
           $(modal).html(_this.templateInviteEmployee({item: res}))
+          $(modal).find('input[name=authenticity_token]').val($("#authenticity_token"))
           if _this.params.view == 'manager'
             $(modal).find('.invitee-managed-by').val(res.company.current_user_id).prop('disabled', 'disabled')
           else if _this.params.view == 'finance_manager'
@@ -192,6 +261,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   inviteEmployee: (e) ->
     e.preventDefault()
     _this = @
+    target = e.currentTarget
+    $(target).attr('disabled', true)
     modal = $(e.currentTarget).closest('#modal-mp')
     form = $(e.currentTarget).closest('.modal-content').find('.modal-body form.new-invite-employee')
     values = {}
@@ -225,15 +296,70 @@ class FinlyF.Views.UsersIndex extends Backbone.View
           $(modal).modal('hide')
           if parseInt(_this.params.filter_state) == 2
             _this.refetchCollection()
+        else
+          $(target).attr('disabled', false)
 
         # console.log res
       error: (err) ->
         console.log "Err", err
+        $(target).attr('disabled', false)
     })
+
+
+  processImport: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    modal = $(@el).find("#modal-import-employees")
+    $(modal).modal('show')
+    $(modal).find("input[name=authenticity_token]").val($("#authenticity_token").val())
+
+  importEmployees: (e) ->
+    # console.log "Success", e
+    # target = e.currentTarget
+
+    # $(target).find('input[type=submit]').attr('disabled', true).val('Submitted!')
+    # e.preventDefault()
+    # target = e.currentTarget
+    # url = $(target).attr('action')
+
+    # # $(target).html("&nbsp;&nbsp;&nbsp;<i class='fa fa-spin fa-circle-o-notch'></i>&nbsp;&nbsp;&nbsp;").attr('disabled', 'disabled')
+    # formData = new FormData(target)
+
+    # $.ajax({
+    #   url: url,
+    #   type: "POST",
+    #   dataType: 'csv',
+    #   data: formData,
+    #   success: (res) ->
+    #     console.log res
+    #     # FinlyF.snapNotify(res.messages)
+    #     # if res.success == true
+    #     #   $("#modal-new").modal('hide')
+    #     #   _this.refetchCollection()
+    #     # else
+    #     #   $(target).html("Create")
+    #     #   $(target).attr('disabled', false)
+    #   error: (err) ->
+    #     console.log "Error", err 
+    #     # $(target).attr('disabled', false)
+    #   cache: false,
+    #   contentType: false,
+    #   processData: false
+    # })
+
+  processImportCardMapping: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    modal = $(@el).find("#modal-import-card-mapping")
+    $(modal).modal('show')
+    $(modal).find("input[name=authenticity_token]").val($("#authenticity_token").val())
 
   filterState: (e) ->
     e.preventDefault()
     target = e.currentTarget
+    @params.page = 1
 
     @params.filter_state = parseInt($(target).attr('data-filter-state'))
 
@@ -249,6 +375,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
       @searchUser(e)
 
   searchUser: (e) ->
+    _this = @
     query = $(e.currentTarget).val()
     @collection.fetch({
       reset: true,
@@ -257,6 +384,8 @@ class FinlyF.Views.UsersIndex extends Backbone.View
         filter_state: @params.filter_state
         filter_search: query
       }
+      success: ->
+        _this.toggleLoadMoreUsers(_this.collection)
     }) 
 
   ##Funactionalities
@@ -287,3 +416,30 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  toggleLoadMoreUsers: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 5
+      # console.log "Should hide"
+      $(@el).find('.load-more-users').css('display', 'none')
+    else
+      $(@el).find('.load-more-users').css('display', 'inline')
+
+
+
+  filter: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+
+    container = $(target).closest('.dropdown-filters')
+
+    params = {
+      'filter_state': $(container).find(".filter-state").val() || ""
+      'filter_role': $(container).find(".filter-role").val() || ""
+    }
+
+    if @params.view
+      params.view = @params.view
+
+
+    FinlyF.primary_router.navigate('employees/params=' + JSON.stringify(params), {trigger: true})

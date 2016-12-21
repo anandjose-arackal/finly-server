@@ -18,6 +18,8 @@
 #  is_deleted           :boolean          default(FALSE), not null
 #
 
+
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -30,20 +32,25 @@ class Expense < ActiveRecord::Base
   belongs_to :category
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
+  belongs_to :surcharge, class_name: 'Z'
 
   has_many :receipts, as: :parent
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
+  has_one :card_transaction
 
-  accepts_nested_attributes_for :amount, :manual_expense, :card_expense
+  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :manual_expense
+  accepts_nested_attributes_for :card_expense
   accepts_nested_attributes_for :receipts
+
 
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
-  delegate :expense_type, to: :expense_type
+  delegate :surcharge_value, to: :card_expense
+  delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
-  delegate :merchant_name, to: :manual_expense
   delegate :user_name, to: :user
 
   validates :date, presence: true
@@ -51,8 +58,7 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validate :no_future_date
-  validate :created_by
-  validate :report_status
+  # validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
 
@@ -75,8 +81,12 @@ class Expense < ActiveRecord::Base
 
   default_scope { order('expenses.created_at DESC') }
 
+
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
+  scope :with_user, ->(user_id) { where user_id: user_id }
+  # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
+  scope :filter_expense_type_id, ->(type_id) { where expense_type_id: type_id }
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
@@ -91,6 +101,7 @@ class Expense < ActiveRecord::Base
         # do nothing
     end
   end
+
   scope :filter_sort, ->(sort_by, order) do
     order.upcase! if order
     order("#{sort_by} #{order}") # sort_by: created_at, date etc. order: asc/desc
@@ -99,17 +110,34 @@ class Expense < ActiveRecord::Base
     unless date_from.blank? && date_to.blank?
       type_val = :date
       date_from = "1990-01-01" if date_from.blank?
-      date_to = Date.today if date_to.blank?
+      date_to = DateUtils.local_date if date_to.blank?
       date_from = date_from.to_date if date_from.present?
-      date_to = date_to.to_date + 1 if date_to.present?
+      date_to = date_to.to_date if date_to.present?
       expenses = arel_table
       where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
     end
   end
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
-  scope :filter_merchant, -> (merchant_name) { joins(:manual_expense).select('expenses.*').where('merchant like ?', "%#{merchant_name}%") }
+
+  scope :filter_merchant, -> (merchant_name) {
+    expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
+    expense_ids += CardExpense.where('editable_merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
+
+    where(id: expense_ids)
+  }
+
+  # scope :filter_merchant, -> (merchant_name) {
+  #   joins(:manual_expense, :card_expense).select('expenses.*').where('lower(merchant) like ? OR lower(editable_merchant) like ?', "%#{merchant_name}%", "%#{merchant_name}%")
+  # }
+
   scope :filter_status_id, -> (status_id) { where expense_status_id: status_id }
-  scope :filter_search, -> (value) { joins(:manual_expense).joins(:amount).select('expenses.*').where('merchant like ? OR note like ?', "%#{value}%", "%#{value}%") }
+  scope :filter_search, -> (value) do
+    expense_ids = ManualExpense.where('merchant like ?', "%#{value}%").pluck(:expense_id)
+    expense_ids += CardExpense.where('editable_merchant like ?', "%#{value}%").pluck(:expense_id)
+
+    where('id IN (?) OR note like ?', expense_ids, "%#{value}%",)
+    # joins(:card_expense).joins(:manual_expense).joins(:amount).select('expenses.*').where('editable_merchant like ? or merchant like ? OR note like ?', "%#{value}%", "%#{value}%", "%#{value}%")
+  end
 
   scope :filter_receipt, -> (value) do
     expense_ids = Receipt.where(parent_type: Expense).uniq.pluck(:parent_id)
@@ -124,6 +152,9 @@ class Expense < ActiveRecord::Base
   scope :manual, -> { joins(:manual_expense) }
   scope :card, -> { joins(:card_expense) }
 
+  scope :only_card_expenses, -> { where(expense_type_id: 2) }
+  scope :only_manual_expenses, -> { where(expense_type_id: 1) }
+
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
@@ -134,9 +165,36 @@ class Expense < ActiveRecord::Base
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
+  scope :filter_user_id, ->(id) { where user_id: id }
 
   delegate :category_name, to: :category
 
+
+  def merchant_name
+    case self.expense_type_id
+      when 1
+        return self.manual_expense.merchant
+      when 2
+        return self.card_expense.editable_merchant
+      else
+        # do nothing
+    end
+  end
+
+  def surcharge_value
+    case self.expense_type_id
+      when 1
+        return 0
+      when 2
+        return self.card_expense.surcharge_amount
+    end
+  end
+
+  def report_name
+    if report_id
+      self.report.name
+    end
+  end
 
   # returns the number of receipts attached to this expense
   def receipts_count
@@ -182,28 +240,19 @@ class Expense < ActiveRecord::Base
   private
 
   # only employees can create an expense
-  def created_by
-    unless self.user.employee?
-      errors.add(:expense, 'can only be created by employees')
-    end
-  end
+  # def created_by
+  #   unless self.user.employee?
+  #     errors.add(:expense, 'can only be created by employees')
+  #   end
+  # end
 
   # cannot add an expense with future date
   def no_future_date
-    if date.present? and date > Date.today
+    if date.present? and date > DateUtils.local_date
       errors.add(:date, 'cannot be in the future!')
     end
   end
 
-  # ensuring the report is either open or retracted before allowing editing of expense
-  def report_status
-    if self.report_id
-      report = self.report
-      unless report.open? or report.retracted? or report.rejected?
-        errors.add(:report, 'cannot be edited in this state')
-      end
-    end
-  end
 
   def valid_expense_type
     case expense_type_id

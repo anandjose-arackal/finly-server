@@ -12,9 +12,10 @@
 #  updated_at   :datetime         not null
 #
 
+
+
 class Category < ActiveRecord::Base
   belongs_to :company
-
 
   validates :company_id, presence: true
   validates :name, presence: true

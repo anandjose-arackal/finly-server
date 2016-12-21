@@ -12,9 +12,9 @@ json.amount do
 end
 json.type expense.expense_type_id
 if expense.manual_expense?
-  json.manual_expense do
-    json.merchant_name expense.manual_expense.merchant_name
-  end
+  json.merchant_name expense.manual_expense.merchant_name
+elsif expense.card_expense?
+  json.merchant_name expense.card_expense.editable_merchant
 end
 json.category do
   json.id expense.category.id

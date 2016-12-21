@@ -2,14 +2,13 @@
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
 class Expense::ExCard::Update < Expense::ExCard::Base
-  attr_accessor :updated_expense_params
+  attr_accessor :updated_expense_params, :editable_attrs
 
   def pre_validate
-    super
-    if params.blank?
+    if user.blank? or params.blank?
       messages[:error] << "Parameters not present."
     end
-    if params[:expense_id].blank? or params[:id].blank?
+    if params[:expense_id].blank? and params[:id].blank?
       messages[:error] << "Expense ID missing!"
     end
   end
@@ -17,27 +16,45 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def init
     super
-    # setting up the expense params for updation
+    define_editable_attributes if expense
+    # id = (params[:expense_id] or params[:id])
+    # self.expense = user.expenses.find_by(id: id)
     self.updated_expense_params = update_card_expense_params
-    if expense.card_expense.present? and params[:expense][:merchant]
-      self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
+    if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
+      # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
+      # todo - check if the api fails because of this
+      if updated_expense_params[:receipts_attributes] == [""]
+        receipt = expense.receipts.first
+        if receipt
+          receipt.parent = nil
+          receipt.save
+        end
+      end
+      updated_expense_params.delete(:receipts_attributes)
     end
-    if expense.receipts.present? and params[:expense][:receipt]
-      self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
+    if expense
+      if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
+        self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
+      end
     end
   end
 
 
   def validate
-    unless expense
-      messages[:error] << "Cannot find expense to edit. "
+    if expense.report_id and personal_view?
+      unless expense.report.editable?
+        messages[:error] << "Expense cannot be edited at this stage"
+      end
     end
   end
 
 
   def authorize
-    unless expense.user_id == user.id
-      messages[:error] << "You do not own this expense."
+    unless expense
+      raise_unauthorized_exception
+    end
+    if personal_view? and expense.user_id != user.id
+      raise_unauthorized_exception
     end
   end
 
@@ -47,19 +64,23 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       messages[:error] = self.expense.errors.full_messages
       return false
     end
-    success
   end
 
   def post_process
-    # send mailer or notification indicating updation of expense
+    # add report comment
+    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+
+    messages[:success] << 'Expense updated'
   end
 
   private
-  # this will be called when the merchant, or receipt of the expense needs to be updated, from the user's view of expenses
-  def update_card_expense_params
-    params.require(:expense).permit(:note, :category_id,
-                                    card_expense_attributes: [:editable_merchant, :id],
-                                    receipts_attributes: [:image, :user_id, :id])
+
+  def define_editable_attributes
+    self.editable_attrs = {note: expense.note,
+                           merchant_name: expense.merchant_name,
+                           category_name: expense.category_name,
+                           receipt: expense.receipts.count
+    }
   end
 
 end

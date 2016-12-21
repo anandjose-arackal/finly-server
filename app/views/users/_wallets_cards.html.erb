@@ -1,0 +1,326 @@
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+
+    <div class="section-card" style="padding-bottom: 20px;">
+      <div class="row no-margin section-header" style="margin-bottom: 15px;">
+        <div class="col-sm-12">
+          <h4>Finly Account</h4>
+        </div>
+      </div> 
+
+      <div class="row no-margin">
+        <div class="no-padding col-sm-12">
+          <div class="row no-margin" style="margin-top: 20px;">
+            <div class="col-sm-2">
+              <label class="control-label" style="font-size: 20px; font-weight: normal;">Balance:</label>
+            </div>
+            <div class="col-sm-4" style="font-size: 25px; color: #2ECC71;">
+              <span>&#8377;&nbsp;&nbsp;</span><span class="current_user_wallet_balance"><i class="fa fa-spin fa-spinner"></i></span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="col-sm-12 no-padding">
+    <div class="section-card">
+      <div class="row no-margin section-header" style="margin-bottom: 15px;">
+        <div class="col-sm-12">
+          <h4>Cards</h4>
+        </div>
+      </div>
+
+      <div class="row no-margin">
+        
+        <div class="col-sm-12">
+          <div class="row no-margin" style="padding: 10px;">
+            <% current_user.cards.each do |card| %>
+              <div class="col-sm-6">
+                <div class="card text-center" style="display: inline-block;">
+                  <div class="logo">Finly</div>
+                  <div class="status">
+                    <% if card.active %>
+                      <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label>
+                    <% else %>
+                      <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Blocked</span></label>
+                    <% end %>
+                  </div>
+                  <div class="card-type">Expense Card</div>
+                  <div class="card-number">
+                    <span class="first-four">XXXX</span>
+                    <span class="second-four">XXXX</span>
+                    <span class="third-four">XXXX</span>
+                    <span class="fourth-four"><%= card.ending_number %></span>
+                  </div>
+                  <div class="user-name"><%= card.user.name %></div>
+                  <div class="visa"><i class="fa fa-cc-visa"></i></div>
+                </div> 
+              </div>
+
+              <div class="col-sm-6">
+
+                <table class="">
+                  <tr>
+                    <td style="padding-right: 25px;"><label>Card Balance:</label></td>
+                    <td>
+                      <span class="balance" style="font-size: 25px; color: #2ECC71;">&#8377;&nbsp;&nbsp;<span class="current_user_card_balance"><i class="fa fa-spin fa-spinner"></i></span></span> 
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label>Actions:</label></td>
+                    <td>
+                      <% if card.active %>
+                      <button class="btn btn-sm btn-danger btn-card-update-status" data-card-status-type="0">Block</button>
+                      <% else %>
+                        <button class="btn btn-sm btn-success btn-card-update-status" data-card-status-type="1">Unblock</button>(Disabled By: <%= card.disabled_by_user.name %>)
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <button data-src="https://freedomcard.itzcash.com/freedomcard/html/LoginFrame.html" data-target="#modal-iframe" data-toggle="modal" class="btn btn-default btn-iframe-modal">Change ATM PIN</button> 
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <button data-src="https://staging.itzcash.com/bank/jsp/CardValidation.jsp" data-target="#modal-iframe" data-toggle="modal" class="btn btn-default btn-iframe-modal">Change IPIN of Card</button> 
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+            <% end %>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+     
+  </div>
+
+</div>
+
+
+
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+
+    snapNotify = function(obj) {
+      var color, container, message, messages, results, type;
+      console.log(obj);
+      results = [];
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          results.push((function() {
+            var i, len, results1;
+            results1 = [];
+            for (i = 0, len = messages.length; i < len; i++) {
+              message = messages[i];
+              results1.push(ohSnap(message, {
+                color: color,
+                'duration': '6000'
+                // 'container-id': container
+              }));
+            }
+            return results1;
+          })());
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    };
+    //Get card balance and populate
+    $.ajax({
+      url: '/users/' + '<%= current_user.id %>' + '/balance',
+      data: {
+        current_user_wallet: true,
+        current_user_card: true
+      },
+      dataType: 'json',
+      success: function(res){
+        $(".current_user_wallet_balance").html(res.current_user_wallet);
+        $(".current_user_card_balance").html(res.current_user_card);
+      },
+      error: function(err){
+        console.log("Error", err);
+      }
+    });
+  });
+
+  $(".btn-transfer").on('click', function(e){
+    console.log(this);
+    transfer_type = $(this).attr('data-transfer')
+    switch(transfer_type) {
+      case 'wallet-to-card':
+        // show modal
+        break;
+      case 'card-to-wallet':
+        // show modal
+      }
+    //Show modal for collecting amoutn and password
+
+    //Send data 
+  });
+
+  // $(".btn-card-update-status").on('click', function(e){
+  //   var card_status = $(this).attr('data-card-status-type');
+  //   $(".btn-confirm-card-status").attr('data-card-status-type', card_status)
+  // });
+  // $(".btn-confirm-card-status").on('click', function(e){
+  //   var card_status = $(this).attr('data-card-status-type');
+  //   target = this;
+  //   $.ajax({
+  //     url: '/cards/update_status',
+  //     type: "POST",
+  //     dataType: 'json',
+  //     data: {
+  //       view: 'personal',
+  //       user_id: '<%= current_user.id %>',
+  //       status_type: card_status,
+  //       password: $(target).closest('.modal-body').find('input[type=password]').val()
+  //     },
+  //     success: function(res){
+  //       console.log(res);
+  //       snapNotify(res.messages)
+  //       if(res.success === true){
+  //         window.location.reload();
+  //       }
+  //     },
+  //     error: function(err){
+  //       console.log("ERror", err);
+  //     }
+  //   });
+  // });
+</script>
+
+<style type="text/css">
+  
+/*Unique Styles to be moved to main css file*/
+  .card{
+    width: 400px;
+    position: relative;
+    /*background: papayawhip;*/
+    background: #3F51B5;
+    color: white;
+    padding: 20px;
+    height: 235px;
+    border-radius: 14px;
+  }
+
+  .card .status{
+    position: absolute;
+    top: 26px;
+  }
+
+  .card .status i{
+    font-size: 20px;
+  }
+
+  .card .status span{
+    font-size: 18px;
+    font-weight: normal;
+  }
+
+  .card .logo{
+    position: absolute;
+    font-family: 'Bree Serif' !important;
+    font-size: 30px;color: white;
+    right: 20px;
+    top: 15px;
+  }
+
+  .card .user-name{
+    position: absolute;
+    top: 74%;
+    left: 40px;
+  }
+
+  .card .visa{
+    position: absolute;
+    right: 19px;
+    bottom: 7px;
+    font-size: 35px;
+  }
+
+  .card .card-type{
+    position: absolute;
+    text-transform: uppercase;
+    top: 42%;
+    left: 40px;
+
+  }
+  .card-number{
+    font-size: 28px;
+    /*margin-top: 29px;*/
+    font-family: monospace;
+    position: absolute;
+    top: 50%;
+    left: 40px;
+  }
+
+  .card-balance{
+    /*margin-top: 30px;*/
+  }
+
+  .card-balance label.balance{
+    display: block;
+    font-size: 25px;
+    color: #2ECC71;
+  }
+  .btn-ghost{
+    width: 150px;
+    background: transparent;
+  }
+
+  .btn-ghost:hover{
+    background: transparent;
+    border: 1px solid #F4F560;
+    color: white;
+  }
+</style>

@@ -8,12 +8,17 @@
 #  updated_at :datetime         not null
 #
 
+
 class PaymentMode < ActiveRecord::Base
 
-  MODES = {cash: 1}
+  MODES = {cash: 1, card: 2}
 
   def self.id_for(item)
     MODES[item]
+  end
+
+  def payment_mode_name
+    self.name
   end
 
 end

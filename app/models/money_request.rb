@@ -2,34 +2,41 @@
 #
 # Table name: money_requests
 #
-#  id                      :integer          not null, primary key
-#  name                    :string(255)
-#  user_id                 :integer          not null
-#  policy_id               :integer
-#  payment_mode_id         :integer          not null
-#  payment_id              :integer
-#  required_by_date        :date
-#  status_id               :integer          not null
-#  controlling_user_id     :integer
-#  controlling_for_user_id :integer
-#  loaded_by               :integer
-#  loaded_at               :datetime
-#  submitted_at            :datetime
-#  note                    :string(255)
-#  accounted               :boolean          default(FALSE), not null
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
+#  id                           :integer          not null, primary key
+#  name                         :string(255)
+#  user_id                      :integer          not null
+#  policy_id                    :integer
+#  payment_mode_id              :integer          not null
+#  payment_id                   :integer
+#  required_by_date             :date
+#  status_id                    :integer          not null
+#  controlling_user_id          :integer
+#  controlling_user_role_id     :integer
+#  controlling_for_user_id      :integer
+#  controlling_for_user_role_id :integer
+#  loaded_by                    :integer
+#  loaded_at                    :datetime
+#  submitted_at                 :datetime
+#  memo                         :string(255)
+#  accounted                    :boolean          default(FALSE), not null
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  is_deleted                   :boolean          default(FALSE), not null
 #
 
+
+
 class MoneyRequest < ActiveRecord::Base
-  include OperationCallbacks, MathUtil
+  include OperationCallbacks, MathUtil, SoftDeletable
 
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :user
   belongs_to :card
   belongs_to :loaded_by, class_name: 'User'
   belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
   belongs_to :payment_mode
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy
@@ -56,6 +63,7 @@ class MoneyRequest < ActiveRecord::Base
   scope :include_user, -> { includes :user }
   scope :with_payment, -> { where.not payment_id: nil }
   scope :without_payment, -> { where payment_id: nil }
+  scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
 
   scope :filter_status, ->(status_id) { where status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -73,7 +81,7 @@ class MoneyRequest < ActiveRecord::Base
       date_to = "2100-01-01" if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date + 1 if date_to.present?
-      # date_to = Date.today if date_to.blank?
+      # date_to = DateUtils.local_date if date_to.blank?
       money_requests = arel_table
       where(money_requests[:created_at].gteq(date_from).and(money_requests[:created_at].lteq(date_to)))
     end
@@ -82,40 +90,69 @@ class MoneyRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :items
   delegate :status_name, to: :status
+  delegate :payment_mode_name, to: :payment_mode
 
-  default_scope { order(created_at: :desc, status_id: :asc) }
+  default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   before_save :handle_name
   before_save :handle_nil_amount
   before_create :create_items
 
-  # Used to retrieve all the users associated with this money request. If user before is provided,
-  # it provides a list of all users who interacted with the money request before this given user. Mainly used for reject_to
-  def associated_users(user_before = nil, ordered = false)
-    return nil if tracks.blank?
-    trackings = tracks.without_take_control_action
-    if user_before.present?
-      track = trackings.with_action_user(user_before.id).first
-      unless track.blank?
-        trackings = trackings.created_before(track.created_at)
-      end
-    end
-    user_ids = trackings.map(&:action_user_id).uniq
-    if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
-      if controlling_for_user_id.present?
-        user_ids << controlling_for_user_id
-      else
-        user_ids << controlling_user_id
-      end
-    end
-    if user_ids.size > 0
-      # Order is MySQL Specific
-      user_ids = user_ids.reverse!
-      user_ids.reject! { |id| id.blank? }
-      return User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
-    end
-    nil
-  end
+  attr_accessor :cache_users
+
+  # # Used to retrieve all the users associated with this report. If user before is provided,
+  # # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  # # Pass params[:inlcude_roles] = true to get list of users with roles
+  # def associated_users(user_before = nil, params={})
+  #   return nil if self.tracks.blank?
+  #   trackings = tracks.without_take_control_action
+  #
+  #   if user_before.present?
+  #     track = trackings.with_action_user(user_before.id).first
+  #     unless track.blank?
+  #       trackings = trackings.created_before(track.created_at)
+  #     end
+  #   end
+  #
+  #   if params.present? and params[:include_roles]
+  #     association_map = {}
+  #     trackings.each do |track|
+  #       [[track.action_user, track.action_user_role_id], [track.modified_user, track.modified_user_role_id]].each do |item|
+  #         if association_map[item[0]].blank?
+  #           association_map[item[0]] = {roles: []}
+  #         end
+  #         map = association_map[item[0]]
+  #         map[:roles] << item[1] unless map[:roles].include?(item[1]) and not item[1].nil?
+  #       end
+  #     end
+  #     return association_map
+  #   end
+  #
+  #   user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
+  #   if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
+  #     if controlling_for_user_id.present?
+  #       user_ids << controlling_for_user_id
+  #     else
+  #       user_ids << controlling_user_id
+  #     end
+  #   end
+  #
+  #   # User IDs was blank when an admin was taking control of his own report and rejecting it. This is the fix
+  #   if user_ids.present?
+  #     user_ids.uniq!
+  #   else
+  #     user_ids = [self.user_id]
+  #   end
+  #
+  #   if user_ids.size > 0
+  #     # Order is MySQL Specific
+  #     user_ids = user_ids.reverse!
+  #     user_ids.reject! { |id| id.blank? }
+  #     users = User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
+  #     return users
+  #   end
+  #   nil
+  # end
 
   def open?
     status_id == MoneyRequestStatus.open_id
@@ -161,6 +198,14 @@ class MoneyRequest < ActiveRecord::Base
     processing?
   end
 
+  def payment_mode_card?
+    self.payment_mode_id == PaymentMode.id_for(:card)
+  end
+
+  def payment_mode_cash?
+    self.payment_mode_id == PaymentMode.id_for(:cash)
+  end
+
   def relative_status_name(user)
     if processing? and controlling_user? user
       return 'Pending Review'
@@ -175,6 +220,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def controlling_user?(user)
+    return false if self.controlling_user.blank?
     self.controlling_user.id == user.id
   end
 

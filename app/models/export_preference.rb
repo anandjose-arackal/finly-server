@@ -10,6 +10,7 @@
 #  updated_at      :datetime         not null
 #
 
+
 class ExportPreference < ActiveRecord::Base
   belongs_to :company
   belongs_to :export_field

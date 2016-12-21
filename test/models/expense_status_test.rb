@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #
 
+
 require 'test_helper'
 
 class ExpenseStatusTest < ActiveSupport::TestCase

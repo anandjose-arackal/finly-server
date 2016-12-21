@@ -1,6 +1,6 @@
 <div class="row" style="height: 100%;">
   <div class="col-sm-8 show-details-panel">
-    <div class="row item-title show-details-title">
+    {{!-- <div class="row item-title show-details-title">
       <div class="col-sm-6">
         <h4 class="item-name">
           <label class="item-attr-preview">{{item.name}}</label>
@@ -8,7 +8,6 @@
         </h4>
       </div>
       <div class="col-sm-6 text-right">
-
         {{#if item.actions.take_control}}
           <button class="btn btn-warning btn-sm btn-report-action" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>
         {{/if}}
@@ -39,9 +38,8 @@
         {{#if item.actions.reimbursement_confirm}}
           <button class="btn btn-sm btn-success btn-report-action" data-url="{{item.actions.reimbursement_confirm}}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;Confirm Reimbursement</button>
         {{/if}}
-        
       </div>
-    </div>
+    </div> --}}
 
     <div class="row item-body">
       <div class="col-sm-7">
@@ -113,7 +111,7 @@
         
       </div>
       <div class="col-sm-5">
-        <div class="row">
+        <div class="row text-right no-margin">
 
           <div class="dropdown">
             <button class="btn-primary btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">Export <span class="caret"></span></button>
@@ -125,11 +123,20 @@
           </div>
 
           {{#if item.actions.editable}}
-            <button class="btn btn-navbar btn-sm btn-danger btn-delete-item"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+            <button type="button" class="btn btn-navbar btn-sm btn-danger btn-delete-item" data-toggle="modal" data-target="#modal-confirm-delete"><i class="fa fa-trash"></i>&nbsp;&nbsp;MeDelete</button>
           {{/if}}
 
 
         </div><!-- .row-->
+        <div class="row no-margin">
+          <div class="col-sm-12 no-padding">
+            {{#if item.auto_submit}}
+              <div class="alert alert-info">
+                <strong>Note:</strong> This is an auto-submitted report
+              </div>
+            {{/if}}
+          </div>
+        </div>
       </div>
     </div>
     <hr />
@@ -173,11 +180,11 @@
     <div class="row no-margin">
       {{#each item.expense_sections}}
       <div class="col-sm-12 expense-category">
-        <div class="row" style="padding: 0 10px; background: #B4AFD0;">
+        <div class="row" style="padding: 0 10px; background: #A0A8DB;">
           <div class="col-sm-6 no-padding"><h5>{{this.section_name}}</h5></div>
           <div class="col-sm-6 no-padding"><h5 class="text-right">{{this.section_total}}</h5></div>
         </div>
-        <div class="row" style="padding: 5px 10px; background: #DDDAEA;">
+        <div class="row" style="padding: 5px 10px; background: #C5CAE9;">
           <div class="col-sm-1 no-padding">Sl. No.</div>
           <div class="col-sm-2 no-padding">Date</div>
           <div class="col-sm-2 no-padding">Merchant</div>
@@ -200,7 +207,14 @@
             <div class="row" style="padding: 3px 10px;">
           {{/ifCond}}
         {{/ifCond}}
-          <div class="col-sm-1 no-padding">{{increment @index 1}}</div>
+          <div class="col-sm-1 no-padding">
+            {{increment @index 1}}
+            {{#if_eq this.expense_type_id 2}}
+              <i class="fa fa-cc-visa" style="margin-left: 30%;"></i>
+            {{else}}
+              <i class="fa fa-money" style="margin-left: 30%;"></i>
+            {{/if_eq}}
+          </div>
           <div class="col-sm-2 no-padding">{{this.date}}</div>
           <div class="col-sm-2 no-padding">{{this.merchant_name}}</div>
           <div class="col-sm-3 no-padding">{{#if this.note}}{{this.note}}{{else}}--{{/if}}</div>
@@ -253,10 +267,9 @@
   </div><!-- col-sm-8 -->
 
   <div class="col-sm-4 timeline show-details-panel">
-    <div class="row show-details-title">
+    {{!-- <div class="row show-details-title">
       <div class="col-sm-12 no-padding"></div>
-    </div>
-    <div class="row no-margin" style="margin-top: 60px;"><h4>Timeline</h4></div>
+    </div> --}}
     <div class="row no-margin">
       <div class="col-sm-2 no-padding">
         <span class="roundCircle">{{item.user_initial}}</span>
@@ -328,10 +341,10 @@
   }
 
 
-  .item-body{
+  /*.item-body{
     margin-top: 60px;
   }
-
+*/
 
   .roundCircle{
     border-radius: 50%;
@@ -343,7 +356,7 @@
   }
 
   .timeline{
-    background: #F7F9FB;
+    background: #F6F7FC;
   }
 
   textarea.comment-content{
@@ -362,13 +375,13 @@
     font-size: 12px;
   }
 
-  .item-details .expense-category {
+  .expense-category {
     border: 1px solid #cdcdcd;
     margin-bottom: 20px;
     border-radius: 5px;
   }
 
-  .item-details .expense-category:last-child{
+  .expense-category:last-child{
     margin-bottom: 350px;
   }
 </style>

@@ -8,10 +8,12 @@
 #  updated_at :datetime         not null
 #
 
+
+
 class MoneyRequestTrackingAction < ActiveRecord::Base
 
-  ACTIONS={create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
-           take_control: 8, credited: 9}
+  ACTIONS={create: 1, retract: 2, submit: 3, approve: 4, approve_and_forward: 5, auto_approve: 6, reject: 7, unapprove: 8,
+           take_control: 9, credited: 10}
 
   self.class.instance_eval do
     ACTIONS.each do |key, value|

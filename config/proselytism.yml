@@ -8,6 +8,15 @@ test:
   oo_conversion_max_tries: 2
   oo_conversion_max_time: 4 #seconds
 
+staging:
+  open_office_path: "soffice"
+  oo_server_bridge: "JOD"
+  oo_server_max_cpu: 95  #percent
+  oo_server_max_cpu_delay: 2 #seconds
+  oo_server_availability_delay: 6 # seconds
+  oo_server_start_delay: 2 #seconds
+  oo_conversion_max_tries: 2
+  oo_conversion_max_time: 4 #seconds
 
 development:
   open_office_path: "soffice"
@@ -18,6 +27,16 @@ development:
   oo_server_start_delay: 2 #seconds
   oo_conversion_max_tries: 2
   oo_conversion_max_time: 4 #seconds
+
+itzcash_uat:
+  open_office_path: "soffice"
+  oo_server_bridge: "PYOD"
+  oo_server_max_cpu: 98  #percent
+  oo_server_max_cpu_delay: 2 #seconds
+  oo_server_availability_delay: 7 #seconds
+  oo_server_start_delay: 2 #seconds
+  oo_conversion_max_tries: 2
+  oo_conversion_max_time: 5 #seconds
 
 production:
   open_office_path: "soffice"

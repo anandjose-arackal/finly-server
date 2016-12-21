@@ -1,6 +1,6 @@
 class User::Team::Review::UserRole < BaseOperation
 
-  def self.call(user, obj)
+  def self.call(user, obj, params={})
     return nil unless obj.present? and user.present?
     obj_type = nil
     if obj.is_a?(MoneyRequest)
@@ -12,8 +12,10 @@ class User::Team::Review::UserRole < BaseOperation
 
     if user.id == obj.user.id
       return UserRole.id_for(:employee)
-    elsif obj.controlling_for_user.present? and user.admin?
-      UserRole.id_for(:admin)
+    elsif obj.controlling_user_id == user.id
+      obj.controlling_user_role_id
+    elsif obj.controlling_for_user_id == user.id
+      obj.controlling_for_user_role_id
     else
       param = {}
       param[obj_type] = obj

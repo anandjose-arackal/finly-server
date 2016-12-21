@@ -45,7 +45,8 @@ class Report::Base < BaseOperation
 
     def init
       self.report = params[:report]
-      self.categories = user.company.categories
+      report.reload
+      self.categories = report.user.company.categories
       self.expenses = report.expenses
       self.status = report.relative_status_name user
       self.total = report.total_amount
@@ -89,7 +90,7 @@ class Report::Base < BaseOperation
     def load_actions
       actions = {}
       if admin_view?
-        if self.report.can_take_control? and not self.report.controlling_user?(user) and not self.report.user.id == user.id
+        if self.report.can_take_control? and not self.report.controlling_user?(user) #and not self.report.user.id == user.id
           actions[:take_control] = {url: Rails.application.routes.url_helpers.report_take_control_path(report_id: report.id, view: params[:view])}
         elsif self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
@@ -99,7 +100,7 @@ class Report::Base < BaseOperation
         if self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
-        elsif (self.report.can_unapprove?) and self.report.associated_users(self.report.controlling_user).include?(user)
+        elsif (self.report.can_unapprove?) and Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.controlling_user).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
         end
       else

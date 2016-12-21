@@ -1,10 +1,17 @@
 <div class="row no-margin no-padding">
   <div class="col-sm-6">
      <ul class="nav navbar-nav">
-       <li><button class="btn navbar-btn-refresh btn-success"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</button></li>    
-      <li><button class="btn btn-sm btn-primary btn-new">New Expense</button></li> 
-      <li><button class="btn btn-sm btn-primary btn-create-report" style="display: none;">Create Report</button></li> 
-    </ul>   
+      <li><button class="btn navbar-btn-refresh btn-success"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</button></li>
+      {{#unless item.view}}
+        <li><button class="btn btn-sm btn-primary btn-new">New Expense</button></li> 
+        <li><button class="btn btn-sm btn-primary btn-create-report" disabled="disabled">Create Report</button></li> 
+      {{else}}
+        {{#if_eq item.view 'personal'}}
+          <li><button class="btn btn-sm btn-primary btn-new">New Expense</button></li> 
+          <li><button class="btn btn-sm btn-primary btn-create-report" disabled="disabled">Create Report</button></li> 
+        {{/if_eq}}
+      {{/unless}}
+    </ul>
   </div>
 
   
@@ -23,7 +30,6 @@
           </div>
         </div>
       </form>
-      
     </ul>   
   </div>
 

@@ -12,22 +12,34 @@
 #  is_deleted :boolean          default(FALSE), not null
 #
 
+
+
 require 'test_helper'
 
 class PolicyTest < ActiveSupport::TestCase
 
   def setup
     @p = Policy.last
-    @u1 = User.find_by(email: 'user1@finlytest.io')
-    @u2 = User.find_by(email: 'user2@finlytest.io')
+    @u1 = users(:employee)
+    @u2 = users(:second_employee)
+    @m = users(:manager)
   end
 
   test 'has_one version update' do
-    @p.configuration.update_attribute(:require_category, true)
-    @p.configuration.update_attribute(:require_category, false)
+    original_name = @p.name
+    @p.configuration.update_attributes(:require_category => true)
+
+    @p.update_attributes(name: "Something new")
+    @p.configuration.update_attributes(:require_category => false)
+
     assert_equal @p.configuration.require_category, false
+    assert_equal "Something new", @p.name
+
     p2 = @p.versions.last.reify(has_one: true)
+
     assert_equal p2.configuration.require_category, true
+
+    assert_equal original_name, p2.name
     @p.reload
     assert_equal @p.configuration.require_category, false
   end
@@ -44,7 +56,7 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'has_many version create' do
-    @p.user_team_mapping.create(user_id: 13, manager_id: 14, greater_than_amount_id: Amount.last.id)
+    @p.user_team_mapping.create(user_id: @u1.id, manager_id: @m.id, greater_than_amount_id: Amount.last.id)
     p2 = @p.versions.last.reify has_many: true, has_one: true
     assert_equal p2.user_team_mapping.size + 1, @p.user_team_mapping.size
   end

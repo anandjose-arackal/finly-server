@@ -1,11 +1,58 @@
-<% if @result.users_with_manager_email.present? %>
-    <% @result.users_with_manager_email.each do |item| %>
-        <% user = item[:user] %>
-        <div class="row" style="margin: 0;font-size: 12px; text-align: left; padding: 10px 0 10px 0;height: 30px;border-bottom: 1px solid #d8d8d8;">
-          <div class="col-md-1"><input class="checkboxes" type="checkbox" name="add_user_id" value="<%= user.id %>" onclick="makeButtonVisible()" style="margin: 4px 8px 0 8px"></div>
-          <div class="col-md-3" style="padding-left: 20px"><%= user.name %></div>
-          <div class="col-md-4" style="padding-left: 25px"><%= user.email %></div>
-          <div class="col-md-4" style="text-align: center;padding-left: 38px"><%= item[:manager] %></div>
+<div class="modal-dialog modal-md" style="width: 60%; height: 100%;">
+  <div class="modal-content" style="height: 80%; overflow-y: scroll;">
+    <div class="modal-header" style="">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+      <div class="row no-margin">
+        <div class="col-sm-6">
+          <h4 class="text-left modal-title" style="text-align: left; height: 28px;">Invite Employees To Policy</h4>
         </div>
-    <% end %>
-<% end %>
+        <div class="col-sm-5 text-right">
+          <form data-remote="true" hidden="hidden"  id="addUsersToPolicyForm" method="post">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+            <input id="addUserToPolicyIds" name="users_id" type="text">
+          </form>
+
+          <button class="btn btn-primary btn-sm" id="addUsersToPolicyButton" type="button" data-url="<%= policy_add_users_path(load_params policy_id: @result.policy.id) %>" style="margin: 0;" disabled="disabled">Add Users</button>     
+        </div>
+      </div>
+    </div>
+    <div class="modal-body" style="padding: 0; max-height: 75%; overflow-y: scroll; ">
+      <form data-remote data-turboboost  id="usersPolicyList" action="<%= policy_invitable_users_path(load_params policy_id: @result.policy.id) %>" method="post" style="display: none;">
+        <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+      </form>
+        <div class="row no-margin">
+          <div class="col-sm-12">
+            <div class="row no-margin" style="font-weight: bold;padding: 10px 0;">
+              <div class="col-md-1"><input disabled="disabled" type="checkbox" id="select-invitable-users"></div>
+              <div class="col-md-3">User Name</div>
+              <div class="col-md-3">Email Id</div>
+              <div class="col-md-2">Mobile Number</div>
+              <div class="col-md-3">Manager</div>
+            </div>
+            <div id="invitable-users">
+              <% if @result.users_with_manager_email.present? %>
+                <% @result.users_with_manager_email.each do |item| %>
+                  <% user = item[:user] %>
+                  <div class="row no-margin invitable-user" data-user-id="<%= user.id %>">
+                    <div class="col-md-1"><input class="select-invitable-user" type="checkbox" name="add_user_id" value="<%= user.id %>"></div>
+                    <div class="col-md-3"><%= user.name.blank? ? "Not Set" : user.name %></div>
+                    <div class="col-md-3"><%= user.email.blank? ? "Not Set" : user.email %></div>
+                    <div class="col-md-2"><%= user.mobile_number.blank? ? "Not Set" : user.mobile_number %></div>
+                    <div class="col-md-3"><%= item[:manager] %></div>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>  
+          </div>
+          
+        </div><!-- .row -->
+        
+        <form data-remote data-turboboost hidden="hidden"  id="addUsersToPolicy" action="<%= policy_add_users_path(load_params policy_id: @result.policy.id) %>" method="post">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          <input id="addUserIds" name="user_id" type="text">
+        </form>
+      </section>
+    </div>
+  </div>
+</div>

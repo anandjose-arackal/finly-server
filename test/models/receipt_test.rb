@@ -17,6 +17,7 @@
 #  receipt_email_id   :integer
 #
 
+
 require 'test_helper'
 
 class ReceiptTest < ActiveSupport::TestCase

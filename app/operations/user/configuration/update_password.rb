@@ -17,12 +17,15 @@ class User::Configuration::UpdatePassword < BaseOperation
     new_pwd_params = params[:user]
     unless new_pwd_params[:current_password].present?
       messages[:error] << 'Current password cannot be blank'
+      return
     end
     unless new_pwd_params[:password].present?
       messages[:error] << 'New password cannot be blank'
+      return
     end
     unless new_pwd_params[:password_confirmation].present?
       messages[:error] << 'Password confirmation cannot be blank'
+      return
     end
   end
 

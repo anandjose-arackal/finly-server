@@ -2,12 +2,17 @@ class Settlement::MoneyRequest::Approved < MoneyRequest::Base
   attr_accessor :money_request, :selected_user
 
   def authorized_user_types
+    return nil if params.present? and (params[:auto_approve])
     [:manager, :finance_manager, :admin]
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << 'No user or params passed'
+    if params.blank?
+      add_message :error, 'Advance Request not found'
+      return
+    end
+    if user.blank? and not params[:auto_approve]
+      add_message :error, 'User not found'
     end
   end
 

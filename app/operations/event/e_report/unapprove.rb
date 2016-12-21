@@ -1,7 +1,7 @@
 class Event::EReport::Unapprove < Event::EReport::Base
 
   def event_id
-    Event.report_unapprove_id
+    NotifierType.report_unapprove_id
   end
 
   def affected_users
@@ -9,7 +9,11 @@ class Event::EReport::Unapprove < Event::EReport::Base
     # users = [self.report.controlling_user]
     # users << prev_user if prev_user.present?
     # users
-    [self.report.controlling_user]
+    [self.report.controlling_user, self.report.tracks.last.modified_user]
+  end
+
+  def notification_affected_users
+    [report.controlling_user, report.tracks.last.modified_user]
   end
 
   def send_push_notification(user)
@@ -19,7 +23,23 @@ class Event::EReport::Unapprove < Event::EReport::Base
   end
 
   def set_notification(user)
-
+    if report.controlling_user_id == user.id
+      view_role_id = report.controlling_user_role_id
+    else
+      view_role_id = report.tracks.last.modified_user_role_id
+    end
+    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+                                             action_type_id: NotificationActionType.notify_unapprove_id,
+                                             action_user_id: self.user.id,
+                                             object_id: report.id,
+                                             object_type: "Report",
+                                             path_object_id: report.id,
+                                             path_object_type: "Report",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: view_role_id
+    )
+    notification.save
   end
 
   def mailer_subject(user)

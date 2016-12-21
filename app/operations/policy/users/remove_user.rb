@@ -2,7 +2,6 @@
 # params:
 # policy_id: the policy from which a user needs to be removed
 # removed_user_id: the id of the user who needs to be removed.
-# todo - generalize this to remove multiple users
 
 class Policy::Users::RemoveUser < Policy::Base
 
@@ -18,11 +17,6 @@ class Policy::Users::RemoveUser < Policy::Base
     self.removed_users = user.company.users.where(id: ids)
   end
 
-  def validate
-    super()
-
-  end
-
   def authorize
     unless removed_users.present?
       raise_unauthorized_exception
@@ -36,11 +30,21 @@ class Policy::Users::RemoveUser < Policy::Base
     end
   end
 
+  def validate
+    super()
+    removed_users.each do |removed_user|
+      auto_submit_config = removed_user.auto_submit_config
+      if auto_submit_config.enabled and auto_submit_config.default_policy_id.present? and auto_submit_config.default_policy_id == self.policy.id
+        add_message :error, "#{removed_user.name} has this policy as their default policy for auto submission. Please update this before removing the user from the policy"
+      end
+    end
+  end
+
   def process
     removed_users.each do |removed_user|
       # Remove user
       unless self.policy.users.destroy(removed_user)
-        messages[:error] << "Couldn't remove user from the policy."
+        add_message :error, "Couldn't remove user from the policy."
         return false
       end
       # Remove user configuration
@@ -49,7 +53,7 @@ class Policy::Users::RemoveUser < Policy::Base
   end
 
   def post_process
-    messages[:success] << "User removed from policy."
+    add_message :success, "User removed from policy."
   end
 
   def success

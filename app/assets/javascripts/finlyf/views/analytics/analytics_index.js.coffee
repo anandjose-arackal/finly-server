@@ -30,6 +30,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     else
       @params = {}
     @params.view = @params.view || 'personal'
+    @params.filter_analytics_type = @params.filter_analytics_type || 'category'
     _this = @
     @dump = []
     @collection = new FinlyF.Collections.Analytics()
@@ -73,6 +74,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     @max_total = Math.max.apply(Math,arr)
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
+
+    FinlyF.stopMainLoader()
 
     #Stop refresh spinner if spinning
     spinner = $(@el).find(".secondary-navbar .navbar-btn-refresh i")
@@ -134,7 +137,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       'filter_analytics_type': $(navbar_main).find('li.filter-data-type.active').attr('data-show-type') || "category"
     }
 
-    console.log "Will navigate now.", params
+    # console.log "Will navigate now.", params
     if @params.view
       params.view = @params.view
 

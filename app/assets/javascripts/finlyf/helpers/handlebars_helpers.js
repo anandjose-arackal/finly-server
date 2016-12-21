@@ -46,6 +46,12 @@ Handlebars.registerHelper("case", function(value, options) {
     }
 });
 
+// Handlebars.registerHelper("default", function(options) {
+//     if (!this._switch_break_) {
+//         return options.fn(this);
+//     }
+// });
+
 Handlebars.registerHelper('if_all', function() {
   var args = [].slice.apply(arguments);
   var opts = args.pop();
@@ -85,6 +91,26 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 });
 
 
+Handlebars.registerHelper('or', function(/* any, any, ..., options */) {
+  var argLength = arguments.length - 1;
+  var options = arguments[argLength];
+  var success = false;
+  var i = 0;
+  while (i < argLength) {
+    if (arguments[i]) {
+      success = true;
+      break;
+    }
+    i++;
+  }
+  if (success) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+});
+
+
 //Set a variable
 Handlebars.registerHelper('setVar', function(varName, varValue, options){
   options.data.root[varName] = varValue;
@@ -95,11 +121,4 @@ Handlebars.registerHelper('setVar', function(varName, varValue, options){
 Handlebars.registerHelper('percentage', function(a, b){
   return parseInt(parseFloat(a) / parseFloat(b) * 100);
 })
-
-
-
-
-
-
-
 

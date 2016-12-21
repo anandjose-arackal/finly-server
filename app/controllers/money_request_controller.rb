@@ -15,6 +15,7 @@ class MoneyRequestController < ApplicationController
     respond render: :show
   end
 
+  # params[:type] = types given below
   def update
     # fail
     if params[:type].blank?
@@ -34,6 +35,11 @@ class MoneyRequestController < ApplicationController
         @result = MoneyRequest::Reject.(current_user, params)
       when :unapprove
         @result = MoneyRequest::Unapprove.(current_user, params)
+      when :credit
+        # from_account: wallet / virtual_account
+        @result = MoneyRequest::PrepaidCard::Credit.(current_user, params)
+      when :approve_and_forward_to
+        @result = MoneyRequest::ApproveAndForward.(current_user, params)
       when :take_control
         @result = MoneyRequest::TakeControl.(current_user, params)
     end

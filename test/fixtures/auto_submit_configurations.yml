@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  period_id: 
+  enabled: false
+  default_note: MyText
+  default_category_id: 1
+  default_policy_id: 1
+  autosubmitable_id: 
+  autosubmitable_type: Autosubmitable
+
+two:
+  period_id: 
+  enabled: false
+  default_note: MyText
+  default_category_id: 1
+  default_policy_id: 1
+  autosubmitable_id: 
+  autosubmitable_type: Autosubmitable

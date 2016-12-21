@@ -11,6 +11,7 @@
 #  updated_at            :datetime         not null
 #
 
+
 class CardConfiguration < ActiveRecord::Base
   belongs_to :card_status
   belongs_to :configured_by_user, class_name: "User"

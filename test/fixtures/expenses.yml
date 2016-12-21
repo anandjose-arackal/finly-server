@@ -1,0 +1,39 @@
+# == Schema Information
+#
+# Table name: expenses
+#
+#  id                   :integer          not null, primary key
+#  amount_id            :integer
+#  expense_status_id    :integer
+#  note                 :text(65535)
+#  date                 :date
+#  user_id              :integer
+#  expense_type_id      :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  manager_memo         :text(65535)
+#  rejecting_manager_id :integer
+#  report_id            :integer
+#  category_id          :integer
+#  is_deleted           :boolean          default(FALSE), not null
+#
+
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+#one:
+#  amount_id:
+#  expense_status_id:
+#  note: MyText
+
+#  date: 2016-06-29 19:46:48
+#  user_id:
+#  expense_type_id:
+#
+#two:
+#  amount_id:
+#  expense_status_id:
+#  note: MyText
+#  date: 2016-06-29 19:46:48
+#  user_id:
+#  expense_type_id:

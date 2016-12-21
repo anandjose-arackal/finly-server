@@ -1,0 +1,42 @@
+json.table1 do
+  json.user_account_opening_balance 12
+  json.account_load 0
+  json.account_withdrawal 12
+  json.account_transfer 12
+  json.from_own_account 12
+  json.from_other_accounts 12
+  json.from_company_account 12
+  json.atm 12
+  json.pos 12
+  json.online 12
+  json.reversals 12
+  json.atm_fees 12
+  json.surcharge 12
+  json.other_surcharges 12
+  json.finly_account_closing_balance 12
+  json.card_account_balance 12
+  json.cash_in_hand 12
+end
+json.table2 do
+  json.opening_card_balance 12
+  json.opening_cash_in_hand 12
+  json.card_load 12
+  json.cash_withdrawal 12
+  json.paid_to_employee 12
+  json.paid_by_employee 12
+  json.verified_card_ex 12
+  json.verified_cash_ex 12
+  json.closing_card_balance 12
+  json.closing_cash_in_hand 12
+end
+json.table3 do
+  json.opening_card_balance 12
+  json.declined_card_expenses 12
+  json.declined_cash_expenses 12
+  json.total_unverified_card_reversal 12
+  json.unreported_card_expenses 12
+  json.pending_card_expenses 12
+  json.pending_cash_expenses 12
+  json.closing_card_balance 12
+  json.remaining_cash 12
+end

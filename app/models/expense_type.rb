@@ -8,12 +8,17 @@
 #  updated_at :datetime         not null
 #
 
+
+
+
 class ExpenseType < ActiveRecord::Base
 
   validates :name, presence: true
 
+  VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5}
+
   # delegated from expense model
-  def expense_type
+  def expense_type_name
     self.name
   end
 
@@ -35,5 +40,9 @@ class ExpenseType < ActiveRecord::Base
 
   def self.per_diem_expense_id
     5
+  end
+
+  def self.id_for(item)
+    VALUES[item]
   end
 end

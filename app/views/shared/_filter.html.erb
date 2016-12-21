@@ -47,7 +47,7 @@
           Range:</p>
         <select id="datesFilterSelect" class="selectors" onchange="handleCustom(this)" name="filter_date[from]">
           <option style="display:none" value="" selected="selected"></option>
-          <option value="<%= Date.today %>">Today</option>
+          <option value="<%= DateUtils.local_date %>">Today</option>
           <option value="<%= 2.days.ago.strftime("%Y/%m/%d") %>">Last two days</option>
           <option value="<%= 1.week.ago.strftime("%Y/%m/%d") %>">This week</option>
 

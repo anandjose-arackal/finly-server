@@ -1,6 +1,6 @@
 require "#{Rails.root}/app/operations/settlement/index"
 class Settlement::Show < Settlement::Base
-  attr_accessor :selected_user, :reports, :payments, :money_requests, :actions, :type, :view_to_load
+  attr_accessor :selected_user, :reports, :payments, :money_requests, :type, :view_to_load
 
   def pre_validate
     unless user.present?
@@ -14,11 +14,7 @@ class Settlement::Show < Settlement::Base
   def init
     self.type = {}
     self.view_to_load = params[:view_to_load]
-  end
-
-  def process
     load_selected_user
-    return if has_errors?
     if self.view_to_load == 'payments'
       load_payments
     elsif self.view_to_load.include?('money_request')
@@ -28,7 +24,13 @@ class Settlement::Show < Settlement::Base
     end
     return if has_errors?
     self.type[view_to_load.to_sym] = true
-    load_actions
+  end
+
+  def post_process
+    super()
+    if params[:ref] == '1' and params[:n_id].present?
+      Event::EMoneyRequest::Unset.(user, params)
+    end
   end
 
   def success
@@ -36,18 +38,16 @@ class Settlement::Show < Settlement::Base
     params[:reports] = reports
     params[:payments] = payments
     params[:money_requests] = money_requests
-    params[:actions] = actions
     params[:type] = type
     Settlement::Show::Presenter.new(user, params, messages)
   end
 
   class Settlement::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :selected_user, :items, :actions, :type
+    attr_accessor :selected_user, :items, :type
 
     def init
       self.selected_user = params[:selected_user]
       self.items = (params[:reports] or params[:payments] or params[:money_requests])
-      self.actions = params[:actions]
       self.type = params[:type]
     end
 
@@ -90,7 +90,7 @@ class Settlement::Show < Settlement::Base
   end
 
   def load_payments
-    self.payments = self.selected_user.payments.with_details
+    self.payments = self.selected_user.payments.with_details.involving_user_credits(selected_user.id).non_personal
   end
 
   def load_money_requests
@@ -100,17 +100,6 @@ class Settlement::Show < Settlement::Base
       self.money_requests = self.selected_user.money_requests
       self.money_requests = self.money_requests.send(self.view_to_load) if self.money_requests.present?
     end
-  end
-
-  def load_actions
-    return unless admin_view? or finance_view?
-    return if self.selected_user.id == user.id and not admin_view?
-    self.actions = {}
-    self.actions[:add_reimbursement] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.reimbursement_id.to_s)}
-    self.actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.settlement_id)}
-    self.actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.debt_clearance_id)}
-    self.actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
-    self.actions[:credit_money_request] = {url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.advance_id)}
   end
 
 end

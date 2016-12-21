@@ -4,12 +4,11 @@ class Settlement::Base < BaseOperation
 
   class Settlement::Base::BasePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-
   end
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "No user or params passed."
+      add_message :error, 'No user or params passed'
       return false
     end
     # todo - temporary, will be changed once currencies is implemented. Error will be thrown if currency is not provided
@@ -18,32 +17,33 @@ class Settlement::Base < BaseOperation
     end
   end
 
-
   def validate_date(date)
     if date.blank?
-      messages[:error] << 'Date cannot be blank'
+      add_message :error, 'Date cannot be blank'
+      return false
+    end
+    unless DateUtils.validate_date_format?(date)
+      add_message :error, 'Invalid date format'
       return false
     end
     unless date.is_a?(Date)
       date = Date.parse(date)
     end
-
-    if date.present? and date > Date.today
-      messages[:error] << 'Date cannot be later than the current date'
+    if date.present? and date > DateUtils.local_date
+      add_message :error, 'Date cannot be later than the current date'
       return false
     end
-
-    return true
+    true
   end
 
   def cash_in_hand(user, date=nil)
-    if date.present? and date.is_a?(Date)
-      date = Date.parse(date)
+    if date.present? and (date.is_a?(Date) or date.is_a?(String))
+      date = Date.parse(date) rescue date
     end
     cash = user.balance_sheet.cash_in_hand
-    return cash if date.blank? or date == Date.today
+    return cash if date.blank? or date == DateUtils.local_date
     payments = user.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_to_user.sum(:value)
+    payments_to_user = payments.transferred_cash_to_user.sum(:value)
     debt_clearance = payments.debt_clearance.sum(:value)
     settlement = payments.settlement.sum(:value)
     reports = user.reports.processed.submitted_after(date)

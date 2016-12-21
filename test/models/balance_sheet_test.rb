@@ -11,6 +11,7 @@
 #  pending_advance_id       :integer
 #
 
+
 require 'test_helper'
 
 class BalanceSheetTest < ActiveSupport::TestCase

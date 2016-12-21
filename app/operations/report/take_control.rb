@@ -25,9 +25,18 @@ class Report::TakeControl < Report::Base
   end
 
   def process
-    if report.update_attributes controlling_user: user, controlling_for_user: report.controlling_user, memo: params[:memo]
-      track = report.tracks.build action_user: user, report_tracking_action_id: ReportTrackingAction.take_control_id,
-                                  report_status_id: report.status_id, memo: params[:memo]
+    if report.update_attributes controlling_user: user,
+                                controlling_for_user: report.controlling_user,
+                                controlling_user_role_id: UserRole.id_for(:admin),
+                                controlling_for_user_role_id: report.controlling_user_role_id,
+                                memo: params[:memo]
+      track = report.tracks.build action_user: user,
+                                  action_user_role_id: UserRole.id_for(:admin),
+                                  modified_user_id: report.controlling_for_user_id,
+                                  modified_user_role_id: report.controlling_for_user_role_id,
+                                  report_tracking_action_id: ReportTrackingAction.take_control_id,
+                                  report_status_id: report.status_id,
+                                  memo: params[:memo]
       track.save
       return
     end
@@ -36,7 +45,7 @@ class Report::TakeControl < Report::Base
 
   def post_process
     if success?
-      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_take_control), content: params[:memo]
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_take_control), content: params[:take_control_note]
       comment.save
     end
     Event::EReport::TakeControl.(self.user, report: self.report)

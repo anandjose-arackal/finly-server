@@ -10,6 +10,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class UserTag < ActiveRecord::Base
   belongs_to :user
 

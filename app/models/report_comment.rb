@@ -17,6 +17,9 @@
 #  payment_id               :integer
 #
 
+
+
+
 class ReportComment < ActiveRecord::Base
   belongs_to :report
   belongs_to :user
@@ -33,12 +36,11 @@ class ReportComment < ActiveRecord::Base
 
   default_scope { order created_at: :desc }
 
-
   def generate(u = nil)
     comment = nil
     name = nil
     if self.user.present? and u.present? and u.id == self.user_id
-      name = "You"
+      name = 'You'
     elsif self.user.present?
       name = self.user.name
     end
@@ -52,12 +54,19 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:report_submit)
         # Report submit
         comment = "#{name} submitted the report"
+      when ReportCommentAction.id_for(:report_auto_submit)
+        comment = 'Report auto-submitted'
       when ReportCommentAction.id_for(:report_approve)
         # Report approve
         comment = "#{name} approved the report"
       when ReportCommentAction.id_for(:report_auto_approve)
         # Report auto_approve
-        comment = "Report auto-approved as no manager is assigned to the user"
+        if self.report.present? and u.present? and u.id == self.report.user_id
+          name = 'you'
+        elsif self.user_id.present?
+          name = self.user.name
+        end
+        comment = "Report auto-approved as no manager is assigned to #{name}"
       when ReportCommentAction.id_for(:report_reject)
         # Report reject
         comment = "#{name} rejected the report"
@@ -70,6 +79,9 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:report_take_control)
         # Report take control
         comment = "#{name} took control of the report"
+        if self.content.present?
+          comment += " with a note: '#{self.content}'"
+        end
       when ReportCommentAction.id_for(:report_update)
         # Report update
         comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
@@ -78,7 +90,7 @@ class ReportComment < ActiveRecord::Base
         payment_id = payment.id rescue nil
         comment = "#{name} reimbursed the report with Payment ID : #{payment_id}"
         if payment.note.present?
-          comment += " , note : #{payment.note}"
+          comment += " , with a note : #{payment.note}"
         end
       when ReportCommentAction.id_for(:report_reimbursement_confirmed)
         # Report reimbursement confirmed
@@ -107,6 +119,15 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:expense_update)
         # Expense update
         comment = "#{name} updated the expense at : #{expense.merchant_name}. #{updated_field} from #{updated_from} to #{updated_to}"
+      when ReportCommentAction.id_for(:expense_attach_receipt)
+        # adding a receipt to an expense
+        comment = "#{name} attached a receipt to the expense at : #{expense.merchant_name}"
+      when ReportCommentAction.id_for(:expense_detach_receipt)
+        # adding a receipt to an expense
+        comment = "#{name} detached a receipt from the expense at : #{expense.merchant_name}"
+      when ReportCommentAction.id_for(:expense_update_receipt)
+        # adding a receipt to an expense
+        comment = "#{name} updated a receipt on the expense at : #{expense.merchant_name}"
     end
     comment
   end
@@ -121,7 +142,7 @@ class ReportComment < ActiveRecord::Base
           ReportCommentAction.id_for(:report_reimbursement_confirmed)
         validate_attributes [:user_id]
       when ReportCommentAction.id_for(:report_update)
-        validate_attributes [:user_id, :updated_field]
+        validate_attributes [:user_id, :updated_field, :updated_from, :updated_to]
       when ReportCommentAction.id_for(:report_reimbursed)
         validate_attributes [:user_id, :payment]
       when ReportCommentAction.id_for(:report_attach_receipt)

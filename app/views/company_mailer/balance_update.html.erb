@@ -1,0 +1,14 @@
+<% content_for :body do %>
+    <h3><%= "#{@company}" %> has loaded money into their company account. The details are as follows: </h3>
+
+    <h4>Amount: <%= @amount %></h4>
+    <br/>
+    <h4>Transaction ID: <%= @reference_id %></h4>
+    <br/>
+    <h4>Date: <%= Date.parse(@date).strftime("%d %B, %Y") %></h4>
+    <br/>
+    <h4>Remarks: <%= @remarks %></h4>
+    <br/>
+<% end %>
+
+<%= render 'application_mailer/template' %>

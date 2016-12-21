@@ -8,6 +8,8 @@
 #  updated_at :datetime         not null
 #
 
+
+
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 
@@ -30,6 +32,10 @@ class UserRole < ActiveRecord::Base
   def self.id_for(role)
     role == :finance_manager if role == :finance
     VALUES[role]
+  end
+
+  def self.name_for(role_id)
+    VALUES.key(role_id)
   end
 
 end

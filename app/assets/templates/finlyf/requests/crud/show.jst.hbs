@@ -1,18 +1,323 @@
-<div class="item-details">
-  <div class="" id="item-show-details">
-  </div>
+<div class="row no-margin" style="height: 100%;">
+  <div class="col-sm-8 show-details-panel no-padding" style="background: white;">
+    <input type="hidden" name="type" value="update" />
 
-  <div class="modal fade" tabindex="-1" role="dialog" id="modal-mp" data-backdrop="false">
-    
-  </div><!-- /.modal -->
-</div>
+    <div class="row item-body no-margin">
+      <div class="col-sm-7">
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Policy</label></div>
+          <div class="col-sm-6 item-policy">
+            <label class="control-label item-attr-preview">
+              {{#if item.policy}}
+                {{item.policy}}
+              {{else}}
+                None
+              {{/if}}
+            </label>
+            <select name="money_request[policy_id]" class="item-attr-edit item-policy item-policy-edit form-control" name="item-policy" data-default-value="{{item.policy_id}}">
+              <option value="">None</option>
+              {{#each item.policies}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Memo</label></div>
+          <div class="col-sm-6">
+            <label class="control-label item-attr-preview">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</label>
+            <textarea class="item-attr-edit form-control item-memo-edit" name="money_request[memo]">{{item.memo}}</textarea>
+          </div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Payment Mode</label></div>
+          <div class="col-sm-6">
+            <label class="control-label item-attr-preview">
+            {{#if item.payment_mode_id}}
+              {{#switch item.payment_mode_id}}
+                {{#case 1}}Cash{{/case}}
+                {{#case 2}}Card{{/case}}
+              {{/switch}} 
+            {{else}}
+              --
+            {{/if}}
+            </label>
+            {{#if item.card.assigned}}
+              <select class="form-control item-attr-edit" name="money_request[payment_mode_id]">
+                <option value="1" {{#if_eq item.payment_mode_id 1}}selected="selected"{{/if_eq}}>Cash</option>
+                <option value="2" {{#if_eq item.payment_mode_id 2}}selected="selected"{{/if_eq}}>Card</option>
+              </select> 
+            {{else}}
+              <label class="control-label item-attr-edit">Cash</label>
+              <input type="hidden" name="money_request[payment_mode_id]" value="1">
+            {{/if}}
+
+          </div>
+        </div>
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Status</label></div>
+          <div class="col-sm-6">
+            {{#switch item.status}}
+              {{#case 'Open'}}<span class="label label-default">{{item.status}}</span>{{/case}}
+              {{#case 'Approved'}}<span class="label label-success">{{item.status}}</span>{{/case}}
+              {{#case 'Rejected'}}<span class="label label-danger">{{item.status}}</span>{{/case}}
+              {{#case 'Retracted'}}<span class="label label-default">{{item.status}}</span>{{/case}}
+              {{#case 'Processing'}}<span class="label label-primary">{{item.status}}</span>{{/case}}
+              {{#case 'Credited'}}<span class="label label-success">{{item.status}}</span>{{/case}}
+            {{/switch}}
+          </div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">From</label></div>
+          <div class="col-sm-6">{{item.user_name}}</div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To Manager</label></div>
+          <div class="col-sm-6"><label>{{#if item.manager_name}}{{item.manager_name}}{{else}}--{{/if}}</label></div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
+          <div class="col-sm-6"><label>{{#if item.finance_manager_name}}{{item.finance_manager_name}}{{else}}--{{/if}}</label></div>
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Require By Date</label></div>
+          <div class="col-sm-6">
+            <label class="control-label item-attr-preview">{{#if item.required_by_date}}{{item.required_by_date}}{{else}}Not Set{{/if}}</label>
+            <input class="item-attr-edit datepicker form-control" type="text" name="money_request[required_by_date]" value="{{item.required_by_date}}" />
+          </div>   
+        </div>
+
+        <div class="row no-margin">
+          <div class="col-sm-6"><label class="control-label">Total Amount:</label></div>
+          <div class="col-sm-6"><label>&#8377;&nbsp;{{item.total}}</label></div>
+        </div>
+        
+      </div>
+      <div class="col-sm-5">
+        <div class="row no-margin text-right">
+
+          {{#if item.actions.editable}}
+            <button class="btn btn-navbar btn-sm btn-danger btn-delete-request"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
+          {{/if}}
+
+        </div><!-- .row-->
+      </div>
+    </div>
+    <hr />
+    {{#ifCond item.violations.blocking_present '||' item.violations.warning_present}}
+    <div class="row no-margin violations">
+      <h4>Report Violations</h4>
+      <div class="col-sm-12">
+        {{#each item.violations.warning_messages}}
+          {{#if this.message}}
+            <div class="violation violation-warning col-sm-10 text-center col-sm-offset-1 alert alert-warning" role="alert">{{this.message}}</div>
+          {{/if}}
+        {{/each}}
+
+        {{#if item.violations.blocking_present}}
+        <div class="col-sm-10 no-padding col-sm-offset-1">
+          <hr style="margin: 8px auto;" />
+        </div>
+        {{/if}}
+
+        {{#each item.violations.blocking_messages}}
+          {{#if this.message}}
+            <div class="violation violation-blocking col-sm-10 text-center col-sm-offset-1 alert alert-danger" role="alert">{{this.message}}</div>
+          {{/if}}
+        {{/each}}
+      </div>
+      <hr />
+    </div><!-- .violations -->
+    {{/ifCond}}
+
+    <div class="row no-margin" style="background: #A0A8DB;">
+      <div class="col-sm-3 no-padding" style="padding-left: 10px;">
+        <h4>CATEGORIES</h4>
+      </div>
+      <div class="col-sm-2 text-right"><h4 style="font-weight: bold;">Total</h4></div>
+      <div class="col-sm-4">
+        <h4 style="font-weight: bold;">&#8377;&nbsp;{{item.total}}</h4>
+      </div>
+    </div>
+    <div class="row no-margin request-categories">
+      {{#each item.request_items}}
+        <div class="row no-margin request-category" style="padding-top: 10px;">
+          <div class="col-sm-5" style="border-bottom: 1px solid #eee;">
+            <h4 class="request-category-name">{{this.category.name}}</h4>
+          </div>
+          <div class="col-sm-4" style="border-bottom: 1px solid #eee;">
+
+            <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
+            <label class="control-label item-attr-preview" style="line-height: 35px; font-size: 18px;">&#8377;&nbsp;{{this.amount.value}}</label>
+            <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" style="margin-bottom: 6px;" />
+            <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+          </div>
+        </div>
+      {{/each}}
+    </div>
+    {{!-- <div class="row no-margin request-categories">
+      {{#each item.request_items}}
+        {{#if this.amount.value}}
+          <div class="row no-margin request-category">
+            <div class="col-sm-6">
+              <h4 class="request-category-name">{{this.category.name}}</h4>
+            </div>
+            <div class="col-sm-4">
+
+              <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
+              <label class="control-label item-attr-preview">{{this.amount.value}}</label>
+              <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" />
+              <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+            </div>
+            <div class="col-sm-2">
+              <button class="btn btn-danger btn-sm btn-remove-request-category item-attr-edit">Remove</button>
+            </div>
+          </div>
+        {{/if}}
+      {{/each}}
+    </div> --}}
+    {{!-- {{#if item.actions.editable}}
+    <div class="row no-margin">
+      <div class="row no-margin add-request-category">
+        <div class="col-sm-6">
+          <select name="category" class="form-control request-category-dropdown">
+            {{#each item.request_items}}
+              {{#unless this.amount.value}}
+              <option value="{{this.category.id}}">{{this.category.name}}</option>
+              {{/unless}}
+            {{/each}}
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <input class="form-control" type="number" name="amount_value" value="0">
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-sm btn-add-request-category">Add</button>
+        </div>
+      </div>
+    </div>
+    {{/if}} --}}
+  </div><!-- col-sm-8 -->
+
+  <div class="col-sm-4 timeline show-details-panel">
+    <div class="row no-margin">
+      <div class="col-sm-2 no-padding">
+        <span class="roundCircle">{{item.user_initial}}</span>
+      </div>
+      <div class="col-sm-10 no-padding text-right form-new-comment">
+        <textarea class="form-control comment-content"></textarea>
+        <button class="btn btn-navbar btn-sm btn-warning btn-post-comment" data-item-id="{{item.id}}">Post</button>
+      </div>
+    </div>
+    <div class="comments">
+    {{#if item.comments}}
+      {{#each item.comments}}
+      <div class="row no-margin comment">
+        <div class="col-sm-2 no-padding">
+          <span class="roundCircle">{{this.comment_user_initial}}</span>
+        </div>
+        <div class="col-sm-10 no-padding">
+          <div class="row no-margin comment-content">
+            <div class="col-sm-12 no-padding">
+              {{this.content}}
+            </div>
+          </div>
+          <div class="row no-margin comment-meta">
+            <div class="col-sm-12 no-padding">
+              {{this.comment_user_name}} - {{this.created_at}}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    {{/if}}  
+    </div>
+  </div><!-- col-sm-4 -->
+</div><!-- .row -->
 
 <style type="text/css">
+  .show-details-title{
+    position: fixed;
+    max-height: 50px;
+    min-height: 50px;
+    background: #fff;
+    z-index: 9;
+    /*box-shadow: 0 0 9px 0px rgba(0, 0, 0, 0.2)*/
+    /*box-shadow: 0 2px 9px -4px #777;*/
+    box-shadow: 0 1px 3px -3px rgba(0, 0, 0, 0.46);
+    border-bottom: 1px solid #eee;
+  }
+  .col-sm-8 .show-details-title{
+    width: 66.666%;
+    margin-top: -60px;
+  }
 
-#modal-mp{
-  position: absolute;
-}
-.modal-backdrop{
-  z-index: 1;
-}
+  .col-sm-4 .show-details-title{
+    width: 33.333%;
+    box-shadow: 1px 1px 3px -3px rgba(0, 0, 0, 0.46);
+    background: rgba(255, 255, 255, 0.5);
+
+  }
+
+  .violation{
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .item-attr-edit{
+    display: none;
+  }
+
+  /*.item-title{
+    background: aliceblue;
+  }
+*/
+  /*.item-body{
+    margin-top: 60px;
+  }
+*/
+
+  .roundCircle{
+    border-radius: 50%;
+    line-height: 40px;
+    width: 40px;
+    /*height: 50px;*/
+    height: 40px;
+    background: #23fa8b;
+  }
+
+  .timeline{
+    background: #F6F7FC;
+  }
+
+  textarea.comment-content{
+    border-radius: 1.5px;
+    margin-bottom: 5px;
+  }
+
+  .comment{
+    /*background: #efefef;*/
+    padding: 10px 0;
+    /*margin-bottom: 10px;*/
+  }
+
+  .comment-meta{
+    color: #aaa;
+    font-size: 12px;
+  }
+
+  .item-details .expense-category {
+    border: 1px solid #cdcdcd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+
+  .item-details .expense-category:last-child{
+    margin-bottom: 350px;
+  }
 </style>
