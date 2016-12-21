@@ -17,7 +17,7 @@ class RejectReportEventTest < ActiveSupport::TestCase
   test 'successful reject from first approver who is a manager' do
     @report.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @report.stubs(:rejected?).returns(true)
-    @report.expects(:associated_users).with(@manager, include_roles: true).twice.returns([@owner => [nil, 4], @manager => [3]])
+    @report.expects(:associated_users).with(@manager).twice.returns([@owner => [nil, 4], @manager => [3]])
 
     response = nil
     event = Event::EReport::Reject.new(@manager, report: @report)
@@ -34,7 +34,7 @@ class RejectReportEventTest < ActiveSupport::TestCase
   test 'successful reject from second approver who is a manager' do
     @report.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @report.stubs(:rejected?).returns(true)
-    @report.expects(:associated_users).with(@second_manager, include_roles: true).twice.returns([@owner, @second_manager, @manager])
+    @report.expects(:associated_users).with(@second_manager).twice.returns([@owner, @second_manager, @manager])
 
     response = nil
     event = Event::EReport::Reject.new(@second_manager, report: @report)
@@ -52,7 +52,7 @@ class RejectReportEventTest < ActiveSupport::TestCase
   test 'successful reject from finance manager' do
     @report.stubs(:tracks => stub(:last => stub(:action_user => @manager)))
     @report.stubs(:rejected?).returns(true)
-    @report.expects(:associated_users).with(@finance_manager, includes_roles: true).twice.returns([@owner, @finance_manager, @second_manager, @manager])
+    @report.expects(:associated_users).with(@finance_manager).twice.returns([@owner, @finance_manager, @second_manager, @manager])
 
     response = nil
     event = Event::EReport::Reject.new(@finance_manager, report: @report)

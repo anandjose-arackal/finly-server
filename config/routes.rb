@@ -487,7 +487,7 @@ Rails.application.routes.draw do
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
 
-  devise_for :users
+  devise_for :users, controllers: {passwords: "passwords"}
 
   namespace :api do
     namespace :v0 do

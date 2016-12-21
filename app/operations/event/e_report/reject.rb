@@ -18,11 +18,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    self.report.associated_users self.user
-  end
-
-  def notification_affected_users
-    report.associated_users(user, include_roles: true)
+    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
   end
 
   def send_push_notification(user)
@@ -31,7 +27,8 @@ class Event::EReport::Reject < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.report_id,
                                             action_type_id: NotificationActionType.notify_reject_id,
@@ -42,7 +39,7 @@ class Event::EReport::Reject < Event::EReport::Base
                                             path_object_type: "Report",
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: role[:roles].first
+                                            view_role_id: roles.first
                                             )
     notification.save
   end

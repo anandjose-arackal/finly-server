@@ -17,7 +17,7 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
   end
 
   def affected_users
-    users = self.money_request.associated_users nil, include_roles: true
+    users = MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request)
     users.reject { |r| r == self.user }
   end
 
@@ -28,7 +28,8 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role)
+  def set_notification(user)
+    roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
                                              action_type_id: NotificationActionType.notify_comment_id,
                                              action_user_id: self.user.id,
@@ -38,7 +39,7 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
                                              path_object_type: "Advance Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: role[:roles].first
+                                             view_role_id: roles.first
     )
     notification.save
   end

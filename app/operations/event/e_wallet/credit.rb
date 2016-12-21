@@ -18,7 +18,7 @@ class Event::EWallet::Credit < Event::EWallet::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role)
+  def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.wallet_id,
                                              action_type_id: NotificationActionType.notify_credit_id,
                                              action_user_id: payment.initiating_user_id,

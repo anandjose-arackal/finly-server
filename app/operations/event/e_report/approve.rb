@@ -66,7 +66,7 @@ class Event::EReport::Approve < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
     if approved
       if auto_approve
         notify_type = NotificationActionType.id_for(:notify_auto_approve)

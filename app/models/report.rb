@@ -105,59 +105,61 @@ class Report < ActiveRecord::Base
 
   before_destroy :clear_expenses
 
-  # Used to retrieve all the users associated with this report. If user before is provided,
-  # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
-  # Pass params[:inlcude_roles] = true to get list of users with roles
-  def associated_users(user_before = nil, params={})
-    return nil if self.tracks.blank?
-    trackings = tracks.without_take_control_action
+  attr_accessor :cache_users
 
-    if user_before.present?
-      track = trackings.find_by(action_user_id: user_before.id)
-      unless track.blank?
-        trackings = trackings.created_before(track.created_at)
-      end
-    end
-
-    if params.present? and params[:include_roles]
-      association_map = {}
-      trackings.each do |track|
-        [[track.action_user, track.action_user_role_id], [track.modified_user, track.modified_user_role_id]].each do |item|
-          if association_map[item[0]].blank?
-            association_map[item[0]] = {roles: []}
-          end
-          map = association_map[item[0]]
-          map[:roles] << item[1] unless map[:roles].include?(item[1]) and not item[1].nil?
-        end
-      end
-      return association_map
-    end
-
-    user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
-    if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
-      if controlling_for_user_id.present?
-        user_ids << controlling_for_user_id
-      else
-        user_ids << controlling_user_id
-      end
-    end
-
-    # User IDs was blank when an admin was taking control of his own report and rejecting it. This is the fix
-    if user_ids.present?
-      user_ids.uniq!
-    else
-      user_ids = [self.user_id]
-    end
-
-    if user_ids.size > 0
-      # Order is MySQL Specific
-      user_ids = user_ids.reverse!
-      user_ids.reject! { |id| id.blank? }
-      users = User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
-      return users
-    end
-    nil
-  end
+  # # Used to retrieve all the users associated with this report. If user before is provided,
+  # # it provides a list of all users who interacted with the report before this given user. Mainly used for reject_to
+  # # Pass params[:inlcude_roles] = true to get list of users with roles
+  # def associated_users(user_before = nil, params={})
+  #   return nil if self.tracks.blank?
+  #   trackings = tracks.without_take_control_action
+  #
+  #   if user_before.present?
+  #     track = trackings.find_by(action_user_id: user_before.id)
+  #     unless track.blank?
+  #       trackings = trackings.created_before(track.created_at)
+  #     end
+  #   end
+  #
+  #   if params.present? and params[:include_roles]
+  #     association_map = {}
+  #     trackings.each do |track|
+  #       [[track.action_user, track.action_user_role_id], [track.modified_user, track.modified_user_role_id]].each do |item|
+  #         if association_map[item[0]].blank?
+  #           association_map[item[0]] = {roles: []}
+  #         end
+  #         map = association_map[item[0]]
+  #         map[:roles] << item[1] unless map[:roles].include?(item[1]) and not item[1].nil?
+  #       end
+  #     end
+  #     return association_map
+  #   end
+  #
+  #   user_ids = (trackings.map(&:action_user_id) + trackings.map(&:modified_user_id))
+  #   if controlling_user_id.present? and (user_before.blank? or user_before.id != controlling_user_id)
+  #     if controlling_for_user_id.present?
+  #       user_ids << controlling_for_user_id
+  #     else
+  #       user_ids << controlling_user_id
+  #     end
+  #   end
+  #
+  #   # User IDs was blank when an admin was taking control of his own report and rejecting it. This is the fix
+  #   if user_ids.present?
+  #     user_ids.uniq!
+  #   else
+  #     user_ids = [self.user_id]
+  #   end
+  #
+  #   if user_ids.size > 0
+  #     # Order is MySQL Specific
+  #     user_ids = user_ids.reverse!
+  #     user_ids.reject! { |id| id.blank? }
+  #     users = User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
+  #     return users
+  #   end
+  #   nil
+  # end
 
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"

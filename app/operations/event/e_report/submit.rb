@@ -18,7 +18,7 @@ class Event::EReport::Submit < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
                                              action_type_id: NotificationActionType.notify_submit_id,
                                              action_user_id: report.user_id,

@@ -8,6 +8,8 @@ class MsgQueuePoller
     client = Stomp::Connection.new(username, password, "180.179.138.163", 61613, true)
     client.subscribe("/queue/FinlyQueue")
 
+    puts "Subscribed!"
+
     loop do
       message = client.receive
 

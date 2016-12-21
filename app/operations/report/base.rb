@@ -26,7 +26,6 @@ class Report::Base < BaseOperation
     end
   end
 
-
   # added here because in most cases we will be returning the report itself
   def success
     present_report
@@ -101,7 +100,7 @@ class Report::Base < BaseOperation
         if self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
-        elsif (self.report.can_unapprove?) and self.report.associated_users(self.report.controlling_user).include?(user)
+        elsif (self.report.can_unapprove?) and Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.controlling_user).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
         end
       else
