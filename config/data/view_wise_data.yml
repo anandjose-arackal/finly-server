@@ -59,11 +59,11 @@ finance_manager:
 #      - Team Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
-      - Settlements: settlements
+      - Team Settlements: settlements
       - Team Members: employees
       - Team Advance Requests: requests
       - Team Reports: reports
-      - Company Expenses: expenses
+      - Team Expenses: expenses
 
 
     cog:

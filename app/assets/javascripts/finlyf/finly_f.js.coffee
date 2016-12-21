@@ -48,6 +48,8 @@ window.FinlyF =
     # console.log FinlyF.Global.current_user
     
   fetchNotifications: (container, page, replaceContent) ->
+    if replaceContent
+      $(container).find('.notifications-list').html("<div class='text-center' style='margin-top: 15px;'><i class='fa fa-spinner fa-spin' style='color: #999;'></i></div>")
     # console.log $(container).html()
     # console.log "Will fetch notifications now."
     data = {
@@ -64,11 +66,10 @@ window.FinlyF =
       data: data
       success: (res) ->
         if res.length < 10
-          console.log "Decisions"
-
           $(container).find('.btn-load-more-notifications').attr('disabled', true).text("No More Notifications")
         else
           $(container).find('.btn-load-more-notifications').removeAttr('disabled').text("Load More").attr('data-page', page + 1)
+
         if replaceContent
           $(container).find('.navbar-notifications .notifications-list').html(FinlyF.Global.templates.templateNotifications({items: res}))
         else

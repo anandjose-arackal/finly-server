@@ -220,7 +220,57 @@ $brand-info: #00BCD4;
 .admin{
   #primary-navbar{
     background: #F44336;
+    background: #E91E63;
   }
+
+  #primary-navbar.navbar-inverse .navbar-nav > li > a {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #fff;
+    background-color: #F44336;
+    background-color: #E91E63;
+    font-weight: bold;
+  }
+
+  .user.active {
+    background-color: #F44336;
+    background-color: #E91E63;
+    color: white;
+    font-weight: bold;
+  }
+
+  .user:hover{
+    background: #FAC8D9;
+  }
+
+  .user.active:hover{
+    background: #E91E63;
+  }
+
+  #navbar-notification-count.badge-danger{
+    background: #3F51B5;
+  }
+
+  .navbar-notification.unread{
+    background: #FDE7EE;
+  }
+}
+
+.user.active{
+  background: #3F51B5;
+  color: white;
+  font-weight: bold;
+}
+
+.user.active:hover{
+  background: #3F51B5;
+}
+
+.user:hover{
+  background: #C4CAEB;
+  cursor: pointer;
 }
 
 .navbar-inverse .navbar-nav > li > a {
@@ -443,7 +493,6 @@ $header-grey: #efefef;
 
 
 #primary-navbar.navbar-inverse .navbar-nav > li > a {
-  color: #ccc;
   color: rgba(255, 255, 255, 0.5);
   border-bottom: 3px solid transparent;
   text-transform: uppercase;
@@ -515,19 +564,22 @@ body {
 }
 
 .navbar-notifications-header{
-  background: #BBB;
+  background: #fff;
+  border-bottom: 1px solid #bbb;
+  border-bottom: 3px double #bbb;
 }
 
 .navbar-notification{
-    color: #555;
+    color: #565656;
     width: 100%;
     padding: 0 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ccc;
 }
+
 .navbar-notification.unread{
   // background: #ebf5fb;
   // background: #F0F4C3;
-  background: #FFF1DA;
+  background: #EAECF8;
 }
 .navbar-notification .title {
     font-weight: bold;
@@ -565,6 +617,8 @@ body {
 
 .badge-danger{
   background: #ee3900;
+  margin-top: -15px;
+  margin-left: -3px;    
 }
 
 .navbar-text{
