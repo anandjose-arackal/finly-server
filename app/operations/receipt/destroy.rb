@@ -2,8 +2,11 @@ class Receipt::Destroy < Receipt::Base
   attr_accessor :receipt
 
   def pre_validate
-    if params.blank? or user.blank?
-      messages[:error] << "No user or parameters present."
+    if user.blank?
+      add_message :error, 'User not found'
+    end
+    if params.blank?
+      add_message :error, 'Receipt not found'
     end
   end
 
@@ -23,18 +26,17 @@ class Receipt::Destroy < Receipt::Base
 
   def validate
     if receipt.parent
-      messages[:error] << "Receipt that is associated with an expense or report cannot be deleted."
-      return false
+      add_message :error, 'Receipt that is associated with an expense or report cannot be deleted.'
     end
   end
 
   def process
     unless receipt.destroy
-      messages[:error] << "DB Error. Try again."
+      add_message :error, 'DB Error. Try again'
     end
   end
 
   def post_process
-    messages[:success] << "Receipt destroyed."
+    add_message :success, 'Receipt deleted'
   end
 end
