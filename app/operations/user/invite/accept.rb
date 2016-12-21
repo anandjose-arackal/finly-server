@@ -65,7 +65,7 @@ class User::Invite::Accept < User::Invite::Base
     return unless verify_field last_name, 'Last name cannot be blank'
     return unless verify_field mobile_number, 'Mobile number cannot be blank'
     return unless verify_field date_of_birth, 'Date of birth cannot be blank'
-    return unless verify_field gender, 'Gender cannot be blank'
+    return unless verify_field gender, 'Gender not selected'
     return unless verify_field address_1, 'Address 1 cannot be blank'
     return unless verify_field address_2, 'Address 2 cannot be blank'
     return unless verify_field city, 'City cannot be blank'

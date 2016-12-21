@@ -26,6 +26,7 @@ module Constants
   #########################
 
   if Rails.env.development?
+    # url = "http://192.168.81.156:3000/#"
     url = "http://localhost:3000/#"
   elsif Rails.env.production?
     url = "https://52.76.54.96/#" # todo - will be changed for final deployment
