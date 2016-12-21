@@ -168,13 +168,13 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.notify_atm_withdrawal_id
         action = " withdrawn an amount of"
       when NotificationActionType.notify_credit_reimbursement_id
-        action = " credited a reimbursement of"
+        action = " credited reimbursement of"
       when NotificationActionType.notify_credit_advance_request_id
         action = " credited an amount of"
       when NotificationActionType.notify_credit_id
         action = " credited an amount of"
       when NotificationActionType.notify_debit_id
-        action = "debited an amount of"
+        action = " debited an amount of"
       else
         action = ""
     end
@@ -268,7 +268,7 @@ class Notification < ActiveRecord::Base
         path = "reports/#{self.path_object_id}"
       when "Advance Request"
         path = "requests/#{self.path_object_id}"
-      when "Settlement", "Wallet"
+      when "Settlement", "Wallet", "Payment"
         path = "settlements/"
         if view == "\"personal\"" or view.nil?
           path += "#{user.id}"
