@@ -137,30 +137,33 @@ class Notification < ActiveRecord::Base
       prep = " has"
     end
 
+    object_prep = retrieve_object_preposition
+
     content += prep # short for preposition
     case self.action_type_id
       when NotificationActionType.notify_submit_id
-        action = " submitted a"
+        action = " submitted"
       when NotificationActionType.notify_approve_id
-        action = " approved a"
+        action = " approved"
       when NotificationActionType.notify_reject_id
-        action = " rejected a"
+        action = " rejected"
       when NotificationActionType.notify_retract_id
-        action = " retracted a"
+        action = " retracted"
       when NotificationActionType.notify_unapprove_id
-        action = " unapproved a"
+        action = " unapproved"
       when NotificationActionType.notify_auto_approve_id
         action = ""
       when NotificationActionType.notify_awaiting_approval_id
-        action = " approved a"
+        action = " approved"
       when NotificationActionType.notify_credit_reimbursement_id
         action = " credited a reimbursement of"
+        object_prep = ""
       when NotificationActionType.notify_update_id
-        action = " updated a"
+        action = " updated"
       when NotificationActionType.notify_take_control_id
-        action = " taken control of a"
+        action = " taken control of"
       when NotificationActionType.notify_comment_id
-        action = " commented on a"
+        action = " commented on"
       when NotificationActionType.notify_cash_withdrawal_id
         action = " withdrawn an amount of"
       when NotificationActionType.notify_cash_load_id
@@ -180,7 +183,7 @@ class Notification < ActiveRecord::Base
     end
 
     # adding action
-    content += action
+    content += action + object_prep
 
     amount_value = Amount.find_by(id: self.amount_id).value rescue nil
     if amount_value
@@ -195,7 +198,7 @@ class Notification < ActiveRecord::Base
     case object_type
       when "Report"
         if action_type_id == NotificationActionType.notify_credit_reimbursement_id
-          object = " for a report"
+          object = " for your report"
         else
           object = " report"
         end
@@ -301,6 +304,23 @@ class Notification < ActiveRecord::Base
 
   def generate_time
     return timestamp.strftime("%I:%M %p")
+  end
+
+  def retrieve_object_preposition
+    case object_type
+      when "Report"
+        object = Report.find_by(id: object_id)
+      when "Advance Request"
+        object = MoneyRequest.find_by(id: object_id)
+      else
+        return ""
+    end
+    owner = object.user
+    if self.user_id == owner.id
+     return " your"
+    else
+      return " " + owner.name + "'s"
+    end
   end
 
 end
