@@ -226,8 +226,8 @@ class Notification < ActiveRecord::Base
         object_name = " at #{e.merchant_name}"
       when "Card"
         object = " to your card"
-        c = Card.find_by(id: self.object_id)
-        object_name = " with serial ID #{c.proxy}"
+        # c = self.user.cards.first
+        # object_name = " with serial no. #{c.proxy}"
       when "Wallet"
         if action_type_id == NotificationActionType.notify_credit_id
           object = " to your Finly account"
@@ -268,7 +268,7 @@ class Notification < ActiveRecord::Base
         path = "reports/#{self.path_object_id}"
       when "Advance Request"
         path = "requests/#{self.path_object_id}"
-      when "Settlement", "Wallet", "Payment"
+      when "Settlement", "Wallet", "Payment", "Card"
         path = "settlements/"
         if view == "\"personal\"" or view.nil?
           path += "#{user.id}"
