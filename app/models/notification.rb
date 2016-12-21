@@ -138,6 +138,7 @@ class Notification < ActiveRecord::Base
     end
 
     object_prep = retrieve_object_preposition
+    # debugger
 
     content += prep # short for preposition
     case self.action_type_id
@@ -316,7 +317,9 @@ class Notification < ActiveRecord::Base
         return ""
     end
     owner = object.user
-    if self.user_id == owner.id
+    if self.action_type_id == NotificationActionType.notify_auto_approve_id
+      return ""
+    elsif self.user_id == owner.id
      return " your"
     else
       return " " + owner.name + "'s"
