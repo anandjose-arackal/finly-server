@@ -107,6 +107,15 @@ class FinlyF.Views.ReportsIndex extends Backbone.View
     @dump = @collection.models.slice()
     # console.log "Models - ", @collecion.models.length
     $(@el).find("#items").html("")
+    if @dump.length == 0
+      # console.log "Nothing is there!"
+      item = {
+        name: 'report'
+        capitalized_name: 'Report'
+        pluralized: 'reports'
+        capitalized_pluralized: 'Reports'
+      }
+      $(@el).find("#items").html(FinlyF.Global.templates.templateNoResultsFound(item: item))
     # @collection.each(@appendItems, @)
     _.each(_this.collection.models, _this.appendItems, _this)
 

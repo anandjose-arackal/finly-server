@@ -17,6 +17,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
   #IO (IndexOnly)
   templateIOSkeleton: HandlebarsTemplates['finlyf/base/skeletonIO']
+  templateNoResultsFound: HandlebarsTemplates['finlyf/global/noResultsFound']
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
@@ -119,8 +120,20 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
   processItems: ->
     #Append all the expenses
     @dump = @collection.models.slice()
+
+
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
+
+    if @dump.length == 0
+      # console.log "Nothing is there!"
+      item = {
+        name: 'expense'
+        capitalized_name: 'Expense'
+        pluralized: 'expenses'
+        capitalized_pluralized: 'Expenses'
+      }
+      $(@el).find("#items").html(FinlyF.Global.templates.templateNoResultsFound(item: item))
     @collection.each(@appendItems, @)
 
     FinlyF.stopMainLoader()

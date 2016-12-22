@@ -46,6 +46,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
       @params = options.params || {}
     else
       @params = {}
+    @params.view = @params.view || 'personal'
     @params.page = 1
     _this = @
     @dump = []
@@ -104,6 +105,15 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     @dump = @collection.models.slice()
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
+
+    if @dump.length == 0
+      item = {
+        name: 'receipt'
+        capitalized_name: 'Receipt'
+        pluralized: 'receipts'
+        capitalized_pluralized: 'Receipts'
+      }
+      $(@el).find("#items").html(FinlyF.Global.templates.templateNoResultsFound(item: item))
     @collection.each(@appendItems, @)
     
     FinlyF.stopMainLoader()

@@ -111,7 +111,7 @@
     <hr />
     {{#ifCond item.violations.blocking_present '||' item.violations.warning_present}}
     <div class="row no-margin violations">
-      <h4>Report Violations</h4>
+      <h4>Request Violations</h4>
       <div class="col-sm-12">
         {{#each item.violations.warning_messages}}
           {{#if this.message}}
@@ -135,31 +135,43 @@
     </div><!-- .violations -->
     {{/ifCond}}
 
-    <div class="row no-margin" style="background: #A0A8DB;">
-      <div class="col-sm-3 no-padding" style="padding-left: 10px;">
-        <h4>CATEGORIES</h4>
-      </div>
-      <div class="col-sm-2 text-right"><h4 style="font-weight: bold;">Total</h4></div>
-      <div class="col-sm-4">
-        <h4 style="font-weight: bold;">&#8377;&nbsp;{{item.total}}</h4>
-      </div>
-    </div>
-    <div class="row no-margin request-categories">
-      {{#each item.request_items}}
-        <div class="row no-margin request-category" style="padding-top: 10px;">
-          <div class="col-sm-5" style="border-bottom: 1px solid #eee;">
-            <h4 class="request-category-name">{{this.category.name}}</h4>
-          </div>
-          <div class="col-sm-4" style="border-bottom: 1px solid #eee;">
+    <div class="row no-margin">
+      <div class="col-sm-12">
+        <div class="section-card">
+          <div class="row no-margin section-header" style="margin-bottom: 15px;">
+            <div class="col-sm-3">
+              <h4>CATEGORIES</h4>
+            </div>
+            <div class="col-sm-2 text-right"><h4>TOTAL</h4></div>
+            <div class="col-sm-4"><h4>&#8377;&nbsp;{{item.total}}</h4></div>
 
-            <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
-            <label class="control-label item-attr-preview" style="line-height: 35px; font-size: 18px;">&#8377;&nbsp;{{this.amount.value}}</label>
-            <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" style="margin-bottom: 6px;" />
-            <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+          </div>
+
+          <div class="row no-margin">
+            <div class="col-sm-12 request-categories">
+              {{#each item.request_items}}
+                <div class="row no-margin request-category" style="padding-top: 10px;">
+                  <div class="col-sm-5" style="border-bottom: 1px solid #eee;">
+                    <h4 class="request-category-name">{{this.category.name}}</h4>
+                  </div>
+                  <div class="col-sm-4" style="border-bottom: 1px solid #eee;">
+
+                    <input class="request-category-id" type="hidden" name="money_request[items_attributes][][category_id]" value="{{this.category.id}}">
+                    <label class="control-label item-attr-preview" style="line-height: 35px; font-size: 18px;">&#8377;&nbsp;{{this.amount.value}}</label>
+                    <input name="money_request[items_attributes][][amount_attributes][value]" type="number" class="item-attr-edit form-control request-category-amount-value" value="{{this.amount.value}}" style="margin-bottom: 6px;" />
+                    <input name="money_request[items_attributes][][amount_attributes][currency_id]" type="hidden" value="1" />
+                  </div>
+                </div>
+              {{/each}}
+            </div>
           </div>
         </div>
-      {{/each}}
+      </div>
+        
     </div>
+
+      
+    
     {{!-- <div class="row no-margin request-categories">
       {{#each item.request_items}}
         {{#if this.amount.value}}

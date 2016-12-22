@@ -196,13 +196,25 @@
 
 // Home css scss content ends
 
+// Scheme Material Pallets
+// $brand-primary: #3F51B5;
+// $brand-success: #4CAF50;
+// $brand-warning: #FFC107;
+// $brand-danger: #F44336;
+// $brand-info: #00BCD4;
+// $brand-admin-primary: #E91E63; //Hot Pink
 
-$brand-primary: #3F51B5;
-$brand-success: #4CAF50;
-$brand-warning: #FFC107;
-// $brand-warning: #FFA000;
-$brand-danger: #F44336;
-$brand-info: #00BCD4;
+// Scheme FlatUIColors
+$brand-primary: #2980b9;
+$brand-success: #2ECC71;
+$brand-warning: #f1c40f;
+$brand-danger: #E74C3C;
+$brand-info: #3498db;
+// $brand-admin-primary: #E74C3C;
+$brand-admin-primary: #e74c3c;
+// $brand-admin-primary: #2DAF4A; //Complementing
+// $brand-admin-primary: #277E8E;
+
 
 
 @import "bootstrap";
@@ -215,61 +227,105 @@ $brand-info: #00BCD4;
 }
 
 #primary-navbar{
-  background: #3F51B5;
+  background: $brand-primary;
 } 
 .admin{
   #primary-navbar{
     background: #F44336;
-    background: #E91E63;
+    background: $brand-admin-primary;
   }
 
   #primary-navbar.navbar-inverse .navbar-nav > li > a {
     color: rgba(255, 255, 255, 0.7);
   }
 
+  .nav-pills.nav-stacked > li.active > a, .nav-pills.nav-stacked > li.active > a:hover, .nav-pills.nav-stacked > li.active > a:focus {
+    border-bottom: none;
+    border-left: 5px solid $brand-admin-primary;
+  }
+
+
   .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-    color: #fff;
-    background-color: #F44336;
-    background-color: #E91E63;
-    font-weight: bold;
+    border-bottom: 3px solid $brand-admin-primary;
+  }
+
+  #user-details{
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+      border: 0;
+      border-left: 5px solid $brand-admin-primary;
+    }
   }
 
   .user.active {
-    background-color: #F44336;
-    background-color: #E91E63;
-    color: white;
-    font-weight: bold;
-  }
-
-  .user:hover{
-    background: #FAC8D9;
-  }
-
-  .user.active:hover{
-    background: #E91E63;
+    border-left:5px solid $brand-admin-primary;
   }
 
   #navbar-notification-count.badge-danger{
-    background: #3F51B5;
+    background: $brand-primary;
   }
 
   .navbar-notification.unread{
     background: #FDE7EE;
   }
+
+  .section-card{
+    // border: 1px solid lighten($brand-admin-primary, 30%);
+    border: 1px solid #ddd;
+
+    .section-header{
+      background: #f8f8f8;
+    }
+  }
+
+  .bg-accent-darker{
+    background: lighten($brand-admin-primary, 25%);
+  }
+
+  .bg-accent-dark{
+    // background: lighten($brand-admin-primary, 30%);
+    background: #e7e7e7;
+
+  }
+
+  .bg-accent-light{
+    // background: lighten($brand-admin-primary, 35%);
+    background: #f8f8f8;
+  }
+
+  .bg-accent-lighter{
+    background: lighten($brand-admin-primary, 45%);
+
+  }
+
+  .border-accent-darker{
+    // border:1px solid lighten($brand-admin-primary, 25%);
+    border:1px solid #ddd;
+  }
+
+  #primary-navbar .navbar-nav > li > a.line-break-links{
+    font-size: 12px;
+    line-height: 9px;
+  }
+}
+
+.superscript{
+  font-size: 10px;
+  line-height: 10px;
 }
 
 .user.active{
-  background: #3F51B5;
-  color: white;
+  background: white;
+  border-left:5px solid $brand-primary;
+  color: #555;
   font-weight: bold;
 }
 
 .user.active:hover{
-  background: #3F51B5;
+  background: white;
 }
 
 .user:hover{
-  background: #C4CAEB;
+  background: #eee;
   cursor: pointer;
 }
 
@@ -293,6 +349,27 @@ $brand-info: #00BCD4;
   border-bottom: 3px solid #CD925A;
   border-bottom: 3px solid #FFF;
   background-color: transparent;
+}
+
+
+.bg-accent-dark{
+  // background: lighten($brand-primary, 35%);
+  background: #e7e7e7;
+}
+
+.bg-accent-light{
+  // background: lighten($brand-primary, 45%);
+  background: #f8f8f8;
+}
+
+.bg-accent-darker{
+  // background: lighten($brand-primary, 25%);
+  background: #e1e1e1;
+}
+
+.border-accent-darker{
+  // border:1px solid lighten($brand-primary, 25%);
+  border: 1px solid #ddd;
 }
 
 
@@ -357,15 +434,15 @@ $brand-info: #00BCD4;
 
 // Vertical Divider
 .navbar .divider-vertical {
-    height: 50px;
-    margin: 0 9px;
-    border-right: 1px solid #ffffff;
-    border-left: 1px solid #f2f2f2;
+  height: 50px;
+  margin: 0 9px;
+  border-right: 1px solid #ffffff;
+  border-left: 1px solid #f2f2f2;
 }
 
 .navbar-inverse .divider-vertical {
-    border-right-color: #222222;
-    border-left-color: #111111;
+  border-right-color: #222222;
+  border-left-color: #111111;
 }
 
 @media (max-width: 767px) {
@@ -376,10 +453,34 @@ $brand-info: #00BCD4;
 // Vertical Divider
 
 
-.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-  color: #fff;
-  background-color: #3F51B5;
+.nav-pills.nav-stacked > li.active > a, .nav-pills.nav-stacked > li.active > a:hover, .nav-pills.nav-stacked > li.active > a:focus {
+  border-bottom: none;
+  border-left: 5px solid $brand-primary;
 }
+
+// .nav-pills.nav-stacked > li.active > a, .nav-pills.nav-stacked > li.active > a:hover, .nav-pills.nav-stacked > li.active > a:focus {
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+  color: #555;
+  // background-color: $brand-primary;
+  background-color: #fff;
+  font-weight: bold;
+  border-bottom: 3px solid $brand-primary;
+}
+
+
+#user-details{
+  .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    border: 0;
+    border-left: 5px solid $brand-primary;
+    font-weight: bold;
+  }
+
+  .nav-tabs li a:hover {
+    background-color: #fbfbfb;
+  }
+}
+
+
 //Customization over bootstrap
 .form-control{
   border-radius: 2px;
@@ -458,21 +559,21 @@ label.grey-text{
   font-weight: normal;
 }
 
-$background-blue: #f5f6f9;
-$button-green: #93c178;
+// $background-blue: #f5f6f9;
+// $button-green: #93c178;
 
-$button-light-blue: #8394AE;
-$button-dark-blue: #465c8b;
+// $button-light-blue: #8394AE;
+// $button-dark-blue: #465c8b;
 
-$circle-blue: #9EACC9;
-$border-color: #d8d8d8;
-$header-light-green: #CFE8DA;
+// $circle-blue: #9EACC9;
+// $border-color: #d8d8d8;
+// $header-light-green: #CFE8DA;
 
-$button-text-color: #999;
-$button-border: #dfdfdf;
-$button-gray-bg: #f9f9f9;
+// $button-text-color: #999;
+// $button-border: #dfdfdf;
+// $button-gray-bg: #f9f9f9;
 
-$header-grey: #efefef;
+// $header-grey: #efefef;
 
 // Buttons
 .btn{
@@ -604,12 +705,16 @@ body {
 
 .section-card{
   border-radius: 5px;
-  border: 1px solid #C5CAE9;
+  // border: 1px solid lighten($brand-primary, 30%);
+  border: 1px solid #ddd;
   margin-bottom: 15px;
+  padding-bottom: 15px;
 }
 
 .section-header{
-  background: #C5CAE9;
+  // background: #C5CAE9;
+  // background: lighten($brand-primary, 35%);
+  background: #f8f8f8;
   border-radius: 4px 4px 0 0;
   margin-bottom: 15px;
 }
