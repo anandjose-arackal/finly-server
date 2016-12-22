@@ -51,7 +51,7 @@
               <label class="control-label">Address:</label>
             </div>
             <div class="col-sm-4">
-              <label class="control-label"><%= current_user.mobile_number %></label>
+              <label class="control-label"><%= (current_user.profile.address_1 || 'Address line 1 not set') + ", " + (current_user.profile.address_2 || 'Address line 2 note set') + ", " + (current_user.profile.city || 'City not set') + ", " + (current_user.profile.pin_code || 'PIN Code not set') %></label>
             </div>
           </div>
 
