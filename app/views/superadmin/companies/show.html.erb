@@ -12,22 +12,102 @@
         <input name="utf8" type="hidden" value="&#x2713;"/>
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-        <p>Admin Name: </p>
-        <input type="text" name="admin[name]" placeholder="Name" title="Admin name">
+        <div style="width: 600px;padding: 20px 40px 40px 80px; background-color: white; margin:30px auto;border: 1px solid #d8d8d8">
 
-        <p>Admin Email: </p>
-        <input id="email" type="text" name="admin[email]" placeholder="Email" title="Admin Email Address">
+          <label style="font-weight: 500">Email: </label>
+          <div>
+            <input type="text" class="form-control" name="user[email]" >
+          </div>
 
-        <p>Admin password: </p>
-        <input id="password" type="password" name="admin[password]" placeholder="Password" title="Enter Password">
+          <label style="font-weight: 500">Password: </label>
+          <div>
+            <input type="password" class="form-control user-password" name="user[password]">
+          </div>
+          <label style="font-weight: 500">Confirm Password: </label>
+          <div>
+            <input type="password" class="form-control" name="user[password_confirmation]">
+          </div>
+          <label style="font-weight: 500">Mobile Number: </label>
+          <div>
+            <div class="input-group" style="width: 80%;">
+              <span class="input-group-addon" id="basic-addon1">+91</span>
 
-        <p>Retype password: </p>
-        <input id="passwordConfirmation" type="password" name="admin[password]" placeholder="Repeat Password">
+              <input type="number" class="form-control" name="user[mobile_number]">
 
-        <p>Number: </p>
-        <input type="text" name="admin[mobile_number]" placeholder="XXX" title="Admin number">
+            </div>
+          </div>
 
-        <input type="submit" class="abaButton" id="addCompanyButton" value="Add Admin">
+          <!-- <h4>User Details</h4> -->
+          <div style="width: 80%;">
+            <hr />
+          </div>
+
+          <label style="font-weight: 500">First Name: </label>
+          <div>
+            <input type="text" class="form-control" name="user[first_name]">
+          </div>
+
+          <label style="font-weight: 500">Middle Name(Optional): </label>
+          <div>
+            <input type="text" class="form-control" name="user[maiden_name]" value="">
+          </div>
+
+          <label style="font-weight: 500">Last Name: </label>
+          <div>
+            <input type="text" class="form-control" name="user[last_name]">
+          </div>
+
+          <label style="font-weight: 500">Date of Birth:</label>
+          <div>
+            <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]">
+          </div>
+
+          <label style="font-weight: 500">Gender:</label>
+          <div>
+            <label style="margin-right: 20px; margin-top: 0;">
+              <input type="radio" name="user[profile_attributes][gender]"
+                     value="m" style="display: inline;">&nbsp;Male
+            </label>
+            <label style="margin-top: 0;">
+              <input type="radio" name="user[profile_attributes][gender]"
+                     value="f" style="display: inline;">&nbsp;Female
+            </label>
+          </div>
+
+          <label style="font-weight: 500">Address Line 1:</label>
+          <div>
+            <input type="text" class="form-control" name="user[profile_attributes][address_1]">
+          </div>
+
+          <label style="font-weight: 500">Address Line 2:</label>
+          <div>
+            <input type="text" class="form-control" name="user[profile_attributes][address_2]">
+          </div>
+
+          <label style="font-weight: 500">City:</label>
+          <div>
+            <input type="text" class="form-control" name="user[profile_attributes][city]">
+          </div>
+
+          <label style="font-weight: 500">State:</label>
+          <div>
+            <select class="form-control" name="user[profile_attributes][state_id]">
+              <% @states.each do |state| %>
+                  <option value="<%= state[:code] %>"><%= state[:name] %></option>
+              <% end %>
+            </select>
+          </div>
+
+          <label style="font-weight: 500">Pin Code:</label>
+          <div>
+            <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
+          </div>
+
+          <div>
+            <button id="submitButton" style="border-radius: 1px; height: 40px"> SUBMIT</button>
+          </div>
+
+        </div>
 
       </form>
 
@@ -46,7 +126,7 @@
       <div class="modal-body" style="padding-top: 0;">
         <div class="row no-margin">
           <div class="col-sm-12 text-right">
-            <a href="/assets/sample_import_format.xls" class="btn btn-warning btn-sm">Download Template</a>
+            <a href="/assets/sample_import format_superadmin.xls" class="btn btn-warning btn-sm">Download Template</a>
           </div>
         </div>
 
@@ -69,6 +149,15 @@
 </div>
 
 <script>
+
+  $(document).ready(function(){
+    $(".datepicker").datepicker({
+      dateFormat: "dd-mm-yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "-100:+0"
+    })
+  });
 
   function showInviteModal()
   {

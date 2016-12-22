@@ -57,19 +57,26 @@ class Import::Superadmin::Users < Import::Base
       self.params = process_row(row)
       error_messages = params[:error_messages]
       params.delete(:error_messages)
+
+      unique = mobile_number_taken?(row[import_fields[:mobile_number]])
+
       if type == 'email'
         self.invitee = User.invite!(params)
       elsif type == 'mobile'
-        self.invitee = User.invite!(params, user) do |u|
-          u.skip_invitation
-          u.update_attribute(:email, "")
-          u.update_attribute(:mobile_only_invite, true)
-          # send welcome message to invitee
-          WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
+        if unique
+          self.invitee = User.invite!(params, user) do |u|
+            u.skip_invitation
+            u.update_attribute(:email, "")
+            u.update_attribute(:mobile_only_invite, true)
+            # send welcome message to invitee
+            WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
+          end
         end
       end
 
-      if User.exists?(invitee.id)
+      if !unique
+        result_hash[i] = "This mobile number is already taken"
+      elsif User.exists?(invitee.id)
         if error_messages.present?
           result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
         else
@@ -87,19 +94,6 @@ class Import::Superadmin::Users < Import::Base
   end
 
   private
-
-  def retrieve_invite_type(row)
-    if row[import_fields[:email]].present?
-      return 'email'
-    elsif row[import_fields[:mobile_number]].present?
-      return 'mobile'
-    else
-      # default case is email
-      return 'email'
-    end
-  end
-
-
 
   # generating the parameters that enable the user to be invited
   def process_row(row)
