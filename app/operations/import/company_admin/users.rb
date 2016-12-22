@@ -34,12 +34,12 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       error_messages = params[:error_messages]
       params.delete(:error_messages)
 
-      unique = mobile_number_taken?(row[import_fields[:mobile_number]])
+      unique = mobile_number_valid?(row[import_fields[:mobile_number]])
 
-      if type == 'email'
-        self.invitee = user.company.users.invite!(params)
-      elsif type == 'mobile'
-        if unique
+      if unique == true
+        if type == 'email'
+          self.invitee = user.company.users.invite!(params)
+        elsif type == 'mobile'
           self.invitee = user.company.users.invite!(params, user) do |u|
             u.skip_invitation
             u.update_attribute(:email, "")
@@ -50,7 +50,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
         end
       end
 
-      if !unique
+      if unique.is_a?(String)
         result_hash[i] = "This mobile number is already taken"
       elsif User.exists?(invitee.id)
         if error_messages.present?

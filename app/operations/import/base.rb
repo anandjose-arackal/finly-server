@@ -22,13 +22,19 @@ class Import::Base < BaseOperation
     end
   end
 
-  def mobile_number_taken?(number)
-    return false if number.blank?
-    present = User.find_by(mobile_number: number)
-    if present.blank?
-      return true
+  def mobile_number_valid?(number)
+    return "Moblie number not present" if number.blank?
+    user = User.find_by(mobile_number: number)
+
+    if user.blank?
+      # checking if it's a valid mobile number
+      if number.to_s =~ Constants::VALID_MOBILE_NUMBER
+        return true
+      else
+        return "Mobile number invalid"
+      end
     else
-      return false
+      return "Mobile number is already taken"
     end
   end
 

@@ -2,7 +2,12 @@ class CompaniesController < ApplicationController
 
   def notify
     # todo
-    @company_balance = 30000.00
+    @result = Company::VirtualAccount::Balance.(current_user, params)
+    if @result.success?
+      @company_balance = @result.balance
+    else
+      @company_balance = 0
+    end
   end
 
   def add_balance
