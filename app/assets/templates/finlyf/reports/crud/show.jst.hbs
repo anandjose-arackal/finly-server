@@ -59,7 +59,7 @@
     </div> --}}
 
     <div class="row item-body">
-      <div class="col-sm-7">
+      <div class="col-sm-6">
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">Policy</label></div>
           <div class="col-sm-6 item-policy">
@@ -127,7 +127,7 @@
         </div>
         
       </div>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <div class="row text-right no-margin">
 
           <div class="dropdown">
@@ -142,6 +142,16 @@
           {{#if item.actions.editable}}
             <button class="btn btn-navbar btn-sm btn-danger" data-toggle="modal" data-target="#modal-confirm-delete"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</button>
           {{/if}}
+
+          <div class="row no-margin">
+            <div class="col-sm-12 no-padding text-left">
+              {{#if item.auto_submit}}
+                <div class="alert alert-info" style="padding: 15px;">
+                  <strong>Note:</strong> This is an auto-submitted report.
+                </div>
+              {{/if}}
+            </div>
+          </div>
 
 
         </div><!-- .row-->

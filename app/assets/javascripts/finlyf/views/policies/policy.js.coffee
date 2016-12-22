@@ -361,6 +361,7 @@ class FinlyF.Views.Policy extends Backbone.View
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
+          _this.fetchTabContent()
         else
           $(button).html("Update").removeAttr('disabled')
       error: (err) ->
