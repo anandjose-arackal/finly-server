@@ -28,7 +28,7 @@ class ExternalUrlController < ApplicationController
       end
     end
     if report.present?
-      redirect_to "#{root_url}#reports/params={\"view\":\"#{params[:view]}\",\"report_id\":\"#{report.id}\"}"
+      redirect_to "#{root_url}#reports/params={\"view\":\"#{params[:view]}\",\"report_id\":\"#{report.id}\",\"preview\":true}"
       # redirect_to "#{root_url}#reports/params={\"view\":\"#{params[:view]}, report_id:#{report.id}\"}"
     else
       redirect_to root_path
@@ -61,7 +61,7 @@ class ExternalUrlController < ApplicationController
       end
     end
     if money_request.present?
-      redirect_to "#{root_url}#requests/#{money_request.id}/params={\"view\":\"#{params[:view]}\"}"
+      redirect_to "#{root_url}#requests/#{money_request.id}/params={\"view\":\"#{params[:view]}\",\"preview\":true}"
     else
       redirect_to root_path
     end

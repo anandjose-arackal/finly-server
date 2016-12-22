@@ -31,7 +31,7 @@ class MoneyRequest::Destroy < MoneyRequest::Base
   end
 
   def post_process
-    messages[:success] << 'Money Request deleted'
+    messages[:success] << 'Advance Request deleted'
   end
 
   def success
