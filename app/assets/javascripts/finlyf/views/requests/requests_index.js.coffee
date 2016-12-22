@@ -106,6 +106,16 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
     # console.log "Models - ", @collection.models.length
     $(@el).find("#items").html("")
     # @collection.each(@appendItems, @)
+
+
+    if @dump.length == 0
+      item = {
+        name: 'advance request'
+        capitalized_name: 'Advance Request'
+        pluralized: 'advance requests'
+        capitalized_pluralized: 'Advance Requests'
+      }
+      $(@el).find("#items").html(FinlyF.Global.templates.templateNoResultsFound(item: item))
     _.each(_this.collection.models, _this.appendItems, _this)
 
     #Stop refresh spinner if spinning

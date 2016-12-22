@@ -17,6 +17,7 @@ window.FinlyF =
     FinlyF.Global.templates.templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
     FinlyF.Global.templates.templateUserNavProfile = HandlebarsTemplates['finlyf/global/userNavProfile']
     FinlyF.Global.templates.templateNotifications = HandlebarsTemplates['finlyf/global/templateNotifications']
+    FinlyF.Global.templates.templateNoResultsFound = HandlebarsTemplates['finlyf/global/noResultsFound']
 
     user = {
       name: $("#current_user_id").attr('data-user-name')

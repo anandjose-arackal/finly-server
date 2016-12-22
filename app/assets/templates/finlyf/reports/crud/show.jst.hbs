@@ -131,7 +131,7 @@
         <div class="row text-right no-margin">
 
           <div class="dropdown">
-            <button class="btn-primary btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">Export <span class="caret"></span></button>
+            <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">Export <span class="caret"></span></button>
             <ul class="dropdown-menu dropdown-menu-right">
               <li><a href="{{item.export_pdf}}" target="_blank">PDF</a></li>
               <li><a href="{{item.export_xls}}" target="_blank">XLS</a></li>
@@ -180,19 +180,19 @@
       </div>
       <div class="col-sm-6 no-padding text-right">
         {{#if item.actions.editable}}
-          <button class="add-new-expense btn btn-navbar" data-item-id="{{item.id}}">Add New Expense</button>
-          <button class="add-existing-expense btn btn-navbar" data-item-id="{{item.id}}">Add Existing Expense</button>
+          <button class="add-new-expense btn btn-navbar btn-primary" data-item-id="{{item.id}}">Add New Expense</button>
+          <button class="add-existing-expense btn btn-navbar btn-primary" data-item-id="{{item.id}}">Add Existing Expense</button>
         {{/if}}
       </div>
     </div>
     <div class="row no-margin">
       {{#each item.expense_sections}}
       <div class="col-sm-12 expense-category">
-        <div class="row" style="padding: 0 10px; background: #A0A8DB;">
+        <div class="row bg-accent-dark" style="padding: 0 10px;">
           <div class="col-sm-6 no-padding"><h5>{{this.section_name}}</h5></div>
           <div class="col-sm-6 no-padding"><h5 class="text-right">{{this.section_total}}</h5></div>
         </div>
-        <div class="row" style="padding: 5px 10px; background: #C5CAE9;">
+        <div class="row bg-accent-light" style="padding: 5px 10px;">
           <div class="col-sm-1 no-padding">Sl. No.</div>
           <div class="col-sm-2 no-padding">Date</div>
           <div class="col-sm-2 no-padding">Merchant</div>
@@ -230,7 +230,7 @@
 
 
           <div class="col-sm-3 no-padding text-right">
-            <button data-item-id="{{this.id}}" class="no-margin btn btn-view-sub-item btn-xs btn-warning">Details</button>
+            <button data-item-id="{{this.id}}" class="no-margin btn btn-view-sub-item btn-xs btn-default">Details</button>
           {{#if ../../item.actions.editable}}
             <button data-item-id="{{this.id}}" class="no-margin btn-delete-sub-item btn btn-xs btn-danger">Delete</button>
           {{/if}}

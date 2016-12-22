@@ -2,12 +2,12 @@ admin:
   links:
     primary_navbar:
       # - Company Expenses: expenses
-      - Company Analytics: analytics
-      - Company Settlements: settlements
-      - Company Employees: employees
-      - Advance Requests: requests
-      - Company Reports: reports
-      - Company Expenses: expenses
+      - <span class="superscript">Company</span><br>Analytics: analytics
+      - <span class="superscript">Company</span><br>Settlements: settlements
+      - <span class="superscript">Company</span><br>Employees: employees
+      - <span class="superscript">Company</span><br>Advance Requests: requests
+      - <span class="superscript">Company</span><br>Reports: reports
+      - <span class="superscript">Company</span><br>Expenses: expenses
 
     cog:
       - Organization Account: '#organization_account/params={"view":"admin"}'
@@ -41,10 +41,10 @@ manager:
 #      - Team Analytics: analytics
       # - Team Expenses: expenses
       # - Team Analytics: analytics
-      - Team Members: employees
-      - Team Advance Requests: requests
-      - Team Reports: reports
-      - Team Expenses: expenses
+      - <span class="superscript">Team</span><br>Members: employees
+      - <span class="superscript">Team</span><br>Advance Requests: requests
+      - <span class="superscript">Team</span><br>Reports: reports
+      - <span class="superscript">Team</span><br>Expenses: expenses
 
     cog:
       - My Account: '#settings'
@@ -56,14 +56,14 @@ manager:
 finance_manager:
   links:
     primary_navbar:
-#      - Team Analytics: analytics
+#      - <span class="superscript">Team</span><br>Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
-      - Team Settlements: settlements
-      - Team Members: employees
-      - Team Advance Requests: requests
-      - Team Reports: reports
-      - Team Expenses: expenses
+      - <span class="superscript">Team</span><br>Settlements: settlements
+      - <span class="superscript">Team</span><br>Members: employees
+      - <span class="superscript">Team</span><br>Advance Requests: requests
+      - <span class="superscript">Team</span><br>Reports: reports
+      - <span class="superscript">Team</span><br>Expenses: expenses
 
 
     cog:
