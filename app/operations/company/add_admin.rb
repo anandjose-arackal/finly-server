@@ -43,11 +43,14 @@ class Company::AddAdmin < Company::Base
   private
 
   def admin_params
-    params[:admin][:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},
+    params[:user][:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},
                                                 {user_role_id: UserRole.employee_id}]
 
-    params.require(:admin).permit(:name, :email, :password, :password_confirmation,
-                                  :mobile_number, team_mapping_attributes: [:default], role_mapping_attributes: [:user_role_id])
+    params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
+                                 :maiden_name, :last_name,
+                                 profile_attributes: [:date_of_birth, :gender, :address_1,
+                                                      :address_2, :city, :state_id, :pin_code],
+                                 role_mapping_attributes: [:user_role_id])
   end
 
 end

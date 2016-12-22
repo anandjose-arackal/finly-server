@@ -22,4 +22,25 @@ class Import::Base < BaseOperation
     end
   end
 
+  def mobile_number_taken?(number)
+    return false if number.blank?
+    present = User.find_by(mobile_number: number)
+    if present.blank?
+      return true
+    else
+      return false
+    end
+  end
+
+  def retrieve_invite_type(row)
+    if row[import_fields[:email]].present?
+      return 'email'
+    elsif row[import_fields[:mobile_number]].present?
+      return 'mobile'
+    else
+      # default case is email
+      return 'email'
+    end
+  end
+
 end
