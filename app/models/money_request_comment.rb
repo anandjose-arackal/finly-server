@@ -71,7 +71,7 @@ class MoneyRequestComment < ActiveRecord::Base
       when MoneyRequestCommentAction.id_for(:unapprove)
         comment = "#{name} unapproved the advance request"
       when MoneyRequestCommentAction.id_for(:take_control)
-        comment = "#{name} took control of the advance request"
+        comment = "#{name} took control of the advance request from #{}"
         if self.content.present?
           comment += " with a note: '#{self.content}'"
         end
@@ -83,19 +83,19 @@ class MoneyRequestComment < ActiveRecord::Base
         payment_id = payment.id rescue nil
         comment = "#{name} credited #{name_rec} wallet with Payment ID : #{payment_id}"
         if payment.note.present?
-          comment += " , note : #{payment.note}"
+          comment += " , with a note : #{payment.note}"
         end
       when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_card), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_card)
         payment_id = payment.id rescue nil
         comment = "#{name} credited #{name_rec} card with Payment ID : #{payment_id}"
         if payment.note.present?
-          comment += " , note : #{payment.note}"
+          comment += " , with a note : #{payment.note}"
         end
       when MoneyRequestCommentAction.id_for(:credited)
         payment_id = payment.id rescue nil
         comment = "#{name} credited the advance request with Payment ID : #{payment_id}"
         if payment.note.present?
-          comment += " , note : #{payment.note}"
+          comment += " , with a note : #{payment.note}"
         end
     end
     comment

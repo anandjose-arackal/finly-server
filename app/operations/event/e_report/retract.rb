@@ -5,12 +5,13 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def affected_users
-    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    users = Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
     users.reject { |r| r == self.user}
   end
 
   def notification_affected_users
-    [report.controlling_user]
+    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    users.reject { |r| r == self.user}
   end
 
   def send_push_notification(user)

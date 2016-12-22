@@ -19,13 +19,22 @@ class Event::EWallet::Credit < Event::EWallet::Base
   end
 
   def set_notification(user)
+    # debugger
+    case to_account
+      when :wallet
+        object = "Wallet"
+      when :card
+        object = "Card"
+      else
+        object = "Wallet"
+    end
     notification = user.notifications.create(notification_type_id: NotificationType.wallet_id,
                                              action_type_id: NotificationActionType.notify_credit_id,
                                              action_user_id: payment.initiating_user_id,
                                              object_id: payment.id,
-                                             object_type: "Wallet",
+                                             object_type: object,
                                              path_object_id: payment.id,
-                                             path_object_type: "Wallet",
+                                             path_object_type: object,
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: nil,

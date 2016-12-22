@@ -75,8 +75,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def process
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user, payment_type_id: PaymentType.id_for(:advance), date: payment_param[:date], note: params[:note],
-                                          amount_attributes: {value: payment_param[:amount], currency_id: payment_param[:currency_id]})
+    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
+                                          payment_type_id: PaymentType.id_for(:advance),
+                                          date: payment_param[:date], note: payment_param[:note],
+                                          amount_attributes: {value: payment_param[:amount],
+                                                              currency_id: payment_param[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(payment_param[:amount], payment_param[:currency_id])
       # balance_sheet.subtract_pending_reimbursement
@@ -97,7 +100,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def post_process
     add_message :success, 'Cash advance added'
-    
+
     Event::ESettlement::AddCashAdvance.(user, payment: self.payment)
   end
 

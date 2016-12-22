@@ -16,6 +16,9 @@ default: &default
     base: "https://control.msg91.com"
     path: "api/sendhttp.php"
 
+staging:
+  <<: *default
+
 development:
   <<: *default
 

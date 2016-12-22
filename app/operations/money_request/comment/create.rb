@@ -8,7 +8,7 @@ class MoneyRequest::Comment::Create < MoneyRequest::Base
     super
     content = (params[:comment] or params[:content])
     if content.blank?
-      messages[:error] << 'Nothing to post'
+      add_message :error, 'Nothing to post'
     end
   end
 
@@ -22,6 +22,7 @@ class MoneyRequest::Comment::Create < MoneyRequest::Base
 
   def post_process
     Event::EMoneyRequest::EComment::Create.(self.user, money_request: self.money_request)
+    add_message :success, 'Comment posted'
   end
 
 end
