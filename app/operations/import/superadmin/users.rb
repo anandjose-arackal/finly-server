@@ -115,28 +115,28 @@ class Import::Superadmin::Users < Import::Base
     # creating team mapping attributes
     if row[import_fields[:reporting_manager]]
       manager = User.find_by(email: row[import_fields[:reporting_manager]]) rescue nil
-      unless manager and manager.manager?
+      unless manager and manager.manager? and manager.company_id == row[import_fields[:company_id]]
         errors << "Reporting Manager not found"
         manager = nil
       end
     end
     if row[import_fields[:reporting_finance_manager]]
       finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]]) rescue nil
-      unless finance_manager and finance_manager.finance_manager?
+      unless finance_manager and finance_manager.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
         errors << "Reporting Finance Manager not found"
         finance_manager = nil
       end
     end
     if row[import_fields[:approves_to]]
       approves_to = User.find_by(email: row[import_fields[:approves_to]]) rescue nil
-      unless approves_to and approves_to.manager?
+      unless approves_to and approves_to.manager? and approves_to.company_id == row[import_fields[:company_id]]
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
     end
     if row[import_fields[:approves_finance_to]]
       approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]]) rescue nil
-      unless approves_finance_to and approves_finance_to.finance_manager?
+      unless approves_finance_to and approves_finance_to.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil
       end
@@ -169,7 +169,7 @@ class Import::Superadmin::Users < Import::Base
       user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
                                         card_type_id: 1,
                                         product_code: "NGPRHD",
-                                        ending_number: row[import_fields[:card_serial_id]].last(4),
+                                        ending_number: row[import_fields[:card_ending_numbers]],
                                         company_id: row[import_fields[:company_id]]
                                         }]
     end
@@ -197,7 +197,8 @@ class Import::Superadmin::Users < Import::Base
       :approves_to => 16,
       :approves_finance_to => 17,
       :card_serial_id => 18,
-      :company_id => 19
+      :card_ending_numbers => 19,
+      :company_id => 20
    }
   end
 
