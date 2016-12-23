@@ -93,7 +93,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
   end
 
   def post_process
-    add_message :success, 'Funds transferred successfully!'
+    add_message :success, 'Funds transferred successfully'
   end
 
 end
