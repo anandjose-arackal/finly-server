@@ -47,7 +47,7 @@ class Company::Create < Company::Base
   private
 
   def company_params
-    params.require(:company).permit(:name)
+    params.require(:company).permit(:name, :d_code)
   end
 
   def admin_params
@@ -60,6 +60,5 @@ class Company::Create < Company::Base
                                                       :address_2, :city, :state_id, :pin_code],
                                  role_mapping_attributes: [:user_role_id])
   end
-
-
+  
 end

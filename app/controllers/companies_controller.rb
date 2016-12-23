@@ -1,5 +1,8 @@
 class CompaniesController < ApplicationController
 
+  before_action :authenticate_user!
+  before_action :superadmin_accounts
+
   def notify
     # todo
     @result = Company::VirtualAccount::Balance.(current_user, params)
@@ -13,6 +16,14 @@ class CompaniesController < ApplicationController
   def add_balance
     @result = Company::AddBalance.(current_user, params)
     respond
+  end
+
+  private
+
+  def superadmin_accounts
+    unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
+      redirect_to root_url
+    end
   end
 
 end
