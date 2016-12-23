@@ -399,67 +399,68 @@ if Report.count == 0
   end
 end
 
-if Card.count == 0
-  # Company.all.each do |company|
-  #   5.times do
-  #     number = random_mobile_number
-  #     company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
-  #                          product_code: 'NGPRHD',
-  #                          card_type_id: random_integer(1, 3))
-  #   end
-  # end
+unless Rails.env.production?
+  if Card.count == 0
+    # Company.all.each do |company|
+    #   5.times do
+    #     number = random_mobile_number
+    #     company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
+    #                          product_code: 'NGPRHD',
+    #                          card_type_id: random_integer(1, 3))
+    #   end
+    # end
 
-  User.all.each do |user|
-    if user.id < 9
-      number = "S0001774009#{(user.id - 1)}"
-      user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
-                        card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+    User.all.each do |user|
+      if user.id < 9
+        number = "S0001774009#{(user.id - 1)}"
+        user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: 'NGPRHD',
+                          card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+      end
     end
   end
-end
 
 # creating some junk transactions and card expenses for testing
-if CardTransaction.count == 0
-  User.all.each do |user|
-    next unless user.cards.present?
-    card = user.cards.first
-    20.times do
+  if CardTransaction.count == 0
+    User.all.each do |user|
+      next unless user.cards.present?
+      card = user.cards.first
+      20.times do
 
-      trans_types = ["POS", "ATM", "Ecom"]
-      trans_modes = ["Debit", "Credit"]
-      from_date = DateTime.parse("01-07-2016 12:00:00")
-      to_date = DateTime.now
-      random_amount = random_integer(50,200) + 0.1234
-      sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
+        trans_types = ["POS", "ATM", "Ecom"]
+        trans_modes = ["Debit", "Credit"]
+        from_date = DateTime.parse("01-07-2016 12:00:00")
+        to_date = DateTime.now
+        random_amount = random_integer(50, 200) + 0.1234
+        sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
 
-      data = sample_msg_queue_entry.split(",")
+        data = sample_msg_queue_entry.split(",")
 
-      # for the split between merchant city and merchant name
-      name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
-      merchant_name = name_city[0]
-      merchant_city = name_city[1]
+        # for the split between merchant city and merchant name
+        name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
+        merchant_name = name_city[0]
+        merchant_city = name_city[1]
 
-      trans_params = {reference_id: data[0],
-                      transaction_timestamp: data[1],
-                      transaction_amount_attributes: {value: data[2], currency_id: 1},
-                      billing_amount_attributes: {value: data[3], currency_id: 1},
-                      auth_transaction_id: data[4],
-                      transaction_mode: data[5],
-                      itzcash_merchant_key: data[6],
-                      merchant_name: merchant_name,
-                      merchant_city: merchant_city,
-                      response_code: data[8],
-                      transaction_type: data[9],
-                      serial_id: data[10],
-                      product_code: data[11]
-      }
+        trans_params = {reference_id: data[0],
+                        transaction_timestamp: data[1],
+                        transaction_amount_attributes: {value: data[2], currency_id: 1},
+                        billing_amount_attributes: {value: data[3], currency_id: 1},
+                        auth_transaction_id: data[4],
+                        transaction_mode: data[5],
+                        itzcash_merchant_key: data[6],
+                        merchant_name: merchant_name,
+                        merchant_city: merchant_city,
+                        response_code: data[8],
+                        transaction_type: data[9],
+                        serial_id: data[10],
+                        product_code: data[11]
+        }
 
-      trans = Card::Transaction::Create.(trans_params).transaction
+        trans = Card::Transaction::Create.(trans_params).transaction
+      end
+
     end
-
   end
 end
-
 # end
 
 
