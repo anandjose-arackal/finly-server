@@ -86,22 +86,19 @@ class Report::Submit < Report::Base
       end
       return true
     end
-    memo = params[:memo]
     submitted_at = DateTime.now
     if report.update_attributes report_status_id: ReportStatus.processing_id,
                                 controlling_user_id: manager.id,
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: manager_role_id,
                                 controlling_for_user_role_id: nil,
-                                memo: memo,
                                 submitted_at: submitted_at
       report.tracks.create action_user: user,
                            action_user_role_id: UserRole.id_for(:employee),
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
                            report_tracking_action_id: ReportTrackingAction.submit_id,
-                           report_status_id: ReportStatus.processing_id,
-                           memo: memo
+                           report_status_id: ReportStatus.processing_id
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
       end

@@ -60,7 +60,6 @@ class MoneyRequest::Approve < MoneyRequest::Base
     update_attributes[:controlling_for_user_id] = nil
     update_attributes[:controlling_user_role_id] = to_user_role_id
     update_attributes[:controlling_for_user_role_id] = nil
-    update_attributes[:memo] = self.params[:memo]
     update_attributes[:submitted_at] = DateTime.now if auto_approve
     if money_request.update_attributes update_attributes
       if auto_approve

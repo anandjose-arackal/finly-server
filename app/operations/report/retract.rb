@@ -47,7 +47,7 @@ class Report::Retract < Report::Base
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: role_id,
                                 controlling_for_user_role_id: nil,
-                                memo: nil, submitted_at: nil, auto_submit: false
+                                submitted_at: nil, auto_submit: false
       track = report.tracks.build action_user: user,
                                   action_user_role_id: role_id,
                                   modified_user: prev_controlling_user,

@@ -39,13 +39,11 @@ class MoneyRequest::Retract < MoneyRequest::Base
     prev_controlling_user = (money_request.controlling_for_user or money_request.controlling_user)
     prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.money_request)
     role_id = UserRole.id_for(:employee)
-    memo = (params[:note] or params[:memo] or money_request.memo)
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:retracted),
                                        controlling_user_id: user.id,
                                        controlling_for_user_id: nil,
                                        controlling_user_role_id: role_id,
                                        controlling_for_user_role_id: nil,
-                                       memo: memo,
                                        submitted_at: nil
       money_request.tracks.create action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),

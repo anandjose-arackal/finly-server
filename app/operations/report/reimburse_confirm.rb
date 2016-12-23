@@ -21,8 +21,7 @@ class Report::ReimburseConfirm < Report::Base
                                 controlling_for_user: nil,
                                 controlling_user_role_id: nil,
                                 controlling_for_user_role_id: nil,
-                                report_status_id: ReportStatus.reimbursement_confirmed_id,
-                                memo: nil
+                                report_status_id: ReportStatus.reimbursement_confirmed_id
       track = report.tracks.build action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user: user,

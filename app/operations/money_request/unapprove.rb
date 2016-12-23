@@ -43,12 +43,10 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
     elsif finance_view?
       role_id = UserRole.id_for(:finance_manager)
     end
-    memo = (params[:note] or params[:memo] or money_request.memo)
     if money_request.update_attributes controlling_user_id: user.id,
                                        controlling_for_user_id: nil,
                                        controlling_user_role_id: role_id,
                                        controlling_for_user_role_id: nil,
-                                       memo: memo,
                                        status_id: MoneyRequestStatus.id_for(:processing)
       money_request.tracks.create action_user: user,
                                   action_user_role_id: role_id,

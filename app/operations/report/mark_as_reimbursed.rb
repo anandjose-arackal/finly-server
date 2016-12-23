@@ -31,7 +31,6 @@ class Report::MarkAsReimbursed < Report::Base
                                 controlling_user_role_id: nil,
                                 controlling_for_user_role_id: nil,
                                 report_status_id: ReportStatus.reimbursed_id,
-                                memo: nil,
                                 reimbursement: payment
       # todo test this logic
       role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)

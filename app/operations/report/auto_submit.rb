@@ -60,9 +60,10 @@ class Report::AutoSubmit < Report::Base
   protected
   def create_report
     role_id = UserRole.id_for(:employee)
+    memo = auto_submit_config.default_memo
     self.report = selected_user.reports.build report_status_id: ReportStatus.open_id, controlling_user: selected_user,
                                               controlling_user_role_id: role_id, policy_id: auto_submit_config.default_policy_id,
-                                              name: params[:name], auto_submit: true
+                                              name: params[:name], auto_submit: true, memo: memo
     if report.save
       Report::Expenses::Add.(user, {selected_user: selected_user, report: report, expenses: processing_expenses, auto_submit: true})
     else
@@ -88,37 +89,40 @@ class Report::AutoSubmit < Report::Base
     presenter = User::Team::Review::NextReviewer.(report)
     manager = presenter.user
     manager_role_id = presenter.role_id
+
+    comment = report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
+
     # If no manager assigned, auto approve the report
     if manager.blank?
       # call the approve class with the right parameters
       approve_op = Report::Approve.new(user, {report: self.report, auto_approve: true, auto_submit: true})
       unless approve_op.run.success?
         self.add_message :error, approve_op.messages[:error]
+        comment.destroy
         return false
       end
       report.reload
+
       # changing the status of the expenses in the auto approved report.
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
       end
       return true
     end
-    memo = auto_submit_config.default_memo
+    # memo = auto_submit_config.default_memo
     submitted_at = DateTime.now
     if report.update_attributes report_status_id: ReportStatus.processing_id,
                                 controlling_user_id: manager.id,
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: manager_role_id,
                                 controlling_for_user_role_id: nil,
-                                memo: memo,
                                 submitted_at: submitted_at
       report.tracks.create action_user: user,
                            action_user_role_id: manager_role_id,
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
                            report_tracking_action_id: ReportTrackingAction.submit_id,
-                           report_status_id: ReportStatus.processing_id,
-                           memo: memo
+                           report_status_id: ReportStatus.processing_id
       report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)

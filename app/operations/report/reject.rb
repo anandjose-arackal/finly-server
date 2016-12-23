@@ -57,14 +57,13 @@ class Report::Reject < Report::Base
                                 controlling_user_id: reject_to_user.id,
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: reject_to_user_role_id,
-                                controlling_for_user_role_id: nil, memo: params[:memo]
+                                controlling_for_user_role_id: nil
       report.tracks.create action_user: user,
                                   action_user_role_id: user_role,
                                   modified_user_id: reject_to_user.id,
                                   modified_user_role_id: reject_to_user_role_id,
                                   report_tracking_action_id: ReportTrackingAction.reject_id,
-                                  report_status_id: status,
-                                  memo: params[:memo]
+                                  report_status_id: status
       # Reset expenses status to unsubmitted if report is rejected
       if status == ReportStatus.rejected_id
         report.expenses.each do |expense|
