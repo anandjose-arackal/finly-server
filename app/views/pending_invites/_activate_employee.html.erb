@@ -65,10 +65,10 @@
               <label style="font-weight: 500">Gender:</label>
               <div>
                 <label style="margin-right: 20px; margin-top: 0;">
-                  <input type="radio" name="user[profile_attributes][gender]" readonly value="m" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'm' %> selected="selected" <% end %>>&nbsp;Male
+                  <input type="radio" name="user[profile_attributes][gender]" readonly value="m" style="display: inline;" <% if @pending_user.profile.gender and @pending_user.profile.gender == 'm' %> checked="checked" <% end %>>&nbsp;Male
                 </label>
                 <label style="margin-top: 0;">
-                  <input type="radio" name="user[profile_attributes][gender]" readonly value="f" style="display: inline;" <% unless @pending_user.profile.gender.blank? and @pending_user.profile.gender == 'f' %> selected="selected" <% end %>>&nbsp;Female
+                  <input type="radio" name="user[profile_attributes][gender]" readonly value="f" style="display: inline;" <% if @pending_user.profile.gender and @pending_user.profile.gender == 'f' %> selected="selected" <% end %>>&nbsp;Female
                 </label>
               </div><br />
 

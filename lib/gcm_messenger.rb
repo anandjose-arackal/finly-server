@@ -3,7 +3,9 @@ class GcmMessenger
   include Sidekiq::Worker
   # todo critical to remove this before deploy
   require 'openssl'
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+  unless Rails.env.production?
+    OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+  end
 
   def self.push(users, params)
     # self.new.perform_async(users, params)
