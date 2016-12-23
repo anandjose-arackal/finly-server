@@ -62,7 +62,7 @@ class Company::AddAdmin < Company::Base
       p[:cards_attributes] = [{proxy: params[:user][:card_attributes][:proxy],
                                card_type_id: 1,
                                product_code: "NGPRHD",
-                               ending_number: params[:user][:card_attributes][:proxy].last(4),
+                               ending_number: params[:user][:card_attributes][:ending_number],
                                company_id: company.id
                               }]
     end
