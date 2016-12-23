@@ -225,7 +225,7 @@ class Notification < ActiveRecord::Base
           object_name += " and is awaiting your further approval"
         end
       when "Expense"
-        object = " expense"
+        object = " an expense"
         e = Expense.find_by(id: self.object_id)
         object_name = " at #{e.merchant_name}"
       when "Card"

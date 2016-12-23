@@ -5,7 +5,7 @@ module Constants
   VALID_GENDER = /[MmFf]/i
 
   # todo - needs to be edited once we get the account details.
-  ITZCASH_EMAIL_ID = 'vivek.a@finly.io'
+  ITZCASH_EMAIL_ID = 'sreeram.nr@finly.io'
 
   SUPERADMIN_ACCOUNTS = ['sreeram@finlytest.io', 'vivek@finlytest.io', 'veekshith@finlytest.io', 'bala@finlytest.io', 'admin@finlytest.io']
 
