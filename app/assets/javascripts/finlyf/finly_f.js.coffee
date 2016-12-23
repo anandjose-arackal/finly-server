@@ -281,6 +281,7 @@ window.FinlyF =
     for notification in notifications
       if $(notification).hasClass('unread')
           $(notification).removeClass('unread')
+    $(container).find("#navbar-notification-count").text("")
 
 
   navigate: (e, attr)->
