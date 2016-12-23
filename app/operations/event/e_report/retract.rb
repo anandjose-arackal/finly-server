@@ -10,7 +10,7 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def notification_affected_users
-    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    users = Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
     users.reject { |r| r == self.user}
   end
 
@@ -20,7 +20,8 @@ class Event::EReport::Retract < Event::EReport::Base
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
-  def set_notification(user, role = nil)
+  def set_notification(user)
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.report_id,
                                              action_type_id: NotificationActionType.notify_retract_id,
                                              action_user_id: report.user_id,
@@ -30,7 +31,7 @@ class Event::EReport::Retract < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: report.controlling_user_role_id
+                                             view_role_id: roles.first
                                             )
     notification.save
   end
