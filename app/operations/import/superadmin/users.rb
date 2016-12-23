@@ -58,12 +58,12 @@ class Import::Superadmin::Users < Import::Base
       error_messages = params[:error_messages]
       params.delete(:error_messages)
 
-      unique = mobile_number_taken?(row[import_fields[:mobile_number]])
+      unique = mobile_number_valid?(row[import_fields[:mobile_number]])
 
-      if type == 'email'
-        self.invitee = User.invite!(params)
-      elsif type == 'mobile'
-        if unique
+      if unique == true
+        if type == 'email'
+          self.invitee = User.invite!(params)
+        elsif type == 'mobile'
           self.invitee = User.invite!(params, user) do |u|
             u.skip_invitation
             u.update_attribute(:email, "")
@@ -74,8 +74,8 @@ class Import::Superadmin::Users < Import::Base
         end
       end
 
-      if !unique
-        result_hash[i] = "This mobile number is already taken"
+      if unique.is_a?(String)
+        result_hash[i] = unique
       elsif User.exists?(invitee.id)
         if error_messages.present?
           result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
@@ -167,10 +167,11 @@ class Import::Superadmin::Users < Import::Base
     # i.e. add cards only when the user
     if row[import_fields[:card_serial_id]].present?
       user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
-                                      card_type_id: 1,
-                                      product_code: "NGPRHD",
-                                      ending_number: row[import_fields[:card_serial_id]].last(4)
-                                      }]
+                                        card_type_id: 1,
+                                        product_code: "NGPRHD",
+                                        ending_number: row[import_fields[:card_serial_id]].last(4),
+                                        company_id: row[import_fields[:company_id]]
+                                        }]
     end
     return user_params
   end
