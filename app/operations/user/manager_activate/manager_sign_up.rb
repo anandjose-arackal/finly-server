@@ -123,6 +123,10 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     invited_user.accept_invitation!
     invited_user.confirm
     invited_user.update_attributes(mobile_only_invite: false)
+    # activating the user's card
+    if invited_user.cards.present?
+      invited_user.cards.first.update_attributes(active: true)
+    end
   end
 
   def post_process

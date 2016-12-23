@@ -1,5 +1,7 @@
 class CompaniesController < ApplicationController
 
+  before_action :authenticate_user!
+
   def notify
     # todo
     @result = Company::VirtualAccount::Balance.(current_user, params)

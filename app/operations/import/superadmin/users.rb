@@ -167,10 +167,11 @@ class Import::Superadmin::Users < Import::Base
     # i.e. add cards only when the user
     if row[import_fields[:card_serial_id]].present?
       user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
-                                      card_type_id: 1,
-                                      product_code: "NGPRHD",
-                                      ending_number: row[import_fields[:card_serial_id]].last(4)
-                                      }]
+                                        card_type_id: 1,
+                                        product_code: "NGPRHD",
+                                        ending_number: row[import_fields[:card_serial_id]].last(4),
+                                        company_id: row[import_fields[:company_id]]
+                                        }]
     end
     return user_params
   end
