@@ -1,6 +1,7 @@
 class Superadmin::CompaniesController < ApplicationController
 
   before_action :authenticate_user!
+  before_action :superadmin_accounts
 
   def new
     @states = State::VALUES
@@ -30,7 +31,7 @@ class Superadmin::CompaniesController < ApplicationController
       redirect_to superadmin_companies_path
     else
       flash[:error] = @result.messages[:error]
-      redirect_to superadmin_company_path
+      redirect_to request.referrer
     end
   end
 
@@ -43,6 +44,15 @@ class Superadmin::CompaniesController < ApplicationController
     @result = import_op.run
     respond_to do |format|
       format.csv { send_data @result, :type => 'text/csv; charset=iso-8859-1; header=present', :disposition => "attachment;data=result.csv" }
+    end
+  end
+
+
+  private
+
+  def superadmin_accounts
+    unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
+      redirect_to root_url
     end
   end
 

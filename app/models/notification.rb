@@ -217,7 +217,7 @@ class Notification < ActiveRecord::Base
           mr = MoneyRequest.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         else
-          object = "n advance request"
+          object = " advance request"
           mr = MoneyRequest.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         end
@@ -269,9 +269,19 @@ class Notification < ActiveRecord::Base
     path = ""
     case self.path_object_type
       when "Report"
-        path = "reports/#{self.path_object_id}"
+        path_object = Report.find_by(id: self.path_object_id)
+        if path_object.is_deleted?
+          path = "reports"
+        else
+          path = "reports/#{self.path_object_id}"
+        end
       when "Advance Request"
-        path = "requests/#{self.path_object_id}"
+        path_object = MoneyRequest.find_by(id: self.path_object_id)
+        if path_object.is_deleted?
+          path = "requests"
+        else
+          path = "requests/#{self.path_object_id}"
+        end
       when "Settlement", "Wallet", "Payment", "Card"
         path = "settlements/"
         if view == "\"personal\"" or view.nil?
@@ -320,9 +330,11 @@ class Notification < ActiveRecord::Base
     if self.action_type_id == NotificationActionType.notify_auto_approve_id
       return ""
     elsif self.action_user_id == owner.id
-      return " a"
+      return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
+      return " a" if object_type == "Report"
+      return " an" if object_type == "Advance Request"
     elsif self.user_id == owner.id
-     return " your"
+      return " your"
     else
       return " " + owner.name + "'s"
     end

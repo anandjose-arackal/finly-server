@@ -40,17 +40,34 @@ class Company::AddAdmin < Company::Base
     Company::Base::CompanyPresenter.new(user, company: company)
   end
 
+  def post_process
+    # if the admin has a card, activate that card
+    if admin.cards.present?
+      admin.cards.first.update_attributes(active: true)
+    end
+  end
+
   private
 
   def admin_params
     params[:user][:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},
                                                 {user_role_id: UserRole.employee_id}]
 
-    params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
+    p = params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
                                  :maiden_name, :last_name,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code],
                                  role_mapping_attributes: [:user_role_id])
+    if params[:user][:card_attributes][:proxy].present? # todo - also check if the card number matches the Card number format
+      p[:cards_attributes] = [{proxy: params[:user][:card_attributes][:proxy],
+                               card_type_id: 1,
+                               product_code: "NGPRHD",
+                               ending_number: params[:user][:card_attributes][:proxy].last(4),
+                               company_id: company.id
+                              }]
+    end
+    p.permit!
+    return p
   end
 
 end
