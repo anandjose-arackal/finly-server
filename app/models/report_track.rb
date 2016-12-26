@@ -5,7 +5,6 @@
 #  id                        :integer          not null, primary key
 #  report_id                 :integer          not null
 #  action_user_id            :integer
-#  action_user_role_id       :integer
 #  modified_user_id          :integer
 #  report_tracking_action_id :integer
 #  report_status_id          :integer          not null
@@ -14,7 +13,9 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  payment_id                :integer
+#  action_user_role_id       :integer
 #
+
 
 
 class ReportTrack < ActiveRecord::Base
