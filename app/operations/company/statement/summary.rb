@@ -8,7 +8,7 @@ class Company::Statement::Summary < Company::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      add_message :error, "Invalid parameters. Try again"
+      add_message :error, "Invalid parameters"
     end
   end
 
