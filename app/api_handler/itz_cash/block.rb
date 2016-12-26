@@ -31,9 +31,9 @@ class ItzCash::Block < ItzCash::Base
     user.cards.first.update_attribute(:active, false)
   end
 
-  def success_response_code
-    [0, -100]
-  end
+  # def success_response_code
+  #   [0, -100]
+  # end
 
   def success
     # ResponseCode,SerialID,Description
@@ -52,6 +52,17 @@ class ItzCash::Block < ItzCash::Base
       self.description = params[:description]
     end
 
+  end
+
+  protected
+
+  # Handle success for -100 as -100 is returned if the card is already blocked
+  def success?
+    success = super
+    if not success and parsed_response[0] == '-100' and (self.response.body.include?('The card is already unblocked') or self.response.body.include?('The card is already blocked'))
+      success = true
+    end
+    success
   end
 
 end
