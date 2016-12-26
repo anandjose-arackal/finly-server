@@ -168,7 +168,7 @@ class Import::Superadmin::Users < Import::Base
     if row[import_fields[:card_serial_id]].present?
       user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
                                         card_type_id: 1,
-                                        product_code: "NGPRHD",
+                                        product_code: Constants::ItzCash::PRODUCT_CODE,
                                         ending_number: row[import_fields[:card_ending_numbers]],
                                         company_id: row[import_fields[:company_id]]
                                         }]
