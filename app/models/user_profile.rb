@@ -15,15 +15,14 @@
 #  default_currency_id :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  date_of_birth       :date             not null
+#  date_of_birth       :date             default(Fri, 23 Dec 2016), not null
 #  gender              :string(255)      not null
-#  address_1           :string(255)      not null
-#  address_2           :string(255)      not null
-#  city                :string(255)      not null
-#  state_id            :integer          not null
-#  pin_code            :string(255)      not null
+#  address_1           :string(255)      default(""), not null
+#  address_2           :string(255)      default(""), not null
+#  city                :string(255)      default(""), not null
+#  state_id            :integer          default(1), not null
+#  pin_code            :string(255)      default(""), not null
 #
-
 
 class UserProfile < ActiveRecord::Base
   belongs_to :user

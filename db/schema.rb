@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161219075225) do
+ActiveRecord::Schema.define(version: 20161226072656) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -874,6 +874,7 @@ ActiveRecord::Schema.define(version: 20161219075225) do
     t.boolean  "auto_submit",                                            default: false, null: false
     t.boolean  "auto_approve",                                           default: false, null: false
     t.date     "accounted_at"
+    t.datetime "approved_at"
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
