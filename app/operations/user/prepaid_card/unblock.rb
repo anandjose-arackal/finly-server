@@ -15,10 +15,10 @@ class User::PrepaidCard::Unblock < User::PrepaidCard::Block
 
   def validate_status
     card = selected_user.cards.first
-    if card.active
-      add_message :error, 'Card is already active'
-      return
-    end
+    # if card.active
+    #   add_message :error, 'Card is already active'
+    #   return
+    # end
     disabled_by_role = card.disabled_by_role_id
     curr_role = user_role_id
     if curr_role == UserRole.id_for(:employee) and disabled_by_role != nil and disabled_by_role != UserRole.id_for(:employee) and not self.user.company_admin?
@@ -40,7 +40,7 @@ class User::PrepaidCard::Unblock < User::PrepaidCard::Block
                                                  disabled_by_user: nil,
                                                  disable_note: nil})
     if self.block_presenter.present? and self.block_presenter.success?
-      add_message :success, 'Successfully unblocked the card!'
+      add_message :success, 'Successfully unblocked the card'
     end
   end
 
