@@ -1,0 +1,19 @@
+<table class="table table-striped" style="border: 1px solid #ddd;">
+  <thead>
+    <tr>
+      <td>#</td>
+      <td>Policy</td>
+      <td>Amount</td>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @policies.each_with_index do |index, policy| %>
+    <tr>
+      <td><%= index %></td>
+      <td><%= policy.name %></td>
+      <td><%= policy.total %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

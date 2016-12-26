@@ -3,7 +3,6 @@ class StatementsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-
   end
 
   def show
@@ -28,4 +27,23 @@ class StatementsController < ApplicationController
     end
   end
 
+  # Company Statments
+  def company_statements
+    respond_to do |format|
+      format.html {render partial: 'company_statements'}
+    end
+  end
+
+  def company_summary
+    respond_to do |format|
+      format.html {render partial: 'company_summary'}
+    end
+  end
+
+  def policies_summary
+    @policies = []
+    respond_to do |format|
+      format.html {render partial: 'policies_summary'}
+    end
+  end
 end
