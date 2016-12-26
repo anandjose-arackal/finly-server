@@ -26,7 +26,7 @@ class ItzCash::VirtualAccountBalance < ItzCash::Base
     params[:wallets_count] = parsed_response[2].to_i
     params[:wallets] = []
     params[:wallets_count].times do |pos|
-      params[:wallets][pos] = {name: parsed_response[(3 + (3 * pos))], balance: parsed_response[(4+(3*pos))].to_d, account_no: parsed_response[(5+(3*pos))].to_d}
+      params[:wallets][pos] = {name: parsed_response[(3 + (3 * pos))], balance: parsed_response[(4+(3*pos))].to_d, account_number: parsed_response[(5+(3*pos))].to_d}
     end
     ItzCash::VirtualAccountBalance::SuccessPresenter.new(user, params, messages)
   end
