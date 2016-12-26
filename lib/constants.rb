@@ -34,7 +34,7 @@ module Constants
   elsif Rails.env.itzcash_uat?
     url = "http://180.179.138.175/#"
   elsif Rails.env.production?
-    url = "https://www.finly.io"
+    url = "https://www.finly.io/#"
   else
     url = ""
   end
