@@ -81,7 +81,7 @@
       <div>
         <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]"
         <% if @pending_user.profile and @pending_user.profile.date_of_birth %>
-          value="<%= @pending_user.profile.date_of_birth %>"
+          value="<%= @pending_user.profile.date_of_birth.strftime("%d-%m-%Y") %>"
           readonly
         <% end %>
         >

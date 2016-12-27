@@ -61,8 +61,8 @@ class Company::AddAdmin < Company::Base
     if params[:user][:card_attributes][:proxy].present? # todo - also check if the card number matches the Card number format
       p[:cards_attributes] = [{proxy: params[:user][:card_attributes][:proxy],
                                card_type_id: 1,
-                               product_code: "NGPRHD",
-                               ending_number: params[:user][:card_attributes][:proxy].last(4),
+                               product_code: Constants::ItzCash::PRODUCT_CODE,
+                               ending_number: params[:user][:card_attributes][:ending_number],
                                company_id: company.id
                               }]
     end

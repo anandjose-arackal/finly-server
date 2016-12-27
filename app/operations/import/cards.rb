@@ -77,7 +77,7 @@ class Import::Cards < Import::Base
     if row[import_fields[:card_serial_id]].present?
       self.card_params = {proxy: row[import_fields[:card_serial_id]],
                            card_type_id: 1,
-                           product_code: "NGPRHD",
+                           product_code: Constants::ItzCash::PRODUCT_CODE,
                            ending_number: row[import_fields[:card_serial_id]].last(4)
                           }
     else

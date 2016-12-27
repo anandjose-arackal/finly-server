@@ -28,11 +28,13 @@ module Constants
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost:3000/#"
-  elsif Rails.env.production? or Rails.env.staging?
+  elsif Rails.env.staging?
     url = "https://52.76.54.96/#" # todo - will be changed for final deployment
     # url = "https://www.finly.io/#"
   elsif Rails.env.itzcash_uat?
     url = "http://180.179.138.175/#"
+  elsif Rails.env.production?
+    url = "https://www.finly.io/#"
   else
     url = ""
   end
@@ -46,7 +48,17 @@ module Constants
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"
 
     MODULE = 'FINLY'
-    MERCHANT_TYPE_KEY = 'DEFAULT_ITIL'
+
+    if Rails.env.production?
+      MERCHANT_TYPE_KEY_CREDIT = 'OLCEXP_CARDTOPUP'
+      MERCHANT_TYPE_KEY_DEBIT = 'OLCEXP_CARDDEBIT'
+      PRODUCT_CODE = 'HDFFIN'
+    else
+      MERCHANT_TYPE_KEY_CREDIT = 'DEFAULT_ITIL'
+      MERCHANT_TYPE_KEY_DEBIT = 'DEFAULT_ITIL'
+      PRODUCT_CODE = 'NGPRHD'
+    end
+
     # PRODUCT_CODE = 'NGPRHD'
     # CHARGE_CODE = 'GPRESC'
     TRANSACTION_TYPE_CREDIT = 1

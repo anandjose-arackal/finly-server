@@ -28,8 +28,8 @@ gem 'crono', '1.0.3'
 gem 'roo', '2.5.1'
 gem 'roo-xls', '1.0.0'
 
-# Gem to show db schema in model file
-gem 'annotate', '2.7.1'
+  # Gem to show db schema in model file
+  gem 'annotate', '2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
