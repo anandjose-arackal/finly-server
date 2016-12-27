@@ -34,7 +34,7 @@ module Constants
   elsif Rails.env.itzcash_uat?
     url = "http://180.179.138.175/#"
   elsif Rails.env.production?
-    url = "https://www.finly.io"
+    url = "https://www.finly.io/#"
   else
     url = ""
   end
@@ -48,7 +48,17 @@ module Constants
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"
 
     MODULE = 'FINLY'
-    MERCHANT_TYPE_KEY = 'DEFAULT_ITIL'
+
+    if Rails.env.production?
+      MERCHANT_TYPE_KEY_CREDIT = 'OLCEXP_CARDTOPUP'
+      MERCHANT_TYPE_KEY_DEBIT = 'OLCEXP_CARDDEBIT'
+      PRODUCT_CODE = 'HDFFIN'
+    else
+      MERCHANT_TYPE_KEY_CREDIT = 'DEFAULT_ITIL'
+      MERCHANT_TYPE_KEY_DEBIT = 'DEFAULT_ITIL'
+      PRODUCT_CODE = 'NGPRHD'
+    end
+
     # PRODUCT_CODE = 'NGPRHD'
     # CHARGE_CODE = 'GPRESC'
     TRANSACTION_TYPE_CREDIT = 1
