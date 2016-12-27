@@ -6,6 +6,7 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
 
   events:
     'click .navigate-tab li a': 'navigateTab'
+    'click .company-statements-types li a': 'filterStatements'
     'submit form#form-add-category': 'addCategory'
     'click .btn-delete-category': 'deleteCategory'
 
@@ -224,3 +225,32 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
 
     button = $(form).find('.btn-update-export-preference')
     $(button).removeClass('hidden')
+
+  filterStatements: (e) ->
+    _this = @
+    e.preventDefault()
+    target = e.currentTarget
+    statements_type = $(target).attr('data-statements-type')
+
+    statements_container = $(@el).find(".company-summary-container")
+    FinlyF.startMainLoader(statements_container)
+
+    parentLI = $(e.currentTarget).parent()
+    lis = $(e.currentTarget).parent().siblings()
+
+    $(lis).removeClass('active')
+    $(parentLI).addClass('active')
+
+    $.ajax({
+      url: 'statements/' + statements_type
+      dataType: 'html',
+      data: {
+        view: _this.params.view
+      },
+      success: (res) ->
+        $(statements_container).html(res)
+        FinlyF.stopMainLoader(statements_container)
+
+      error: (err) ->
+        console.log "Err", err
+    })

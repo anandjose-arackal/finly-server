@@ -307,6 +307,12 @@ $brand-admin-primary: #e74c3c; //Hot Pink
     font-size: 12px;
     line-height: 9px;
   }
+
+  // Used when there is a navbar nav inside section card > section header
+  .section-card ul.nav li.active a, .section-card ul.nav li.active a:hover, .section-card ul.nav li.active a:focus .section-card ul.nav li.active a:active{
+    border-bottom: 3px solid $brand-admin-primary;
+    background: white;
+  }
 }
 
 .superscript{
