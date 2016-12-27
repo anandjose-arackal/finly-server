@@ -12,7 +12,7 @@
     <tr>
       <td><%= index + 1 %></td>
       <% policy.each do |k, v| %>
-      <td><%= k.name %></td>
+      <td><%= k.name ? k.name : "None" %></td>
       <td><%= v %></td>
       <% end %>
     </tr>
