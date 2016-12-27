@@ -46,7 +46,7 @@ class Company::Statement::Summary < Company::Base
     company.users.each do |user|
       # calculating advance fund totals
       # todo - find out filter parameters
-      user.money_requests.each do |request|
+      (user.money_requests.approved + user.money_requests.credited_money_request).each do |request|
         items[:total_advance_fund_requests] += request.total_amount
       end
 
@@ -58,8 +58,21 @@ class Company::Statement::Summary < Company::Base
       # calculating cash given in advance
       items[:total_cash_in_hand] += user.cash_in_hand.value
     end
-
   end
+
+  def success
+    Company::Statement::Summary::SummaryPresenter.new(user, {items: items}, messages)
+  end
+
+  class Company::Statement::Summary::SummaryPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :items
+
+    def init
+      self.items = params[:items]
+    end
+  end
+
 
   private
 
