@@ -6,7 +6,7 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
 
   events:
     'click .navigate-tab li a': 'navigateTab'
-    'click .company-statements-types li a': 'filterStatements'
+    'click .company-statements-types li a': 'filterStatementsbyType'
     'submit form#form-add-category': 'addCategory'
     'click .btn-delete-category': 'deleteCategory'
 
@@ -20,6 +20,8 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
 
     'submit form.form-update-export-preferences': 'updateExportPreference'
     'click .btn-delete-export-preference': 'deleteExportPreference'
+
+    'change input.filter-date-statements': 'filterStatements'
 
   initialize: (options) ->
     if options
@@ -75,6 +77,9 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
         # console.log res
         FinlyF.stopMainLoader()
         $(current_tab).html(res)
+        $(current_tab).find('.datepicker').datepicker({
+          dateFormat: "dd-mm-yy"
+        })
       error: (err) ->
         console.log "Error", err
     })
@@ -226,25 +231,40 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
     button = $(form).find('.btn-update-export-preference')
     $(button).removeClass('hidden')
 
-  filterStatements: (e) ->
+  filterStatementsbyType: (e) ->
     _this = @
     e.preventDefault()
     target = e.currentTarget
-    statements_type = $(target).attr('data-statements-type')
 
-    statements_container = $(@el).find(".company-summary-container")
-    FinlyF.startMainLoader(statements_container)
+    # statements_container = $(@el).find(".company-summary-container")
+    # FinlyF.startMainLoader(statements_container)
 
     parentLI = $(e.currentTarget).parent()
     lis = $(e.currentTarget).parent().siblings()
 
     $(lis).removeClass('active')
     $(parentLI).addClass('active')
+    @filterStatements()
+
+  filterStatements: ->
+    console.log "Listenting to event"
+    _this = @
+
+    statements_container = $(@el).find(".company-summary-container")
+    statements_navbar = $(@el).find(".company-statements-navbar")
+    statements_type = $(statements_navbar).find('ul.company-statements-types li.active a').attr('data-statements-type')
+
+    FinlyF.startMainLoader(statements_container)
+
+    @params.filter_date_from = $(statements_navbar).find('input.filter-date-from').val()
+    @params.filter_date_to = $(statements_navbar).find('input.filter-date-to').val()
 
     $.ajax({
       url: 'statements/' + statements_type
       dataType: 'html',
       data: {
+        filter_date_from: _this.params.filter_date_from
+        filter_date_to: _this.params.filter_date_to
         view: _this.params.view
       },
       success: (res) ->
@@ -254,3 +274,14 @@ class FinlyF.Views.OrganizationAccount extends Backbone.View
       error: (err) ->
         console.log "Err", err
     })
+
+  # filterStatementsbyDate: (e) ->
+  #   # target = e.currentTarget
+  #   # navbar = $(target).closest('.company-statements-navbar')
+  #   @filterStatements()
+
+
+
+
+
+
