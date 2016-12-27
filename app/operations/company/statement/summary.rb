@@ -1,4 +1,4 @@
-class Company::Statement::Summary < Company::Base
+class Company::Statement::Summary < Company::Statement::Base
 
   attr_accessor :items
 
@@ -27,17 +27,22 @@ class Company::Statement::Summary < Company::Base
   end
 
   def process
-    items[:company_balance] = Company::VirtualAccount::Balance.(user).balance
+    result = Company::VirtualAccount::Balance.(user)
+    items[:company_balance] = result.balance
 
     # calculating money with employees in various forms
     items[:employees] = {}
     items[:employees][:card_balance] = 0
     items[:employees][:wallet_balance] = 0
     items[:employees][:cash_in_hand_balance] = 0
+    items[:employees][:total] = 0
     company.users.each do |user|
       items[:employees][:card_balance] += card_balance_on_date(user, end_date)
       items[:employees][:wallet_balance] += user_account_balance_on_date(user, end_date)
       items[:employees][:cash_in_hand_balance] += cash_in_hand_on_date(user, end_date)
+    end
+    items[:employees].each do |k, v|
+      items[:employees][:total] += v
     end
 
     items[:total_advance_fund_requests] = 0
@@ -45,7 +50,6 @@ class Company::Statement::Summary < Company::Base
     items[:total_cash_in_hand] = 0
     company.users.each do |user|
       # calculating advance fund totals
-      # todo - find out filter parameters
       (user.money_requests.approved + user.money_requests.credited_money_request).each do |request|
         items[:total_advance_fund_requests] += request.total_amount
       end
@@ -130,6 +134,5 @@ class Company::Statement::Summary < Company::Base
   def company_balance_on_date(date = nil)
 
   end
-
 
 end

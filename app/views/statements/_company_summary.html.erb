@@ -10,45 +10,45 @@
     <tr>
       <td>1</td>
       <td>Current Company Balance</td>
-      <td>&#8377;&nbsp;+ 24,500/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:company_balance]%>/-</td>
     </tr>
     <tr>
       <td>2</td>
       <td>Total Amount with Employees</td>
-      <td>&#8377;&nbsp;+ 14,500/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:employees][:total]%>/-</td>
     </tr>
     <tr>
       <td></td>
       <td><span style="display:inline-block; width: 20px;"></span>Total Amount on Cards</td>
-      <td>&#8377;&nbsp;8900/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:employees][:card_balance]%>/-</td>
     </tr>
     <tr>
       <td></td>
       <td><span style="display:inline-block; width: 20px;"></span>Total Amount in Finly Accounts</td>
-      <td>&#8377;&nbsp;323/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:employees][:wallet_balance]%>/-</td>
     </tr>
     <tr>
       <td></td>
       <td><span style="display:inline-block; width: 20px;"></span>Total Cash in Employees Hand</td>
-      <td>&#8377;&nbsp;45/- </td>
+      <td>&#8377;&nbsp;<%=@result.items[:employees][:cash_in_hand_balance]%>/- </td>
     </tr>
 
     <tr>
       <td>3</td>
       <td>Total Advance Fund Requests</td>
-      <td>&#8377;&nbsp;34,500/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:total_advance_fund_requests]%>/-</td>
     </tr>
 
     <tr>
       <td>4</td>
       <td>Total amount pending on Reimbursements</td>
-      <td>&#8377;&nbsp;4,500/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:total_pending_reimbursements]%>/-</td>
     </tr>
 
     <tr>
       <td>5</td>
       <td>Total Cash given in Advance</td>
-      <td>&#8377;&nbsp;9,500/-</td>
+      <td>&#8377;&nbsp;<%=@result.items[:total_cash_in_hand]%>/-</td>
     </tr>
   </tbody>
 </table>

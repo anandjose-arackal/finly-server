@@ -14,10 +14,11 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
   end
 
   def init
+    super()
     self.company = user.company
-    self.items = {}
+    self.items = []
     if user.company_admin?
-      self.policies = company.policies
+      self.policies = company.policies.non_default
     elsif user.policy_admin?
       self.policies = user.admin_policies
     end
@@ -33,10 +34,12 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   def process
     policies.each do |policy|
+      total = 0
       r = Report.where(policy_id: policy.id).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
       r.each do |report|
-        items[policy.id] += report.total_amount
+        total += report.total_amount
       end
+      self.items << {policy => total}
     end
   end
 
