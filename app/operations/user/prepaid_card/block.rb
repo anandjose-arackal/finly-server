@@ -15,13 +15,6 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
     end
   end
 
-  def process
-    self.block_presenter = ItzCash::Block.(selected_user, params)
-    if block_presenter.failure?
-      add_message :error, block_presenter.messages[:error]
-    end
-  end
-
   def validate
     super
     return if has_errors?
@@ -29,8 +22,15 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
   end
 
   def validate_status
-    unless selected_user.cards.first.active
-      add_message :error, 'Card is already blocked'
+    # unless selected_user.cards.first.active
+    #   add_message :error, 'Card is already blocked'
+    # end
+  end
+
+  def process
+    self.block_presenter = ItzCash::Block.(selected_user, params)
+    if block_presenter.failure?
+      add_message :error, block_presenter.messages[:error]
     end
   end
 

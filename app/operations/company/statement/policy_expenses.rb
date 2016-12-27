@@ -18,7 +18,7 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
     self.company = user.company
     self.items = []
     if user.company_admin?
-      self.policies = company.policies.non_default
+      self.policies = company.policies
     elsif user.policy_admin?
       self.policies = user.admin_policies
     end
@@ -35,11 +35,15 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
   def process
     policies.each do |policy|
       total = 0
-      r = Report.where(policy_id: policy.id).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
-      r.each do |report|
-        total += report.total_amount
+      if policy.name.nil?
+        self.items << default_policy_total(policy)
+      else
+        r = Report.where(policy_id: policy.id).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+        r.each do |report|
+          total += report.total_amount
+        end
+        self.items << {policy => total}
       end
-      self.items << {policy => total}
     end
   end
 
@@ -54,6 +58,19 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
     def init
       self.items = params[:items]
     end
+  end
+
+
+  private
+
+  def default_policy_total(policy)
+    user_ids = user.company.users.pluck(:id)
+    r = Report.where(user_id: user_ids).where(policy_id: nil).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+    total = 0
+    r.each do |report|
+      total += report.total_amount
+    end
+    {policy => total}
   end
 
 end
