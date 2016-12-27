@@ -1,4 +1,4 @@
-class Company::PolicyExpenses < Company::Statement::Base
+class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   attr_accessor :policies, :items
 
@@ -37,6 +37,19 @@ class Company::PolicyExpenses < Company::Statement::Base
       r.each do |report|
         items[policy.id] += report.total_amount
       end
+    end
+  end
+
+  def success
+    Company::Statement::PolicyExpenses::PolicyExpensePresenter.new(user, {items: items}, messages)
+  end
+
+  class Company::Statement::PolicyExpenses::PolicyExpensePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :items
+
+    def init
+      self.items = params[:items]
     end
   end
 
