@@ -14,7 +14,7 @@ class MoneyRequest::Index < MoneyRequest::Base
 
   def authorize
     if self.role_id.present?
-      raise_unauthorized_exception unless user.has_role?(self.role_id)
+      raise_unauthorized_exception if not user.has_role?(self.role_id) and not (role_id == UserRole.id_for(:admin) and user.policy_admin?)
     elsif not user.employee?
       raise_unauthorized_exception
     end

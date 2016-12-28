@@ -1,11 +1,19 @@
 class MsgQueuePoller
 
+
   def self.run
+    username = ENV["MSG_QUEUE_USERNAME_TESTING"]
+    password = ENV["MSG_QUEUE_PASSWORD_TESTING"]
+    if Rails.env == 'production'
+      mq_server_address = ENV["MSG_QUEUE_ADDRESS_PRODUCTION"]
+    elsif Rails.env == 'itzcash_uat'
+      mq_server_address = ENV["MSG_QUEUE_ADDRESS_UAT"]
+    else
+      mq_server_address = ENV["MSG_QUEUE_ADDRESS_TESTING"]
+    end
 
-    username = Constants::ItzCash::MSG_QUEUE_USERNAME
-    password = Constants::ItzCash::MSG_QUEUE_PASSWORD
 
-    client = Stomp::Connection.new(username, password, "180.179.138.163", 61613, true)
+    client = Stomp::Connection.new(username, password, mq_server_address, 61613, true)
     client.subscribe("/queue/FinlyQueue")
 
     puts "Subscribed!"
@@ -40,8 +48,8 @@ class MsgQueuePoller
       # triggering the operation to create a card transaction
       begin
         result = Card::Transaction::Create.(trans_params)
-      rescue
-        # todo - log the output to a log file
+      rescue NotAuthorizedException
+        # todo - output to log file that transaction creation failed
       end
 
       # if the creation of an entry on the transaction table fails, log it in a file
