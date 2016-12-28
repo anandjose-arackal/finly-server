@@ -338,7 +338,7 @@ ActiveRecord::Schema.define(version: 20161227112518) do
     t.string   "symbol",       limit: 255
   end
 
-  create_table "enforce_policy", force: :cascade do |t|
+  create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
     t.boolean  "enabled"
@@ -346,7 +346,7 @@ ActiveRecord::Schema.define(version: 20161227112518) do
     t.datetime "updated_at",                   null: false
   end
 
-  add_index "enforce_policy", ["enforceable_type", "enforceable_id"], name: "index_enforce_policy_on_enforceable_type_and_enforceable_id", using: :btree
+  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
