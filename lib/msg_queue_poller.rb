@@ -2,8 +2,8 @@ class MsgQueuePoller
 
 
   def self.run
-    username = ENV["MSG_QUEUE_USERNAME_TESTING"]
-    password = ENV["MSG_QUEUE_PASSWORD_TESTING"]
+    username = ENV["MSG_QUEUE_USERNAME"]
+    password = ENV["MSG_QUEUE_PASSWORD"]
     if Rails.env == 'production'
       mq_server_address = ENV["MSG_QUEUE_ADDRESS_PRODUCTION"]
     elsif Rails.env == 'itzcash_uat'
