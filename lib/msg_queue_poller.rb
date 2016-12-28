@@ -12,6 +12,7 @@ class MsgQueuePoller
       mq_server_address = ENV["MSG_QUEUE_ADDRESS_TESTING"]
     end
 
+    error_logger = Logger.new("#{Rails.root}/log/msg_queue_errors.log")
 
     client = Stomp::Connection.new(username, password, mq_server_address, 61613, true)
     client.subscribe("/queue/FinlyQueue")
@@ -48,18 +49,18 @@ class MsgQueuePoller
       # triggering the operation to create a card transaction
       begin
         result = Card::Transaction::Create.(trans_params)
-      rescue NotAuthorizedException
-        # todo - output to log file that transaction creation failed
+      rescue NotAuthorizedException => error
+        error_logger.error("Following transaction could not be expensed: #{message.body} because of the following error: #{error.message}")
       end
 
       # if the creation of an entry on the transaction table fails, log it in a file
       begin
         trans = CardTransaction.create(trans_params)
         unless trans
-          # todo - output to log file that transaction that wasn't created
+          error_logger.error("Following transaction could not be created: #{message.body} because of following errors: #{trans.errors.full_messages}")
         end
-      rescue
-        # todo - output to a file the transaction that wasn't created
+      rescue => error
+        error_logger.error("Following transaction could not be created : #{message.body} because of following errors: #{error.message}")
       end
     end
 
