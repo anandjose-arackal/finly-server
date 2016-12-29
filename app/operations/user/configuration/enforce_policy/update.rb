@@ -1,6 +1,6 @@
 # operation to update the enforce policy
 
-class User::Configuration::EnforePolicy::Update < User::Configuration::EnforcePolicy::Base
+class User::Configuration::EnforcePolicy::Update < User::Configuration::EnforcePolicy::Base
 
   def init
     super()

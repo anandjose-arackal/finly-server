@@ -13,7 +13,7 @@ class User::Configuration::EnforcePolicy::Base < BaseOperation
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = user.company.users.find_by(id: id)
-    self.enforce_config = selected_user.enforceable
+    self.enforce_config = selected_user.enforce_policy
   end
 
 end
