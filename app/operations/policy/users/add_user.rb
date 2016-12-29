@@ -38,7 +38,7 @@ class Policy::Users::AddUser < Policy::Base
       # check if it's an empty policy, for adding a user for the first time
       self.policy = Policy.find_by(id: params[:policy_id])
       unless policy.users.blank?
-        messages[:error] << "Policy not found."
+        messages[:error] << "Policy not found"
       end
     end
     unless user.policy_admin?(policy) or user.admin?
@@ -61,7 +61,7 @@ class Policy::Users::AddUser < Policy::Base
           cloned_item.greater_than_amount = amount
         end
         unless cloned_item.save
-          messages[:error] << "Some users couldn't be added to the policy."
+          messages[:error] << "Some users couldn't be added to the policy"
           return false
         end
       end

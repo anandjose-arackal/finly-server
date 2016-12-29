@@ -56,13 +56,19 @@ class Report::Approve < Report::Base
         status = ReportStatus.closed_id
       end
     end
+    if status == ReportStatus.approved_id
+      approved_at = DateUtils.local_date_time
+    else
+      approved_at = nil
+    end
     curr_user_role = User::Team::Review::UserRole.(user, self.report)
     update_attributes = {report_status_id: status,
                          controlling_user: manager,
                          controlling_for_user_id: nil,
                          controlling_user_role_id: to_user_role_id,
                          controlling_for_user_role_id: nil,
-                         auto_approve: auto_approve}
+                         auto_approve: auto_approve,
+                         approved_at: approved_at}
     update_attributes[:submitted_at] = DateTime.now if auto_approve
     if report.update_attributes update_attributes
       if auto_approve

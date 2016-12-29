@@ -8,14 +8,15 @@
 #  modified_user_id                 :integer
 #  money_request_tracking_action_id :integer
 #  status_id                        :integer
-#  action_user_role_id             :integer
 #  modified_user_role_id            :integer
 #  payment_id                       :integer
 #  memo                             :string(255)
 #  created_at                       :datetime         not null
 #  updated_at                       :datetime         not null
 #  action_id                        :integer
+#  action_user_role_id              :integer
 #
+
 
 
 class MoneyRequestTrack < ActiveRecord::Base

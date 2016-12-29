@@ -7,7 +7,7 @@
 #  requested_by_user_id :integer          not null
 #  reference_id         :string(255)      not null
 #  date                 :date             not null
-#  amount               :decimal(64, 12)
+#  amount_id            :integer
 #  remark               :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
