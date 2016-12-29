@@ -444,6 +444,42 @@
       </div> --}}
       <div class="tab-pane" id="tab-user-policies">
         <section class="user-policies">
+          <div class="enforce-policy section-card">
+            <div class="row no-margin section-header">
+              <div class="col-sm-6">
+                <h4>Enforce Policy</h4>
+              </div>
+              <div class="col-sm-6">
+                <button class="btn btn-sm btn-warning btn-edit-enforce-policy"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+              </div>
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-6">
+                <form>
+                  <input type="hidden" name="type" value="enforce_policy">
+                  <div class="row no-margin">
+                    <div class="col-sm-3">Enabled:</div>
+                    <div class="col-sm-9">
+                    {{#if item.enforce_policy.enabled}}
+                      <label class="item-attr-preview">Yes</label>
+                      <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="enforce_policy[enabled]" value="1" checked="checked">&nbsp;&nbsp;Yes</label>&nbsp;&nbsp;
+                      <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="enforce_policy[enabled]" value="0">&nbsp;&nbsp;No </label>
+                    {{else}}
+                      <label class="item-attr-preview">No</label>
+                      <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="enforce_policy[enabled]" value="1">&nbsp;&nbsp;Yes</label>&nbsp;&nbsp;
+                      <label class="item-attr-edit"><input class="item-attr-edit" type="radio" name="enforce_policy[enabled]" value="0" checked="checked">&nbsp;&nbsp;No </label>
+                    {{/if}}
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-sm-6">
+              {{!-- Note explaining enforce policy --}}
+              </div>
+            </div>
+          </div>
+
           {{#each item.mapping}}
           <div class="policy section-card" style="margin-bottom: 15px;">
             <div class="row policy-name no-margin section-header">
