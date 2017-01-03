@@ -38,7 +38,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config
+                  :periods, :auto_submit_config, :enforce_policy_enabled
 
     def init
       self.selected_user = params[:selected_user]
@@ -56,6 +56,7 @@ class User::Show < User::Base
       self.card = params[:card]
       self.auto_submit_config = self.selected_user.auto_submit_config
       self.periods = Period.all
+      self.enforce_policy_enabled = user.enforce_policy_enabled?
     end
 
     private

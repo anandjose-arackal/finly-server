@@ -323,6 +323,10 @@ class User < ActiveRecord::Base
     self.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
   end
 
+  def enforce_policy_enabled?
+    self.enforce_policy.enabled
+  end
+
   private
 
   def email_format
