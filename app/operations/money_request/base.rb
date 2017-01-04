@@ -46,11 +46,19 @@ class MoneyRequest::Base < BaseOperation
       self.required_by_date = money_request.required_by_date
       self.comments = money_request.comments
       self.actions = load_actions
-      self.policies = money_request.user.policies
+      self.policies = retrieve_policies
       self.selected_policy = money_request.policy
       self.manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :manager)
       self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
       self.card = load_card
+    end
+
+    def retrieve_policies
+      if money_request.user.enforce_policy_enabled?
+        return money_request.user.policies.non_default
+      else
+        return money_request.user.policies
+      end
     end
 
     def load_card

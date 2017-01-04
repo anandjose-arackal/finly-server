@@ -7,6 +7,7 @@ json.finance_manager_name @result.finance_manager.name rescue ''
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
+json.enforce_policy_enabled = @result.report.user.enforce_policy_enabled?
 
 policy_id = nil
 policy_name = nil
