@@ -54,7 +54,7 @@ class Company::AddAdmin < Company::Base
                                                 {user_role_id: UserRole.employee_id}]
 
     p = params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
-                                 :maiden_name, :last_name,
+                                 :last_name, :mothers_maiden_name,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code],
                                  role_mapping_attributes: [:user_role_id])

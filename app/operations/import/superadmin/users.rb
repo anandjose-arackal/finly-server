@@ -145,7 +145,7 @@ class Import::Superadmin::Users < Import::Base
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
                     email: row[import_fields[:email]],
-                    mobile_number: row[import_fields[:mobile_number]],
+                    mobile_number: row[import_fields[:mobile_number]].to_i,
                     role_mapping_attributes: role_mapping_attributes,
                     team_mapping_attributes: [{default: true, manager: manager,
                                                               finance_manager: finance_manager,
@@ -161,6 +161,7 @@ class Import::Superadmin::Users < Import::Base
                                          city: row[import_fields[:city]]
                                         },
                     company_id: row[import_fields[:company_id]],
+                    mothers_maiden_name: row[import_fields[:mothers_maiden_name]],
                     error_messages: errors
                   }
 
@@ -198,7 +199,8 @@ class Import::Superadmin::Users < Import::Base
       :approves_finance_to => 17,
       :card_serial_id => 18,
       :card_ending_numbers => 19,
-      :company_id => 20
+      :company_id => 20,
+      :mothers_maiden_name => 21
    }
   end
 
