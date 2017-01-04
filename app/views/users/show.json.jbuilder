@@ -8,7 +8,9 @@ json.user do
   json.activateable @result.selected_user.manager_activateable?
   json.enforce_policy do
     json.enabled @result.enforce_policy_enabled
-    json.approver (@result.user.manager? or @result.user.finance_manager?)
+    approver = @result.user.manager? or @result.user.finance_manager?
+    json.approver approver
+    json.non_approver !approver
   end
 end
 json.role do
