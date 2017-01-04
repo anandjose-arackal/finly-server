@@ -31,7 +31,7 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
 
-  validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {maximum: 12}
+  validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
 
   # before_save do
   #   if self.proxy
