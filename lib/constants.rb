@@ -47,7 +47,6 @@ module Constants
 
     MSG_QUEUE_USERNAME = "finly"
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"
-    MSG_QUEUE_ADDRESS = "180.179.138."
 
     MODULE = 'FINLY'
 
