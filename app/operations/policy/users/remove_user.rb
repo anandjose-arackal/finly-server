@@ -37,6 +37,11 @@ class Policy::Users::RemoveUser < Policy::Base
       if auto_submit_config.enabled and auto_submit_config.default_policy_id.present? and auto_submit_config.default_policy_id == self.policy.id
         add_message :error, "#{removed_user.name} has this policy as their default policy for auto submission. Please update this before removing the user from the policy"
       end
+
+      enforce_policy_config = removed_user.enforce_policy
+      if enforce_policy_config.enabled and removed_user.policies.non_default.count == 1
+        add_message :error, "#{removed_user.name} has to be part of at least one non-default policy. Please update their enforce policy configuration to perform this action"
+      end
     end
   end
 
