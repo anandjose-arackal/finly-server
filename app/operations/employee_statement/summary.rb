@@ -173,10 +173,10 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     unless date
       return result.balance.to_f
     end
-    card_expenses = selected_user.card_transactions.debits.where('transaction_timestamp > ?', start_date).joins(:billing_amount).sum(:value)
+    card_expenses = selected_user.card_transactions.debits.where('transaction_timestamp > ?', date).joins(:billing_amount).sum(:value)
     card_load_amount = selected_user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_card),
                                                              PaymentType.id_for(:credit_from_wallet_to_card)]).joins(:amount).sum(:value)
-    balance = result.balance.to_f + card_load_amount - card_expenses
+    balance = result.balance.to_f - card_load_amount + card_expenses
     precision_value  balance
   end
 

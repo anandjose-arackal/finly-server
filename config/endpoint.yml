@@ -25,6 +25,9 @@ development:
 test:
   <<: *default
 
+performance_test:
+  <<: *default
+
 itzcash_uat:
   base_url: "http://cvmsuat.itzcash.com:8080"
   itzcash_account_details:
