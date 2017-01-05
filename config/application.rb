@@ -22,6 +22,14 @@ module Finly
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
+    # adding the msg queue server addresses to environment variables
+    config.before_configuration do
+      env_file = File.join(Rails.root, 'config', 'msg_queue.yml')
+      YAML.load(File.open(env_file)).each do |key, value|
+        ENV[key.to_s] = value
+      end if File.exists?(env_file)
+    end
+
     # autoload paths that are in the lib folder
     config.autoload_paths += %W(#{config.root}/lib)
 

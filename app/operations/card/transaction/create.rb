@@ -19,9 +19,10 @@ class Card::Transaction::Create < BaseOperation
   def init
     self.card = Card.find_by(proxy: params[:serial_id])
     self.user = self.card.user rescue nil
-    self.type = params[:transaction_type]
-    self.mode = params[:transaction_mode]
+    self.type = params[:transaction_type].upcase rescue nil
+    self.mode = params[:transaction_mode].upcase rescue nil
     params[:user_id] = user.id if user
+    params[:card_id] = card.id if card
   end
 
   def authorize
@@ -36,9 +37,9 @@ class Card::Transaction::Create < BaseOperation
 
   def process
     case type
-      when "Debit"
+      when "DEBIT"
         case mode
-          when "POS", "Ecom"
+          when "POS", "ECOM"
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
@@ -83,7 +84,7 @@ class Card::Transaction::Create < BaseOperation
           else
             # do nothing
         end
-      when "Credit"
+      when "CREDIT"
         self.transaction = CardTransaction.new(params)
         unless transaction.save
           messages[:error] = transaction.errors.full_messages

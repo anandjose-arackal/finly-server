@@ -26,13 +26,12 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   has_many :transactions, class_name: 'CardTransaction'
 
-
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
 
-  validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}
+  validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
 
   # before_save do
   #   if self.proxy

@@ -43,8 +43,8 @@ class User::Invite::Accept < User::Invite::Base
 
     invitation_token = param[:invitation_token]
     first_name = param[:first_name]
-    maiden_name = param[:maiden_name]
     last_name = param[:last_name]
+    mothers_maiden_name = param[:mothers_maiden_name]
     mobile_number = param[:mobile_number]
     password = param[:password]
     password_confirmation = param[:password_confirmation]
@@ -63,6 +63,7 @@ class User::Invite::Accept < User::Invite::Base
     return unless verify_field password_confirmation, 'Password confirmation cannot be blank'
     return unless verify_field first_name, 'First name cannot be blank'
     return unless verify_field last_name, 'Last name cannot be blank'
+    return unless verify_field mothers_maiden_name, 'Mother\'s maiden name cannot be blank'
     return unless verify_field mobile_number, 'Mobile number cannot be blank'
     return unless verify_field date_of_birth, 'Date of birth cannot be blank'
     return unless verify_field gender, 'Gender not selected'
@@ -140,7 +141,7 @@ class User::Invite::Accept < User::Invite::Base
 
   def user_params
     params.require(:user).permit(:password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
-                                 :maiden_name, :last_name,
+                                 :last_name, :mothers_maiden_name,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code])
   end
