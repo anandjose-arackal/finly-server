@@ -45,21 +45,23 @@ class MsgQueuePoller
                       product_code: data[11]
                       }
 
-      @rescued = nil
+      rescued = false
       @result = nil
       # triggering the operation to create a card transaction
       begin
         @result = Card::Transaction::Create.(trans_params)
       rescue NotAuthorizedException => error
         error_logger.error("Following transaction could not be expensed: #{message.body} because of the following error: #{error.message}")
+        trans = CardTransaction.create(trans_params)
+        rescued = true
       end
 
 
       # if the creation of an entry on the transaction table fails, log it in a file
-      if @result.transaction.nil?
+      if not rescued and @result.transaction.nil?
         begin
-          trans = CardTransaction.create(trans_params)
-          unless trans
+          trans = CardTransaction.new(trans_params)
+          unless trans.save
             error_logger.error("Following transaction could not be created: #{message.body} because of following errors: #{trans.errors.full_messages}")
           end
         rescue => error
