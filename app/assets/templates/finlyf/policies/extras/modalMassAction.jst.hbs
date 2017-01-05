@@ -2,43 +2,47 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <h4 class="modal-title">Removed Users From {{item.policy.name}} Policy</h4>
+      <h4 class="modal-title">Successfully Removed</h4>
     </div>
     <div class="modal-body">
-      <div class="row no-margin">
-        <div class="col-sm-12">
-          <h4>Successfully Removed {{item.target_items.length}} Users from {{item.policy.name}} Policy</h4>
-        </div>
-
+      {{#if item.target_items}}
         <div class="row no-margin">
           <div class="col-sm-12">
-            <div class="col-sm-12" style="border-bottom: 2px solid #ccc; padding: 12px 20px;">
-              <div class="row no-margin">
-                <div class="col-sm-1 no-padding"><label>#</label></div>
-                <div class="col-sm-3"><label>Name</label></div>
-                <div class="col-sm-3 no-padding"><label>Email</label></div>
-                <div class="col-sm-2"><label>Mobile</label></div>
-                <div class="col-sm-3 no-padding"><label>Status</label></div>
-              </div>
-            </div>
-            {{#each item.target_items}}
-              <div class="col-sm-12" style="border-bottom: 1px solid #bbb; padding: 10px 20px;">
+            <h4>Removed {{item.target_items.length}} Users from {{item.policy.name}} Policy</h4>
+          </div>
+
+          <div class="row no-margin">
+            <div class="col-sm-12">
+              <div class="col-sm-12" style="border-bottom: 2px solid #ccc; padding: 12px 20px;">
                 <div class="row no-margin">
-                  <div class="col-sm-1 no-padding">{{add @index 1}}</div>
-                  <div class="col-sm-3">{{this.name}}</div>
-                  <div class="col-sm-3 no-padding">{{this.email}}</div>
-                  <div class="col-sm-2">{{this.mobile_number}}</div>
-                  <div class="col-sm-3 no-padding">Removed</div>
+                  <div class="col-sm-1 no-padding"><label>#</label></div>
+                  <div class="col-sm-3"><label>Name</label></div>
+                  <div class="col-sm-3 no-padding"><label>Email</label></div>
+                  <div class="col-sm-2"><label>Mobile</label></div>
+                  <div class="col-sm-3 no-padding"><label>Status</label></div>
                 </div>
               </div>
-            {{/each}}
+              {{#each item.target_items}}
+                <div class="col-sm-12" style="border-bottom: 1px solid #bbb; padding: 10px 20px;">
+                  <div class="row no-margin">
+                    <div class="col-sm-1 no-padding">{{add @index 1}}</div>
+                    <div class="col-sm-3">{{this.name}}</div>
+                    <div class="col-sm-3 no-padding">{{this.email}}</div>
+                    <div class="col-sm-2">{{this.mobile_number}}</div>
+                    <div class="col-sm-3 no-padding">Removed</div>
+                  </div>
+                </div>
+              {{/each}}
+            </div>
           </div>
         </div>
-          
-      </div>
+      {{/if}}
+
+      {{#if_all item.target_items.length item.conflict}} 
+      <div class="row" style="margin-top: 20px;"><hr /></div>
+      {{/if_all}}
 
       {{#if item.conflict}}
-      <div class="row" style="margin-top: 20px;"><hr /></div>
       <div class="row no-margin">
         <div class="col-sm-12">
           <div class="row no-margin">
