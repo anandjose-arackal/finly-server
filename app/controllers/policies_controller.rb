@@ -85,13 +85,6 @@ class PoliciesController < ApplicationController
     end
   end
 
-
-
-  # def invitable_users
-  #   @result = Policy::InvitableUsers.(current_user, params)
-  #   respond
-  # end
-
   def add_users
     @result = Policy::Users::AddUser.(current_user, params)
     if @result.success?
@@ -107,9 +100,7 @@ class PoliciesController < ApplicationController
   def remove_users
     @result = Policy::Users::RemoveUser.(current_user, params)
     if @result.success?
-      messages = @result.messages
-      @result = Policy::Show.(current_user, params)
-      @result.messages = messages
+      @result.users = Policy::Show.(current_user, params).users
     end
     respond_to do |format|
       format.json {}
