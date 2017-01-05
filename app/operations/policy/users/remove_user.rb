@@ -82,7 +82,9 @@ class Policy::Users::RemoveUser < Policy::Base
   end
 
   def post_process
-    add_message :success, "User removed from policy."
+    unless removed_users.empty?
+      add_message :success, "User removed from policy."
+    end
   end
 
   def success
