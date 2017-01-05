@@ -58,7 +58,7 @@ class Policy::Users::RemoveUser < Policy::Base
 
       enforce_policy_config = removed_user.enforce_policy
       if enforce_policy_config.enabled and removed_user.policies.non_default.count == 1
-        messages << "#{removed_user.name} has this policy as their default policy for auto submission. Please update this before removing the user from the policy"
+        messages << "#{removed_user.name} has 'Enforce Policy' enabled and needs to be a part of at least one non-default policy"
         self.removed_users -= [removed_user]
         conflicts = true
       end
