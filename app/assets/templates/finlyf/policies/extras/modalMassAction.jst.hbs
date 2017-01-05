@@ -2,46 +2,84 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <h4 class="modal-title">Success!</h4>
+      <h4 class="modal-title">Removed Users From {{item.policy.name}} Policy</h4>
     </div>
     <div class="modal-body">
       <div class="row no-margin">
         <div class="col-sm-12">
-          <h4>Successfully Removed Users from Policy</h4>
+          <h4>Successfully Removed {{item.target_items.length}} Users from {{item.policy.name}} Policy</h4>
         </div>
-        <div class="col-sm-12">
-          {{#each item.target_items}}
-            <div class="row no-margin">
-              <div class="col-sm-1">{{@index}}</div>
-              <div class="col-sm-3">{{this.name}}</div>
-              <div class="col-sm-3">{{this.email}}</div>
-              <div class="col-sm-3">{{this.mobile_number}}</div>
-            </div>
-          {{/each}}
-        </div>
-      </div>
-      {{#if item.conflict}}
+
         <div class="row no-margin">
-          <div class="col-sm-12"><hr /></div>
-        {{#each item.conflict_items}}
-          <div class="row no-margin">
-            <div class="col-sm-12">
-              <div class="col-sm-1">{{@index}}</div>
-              <div class="col-sm-2">{{this.user.name}}</div>
-              <div class="col-sm-2">{{this.user.email}}</div>
-              <div class="col-sm-2">{{this.user.mobile_number}}</div>
-              <div class="col-sm-5">
-                <div class="row no-margin">
-                  {{#each this.message}}
-                    <div class="col-sm-12">{{this}}</div>
-                  {{/each}}
-                </div>
+          <div class="col-sm-12">
+            <div class="col-sm-12" style="border-bottom: 2px solid #ccc; padding: 12px 20px;">
+              <div class="row no-margin">
+                <div class="col-sm-1 no-padding"><label>#</label></div>
+                <div class="col-sm-3"><label>Name</label></div>
+                <div class="col-sm-3 no-padding"><label>Email</label></div>
+                <div class="col-sm-2"><label>Mobile</label></div>
+                <div class="col-sm-3 no-padding"><label>Status</label></div>
               </div>
             </div>
+            {{#each item.target_items}}
+              <div class="col-sm-12" style="border-bottom: 1px solid #bbb; padding: 10px 20px;">
+                <div class="row no-margin">
+                  <div class="col-sm-1 no-padding">{{add @index 1}}</div>
+                  <div class="col-sm-3">{{this.name}}</div>
+                  <div class="col-sm-3 no-padding">{{this.email}}</div>
+                  <div class="col-sm-2">{{this.mobile_number}}</div>
+                  <div class="col-sm-3 no-padding">Removed</div>
+                </div>
+              </div>
+            {{/each}}
           </div>
-        {{/each}}
         </div>
+          
+      </div>
+
+      {{#if item.conflict}}
+      <div class="row" style="margin-top: 20px;"><hr /></div>
+      <div class="row no-margin">
+        <div class="col-sm-12">
+          <div class="row no-margin">
+            <h4>Couldn't Remove {{item.conflict_items.length}} Users Due to Conflits.</h4>
+          </div>
+          <div class="row no-margin">
+            <div class="col-sm-12" style="border-bottom: 2px solid #ccc; padding: 12px 20px;">
+              <div class="row no-margin">
+                <div class="col-sm-1 no-padding">#</div>
+                <div class="col-sm-3"><label>Name</label></div>
+                <div class="col-sm-3 no-padding"><label>Email</label></div>
+                <div class="col-sm-2"><label>Mobile</label></div>
+                <div class="col-sm-3 no-padding"><label>Conflicts</label></div>
+              </div>
+            </div> 
+            {{#each item.conflict_items}}
+              <div class="col-sm-12" style="padding: 10px 20px; border-bottom: 1px solid #bbb;">
+                <div class="row no-margin" data-toggle="collapse" data-target="#collapse-conflict-message-{{this.user.id}}"  aria-expanded="false" style="cursor: pointer;" class="collapsed">
+                  <div class="col-sm-1 no-padding">{{add @index 1}}</div>
+                  <div class="col-sm-3">{{this.user.name}}</div>
+                  <div class="col-sm-3 no-padding">{{this.user.email}}</div>
+                  <div class="col-sm-2">{{this.user.mobile_number}}</div>
+                  <div class="col-sm-3 no-padding"><label style="cursor: pointer;">{{this.message.length}} Conflicts</label></div>
+                </div>
+
+                <div class="collapse" id="collapse-conflict-message-{{this.user.id}}" aria-expanded="false" style="height: 0px;">
+                  <div class="row no-margin">
+                    {{#each this.message}}
+                      <div class="col-sm-11 col-sm-offset-1" style="padding: 10px 13px; margin-bottom: 10px;">
+                        <div class="alert alert-danger" style="padding: 10px;">{{this}}</div>
+                      </div>
+                    {{/each}}
+                  </div>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
       {{/if}}
+          
     </div>
   </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
