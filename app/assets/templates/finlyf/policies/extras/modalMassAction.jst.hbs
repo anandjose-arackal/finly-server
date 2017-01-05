@@ -10,9 +10,9 @@
           <h4>Successfully Removed Users from Policy</h4>
         </div>
         <div class="col-sm-12">
-          {{#each item.removed_items}}
+          {{#each item.target_items}}
             <div class="row no-margin">
-              <div class="col-sm-1">{{index}}</div>
+              <div class="col-sm-1">{{@index}}</div>
               <div class="col-sm-3">{{this.name}}</div>
               <div class="col-sm-3">{{this.email}}</div>
               <div class="col-sm-3">{{this.mobile_number}}</div>
@@ -26,10 +26,10 @@
         {{#each item.conflict_items}}
           <div class="row no-margin">
             <div class="col-sm-12">
-              <div class="col-sm-1">{{index}}</div>
-              <div class="col-sm-2">{{this.name}}</div>
-              <div class="col-sm-2">{{this.email}}</div>
-              <div class="col-sm-2">{{this.mobile_number}}</div>
+              <div class="col-sm-1">{{@index}}</div>
+              <div class="col-sm-2">{{this.user.name}}</div>
+              <div class="col-sm-2">{{this.user.email}}</div>
+              <div class="col-sm-2">{{this.user.mobile_number}}</div>
               <div class="col-sm-5">
                 <div class="row no-margin">
                   {{#each this.message}}
