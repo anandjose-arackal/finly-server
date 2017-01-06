@@ -13,7 +13,7 @@ json.finance_manager_name @result.finance_manager.name rescue ''
 json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
-json.enforce_policy_enabled = @result.money_request.user.enforce_policy_enabled?
+json.enforce_policy_enabled @result.money_request.user.enforce_policy_enabled?
 
 json.card @result.card
 
