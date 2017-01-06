@@ -77,11 +77,11 @@ Rails.application.configure do
     domain:               'www.finly.io',
     user_name:            'finly@itzcash.com',
     # password:             'idAr5APhk61X',
-    # ssl:                  true,
+    ssl:                  true,
     # tls:                  true,
     # authentication:       :plain,
-    # enable_starttls_auto: true,
-    :openssl_verify_mode  => 'none'
+    enable_starttls_auto: true#,
+    # :openssl_verify_mode  => 'none'
   }
 
   #####################################################################
