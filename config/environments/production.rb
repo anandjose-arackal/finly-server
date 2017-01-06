@@ -70,7 +70,7 @@ Rails.application.configure do
 
   ################### SETTINGS FOR SENDGRID ##########################
   config.action_mailer.default_url_options = { host: "www.finly.io" }
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.delivery_method = :sendmail
   config.action_mailer.smtp_settings = {
     address:              'mail2.itzcash.com',
     port:                 25,
