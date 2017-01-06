@@ -74,15 +74,16 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              'mail2.itzcash.com',
     port:                 25,
-    domain:               'www.finly.io',
-    user_name:            'finly@itzcash.com',
+    domain:               'www.finly.io'
+#    user_name:            'finly@itzcash.com',
     # password:             '',
     # ssl:                  true,
     # tls:                  true,
-    authentication:       :none,
+#    authentication:       :none,
     # enable_starttls_auto: true,
     # :openssl_verify_mode  => 'none'
   }
+
 
   #####################################################################
 
