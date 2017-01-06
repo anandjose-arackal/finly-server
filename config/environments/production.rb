@@ -72,14 +72,14 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: "www.finly.io" }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              'smtp.sendgrid.net',
-    port:                 587,
+    address:              'mail2.itzcash.com',
+    port:                 25,
     domain:               'www.finly.io',
-    user_name:            'vivekagb',
-    password:             'idAr5APhk61X',
+    user_name:            'finly@itzcash.com',
+    # password:             'idAr5APhk61X',
     # ssl:                  true,
     # tls:                  true,
-    authentication:       :plain,
+    # authentication:       :plain,
     enable_starttls_auto: true,
     :openssl_verify_mode  => 'none'
   }
