@@ -440,6 +440,14 @@
 #                                          PUT        /receipts/:id(.:format)                                     receipts#update
 #                                          DELETE     /receipts/:id(.:format)                                     receipts#destroy
 #             superadmin_company_new_admin POST       /superadmin/companies/:company_id/add_admin(.:format)       superadmin/companies#add_admin
+#                 superadmin_company_users GET        /superadmin/companies/:company_id/users(.:format)           superadmin/users#index
+#                                          POST       /superadmin/companies/:company_id/users(.:format)           superadmin/users#create
+#              new_superadmin_company_user GET        /superadmin/companies/:company_id/users/new(.:format)       superadmin/users#new
+#             edit_superadmin_company_user GET        /superadmin/companies/:company_id/users/:id/edit(.:format)  superadmin/users#edit
+#                  superadmin_company_user GET        /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#show
+#                                          PATCH      /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#update
+#                                          PUT        /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#update
+#                                          DELETE     /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#destroy
 #                     superadmin_companies GET        /superadmin/companies(.:format)                             superadmin/companies#index
 #                                          POST       /superadmin/companies(.:format)                             superadmin/companies#create
 #                   new_superadmin_company GET        /superadmin/companies/new(.:format)                         superadmin/companies#new
@@ -448,14 +456,6 @@
 #                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
-#                         superadmin_users GET        /superadmin/users(.:format)                                 superadmin/users#index
-#                                          POST       /superadmin/users(.:format)                                 superadmin/users#create
-#                      new_superadmin_user GET        /superadmin/users/new(.:format)                             superadmin/users#new
-#                     edit_superadmin_user GET        /superadmin/users/:id/edit(.:format)                        superadmin/users#edit
-#                          superadmin_user GET        /superadmin/users/:id(.:format)                             superadmin/users#show
-#                                          PATCH      /superadmin/users/:id(.:format)                             superadmin/users#update
-#                                          PUT        /superadmin/users/:id(.:format)                             superadmin/users#update
-#                                          DELETE     /superadmin/users/:id(.:format)                             superadmin/users#destroy
 #                                          GET        /statements/:id/summary(.:format)                           statements#summary
 #                         export_statement GET        /export/:id/statements(.:format)                            export#statement
 #                               statements GET        /statements(.:format)                                       statements#index
@@ -707,8 +707,8 @@ Rails.application.routes.draw do
   namespace :superadmin do
     resources :companies do
       post 'add_admin', to: 'companies#add_admin', as: :new_admin
+      resources :users
     end
-    resources :users
   end
 
   get 'statements/:id/summary' => 'statements#summary'

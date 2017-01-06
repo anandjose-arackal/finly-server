@@ -1,0 +1,130 @@
+<div class="row" style="background-color: white !important;">
+  <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
+
+  <h3 style="text-align: center"><%=@user.name%>></h3>
+
+  <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_users_path %>" method="post">
+    <input name="utf8" type="hidden" value="&#x2713;"/>
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <input name="_method" value="patch" type="hidden">
+
+    <div style="width: 600px;padding: 20px 40px 40px 80px; background-color: white; margin:30px auto;border: 1px solid #d8d8d8">
+
+      <label style="font-weight: 500">Email: </label>
+      <div>
+        <input type="text" class="form-control" name="user[email]" value="<%=@user.email%>" readonly>
+      </div>
+
+
+      <label style="font-weight: 500">Mobile Number: </label>
+
+      <div>
+        <div class="input-group" style="width: 80%;">
+          <span class="input-group-addon" id="basic-addon1">+91</span>
+
+          <input type="number" class="form-control" name="user[mobile_number]" value="<%=@user.mobile_number%>" readonly>
+
+        </div>
+      </div>
+
+      <!-- <h4>User Details</h4> -->
+      <div style="width: 80%;">
+        <hr />
+      </div>
+
+      <label style="font-weight: 500">First Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[first_name]" value="<%=@user.first_name%>">
+      </div>
+
+      <label style="font-weight: 500">Last Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[last_name]" value="<%=@user.last_name%>">
+      </div>
+
+      <label style="font-weight: 500">Mother's Maiden Name: </label>
+      <div>
+        <input type="text" class="form-control" name="user[mothers_maiden_name]" value="<%=@user.mothers_maiden_name%>">
+      </div>
+
+      <label style="font-weight: 500">Date of Birth:</label>
+      <div>
+        <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]" value="<%= @user.profile.date_of_birth %>">
+      </div>
+
+      <label style="font-weight: 500">Gender:</label>
+      <div>
+        <label style="margin-right: 20px; margin-top: 0;">
+          <input type="radio" name="user[profile_attributes][gender]"
+                 value="m"
+                 <% if @user.profile.gender == 'm' %>
+                 checked="checked"
+                 <% end %>
+                 style="display: inline;">&nbsp;Male
+        </label>
+        <label style="margin-top: 0;">
+          <input type="radio" name="user[profile_attributes][gender]"
+                 value="f"
+                 <% if @user.profile.gender == 'm' %>
+                 checked="checked"
+                 <% end %>
+                 style="display: inline;">&nbsp;Female
+        </label>
+      </div>
+
+      <label style="font-weight: 500">Address Line 1:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][address_1]" value="<%= @user.profile.address_1 %>">
+      </div>
+
+      <label style="font-weight: 500">Address Line 2:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][address_2]" value="<%= @user.profile.address_2 %>">
+      </div>
+
+      <label style="font-weight: 500">City:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][city]" value="<%= @user.profile.city %>">
+      </div>
+
+      <label style="font-weight: 500">State:</label>
+      <div>
+        <select class="form-control" name="user[profile_attributes][state_id]">
+          <% @states.each do |state| %>
+              <option value="<%= state[:code] %>"
+              <% if @user.profile.state.name == state[:name] %>
+              selected
+              <% end %>
+              ><%= state[:name] %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <label style="font-weight: 500">Pin Code:</label>
+      <div>
+        <input type="text" class="form-control" name="user[profile_attributes][pin_code]" value="<%= @user.profile.pin_code %>">
+      </div>
+
+      <h4>Card Details</h4>
+
+      <label style="font-weight: 500">Card Proxy: </label>
+      <div>
+        <input type="text" class="form-control" name="user[card_attributes][proxy]" value="<%= @user.cards.first.proxy if @user.cards.present? %>">
+      </div>
+
+      <label style="font-weight: 500">Card Ending Number: </label>
+      <div>
+        <input type="text" class="form-control" name="user[card_attributes][ending_number]" value="<%= @user.cards.first.ending_number if @user.cards.present? %>">
+      </div>
+
+      <br/>
+      <div>
+        <button id="submitButton" style="border-radius: 1px; height: 40px"> SUBMIT</button>
+      </div>
+
+    </div>
+
+  </form>
+
+  </div>
+</div>

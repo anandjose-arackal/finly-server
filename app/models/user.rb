@@ -46,11 +46,6 @@
 #
 
 
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -322,6 +317,14 @@ class User < ActiveRecord::Base
 
   def otp_confirm
     self.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+  end
+
+  def superadmin?
+    if Constants::SUPERADMIN_ACCOUNTS.include?(self.email)
+      true
+    else
+      false
+    end
   end
 
   private

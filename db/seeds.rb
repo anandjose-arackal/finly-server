@@ -201,7 +201,7 @@ if c.categories.count == 0
 end
 
 if User.count == 0
-  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finlytest.io",
+  a = User.create(company: Company.first, first_name: "Finly", last_name: "Admin", email: "admin@finlexpense.io",
                   password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                   mothers_maiden_name: Faker::Name.first_name,
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
@@ -211,7 +211,7 @@ if User.count == 0
 
   fm = []
   3.times do |pos|
-    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlytest.io",
+    fm << User.create(company: Company.first, first_name: "Finly", last_name: "FinanceManager#{pos}", email: "finance#{pos}@finlyexpense.io",
                       password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                       mothers_maiden_name: Faker::Name.first_name,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
@@ -222,7 +222,7 @@ if User.count == 0
   end
   m = []
   3.times do |pos|
-    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finlytest.io",
+    m << User.create(company: Company.first, first_name: "Finly", last_name: "Manager#{pos}", email: "manager#{pos}@finlyexpense.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
                      role_mapping_attributes: [{user_role_id: 3},
@@ -234,7 +234,7 @@ if User.count == 0
   u = []
 
   # creating user0
-  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@finlytest.io",
+  u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@finlyexpense.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: 4},
