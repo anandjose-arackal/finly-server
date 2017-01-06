@@ -75,13 +75,13 @@ Rails.application.configure do
     address:              'mail2.itzcash.com',
     port:                 25,
     domain:               'www.finly.io',
-    user_name:            'finly@itzcash.com',
-    password:             '',
+    # user_name:            'finly@itzcash.com',
+    # password:             '',
     # ssl:                  true,
     # tls:                  true,
-    authentication:       :plain,
-    enable_starttls_auto: true,
-    :openssl_verify_mode  => 'none'
+    # authentication:       :plain,
+    # enable_starttls_auto: true,
+    # :openssl_verify_mode  => 'none'
   }
 
   #####################################################################
