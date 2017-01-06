@@ -89,6 +89,7 @@ class User::Wallet::Credit < User::Wallet::Base
       if target_account == :wallet
 
         if target_user.wallet.add_funds(self.amount)
+          # Credit company wallet balance when funds are transferred from virtual account to wallet
           user.company.account.funds_credited_to_wallet(self.amount)
 
           payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_wallet)
@@ -126,6 +127,8 @@ class User::Wallet::Credit < User::Wallet::Base
         credit_presenter = ItzCash::Credit.(target_user, params)
         if credit_presenter.success?
           initiating_user.wallet.subtract_funds(self.amount)
+          # Reduce company wallet balance when funds are transferred from wallet to card
+          user.company.account.funds_debited_from_wallet(self.amount)
 
           payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_card)
           self.payment = Payment.create payment_attributes
