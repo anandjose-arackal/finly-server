@@ -9,6 +9,7 @@
 #
 
 
+
 class ReportTrackingAction < ActiveRecord::Base
 
 

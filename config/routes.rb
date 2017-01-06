@@ -1,457 +1,485 @@
 # == Route Map
 #
-#                                  Prefix Verb       URI Pattern                                                 Controller#Action
-#                  new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
-#                      admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
-#              destroy_admin_user_session DELETE|GET /admin/logout(.:format)                                     active_admin/devise/sessions#destroy
-#                     admin_user_password POST       /admin/password(.:format)                                   active_admin/devise/passwords#create
-#                 new_admin_user_password GET        /admin/password/new(.:format)                               active_admin/devise/passwords#new
-#                edit_admin_user_password GET        /admin/password/edit(.:format)                              active_admin/devise/passwords#edit
-#                                         PATCH      /admin/password(.:format)                                   active_admin/devise/passwords#update
-#                                         PUT        /admin/password(.:format)                                   active_admin/devise/passwords#update
-#                              admin_root GET        /admin(.:format)                                            admin/dashboard#index
-#          batch_action_admin_admin_users POST       /admin/admin_users/batch_action(.:format)                   admin/admin_users#batch_action
-#                       admin_admin_users GET        /admin/admin_users(.:format)                                admin/admin_users#index
-#                                         POST       /admin/admin_users(.:format)                                admin/admin_users#create
-#                    new_admin_admin_user GET        /admin/admin_users/new(.:format)                            admin/admin_users#new
-#                   edit_admin_admin_user GET        /admin/admin_users/:id/edit(.:format)                       admin/admin_users#edit
-#                        admin_admin_user GET        /admin/admin_users/:id(.:format)                            admin/admin_users#show
-#                                         PATCH      /admin/admin_users/:id(.:format)                            admin/admin_users#update
-#                                         PUT        /admin/admin_users/:id(.:format)                            admin/admin_users#update
-#                                         DELETE     /admin/admin_users/:id(.:format)                            admin/admin_users#destroy
-#            batch_action_admin_companies POST       /admin/companies/batch_action(.:format)                     admin/companies#batch_action
-#                         admin_companies GET        /admin/companies(.:format)                                  admin/companies#index
-#                                         POST       /admin/companies(.:format)                                  admin/companies#create
-#                       new_admin_company GET        /admin/companies/new(.:format)                              admin/companies#new
-#                      edit_admin_company GET        /admin/companies/:id/edit(.:format)                         admin/companies#edit
-#                           admin_company GET        /admin/companies/:id(.:format)                              admin/companies#show
-#                                         PATCH      /admin/companies/:id(.:format)                              admin/companies#update
-#                                         PUT        /admin/companies/:id(.:format)                              admin/companies#update
-#                                         DELETE     /admin/companies/:id(.:format)                              admin/companies#destroy
-#                         admin_dashboard GET        /admin/dashboard(.:format)                                  admin/dashboard#index
-#             batch_action_admin_expenses POST       /admin/expenses/batch_action(.:format)                      admin/expenses#batch_action
-#                          admin_expenses GET        /admin/expenses(.:format)                                   admin/expenses#index
-#                                         POST       /admin/expenses(.:format)                                   admin/expenses#create
-#                       new_admin_expense GET        /admin/expenses/new(.:format)                               admin/expenses#new
-#                      edit_admin_expense GET        /admin/expenses/:id/edit(.:format)                          admin/expenses#edit
-#                           admin_expense GET        /admin/expenses/:id(.:format)                               admin/expenses#show
-#                                         PATCH      /admin/expenses/:id(.:format)                               admin/expenses#update
-#                                         PUT        /admin/expenses/:id(.:format)                               admin/expenses#update
-#                                         DELETE     /admin/expenses/:id(.:format)                               admin/expenses#destroy
-#       batch_action_admin_money_requests POST       /admin/money_requests/batch_action(.:format)                admin/money_requests#batch_action
-#                    admin_money_requests GET        /admin/money_requests(.:format)                             admin/money_requests#index
-#                                         POST       /admin/money_requests(.:format)                             admin/money_requests#create
-#                 new_admin_money_request GET        /admin/money_requests/new(.:format)                         admin/money_requests#new
-#                edit_admin_money_request GET        /admin/money_requests/:id/edit(.:format)                    admin/money_requests#edit
-#                     admin_money_request GET        /admin/money_requests/:id(.:format)                         admin/money_requests#show
-#                                         PATCH      /admin/money_requests/:id(.:format)                         admin/money_requests#update
-#                                         PUT        /admin/money_requests/:id(.:format)                         admin/money_requests#update
-#                                         DELETE     /admin/money_requests/:id(.:format)                         admin/money_requests#destroy
-#             batch_action_admin_policies POST       /admin/policies/batch_action(.:format)                      admin/policies#batch_action
-#                          admin_policies GET        /admin/policies(.:format)                                   admin/policies#index
-#                                         POST       /admin/policies(.:format)                                   admin/policies#create
-#                        new_admin_policy GET        /admin/policies/new(.:format)                               admin/policies#new
-#                       edit_admin_policy GET        /admin/policies/:id/edit(.:format)                          admin/policies#edit
-#                            admin_policy GET        /admin/policies/:id(.:format)                               admin/policies#show
-#                                         PATCH      /admin/policies/:id(.:format)                               admin/policies#update
-#                                         PUT        /admin/policies/:id(.:format)                               admin/policies#update
-#                                         DELETE     /admin/policies/:id(.:format)                               admin/policies#destroy
-#              batch_action_admin_reports POST       /admin/reports/batch_action(.:format)                       admin/reports#batch_action
-#                           admin_reports GET        /admin/reports(.:format)                                    admin/reports#index
-#                                         POST       /admin/reports(.:format)                                    admin/reports#create
-#                        new_admin_report GET        /admin/reports/new(.:format)                                admin/reports#new
-#                       edit_admin_report GET        /admin/reports/:id/edit(.:format)                           admin/reports#edit
-#                            admin_report GET        /admin/reports/:id(.:format)                                admin/reports#show
-#                                         PATCH      /admin/reports/:id(.:format)                                admin/reports#update
-#                                         PUT        /admin/reports/:id(.:format)                                admin/reports#update
-#                                         DELETE     /admin/reports/:id(.:format)                                admin/reports#destroy
-#                batch_action_admin_users POST       /admin/users/batch_action(.:format)                         admin/users#batch_action
-#                             admin_users GET        /admin/users(.:format)                                      admin/users#index
-#                                         POST       /admin/users(.:format)                                      admin/users#create
-#                          new_admin_user GET        /admin/users/new(.:format)                                  admin/users#new
-#                         edit_admin_user GET        /admin/users/:id/edit(.:format)                             admin/users#edit
-#                              admin_user GET        /admin/users/:id(.:format)                                  admin/users#show
-#                                         PATCH      /admin/users/:id(.:format)                                  admin/users#update
-#                                         PUT        /admin/users/:id(.:format)                                  admin/users#update
-#                                         DELETE     /admin/users/:id(.:format)                                  admin/users#destroy
-#                          admin_comments GET        /admin/comments(.:format)                                   admin/comments#index
-#                                         POST       /admin/comments(.:format)                                   admin/comments#create
-#                           admin_comment GET        /admin/comments/:id(.:format)                               admin/comments#show
-#                                         DELETE     /admin/comments/:id(.:format)                               admin/comments#destroy
-#     api_v1_configuration_category_index GET        /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
-#           api_v1_configuration_category GET        /api/v1/configuration/category(.:format)                    api/v1/configuration#category
-#                         email_processor POST       /email/incoming(.:format)                                   griddler/emails#create
-#                               oauth_new GET        /oauth/new(.:format)                                        oauth/auth#new
-#                         oauth_authorize POST       /oauth/authorize(.:format)                                  opro/oauth/auth#create
-#                             oauth_token POST       /oauth/token(.:format)                                      oauth/token#create {:format=>"json"}
-#                       oauth_client_apps GET        /oauth_client_apps(.:format)                                opro/oauth/client_app#index
-#                                         POST       /oauth_client_apps(.:format)                                opro/oauth/client_app#create
-#                    new_oauth_client_app GET        /oauth_client_apps/new(.:format)                            opro/oauth/client_app#new
-#                   edit_oauth_client_app GET        /oauth_client_apps/:id/edit(.:format)                       opro/oauth/client_app#edit
-#                        oauth_client_app GET        /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#show
-#                                         PATCH      /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#update
-#                                         PUT        /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#update
-#                                         DELETE     /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#destroy
-#                              oauth_docs GET        /oauth_docs(.:format)                                       opro/oauth/docs#index
-#                               oauth_doc GET        /oauth_docs/:id(.:format)                                   opro/oauth/docs#show
-#                             oauth_tests GET        /oauth_tests(.:format)                                      opro/oauth/tests#index
-#                                         POST       /oauth_tests(.:format)                                      opro/oauth/tests#create
-#                              oauth_test GET        /oauth_tests/:id(.:format)                                  opro/oauth/tests#show
-#                                         DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
-#                           accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
-#                    preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
-#                        new_user_session GET        /users/sign_in(.:format)                                    devise/sessions#new
-#                            user_session POST       /users/sign_in(.:format)                                    devise/sessions#create
-#                    destroy_user_session DELETE     /users/sign_out(.:format)                                   devise/sessions#destroy
-#                           user_password POST       /users/password(.:format)                                   devise/passwords#create
-#                       new_user_password GET        /users/password/new(.:format)                               devise/passwords#new
-#                      edit_user_password GET        /users/password/edit(.:format)                              devise/passwords#edit
-#                                         PATCH      /users/password(.:format)                                   devise/passwords#update
-#                                         PUT        /users/password(.:format)                                   devise/passwords#update
-#                cancel_user_registration GET        /users/cancel(.:format)                                     devise_invitable/registrations#cancel
-#                       user_registration POST       /users(.:format)                                            devise_invitable/registrations#create
-#                   new_user_registration GET        /users/sign_up(.:format)                                    devise_invitable/registrations#new
-#                  edit_user_registration GET        /users/edit(.:format)                                       devise_invitable/registrations#edit
-#                                         PATCH      /users(.:format)                                            devise_invitable/registrations#update
-#                                         PUT        /users(.:format)                                            devise_invitable/registrations#update
-#                                         DELETE     /users(.:format)                                            devise_invitable/registrations#destroy
-#                       user_confirmation POST       /users/confirmation(.:format)                               devise/confirmations#create
-#                   new_user_confirmation GET        /users/confirmation/new(.:format)                           devise/confirmations#new
-#                                         GET        /users/confirmation(.:format)                               devise/confirmations#show
-#                             user_unlock POST       /users/unlock(.:format)                                     devise/unlocks#create
-#                         new_user_unlock GET        /users/unlock/new(.:format)                                 devise/unlocks#new
-#                                         GET        /users/unlock(.:format)                                     devise/unlocks#show
-#                  accept_user_invitation GET        /users/invitation/accept(.:format)                          devise/invitations#edit
-#                  remove_user_invitation GET        /users/invitation/remove(.:format)                          devise/invitations#destroy
-#                         user_invitation POST       /users/invitation(.:format)                                 devise/invitations#create
-#                     new_user_invitation GET        /users/invitation/new(.:format)                             devise/invitations#new
-#                                         PATCH      /users/invitation(.:format)                                 devise/invitations#update
-#                                         PUT        /users/invitation(.:format)                                 devise/invitations#update
-#                         api_v0_expenses GET        /api/v0/expenses(.:format)                                  api/v0/expenses#index
-#                                         POST       /api/v0/expenses(.:format)                                  api/v0/expenses#create
-#                          api_v0_expense GET        /api/v0/expenses/:id(.:format)                              api/v0/expenses#show
-#                                         PATCH      /api/v0/expenses/:id(.:format)                              api/v0/expenses#update
-#                                         PUT        /api/v0/expenses/:id(.:format)                              api/v0/expenses#update
-#                                         DELETE     /api/v0/expenses/:id(.:format)                              api/v0/expenses#destroy
-#                          api_v0_reports GET        /api/v0/reports(.:format)                                   api/v0/reports#index
-#                                         POST       /api/v0/reports(.:format)                                   api/v0/reports#create
-#                           api_v0_report GET        /api/v0/reports/:id(.:format)                               api/v0/reports#show
-#                                         PATCH      /api/v0/reports/:id(.:format)                               api/v0/reports#update
-#                                         PUT        /api/v0/reports/:id(.:format)                               api/v0/reports#update
-#                                         DELETE     /api/v0/reports/:id(.:format)                               api/v0/reports#destroy
-#                   api_v0_report_comment POST       /api/v0/reports/:report_id/comment(.:format)                api/v0/reports#comment
-#                   api_v0_report_retract PATCH      /api/v0/reports/:report_id/retract(.:format)                api/v0/reports#retract
-#                    api_v0_report_submit PATCH      /api/v0/reports/:report_id/submit(.:format)                 api/v0/reports#submit
-#                   api_v0_report_approve PATCH      /api/v0/reports/:report_id/approve(.:format)                api/v0/reports#approve
-#                 api_v0_report_unapprove PATCH      /api/v0/reports/:report_id/unapprove(.:format)              api/v0/reports#unapprove
-#                    api_v0_report_reject PATCH      /api/v0/reports/:report_id/reject(.:format)                 api/v0/reports#reject
-#     api_v0_report_reimbursement_confirm PATCH      /api/v0/reports/:report_id/reimbursement_confirm(.:format)  api/v0/reports#reimbursement_confirm
-#              api_v0_report_take_control PATCH      /api/v0/reports/:report_id/take_control(.:format)           api/v0/reports#take_control
-#              api_v0_report_add_expenses POST       /api/v0/reports/:report_id/add_expenses(.:format)           api/v0/reports#add_expenses
-#           api_v0_report_remove_expenses DELETE     /api/v0/reports/:report_id/remove_expenses(.:format)        api/v0/reports#remove_expenses
-#            api_v0_report_reject_expense PATCH      /api/v0/reports/:report_id/reject_expense(.:format)         api/v0/reports#reject_expense
-#             api_v0_report_assign_policy POST       /api/v0/reports/:report_id/assign_policy(.:format)          api/v0/reports#assign_policy
-#                                         GET        /api/v0/reports(.:format)                                   api/v0/reports#index
-#                                         POST       /api/v0/reports(.:format)                                   api/v0/reports#create
-#                       new_api_v0_report GET        /api/v0/reports/new(.:format)                               api/v0/reports#new
-#                      edit_api_v0_report GET        /api/v0/reports/:id/edit(.:format)                          api/v0/reports#edit
-#                                         GET        /api/v0/reports/:id(.:format)                               api/v0/reports#show
-#                                         PATCH      /api/v0/reports/:id(.:format)                               api/v0/reports#update
-#                                         PUT        /api/v0/reports/:id(.:format)                               api/v0/reports#update
-#                                         DELETE     /api/v0/reports/:id(.:format)                               api/v0/reports#destroy
-#                         api_v0_receipts GET        /api/v0/receipts(.:format)                                  api/v0/receipts#index
-#                                         POST       /api/v0/receipts(.:format)                                  api/v0/receipts#create
-#                          api_v0_receipt PATCH      /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
-#                                         PUT        /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
-#                                         DELETE     /api/v0/receipts/:id(.:format)                              api/v0/receipts#destroy
-#     api_v0_receipt_expense_from_receipt POST       /api/v0/receipts/:receipt_id/expense_from_receipt(.:format) api/v0/receipts#expense_from_receipt
-#                                         GET        /api/v0/receipts(.:format)                                  api/v0/receipts#index
-#                                         POST       /api/v0/receipts(.:format)                                  api/v0/receipts#create
-#                      new_api_v0_receipt GET        /api/v0/receipts/new(.:format)                              api/v0/receipts#new
-#                     edit_api_v0_receipt GET        /api/v0/receipts/:id/edit(.:format)                         api/v0/receipts#edit
-#                                         GET        /api/v0/receipts/:id(.:format)                              api/v0/receipts#show
-#                                         PATCH      /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
-#                                         PUT        /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
-#                                         DELETE     /api/v0/receipts/:id(.:format)                              api/v0/receipts#destroy
-#         api_v0_configuration_categories GET        /api/v0/configuration/categories(.:format)                  api/v0/configuration/category#index
-#       api_v0_configuration_gcm_register POST       /api/v0/configuration/gcm/register(.:format)                api/v0/configuration/gcm#create
-#     api_v0_configuration_gcm_unregister POST       /api/v0/configuration/gcm/unregister(.:format)              api/v0/configuration/gcm#delete
-#                         api_v1_expenses GET        /api/v1/expenses(.:format)                                  api/v1/expenses#index
-#                                         POST       /api/v1/expenses(.:format)                                  api/v1/expenses#create
-#                          api_v1_expense GET        /api/v1/expenses/:id(.:format)                              api/v1/expenses#show
-#                                         PATCH      /api/v1/expenses/:id(.:format)                              api/v1/expenses#update
-#                                         PUT        /api/v1/expenses/:id(.:format)                              api/v1/expenses#update
-#                                         DELETE     /api/v1/expenses/:id(.:format)                              api/v1/expenses#destroy
-#                          api_v1_reports GET        /api/v1/reports(.:format)                                   api/v1/reports#index
-#                                         POST       /api/v1/reports(.:format)                                   api/v1/reports#create
-#                           api_v1_report GET        /api/v1/reports/:id(.:format)                               api/v1/reports#show
-#                                         PATCH      /api/v1/reports/:id(.:format)                               api/v1/reports#update
-#                                         PUT        /api/v1/reports/:id(.:format)                               api/v1/reports#update
-#                                         DELETE     /api/v1/reports/:id(.:format)                               api/v1/reports#destroy
-#                   api_v1_report_comment POST       /api/v1/reports/:report_id/comment(.:format)                api/v1/reports#comment
-#                                         GET        /api/v1/reports(.:format)                                   api/v1/reports#index
-#                                         POST       /api/v1/reports(.:format)                                   api/v1/reports#create
-#                       new_api_v1_report GET        /api/v1/reports/new(.:format)                               api/v1/reports#new
-#                      edit_api_v1_report GET        /api/v1/reports/:id/edit(.:format)                          api/v1/reports#edit
-#                                         GET        /api/v1/reports/:id(.:format)                               api/v1/reports#show
-#                                         PATCH      /api/v1/reports/:id(.:format)                               api/v1/reports#update
-#                                         PUT        /api/v1/reports/:id(.:format)                               api/v1/reports#update
-#                                         DELETE     /api/v1/reports/:id(.:format)                               api/v1/reports#destroy
-#                   api_v1_money_requests GET        /api/v1/money_requests(.:format)                            api/v1/money_requests#index
-#                                         POST       /api/v1/money_requests(.:format)                            api/v1/money_requests#create
-#                    api_v1_money_request GET        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#show
-#                                         PATCH      /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
-#                                         PUT        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
-#                                         DELETE     /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#destroy
-#            api_v1_money_request_comment POST       /api/v1/money_requests/:money_request_id/comment(.:format)  api/v1/money_requests#comment
-#                                         GET        /api/v1/money_requests(.:format)                            api/v1/money_requests#index
-#                                         POST       /api/v1/money_requests(.:format)                            api/v1/money_requests#create
-#                new_api_v1_money_request GET        /api/v1/money_requests/new(.:format)                        api/v1/money_requests#new
-#               edit_api_v1_money_request GET        /api/v1/money_requests/:id/edit(.:format)                   api/v1/money_requests#edit
-#                                         GET        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#show
-#                                         PATCH      /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
-#                                         PUT        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
-#                                         DELETE     /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#destroy
-#                         api_v1_receipts GET        /api/v1/receipts(.:format)                                  api/v1/receipts#index
-#                                         POST       /api/v1/receipts(.:format)                                  api/v1/receipts#create
-#                          api_v1_receipt PATCH      /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
-#                                         PUT        /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
-#                                         DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
-#                 api_v1_receipt_add_note POST       /api/v1/receipts/:receipt_id/add_note(.:format)             api/v1/receipts#add_note
-#     api_v1_receipt_expense_from_receipt POST       /api/v1/receipts/:receipt_id/expense_from_receipt(.:format) api/v1/receipts#expense_from_receipt
-#                                         GET        /api/v1/receipts(.:format)                                  api/v1/receipts#index
-#                                         POST       /api/v1/receipts(.:format)                                  api/v1/receipts#create
-#                      new_api_v1_receipt GET        /api/v1/receipts/new(.:format)                              api/v1/receipts#new
-#                     edit_api_v1_receipt GET        /api/v1/receipts/:id/edit(.:format)                         api/v1/receipts#edit
-#                                         GET        /api/v1/receipts/:id(.:format)                              api/v1/receipts#show
-#                                         PATCH      /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
-#                                         PUT        /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
-#                                         DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
-#                            api_v1_users GET        /api/v1/users(.:format)                                     api/v1/users#index
-#                             api_v1_user GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
-#                                  api_v1 POST       /api/v1/cards/:id/balance/update(.:format)                  api/v1/cards#update_balance
-#                                         POST       /api/v1/cards/:id/status/update(.:format)                   api/v1/cards#update_status
-#         api_v1_configuration_categories GET        /api/v1/configuration/categories(.:format)                  api/v1/configuration/category#index
-#       api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
-#     api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
-#                  policies_expense_rules GET        /policies/expense_rules(.:format)                           policies#expense_rules
-#                   policies_budget_rules GET        /policies/budget_rules(.:format)                            policies#budget_rules
-#                 policies_policy_members GET        /policies/policy_members(.:format)                          policies#policy_members
-#                    policies_create_rule GET        /policies/create_rule(.:format)                             policies#create_rule
-#         policies_policy_member_settings GET        /policies/policy_member_settings(.:format)                  policies#policy_member_settings
-#                        policies_details GET        /policies/details(.:format)                                 policies#details
-#                                policies GET        /policies(.:format)                                         policies#index
-#                                         POST       /policies(.:format)                                         policies#create
-#                                  policy GET        /policies/:id(.:format)                                     policies#show
-#                                         PATCH      /policies/:id(.:format)                                     policies#update
-#                                         PUT        /policies/:id(.:format)                                     policies#update
-#                                         DELETE     /policies/:id(.:format)                                     policies#destroy
-#                  policy_invitable_users POST       /policies/:policy_id/invitable_users(.:format)              policies#invitable_users
-#                        policy_add_users POST       /policies/:policy_id/add_users(.:format)                    policies#add_users
-#                     policy_remove_users POST       /policies/:policy_id/remove_users(.:format)                 policies#remove_users
-#        policy_update_user_configuration PATCH      /policies/:policy_id/update_users_configuration(.:format)   policies#update_user_configuration
-#                  policy_destroy_mapping DELETE     /policies/:policy_id/remove_mapping/:mapping_id(.:format)   policies#destrot_mapping
-#                         policy_add_rule POST       /policies/:policy_id/add_rule(.:format)                     rules#create
-#                      policy_remove_rule DELETE     /policies/:policy_id/remove_rule(.:format)                  rules#destroy
-#                                         GET        /policies(.:format)                                         policies#index
-#                                         POST       /policies(.:format)                                         policies#create
-#                              new_policy GET        /policies/new(.:format)                                     policies#new
-#                             edit_policy GET        /policies/:id/edit(.:format)                                policies#edit
-#                                         GET        /policies/:id(.:format)                                     policies#show
-#                                         PATCH      /policies/:id(.:format)                                     policies#update
-#                                         PUT        /policies/:id(.:format)                                     policies#update
-#                                         DELETE     /policies/:id(.:format)                                     policies#destroy
-#                              categories GET        /categories(.:format)                                       categories#index
-#                                         POST       /categories(.:format)                                       categories#create
-#                            new_category GET        /categories/new(.:format)                                   categories#new
-#                           edit_category GET        /categories/:id/edit(.:format)                              categories#edit
-#                                category GET        /categories/:id(.:format)                                   categories#show
-#                                         PATCH      /categories/:id(.:format)                                   categories#update
-#                                         PUT        /categories/:id(.:format)                                   categories#update
-#                                         DELETE     /categories/:id(.:format)                                   categories#destroy
-#                      export_preferences GET        /export_preferences(.:format)                               export_preferences#index
-#                                         POST       /export_preferences(.:format)                               export_preferences#create
-#                   new_export_preference GET        /export_preferences/new(.:format)                           export_preferences#new
-#                  edit_export_preference GET        /export_preferences/:id/edit(.:format)                      export_preferences#edit
-#                       export_preference GET        /export_preferences/:id(.:format)                           export_preferences#show
-#                                         PATCH      /export_preferences/:id(.:format)                           export_preferences#update
-#                                         PUT        /export_preferences/:id(.:format)                           export_preferences#update
-#                                         DELETE     /export_preferences/:id(.:format)                           export_preferences#destroy
-#                        companies_notify GET        /companies/notify(.:format)                                 companies#notify
-#                     company_add_balance POST       /companies/:company_id/add_balance(.:format)                companies#add_balance
-#                               companies GET        /companies(.:format)                                        companies#index
-#                                         POST       /companies(.:format)                                        companies#create
-#                             new_company GET        /companies/new(.:format)                                    companies#new
-#                            edit_company GET        /companies/:id/edit(.:format)                               companies#edit
-#                                 company GET        /companies/:id(.:format)                                    companies#show
-#                                         PATCH      /companies/:id(.:format)                                    companies#update
-#                                         PUT        /companies/:id(.:format)                                    companies#update
-#                                         DELETE     /companies/:id(.:format)                                    companies#destroy
-#      organization_account_policies_list GET        /organization_account/policies_list(.:format)               organization_account#policies_list
-#         organization_account_categories GET        /organization_account/categories(.:format)                  organization_account#categories
-# organization_account_export_preferences GET        /organization_account/export_preferences(.:format)          organization_account#export_preferences
-#                            add_category POST       /add_category(.:format)                                     organization_account#add_category
-#                         remove_category DELETE     /remove_category(.:format)                                  organization_account#remove_category
-#                update_export_preference PATCH      /export/:id/update(.:format)                                organization_account#update_export_column
-#                        add_export_field POST       /add_export_field(.:format)                                 organization_account#add_export_column
-#                     delete_export_field DELETE     /remove_export_field(.:format)                              organization_account#remove_export_column
-#                                  people GET        /people(.:format)                                           people#people
-#                           verify_mobile GET        /users/verify(.:format)                                     otp#edit
-#                    update_mobile_number POST       /otp/update(.:format)                                       otp#update
-#                              verify_otp POST       /otp/verify(.:format)                                       otp#verify
-#                              resend_otp POST       /otp/resend(.:format)                                       otp#resend
-#                            card_details POST       /cards/details(.:format)                                    cards#details
-#                          update_balance POST       /cards/update_balance(.:format)                             cards#update_balance
-#                      update_card_status POST       /cards/update_status(.:format)                              cards#update_status
-#                                 reports GET        /reports(.:format)                                          reports#index
-#                                         POST       /reports(.:format)                                          reports#create
-#                                  report GET        /reports/:id(.:format)                                      reports#show
-#                                         PATCH      /reports/:id(.:format)                                      reports#update
-#                                         PUT        /reports/:id(.:format)                                      reports#update
-#                                         DELETE     /reports/:id(.:format)                                      reports#destroy
-#                           export_report GET        /export/report(.:format)                                    export#report
-#                          report_comment POST       /reports/:report_id/comment(.:format)                       reports#comment
-#                          report_retract PATCH      /reports/:report_id/retract(.:format)                       reports#retract
-#                           report_submit PATCH      /reports/:report_id/submit(.:format)                        reports#submit
-#                          report_approve PATCH      /reports/:report_id/approve(.:format)                       reports#approve
-#                        report_unapprove PATCH      /reports/:report_id/unapprove(.:format)                     reports#unapprove
-#                           report_reject PATCH      /reports/:report_id/reject(.:format)                        reports#reject
-#                   report_reject_expense PATCH      /reports/:report_id/reject_expense(.:format)                reports#reject_expense
-#            report_reimbursement_confirm PATCH      /reports/:report_id/reimbursement_confirm(.:format)         reports#reimbursement_confirm
-#                     report_take_control PATCH      /reports/:report_id/take_control(.:format)                  reports#take_control
-#                     report_add_expenses POST       /reports/:report_id/add_expenses(.:format)                  reports#add_expenses
-#                  report_remove_expenses DELETE     /reports/:report_id/remove_expenses(.:format)               reports#remove_expenses
-#                                         GET        /reports(.:format)                                          reports#index
-#                                         POST       /reports(.:format)                                          reports#create
-#                              new_report GET        /reports/new(.:format)                                      reports#new
-#                             edit_report GET        /reports/:id/edit(.:format)                                 reports#edit
-#                                         GET        /reports/:id(.:format)                                      reports#show
-#                                         PATCH      /reports/:id(.:format)                                      reports#update
-#                                         PUT        /reports/:id(.:format)                                      reports#update
-#                                         DELETE     /reports/:id(.:format)                                      reports#destroy
-#                     money_request_index GET        /money_request(.:format)                                    money_request#index
-#                                         POST       /money_request(.:format)                                    money_request#create
-#                           money_request GET        /money_request/:id(.:format)                                money_request#show
-#                                         PATCH      /money_request/:id(.:format)                                money_request#update
-#                                         PUT        /money_request/:id(.:format)                                money_request#update
-#                                         DELETE     /money_request/:id(.:format)                                money_request#destroy
-#                   money_request_comment POST       /money_request/:money_request_id/comment(.:format)          money_request#comment
-#                                         GET        /money_request(.:format)                                    money_request#index
-#                                         POST       /money_request(.:format)                                    money_request#create
-#                       new_money_request GET        /money_request/new(.:format)                                money_request#new
-#                      edit_money_request GET        /money_request/:id/edit(.:format)                           money_request#edit
-#                                         GET        /money_request/:id(.:format)                                money_request#show
-#                                         PATCH      /money_request/:id(.:format)                                money_request#update
-#                                         PUT        /money_request/:id(.:format)                                money_request#update
-#                                         DELETE     /money_request/:id(.:format)                                money_request#destroy
-#                  expense_attach_receipt POST       /expenses/:expense_id/attach_receipt(.:format)              expenses#attach_receipt
-#                  expense_detach_receipt POST       /expenses/:expense_id/detach_receipt(.:format)              expenses#detach_receipt
-#                     expense_add_receipt POST       /expenses/:expense_id/add_receipt(.:format)                 expenses#add_receipt
-#                                expenses GET        /expenses(.:format)                                         expenses#index
-#                                         POST       /expenses(.:format)                                         expenses#create
-#                             new_expense GET        /expenses/new(.:format)                                     expenses#new
-#                            edit_expense GET        /expenses/:id/edit(.:format)                                expenses#edit
-#                                 expense GET        /expenses/:id(.:format)                                     expenses#show
-#                                         PATCH      /expenses/:id(.:format)                                     expenses#update
-#                                         PUT        /expenses/:id(.:format)                                     expenses#update
-#                                         DELETE     /expenses/:id(.:format)                                     expenses#destroy
-#                     expenses_unreported POST       /expenses/unreported(.:format)                              expenses#unreported
-#                        receipt_add_note POST       /receipts/:receipt_id/add_note(.:format)                    receipts#add_note
-#                                receipts GET        /receipts(.:format)                                         receipts#index
-#                                         POST       /receipts(.:format)                                         receipts#create
-#                             new_receipt GET        /receipts/new(.:format)                                     receipts#new
-#                            edit_receipt GET        /receipts/:id/edit(.:format)                                receipts#edit
-#                                 receipt GET        /receipts/:id(.:format)                                     receipts#show
-#                                         PATCH      /receipts/:id(.:format)                                     receipts#update
-#                                         PUT        /receipts/:id(.:format)                                     receipts#update
-#                                         DELETE     /receipts/:id(.:format)                                     receipts#destroy
-#                    expense_from_receipt POST       /expense_from_receipt(.:format)                             receipts#expense_from_receipt
-#                      users_get_managers GET        /users/get_managers(.:format)                               users#get_managers
-#                      users_user_profile GET        /users/user_profile(.:format)                               users#user_profile
-#                      users_user_balance GET        /users/user_balance(.:format)                               users#user_balance
-#                     users_user_security GET        /users/user_security(.:format)                              users#user_security
-#                                   users GET        /users(.:format)                                            users#index
-#                                         POST       /users(.:format)                                            users#create
-#                                    user GET        /users/:id(.:format)                                        users#show
-#                                         PATCH      /users/:id(.:format)                                        users#update
-#                                         PUT        /users/:id(.:format)                                        users#update
-#                                         DELETE     /users/:id(.:format)                                        users#destroy
-#                            user_details POST       /users/:user_id/user_details(.:format)                      users#user_details
-#                        user_update_team PATCH      /users/:user_id/update_user_team(.:format)                  users#update_team
-#                        user_update_role PATCH      /users/:user_id/update_role(.:format)                       users#update_user_role
-#                            user_profile GET        /users/:user_id/profile(.:format)                           users#profile
-#                    user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
-#                            user_balance GET        /users/:user_id/balance(.:format)                           users#balance
-#                                         GET        /users(.:format)                                            users#index
-#                                         POST       /users(.:format)                                            users#create
-#                                new_user GET        /users/new(.:format)                                        users#new
-#                               edit_user GET        /users/:id/edit(.:format)                                   users#edit
-#                                         GET        /users/:id(.:format)                                        users#show
-#                                         PATCH      /users/:id(.:format)                                        users#update
-#                                         PUT        /users/:id(.:format)                                        users#update
-#                                         DELETE     /users/:id(.:format)                                        users#destroy
-#                             mass_import GET        /mass_import(.:format)                                      users#mass_import
-#                             user_import POST       /import(.:format)                                           users#import
-#                         pending_invites POST       /pending_invites(.:format)                                  pending_invites#create
-#                     edit_pending_invite GET        /pending_invites/:id/edit(.:format)                         pending_invites#edit
-#                          pending_invite PATCH      /pending_invites/:id(.:format)                              pending_invites#update
-#                                         PUT        /pending_invites/:id(.:format)                              pending_invites#update
-#                                         DELETE     /pending_invites/:id(.:format)                              pending_invites#destroy
-#                   pending_invite_accept PATCH      /pending_invites/:pending_invite_id/accept(.:format)        pending_invites#accept
-#                                         GET        /pending_invites(.:format)                                  pending_invites#index
-#                                         POST       /pending_invites(.:format)                                  pending_invites#create
-#                      new_pending_invite GET        /pending_invites/new(.:format)                              pending_invites#new
-#                                         GET        /pending_invites/:id/edit(.:format)                         pending_invites#edit
-#                                         GET        /pending_invites/:id(.:format)                              pending_invites#show
-#                                         PATCH      /pending_invites/:id(.:format)                              pending_invites#update
-#                                         PUT        /pending_invites/:id(.:format)                              pending_invites#update
-#                                         DELETE     /pending_invites/:id(.:format)                              pending_invites#destroy
-#                     settlements_summary GET        /settlements/summary(.:format)                              settlements#summary
-#                             settlements GET        /settlements(.:format)                                      settlements#index
-#                                         POST       /settlements(.:format)                                      settlements#create
-#                          new_settlement GET        /settlements/new(.:format)                                  settlements#new
-#                         edit_settlement GET        /settlements/:id/edit(.:format)                             settlements#edit
-#                              settlement GET        /settlements/:id(.:format)                                  settlements#show
-#                                         PATCH      /settlements/:id(.:format)                                  settlements#update
-#                                         PUT        /settlements/:id(.:format)                                  settlements#update
-#                                         DELETE     /settlements/:id(.:format)                                  settlements#destroy
-#                  settlement_add_payment POST       /settlements/:id/add_payment(.:format)                      settlements#add_payment
-#                                         GET        /receipts(.:format)                                         receipts#index
-#                                         POST       /receipts(.:format)                                         receipts#create
-#                                         GET        /receipts/new(.:format)                                     receipts#new
-#                                         GET        /receipts/:id/edit(.:format)                                receipts#edit
-#                                         GET        /receipts/:id(.:format)                                     receipts#show
-#                                         PATCH      /receipts/:id(.:format)                                     receipts#update
-#                                         PUT        /receipts/:id(.:format)                                     receipts#update
-#                                         DELETE     /receipts/:id(.:format)                                     receipts#destroy
-#            superadmin_company_new_admin POST       /superadmin/companies/:company_id/add_admin(.:format)       superadmin/companies#add_admin
-#                    superadmin_companies GET        /superadmin/companies(.:format)                             superadmin/companies#index
-#                                         POST       /superadmin/companies(.:format)                             superadmin/companies#create
-#                  new_superadmin_company GET        /superadmin/companies/new(.:format)                         superadmin/companies#new
-#                 edit_superadmin_company GET        /superadmin/companies/:id/edit(.:format)                    superadmin/companies#edit
-#                      superadmin_company GET        /superadmin/companies/:id(.:format)                         superadmin/companies#show
-#                                         PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
-#                                         PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
-#                                         DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
-#                                         GET        /statements/:id/summary(.:format)                           statements#summary
-#                        export_statement GET        /export/:id/statement(.:format)                             export#statement
-#                              statements GET        /statements(.:format)                                       statements#index
-#                                         POST       /statements(.:format)                                       statements#create
-#                           new_statement GET        /statements/new(.:format)                                   statements#new
-#                          edit_statement GET        /statements/:id/edit(.:format)                              statements#edit
-#                               statement GET        /statements/:id(.:format)                                   statements#show
-#                                         PATCH      /statements/:id(.:format)                                   statements#update
-#                                         PUT        /statements/:id(.:format)                                   statements#update
-#                                         DELETE     /statements/:id(.:format)                                   statements#destroy
-#                                    root GET        /                                                           home#index
-#                                 welcome GET        /welcome(.:format)                                          home#welcome
-#                                   about GET        /about(.:format)                                            home#about
-#                   autocomplete_merchant GET        /autocomplete/merchant(.:format)                            autocomplete#merchant
-#                       autocomplete_user GET        /autocomplete/user(.:format)                                autocomplete#user
-#                     external_url_report GET        /external/reports/:id(.:format)                             external_url#report
-#                 external_url_settlement GET        /external/settlements/:id(.:format)                         external_url#payment
-#                               analytics GET        /analytics(.:format)                                        analytics#show
-#                                         GET        /companies/notify(.:format)                                 companies#notify
+#                                   Prefix Verb       URI Pattern                                                 Controller#Action
+#                   new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
+#                       admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
+#               destroy_admin_user_session DELETE|GET /admin/logout(.:format)                                     active_admin/devise/sessions#destroy
+#                      admin_user_password POST       /admin/password(.:format)                                   active_admin/devise/passwords#create
+#                  new_admin_user_password GET        /admin/password/new(.:format)                               active_admin/devise/passwords#new
+#                 edit_admin_user_password GET        /admin/password/edit(.:format)                              active_admin/devise/passwords#edit
+#                                          PATCH      /admin/password(.:format)                                   active_admin/devise/passwords#update
+#                                          PUT        /admin/password(.:format)                                   active_admin/devise/passwords#update
+#                               admin_root GET        /admin(.:format)                                            admin/dashboard#index
+#           batch_action_admin_admin_users POST       /admin/admin_users/batch_action(.:format)                   admin/admin_users#batch_action
+#                        admin_admin_users GET        /admin/admin_users(.:format)                                admin/admin_users#index
+#                                          POST       /admin/admin_users(.:format)                                admin/admin_users#create
+#                     new_admin_admin_user GET        /admin/admin_users/new(.:format)                            admin/admin_users#new
+#                    edit_admin_admin_user GET        /admin/admin_users/:id/edit(.:format)                       admin/admin_users#edit
+#                         admin_admin_user GET        /admin/admin_users/:id(.:format)                            admin/admin_users#show
+#                                          PATCH      /admin/admin_users/:id(.:format)                            admin/admin_users#update
+#                                          PUT        /admin/admin_users/:id(.:format)                            admin/admin_users#update
+#                                          DELETE     /admin/admin_users/:id(.:format)                            admin/admin_users#destroy
+#             batch_action_admin_companies POST       /admin/companies/batch_action(.:format)                     admin/companies#batch_action
+#                          admin_companies GET        /admin/companies(.:format)                                  admin/companies#index
+#                                          POST       /admin/companies(.:format)                                  admin/companies#create
+#                        new_admin_company GET        /admin/companies/new(.:format)                              admin/companies#new
+#                       edit_admin_company GET        /admin/companies/:id/edit(.:format)                         admin/companies#edit
+#                            admin_company GET        /admin/companies/:id(.:format)                              admin/companies#show
+#                                          PATCH      /admin/companies/:id(.:format)                              admin/companies#update
+#                                          PUT        /admin/companies/:id(.:format)                              admin/companies#update
+#                                          DELETE     /admin/companies/:id(.:format)                              admin/companies#destroy
+#                          admin_dashboard GET        /admin/dashboard(.:format)                                  admin/dashboard#index
+#              batch_action_admin_expenses POST       /admin/expenses/batch_action(.:format)                      admin/expenses#batch_action
+#                           admin_expenses GET        /admin/expenses(.:format)                                   admin/expenses#index
+#                                          POST       /admin/expenses(.:format)                                   admin/expenses#create
+#                        new_admin_expense GET        /admin/expenses/new(.:format)                               admin/expenses#new
+#                       edit_admin_expense GET        /admin/expenses/:id/edit(.:format)                          admin/expenses#edit
+#                            admin_expense GET        /admin/expenses/:id(.:format)                               admin/expenses#show
+#                                          PATCH      /admin/expenses/:id(.:format)                               admin/expenses#update
+#                                          PUT        /admin/expenses/:id(.:format)                               admin/expenses#update
+#                                          DELETE     /admin/expenses/:id(.:format)                               admin/expenses#destroy
+#        batch_action_admin_money_requests POST       /admin/money_requests/batch_action(.:format)                admin/money_requests#batch_action
+#                     admin_money_requests GET        /admin/money_requests(.:format)                             admin/money_requests#index
+#                                          POST       /admin/money_requests(.:format)                             admin/money_requests#create
+#                  new_admin_money_request GET        /admin/money_requests/new(.:format)                         admin/money_requests#new
+#                 edit_admin_money_request GET        /admin/money_requests/:id/edit(.:format)                    admin/money_requests#edit
+#                      admin_money_request GET        /admin/money_requests/:id(.:format)                         admin/money_requests#show
+#                                          PATCH      /admin/money_requests/:id(.:format)                         admin/money_requests#update
+#                                          PUT        /admin/money_requests/:id(.:format)                         admin/money_requests#update
+#                                          DELETE     /admin/money_requests/:id(.:format)                         admin/money_requests#destroy
+#              batch_action_admin_policies POST       /admin/policies/batch_action(.:format)                      admin/policies#batch_action
+#                           admin_policies GET        /admin/policies(.:format)                                   admin/policies#index
+#                                          POST       /admin/policies(.:format)                                   admin/policies#create
+#                         new_admin_policy GET        /admin/policies/new(.:format)                               admin/policies#new
+#                        edit_admin_policy GET        /admin/policies/:id/edit(.:format)                          admin/policies#edit
+#                             admin_policy GET        /admin/policies/:id(.:format)                               admin/policies#show
+#                                          PATCH      /admin/policies/:id(.:format)                               admin/policies#update
+#                                          PUT        /admin/policies/:id(.:format)                               admin/policies#update
+#                                          DELETE     /admin/policies/:id(.:format)                               admin/policies#destroy
+# batch_action_admin_preview_registrations POST       /admin/preview_registrations/batch_action(.:format)         admin/preview_registrations#batch_action
+#              admin_preview_registrations GET        /admin/preview_registrations(.:format)                      admin/preview_registrations#index
+#                                          POST       /admin/preview_registrations(.:format)                      admin/preview_registrations#create
+#           new_admin_preview_registration GET        /admin/preview_registrations/new(.:format)                  admin/preview_registrations#new
+#          edit_admin_preview_registration GET        /admin/preview_registrations/:id/edit(.:format)             admin/preview_registrations#edit
+#               admin_preview_registration GET        /admin/preview_registrations/:id(.:format)                  admin/preview_registrations#show
+#                                          PATCH      /admin/preview_registrations/:id(.:format)                  admin/preview_registrations#update
+#                                          PUT        /admin/preview_registrations/:id(.:format)                  admin/preview_registrations#update
+#                                          DELETE     /admin/preview_registrations/:id(.:format)                  admin/preview_registrations#destroy
+#               batch_action_admin_reports POST       /admin/reports/batch_action(.:format)                       admin/reports#batch_action
+#                            admin_reports GET        /admin/reports(.:format)                                    admin/reports#index
+#                                          POST       /admin/reports(.:format)                                    admin/reports#create
+#                         new_admin_report GET        /admin/reports/new(.:format)                                admin/reports#new
+#                        edit_admin_report GET        /admin/reports/:id/edit(.:format)                           admin/reports#edit
+#                             admin_report GET        /admin/reports/:id(.:format)                                admin/reports#show
+#                                          PATCH      /admin/reports/:id(.:format)                                admin/reports#update
+#                                          PUT        /admin/reports/:id(.:format)                                admin/reports#update
+#                                          DELETE     /admin/reports/:id(.:format)                                admin/reports#destroy
+#                 batch_action_admin_users POST       /admin/users/batch_action(.:format)                         admin/users#batch_action
+#                              admin_users GET        /admin/users(.:format)                                      admin/users#index
+#                                          POST       /admin/users(.:format)                                      admin/users#create
+#                           new_admin_user GET        /admin/users/new(.:format)                                  admin/users#new
+#                          edit_admin_user GET        /admin/users/:id/edit(.:format)                             admin/users#edit
+#                               admin_user GET        /admin/users/:id(.:format)                                  admin/users#show
+#                                          PATCH      /admin/users/:id(.:format)                                  admin/users#update
+#                                          PUT        /admin/users/:id(.:format)                                  admin/users#update
+#                                          DELETE     /admin/users/:id(.:format)                                  admin/users#destroy
+#                           admin_comments GET        /admin/comments(.:format)                                   admin/comments#index
+#                                          POST       /admin/comments(.:format)                                   admin/comments#create
+#                            admin_comment GET        /admin/comments/:id(.:format)                               admin/comments#show
+#                                          DELETE     /admin/comments/:id(.:format)                               admin/comments#destroy
+#      api_v1_configuration_category_index GET        /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
+#            api_v1_configuration_category GET        /api/v1/configuration/category(.:format)                    api/v1/configuration#category
+#                          email_processor POST       /email/incoming(.:format)                                   griddler/emails#create
+#                                oauth_new GET        /oauth/new(.:format)                                        oauth/auth#new
+#                          oauth_authorize POST       /oauth/authorize(.:format)                                  opro/oauth/auth#create
+#                              oauth_token POST       /oauth/token(.:format)                                      oauth/token#create {:format=>"json"}
+#                        oauth_client_apps GET        /oauth_client_apps(.:format)                                opro/oauth/client_app#index
+#                                          POST       /oauth_client_apps(.:format)                                opro/oauth/client_app#create
+#                     new_oauth_client_app GET        /oauth_client_apps/new(.:format)                            opro/oauth/client_app#new
+#                    edit_oauth_client_app GET        /oauth_client_apps/:id/edit(.:format)                       opro/oauth/client_app#edit
+#                         oauth_client_app GET        /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#show
+#                                          PATCH      /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#update
+#                                          PUT        /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#update
+#                                          DELETE     /oauth_client_apps/:id(.:format)                            opro/oauth/client_app#destroy
+#                               oauth_docs GET        /oauth_docs(.:format)                                       opro/oauth/docs#index
+#                                oauth_doc GET        /oauth_docs/:id(.:format)                                   opro/oauth/docs#show
+#                              oauth_tests GET        /oauth_tests(.:format)                                      opro/oauth/tests#index
+#                                          POST       /oauth_tests(.:format)                                      opro/oauth/tests#create
+#                               oauth_test GET        /oauth_tests/:id(.:format)                                  opro/oauth/tests#show
+#                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
+#                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
+#                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
+#                         new_user_session GET        /users/sign_in(.:format)                                    devise/sessions#new
+#                             user_session POST       /users/sign_in(.:format)                                    devise/sessions#create
+#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   devise/sessions#destroy
+#                            user_password POST       /users/password(.:format)                                   passwords#create
+#                        new_user_password GET        /users/password/new(.:format)                               passwords#new
+#                       edit_user_password GET        /users/password/edit(.:format)                              passwords#edit
+#                                          PATCH      /users/password(.:format)                                   passwords#update
+#                                          PUT        /users/password(.:format)                                   passwords#update
+#                 cancel_user_registration GET        /users/cancel(.:format)                                     devise_invitable/registrations#cancel
+#                        user_registration POST       /users(.:format)                                            devise_invitable/registrations#create
+#                    new_user_registration GET        /users/sign_up(.:format)                                    devise_invitable/registrations#new
+#                   edit_user_registration GET        /users/edit(.:format)                                       devise_invitable/registrations#edit
+#                                          PATCH      /users(.:format)                                            devise_invitable/registrations#update
+#                                          PUT        /users(.:format)                                            devise_invitable/registrations#update
+#                                          DELETE     /users(.:format)                                            devise_invitable/registrations#destroy
+#                        user_confirmation POST       /users/confirmation(.:format)                               devise/confirmations#create
+#                    new_user_confirmation GET        /users/confirmation/new(.:format)                           devise/confirmations#new
+#                                          GET        /users/confirmation(.:format)                               devise/confirmations#show
+#                              user_unlock POST       /users/unlock(.:format)                                     devise/unlocks#create
+#                          new_user_unlock GET        /users/unlock/new(.:format)                                 devise/unlocks#new
+#                                          GET        /users/unlock(.:format)                                     devise/unlocks#show
+#                   accept_user_invitation GET        /users/invitation/accept(.:format)                          devise/invitations#edit
+#                   remove_user_invitation GET        /users/invitation/remove(.:format)                          devise/invitations#destroy
+#                          user_invitation POST       /users/invitation(.:format)                                 devise/invitations#create
+#                      new_user_invitation GET        /users/invitation/new(.:format)                             devise/invitations#new
+#                                          PATCH      /users/invitation(.:format)                                 devise/invitations#update
+#                                          PUT        /users/invitation(.:format)                                 devise/invitations#update
+#                          api_v0_expenses GET        /api/v0/expenses(.:format)                                  api/v0/expenses#index
+#                                          POST       /api/v0/expenses(.:format)                                  api/v0/expenses#create
+#                           api_v0_expense GET        /api/v0/expenses/:id(.:format)                              api/v0/expenses#show
+#                                          PATCH      /api/v0/expenses/:id(.:format)                              api/v0/expenses#update
+#                                          PUT        /api/v0/expenses/:id(.:format)                              api/v0/expenses#update
+#                                          DELETE     /api/v0/expenses/:id(.:format)                              api/v0/expenses#destroy
+#                           api_v0_reports GET        /api/v0/reports(.:format)                                   api/v0/reports#index
+#                                          POST       /api/v0/reports(.:format)                                   api/v0/reports#create
+#                            api_v0_report GET        /api/v0/reports/:id(.:format)                               api/v0/reports#show
+#                                          PATCH      /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                          PUT        /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                          DELETE     /api/v0/reports/:id(.:format)                               api/v0/reports#destroy
+#                    api_v0_report_comment POST       /api/v0/reports/:report_id/comment(.:format)                api/v0/reports#comment
+#                    api_v0_report_retract PATCH      /api/v0/reports/:report_id/retract(.:format)                api/v0/reports#retract
+#                     api_v0_report_submit PATCH      /api/v0/reports/:report_id/submit(.:format)                 api/v0/reports#submit
+#                    api_v0_report_approve PATCH      /api/v0/reports/:report_id/approve(.:format)                api/v0/reports#approve
+#                  api_v0_report_unapprove PATCH      /api/v0/reports/:report_id/unapprove(.:format)              api/v0/reports#unapprove
+#                     api_v0_report_reject PATCH      /api/v0/reports/:report_id/reject(.:format)                 api/v0/reports#reject
+#      api_v0_report_reimbursement_confirm PATCH      /api/v0/reports/:report_id/reimbursement_confirm(.:format)  api/v0/reports#reimbursement_confirm
+#               api_v0_report_take_control PATCH      /api/v0/reports/:report_id/take_control(.:format)           api/v0/reports#take_control
+#               api_v0_report_add_expenses POST       /api/v0/reports/:report_id/add_expenses(.:format)           api/v0/reports#add_expenses
+#            api_v0_report_remove_expenses DELETE     /api/v0/reports/:report_id/remove_expenses(.:format)        api/v0/reports#remove_expenses
+#             api_v0_report_reject_expense PATCH      /api/v0/reports/:report_id/reject_expense(.:format)         api/v0/reports#reject_expense
+#              api_v0_report_assign_policy POST       /api/v0/reports/:report_id/assign_policy(.:format)          api/v0/reports#assign_policy
+#                                          GET        /api/v0/reports(.:format)                                   api/v0/reports#index
+#                                          POST       /api/v0/reports(.:format)                                   api/v0/reports#create
+#                        new_api_v0_report GET        /api/v0/reports/new(.:format)                               api/v0/reports#new
+#                       edit_api_v0_report GET        /api/v0/reports/:id/edit(.:format)                          api/v0/reports#edit
+#                                          GET        /api/v0/reports/:id(.:format)                               api/v0/reports#show
+#                                          PATCH      /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                          PUT        /api/v0/reports/:id(.:format)                               api/v0/reports#update
+#                                          DELETE     /api/v0/reports/:id(.:format)                               api/v0/reports#destroy
+#                          api_v0_receipts GET        /api/v0/receipts(.:format)                                  api/v0/receipts#index
+#                                          POST       /api/v0/receipts(.:format)                                  api/v0/receipts#create
+#                           api_v0_receipt PATCH      /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                          PUT        /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                          DELETE     /api/v0/receipts/:id(.:format)                              api/v0/receipts#destroy
+#      api_v0_receipt_expense_from_receipt POST       /api/v0/receipts/:receipt_id/expense_from_receipt(.:format) api/v0/receipts#expense_from_receipt
+#                                          GET        /api/v0/receipts(.:format)                                  api/v0/receipts#index
+#                                          POST       /api/v0/receipts(.:format)                                  api/v0/receipts#create
+#                       new_api_v0_receipt GET        /api/v0/receipts/new(.:format)                              api/v0/receipts#new
+#                      edit_api_v0_receipt GET        /api/v0/receipts/:id/edit(.:format)                         api/v0/receipts#edit
+#                                          GET        /api/v0/receipts/:id(.:format)                              api/v0/receipts#show
+#                                          PATCH      /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                          PUT        /api/v0/receipts/:id(.:format)                              api/v0/receipts#update
+#                                          DELETE     /api/v0/receipts/:id(.:format)                              api/v0/receipts#destroy
+#          api_v0_configuration_categories GET        /api/v0/configuration/categories(.:format)                  api/v0/configuration/category#index
+#        api_v0_configuration_gcm_register POST       /api/v0/configuration/gcm/register(.:format)                api/v0/configuration/gcm#create
+#      api_v0_configuration_gcm_unregister POST       /api/v0/configuration/gcm/unregister(.:format)              api/v0/configuration/gcm#delete
+#                          api_v1_expenses GET        /api/v1/expenses(.:format)                                  api/v1/expenses#index
+#                                          POST       /api/v1/expenses(.:format)                                  api/v1/expenses#create
+#                           api_v1_expense GET        /api/v1/expenses/:id(.:format)                              api/v1/expenses#show
+#                                          PATCH      /api/v1/expenses/:id(.:format)                              api/v1/expenses#update
+#                                          PUT        /api/v1/expenses/:id(.:format)                              api/v1/expenses#update
+#                                          DELETE     /api/v1/expenses/:id(.:format)                              api/v1/expenses#destroy
+#                           api_v1_reports GET        /api/v1/reports(.:format)                                   api/v1/reports#index
+#                                          POST       /api/v1/reports(.:format)                                   api/v1/reports#create
+#                            api_v1_report GET        /api/v1/reports/:id(.:format)                               api/v1/reports#show
+#                                          PATCH      /api/v1/reports/:id(.:format)                               api/v1/reports#update
+#                                          PUT        /api/v1/reports/:id(.:format)                               api/v1/reports#update
+#                                          DELETE     /api/v1/reports/:id(.:format)                               api/v1/reports#destroy
+#                    api_v1_report_comment POST       /api/v1/reports/:report_id/comment(.:format)                api/v1/reports#comment
+#                                          GET        /api/v1/reports(.:format)                                   api/v1/reports#index
+#                                          POST       /api/v1/reports(.:format)                                   api/v1/reports#create
+#                        new_api_v1_report GET        /api/v1/reports/new(.:format)                               api/v1/reports#new
+#                       edit_api_v1_report GET        /api/v1/reports/:id/edit(.:format)                          api/v1/reports#edit
+#                                          GET        /api/v1/reports/:id(.:format)                               api/v1/reports#show
+#                                          PATCH      /api/v1/reports/:id(.:format)                               api/v1/reports#update
+#                                          PUT        /api/v1/reports/:id(.:format)                               api/v1/reports#update
+#                                          DELETE     /api/v1/reports/:id(.:format)                               api/v1/reports#destroy
+#                    api_v1_money_requests GET        /api/v1/money_requests(.:format)                            api/v1/money_requests#index
+#                                          POST       /api/v1/money_requests(.:format)                            api/v1/money_requests#create
+#                     api_v1_money_request GET        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#show
+#                                          PATCH      /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
+#                                          PUT        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
+#                                          DELETE     /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#destroy
+#             api_v1_money_request_comment POST       /api/v1/money_requests/:money_request_id/comment(.:format)  api/v1/money_requests#comment
+#                                          GET        /api/v1/money_requests(.:format)                            api/v1/money_requests#index
+#                                          POST       /api/v1/money_requests(.:format)                            api/v1/money_requests#create
+#                 new_api_v1_money_request GET        /api/v1/money_requests/new(.:format)                        api/v1/money_requests#new
+#                edit_api_v1_money_request GET        /api/v1/money_requests/:id/edit(.:format)                   api/v1/money_requests#edit
+#                                          GET        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#show
+#                                          PATCH      /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
+#                                          PUT        /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#update
+#                                          DELETE     /api/v1/money_requests/:id(.:format)                        api/v1/money_requests#destroy
+#                          api_v1_receipts GET        /api/v1/receipts(.:format)                                  api/v1/receipts#index
+#                                          POST       /api/v1/receipts(.:format)                                  api/v1/receipts#create
+#                           api_v1_receipt PATCH      /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
+#                                          PUT        /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
+#                                          DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
+#                  api_v1_receipt_add_note POST       /api/v1/receipts/:receipt_id/add_note(.:format)             api/v1/receipts#add_note
+#      api_v1_receipt_expense_from_receipt POST       /api/v1/receipts/:receipt_id/expense_from_receipt(.:format) api/v1/receipts#expense_from_receipt
+#                                          GET        /api/v1/receipts(.:format)                                  api/v1/receipts#index
+#                                          POST       /api/v1/receipts(.:format)                                  api/v1/receipts#create
+#                       new_api_v1_receipt GET        /api/v1/receipts/new(.:format)                              api/v1/receipts#new
+#                      edit_api_v1_receipt GET        /api/v1/receipts/:id/edit(.:format)                         api/v1/receipts#edit
+#                                          GET        /api/v1/receipts/:id(.:format)                              api/v1/receipts#show
+#                                          PATCH      /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
+#                                          PUT        /api/v1/receipts/:id(.:format)                              api/v1/receipts#update
+#                                          DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
+#                             api_v1_users GET        /api/v1/users(.:format)                                     api/v1/users#index
+#                              api_v1_user GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
+#                                   api_v1 POST       /api/v1/cards/:id/balance/update(.:format)                  api/v1/cards#update_balance
+#                                          POST       /api/v1/cards/:id/status/update(.:format)                   api/v1/cards#update_status
+#          api_v1_configuration_categories GET        /api/v1/configuration/categories(.:format)                  api/v1/configuration/category#index
+#        api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
+#      api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
+#                   policies_expense_rules GET        /policies/expense_rules(.:format)                           policies#expense_rules
+#                    policies_budget_rules GET        /policies/budget_rules(.:format)                            policies#budget_rules
+#                  policies_policy_members GET        /policies/policy_members(.:format)                          policies#policy_members
+#                     policies_create_rule GET        /policies/create_rule(.:format)                             policies#create_rule
+#          policies_policy_member_settings GET        /policies/policy_member_settings(.:format)                  policies#policy_member_settings
+#                         policies_details GET        /policies/details(.:format)                                 policies#details
+#                                 policies GET        /policies(.:format)                                         policies#index
+#                                          POST       /policies(.:format)                                         policies#create
+#                                   policy GET        /policies/:id(.:format)                                     policies#show
+#                                          PATCH      /policies/:id(.:format)                                     policies#update
+#                                          PUT        /policies/:id(.:format)                                     policies#update
+#                                          DELETE     /policies/:id(.:format)                                     policies#destroy
+#                   policy_invitable_users POST       /policies/:policy_id/invitable_users(.:format)              policies#invitable_users
+#                         policy_add_users POST       /policies/:policy_id/add_users(.:format)                    policies#add_users
+#                      policy_remove_users POST       /policies/:policy_id/remove_users(.:format)                 policies#remove_users
+#         policy_update_user_configuration PATCH      /policies/:policy_id/update_users_configuration(.:format)   policies#update_user_configuration
+#                   policy_destroy_mapping DELETE     /policies/:policy_id/remove_mapping/:mapping_id(.:format)   policies#destrot_mapping
+#                          policy_add_rule POST       /policies/:policy_id/add_rule(.:format)                     rules#create
+#                       policy_remove_rule DELETE     /policies/:policy_id/remove_rule(.:format)                  rules#destroy
+#                                          GET        /policies(.:format)                                         policies#index
+#                                          POST       /policies(.:format)                                         policies#create
+#                               new_policy GET        /policies/new(.:format)                                     policies#new
+#                              edit_policy GET        /policies/:id/edit(.:format)                                policies#edit
+#                                          GET        /policies/:id(.:format)                                     policies#show
+#                                          PATCH      /policies/:id(.:format)                                     policies#update
+#                                          PUT        /policies/:id(.:format)                                     policies#update
+#                                          DELETE     /policies/:id(.:format)                                     policies#destroy
+#                               categories GET        /categories(.:format)                                       categories#index
+#                                          POST       /categories(.:format)                                       categories#create
+#                             new_category GET        /categories/new(.:format)                                   categories#new
+#                            edit_category GET        /categories/:id/edit(.:format)                              categories#edit
+#                                 category GET        /categories/:id(.:format)                                   categories#show
+#                                          PATCH      /categories/:id(.:format)                                   categories#update
+#                                          PUT        /categories/:id(.:format)                                   categories#update
+#                                          DELETE     /categories/:id(.:format)                                   categories#destroy
+#                       export_preferences GET        /export_preferences(.:format)                               export_preferences#index
+#                                          POST       /export_preferences(.:format)                               export_preferences#create
+#                    new_export_preference GET        /export_preferences/new(.:format)                           export_preferences#new
+#                   edit_export_preference GET        /export_preferences/:id/edit(.:format)                      export_preferences#edit
+#                        export_preference GET        /export_preferences/:id(.:format)                           export_preferences#show
+#                                          PATCH      /export_preferences/:id(.:format)                           export_preferences#update
+#                                          PUT        /export_preferences/:id(.:format)                           export_preferences#update
+#                                          DELETE     /export_preferences/:id(.:format)                           export_preferences#destroy
+#                         companies_notify GET        /companies/notify(.:format)                                 companies#notify
+#                      company_add_balance POST       /companies/:company_id/add_balance(.:format)                companies#add_balance
+#                                companies GET        /companies(.:format)                                        companies#index
+#                                          POST       /companies(.:format)                                        companies#create
+#                              new_company GET        /companies/new(.:format)                                    companies#new
+#                             edit_company GET        /companies/:id/edit(.:format)                               companies#edit
+#                                  company GET        /companies/:id(.:format)                                    companies#show
+#                                          PATCH      /companies/:id(.:format)                                    companies#update
+#                                          PUT        /companies/:id(.:format)                                    companies#update
+#                                          DELETE     /companies/:id(.:format)                                    companies#destroy
+#       organization_account_policies_list GET        /organization_account/policies_list(.:format)               organization_account#policies_list
+#          organization_account_categories GET        /organization_account/categories(.:format)                  organization_account#categories
+#  organization_account_export_preferences GET        /organization_account/export_preferences(.:format)          organization_account#export_preferences
+#                             add_category POST       /add_category(.:format)                                     organization_account#add_category
+#                          remove_category DELETE     /remove_category(.:format)                                  organization_account#remove_category
+#                 update_export_preference PATCH      /export/:id/update(.:format)                                organization_account#update_export_column
+#                         add_export_field POST       /add_export_field(.:format)                                 organization_account#add_export_column
+#                      delete_export_field DELETE     /remove_export_field(.:format)                              organization_account#remove_export_column
+#                                   people GET        /people(.:format)                                           people#people
+#                            verify_mobile GET        /users/verify(.:format)                                     otp#edit
+#                     update_mobile_number POST       /otp/update(.:format)                                       otp#update
+#                               verify_otp POST       /otp/verify(.:format)                                       otp#verify
+#                               resend_otp POST       /otp/resend(.:format)                                       otp#resend
+#                             card_details POST       /cards/details(.:format)                                    cards#details
+#                           update_balance POST       /cards/update_balance(.:format)                             cards#update_balance
+#                       update_card_status POST       /cards/update_status(.:format)                              cards#update_status
+#                                  reports GET        /reports(.:format)                                          reports#index
+#                                          POST       /reports(.:format)                                          reports#create
+#                                   report GET        /reports/:id(.:format)                                      reports#show
+#                                          PATCH      /reports/:id(.:format)                                      reports#update
+#                                          PUT        /reports/:id(.:format)                                      reports#update
+#                                          DELETE     /reports/:id(.:format)                                      reports#destroy
+#                            export_report GET        /export/report(.:format)                                    export#report
+#                           report_comment POST       /reports/:report_id/comment(.:format)                       reports#comment
+#                           report_retract PATCH      /reports/:report_id/retract(.:format)                       reports#retract
+#                            report_submit PATCH      /reports/:report_id/submit(.:format)                        reports#submit
+#                           report_approve PATCH      /reports/:report_id/approve(.:format)                       reports#approve
+#                         report_unapprove PATCH      /reports/:report_id/unapprove(.:format)                     reports#unapprove
+#                            report_reject PATCH      /reports/:report_id/reject(.:format)                        reports#reject
+#                    report_reject_expense PATCH      /reports/:report_id/reject_expense(.:format)                reports#reject_expense
+#             report_reimbursement_confirm PATCH      /reports/:report_id/reimbursement_confirm(.:format)         reports#reimbursement_confirm
+#                      report_take_control PATCH      /reports/:report_id/take_control(.:format)                  reports#take_control
+#                      report_add_expenses POST       /reports/:report_id/add_expenses(.:format)                  reports#add_expenses
+#                   report_remove_expenses DELETE     /reports/:report_id/remove_expenses(.:format)               reports#remove_expenses
+#                                          GET        /reports(.:format)                                          reports#index
+#                                          POST       /reports(.:format)                                          reports#create
+#                               new_report GET        /reports/new(.:format)                                      reports#new
+#                              edit_report GET        /reports/:id/edit(.:format)                                 reports#edit
+#                                          GET        /reports/:id(.:format)                                      reports#show
+#                                          PATCH      /reports/:id(.:format)                                      reports#update
+#                                          PUT        /reports/:id(.:format)                                      reports#update
+#                                          DELETE     /reports/:id(.:format)                                      reports#destroy
+#                      money_request_index GET        /money_request(.:format)                                    money_request#index
+#                                          POST       /money_request(.:format)                                    money_request#create
+#                            money_request GET        /money_request/:id(.:format)                                money_request#show
+#                                          PATCH      /money_request/:id(.:format)                                money_request#update
+#                                          PUT        /money_request/:id(.:format)                                money_request#update
+#                                          DELETE     /money_request/:id(.:format)                                money_request#destroy
+#                    money_request_comment POST       /money_request/:money_request_id/comment(.:format)          money_request#comment
+#                                          GET        /money_request(.:format)                                    money_request#index
+#                                          POST       /money_request(.:format)                                    money_request#create
+#                        new_money_request GET        /money_request/new(.:format)                                money_request#new
+#                       edit_money_request GET        /money_request/:id/edit(.:format)                           money_request#edit
+#                                          GET        /money_request/:id(.:format)                                money_request#show
+#                                          PATCH      /money_request/:id(.:format)                                money_request#update
+#                                          PUT        /money_request/:id(.:format)                                money_request#update
+#                                          DELETE     /money_request/:id(.:format)                                money_request#destroy
+#                   expense_attach_receipt POST       /expenses/:expense_id/attach_receipt(.:format)              expenses#attach_receipt
+#                   expense_detach_receipt POST       /expenses/:expense_id/detach_receipt(.:format)              expenses#detach_receipt
+#                      expense_add_receipt POST       /expenses/:expense_id/add_receipt(.:format)                 expenses#add_receipt
+#                                 expenses GET        /expenses(.:format)                                         expenses#index
+#                                          POST       /expenses(.:format)                                         expenses#create
+#                              new_expense GET        /expenses/new(.:format)                                     expenses#new
+#                             edit_expense GET        /expenses/:id/edit(.:format)                                expenses#edit
+#                                  expense GET        /expenses/:id(.:format)                                     expenses#show
+#                                          PATCH      /expenses/:id(.:format)                                     expenses#update
+#                                          PUT        /expenses/:id(.:format)                                     expenses#update
+#                                          DELETE     /expenses/:id(.:format)                                     expenses#destroy
+#                      expenses_unreported POST       /expenses/unreported(.:format)                              expenses#unreported
+#                         receipt_add_note POST       /receipts/:receipt_id/add_note(.:format)                    receipts#add_note
+#                                 receipts GET        /receipts(.:format)                                         receipts#index
+#                                          POST       /receipts(.:format)                                         receipts#create
+#                              new_receipt GET        /receipts/new(.:format)                                     receipts#new
+#                             edit_receipt GET        /receipts/:id/edit(.:format)                                receipts#edit
+#                                  receipt GET        /receipts/:id(.:format)                                     receipts#show
+#                                          PATCH      /receipts/:id(.:format)                                     receipts#update
+#                                          PUT        /receipts/:id(.:format)                                     receipts#update
+#                                          DELETE     /receipts/:id(.:format)                                     receipts#destroy
+#                     expense_from_receipt POST       /expense_from_receipt(.:format)                             receipts#expense_from_receipt
+#                       users_get_managers GET        /users/get_managers(.:format)                               users#get_managers
+#                       users_user_profile GET        /users/user_profile(.:format)                               users#user_profile
+#                       users_user_balance GET        /users/user_balance(.:format)                               users#user_balance
+#                      users_user_security GET        /users/user_security(.:format)                              users#user_security
+#                                    users GET        /users(.:format)                                            users#index
+#                                          POST       /users(.:format)                                            users#create
+#                                     user GET        /users/:id(.:format)                                        users#show
+#                                          PATCH      /users/:id(.:format)                                        users#update
+#                                          PUT        /users/:id(.:format)                                        users#update
+#                                          DELETE     /users/:id(.:format)                                        users#destroy
+#                             user_details POST       /users/:user_id/user_details(.:format)                      users#user_details
+#                         user_update_team PATCH      /users/:user_id/update_user_team(.:format)                  users#update_team
+#                         user_update_role PATCH      /users/:user_id/update_role(.:format)                       users#update_user_role
+#                             user_profile GET        /users/:user_id/profile(.:format)                           users#profile
+#                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
+#                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
+#                                          GET        /users(.:format)                                            users#index
+#                                          POST       /users(.:format)                                            users#create
+#                                 new_user GET        /users/new(.:format)                                        users#new
+#                                edit_user GET        /users/:id/edit(.:format)                                   users#edit
+#                                          GET        /users/:id(.:format)                                        users#show
+#                                          PATCH      /users/:id(.:format)                                        users#update
+#                                          PUT        /users/:id(.:format)                                        users#update
+#                                          DELETE     /users/:id(.:format)                                        users#destroy
+#                              user_import POST       /import(.:format)                                           users#import
+#                        superadmin_import POST       /superadmin_import(.:format)                                superadmin/companies#import
+#                      initiate_activation GET        /pending_invites/initiate_activation(.:format)              pending_invites#initiate_activation
+#                        activate_employee GET        /pending_invites/activate_employee(.:format)                pending_invites#activate_employee
+#                                 send_otp GET        /pending_invites/send_otp(.:format)                         pending_invites#send_otp
+#               manager_activation_sign_up PATCH      /pending_invites/manager_sign_up(.:format)                  pending_invites#manager_sign_up
+#                  update_default_password POST       /users/update_default_password(.:format)                    users#update_default_password
+#                    edit_default_password GET        /edit_default_password(.:format)                            users#edit_default_password
+#                          pending_invites POST       /pending_invites(.:format)                                  pending_invites#create
+#                      edit_pending_invite GET        /pending_invites/:id/edit(.:format)                         pending_invites#edit
+#                           pending_invite PATCH      /pending_invites/:id(.:format)                              pending_invites#update
+#                                          PUT        /pending_invites/:id(.:format)                              pending_invites#update
+#                                          DELETE     /pending_invites/:id(.:format)                              pending_invites#destroy
+#                    pending_invite_accept PATCH      /pending_invites/:pending_invite_id/accept(.:format)        pending_invites#accept
+#                                          GET        /pending_invites(.:format)                                  pending_invites#index
+#                                          POST       /pending_invites(.:format)                                  pending_invites#create
+#                       new_pending_invite GET        /pending_invites/new(.:format)                              pending_invites#new
+#                                          GET        /pending_invites/:id/edit(.:format)                         pending_invites#edit
+#                                          GET        /pending_invites/:id(.:format)                              pending_invites#show
+#                                          PATCH      /pending_invites/:id(.:format)                              pending_invites#update
+#                                          PUT        /pending_invites/:id(.:format)                              pending_invites#update
+#                                          DELETE     /pending_invites/:id(.:format)                              pending_invites#destroy
+#                      settlements_summary GET        /settlements/summary(.:format)                              settlements#summary
+#                              settlements GET        /settlements(.:format)                                      settlements#index
+#                                          POST       /settlements(.:format)                                      settlements#create
+#                           new_settlement GET        /settlements/new(.:format)                                  settlements#new
+#                          edit_settlement GET        /settlements/:id/edit(.:format)                             settlements#edit
+#                               settlement GET        /settlements/:id(.:format)                                  settlements#show
+#                                          PATCH      /settlements/:id(.:format)                                  settlements#update
+#                                          PUT        /settlements/:id(.:format)                                  settlements#update
+#                                          DELETE     /settlements/:id(.:format)                                  settlements#destroy
+#                   settlement_add_payment POST       /settlements/:id/add_payment(.:format)                      settlements#add_payment
+#                                          GET        /receipts(.:format)                                         receipts#index
+#                                          POST       /receipts(.:format)                                         receipts#create
+#                                          GET        /receipts/new(.:format)                                     receipts#new
+#                                          GET        /receipts/:id/edit(.:format)                                receipts#edit
+#                                          GET        /receipts/:id(.:format)                                     receipts#show
+#                                          PATCH      /receipts/:id(.:format)                                     receipts#update
+#                                          PUT        /receipts/:id(.:format)                                     receipts#update
+#                                          DELETE     /receipts/:id(.:format)                                     receipts#destroy
+#             superadmin_company_new_admin POST       /superadmin/companies/:company_id/add_admin(.:format)       superadmin/companies#add_admin
+#                     superadmin_companies GET        /superadmin/companies(.:format)                             superadmin/companies#index
+#                                          POST       /superadmin/companies(.:format)                             superadmin/companies#create
+#                   new_superadmin_company GET        /superadmin/companies/new(.:format)                         superadmin/companies#new
+#                  edit_superadmin_company GET        /superadmin/companies/:id/edit(.:format)                    superadmin/companies#edit
+#                       superadmin_company GET        /superadmin/companies/:id(.:format)                         superadmin/companies#show
+#                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
+#                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
+#                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
+#                         superadmin_users GET        /superadmin/users(.:format)                                 superadmin/users#index
+#                                          POST       /superadmin/users(.:format)                                 superadmin/users#create
+#                      new_superadmin_user GET        /superadmin/users/new(.:format)                             superadmin/users#new
+#                     edit_superadmin_user GET        /superadmin/users/:id/edit(.:format)                        superadmin/users#edit
+#                          superadmin_user GET        /superadmin/users/:id(.:format)                             superadmin/users#show
+#                                          PATCH      /superadmin/users/:id(.:format)                             superadmin/users#update
+#                                          PUT        /superadmin/users/:id(.:format)                             superadmin/users#update
+#                                          DELETE     /superadmin/users/:id(.:format)                             superadmin/users#destroy
+#                                          GET        /statements/:id/summary(.:format)                           statements#summary
+#                         export_statement GET        /export/:id/statements(.:format)                            export#statement
+#                               statements GET        /statements(.:format)                                       statements#index
+#                                          POST       /statements(.:format)                                       statements#create
+#                            new_statement GET        /statements/new(.:format)                                   statements#new
+#                           edit_statement GET        /statements/:id/edit(.:format)                              statements#edit
+#                                statement GET        /statements/:id(.:format)                                   statements#show
+#                                          PATCH      /statements/:id(.:format)                                   statements#update
+#                                          PUT        /statements/:id(.:format)                                   statements#update
+#                                          DELETE     /statements/:id(.:format)                                   statements#destroy
+#                                     root GET        /                                                           home#index
+#                                  welcome GET        /welcome(.:format)                                          home#welcome
+#                                    about GET        /about(.:format)                                            home#about
+#                    autocomplete_merchant GET        /autocomplete/merchant(.:format)                            autocomplete#merchant
+#                        autocomplete_user GET        /autocomplete/user(.:format)                                autocomplete#user
+#                      external_url_report GET        /external/reports/:id(.:format)                             external_url#report
+#               external_url_money_request GET        /external/requests/:id(.:format)                            external_url#money_request
+#                  external_url_settlement GET        /external/settlements/:id(.:format)                         external_url#payment
+#                                analytics GET        /analytics(.:format)                                        analytics#show
+#                                          GET        /companies/notify(.:format)                                 companies#notify
+#                            notifications GET        /notifications(.:format)                                    notifications#index
+#                     notifications_unread GET        /notifications/unread(.:format)                             notifications#unread
+#              notifications_mark_all_read GET        /notifications/mark_all_read(.:format)                      notifications#mark_all_read
+#                                     faqs GET        /faqs(.:format)                                             faqs#index
 #
 
 Rails.application.routes.draw do
@@ -680,6 +708,7 @@ Rails.application.routes.draw do
     resources :companies do
       post 'add_admin', to: 'companies#add_admin', as: :new_admin
     end
+    resources :users
   end
 
   get 'statements/:id/summary' => 'statements#summary'
