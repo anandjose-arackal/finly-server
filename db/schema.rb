@@ -1048,10 +1048,10 @@ ActiveRecord::Schema.define(version: 20161227112518) do
     t.boolean  "otp_verified",                       default: false, null: false
     t.integer  "otp_count",              limit: 4,   default: 0,     null: false
     t.string   "first_name",             limit: 255, default: "",    null: false
-    t.string   "maiden_name",            limit: 255
     t.string   "last_name",              limit: 255, default: "",    null: false
     t.boolean  "default_password"
     t.boolean  "mobile_only_invite",                 default: false
+    t.string   "mothers_maiden_name",    limit: 255
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

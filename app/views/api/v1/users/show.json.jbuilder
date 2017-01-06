@@ -1,5 +1,9 @@
 json.partial! '/api/v1/users/user', user: @result.selected_user
-json.actions @result.actions
+json.actions do 
+	@result.actions.each do |key, value|
+		json.set! key, value.present?
+	end
+end
 json.wallet do
-  json.balance user.wallet.balance_value
+  json.balance @result.selected_user.wallet.balance_value
 end
