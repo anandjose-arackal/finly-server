@@ -69,17 +69,17 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   ################### SETTINGS FOR SENDGRID ##########################
-  # config.action_mailer.default_url_options = { host: "www.finly.io" }
-  # config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address:              'mail2.itzcash.com',
     port:                 25,
     domain:               'www.finly.io',
-    # user_name:            'finly@itzcash.com',
+    user_name:            'finly@itzcash.com',
     # password:             '',
     # ssl:                  true,
     # tls:                  true,
-    # authentication:       :plain,
+    authentication:       :none,
     # enable_starttls_auto: true,
     # :openssl_verify_mode  => 'none'
   }
