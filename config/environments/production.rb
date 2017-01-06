@@ -76,12 +76,12 @@ Rails.application.configure do
     port:                 25,
     domain:               'www.finly.io',
     user_name:            'finly@itzcash.com',
-    # password:             'idAr5APhk61X',
-    ssl:                  true,
+    password:             '',
+    # ssl:                  true,
     # tls:                  true,
-    # authentication:       :plain,
-    enable_starttls_auto: true#,
-    # :openssl_verify_mode  => 'none'
+    authentication:       :plain,
+    enable_starttls_auto: true,
+    :openssl_verify_mode  => 'none'
   }
 
   #####################################################################
