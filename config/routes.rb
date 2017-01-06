@@ -533,8 +533,8 @@ Rails.application.routes.draw do
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
       end
       resources :users, only: [:index, :show]
-      post 'cards/:id/balance/update', to: 'cards#update_balance'
-      post 'cards/:id/status/update', to: 'cards#update_status'
+      post 'cards/balance/update', to: 'cards#update_balance'
+      post 'cards/status/update', to: 'cards#update_status'
       namespace :configuration do
         get 'categories' => 'category#index', as: :categories
         post 'gcm/register', to: 'gcm#create'
