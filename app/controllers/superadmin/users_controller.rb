@@ -20,12 +20,15 @@ class Superadmin::UsersController < ApplicationController
 
   def update
     @result = Superadmin::User::Update.(current_user, params)
-    if @result.success?
-      flash[:success] = "User updated"
-      redirect_to superadmin_company_path(params[:company_id])
-    else
-      flash[:error] = @result.messages[:error]
-      redirect_to request.referrer
+    # if @result.success?
+    #   flash[:success] = "User updated"
+    #   redirect_to superadmin_company_path(params[:company_id])
+    # else
+    #   flash[:error] = @result.messages[:error]
+    #   redirect_to request.referrer
+    # end
+    respond_to do |format|
+      format.json {}
     end
   end
 
