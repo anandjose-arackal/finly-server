@@ -79,6 +79,15 @@ class MoneyRequest::Index < MoneyRequest::Base
       end
     end
 
+    def status_name(money_request)
+      return nil if money_request.blank?
+      if money_request.processing? and money_request.controlling_user?(self.user)
+        'Awaiting Approval'
+      else
+        money_request.status_name
+      end
+    end
+
     def get_counts
       type_counts = money_requests.group(:status_id)
       self.counts = {}
