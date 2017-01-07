@@ -19,6 +19,7 @@
         {{#case 'Rejected'}}<span class="label label-danger">{{item.status_name}}</span>{{/case}}
         {{#case 'Retracted'}}<span class="label label-default">{{item.status_name}}</span>{{/case}}
         {{#case 'Processing'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
+        {{#case 'Awaiting Approval'}}<span class="label label-primary">{{item.status_name}}</span>{{/case}}
         {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status_name}}</span>{{/case}}
       {{/switch}}
       </div>
