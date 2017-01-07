@@ -3,7 +3,7 @@
 
   <h3 style="text-align: center"><%=@user.name%>></h3>
 
-  <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_users_path %>" method="post">
+  <form accept-charset="UTF-8" id="newCompanyForm" action="/superadmin/companies/<%=@user.company_id%>/users/<%=@user.id%>" method="post">
     <input name="utf8" type="hidden" value="&#x2713;"/>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
     <input name="_method" value="patch" type="hidden">
@@ -57,7 +57,7 @@
         <label style="margin-right: 20px; margin-top: 0;">
           <input type="radio" name="user[profile_attributes][gender]"
                  value="m"
-                 <% if @user.profile.gender == 'm' %>
+                 <% if @user.profile.gender == 'm' or @user.profile.gender == 'M' %>
                  checked="checked"
                  <% end %>
                  style="display: inline;">&nbsp;Male
@@ -65,7 +65,7 @@
         <label style="margin-top: 0;">
           <input type="radio" name="user[profile_attributes][gender]"
                  value="f"
-                 <% if @user.profile.gender == 'm' %>
+                 <% if @user.profile.gender == 'f' or @user.profile.gender == 'F' %>
                  checked="checked"
                  <% end %>
                  style="display: inline;">&nbsp;Female
@@ -91,11 +91,11 @@
       <div>
         <select class="form-control" name="user[profile_attributes][state_id]">
           <% @states.each do |state| %>
-              <option value="<%= state[:code] %>"
-              <% if @user.profile.state.name == state[:name] %>
-              selected
+              <option value="<%= state.id %>"
+              <% if @user.profile.state_id == state.id %>
+                selected
               <% end %>
-              ><%= state[:name] %></option>
+              ><%= state.name %></option>
           <% end %>
         </select>
       </div>
@@ -128,3 +128,21 @@
 
   </div>
 </div>
+
+<script>
+
+  $(document).ready(function(){
+    $(".datepicker").datepicker({
+      dateFormat: "dd-mm-yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "-100:+0"
+    })
+  });
+
+  function showInviteModal()
+  {
+    $('#modal-import-employees').modal('show');
+  }
+
+</script>

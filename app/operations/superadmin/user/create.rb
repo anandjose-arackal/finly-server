@@ -30,14 +30,14 @@ class Superadmin::User::Create < Superadmin::User::Base
     new_user.skip_confirmation_notification!
     if new_user.save
       new_user.activate
-      messages[:success] << "New user created!"
+      messages[:success] << "New user created"
     else
       messages[:error] = new_user.errors.full_messages.to_sentence
     end
   end
 
   def success
-    Company::Base::CompanyPresenter.new(new_user, company: company)
+    Company::Base::CompanyPresenter.new(user, company: company)
   end
 
   def post_process

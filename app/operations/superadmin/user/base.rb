@@ -1,7 +1,7 @@
 class Superadmin::User::Base < Superadmin::Base
 
   def new_user_params
-    params[:user][:role_mapping_attributes] = [{user_role_id: UserRole.employee_id}]
+    params[:user][:role_mapping_attributes] = [{user_role_id: UserRole.admin_id},{user_role_id: UserRole.employee_id}]
 
     p = params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
                                      :last_name, :mothers_maiden_name,

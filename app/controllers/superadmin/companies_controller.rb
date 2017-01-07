@@ -4,7 +4,7 @@ class Superadmin::CompaniesController < ApplicationController
   before_action :superadmin_accounts
 
   def new
-    @states = State::VALUES
+    @states = State.all
   end
 
   def show
