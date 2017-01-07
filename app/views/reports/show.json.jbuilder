@@ -1,7 +1,8 @@
-json.extract! @result.report, :id, :name, :status_name, :memo, :report_status_id, :auto_submit
+json.extract! @result.report, :id, :name, :memo, :report_status_id, :auto_submit
 json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
-json.status @result.status
+json.status @result.status_name(@result.report)
+json.status_name @result.status_name(@result.report)
 json.manager_name @result.manager.name rescue ''
 json.finance_manager_name @result.finance_manager.name rescue ''
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
@@ -23,7 +24,6 @@ json.policies @result.report.user.policies do |policy|
   json.extract! policy, :id, :name
 end
 
-json.status @result.report.status.name
 json.total @result.report.total_amount
 json.date @result.report.created_at.strftime('%d %b %Y')
 
