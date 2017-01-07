@@ -77,6 +77,7 @@ class Report < ActiveRecord::Base
   scope :include_user, -> { includes :user }
   scope :without_payment, -> { where reimbursement_id: nil }
   scope :pending_reimbursement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
+  scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }

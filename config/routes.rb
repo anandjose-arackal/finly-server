@@ -533,6 +533,9 @@ Rails.application.routes.draw do
         post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
       end
       resources :users, only: [:index, :show]
+      resources :users do
+        get 'summary', to: 'users#summary', as: :user_summary
+      end
       post 'cards/balance/update', to: 'cards#update_balance'
       post 'cards/status/update', to: 'cards#update_status'
       namespace :configuration do
