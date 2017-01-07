@@ -120,13 +120,11 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
-  validates :name, presence: true
-  validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :mothers_maiden_name, presence: true, format: {with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, format: Constants::VALID_MOBILE_NUMBER, uniqueness: true
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
+  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
 
-  validate :email_format
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
@@ -330,9 +328,6 @@ class User < ActiveRecord::Base
 
   private
 
-  def email_format
-
-  end
   # def valid_role
   #   if self.role_mapping.count == 0
   #     errors.add(:user, "must be assigned a role")

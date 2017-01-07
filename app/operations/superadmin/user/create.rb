@@ -9,7 +9,7 @@ class Superadmin::User::Create < Superadmin::User::Base
   end
 
   def init
-    self.company = Company.find_by(id: params[:id] || params[:company_id])
+    self.company = Company.find_by(id: params[:company_id])
   end
 
   def authorize
@@ -32,7 +32,7 @@ class Superadmin::User::Create < Superadmin::User::Base
       new_user.activate
       messages[:success] << "New user created"
     else
-      messages[:error] = new_user.errors.full_messages.to_sentence
+      messages[:error] = new_user.errors.full_messages
     end
   end
 

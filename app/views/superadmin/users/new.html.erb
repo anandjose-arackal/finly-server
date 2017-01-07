@@ -207,7 +207,7 @@
         success: function(res){
           snapNotify(res.messages);
           if(res.success){
-            // window.location = res.user_path
+            window.location = '/superadmin/companies/<%=params[:company_id]%>';
           }
         }
       });

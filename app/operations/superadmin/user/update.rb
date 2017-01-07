@@ -35,7 +35,7 @@ class Superadmin::User::Update < Superadmin::User::Base
 
   def process
     unless selected_user.update_attributes(update_parameters)
-      messages[:error] = selected_user.errors.full_messages.to_sentence
+      messages[:error] = selected_user.errors.full_messages
     end
   end
 
