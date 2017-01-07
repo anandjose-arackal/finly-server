@@ -62,7 +62,7 @@ class Notification < ActiveRecord::Base
       when "Card"
         object = "Card"
       when "Wallet"
-        object = "Wallet"
+        object = "Finly Account"
       when "Payment"
         object = "Cash"
       else

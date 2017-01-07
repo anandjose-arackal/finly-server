@@ -33,7 +33,7 @@ class User::ManagerActivate::ReplaceDefaultPassword < User::ManagerActivate::Bas
       messages[:error] = user.errors.full_messages
       return
     end
-    unless user.update_attributes(default_password: false)
+    unless user.update_attributes(default_password: false, reset_password_token: nil)
       messages[:error] = user.errors.full_messages
     end
   end
