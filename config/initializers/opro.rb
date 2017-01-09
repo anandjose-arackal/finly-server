@@ -23,4 +23,11 @@ Opro.setup do |config|
   # as a result users cannot opt out of client permissions, all permissions are granted
   config.password_exchange_enabled = true
 
+  config.find_user_for_auth do |controller, params|
+    return false if params[:email].blank? or params[:password].blank?
+    user = User.find_for_database_authentication(params) rescue nil
+    return false if user.blank?
+    user.valid_password?(params[:password]) ? user : false
+  end
+
 end
