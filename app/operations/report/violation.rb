@@ -186,23 +186,23 @@ class Report::Violation < Report::Base
     if rule.amount_value
       if rule.period
         # setting the start and end date based on the kind of period set by the user
-        if rule.period == 'Month'
+        if rule.period_id == Period.id_for(:month)
           start_date = expense.date.beginning_of_month
           end_date = expense.date.end_of_month
           budget_message = " for the month of #{start_date.strftime('%B')}, #{start_date.strftime('%Y')}"
-        elsif rule.period == 'Week'
+        elsif rule.period_id == Period.id_for(:week)
           start_date = expense.date.beginning_of_week
           end_date = expense.date.end_of_week
           budget_message = " for the week beginning #{start_date.to_s}"
-        elsif rule.period == 'Year'
+        elsif rule.period_id == Period.id_for(:year)
           start_date = expense.date.beginning_of_year
           end_date = expense.date.end_of_year
           budget_message = " for the year #{start_date.strftime('%Y')}"
-        elsif rule.period == 'Day'
+        elsif rule.period_id == Period.id_for(:day)
           start_date = end_date = expense.date
           budget_message = " for date #{start_date.strftime('%B %d, %Y')}"
         end
-        return if expense.category_id != rule.category_id && rule.category_id
+        return if rule.category_id && expense.category_id != rule.category_id
         if rule.category_id
           category = Category.find(rule.category_id)
         else
