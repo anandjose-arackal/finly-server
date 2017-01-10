@@ -19,6 +19,7 @@
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  link                 :text(65535)
+#  view_role_id         :integer
 #
 
 class Notification < ActiveRecord::Base
@@ -61,7 +62,7 @@ class Notification < ActiveRecord::Base
       when "Card"
         object = "Card"
       when "Wallet"
-        object = "Wallet"
+        object = "Finly Account"
       when "Payment"
         object = "Cash"
       else

@@ -14,10 +14,6 @@ class User::ManagerActivate::ReplaceDefaultPassword < User::ManagerActivate::Bas
       return
     end
     new_pwd_params = password_params
-    unless new_pwd_params[:current_password].present?
-      messages[:error] << 'Current password cannot be blank'
-      return
-    end
     unless new_pwd_params[:password].present?
       messages[:error] << 'New password cannot be blank'
       return
@@ -29,11 +25,11 @@ class User::ManagerActivate::ReplaceDefaultPassword < User::ManagerActivate::Bas
   end
 
   def process
-    unless user.update_with_password(password_params)
+    unless user.update_attributes(password_params)
       messages[:error] = user.errors.full_messages
       return
     end
-    unless user.update_attributes(default_password: false)
+    unless user.update_attributes(default_password: false, reset_password_token: nil)
       messages[:error] = user.errors.full_messages
     end
   end
@@ -45,6 +41,6 @@ class User::ManagerActivate::ReplaceDefaultPassword < User::ManagerActivate::Bas
   private
 
   def password_params
-    params.require(:user).permit(:current_password, :password, :password_confirmation)
+    params.require(:user).permit(:password, :password_confirmation)
   end
 end

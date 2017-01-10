@@ -4,7 +4,7 @@ class Superadmin::CompaniesController < ApplicationController
   before_action :superadmin_accounts
 
   def new
-    @states = State::VALUES
+    @states = State.all
   end
 
   def show
@@ -13,7 +13,7 @@ class Superadmin::CompaniesController < ApplicationController
   end
 
   def create
-    @result = Company::Create.(current_user, params)
+    @result = Superadmin::Company::Create.(current_user, params)
     if @result.success?
       flash[:success] = 'Company created'
       redirect_to superadmin_companies_path
