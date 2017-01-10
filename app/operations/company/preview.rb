@@ -12,6 +12,7 @@ class Company::Preview < BaseOperation
     self.preview_company = PreviewRegistration.new(preview_params)
     unless preview_company.save
       messages[:error] = preview_company.errors.full_messages
+      debugger
     end
   end
 

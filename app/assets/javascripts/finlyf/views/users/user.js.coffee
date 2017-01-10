@@ -34,6 +34,9 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-edit-auto-submit': 'editAutoSubmit'
     'click .btn-update-auto-submit': 'updateAutoSubmit'
 
+    'click .btn-edit-enforce-policy': 'editEnforcePolicy'
+    'click .btn-update-enforce-policy': 'updateEnforcePolicy'
+
     # Activating employee without email
     'click .btn-active-employee': 'activateEmployee'
 
@@ -98,7 +101,7 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').text('Update')
+    $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
 
   editAutoSubmit: (e) ->
     target = $(e.currentTarget)
@@ -108,7 +111,50 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('btn-success btn-update-auto-submit').removeClass('btn-warning btn-edit-auto-submit').text('Update')
+    $(target).addClass('btn-success btn-update-auto-submit').removeClass('btn-warning btn-edit-auto-submit').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+
+  editEnforcePolicy: (e) ->
+    target = $(e.currentTarget)
+    container = $(target).closest('.section-card')
+    $(container).find('.item-attr-preview').addClass('hide')
+    $(container).find('.item-attr-edit').addClass('show')
+    #edit
+
+    #change edit button to update
+    $(target).addClass('btn-success btn-update-enforce-policy').removeClass('btn-warning btn-edit-auto-submit').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+
+  updateEnforcePolicy: (e) ->
+    _this = @
+    e.preventDefault()
+    target = $(e.currentTarget)
+    $(target).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr('disabled', true)
+    form = $(target).closest('.section-card').find('form')
+    values = {}
+
+    _.each($(form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    values.view = @params.view
+
+    model = new FinlyF.Models.User({id: @model.get('id')})
+    model.save(values, {
+      data: values,
+      processData: true
+      success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
+        else
+          $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeAttr('disabled')
+      error: (err) ->
+        console.log "Err", err
+        $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeAttr('disabled')
+    })
+
 
   editPolicy: (e) ->
     target = $(e.currentTarget)

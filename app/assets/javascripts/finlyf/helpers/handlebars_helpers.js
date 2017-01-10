@@ -111,6 +111,28 @@ Handlebars.registerHelper('or', function(/* any, any, ..., options */) {
 });
 
 
+
+// Experimental
+Handlebars.registerHelper('and', function(/* any, any, */) {
+  var argLength = arguments.length - 1;
+  var options = arguments[argLength];
+  var success = true;
+  for(var i = 0; i <= argLength - 1; i++){
+    if(typeof arguments[i+1] !== 'undefined'){
+      success = success && (arguments[i] && arguments[i+1]);
+    } else {
+      success = success && arguments[i];
+    }
+  }
+  
+  if (success) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+});
+
+
 //Set a variable
 Handlebars.registerHelper('setVar', function(varName, varValue, options){
   options.data.root[varName] = varValue;

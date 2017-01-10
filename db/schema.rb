@@ -338,6 +338,16 @@ ActiveRecord::Schema.define(version: 20161226072656) do
     t.string   "symbol",       limit: 255
   end
 
+  create_table "enforce_policies", force: :cascade do |t|
+    t.integer  "enforceable_id",   limit: 4,   null: false
+    t.string   "enforceable_type", limit: 255, null: false
+    t.boolean  "enabled"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -1039,10 +1049,10 @@ ActiveRecord::Schema.define(version: 20161226072656) do
     t.boolean  "otp_verified",                       default: false, null: false
     t.integer  "otp_count",              limit: 4,   default: 0,     null: false
     t.string   "first_name",             limit: 255, default: "",    null: false
-    t.string   "maiden_name",            limit: 255
     t.string   "last_name",              limit: 255, default: "",    null: false
     t.boolean  "default_password"
     t.boolean  "mobile_only_invite",                 default: false
+    t.string   "mothers_maiden_name",    limit: 255
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

@@ -38,15 +38,12 @@
 #  otp_verified_at        :datetime
 #  otp_verified           :boolean          default(FALSE), not null
 #  otp_count              :integer          default(0), not null
-#  first_name             :string(255)      not null
-#  maiden_name            :string(255)
-#  last_name              :string(255)      not null
+#  first_name             :string(255)      default(""), not null
+#  last_name              :string(255)      default(""), not null
 #  default_password       :boolean
 #  mobile_only_invite     :boolean          default(FALSE)
+#  mothers_maiden_name    :string(255)
 #
-
-
-
 
 
 
@@ -94,6 +91,7 @@ class User < ActiveRecord::Base
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable
+  has_one :enforce_policy, as: :enforceable
 
   has_many :cards, dependent: :destroy
   has_many :card_transactions
@@ -123,13 +121,11 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
-  validates :name, presence: true
-  validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :mothers_maiden_name, presence: true, format: {with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, format: Constants::VALID_MOBILE_NUMBER, uniqueness: true
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
+  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
 
-  validate :email_format
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
@@ -188,6 +184,7 @@ class User < ActiveRecord::Base
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
+    self.build_enforce_policy(enabled: false).save
   end
 
   def payments
@@ -230,12 +227,12 @@ class User < ActiveRecord::Base
   end
 
   def finance_manager?
-    mapping = role_mapping
+    mapping = self.role_mapping
     mapping.finance_manager.present?
   end
 
   def manager?
-    mapping = role_mapping
+    mapping = self.role_mapping
     mapping.manager.present?
   end
 
@@ -323,11 +320,20 @@ class User < ActiveRecord::Base
     self.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
   end
 
+  def enforce_policy_enabled?
+    self.enforce_policy.enabled
+  end
+
+  def superadmin?
+    if Constants::SUPERADMIN_ACCOUNTS.include?(self.email)
+      true
+    else
+      false
+    end
+  end
+
   private
 
-  def email_format
-
-  end
   # def valid_role
   #   if self.role_mapping.count == 0
   #     errors.add(:user, "must be assigned a role")

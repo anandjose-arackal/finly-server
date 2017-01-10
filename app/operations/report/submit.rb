@@ -35,6 +35,13 @@ class Report::Submit < Report::Base
     unless report.expenses.present?
       add_message :error, 'Cannot submit an empty report'
     end
+    # checking if policy is added if enforce policy is enabled
+    if user.enforce_policy_enabled?
+      if report.policy.nil?
+        add_message :error, "You have to select a policy for the report before submission"
+        return false
+      end
+    end
     # checking for blocking violations
     violations = Report::Violation.(user, report: report)
     violations_present = false
