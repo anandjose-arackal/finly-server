@@ -56,7 +56,7 @@ class Report::Approve < Report::Base
         status = ReportStatus.closed_id
       end
     end
-    if status == ReportStatus.approved_id
+    if status == ReportStatus.approved_id || status == ReportStatus.closed_id
       approved_at = DateUtils.local_date_time
     else
       approved_at = nil

@@ -80,6 +80,8 @@ class Report < ActiveRecord::Base
   scope :pending_reimbursement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
+  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
   scope :filter_report_id, ->(id) { where(id: id) }
