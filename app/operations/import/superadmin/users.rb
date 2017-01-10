@@ -114,38 +114,43 @@ class Import::Superadmin::Users < Import::Base
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes
     if row[import_fields[:reporting_manager]]
-      manager = User.find_by(email: row[import_fields[:reporting_manager]]) rescue nil
+      manager = User.find_by(email: row[import_fields[:reporting_manager]], mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       unless manager and manager.manager? and manager.company_id == row[import_fields[:company_id]]
-        errors << "Reporting Manager not found"
+        errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
     end
     if row[import_fields[:reporting_finance_manager]]
-      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]]) rescue nil
+      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]], mobile_number: row[import_fields[:reporting_finance_manager]]) rescue nil
       unless finance_manager and finance_manager.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
-        errors << "Reporting Finance Manager not found"
+        errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
     end
     if row[import_fields[:approves_to]]
-      approves_to = User.find_by(email: row[import_fields[:approves_to]]) rescue nil
+      approves_to = User.find_by(email: row[import_fields[:approves_to]], mobile_number: row[import_fields[:approves_to]]) rescue nil
       unless approves_to and approves_to.manager? and approves_to.company_id == row[import_fields[:company_id]]
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
     end
     if row[import_fields[:approves_finance_to]]
-      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]]) rescue nil
+      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]], mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
       unless approves_finance_to and approves_finance_to.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil
       end
     end
 
+    pin_code = row[import_fields[:pin_code]].to_i.to_s if row[import_fields[:pin_code]]
+    pin_code ||= nil
+    mobile = row[import_fields[:mobile_number]].to_i.to_s if row[import_fields[:mobile_number]]
+    mobile ||= nil
+
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
                     email: row[import_fields[:email]],
-                    mobile_number: row[import_fields[:mobile_number]].to_i,
+                    mobile_number: mobile,
                     role_mapping_attributes: role_mapping_attributes,
                     team_mapping_attributes: [{default: true, manager: manager,
                                                               finance_manager: finance_manager,
@@ -154,7 +159,7 @@ class Import::Superadmin::Users < Import::Base
                                              }],
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],
-                                         pin_code: row[import_fields[:pin_code]],
+                                         pin_code: pin_code,
                                          date_of_birth: row[import_fields[:dob]],
                                          state_id: row[import_fields[:state_id]],
                                          gender: row[import_fields[:gender]],

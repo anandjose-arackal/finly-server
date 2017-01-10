@@ -1,5 +1,5 @@
 json.array!(@result.paginated_reports) do |report|
-  json.extract! report, :id, :name, :status, :status_name
+  json.extract! report, :id, :name
   json.user do
     json.extract! report.user, :name
   end
@@ -13,7 +13,7 @@ json.array!(@result.paginated_reports) do |report|
   if report.policy
     json.policy report.policy.name
   end
-  json.status report.status.name
+  json.status @result.status_name(report)
   json.total(('%.2f' % report.total_amount))
   json.date report.created_at.strftime("%d %b")
 end

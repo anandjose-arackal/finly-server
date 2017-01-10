@@ -99,6 +99,15 @@ class Report::Index < Report::Base
       counts[:closed] = (type_counts[ReportStatus.closed_id] or 0)
     end
 
+    def status_name(report)
+      return nil if report.blank?
+      if report.processing? and report.controlling_user?(self.user)
+        'Awaiting Approval'
+      else
+        report.status_name
+      end
+    end
+
 
   end
 

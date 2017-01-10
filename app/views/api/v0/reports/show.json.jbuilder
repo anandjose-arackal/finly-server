@@ -5,7 +5,7 @@ json.finance_manager_name finance_manager_name
 json.total @result.total
 json.date @result.dates
 json.report do
-  json.partial! '/api/v0/reports/report', report: @result.report
+  json.partial! '/api/v0/reports/report', report: @result.report, result: @result
 end
 json.actions do
   json.take_control @result.actions[:take_control].present?

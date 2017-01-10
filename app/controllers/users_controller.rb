@@ -50,6 +50,7 @@ class UsersController < ApplicationController
       sign_in @result.user, :bypass => true
       redirect_to root_url
     else
+      flash[:error] = @result.messages[:error].to_sentence
       redirect_to request.referrer
     end
   end

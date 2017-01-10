@@ -109,7 +109,7 @@ class User::Show < User::Base
 
       # Wallet Actions
       if manager_view? or finance_view? or admin_view?
-        if admin_view?
+        if self.user.company_admin?
           # Virtual Account -> Wallet
           credit_params[:from_account] = :virtual_account
           credit_params[:to_account] = :wallet

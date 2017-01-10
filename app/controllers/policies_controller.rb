@@ -85,6 +85,7 @@ class PoliciesController < ApplicationController
     end
   end
 
+
   def add_users
     @result = Policy::Users::AddUser.(current_user, params)
     if @result.success?

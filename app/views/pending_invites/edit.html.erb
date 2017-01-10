@@ -11,7 +11,6 @@
       <div>
         <h4 style="color: #465c8b; font-weight: 300; font-size: 20px">Welcome To Finly Expenses! </h4>
       </div>
-      
 
 
       <label style="font-weight: 500">Company Name: </label>
@@ -139,7 +138,7 @@
       <div>
         <select class="form-control" name="user[profile_attributes][state_id]">
           <% @states.each do |state| %>
-            <option value="<%= state[:code] %>"><%= state[:name] %></option>
+            <option value="<%= state.id %>"><%= state.name %></option>
           <% end %>
         </select>
       </div>
