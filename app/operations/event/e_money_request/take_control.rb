@@ -5,7 +5,11 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
   end
 
   def affected_users
-    [self.money_request.controlling_user, self.money_request.controlling_for_user]
+    [self.money_request.controlling_for_user]
+  end
+
+  def notification_affected_users
+    [report.controlling_for_user]
   end
 
   def send_push_notification(user)
