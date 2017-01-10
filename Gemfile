@@ -109,7 +109,7 @@ gem 'griddler', '1.3.1'
 gem 'griddler-sendgrid', '0.0.1'
 gem 'rmagick', '2.16.0'
 gem 'imgkit','1.6.1'
-gem 'wkhtmltoimage-binary', '0.12.2'
+# gem 'wkhtmltoimage-binary', '0.12.2'
 gem 'proselytism', '0.0.3', git: 'https://github.com/ramanbedi1989/proselytism.git'
 
 gem 'require_all', '1.3.3'
