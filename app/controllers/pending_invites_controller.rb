@@ -3,7 +3,7 @@ class PendingInvitesController < ApplicationController
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
-    @states = State::VALUES
+    @states = State.all
     # i.e. if user has already signed in, redirect to login page
     unless @pending_user and @pending_user.invitation_token
       redirect_to new_user_session_path
@@ -86,7 +86,7 @@ class PendingInvitesController < ApplicationController
   end
 
   def activate_employee
-    @states = State::VALUES
+    @states = State.all
     @pending_user = User.find(params[:user_id])
 
     if @pending_user.otp_verified?

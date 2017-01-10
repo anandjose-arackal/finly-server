@@ -11,7 +11,6 @@
       <div>
         <h4 style="color: #465c8b; font-weight: 300; font-size: 20px">Welcome To Finly Expenses! </h4>
       </div>
-      
 
 
       <label style="font-weight: 500">Company Name: </label>
@@ -62,11 +61,6 @@
          <% end %>
       </div>
 
-      <label style="font-weight: 500">Middle Name(Optional): </label>
-      <div>
-        <input type="text" class="form-control" name="user[maiden_name]" value="">
-      </div>
-
       <label style="font-weight: 500">Last Name: </label>
       <div>
         <input type="text" class="form-control" name="user[last_name]"
@@ -75,6 +69,11 @@
            readonly
         <% end %>
         >
+      </div>
+
+      <label style="font-weight: 500">Mother's Maiden Name : </label>
+      <div>
+        <input type="text" class="form-control" name="user[mothers_maiden_name]" value="">
       </div>
 
       <label style="font-weight: 500">Date of Birth:</label>
@@ -139,7 +138,7 @@
       <div>
         <select class="form-control" name="user[profile_attributes][state_id]">
           <% @states.each do |state| %>
-            <option value="<%= state[:code] %>"><%= state[:name] %></option>
+            <option value="<%= state.id %>"><%= state.name %></option>
           <% end %>
         </select>
       </div>

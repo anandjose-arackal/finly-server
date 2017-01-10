@@ -29,7 +29,7 @@
               <div>
                 <div class="input-group" style="width: 100%;">
                   <span class="input-group-addon" id="basic-addon1">+91</span>
-                  <input type="number" class="form-control" name="user[mobile_number]" value="<%= @pending_user.mobile_number %>" readonly>
+                  <input type="text" class="form-control" name="user[mobile_number]" value="<%= @pending_user.mobile_number %>" readonly>
                 </div>
               </div><br />
 
@@ -45,14 +45,14 @@
                <% end %>>
               </div><br />
 
-              <label style="font-weight: 500">Middle Name(Optional): </label>
-              <div>
-                <input type="text" class="form-control" name="user[maiden_name]"  <% unless @pending_user.maiden_name.blank? %> value="<%= @pending_user.maiden_name %>" readonly <% end %>>
-              </div><br />
-
               <label style="font-weight: 500">Last Name: </label>
               <div>
                 <input type="text" class="form-control" name="user[last_name]" <% unless @pending_user.last_name.blank? %> value="<%= @pending_user.last_name %>" readonly <% end %>>
+              </div><br />
+
+              <label style="font-weight: 500">Mother's Maiden Name : </label>
+              <div>
+                <input type="text" class="form-control" name="user[mothers_maiden_name]"  <% unless @pending_user.mothers_maiden_name.blank? %> value="<%= @pending_user.mothers_maiden_name %>" readonly <% end %>>
               </div><br />
 
               <% if @pending_user.profile %>              
@@ -133,7 +133,7 @@
 
                 <label style="font-weight: 500">State:</label>
                 <div>
-                  <%= select_tag "user[profile_attributes][state_id]", options_for_select(@states.collect {|s| [ s[:name], s[:code] ] })%>
+                  <%= select_tag "user[profile_attributes][state_id]", options_for_select(@states.collect {|s| [ s.id, s.name ] })%>
                 </div><br />
 
                 <label style="font-weight: 500">Pin Code:</label>

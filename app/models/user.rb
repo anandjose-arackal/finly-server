@@ -39,10 +39,10 @@
 #  otp_verified           :boolean          default(FALSE), not null
 #  otp_count              :integer          default(0), not null
 #  first_name             :string(255)      default(""), not null
-#  maiden_name            :string(255)
 #  last_name              :string(255)      default(""), not null
 #  default_password       :boolean
 #  mobile_only_invite     :boolean          default(FALSE)
+#  mothers_maiden_name    :string(255)
 #
 
 
@@ -120,21 +120,19 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
-  validates :name, presence: true
-  validates :first_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :maiden_name, length: {maximum: 30}
-  validates :last_name, presence: true, format: {with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, format: Constants::VALID_MOBILE_NUMBER, uniqueness: true
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
+  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
 
-  validate :email_format
   # validate :valid_role
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
-    where "first_name like ? or maiden_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', maiden_name, ' ', last_name) like ?",
-          "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%"
+    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?",
+          "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%"
   end
   scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
   scope :filter_user_id, ->(user_id) { where id: user_id }
@@ -147,10 +145,10 @@ class User < ActiveRecord::Base
   scope :invited_by, ->(id) { where invited_by_id: id }
 
   # scopes for filters
-  # scope :filter_search, -> (term) { where("first_name like ? OR maiden_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
+  # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    where "first_name like ? or maiden_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', maiden_name, ' ', last_name) like ? or email like ?",
-          "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
+    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ?",
+          "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
   end
 
   scope :filter_state, -> (state) do
@@ -192,9 +190,8 @@ class User < ActiveRecord::Base
   end
 
   def name
-    return nil if first_name.blank? and maiden_name.blank? and last_name.blank?
+    return nil if first_name.blank? and last_name.blank?
     name = first_name
-    name += " #{maiden_name}" if maiden_name.present?
     "#{name} #{last_name}"
   end
 
@@ -321,11 +318,16 @@ class User < ActiveRecord::Base
     self.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
   end
 
+  def superadmin?
+    if Constants::SUPERADMIN_ACCOUNTS.include?(self.email)
+      true
+    else
+      false
+    end
+  end
+
   private
 
-  def email_format
-
-  end
   # def valid_role
   #   if self.role_mapping.count == 0
   #     errors.add(:user, "must be assigned a role")

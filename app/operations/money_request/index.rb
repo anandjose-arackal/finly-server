@@ -14,7 +14,7 @@ class MoneyRequest::Index < MoneyRequest::Base
 
   def authorize
     if self.role_id.present?
-      raise_unauthorized_exception unless user.has_role?(self.role_id)
+      raise_unauthorized_exception if not user.has_role?(self.role_id) and not (role_id == UserRole.id_for(:admin) and user.policy_admin?)
     elsif not user.employee?
       raise_unauthorized_exception
     end
@@ -76,6 +76,15 @@ class MoneyRequest::Index < MoneyRequest::Base
       if self.money_requests.present?
         self.money_requests = apply_scopes(self.money_requests, params)
         self.paginated_money_requests = self.money_requests.paginate(page: params[:page], per_page: 30)
+      end
+    end
+
+    def status_name(money_request)
+      return nil if money_request.blank?
+      if money_request.processing? and money_request.controlling_user?(self.user)
+        'Awaiting Approval'
+      else
+        money_request.status_name
       end
     end
 

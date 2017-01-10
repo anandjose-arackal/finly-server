@@ -7,7 +7,7 @@ module Constants
   # todo - needs to be edited once we get the account details.
   ITZCASH_EMAIL_ID = 'sreeram.nr@finly.io'
 
-  SUPERADMIN_ACCOUNTS = ['sreeram@finlytest.io', 'vivek@finlytest.io', 'veekshith@finlytest.io', 'bala@finlytest.io', 'admin@finlytest.io']
+  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finlytest.io', 'admin@finlytest.io']
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
 
@@ -43,6 +43,7 @@ module Constants
 
 
   class Constants::ItzCash
+
 
     MSG_QUEUE_USERNAME = "finly"
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"

@@ -14,4 +14,4 @@
 # Crono.perform(TestJob).every 2.days, at: '15:30'
 #
 
-Crono.perform(ReportAutoSubmit).every 1.day, at: {hour: 00, min: 01}
+Crono.perform(ReportAutoSubmit).every 1.day, at: {hour: 00, min: 1}

@@ -1,11 +1,19 @@
 class MsgQueuePoller
 
   def self.run
+    username = ENV["MSG_QUEUE_USERNAME"]
+    password = ENV["MSG_QUEUE_PASSWORD"]
+    if Rails.env == 'production'
+      mq_server_address = ENV["MSG_QUEUE_ADDRESS_PRODUCTION"]
+    elsif Rails.env == 'itzcash_uat'
+      mq_server_address = ENV["MSG_QUEUE_ADDRESS_UAT"]
+    else
+      mq_server_address = ENV["MSG_QUEUE_ADDRESS_TESTING"]
+    end
 
-    username = Constants::ItzCash::MSG_QUEUE_USERNAME
-    password = Constants::ItzCash::MSG_QUEUE_PASSWORD
+    error_logger = Logger.new("#{Rails.root}/log/msg_queue_errors.log")
 
-    client = Stomp::Connection.new(username, password, "180.179.138.163", 61613, true)
+    client = Stomp::Connection.new(username, password, mq_server_address, 61613, true)
     client.subscribe("/queue/FinlyQueue")
 
     puts "Subscribed!"
@@ -37,21 +45,28 @@ class MsgQueuePoller
                       product_code: data[11]
                       }
 
+      rescued = false
+      @result = nil
       # triggering the operation to create a card transaction
       begin
-        result = Card::Transaction::Create.(trans_params)
-      rescue
-        # todo - log the output to a log file
+        @result = Card::Transaction::Create.(trans_params)
+      rescue NotAuthorizedException => error
+        error_logger.error("Following transaction could not be expensed: #{message.body} because of the following error: #{error.message}")
+        trans = CardTransaction.create(trans_params)
+        rescued = true
       end
 
+
       # if the creation of an entry on the transaction table fails, log it in a file
-      begin
-        trans = CardTransaction.create(trans_params)
-        unless trans
-          # todo - output to log file that transaction that wasn't created
+      if not rescued and @result.transaction.nil?
+        begin
+          trans = CardTransaction.new(trans_params)
+          unless trans.save
+            error_logger.error("Following transaction could not be created: #{message.body} because of following errors: #{trans.errors.full_messages}")
+          end
+        rescue => error
+          error_logger.error("Following transaction could not be created : #{message.body} because of following errors: #{error.message}")
         end
-      rescue
-        # todo - output to a file the transaction that wasn't created
       end
     end
 

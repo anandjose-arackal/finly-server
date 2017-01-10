@@ -60,6 +60,15 @@ class Report::Base < BaseOperation
       self.violations = Report::Violation.(user, report: self.report)
     end
 
+    def status_name(report)
+      return nil if report.blank?
+      if report.processing? and report.controlling_user?(self.user)
+        'Awaiting Approval'
+      else
+        report.status_name
+      end
+    end
+
     def expenses_category_sorted
       categorized_expenses = []
       self.categories.each do |category|

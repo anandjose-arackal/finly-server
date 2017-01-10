@@ -86,12 +86,6 @@ class PoliciesController < ApplicationController
   end
 
 
-
-  # def invitable_users
-  #   @result = Policy::InvitableUsers.(current_user, params)
-  #   respond
-  # end
-
   def add_users
     @result = Policy::Users::AddUser.(current_user, params)
     if @result.success?

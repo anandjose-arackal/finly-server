@@ -72,24 +72,25 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: "www.finly.io" }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              'smtp.sendgrid.net',
-    port:                 587,
-    domain:               'www.finly.io',
-    user_name:            'vivekagb',
-    password:             'idAr5APhk61X',
+    address:              'mail2.itzcash.com',
+    port:                 25,
+    domain:               'www.finly.io'
+#    user_name:            'finly@itzcash.com',
+    # password:             '',
     # ssl:                  true,
     # tls:                  true,
-    authentication:       :plain,
-    enable_starttls_auto: true,
-    :openssl_verify_mode  => 'none'
+#    authentication:       :none,
+    # enable_starttls_auto: true,
+    # :openssl_verify_mode  => 'none'
   }
+
 
   #####################################################################
 
   # temporary config for mailers
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :test
-  config.action_mailer.default_url_options = { host: 'localhost:3000'}
+  # config.action_mailer.raise_delivery_errors = true
+  # config.action_mailer.delivery_method = :test
+  # config.action_mailer.default_url_options = { host: 'localhost:3000'}
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

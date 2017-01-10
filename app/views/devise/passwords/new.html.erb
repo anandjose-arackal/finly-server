@@ -3,7 +3,6 @@
 <body>
 <img src="<%= image_url('logo_up_medium_res.png') %>">
 <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: {method: :post}) do |f| %>
-    <%= devise_error_messages! %>
     <div class="modal-dialog">
       <div class="loginmodal-container">
         <form data-remote data-turboboost  name="myForm" method="post" action="<%= password_path(resource_name) %>" onsubmit="return validateForm()">
