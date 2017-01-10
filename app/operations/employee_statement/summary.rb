@@ -22,7 +22,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
 
   def process
     # table 1
-    items[:user_account_opening_balance] = user_account_balance(start_date)
+    # items[:user_account_opening_balance] = user_account_balance(start_date)
 
     # Virtual account details
     items[:user_account_status_details] = {}
@@ -49,6 +49,9 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     items[:account_closing_balance] = user_account_balance(end_date)
     items[:card_closing_balance] = card_balance_on_date(end_date)
     items[:closing_cash_in_hand] = cash_in_hand_on_date(end_date)
+
+    items[:user_account_opening_balance] = items[:account_closing_balance] - items[:user_account_status_details][:account_load] + items[:user_account_status_details][:account_withdrawal]
+                                           + items[:user_account_status_details][:account_transfer_to_other_accounts] + items[:user_account_status_details][:account_transfer_to_other_cards]
 
     # table 2
 

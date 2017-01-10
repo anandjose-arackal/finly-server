@@ -118,8 +118,11 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       end
     end
 
+    mobile = row[import_fields[:mobile_number]].to_i.to_s if row[import_fields[:mobile_number]]
+    mobile ||= nil
+
     user_params = { email: row[import_fields[:email]],
-                    mobile_number: row[import_fields[:mobile_number]],
+                    mobile_number: mobile,
                     role_mapping_attributes: role_mapping_attributes,
                     team_mapping_attributes: [{default: true, manager: manager,
                                                finance_manager: finance_manager,
