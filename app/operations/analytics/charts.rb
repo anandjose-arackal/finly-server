@@ -44,11 +44,7 @@ class Analytics::Charts < BaseOperation
   end
 
   def authorize
-    # if user.admin? or user.manager? or user.finance_manager?
-    #   self.fields = [:user, :merchant, :category]
-    # else
-    #   self.fields = [:merchant, :category]
-    # end
+
   end
 
   def pre_process
