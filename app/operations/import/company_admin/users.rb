@@ -90,28 +90,28 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes
     if row[import_fields[:reporting_manager]]
-      manager = User.find_by(email: row[import_fields[:reporting_manager]]) rescue nil
+      manager = User.find_by(email: row[import_fields[:reporting_manager]], mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       unless manager and manager.manager?
-        errors << "Reporting Manager not found"
+        errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
     end
     if row[import_fields[:reporting_finance_manager]]
-      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]]) rescue nil
+      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]], mobile_number: row[import_fields[:reporting_finance_manager]]) rescue nil
       unless finance_manager and finance_manager.finance_manager?
-        errors << "Reporting Finance Manager not found"
+        errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
     end
     if row[import_fields[:approves_to]]
-      approves_to = User.find_by(email: row[import_fields[:approves_to]]) rescue nil
+      approves_to = User.find_by(email: row[import_fields[:approves_to]], mobile_number: row[import_fields[:approves_to]]) rescue nil
       unless approves_to and approves_to.manager?
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
     end
     if row[import_fields[:approves_finance_to]]
-      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]]) rescue nil
+      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]], mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
       unless approves_finance_to and approves_finance_to.finance_manager?
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil

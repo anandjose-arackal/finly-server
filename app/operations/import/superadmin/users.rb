@@ -114,28 +114,28 @@ class Import::Superadmin::Users < Import::Base
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes
     if row[import_fields[:reporting_manager]]
-      manager = User.find_by(email: row[import_fields[:reporting_manager]]) rescue nil
+      manager = User.find_by(email: row[import_fields[:reporting_manager]], mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       unless manager and manager.manager? and manager.company_id == row[import_fields[:company_id]]
-        errors << "Reporting Manager not found"
+        errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
     end
     if row[import_fields[:reporting_finance_manager]]
-      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]]) rescue nil
+      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]], mobile_number: row[import_fields[:reporting_finance_manager]]) rescue nil
       unless finance_manager and finance_manager.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
-        errors << "Reporting Finance Manager not found"
+        errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
     end
     if row[import_fields[:approves_to]]
-      approves_to = User.find_by(email: row[import_fields[:approves_to]]) rescue nil
+      approves_to = User.find_by(email: row[import_fields[:approves_to]], mobile_number: row[import_fields[:approves_to]]) rescue nil
       unless approves_to and approves_to.manager? and approves_to.company_id == row[import_fields[:company_id]]
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
     end
     if row[import_fields[:approves_finance_to]]
-      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]]) rescue nil
+      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]], mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
       unless approves_finance_to and approves_finance_to.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil

@@ -50,9 +50,15 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     items[:card_closing_balance] = card_balance_on_date(end_date)
     items[:closing_cash_in_hand] = cash_in_hand_on_date(end_date)
 
-    items[:user_account_opening_balance] = items[:account_closing_balance] - items[:user_account_status_details][:account_load] + items[:user_account_status_details][:account_withdrawal]
-                                           + items[:user_account_status_details][:account_transfer_to_other_accounts] + items[:user_account_status_details][:account_transfer_to_other_cards]
 
+    items[:user_account_opening_balance] = (items[:account_closing_balance]
+                                         - items[:user_account_status_details][:account_load]
+                                         + items[:user_account_status_details][:account_withdrawal]
+                                         + items[:user_account_status_details][:account_transfer_to_other_accounts]
+                                         + items[:user_account_status_details][:account_transfer_to_other_cards]
+                                         + items[:transferred_to_card][:from_own_account])
+
+    
     # table 2
 
     items[:opening_card_balance] = card_balance_on_date(start_date)
@@ -110,7 +116,6 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
                                                              PaymentType.id_for(:credit_from_virtual_account_to_wallet),
                                                              PaymentType.id_for(:credit_from_wallet_to_card)]).joins(:amount).sum(:value)
     balance = balance + debits - credits
-    debugger
     precision_value balance
   end
 
