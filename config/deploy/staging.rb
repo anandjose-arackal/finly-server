@@ -7,8 +7,11 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '52.76.54.96', user: 'deploy', roles: %w{web app db}
-# set :stage, 'staging'
+server 'staging.finly.io', user: 'centos', roles: %w{web app db}
+set :stage, 'staging'
+set :use_sudo, false
+set :rbenv_type, :user
+set :rbenv_ruby, '2.3.1' # Edit this if you are using MRI Ruby
 # set :rvm_type, :user
 # set :rvm_ruby_version, 'ruby-2.3.0' # Edit this if you are using MRI Ruby
 
