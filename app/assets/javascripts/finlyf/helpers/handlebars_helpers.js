@@ -142,5 +142,15 @@ Handlebars.registerHelper('setVar', function(varName, varValue, options){
 //Find percentage
 Handlebars.registerHelper('percentage', function(a, b){
   return parseInt(parseFloat(a) / parseFloat(b) * 100);
-})
+});
+
+Handlebars.registerHelper('ifIn', function(elem, list, options) {
+  if(list){
+    if(list.indexOf(elem) > -1) {
+      return options.fn(this);
+    }
+  }
+  return options.inverse(this);
+});
+
 

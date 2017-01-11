@@ -127,6 +127,21 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
 
     sidebar = $(@el).find(".sidebar")
     navbar_main = $(@el).find(".navbar-main")
+
+    expenses_status_ids = []
+
+    $(".sidebar .filter-expense-status-id:checked").each( ->
+      expenses_status_ids.push($(this).val())
+    )
+
+    expenses_type_ids = []
+
+    $(".sidebar .filter-expense-type-id:checked").each( ->
+      expenses_type_ids.push($(this).val())
+    )
+
+
+
     params = {
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
@@ -135,6 +150,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       'filter_user_name': $(".sidebar .filter-user").val() || ""
       'filter_show_for': $(".sidebar .select-show-for").val() || ""
       'filter_analytics_type': $(navbar_main).find('li.filter-data-type.active').attr('data-show-type') || "category"
+      'filter_expense_status_id':  expenses_status_ids
+      'filter_expense_type_id': expenses_type_ids
     }
 
     # console.log "Will navigate now.", params
