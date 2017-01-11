@@ -307,6 +307,12 @@ $brand-admin-primary: #e74c3c; //Hot Pink
     font-size: 12px;
     line-height: 9px;
   }
+
+  // Used when there is a navbar nav inside section card > section header
+  .section-card ul.nav li.active a, .section-card ul.nav li.active a:hover, .section-card ul.nav li.active a:focus .section-card ul.nav li.active a:active{
+    border-bottom: 3px solid $brand-admin-primary;
+    background: white;
+  }
 }
 
 .superscript{
@@ -434,7 +440,7 @@ $brand-admin-primary: #e74c3c; //Hot Pink
 
 
 // Vertical Divider
-.navbar .divider-vertical {
+.navbar-nav .divider-vertical {
   height: 50px;
   margin: 0 9px;
   border-right: 1px solid #ffffff;
@@ -735,6 +741,11 @@ body {
 
 .borderless td, .borderless th {
   border: none;
+}
+
+.table thead{
+  font-size: 16px;
+  border-bottom: 2px solid #ccc;
 }
 // Hopefully Obsolete codes
 

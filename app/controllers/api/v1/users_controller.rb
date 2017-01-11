@@ -16,4 +16,9 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
     respond
   end
 
+  def summary
+    @result = User::Summary.(current_user, params)
+    respond
+  end
+
 end
