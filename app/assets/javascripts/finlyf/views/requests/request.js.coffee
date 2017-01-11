@@ -539,6 +539,7 @@ class FinlyF.Views.Request extends Backbone.View
       dataType: 'json',
       data: data,
       success: (res) ->
+        $(target).removeAttr('disabled').html(button_text)
         FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
@@ -546,8 +547,8 @@ class FinlyF.Views.Request extends Backbone.View
             data: {view: _this.current_view}
           })
           # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        else
-          $(target).removeAttr('disabled').html(button_text)
+        # else
+        #   $(target).removeAttr('disabled').html(button_text)
           # _this.model.fetch({
           #   data: {view: _this.current_view}
           # })

@@ -136,14 +136,14 @@
 
 #ohsnap{
   bottom: 0;
-  left: auto;
+  left: 10px;
   margin-top: 60px;
   position: absolute;
   z-index: 1051;
   width: 33%;
   margin-right: auto;
   margin-left: auto;
-  right: 10px;
+  right: auto;
 }
 
 
@@ -155,10 +155,11 @@
   border-radius: 4px;
   // position: absolute;
   bottom: 0px;
-  right: 21px;
+  // right: 21px;
+  left: 21px;
   /* Each alert has its own width */
-  float: right;
-  clear: right;
+  float: left;
+  clear: left;
   z-index: 1051;//Above modal's z index
 }
 

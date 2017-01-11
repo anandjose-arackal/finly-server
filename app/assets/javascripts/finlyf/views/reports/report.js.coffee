@@ -546,14 +546,15 @@ class FinlyF.Views.Report extends Backbone.View
       data: data,
       success: (res) ->
         FinlyF.snapNotify(res.messages)
+        $(target).removeAttr('disabled').html(button_text)
         if res.success == true
           $(modal).modal('hide')
           _this.model.fetch({
             data: {view: _this.current_view}
           })
           # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        else
-          $(target).removeAttr('disabled').html(button_text)
+        # else
+        #   $(target).removeAttr('disabled').html(button_text)
           # _this.model.fetch({
           #   data: {view: _this.current_view}
           # })
