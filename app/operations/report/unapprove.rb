@@ -59,7 +59,8 @@ class Report::Unapprove < Report::Base
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: role_id,
                                 controlling_for_user_role_id: nil,
-                                report_status_id: ReportStatus.processing_id
+                                report_status_id: ReportStatus.processing_id,
+                                approved_at: nil
       report.tracks.create action_user: user,
                            action_user_role_id: role_id,
                            modified_user: prev_controlling_user,

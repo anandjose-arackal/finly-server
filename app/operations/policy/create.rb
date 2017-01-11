@@ -12,11 +12,11 @@ class Policy::Create < Policy::Base
 
   def pre_validate
     if user.blank?
-      messages[:error] << "No user passed."
+      messages[:error] << "No user passed"
       return false
     end
     if params[:name].blank?
-      messages[:error] << "Cannot create policy without name."
+      messages[:error] << "Cannot create policy without name"
       return false
     end
   end
