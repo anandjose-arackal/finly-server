@@ -70,7 +70,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     #Append all the expenses
     # @dump = @collection.models.slice()
     # # console.log "Models - ", @collection.models.length
-    arr = @collection.pluck('total')
+    arr = @collection.pluck('item_total')
     @max_total = Math.max.apply(Math,arr)
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
@@ -89,7 +89,10 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       model: item
       parent: @
     })
-    $(@el).find("#items").append(view_item.render().el)
+    if item.get('meta')
+      $(@el).find("#items-total").append(view_item.render().el)
+    else
+      $(@el).find("#items").append(view_item.render().el)
 
   refetchCollection: (e) ->
     #REFRESH
