@@ -24,6 +24,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     'click .btn-filter-expenses': 'filter'
     'click .filter-data-type': 'filterDataType'
 
+    'click .load-more': 'loadMore'
+
   initialize: (options) ->
     if options
       @params = options.params || {}
@@ -38,6 +40,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        _this.toggleLoadMore(_this.collection)
       error: ->
         console.log "Couldn't fetch Successfully."
     })
@@ -112,7 +115,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
-        # _this.toggleLoadMore(_this.collection)
+        _this.toggleLoadMore(_this.collection)
         # _this.dump.length = 0
         # _this.dump = _this.collection.models.slice()
         # _this.resetPageCount({selector: '.main .load-more', page: 1})
@@ -230,3 +233,44 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  loadMore: (e) ->
+    _this = @
+    target = $(e.currentTarget)
+    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+    $(target).find('span').text('Loading....')
+    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+
+    @collection.fetch({
+      data: _this.params,
+      reset: false,
+      success: ->
+        _this.toggleLoadMore(_this.collection)
+        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+        $(target).find('span').text('Load More')
+        _this.resetPageCount({target: target, page: _this.params.page })
+
+        _this.dump = (_this.dump.concat(_this.collection.models.slice())).slice()
+
+        _this.collection.reset(_this.dump)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
+    })
+
+  toggleLoadMore: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 20
+      # console.log "Should hide"
+      $(@el).find('.load-more').css('display', 'none')
+    else
+      $(@el).find('.load-more').css('display', 'inline')
+
+  resetPageCount: (options) ->
+    if options.target
+      $(options.target).attr('data-page', options.page)
+    else if options.selector
+      $(options.selector).attr('data-page', options.page)
+    else
+      $('.main .load-more').attr('data-page', options.page)
+
