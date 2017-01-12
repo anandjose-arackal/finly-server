@@ -128,7 +128,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @params.id = @user
 
         unless @params.view_to_load
-          @params.view_to_load = 'approved'
+          @params.view_to_load = 'reports'
         
         @collection.url = @collection.url + "/" + @user.toString()
         @collection.fetch({
@@ -206,8 +206,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         #   $(@el).find(".settlements-index").html(@templateMainRequestsApproved({item: @params}))
         else if @params.view_to_load == 'reports'
           $(@el).find(".settlements-index").html(@templateMainReports())
+        else
+          $(@el).find(".settlements-index").html(@templateMainReports())
       else
-        $(@el).find(".settlements-index").html(@templateMainPayments())
+        $(@el).find(".settlements-index").html(@templateMainReports())
 
       $(@el).find(".navbar-main").html(@templateNavbarMainPersonal({item: {id: @user}}))
     else
