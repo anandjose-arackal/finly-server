@@ -874,6 +874,7 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.boolean  "auto_submit",                                            default: false, null: false
     t.boolean  "auto_approve",                                           default: false, null: false
     t.date     "accounted_at"
+    t.datetime "approved_at"
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -931,7 +932,7 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-01-10', null: false
+    t.date     "date_of_birth",                   default: '2017-01-12', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

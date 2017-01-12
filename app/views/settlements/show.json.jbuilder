@@ -11,6 +11,7 @@ json.array! @result.items do |item|
     json.reimbursement_amount item.reimbursement_amount.value
     json.status item.status_name
   elsif item.is_a?(Payment)
+    json.extract! item, :note, :date
     json.type 'payment'
     json.payment_amount item.amount.value
     json.initiating_user item.initiating_user.name

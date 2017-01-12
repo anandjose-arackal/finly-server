@@ -17,9 +17,9 @@ class Settlement::Show < Settlement::Base
     load_selected_user
     if self.view_to_load == 'payments'
       load_payments
-    elsif self.view_to_load == 'money_requests'
+    elsif self.view_to_load.include?('money_request')
       load_money_requests
-    else
+    elsif view_to_load.include?('reports')
       load_reports
     end
     return if has_errors?
@@ -86,6 +86,9 @@ class Settlement::Show < Settlement::Base
     else
       self.reports = self.selected_user.reports.settlement_viewable
     end
+    if view_to_load.include?('approved')
+      self.reports = reports.approved
+    end
   end
 
   def load_payments
@@ -97,6 +100,9 @@ class Settlement::Show < Settlement::Base
       self.money_requests = selected_user.money_requests
     else
       self.money_requests = self.selected_user.money_requests.settlement_viewable
+    end
+    if view_to_load.include?('approved')
+      self.money_requests = money_requests.approved
     end
   end
 
