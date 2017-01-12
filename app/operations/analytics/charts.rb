@@ -7,18 +7,19 @@ class Analytics::Charts < BaseOperation
 
   class Analytics::Charts::ChartsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :charts
+    attr_accessor :charts, :total, :unpaginated_charts
 
     def init
       self.charts = params[:charts]
+      self.total = params[:total]
       self.charts = paginated_charts
     end
 
     def paginated_charts
+      page = params[:page].to_i
       if params[:page].present?
-        return charts[20*(params[:page].to_i - 1), 20*params[:page].to_i]
+        return charts[0 + 20*(page - 1), 20]
       end
-      charts[0, 20]
     end
   end
 
@@ -29,7 +30,7 @@ class Analytics::Charts < BaseOperation
   has_scope :filter_amount, using: [:type, :value], type: :hash
   has_scope :filter_status_id
   has_scope :filter_date, using: [:from, :to], type: :hash
-  has_scope :filter_expense_type_id
+  has_scope :filter_expense_type_id, type: :array
 
   attr_accessor :team_users, :user_ids, :field, :charts, :expenses, :role
 
@@ -140,26 +141,31 @@ class Analytics::Charts < BaseOperation
 
   def status_wise_distribution
     exp_ids = []
+    # i.e. if none of them are selected, show all of them
+    if params[:filter_expense_status_id].nil? or params[:filter_expense_status_id].empty?
+      params[:filter_expense_status_id] = ["1", "2", "3", "4"]
+    end
     if params[:filter_expense_status_id]
       params[:filter_expense_status_id].each do |status_id|
         case status_id
           when '1'
             # i.e. all unreported expenses
-            exp_ids = expenses.where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id, ExpenseStatus.unsubmitted_id]).pluck(:id)
+            exp_ids += expenses.where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id, ExpenseStatus.unsubmitted_id]).pluck(:id)
           when '2'
             r = Report.processing.all
-            exp_ids = expenses.where(report_id: r).pluck(:id)
+            exp_ids += expenses.where(report_id: r).pluck(:id)
           when '3'
             r = Report.approved.all
             exp_ids += expenses.where(report_id: r).pluck(:id)
           when '4'
-            r = Report.processed.all
+            r = Report.reimbursed_and_closed.all
             exp_ids += expenses.where(report_id: r).pluck(:id)
           else
             # do nothing
         end
       end
     end
+    exp_ids.uniq!
     Expense.where(id: exp_ids)
   end
 
