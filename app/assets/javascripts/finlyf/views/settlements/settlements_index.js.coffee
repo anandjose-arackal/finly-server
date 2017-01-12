@@ -74,25 +74,16 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
     #Filters
     'click .user': 'userSettlements'
-
-    # 'click .btn-process-reimburse': 'initReimburse'
-    # 'click .btn-process-debt': 'initDebt'
-    # 'click .btn-process-payment': 'initPayment'
-    # 'click .btn-process-money-request': 'initCreditMoneyRequest'
+    
     'change input[type=radio][name=advance_request_type]': 'loadRequstedAdvanceList' 
 
     #settlements
     'click .btn-back-step-2': 'cancelConfirmation'
-    # 'click .btn-add-payment': 'addPayment'
-    # 'click .settlement-report': 'processSettlementReport'
     'click .settlement-report-select:checkbox': 'processSettlementReport'
-    # 'click .btn-settlement-action': 'processSettlementAction'
-    # 'click .confirm-report-action': 'confirmReportAction'
     'keyup .search-user': 'prepareSearch'
     'submit .navbar-form': 'cancelEvents'
 
     #New actions
-    # 'click .settlement-actions li': 'processCreditDebit'
     'click .btn-summary-action.btn-debit': 'processDebit'
     'click .btn-summary-action.btn-credit': 'processCredit'
     'click input[name=settlement_credit_action]': 'creditDebitOptions'
@@ -416,12 +407,12 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(target).parent().addClass('active')
       if view_to_load == 'payments'
         $(@el).find(".settlements-index").html(@templateMainPayments())
-      else if view_to_load == "approved_money_request"
-        $(@el).find(".settlements-index").html(@templateMainRequestsApproved({item: {view_to_load: view_to_load}}))
-      else if view_to_load == "credited_money_request"
-        $(@el).find(".settlements-index").html(@templateMainRequestsCredited({item: {view_to_load: view_to_load}}))
-      else
-        $(@el).find(".settlements-index").html(@templateMain())
+      else if view_to_load == "money_requests"
+        $(@el).find(".settlements-index").html(@templateMainRequestsApproved({item: {view_to_load: view_to_load}}))#Attention
+      # else if view_to_load == "credited_money_request"
+      #   $(@el).find(".settlements-index").html(@templateMainRequestsCredited({item: {view_to_load: view_to_load}}))
+      else if view_to_load == 'reports'
+        $(@el).find(".settlements-index").html(@templateMain())#attention
       # console.log @collection.url
       @params.view_to_load = view_to_load
       @collection.fetch({
