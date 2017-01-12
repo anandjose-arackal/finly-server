@@ -71,7 +71,10 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     # @dump = @collection.models.slice()
     # # console.log "Models - ", @collection.models.length
     arr = @collection.pluck('item_total')
-    @max_total = Math.max.apply(Math,arr)
+    # console.log arr
+    # console.log arr.filter(Boolean)
+    # console.log arr
+    @max_total = Math.max.apply(Math,arr.filter(Boolean))
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
@@ -83,7 +86,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       $(spinner).removeClass("fa-spin")
 
   appendItems: (item) ->
-    item.set('max_total', @max_total)
+    unless item.get('meta')
+      item.set('max_total', @max_total)
     #Creating view for each expense and appending them
     view_item = new FinlyF.Views.Analytic({
       model: item
