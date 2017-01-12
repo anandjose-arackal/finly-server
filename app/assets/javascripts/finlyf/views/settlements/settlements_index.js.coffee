@@ -584,7 +584,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     @settlementActionData.selectedReports = _.select(@collectionSettlementReports.models, (model) ->
       (_.indexOf(_this.settlementActionData.selected, model.get('id')) > -1)
     )
-    $(container).closest('.modal-body').find('.selected_items_total').text(@selectedReportsTotal())
+
+    console.log @selectedReportsTotal()
+    $(container).closest('.modal-body').find('.selected_items_total').text(Math.round((parseFloat(@selectedReportsTotal())) * 100) / 100)
 
     #report/moneyrequest names
     @settlementActionData.selectedReportNames = []
@@ -748,7 +750,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
         report_container = $(modal_body).find('.settlement-action-items')
         #Load reports
-        @params.view_to_load = 'approved'
+        @params.view_to_load = 'approved_reports'
         @params.id = @user_id
         # collection = new FinlyF.Collections.Settlements()
         @collectionSettlementReports.url = "/settlements/" + @user_id
