@@ -17,7 +17,7 @@ class Settlement::Show < Settlement::Base
     load_selected_user
     if self.view_to_load == 'payments'
       load_payments
-    elsif self.view_to_load.include?('money_request')
+    elsif self.view_to_load == 'money_requests'
       load_money_requests
     else
       load_reports
@@ -84,8 +84,7 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.reports = self.selected_user.reports
     else
-      self.reports = self.selected_user.reports
-      self.reports = self.reports.send(self.view_to_load) if self.reports.present?
+      self.reports = self.selected_user.reports.settlement_viewable
     end
   end
 
@@ -97,8 +96,7 @@ class Settlement::Show < Settlement::Base
     if self.view_to_load.blank?
       self.money_requests = selected_user.money_requests
     else
-      self.money_requests = self.selected_user.money_requests
-      self.money_requests = self.money_requests.send(self.view_to_load) if self.money_requests.present?
+      self.money_requests = self.selected_user.money_requests.settlement_viewable
     end
   end
 
