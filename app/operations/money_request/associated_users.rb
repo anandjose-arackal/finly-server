@@ -68,7 +68,7 @@ class MoneyRequest::AssociatedUsers < MoneyRequest::Base
     if user_ids.present?
       user_ids.uniq!
     else
-      user_ids = [self.user_id]
+      user_ids = [self.user.id]
     end
     user_ids
   end

@@ -89,7 +89,9 @@ class MoneyRequest < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
-  scope :settlement_viewable, -> {where status_id: [MoneyRequestStatus.approved_id, MoneyRequestStatus.credited_id]}
+  scope :settlement_viewable, -> {
+    where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)]
+  }
 
   accepts_nested_attributes_for :items
   delegate :status_name, to: :status
@@ -104,27 +106,27 @@ class MoneyRequest < ActiveRecord::Base
   attr_accessor :cache_users
 
   def open?
-    status_id == MoneyRequestStatus.open_id
+    status_id == MoneyRequestStatus.id_for(:open)
   end
 
   def processing?
-    status_id == MoneyRequestStatus.processing_id
+    status_id == MoneyRequestStatus.id_for(:processing)
   end
 
   def retracted?
-    status_id == MoneyRequestStatus.retracted_id
+    status_id == MoneyRequestStatus.id_for(:retracted)
   end
 
   def rejected?
-    status_id == MoneyRequestStatus.rejected_id
+    status_id == MoneyRequestStatus.id_for(:rejected)
   end
 
   def approved?
-    status_id == MoneyRequestStatus.approved_id
+    status_id == MoneyRequestStatus.id_for(:approved)
   end
 
   def credited?
-    status_id == MoneyRequestStatus.credited_id
+    status_id == MoneyRequestStatus.id_for(:credited)
   end
 
   def can_submit?

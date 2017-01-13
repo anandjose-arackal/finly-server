@@ -330,10 +330,11 @@ class Notification < ActiveRecord::Base
     owner = object.user
     if self.action_type_id == NotificationActionType.notify_auto_approve_id
       return ""
-    elsif self.action_user_id == owner.id
-      return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
-      return " a" if object_type == "Report"
-      return " an" if object_type == "Advance Request"
+    # below condition is only if we're showing notification for an action performed on one's own object. eg. Submit, Approve etc.
+    # elsif self.action_user_id == owner.id
+    #   return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
+    #   return " a" if object_type == "Report"
+    #   return " an" if object_type == "Advance Request"
     elsif self.user_id == owner.id
       return " your"
     else

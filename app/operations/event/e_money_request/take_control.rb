@@ -19,6 +19,7 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
   end
 
   def set_notification(user)
+    # debugger
     if money_request.controlling_for_user_id == user.id
       view_role_id = money_request.controlling_for_user_role_id
     else

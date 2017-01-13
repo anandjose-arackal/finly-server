@@ -14,6 +14,10 @@ class Event::EMoneyRequest::Submit < Event::EMoneyRequest::Base
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
+  def notification_affected_users
+    [self.money_request.controlling_user]
+  end
+
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
                                              action_type_id: NotificationActionType.notify_submit_id,
