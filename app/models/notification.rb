@@ -98,7 +98,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.notify_cash_withdrawal_id
         action = " in hand withdrawn"
       when NotificationActionType.notify_cash_load_id
-        action = " in hand loaded"
+        action = " in hand added"
       when NotificationActionType.notify_atm_withdrawal_id
         action = " withdrawn from ATM"
       when NotificationActionType.notify_credit_advance_request_id
@@ -169,7 +169,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.notify_cash_withdrawal_id
         action = " withdrawn an amount of"
       when NotificationActionType.notify_cash_load_id
-        action = " loaded an amount of"
+        action = " added an amount of"
       when NotificationActionType.notify_atm_withdrawal_id
         action = " withdrawn an amount of"
       when NotificationActionType.notify_credit_reimbursement_id

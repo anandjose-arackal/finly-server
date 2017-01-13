@@ -76,6 +76,8 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       update_attributes[:controlling_for_user_id] = nil
       update_attributes[:controlling_user_role_id] = nil
       update_attributes[:controlling_for_user_role_id] = nil
+      update_attributes[:payment] = result.payment
+
       money_request.update_attributes update_attributes
 
       track_attributes = {}
