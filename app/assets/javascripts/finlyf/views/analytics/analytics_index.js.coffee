@@ -33,6 +33,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       @params = {}
     @params.view = @params.view || 'personal'
     @params.filter_analytics_type = @params.filter_analytics_type || 'category'
+    @params.page = 1
     _this = @
     @dump = []
     @collection = new FinlyF.Collections.Analytics()
@@ -53,7 +54,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
-    @params.indexOnly = false#REF==2I
+    # @params.indexOnly = false#REF==2I
 
 
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
@@ -71,7 +72,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
 
   processItems: ->
     #Append all the expenses
-    # @dump = @collection.models.slice()
+    @dump = @collection.models.slice()
     # # console.log "Models - ", @collection.models.length
     arr = @collection.pluck('item_total')
     # console.log arr
@@ -111,11 +112,16 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       target = e.currentTarget
       $(target).find("i").addClass("fa-spin")
 
+    @params.page = 1
+
     @collection.fetch({
       reset: true,
       data: _this.params,
       success: ->
         _this.toggleLoadMore(_this.collection)
+        _this.dump.length = 0
+        _this.dump = _this.collection.models.slice()
+        _this.resetPageCount({selector: '.main .load-more', page: 1})
         # _this.dump.length = 0
         # _this.dump = _this.collection.models.slice()
         # _this.resetPageCount({selector: '.main .load-more', page: 1})
