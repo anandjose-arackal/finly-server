@@ -25,4 +25,8 @@ class CategoriesController < ApplicationController
     end
   end
 
+  def index
+    @categories = current_company.categories.active rescue []
+  end
+
 end
