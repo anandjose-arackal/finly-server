@@ -809,7 +809,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
         items_container = $(modal_body).find('.settlement-action-items')
         #Load reports
-        @params.view_to_load = 'approved_money_request'
+        @params.view_to_load = 'approved_money_requests'
         @params.id = @user_id
 
         # @params.payment_mode_id = 1
