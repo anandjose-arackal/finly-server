@@ -821,7 +821,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
           data: _this.params
           success: ->
             _this.collectionSettlementReports.each((item) ->
-              if parseInt(item.get('payment_mode_id')) == 1#hard coding for the first time to show cash requested
+              console.log "each money request"
+              if item.get('payment_mode') == 'cash'#hard coding for the first time to show cash requested
                 view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
                 $(items_container).append(view_item.render().el)
               # view_item = new FinlyF.Views.Settlement({ model: item, page: 'money_request' })
