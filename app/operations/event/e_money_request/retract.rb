@@ -16,7 +16,7 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
   end
 
   def set_notification(user)
-    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
                                              action_type_id: NotificationActionType.notify_retract_id,
                                              action_user_id: money_request.user_id,

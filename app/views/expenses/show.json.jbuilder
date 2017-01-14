@@ -11,3 +11,5 @@ end
 json.violations @result.violation
 
 json.editable @result.editable
+
+json.deletable ((params[:view].nil? or params[:view] == 'personal') and @result.expense.manual_expense?)

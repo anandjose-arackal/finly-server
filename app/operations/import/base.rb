@@ -24,14 +24,13 @@ class Import::Base < BaseOperation
 
   def mobile_number_valid?(number)
     return "Moblie number not present" if number.blank?
-    return "Mobile number invalid" if number.is_a?(String)
-    number = number.to_i.to_s
+    return "Mobile number invalid" unless number.is_a?(String)
 
     user = User.find_by(mobile_number: number)
 
     if user.blank?
       # checking if it's a valid mobile number
-      if number.to_i.to_s =~ Constants::VALID_MOBILE_NUMBER
+      if number =~ Constants::VALID_MOBILE_NUMBER
         return true
       else
         return "Mobile number invalid"

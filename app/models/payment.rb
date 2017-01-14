@@ -54,6 +54,7 @@ class Payment < ActiveRecord::Base
   scope :personal, -> { where "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
   scope :non_personal, -> { where.not "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
 
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :initiating_user_id, presence: true

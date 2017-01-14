@@ -51,7 +51,7 @@
   opacity: 0.8;
   z-index: 1001;
   background: white;
-  background-image: url(/assets/images/ajax-loader.gif);
+  background-image: url(/common/images/ajax-loader.gif);
   background-repeat: no-repeat;
   background-size: 30px;
   background-position: center;
@@ -198,23 +198,26 @@
 // Home css scss content ends
 
 // Scheme Material Pallets
-$brand-primary: #3F51B5;
-$brand-success: #4CAF50;
-$brand-warning: #FFC107;
-$brand-danger: #F44336;
-$brand-info: #00BCD4;
-// $brand-admin-primary: #E91E63; //Hot Pink
-$brand-admin-primary: #e74c3c; //Hot Pink
+// $brand-primary: #3F51B5;
+// $brand-success: #4CAF50;
+// $brand-warning: #FFC107;
+// $brand-danger: #F44336;
+// $brand-info: #00BCD4;
+// // $brand-admin-primary: #E91E63; //Hot Pink
+// $brand-admin-primary: #e74c3c; //Hot Pink
 
 // Scheme FlatUIColors
-// $brand-primary: #2980b9;
-// $brand-success: #2ECC71;
-// $brand-warning: #f1c40f;
-// $brand-danger: #E74C3C;
-// $brand-info: #3498db;
-// // $brand-admin-primary: #E74C3C;
-// $brand-admin-primary: #e74c3c;
-// // $brand-admin-primary: #2DAF4A; //Complementing
+$brand-primary: #2980b9;
+$brand-success: #2ECC71;
+$brand-warning: #f1c40f;
+
+$brand-danger: #E74C3C;
+$brand-danger: #FC5F5F;
+
+$brand-info: #3498db;
+$brand-admin-primary: $brand-danger;
+
+// $brand-admin-primary: #2DAF4A; //Complementing
 // $brand-admin-primary: #277E8E;
 
 

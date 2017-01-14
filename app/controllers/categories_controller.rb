@@ -25,4 +25,11 @@ class CategoriesController < ApplicationController
     end
   end
 
+  def index
+    @categories = current_company.categories.active rescue []
+    respond_to do |format|
+      format.json {render json: @categories.as_json(:only => [:id, :name])}
+    end
+  end
+
 end

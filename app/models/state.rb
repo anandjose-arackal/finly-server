@@ -24,6 +24,8 @@ class State < ActiveRecord::Base
             {:code => 'S31', :name => 'Tamil Nadu'}, {:code => 'S32', :name => 'Tripura'}, {:code => 'S33', :name => 'Uttar Pradesh'}, {:code => 'S34', :name => 'Uttaranchal'},
             {:code => 'S35', :name => 'West Bengal'}, {:code => 'S36', :name => 'Telangana'}]
 
+  scope :with_id, -> (id) {where(id: id)}
+
   def self.name_for(state_id)
     return nil if state_id.blank?
     VALUES.each do |map|

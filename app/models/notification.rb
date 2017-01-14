@@ -98,7 +98,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.notify_cash_withdrawal_id
         action = " in hand withdrawn"
       when NotificationActionType.notify_cash_load_id
-        action = " in hand loaded"
+        action = " in hand added"
       when NotificationActionType.notify_atm_withdrawal_id
         action = " withdrawn from ATM"
       when NotificationActionType.notify_credit_advance_request_id
@@ -169,7 +169,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.notify_cash_withdrawal_id
         action = " withdrawn an amount of"
       when NotificationActionType.notify_cash_load_id
-        action = " loaded an amount of"
+        action = " added an amount of"
       when NotificationActionType.notify_atm_withdrawal_id
         action = " withdrawn an amount of"
       when NotificationActionType.notify_credit_reimbursement_id
@@ -330,10 +330,11 @@ class Notification < ActiveRecord::Base
     owner = object.user
     if self.action_type_id == NotificationActionType.notify_auto_approve_id
       return ""
-    elsif self.action_user_id == owner.id
-      return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
-      return " a" if object_type == "Report"
-      return " an" if object_type == "Advance Request"
+    # below condition is only if we're showing notification for an action performed on one's own object. eg. Submit, Approve etc.
+    # elsif self.action_user_id == owner.id
+    #   return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
+    #   return " a" if object_type == "Report"
+    #   return " an" if object_type == "Advance Request"
     elsif self.user_id == owner.id
       return " your"
     else

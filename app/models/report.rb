@@ -82,6 +82,9 @@ class Report < ActiveRecord::Base
   scope :pending_reimbursement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
+  # scope for reports being shown in settlements page
+  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
   scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.closed_id]}
 

@@ -390,6 +390,21 @@ window.FinlyF =
     else
       $(".main-loader").removeClass("main-loader")
 
+  appendCategoriesTo: (target) ->
+    $.ajax({
+      url: '/categories'
+      dataType: 'json'
+      success: (res) ->
+        for category in res
+          $('<option/>', {
+            value: category.id
+            text: category.name
+          }).appendTo(target) 
+        return res
+      error: (err) ->
+        console.log "Err", err
+    }) 
+
 $(document).ready ->
   FinlyF.initialize()
 

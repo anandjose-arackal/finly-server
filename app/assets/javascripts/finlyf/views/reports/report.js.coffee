@@ -140,12 +140,13 @@ class FinlyF.Views.Report extends Backbone.View
 
     #Populate categories from index.json.jbuilder  
     category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
-    options = $("#newExpenseCategory option")
-    for option in options
-      $('<option/>', {
-        value: $(option).attr('value')
-        text: $(option).text()
-      }).appendTo(category_select) 
+    FinlyF.appendCategoriesTo(category_select)
+    # options = $("#newExpenseCategory option")
+    # for option in options
+    #   $('<option/>', {
+    #     value: $(option).attr('value')
+    #     text: $(option).text()
+    #   }).appendTo(category_select)
     
     $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')
@@ -545,16 +546,16 @@ class FinlyF.Views.Report extends Backbone.View
       dataType: 'json',
       data: data,
       success: (res) ->
-        FinlyF.snapNotify(res.messages)
         $(target).removeAttr('disabled').html(button_text)
+        FinlyF.snapNotify(res.messages)
         if res.success == true
           $(modal).modal('hide')
           _this.model.fetch({
             data: {view: _this.current_view}
           })
           # $(_this.parent.el).find("#item-details .close-item-details .close-details").attr("data-refresh-true", true)
-        # else
-        #   $(target).removeAttr('disabled').html(button_text)
+          # else
+          # $(target).removeAttr('disabled').html(button_text)
           # _this.model.fetch({
           #   data: {view: _this.current_view}
           # })

@@ -87,7 +87,7 @@ class User::Invite::Accept < User::Invite::Base
       return
     end
 
-    if State.name_for(state_id).blank?
+    if State.with_id(state_id).first.name.blank?
       add_message :error, 'Invalid state selected'
       return
     end

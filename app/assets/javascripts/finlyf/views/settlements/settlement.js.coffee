@@ -6,6 +6,11 @@ class FinlyF.Views.Settlement extends Backbone.View
   templateMainRequest: HandlebarsTemplates['finlyf/settlements/crud/request']
   templateMainRequestCredited: HandlebarsTemplates['finlyf/settlements/crud/requestCredited']
   templateMainRequestApproved: HandlebarsTemplates['finlyf/settlements/crud/requestApproved']
+
+
+  # New
+  templateMainReport: HandlebarsTemplates['finlyf/settlements/crud/report']
+  templateMainMoneyRequest: HandlebarsTemplates['finlyf/settlements/crud/money_request']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
   className: 'item col-md-12'
@@ -40,13 +45,13 @@ class FinlyF.Views.Settlement extends Backbone.View
       if @params.view_to_load == 'payments'
       # if @model.get('type') == 'payment'
         $(@el).html(@templateMainPayments({item: @model.toJSON()}))
-      else if @params.view_to_load == 'credited_money_request'
+      else if @params.view_to_load == 'money_requests'
       # else if @model.get('type') == 'money_request'
-        $(@el).html(@templateMainRequestCredited({item: @model.toJSON()}))
-      else if @params.view_to_load == 'approved_money_request'
-        $(@el).html(@templateMainRequestApproved({item: @model.toJSON()}))
-      else
-        $(@el).html(@template({item: @model.toJSON()}))
+        $(@el).html(@templateMainMoneyRequest({item: @model.toJSON()}))
+      # else if @params.view_to_load == 'approved_money_request'
+      #   $(@el).html(@templateMainRequestApproved({item: @model.toJSON()}))
+      else if @params.view_to_load == 'reports'
+        $(@el).html(@templateMainReport({item: @model.toJSON()}))
     @
 
   toggleSelect: (e) ->
