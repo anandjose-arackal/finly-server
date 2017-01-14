@@ -20,7 +20,8 @@ json.array! @result.items do |item|
   elsif item.is_a?(Payment)
     json.type 'payment'
     json.payment_amount item.amount.value
-    json.initiating_user item.initiating_user.name
+    json.receiving_user item.receiving_user
+    json.initiating_user item.initiating_user
     payment_type_id = item.payment_type_id
     payment_type_s = PaymentType.name_for(payment_type_id)
     if([PaymentType.id_for(:credit_from_virtual_account_to_wallet), 
