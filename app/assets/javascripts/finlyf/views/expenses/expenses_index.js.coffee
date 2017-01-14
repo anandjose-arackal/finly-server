@@ -96,24 +96,20 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
       $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
       category_select = $(@el).find(".filter-category-id")
-      options = $("#newExpenseCategory option")
-      for option in options
-        $('<option/>', {
-          value: $(option).attr('value')
-          text: $(option).text()
-        }).appendTo(category_select)
+      FinlyF.appendCategoriesTo(category_select)
+      # options = $("#newExpenseCategory option")
+      # for option in options
+      #   $('<option/>', {
+      #     value: $(option).attr('value')
+      #     text: $(option).text()
+      #   }).appendTo(category_select)
       $(@el).find(".main").html(@templateMain({ item: {indexOnly: false, view: @current_view}}))#REF==1I
       FinlyF.structureActions(@el, @params)
     else
       $(@el).html(@templateSkeletonIndexOnly())
       $(@el).find('.sidebar').html(@templateSidebar({item: {indexOnly: true}}))#REF==2I
       category_select = $(@el).find(".filter-category-id")
-      options = $("#newExpenseCategory option")
-      for option in options
-        $('<option/>', {
-          value: $(option).attr('value')
-          text: $(option).text()
-        }).appendTo(category_select)
+      FinlyF.appendCategoriesTo(category_select)
       $(@el).find('.index-only-main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
@@ -266,17 +262,16 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $("#modal-new .modal-body").html(@templateNewExpense)
     $("#modal-new .modal-body").find("[name=authenticity_token]").val($("#authenticity_token").val())
 
-    #Populate categories from index.json.jbuilder  
-    category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
-    options = $("#newExpenseCategory option")
-    for option in options
-      $('<option/>', {
-        value: $(option).attr('value')
-        text: $(option).text()
-      }).appendTo(category_select) 
-    
     $("#modal-new").modal('show')
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
+
+    category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
+    
+    FinlyF.appendCategoriesTo(category_select)
+
+  
+    
+    
 
   showUploadedReceipt: (e) ->
     file = e.currentTarget

@@ -121,20 +121,24 @@ class FinlyF.Views.Expense extends Backbone.View
     })
 
   edit: (e) ->
+    _this = @
     $(e.currentTarget).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeClass('btn-edit-expense btn-warning').addClass('btn-update-expense btn-success')
     $(@el).find(".item-attr-preview").css("display", "none")
     $(@el).find(".item-attr-edit").css("display", "block")
 
     category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
     category_select = $(@el).find(".editExpenseCategory")
-    options = $("#newExpenseCategory option")
-    for option in options
-      $('<option/>', {
-        value: $(option).attr('value')
-        text: $(option).text()
-      }).appendTo(category_select)
 
-    $(category_select).val(@model.get('category_id'))
+    FinlyF.appendCategoriesTo(category_select).done(->
+      $(category_select).val(_this.model.get('category_id'))
+      )
+    # options = $("#newExpenseCategory option")
+    # for option in options
+    #   $('<option/>', {
+    #     value: $(option).attr('value')
+    #     text: $(option).text()
+    #   }).appendTo(category_select)
+
     $(@el).find(".datepicker").datepicker({
       dateFormat: "dd-mm-yy"
     })

@@ -140,12 +140,13 @@ class FinlyF.Views.Report extends Backbone.View
 
     #Populate categories from index.json.jbuilder  
     category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
-    options = $("#newExpenseCategory option")
-    for option in options
-      $('<option/>', {
-        value: $(option).attr('value')
-        text: $(option).text()
-      }).appendTo(category_select) 
+    FinlyF.appendCategoriesTo(category_select)
+    # options = $("#newExpenseCategory option")
+    # for option in options
+    #   $('<option/>', {
+    #     value: $(option).attr('value')
+    #     text: $(option).text()
+    #   }).appendTo(category_select) 
     
     $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')
