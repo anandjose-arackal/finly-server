@@ -75,7 +75,7 @@ class Notification < ActiveRecord::Base
     case self.action_type_id
       when NotificationActionType.id_for(:notify_submit)
         action = " submitted"
-      when NotificationActionType.id_for(:notify_approve_id)
+      when NotificationActionType.id_for(:notify_approve  )
         action = " approved"
       when NotificationActionType.id_for(:notify_awaiting_approval)
         action += " awaiting approval"
@@ -89,7 +89,7 @@ class Notification < ActiveRecord::Base
         action += " auto-approved"
       when NotificationActionType.id_for(:notify_take_control)
         action = " taken control of by Admin"
-      when NotificationActionType.id_for(:credit_reimbursement)
+      when NotificationActionType.id_for(:notify_credit_reimbursement)
         action = " reimbursement credited"
       when NotificationActionType.id_for(:notify_update)
         action = " updated"
@@ -145,7 +145,7 @@ class Notification < ActiveRecord::Base
     case self.action_type_id
       when NotificationActionType.id_for(:notify_submit)
         action = " submitted"
-      when NotificationActionType.id_for(:notify_approve_id)
+      when NotificationActionType.id_for(:notify_approve)
         action = " approved"
       when NotificationActionType.id_for(:notify_reject)
         action = " rejected"
@@ -157,7 +157,7 @@ class Notification < ActiveRecord::Base
         action = ""
       when NotificationActionType.id_for(:notify_awaiting_approval)
         action = " approved"
-      when NotificationActionType.id_for(:credit_reimbursement)
+      when NotificationActionType.id_for(:notify_credit_reimbursement)
         action = " credited a reimbursement of"
         object_prep = ""
       when NotificationActionType.id_for(:notify_update)
@@ -172,7 +172,7 @@ class Notification < ActiveRecord::Base
         action = " added an amount of"
       when NotificationActionType.id_for(:notify_atm_withdrawal)
         action = " withdrawn an amount of"
-      when NotificationActionType.id_for(:credit_reimbursement)
+      when NotificationActionType.id_for(:notify_credit_reimbursement)
         action = " credited reimbursement of"
       when NotificationActionType.id_for(:notify_credit_advance_request)
         action = " credited an amount of"
@@ -330,6 +330,9 @@ class Notification < ActiveRecord::Base
     owner = object.user
     if self.action_type_id == NotificationActionType.id_for(:notify_auto_approve)
       return ""
+    elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)
+      return " a" if object_type == "Report"
+      return " an" if object_type == "Advance Request"
     # below condition is only if we're showing notification for an action performed on one's own object. eg. Submit, Approve etc.
     # elsif self.action_user_id == owner.id
     #   return " your" if self.action_type_id == NotificationActionType.notify_take_control_id

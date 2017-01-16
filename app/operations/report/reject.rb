@@ -67,7 +67,7 @@ class Report::Reject < Report::Base
       # Reset expenses status to unsubmitted if report is rejected
       if status == ReportStatus.rejected_id
         report.expenses.each do |expense|
-          expense.update_attribute :expense_status_id, ExpenseStatus.id_for(:unsibmitted)
+          expense.update_attribute :expense_status_id, ExpenseStatus.id_for(:unsubmitted)
         end
       end
     end
