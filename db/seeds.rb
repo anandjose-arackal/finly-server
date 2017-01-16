@@ -341,7 +341,7 @@ if p.rules_count == 0
                              rule_type_id: 2)
 end
 
-if Report.count == 0
+# if Report.count == 0
 
   c.users.all.each do |user|
 
@@ -403,7 +403,7 @@ if Report.count == 0
       end
     end
   end
-end
+# end
 
 unless Rails.env.production?
   if Card.count == 0

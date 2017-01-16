@@ -13,7 +13,7 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
   end
 
   def event_id
-    NotifierType.money_request_comment_id
+    NotifierType.id_for(:money_request_comment)
   end
 
   def affected_users
@@ -30,8 +30,8 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
 
   def set_notification(user)
     roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
-    notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
-                                             action_type_id: NotificationActionType.notify_comment_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
+                                             action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: self.user.id,
                                              object_id: money_request.id,
                                              object_type: "Advance Request",

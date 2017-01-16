@@ -34,5 +34,9 @@ class ReportTrackingAction < ActiveRecord::Base
     end
   end
 
+  def self.id_for(sym)
+    VALUES[sym]
+  end
+
 
 end

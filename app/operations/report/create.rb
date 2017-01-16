@@ -37,7 +37,7 @@ class Report::Create < Report::Base
                            action_user_role_id: role_id,
                            modified_user: for_user,
                            modified_user_role_id: role_id,
-                           report_tracking_action_id: ReportTrackingAction.create_id,
+                           report_tracking_action_id: ReportTrackingAction.id_for(:create),
                            report_status_id: ReportStatus.open_id
       expenses = params[:expenses]
       expense_ids = nil

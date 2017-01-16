@@ -62,12 +62,12 @@ class Report::Reject < Report::Base
                                   action_user_role_id: user_role,
                                   modified_user_id: reject_to_user.id,
                                   modified_user_role_id: reject_to_user_role_id,
-                                  report_tracking_action_id: ReportTrackingAction.reject_id,
+                                  report_tracking_action_id: ReportTrackingAction.id_for(:reject),
                                   report_status_id: status
       # Reset expenses status to unsubmitted if report is rejected
       if status == ReportStatus.rejected_id
         report.expenses.each do |expense|
-          expense.update_attribute :expense_status_id, ExpenseStatus.unsubmitted_id
+          expense.update_attribute :expense_status_id, ExpenseStatus.id_for(:unsibmitted)
         end
       end
     end

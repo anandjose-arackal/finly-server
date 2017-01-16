@@ -1,7 +1,7 @@
 class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
 
   def event_id
-    NotifierType.settlement_add_cash_advance_id
+    NotifierType.id_for(:settlement_add_cash_advance)
   end
 
   def send_push_notification(user)
@@ -9,8 +9,8 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
   end
 
   def set_notification(user)
-    notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
-                                              action_type_id: NotificationActionType.notify_cash_load_id,
+    notification = user.notifications.create( notification_type_id: NotificationType.id_for(:payment),
+                                              action_type_id: NotificationActionType.id_for(:notify_cash_load),
                                               action_user_id: payment.initiating_user.id,
                                               object_id: payment.id,
                                               object_type: "Payment",

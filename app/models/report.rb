@@ -284,7 +284,7 @@ class Report < ActiveRecord::Base
 
   def final_approver
     return nil unless self.approved? or self.reimbursed? or self.reimbursement_confirmed? or self.closed?
-    tracks = self.tracks.with_action(ReportTrackingAction.approve_id)
+    tracks = self.tracks.with_action(ReportTrackingAction.id_for(:approve))
     if tracks.present?
       return tracks.last.action_user
     end
