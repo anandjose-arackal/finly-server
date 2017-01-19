@@ -91,9 +91,11 @@
               <div>
                 <select class="form-control" name="user[profile_attributes][state_id]">
                   <% @states.each do |state| %>
+                    <option value="<%= state.id %>"
                     <% if @pending_user.profile.state_id == state.id %>
-                      <option value="<%= state.id %>"><%= state.name %></option>
+                      selected
                     <% end %>
+                    ><%= state.name %></option>
                   <% end %>
                 </select>
               </div><br />
