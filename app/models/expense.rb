@@ -32,7 +32,7 @@ class Expense < ActiveRecord::Base
   belongs_to :category
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
-  belongs_to :surcharge, class_name: 'Z'
+  # belongs_to :surcharge, class_name: 'Z'
 
   has_many :receipts, as: :parent
 

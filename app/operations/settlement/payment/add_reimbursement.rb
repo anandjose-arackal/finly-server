@@ -91,15 +91,32 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
                                                  date: payment_params[:date], note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
                                                  amount_attributes: {value: payment_params[:cash_in_hand_deduction], currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if payment.save and cash_deduction.destroy and balance_sheet.subtract_pending_reimbursement precision_value(report_total), payment_params[:currency_id]
-      reports.each do |report|
-        Report::MarkAsReimbursed.(user, {payment: payment, report: report, role_id: role})
+    if payment_params[:amount] == 0
+      if cash_deduction.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
+        reports.each do
+          Report::MarkAsReimbursed.(user, {cash_in_hand_deduction: cash_deduction, report: report, role_id: role, status: ReportStatus.closed_id})
+        end
+        return
+      else
+        add_message :error, cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
       end
-      return true
+    elsif payment_params[:cash_in_hand_deduction] == 0
+      if payment.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
+        reports.each do
+          Report::MarkAsReimbursed.(user, {payment: payment, report: report, role_id: role})
+        end
+      else
+        add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
+      end
+    else
+      if payment.save and cash_deduction.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
+        reports.each do
+          Report::MarkAsReimbursed.(user, {payment: payment, cash_in_hand_deduction: cash_deduction report: report, role_id: role})
+        end
+      else
+        add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
+      end
     end
-    add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
-    payment.destroy
-    cash_deduction.destroy
   end
 
   def post_process

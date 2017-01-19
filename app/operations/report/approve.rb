@@ -52,9 +52,10 @@ class Report::Approve < Report::Base
     status = ReportStatus.processing_id
     if auto_approve or manager.blank?
       status = ReportStatus.approved_id
-      # unless report.require_reimbursement?
-      #   status = ReportStatus.closed_id
-      # end
+      # if the report has no manual expenses, mark it as closed because there are no manual reimbursements
+      if report.expenses.only_manual_expenses.count == 0
+        status = ReportStatus.closed_id
+      end
     end
     if status == ReportStatus.approved_id
       approved_at = DateUtils.local_date_time
@@ -107,18 +108,19 @@ class Report::Approve < Report::Base
       end
       comment.save
 
-      # no need for this anymore because settlement is done separately.
-      # recomputing settlement and marking the report as accounted
-      # unless report.processing?
-      #   Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
-      #   report.reload
-      # end
+      # computing the reimbursement value of tje report
+      unless report.processing?
+        Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
+        report.reload
+      end
       # if report is closed, add the relevant comment
-      # if report.closed?
-      #   # Add comments stating report has been closed as no reimbursements required
-      #   comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.id_for(:report_closed)
-      #   comment.save
-      # end
+      if report.closed?
+        # Add comments stating report has been closed as no reimbursements required
+        comment = report.comments.build(user: nil,
+                                        report_comment_action_id: ReportCommentAction.id_for(:report_closed),
+                                        content: " as there are no reimbursable expenses")
+        comment.save
+      end
       # Send notifications
       Event::EReport::Approve.(self.user, report: self.report, auto_approve: auto_approve)
 
