@@ -74,13 +74,13 @@ class Report::Approve < Report::Base
       if auto_approve
         track = report.tracks.build action_user: nil,
                                     modified_user: nil,
-                                    report_tracking_action_id: ReportTrackingAction.auto_approve_id,
+                                    report_tracking_action_id: ReportTrackingAction.id_for(:auto_approve),
                                     report_status_id: status
       else
         track = report.tracks.build action_user: user,
                                     modified_user_id: report.controlling_user_id,
                                     modified_user_role_id: to_user_role_id,
-                                    report_tracking_action_id: ReportTrackingAction.approve_id,
+                                    report_tracking_action_id: ReportTrackingAction.id_for(:approve),
                                     report_status_id: status,
                                     action_user_role_id: curr_user_role
       end
@@ -89,7 +89,7 @@ class Report::Approve < Report::Base
       if report.closed?
         track = report.tracks.build action_user: nil,
                                     modified_user: nil,
-                                    report_tracking_action_id: ReportTrackingAction.closed_id,
+                                    report_tracking_action_id: ReportTrackingAction.id_for(:closed),
                                     report_status_id: ReportStatus.closed_id
         track.save
       end

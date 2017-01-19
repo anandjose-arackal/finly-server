@@ -1,7 +1,7 @@
 class Event::EReport::Retract < Event::EReport::Base
 
   def event_id
-    NotifierType.report_retract_id
+    NotifierType.id_for(:report_retract)
   end
 
   def affected_users
@@ -22,8 +22,8 @@ class Event::EReport::Retract < Event::EReport::Base
 
   def set_notification(user)
     roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
-    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.notify_retract_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                             action_type_id: NotificationActionType.id_for(:notify_reject),
                                              action_user_id: report.user_id,
                                              object_id: report.id,
                                              object_type: "Report",

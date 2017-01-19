@@ -19,7 +19,7 @@ class User::ManagerActivate::ReplaceDefaultPassword < User::ManagerActivate::Bas
       return
     end
     unless new_pwd_params[:password_confirmation].present?
-      messages[:error] << 'Password confirmation cannot be blank'
+      messages[:error] << 'Password Confirmation cannot be blank'
       return
     end
   end

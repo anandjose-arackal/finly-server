@@ -190,7 +190,7 @@ class MoneyRequest < ActiveRecord::Base
 
   def final_approver
     return nil unless self.approved? or self.credited?
-    tracks = self.tracks.with_action(MoneyRequestTrackingAction.approve_id)
+    tracks = self.tracks.with_action(MoneyRequestTrackingAction.id_for(:approve))
     if tracks.present?
       return tracks.last.action_user
     end

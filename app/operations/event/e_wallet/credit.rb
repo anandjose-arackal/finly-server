@@ -1,7 +1,7 @@
 class Event::EWallet::Credit < Event::EWallet::Base
 
   def event_id
-    NotifierType.wallet_credit_id
+    NotifierType.id_for(:wallet_credit)
   end
 
   def affected_users
@@ -28,8 +28,8 @@ class Event::EWallet::Credit < Event::EWallet::Base
       else
         object = "Wallet"
     end
-    notification = user.notifications.create(notification_type_id: NotificationType.wallet_id,
-                                             action_type_id: NotificationActionType.notify_credit_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:wallet),
+                                             action_type_id: NotificationActionType.id_for(:notify_credit),
                                              action_user_id: payment.initiating_user_id,
                                              object_id: payment.id,
                                              object_type: object,

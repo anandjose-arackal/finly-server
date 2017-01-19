@@ -1,7 +1,7 @@
 class Event::EReport::Unapprove < Event::EReport::Base
 
   def event_id
-    NotifierType.report_unapprove_id
+    NotifierType.id_for(:report_unapprove)
   end
 
   def affected_users
@@ -28,8 +28,8 @@ class Event::EReport::Unapprove < Event::EReport::Base
     else
       view_role_id = report.tracks.last.modified_user_role_id
     end
-    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.notify_unapprove_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                             action_type_id: NotificationActionType.id_for(:notify_unapprove),
                                              action_user_id: self.user.id,
                                              object_id: report.id,
                                              object_type: "Report",

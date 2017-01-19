@@ -26,9 +26,11 @@ class User::Index < User::Base
     def init
       if params[:team].present?
         self.team = apply_scopes(params[:team], params)
-        self.users_type_count = self.team.joins(:role_mapping).group(:user_role_id).count
-        self.users_status_count = self.team.group(:active).count
-        self.pending_invites_count = self.team.pending.count
+        # todo - need to debug below statements. Disabling for now, as we're not using it anywhere
+        # self.users_type_count = self.team.joins(:role_mapping).group(:user_role_id).count
+        # debugger
+        # self.users_status_count = self.team.all.group(:active).count
+        # self.pending_invites_count = self.team.pending.count
         self.paginated_team = self.team.paginate(page: params[:page], per_page: 30)
       end
     end
