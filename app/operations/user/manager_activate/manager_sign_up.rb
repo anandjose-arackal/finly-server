@@ -67,7 +67,7 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     #   return
     # end
 
-    if State.name_for(state_id).blank?
+    if State.with_id(state_id).first.blank?
       add_message :error, 'Invalid state selected'
       return
     end
