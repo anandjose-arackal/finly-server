@@ -1,4 +1,6 @@
-class User::Login::LoginOtp < BaseOperation
+class User::SendFirstLoginOtp < BaseOperation
+
+  attr_accessor :selected_user
 
   OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
@@ -18,12 +20,13 @@ class User::Login::LoginOtp < BaseOperation
 
   def validate
     unless selected_user
-      add_message :error, "This mobile number does not exist in our database"
+      # todo - log this as a mistake instead of throwing error
+      add_message :error, "User not found"
       return
     end
 
     unless params[:mobile_number] =~ Constants::VALID_MOBILE_NUMBER
-      add_message :error, "Please enter a valid mobile number"
+      add_message :error, "Invalid mobile number"
       return
     end
 

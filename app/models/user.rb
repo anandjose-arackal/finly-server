@@ -277,6 +277,10 @@ class User < ActiveRecord::Base
     self.confirm
   end
 
+  def first_time_login?
+    !self.default_password
+  end
+
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
     cash = self.balance_sheet.cash_in_hand

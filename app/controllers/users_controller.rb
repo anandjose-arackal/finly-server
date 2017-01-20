@@ -35,11 +35,6 @@ class UsersController < ApplicationController
     respond
   end
 
-  # def profile
-  #   ap params
-  #   @result = User::Profile.(current_user, params)
-  # end
-
   def edit_default_password
 
   end
@@ -78,9 +73,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def enter_password
-
-  end
 
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
@@ -115,15 +107,35 @@ class UsersController < ApplicationController
     respond
   end
 
-  def enter_otp
+  # action that sends the user an OTP before verifying it
+  def first_time_login
+    @user = User.find_by(mobile_number: params[:mobile_number])
+    respond_to do |format|
+      if @user.first_time_login?
+        # send success message via json
+        format.json { respond_with success: true}
+      else
+        # todo - error message, check this
+        format.json {respond_with success: false}
+      end
+    end
 
   end
 
-  def verify_otp
-
+  def first_login_otp
+    @result = User::Login::SendFirstLoginOtp.(params)
+    if @result.success?
+      # redirecting to page where they can set their password
+      sign_in @result.user, :bypass => true
+      redirect_to user_set_password_path
+    else
+      flash[:error] = @result.messages[:error]
+      redirect_to request.referrer
+    end
   end
 
   private
+
   def update_handler(type = nil)
     unless type
       respond(response: :failure, message: 'Error while updating data')

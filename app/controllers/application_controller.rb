@@ -166,18 +166,6 @@ class ApplicationController < ActionController::Base
     # devise_parameter_sanitizer.permit(:account_update, keys: [:name])
   end
 
-  def after_sign_in_path_for(resource)
-    # puts "REROUTING AFTER LOGIN AND CURRENT USER IS TYPE: " + current_user.user_type_id
-    if resource.is_a?(User)
-      if current_user.admin?
-        admin_company_expenses_path
-      elsif current_user.manager?
-        admin_expenses_path
-      else
-        user_expenses_path(current_user)
-      end
-    end
-  end
 
   def after_sign_out_path_for(resource)
     root_url
