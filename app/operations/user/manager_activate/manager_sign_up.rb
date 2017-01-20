@@ -102,13 +102,10 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
   end
 
   def pre_process
-    # assign a password to the user, and send him the password on mobile. Then save it as the temporary password to be sent
+    # set a dummy password here which will get replaced on first sign up
     temp_password = generate_random_string(4)
     accept_params[:password] = accept_params[:password_confirmation] = temp_password
     accept_params[:default_password] = true
-    message = "Your temporary password is: #{temp_password}. You will be asked to change it upon signing in. Please do not share this information with anyone"
-    # sending the one time password as an SMS. Mobile number is to be sent as an array of mobile numbers
-    WelcomeMessage::Create.(user, {mobile_number: [invited_user.mobile_number], message: message})
   end
 
 
@@ -130,7 +127,11 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
   end
 
   def post_process
-    # send welcome mail
+    # send welcome message
+    message = "Your account has been successfully activated. Please go to www.finly.io to login"
+    # sending the welcome message as an SMS. Mobile number is to be sent as an array of mobile numbers
+    WelcomeMessage::Create.(user, {mobile_number: [invited_user.mobile_number], message: message})
+
     messages[:success] << "User successfully activated!"
   end
 

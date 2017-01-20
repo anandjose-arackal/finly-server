@@ -78,6 +78,9 @@ class UsersController < ApplicationController
     end
   end
 
+  def enter_password
+
+  end
 
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
@@ -110,6 +113,14 @@ class UsersController < ApplicationController
   def balance
     @result = User::Balance.(current_user, params)
     respond
+  end
+
+  def enter_otp
+
+  end
+
+  def verify_otp
+
   end
 
   private

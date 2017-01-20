@@ -109,9 +109,9 @@
 #                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
 #                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
 #                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
-#                         new_user_session GET        /users/sign_in(.:format)                                    devise/sessions#new
-#                             user_session POST       /users/sign_in(.:format)                                    devise/sessions#create
-#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   devise/sessions#destroy
+#                         new_user_session GET        /users/sign_in(.:format)                                    sessions#new
+#                             user_session POST       /users/sign_in(.:format)                                    sessions#create
+#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   sessions#destroy
 #                            user_password POST       /users/password(.:format)                                   passwords#create
 #                        new_user_password GET        /users/password/new(.:format)                               passwords#new
 #                       edit_user_password GET        /users/password/edit(.:format)                              passwords#edit
@@ -238,8 +238,17 @@
 #                                          DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
 #                             api_v1_users GET        /api/v1/users(.:format)                                     api/v1/users#index
 #                              api_v1_user GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
-#                                   api_v1 POST       /api/v1/cards/:id/balance/update(.:format)                  api/v1/cards#update_balance
-#                                          POST       /api/v1/cards/:id/status/update(.:format)                   api/v1/cards#update_status
+#                 api_v1_user_user_summary GET        /api/v1/users/:user_id/summary(.:format)                    api/v1/users#summary
+#                                          GET        /api/v1/users(.:format)                                     api/v1/users#index
+#                                          POST       /api/v1/users(.:format)                                     api/v1/users#create
+#                          new_api_v1_user GET        /api/v1/users/new(.:format)                                 api/v1/users#new
+#                         edit_api_v1_user GET        /api/v1/users/:id/edit(.:format)                            api/v1/users#edit
+#                                          GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
+#                                          PATCH      /api/v1/users/:id(.:format)                                 api/v1/users#update
+#                                          PUT        /api/v1/users/:id(.:format)                                 api/v1/users#update
+#                                          DELETE     /api/v1/users/:id(.:format)                                 api/v1/users#destroy
+#              api_v1_cards_balance_update POST       /api/v1/cards/balance/update(.:format)                      api/v1/cards#update_balance
+#               api_v1_cards_status_update POST       /api/v1/cards/status/update(.:format)                       api/v1/cards#update_status
 #          api_v1_configuration_categories GET        /api/v1/configuration/categories(.:format)                  api/v1/configuration/category#index
 #        api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
 #      api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
@@ -456,6 +465,9 @@
 #                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
+#            statements_company_statements GET        /statements/company_statements(.:format)                    statements#company_statements
+#               statements_company_summary GET        /statements/company_summary(.:format)                       statements#company_summary
+#              statements_policies_summary GET        /statements/policies_summary(.:format)                      statements#policies_summary
 #                                          GET        /statements/:id/summary(.:format)                           statements#summary
 #                         export_statement GET        /export/:id/statements(.:format)                            export#statement
 #                               statements GET        /statements(.:format)                                       statements#index
@@ -515,7 +527,7 @@ Rails.application.routes.draw do
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
 
-  devise_for :users, controllers: {passwords: "passwords"}
+  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"}
 
   namespace :api do
     namespace :v0 do

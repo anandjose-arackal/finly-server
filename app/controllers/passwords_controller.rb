@@ -16,7 +16,7 @@ class PasswordsController < Devise::PasswordsController
         respond_with(resource)
       end
     else
-      @result = User::TemporaryPassword.(params)
+      @result = User::Login::MobileResetPassword.(params)
       if @result.success?
         flash[:notice] = @result.messages[:success].to_sentence
         redirect_to new_user_session_path

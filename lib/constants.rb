@@ -4,6 +4,8 @@ module Constants
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /[MmFf]/i
 
+  OTP_RESEND_INTERVAL = 60
+
   # todo - needs to be edited once we get the account details.
   ITZCASH_EMAIL_ID = 'sreeram.nr@finly.io'
 

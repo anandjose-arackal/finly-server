@@ -2,7 +2,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
   attr_accessor :selected_user
 
-  OTP_RESEND_TIMER = 60
+  OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
   def authorized_user_types
     [:manager, :company_admin]
@@ -45,9 +45,5 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
       messages[:error] = response.messages[:error]
     end
   end
-
-  # def success
-  #   true
-  # end
 
 end
