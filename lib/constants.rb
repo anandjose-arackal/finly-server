@@ -32,7 +32,7 @@ module Constants
     url = "https://52.76.54.96/#" # todo - will be changed for final deployment
     # url = "https://www.finly.io/#"
   elsif Rails.env.itzcash_uat?
-    url = "http://180.179.138.175/#"
+    url = "http://uat.finly.io/#"
   elsif Rails.env.production?
     url = "https://www.finly.io/#"
   else
