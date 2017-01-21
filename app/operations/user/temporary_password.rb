@@ -1,3 +1,5 @@
+# not being used as this flow has changed
+
 class User::TemporaryPassword < BaseOperation
 
   attr_accessor :selected_user, :accept_params, :temp_password
@@ -5,10 +7,6 @@ class User::TemporaryPassword < BaseOperation
   def self.call(params)
     super(nil, params)
   end
-
-  # def initialize(user, params)
-  #   super(nil, params)
-  # end
 
   def pre_validate
     if params.blank?

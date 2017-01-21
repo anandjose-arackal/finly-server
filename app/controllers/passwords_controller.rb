@@ -16,10 +16,10 @@ class PasswordsController < Devise::PasswordsController
         respond_with(resource)
       end
     else
-      @result = User::Login::MobileResetPassword.(params)
+      @result = User::Password::SendResetPasswordOtp.(params)
       if @result.success?
         flash[:notice] = @result.messages[:success].to_sentence
-        redirect_to new_user_session_path
+        redirect_to verify_reset_password_otp_path
       else
         flash[:error] = @result.messages[:error].to_sentence
         redirect_to request.referrer
@@ -57,7 +57,7 @@ class PasswordsController < Devise::PasswordsController
 
   # action that lets mobile only users set their password for the first time
   def set_password
-    @result = User::Login::SetPassword.(current_user, params)
+    @result = User::Password::SetPassword.(current_user, params)
     if @result.success?
       # log in and redirect to root URL
       sign_in @result.user, :bypass => true

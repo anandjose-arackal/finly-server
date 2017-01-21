@@ -189,10 +189,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def check_first_time_login
-    if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
-      redirect_to edit_default_password_path
-    end
-  end
+  # def check_first_time_login
+  #   if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
+  #     redirect_to edit_default_password_path
+  #   end
+  # end
 
 end

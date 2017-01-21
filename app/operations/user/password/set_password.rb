@@ -1,3 +1,5 @@
+# sets the password for a user
+
 class User::Login::SetPassword < BaseOperation
 
   attr_accessor :password_params
@@ -14,7 +16,15 @@ class User::Login::SetPassword < BaseOperation
   end
 
   def validate
-    if params[:password] != params[:password_confirmation]
+    if password_params[:password].blank?
+      add_message :error, "Password cannot be blank"
+      return
+    end
+    if password_params[:password_confirmation].blank?
+      add_message :error, "Password confirmation cannot be blank"
+      return
+    end
+    if password_params[:password] != password_params[:password_confirmation]
       add_message :error, "Password and password confirmation have to match"
     end
   end

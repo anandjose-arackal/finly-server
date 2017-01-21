@@ -674,7 +674,7 @@ Rails.application.routes.draw do
 
   get 'users/get_managers', to: 'users#get_managers'
 
-  #Backbone parials
+  #Backbone partials
   get 'users/user_profile'
   get 'users/user_balance'
   get 'users/user_security'
@@ -688,6 +688,7 @@ Rails.application.routes.draw do
     get 'profile', to: 'users#profile', as: :profile
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
+    get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
 
   # routes for testing import

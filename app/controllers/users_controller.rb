@@ -39,15 +39,8 @@ class UsersController < ApplicationController
 
   end
 
-  def update_default_password
-    @result = User::ManagerActivate::ReplaceDefaultPassword.(current_user, params)
-    if @result.success?
-      sign_in @result.user, :bypass => true
-      redirect_to root_url
-    else
-      flash[:error] = @result.messages[:error].to_sentence
-      redirect_to request.referrer
-    end
+  def verify_reset_password_otp
+
   end
 
 
