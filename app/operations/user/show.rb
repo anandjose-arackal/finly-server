@@ -119,6 +119,7 @@ class User::Show < User::Base
             credit_params[:from_account] = :virtual_account
             credit_params[:to_account] = :card
             actions[:credit_card_from_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+            actions[:debit_from_card_to_wallet] = "Path to be added later"
           end
 
           # Wallet -> Virtual Account
@@ -144,6 +145,7 @@ class User::Show < User::Base
         credit_params[:from_account] = :wallet
         credit_params[:to_account] = :card
         actions[:credit_card_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+        actions[:debit_card_to_wallet] = "Path to be added later"
         # Wallet Actions End
 
 
