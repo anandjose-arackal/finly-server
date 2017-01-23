@@ -52,7 +52,8 @@ class Report::Approve < Report::Base
     status = ReportStatus.processing_id
     if auto_approve or manager.blank?
       status = ReportStatus.approved_id
-      unless report.require_reimbursement?
+      # if the report has no manual expenses, mark it as closed because there are no manual reimbursements
+      if report.expenses.only_manual_expenses.count == 0
         status = ReportStatus.closed_id
       end
     end
@@ -107,7 +108,7 @@ class Report::Approve < Report::Base
       end
       comment.save
 
-      # recomputing settlement and marking the report as accounted
+      # computing the reimbursement value of tje report
       unless report.processing?
         Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
@@ -115,7 +116,9 @@ class Report::Approve < Report::Base
       # if report is closed, add the relevant comment
       if report.closed?
         # Add comments stating report has been closed as no reimbursements required
-        comment = report.comments.build user: nil, report_comment_action_id: ReportCommentAction.id_for(:report_closed)
+        comment = report.comments.build(user: nil,
+                                        report_comment_action_id: ReportCommentAction.id_for(:report_closed),
+                                        content: " as there are no reimbursable expenses")
         comment.save
       end
       # Send notifications
