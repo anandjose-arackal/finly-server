@@ -1,0 +1,64 @@
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="row no-margin">
+      <h4>Summary:</h4>
+    </div>
+
+    {{!-- <div class="row no-margin">
+      <div class="col-sm-3 text-right">Initiating User:</div>
+      <div class="col-sm-8"><label>You</label></div>
+    </div> --}}
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Target User:</div>
+      <div class="col-sm-8"><label>{{summary.userData.user_details.name}}</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Type of Payment:</div>
+      <div class="col-sm-8"><label>Debit</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Action:</div>
+      <div class="col-sm-8"><label>Cash Advance</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-3 text-right">Total Amount:</div>
+      <div class="col-sm-8"><label class="currency">&#8377;&nbsp;{{summary.actionData.d_cash_advance.amount}}</label></div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="alert alert-info">
+        <strong>Note:</strong> The transfer of funds in this transaction is done outside of Finly Expense Management system and is only being logged in Finly.
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="row"><div class="col-sm-12 no-padding"><hr /></div></div>
+
+<div class="row no-margin">
+  <div class="col-sm-12 no-padding">
+    <div class="form-group">
+      <label class="control-form">Note:</label>
+      <textarea name="note" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="control-form">Date:</label>
+      <input type="text" name="date" class="form-control"/>
+    </div>
+
+    <div class="form-group">
+      <label class="control-form">Password:</label>
+      <input type="password" name="password" class="form-control password"/>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-sm btn-primary step-final-action" data-url="{{summary.userData.actions.debit_cash_advance}}" data-action-type="debit_cash_advance">Confirm And Debit</button>
+    </div>
+  </div>
+</div>
