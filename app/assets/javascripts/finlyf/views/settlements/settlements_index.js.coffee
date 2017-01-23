@@ -1371,6 +1371,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+    $(modal_body).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
         
 
   settlementActionFinalize: (e) ->#Step 2 Action
@@ -1402,6 +1404,9 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmReports({summary: summary}))
+
+    
+    $(modal_body).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
   settlementActionConfirm: (e) -> #Step Final Action
     e.preventDefault()
