@@ -33,7 +33,7 @@ class Report::TakeControl < Report::Base
                                   action_user_role_id: UserRole.id_for(:admin),
                                   modified_user_id: report.controlling_for_user_id,
                                   modified_user_role_id: report.controlling_for_user_role_id,
-                                  report_tracking_action_id: ReportTrackingAction.take_control_id,
+                                  report_tracking_action_id: ReportTrackingAction.id_for(:take_control),
                                   report_status_id: report.status_id
       track.save
       return

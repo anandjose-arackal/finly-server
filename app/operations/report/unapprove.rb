@@ -65,7 +65,7 @@ class Report::Unapprove < Report::Base
                            action_user_role_id: role_id,
                            modified_user: prev_controlling_user,
                            modified_user_role_id: prev_controlling_user_role,
-                           report_tracking_action_id: ReportTrackingAction.unapprove_id,
+                           report_tracking_action_id: ReportTrackingAction.id_for(:unapprove),
                            report_status_id: ReportStatus.processing_id
       return
     end

@@ -399,6 +399,7 @@ class FinlyF.Views.Request extends Backbone.View
     # action_type = $(target).attr("data-action-type")
     password = $(container).find('input[name=password]').val()
     amount = $(container).find('input[name=amount]').val()
+    note = $(container).find('textarea[name=note]').val()
 
     modal = $(@el).find("#modal-mp")
     approveOptionsModal = $(@el).find("#modal-approve-options")
@@ -412,6 +413,7 @@ class FinlyF.Views.Request extends Backbone.View
         # type: action_type,
         password: password,
         amount: amount,
+        note: note,
         view: _this.current_view
       },
       success: (res) ->

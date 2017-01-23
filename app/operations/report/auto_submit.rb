@@ -121,7 +121,7 @@ class Report::AutoSubmit < Report::Base
                            action_user_role_id: manager_role_id,
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
-                           report_tracking_action_id: ReportTrackingAction.submit_id,
+                           report_tracking_action_id: ReportTrackingAction.id_for(:submit),
                            report_status_id: ReportStatus.processing_id
       report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
       report.expenses.each do |expense|

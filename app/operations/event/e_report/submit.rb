@@ -1,7 +1,7 @@
 class Event::EReport::Submit < Event::EReport::Base
 
   def event_id
-    NotifierType.report_submit_id
+    NotifierType.id_for(:report_submit)
   end
 
   def affected_users
@@ -19,8 +19,8 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def set_notification(user)
-    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.notify_submit_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                             action_type_id: NotificationActionType.id_for(:notify_submit),
                                              action_user_id: report.user_id,
                                              object_id: report.id,
                                              object_type: "Report",

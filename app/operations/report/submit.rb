@@ -104,7 +104,7 @@ class Report::Submit < Report::Base
                            action_user_role_id: UserRole.id_for(:employee),
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
-                           report_tracking_action_id: ReportTrackingAction.submit_id,
+                           report_tracking_action_id: ReportTrackingAction.id_for(:submit),
                            report_status_id: ReportStatus.processing_id
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
