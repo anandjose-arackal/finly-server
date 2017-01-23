@@ -15,7 +15,7 @@ module Constants
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
-  WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io']
+  WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io', 'finance4@finlytest.io']
 
   # MSG91 / SendOTP API keys ######
 
@@ -31,8 +31,7 @@ module Constants
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost:3000/#"
   elsif Rails.env.staging?
-    url = "https://52.76.54.96/#" # todo - will be changed for final deployment
-    # url = "https://www.finly.io/#"
+    url = "https://www.finly.io/#"
   elsif Rails.env.itzcash_uat?
     url = "http://180.179.138.175/#"
   elsif Rails.env.production?
