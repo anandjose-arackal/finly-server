@@ -515,7 +515,7 @@
                           <div class="col-sm-1">Per</div>
                           <div class="col-sm-2">
                             <label class="item-attr-preview">{{this.period_name}}</label>
-                            <select class="form-control item-attr-edit" name="restrictions[limits][{{@index}}][period_id]">
+                            <select class="form-control item-attr-edit" name="restrictions[limits][{{@index}}][period_id]" data-limit-period="{{this.limit_id}}">
                               {{#each ../item.periods}}
                                 <option value="{{this.id}}">{{this.name}}</option>
                               {{/each}}
