@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170124105547) do
+ActiveRecord::Schema.define(version: 20170124135621) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -100,20 +100,6 @@ ActiveRecord::Schema.define(version: 20170124105547) do
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
-  create_table "card_budget_restrictions", force: :cascade do |t|
-    t.integer  "budget_amount_id",       limit: 4
-    t.integer  "card_id",                limit: 4
-    t.integer  "period_id",              limit: 4
-    t.integer  "product_combination_id", limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "card_budget_restrictions", ["budget_amount_id"], name: "index_card_budget_restrictions_on_budget_amount_id", using: :btree
-  add_index "card_budget_restrictions", ["card_id"], name: "index_card_budget_restrictions_on_card_id", using: :btree
-  add_index "card_budget_restrictions", ["period_id"], name: "index_card_budget_restrictions_on_period_id", using: :btree
-  add_index "card_budget_restrictions", ["product_combination_id"], name: "index_card_budget_restrictions_on_product_combination_id", using: :btree
-
   create_table "card_configurations", force: :cascade do |t|
     t.integer  "prepaid_card_id",       limit: 4
     t.integer  "configured_by_user_id", limit: 4
@@ -178,19 +164,6 @@ ActiveRecord::Schema.define(version: 20170124105547) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
-
-  create_table "card_transaction_restrictions", force: :cascade do |t|
-    t.integer  "count",                  limit: 4
-    t.integer  "card_id",                limit: 4
-    t.integer  "period_id",              limit: 4
-    t.integer  "product_combination_id", limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "card_transaction_restrictions", ["card_id"], name: "index_card_transaction_restrictions_on_card_id", using: :btree
-  add_index "card_transaction_restrictions", ["period_id"], name: "index_card_transaction_restrictions_on_period_id", using: :btree
-  add_index "card_transaction_restrictions", ["product_combination_id"], name: "index_card_transaction_restrictions_on_product_combination_id", using: :btree
 
   create_table "card_transactions", force: :cascade do |t|
     t.integer  "user_id",               limit: 4
@@ -869,6 +842,7 @@ ActiveRecord::Schema.define(version: 20170124105547) do
     t.datetime "updated_at",                            null: false
     t.integer  "payment_id",                limit: 4
     t.integer  "action_user_role_id",       limit: 4
+    t.integer  "cash_in_hand_deduction_id", limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
@@ -900,6 +874,7 @@ ActiveRecord::Schema.define(version: 20170124105547) do
     t.boolean  "auto_approve",                                           default: false, null: false
     t.date     "accounted_at"
     t.datetime "approved_at"
+    t.integer  "cash_in_hand_deduction_id",    limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -1107,14 +1082,10 @@ ActiveRecord::Schema.define(version: 20170124105547) do
   add_foreign_key "budget_rules", "periods"
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
-  add_foreign_key "card_budget_restrictions", "cards"
-  add_foreign_key "card_budget_restrictions", "product_combinations"
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
   add_foreign_key "card_limits", "dummy_restrictions"
-  add_foreign_key "card_transaction_restrictions", "cards"
-  add_foreign_key "card_transaction_restrictions", "product_combinations"
   add_foreign_key "card_transactions", "cards"
   add_foreign_key "card_transactions", "expenses"
   add_foreign_key "card_transactions", "users"
