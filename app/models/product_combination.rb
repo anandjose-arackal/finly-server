@@ -37,6 +37,10 @@ class ProductCombination < ActiveRecord::Base
       'Healthcare'
   ]
 
+  def self.id_for(name)
+    VALUES[name]
+  end
+
   def self.name_for(id)
     TYPES[id-1]
   end

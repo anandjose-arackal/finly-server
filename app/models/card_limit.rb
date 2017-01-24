@@ -9,6 +9,7 @@
 #  period_id            :integer
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  amount               :decimal(10, )
 #
 
 class CardLimit < ActiveRecord::Base
