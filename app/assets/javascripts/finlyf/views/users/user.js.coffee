@@ -1021,11 +1021,10 @@ class FinlyF.Views.User extends Backbone.View
     # values.authenticity_token = $("#authenticity_token").val()
 
     # # console.log values
-    model = new FinlyF.Models.User({id: @model.get('id')})
-    model.save(values, {
-      data: values,
-      processData: true
-      success: (model, res) ->
+    $.ajax({
+      url: '/card_restrictions/' + @model.get('id')
+      data: values
+      success: (res) ->
         FinlyF.snapNotify(res.messages)
         # console.log res
         if res.success == true
@@ -1042,8 +1041,7 @@ class FinlyF.Views.User extends Backbone.View
       error: (err) ->
         console.log "Err", err
         $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
-    }) 
-
+      })
 
 
 
