@@ -982,6 +982,18 @@ class FinlyF.Views.User extends Backbone.View
     $(restrictions_div).find('.item-attr-preview').addClass('hide')
     $(restrictions_div).find('.item-attr-edit').addClass('show')
 
+    selects = $(policy).find("select.item-attr-edit")
+    for select in selects
+      $(select).val($(select).attr('data-default-value'))
+
+    # # Preselect the limit periods
+    # period_selects = $(restrictions_div).find('select.select-limit-period')
+    # for period_select in period_selects
+    #   $(period_select).val($(period_select).attr('data-selected'))
+
+    # # Preselect Applied Product code
+    # product_code_select = $(restrictions_div).find("select[name=restrictions\\[product_code_id\\]")
+
     # selects = $(restrictions_div).find("select.item-attr-edit")
     # for select in selects
     #   $(select).val($(select).attr('data-default-value'))
