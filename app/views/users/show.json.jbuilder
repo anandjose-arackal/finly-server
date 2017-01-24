@@ -96,6 +96,7 @@ json.card do
       json.role role_name
     end
   end
+  json.card_limit @result.card_limit
 end
 
 json.wallet do

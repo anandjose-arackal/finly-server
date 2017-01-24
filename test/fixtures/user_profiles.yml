@@ -15,7 +15,7 @@
 #  default_currency_id :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  date_of_birth       :date             default(Fri, 06 Jan 2017), not null
+#  date_of_birth       :date             default(Tue, 24 Jan 2017), not null
 #  gender              :string(255)      not null
 #  address_1           :string(255)      default(""), not null
 #  address_2           :string(255)      default(""), not null

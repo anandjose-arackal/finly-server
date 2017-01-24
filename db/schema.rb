@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170124071928) do
+ActiveRecord::Schema.define(version: 20170124090827) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -160,8 +160,9 @@ ActiveRecord::Schema.define(version: 20170124071928) do
     t.integer  "amount_id",            limit: 4
     t.integer  "transaction_limit",    limit: 4
     t.integer  "period_id",            limit: 4
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.decimal  "amount",                         precision: 10
   end
 
   add_index "card_limits", ["amount_id"], name: "index_card_limits_on_amount_id", using: :btree

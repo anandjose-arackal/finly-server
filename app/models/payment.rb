@@ -16,6 +16,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
   belongs_to :amount
   belongs_to :payment_type
