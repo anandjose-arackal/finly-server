@@ -24,5 +24,15 @@ class User::CardRestrictions::Destroy < User::Base
     end
   end
 
+  def process
+    unless card_limit.destroy
+      add_message :error, card_limit.errors.full_messages
+    end
+  end
+
+  def post_process
+    add_message :success, "Limit destroyed"
+  end
+
 
 end

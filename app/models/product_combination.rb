@@ -11,7 +11,12 @@
 
 class ProductCombination < ActiveRecord::Base
 
-  VALUES = [
+  VALUES = {transportation: 1,
+            ground_transportation: 2,
+            travel: 3,
+            fuel: 6}
+
+  TYPES = [
       'Transportation',
       'Ground Transportation',
       'Travel',
@@ -33,7 +38,7 @@ class ProductCombination < ActiveRecord::Base
   ]
 
   def self.name_for(id)
-    VALUES[id-1]
+    TYPES[id-1]
   end
 
 end
