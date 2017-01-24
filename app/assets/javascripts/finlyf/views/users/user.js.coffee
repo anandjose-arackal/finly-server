@@ -1024,6 +1024,8 @@ class FinlyF.Views.User extends Backbone.View
     $.ajax({
       url: '/card_restrictions/' + @model.get('id')
       data: values
+      type: "PATCH"
+      dataType: 'json'
       success: (res) ->
         FinlyF.snapNotify(res.messages)
         # console.log res
