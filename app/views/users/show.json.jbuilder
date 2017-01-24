@@ -130,3 +130,20 @@ json.periods do
     json.extract! period, :id, :name
   end
 end
+
+json.restrictions do
+  json.channel_atm true
+  json.channel_pos false
+  json.channel_ecom true
+  json.product_code do
+    json.id 3
+    json.name "Fuel"
+  end
+  json.limits do
+    json.array! 4.times do |i|
+      json.period_id (i+1)
+      json.amount (500 - 200)*rand + 200
+      json.transactions ((10-5)*rand + 5).to_i
+    end
+  end
+end
