@@ -525,13 +525,13 @@
 
                           <div class="col-sm-2">Transactions:</div>
                           <div class="col-sm-2">
-                            <label class="item-attr-preview">{{this.transactions}}</label>
+                            <label class="item-attr-preview">{{#if this.transactions}}{{this.transactions}}{{else}}--{{/if}}</label>
                             <input class="form-control item-attr-edit" type="number" name="restrictions[limits][{{@index}}][transactions]" value="{{this.transactions}}">
                           </div>
 
                           <div class="col-sm-2">Budget</div>
                           <div class="col-sm-2">
-                            <label class="item-attr-preview">{{this.amount}}</label>
+                            <label class="item-attr-preview">{{#if this.amount}}{{this.amount}}{{else}}--{{/if}}</label>
                             <input class="item-attr-edit form-control" type="number" name="restrictions[limits][{{@index}}][budget]" value="{{this.amount}}">
                           </div>
                         </div>
