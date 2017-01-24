@@ -155,7 +155,7 @@ json.restrictions do
       json.limit_id limit.id
       json.period_id limit.period_id
       json.amount limit.amount
-      json.transactions limit.transactions
+      # json.transactions limit.transactions
     end
   end
 end
