@@ -415,6 +415,75 @@
                     </div>
                   </div>
                 </div>
+                <div class="row" style="margin-bottom: 25px;">
+                  <div class="col-sm-3" style="font-size: 16px;">
+                    Card Limit:
+                  </div>
+
+                  <div class="col-sm-9" style="font-size: 16px;">
+                    <label>&#8377;&nbsp;10000.00</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-12">
+                <h4>Restrictions</h4>
+              </div>
+
+              <div class="col-sm-12">
+                <div class="row no-margin">
+                  <div class="col-sm-4">
+                    <label>Available Channels:</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <div class="row no-margin">
+                      <div class="col-sm-4">
+                        <label><input type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />&nbsp;ATM</label>&nbsp;&nbsp;&nbsp;
+                      </div>
+                      <div class="col-sm-4">
+                        <label><input type="checkbox" {{#if item.restrictions.channel_pos}}checked="checked"{{/if}} name="restrictions[channel_pos]" value="1" />&nbsp;POS</label>
+                      </div>
+                      <div class="col-sm-4">
+                        <label><input type="checkbox" {{#if item.restrictions.channel_ecommorce}}checked="checked"{{/if}} name="restrictions[channel_ecommorce]" value="1" />&nbsp;E-Commerce</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row no-margin">
+                  <div class="col-sm-4">
+                    <label>Applied Product Code:</label>
+                  </div>
+
+                  <div class="col-sm-8">
+                    <label class="item-attr-preview">
+                      {{item.restrictions.product_code}}Fuel
+                    </label>
+                    <select class="form-control item-attr-edit" name="restrictions[product_code_id]">
+                      <option value="1">Fuel</option>
+                      <option value="2">Food</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row no-margin">
+                  <div class="col-sm-12">
+                    <h5>Limits</h5> 
+                  </div>
+                  {{#each item.restrictions.limits}}
+
+                    <div class="col-sm-12">
+                      <p>
+                        <strong>Per:</strong>
+
+
+                      </p>
+                    </div>
+                  {{/each}}
+                </div> 
+
               </div>
             </div>
           </div><!-- section card -->
