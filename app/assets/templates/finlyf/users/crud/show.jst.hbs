@@ -509,13 +509,13 @@
                       <label>Limits</label>
                     </div>
                     {{#each item.restrictions.limits}}
-
+                      <input type="hidden" name="restrictions[limits][{{@index}}][id]" value="{{this.limit_id}}">
                       <div class="col-sm-12">
                         <div class="row no-margin">
                           <div class="col-sm-1">Per</div>
                           <div class="col-sm-2">
-                            <label class="item-attr-preview"></label>
-                            <select class="item-attr-edit">
+                            <label class="item-attr-preview">{{this.period_name}}</label>
+                            <select class="form-control item-attr-edit" name="restrictions[limits][{{@index}}][period_id]">
                               {{#each ../item.periods}}
                                 <option value="{{this.id}}">{{this.name}}</option>
                               {{/each}}
@@ -523,7 +523,16 @@
                           </div>
 
                           <div class="col-sm-2">Transactions:</div>
-                          <div class="col-sm-3"></div>
+                          <div class="col-sm-2">
+                            <label class="item-attr-preview">{{this.transactions}}</label>
+                            <input class="form-control item-attr-edit" type="number" name="restrictions[limits][{{@index}}][transactions]" value="{{this.transactions}}">
+                          </div>
+
+                          <div class="col-sm-2">Budget</div>
+                          <div class="col-sm-2">
+                            <label class="item-attr-preview">{{this.amount}}</label>
+                            <input class="item-attr-edit form-control" type="number" name="restrictions[limits][{{@index}}][budget]" value="{{this.amount}}">
+                          </div>
                         </div>
                       </div>
                     {{/each}}
