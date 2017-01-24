@@ -1,6 +1,6 @@
 class User::CardRestrictions::Update < User::Base
 
-  attr_accessor :selected_user, :dummy_restriction
+  attr_accessor :selected_user, :dummy_restriction, :update_params
 
   def authorized_user_types
     [:company_admin]
@@ -40,11 +40,12 @@ class User::CardRestrictions::Update < User::Base
   def set_updating_params
     params[:restrictions][:card_limits_attributes] = []
     params[:restrictions][:limits].each do |index, limit|
-      params[:restrictions][:card_limits_attributes] << {id: limit[:period_id], amount: limit[:budget], period_id: limit[:period_id], transactions: limit[:transactions]}
+      params[:restrictions][:card_limits_attributes] << {id: limit[:id], budget: limit[:budget].to_f, period_id: limit[:period_id], transactions: limit[:transactions]}
     end
   end
 
   def card_restriction_params
-    params.require(:restrictions).permit(:channel_atm, :channel_pos, :channel_ecom, :product_code_id, card_limits_attributes: [:id, :amount, :period_id, :transactions])
+    params[:restrictions][:channel_online] = params[:restrictions][:channel_ecom]
+    params.require(:restrictions).permit(:channel_atm, :channel_pos, :channel_online, :product_code_id, card_limits_attributes: [:id, :budget, :period_id, :transactions])
   end
 end
