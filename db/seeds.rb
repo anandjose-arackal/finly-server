@@ -182,8 +182,8 @@ if CardType.count == 0
 end
 
 if ProductCombination.count == 0
-  ProductCombination::VALUES.each do |value|
-    ProductCombination.create(name: value)
+  ProductCombination::TYPES.each do |type|
+    ProductCombination.create(name: type)
   end
 end
 

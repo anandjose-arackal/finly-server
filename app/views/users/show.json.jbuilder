@@ -147,6 +147,7 @@ json.restrictions do
   end
   json.product_codes do
     json.array! @result.product_codes.each do |pc|
+      debugger
       json.extract! pc, :id, :name
     end
   end
