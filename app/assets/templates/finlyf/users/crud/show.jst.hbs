@@ -428,62 +428,107 @@
             </div>
 
             <div class="row no-margin">
-              <div class="col-sm-12">
+            <hr style="margin: 0;">
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-6">
                 <h4>Restrictions</h4>
               </div>
 
+              <div class="col-sm-6 text-right">
+                <button class="btn btn-warning btn-sm btn-edit-restrictions"><i class="fa fa-edit"></i>&nbsp;Edit</button>
+              </div>
+
               <div class="col-sm-12">
-                <div class="row no-margin">
-                  <div class="col-sm-4">
-                    <label>Available Channels:</label>
-                  </div>
-                  <div class="col-sm-8">
-                    <div class="row no-margin">
-                      <div class="col-sm-4">
-                        <label><input type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />&nbsp;ATM</label>&nbsp;&nbsp;&nbsp;
-                      </div>
-                      <div class="col-sm-4">
-                        <label><input type="checkbox" {{#if item.restrictions.channel_pos}}checked="checked"{{/if}} name="restrictions[channel_pos]" value="1" />&nbsp;POS</label>
-                      </div>
-                      <div class="col-sm-4">
-                        <label><input type="checkbox" {{#if item.restrictions.channel_ecommorce}}checked="checked"{{/if}} name="restrictions[channel_ecommorce]" value="1" />&nbsp;E-Commerce</label>
+                <form class="form-restrictions">
+                  <div class="row no-margin" style="margin-bottom: 10px;">
+                    <div class="col-sm-4">
+                      <label>Available Channels:</label>
+                    </div>
+                    <div class="col-sm-8">
+                      <div class="row no-margin">
+                        <div class="col-sm-4">
+                          <label class="item-attr-preview">
+                            {{#if item.restrictions.channel_atm}}
+                              <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                            {{else}}
+                              <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                            {{/if}}
+                            &nbsp;<span>ATM</span>
+                          </label>
+                          <label class="item-attr-edit"><input type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />&nbsp;ATM</label>&nbsp;&nbsp;&nbsp;
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="item-attr-preview">
+                            {{#if item.restrictions.channel_pos}}
+                              <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                            {{else}}
+                              <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                            {{/if}}
+                            &nbsp;<span>POS</span>
+                          </label>
+                          <label class="item-attr-edit"><input type="checkbox" {{#if item.restrictions.channel_pos}}checked="checked"{{/if}} name="restrictions[channel_pos]" value="1" />&nbsp;POS</label>
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="item-attr-preview">
+                            {{#if item.restrictions.channel_ecom}}
+                              <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                            {{else}}
+                              <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                            {{/if}}
+                            &nbsp;<span>E-Commerce</span>
+                          </label>
+                          <label class="item-attr-edit"><input type="checkbox" {{#if item.restrictions.channel_ecom}}checked="checked"{{/if}} name="restrictions[channel_ecom]" value="1" />&nbsp;E-Commerce</label>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="row no-margin">
-                  <div class="col-sm-4">
-                    <label>Applied Product Code:</label>
+                  <div class="row no-margin" style="margin-bottom: 10px;">
+                    <div class="col-sm-4">
+                      <label>Applied Product Code:</label>
+                    </div>
+
+                    <div class="col-sm-8">
+                      <div class="col-sm-6">
+                        <label class="item-attr-preview">
+                          {{item.restrictions.product_code.name}}
+                        </label>
+                        <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;">
+                          {{#each item.restrictions.product_codes}}
+                            <option value="{{this.id}}">{{this.name}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="col-sm-8">
-                    <label class="item-attr-preview">
-                      {{item.restrictions.product_code}}Fuel
-                    </label>
-                    <select class="form-control item-attr-edit" name="restrictions[product_code_id]">
-                      <option value="1">Fuel</option>
-                      <option value="2">Food</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="row no-margin">
-                  <div class="col-sm-12">
-                    <h5>Limits</h5> 
-                  </div>
-                  {{#each item.restrictions.limits}}
-
+                  <div class="row no-margin">
                     <div class="col-sm-12">
-                      <p>
-                        <strong>Per:</strong>
-
-
-                      </p>
+                      <label>Limits</label>
                     </div>
-                  {{/each}}
-                </div> 
+                    {{#each item.restrictions.limits}}
 
+                      <div class="col-sm-12">
+                        <div class="row no-margin">
+                          <div class="col-sm-1">Per</div>
+                          <div class="col-sm-2">
+                            <label class="item-attr-preview"></label>
+                            <select class="item-attr-edit">
+                              {{#each ../item.periods}}
+                                <option value="{{this.id}}">{{this.name}}</option>
+                              {{/each}}
+                            </select>
+                          </div>
+
+                          <div class="col-sm-2">Transactions:</div>
+                          <div class="col-sm-3"></div>
+                        </div>
+                      </div>
+                    {{/each}}
+                  </div> 
+                </form>
               </div>
             </div>
           </div><!-- section card -->

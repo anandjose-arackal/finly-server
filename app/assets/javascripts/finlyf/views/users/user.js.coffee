@@ -39,6 +39,9 @@ class FinlyF.Views.User extends Backbone.View
 
     # 'shown.bs.modal #modal-import-employees': 'addAuthKey'
 
+    'click .btn-edit-restrictions': 'editRestrictions'
+    'click .btn-update-restrictions': 'updateRestrictions'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
@@ -970,6 +973,65 @@ class FinlyF.Views.User extends Backbone.View
           $(target).removeAttr('disabled').text('Submit')
       })
     )
+
+  editRestrictions: (e) ->
+    e.preventDefault()
+    _this = @
+    target = $(e.currentTarget)
+    restrictions_div = $(target).closest('section').find('form.form-restrictions')
+    $(restrictions_div).find('.item-attr-preview').addClass('hide')
+    $(restrictions_div).find('.item-attr-edit').addClass('show')
+
+    # selects = $(restrictions_div).find("select.item-attr-edit")
+    # for select in selects
+    #   $(select).val($(select).attr('data-default-value'))
+    # # console.log selects.length 
+    #edit
+
+    #change edit button to update
+    $(target).addClass('btn-success btn-update-restrictions').removeClass('btn-warning btn-edit-restrictions').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+
+  updateRestrictions: (e) ->
+    e.preventDefault()
+    _this = @
+    target = e.currentTarget
+
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;")
+    form = $(target).closest('section').find('form.form-restrictions')
+    # form = $(policy).find('form')
+    values = {}
+
+    # _.each($(container).find('form').serializeArray(), (input) ->
+    _.each($(form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    # console.log values
+    # values.authenticity_token = $("#authenticity_token").val()
+
+    # # console.log values
+    model = new FinlyF.Models.User({id: @model.get('id')})
+    model.save(values, {
+      data: values,
+      processData: true
+      success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        # console.log res
+        if res.success == true
+          # console.log "now it will fetch ", _this.params.view
+
+          $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
+        else
+          $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+      error: (err) ->
+        console.log "Err", err
+        $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+    }) 
+
 
 
 
