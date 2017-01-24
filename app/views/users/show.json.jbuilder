@@ -146,6 +146,7 @@ json.restrictions do
   end
   json.limits do
     json.array! 4.times do |i|
+      json.limit_id (i+10)
       json.period_id (i+1)
       json.amount (500 - 200)*rand + 200
       json.transactions ((10-5)*rand + 5).to_i
