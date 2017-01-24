@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170119122026) do
+ActiveRecord::Schema.define(version: 20170124105547) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -154,6 +154,18 @@ ActiveRecord::Schema.define(version: 20170119122026) do
 
   add_index "card_fund_transactions", ["for_user"], name: "index_card_fund_transactions_on_for_user", using: :btree
   add_index "card_fund_transactions", ["requesting_user"], name: "index_card_fund_transactions_on_requesting_user", using: :btree
+
+  create_table "card_limits", force: :cascade do |t|
+    t.integer  "dummy_restriction_id", limit: 4
+    t.integer  "transaction_limit",    limit: 4
+    t.integer  "period_id",            limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.decimal  "budget",                         precision: 10
+  end
+
+  add_index "card_limits", ["dummy_restriction_id"], name: "index_card_limits_on_dummy_restriction_id", using: :btree
+  add_index "card_limits", ["period_id"], name: "index_card_limits_on_period_id", using: :btree
 
   create_table "card_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -337,6 +349,19 @@ ActiveRecord::Schema.define(version: 20170119122026) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
+
+  create_table "dummy_restrictions", force: :cascade do |t|
+    t.integer  "user_id",         limit: 4
+    t.boolean  "channel_atm"
+    t.boolean  "channel_pos"
+    t.boolean  "channel_online"
+    t.integer  "product_code_id", limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "dummy_restrictions", ["product_code_id"], name: "index_dummy_restrictions_on_product_code_id", using: :btree
+  add_index "dummy_restrictions", ["user_id"], name: "index_dummy_restrictions_on_user_id", using: :btree
 
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -844,7 +869,6 @@ ActiveRecord::Schema.define(version: 20170119122026) do
     t.datetime "updated_at",                            null: false
     t.integer  "payment_id",                limit: 4
     t.integer  "action_user_role_id",       limit: 4
-    t.integer  "cash_in_hand_deduction_id", limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
@@ -876,7 +900,6 @@ ActiveRecord::Schema.define(version: 20170119122026) do
     t.boolean  "auto_approve",                                           default: false, null: false
     t.date     "accounted_at"
     t.datetime "approved_at"
-    t.integer  "cash_in_hand_deduction_id",    limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -934,7 +957,7 @@ ActiveRecord::Schema.define(version: 20170119122026) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-01-23', null: false
+    t.date     "date_of_birth",                   default: '2017-01-24', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false
@@ -1089,6 +1112,7 @@ ActiveRecord::Schema.define(version: 20170119122026) do
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
+  add_foreign_key "card_limits", "dummy_restrictions"
   add_foreign_key "card_transaction_restrictions", "cards"
   add_foreign_key "card_transaction_restrictions", "product_combinations"
   add_foreign_key "card_transactions", "cards"
@@ -1104,6 +1128,7 @@ ActiveRecord::Schema.define(version: 20170119122026) do
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_tags", "companies"
+  add_foreign_key "dummy_restrictions", "users"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"

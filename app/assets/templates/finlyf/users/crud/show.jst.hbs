@@ -415,6 +415,130 @@
                     </div>
                   </div>
                 </div>
+                <div class="row" style="margin-bottom: 25px;">
+                  <div class="col-sm-3" style="font-size: 16px;">
+                    Card Limit:
+                  </div>
+
+                  <div class="col-sm-9" style="font-size: 16px;">
+                    <label>&#8377;&nbsp;10000.00</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row no-margin">
+            <hr style="margin: 0;">
+            </div>
+
+            <div class="row no-margin">
+              <div class="col-sm-6">
+                <h4>Restrictions</h4>
+              </div>
+
+              <div class="col-sm-6 text-right">
+                <button class="btn btn-warning btn-sm btn-edit-restrictions"><i class="fa fa-edit"></i>&nbsp;Edit</button>
+              </div>
+
+              <div class="col-sm-12">
+                <form class="form-restrictions">
+                  <div class="row no-margin" style="margin-bottom: 10px;">
+                    <div class="col-sm-4">
+                      <label>Available Channels:</label>
+                    </div>
+                    <div class="col-sm-8">
+                      <div class="row no-margin">
+                        <div class="col-sm-4">
+                          <label class="item-attr-preview">
+                            {{#if item.restrictions.channel_atm}}
+                              <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                            {{else}}
+                              <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                            {{/if}}
+                            &nbsp;<span>ATM</span>
+                          </label>
+                          <label class="item-attr-edit"><input type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />&nbsp;ATM</label>&nbsp;&nbsp;&nbsp;
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="item-attr-preview">
+                            {{#if item.restrictions.channel_pos}}
+                              <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                            {{else}}
+                              <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                            {{/if}}
+                            &nbsp;<span>POS</span>
+                          </label>
+                          <label class="item-attr-edit"><input type="checkbox" {{#if item.restrictions.channel_pos}}checked="checked"{{/if}} name="restrictions[channel_pos]" value="1" />&nbsp;POS</label>
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="item-attr-preview">
+                            {{#if item.restrictions.channel_ecom}}
+                              <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                            {{else}}
+                              <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                            {{/if}}
+                            &nbsp;<span>E-Commerce</span>
+                          </label>
+                          <label class="item-attr-edit"><input type="checkbox" {{#if item.restrictions.channel_ecom}}checked="checked"{{/if}} name="restrictions[channel_ecom]" value="1" />&nbsp;E-Commerce</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row no-margin" style="margin-bottom: 10px;">
+                    <div class="col-sm-4">
+                      <label>Applied Product Code:</label>
+                    </div>
+
+                    <div class="col-sm-8">
+                      <div class="col-sm-6">
+                        <label class="item-attr-preview">
+                          {{item.restrictions.product_code.name}}
+                        </label>
+                        <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code.id}}"
+                          <option value="">None</option>
+                          {{#each item.restrictions.product_codes}}
+                            <option value="{{this.id}}">{{this.name}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row no-margin">
+                    <div class="col-sm-12">
+                      <label>Limits</label>
+                    </div>
+                    {{#each item.restrictions.limits}}
+                      <input type="hidden" name="restrictions[limits][{{@index}}][id]" value="{{this.limit_id}}">
+                      <div class="col-sm-12">
+                        <div class="row no-margin">
+                          <div class="col-sm-1">Per</div>
+                          <div class="col-sm-2">
+                            <label class="item-attr-preview">{{this.period_name}}</label>
+                            <select class="form-control item-attr-edit" name="restrictions[limits][{{@index}}][period_id]" data-default-value={{this.period_id}}>
+                              {{#each ../item.restrictions.card_periods}}
+                                <option value="{{this.id}}">{{this.name}}</option>
+                              {{/each}}
+                            </select>
+                          </div>
+
+                          <div class="col-sm-2">Transactions:</div>
+                          <div class="col-sm-2">
+                            <label class="item-attr-preview">{{#if this.transactions}}{{this.transactions}}{{else}}--{{/if}}</label>
+                            <input class="form-control item-attr-edit" type="number" name="restrictions[limits][{{@index}}][transactions]" value="{{this.transactions}}">
+                          </div>
+
+                          <div class="col-sm-2">Budget</div>
+                          <div class="col-sm-2">
+                            <label class="item-attr-preview">{{#if this.amount}}{{this.amount}}{{else}}--{{/if}}</label>
+                            <input class="item-attr-edit form-control" type="number" name="restrictions[limits][{{@index}}][budget]" value="{{this.amount}}">
+                          </div>
+                        </div>
+                      </div>
+                    {{/each}}
+                  </div> 
+                </form>
               </div>
             </div>
           </div><!-- section card -->

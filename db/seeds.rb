@@ -181,6 +181,12 @@ if CardType.count == 0
   CardType.create(id: 2, name: 'Virtual')
 end
 
+if ProductCombination.count == 0
+  ProductCombination::TYPES.each do |type|
+    ProductCombination.create(name: type)
+  end
+end
+
 ##########################
 
 if Amount.count == 0
@@ -341,7 +347,7 @@ if p.rules_count == 0
                              rule_type_id: 2)
 end
 
-# if Report.count == 0
+if Report.count == 0
 
   c.users.all.each do |user|
 
@@ -403,7 +409,7 @@ end
       end
     end
   end
-# end
+end
 
 unless Rails.env.production?
   if Card.count == 0

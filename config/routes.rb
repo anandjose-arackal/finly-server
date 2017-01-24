@@ -238,8 +238,17 @@
 #                                          DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
 #                             api_v1_users GET        /api/v1/users(.:format)                                     api/v1/users#index
 #                              api_v1_user GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
-#                                   api_v1 POST       /api/v1/cards/:id/balance/update(.:format)                  api/v1/cards#update_balance
-#                                          POST       /api/v1/cards/:id/status/update(.:format)                   api/v1/cards#update_status
+#                 api_v1_user_user_summary GET        /api/v1/users/:user_id/summary(.:format)                    api/v1/users#summary
+#                                          GET        /api/v1/users(.:format)                                     api/v1/users#index
+#                                          POST       /api/v1/users(.:format)                                     api/v1/users#create
+#                          new_api_v1_user GET        /api/v1/users/new(.:format)                                 api/v1/users#new
+#                         edit_api_v1_user GET        /api/v1/users/:id/edit(.:format)                            api/v1/users#edit
+#                                          GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
+#                                          PATCH      /api/v1/users/:id(.:format)                                 api/v1/users#update
+#                                          PUT        /api/v1/users/:id(.:format)                                 api/v1/users#update
+#                                          DELETE     /api/v1/users/:id(.:format)                                 api/v1/users#destroy
+#              api_v1_cards_balance_update POST       /api/v1/cards/balance/update(.:format)                      api/v1/cards#update_balance
+#               api_v1_cards_status_update POST       /api/v1/cards/status/update(.:format)                       api/v1/cards#update_status
 #          api_v1_configuration_categories GET        /api/v1/configuration/categories(.:format)                  api/v1/configuration/category#index
 #        api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
 #      api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
@@ -286,6 +295,14 @@
 #                                          PATCH      /export_preferences/:id(.:format)                           export_preferences#update
 #                                          PUT        /export_preferences/:id(.:format)                           export_preferences#update
 #                                          DELETE     /export_preferences/:id(.:format)                           export_preferences#destroy
+#                        card_restrictions GET        /card_restrictions(.:format)                                card_restrictions#index
+#                                          POST       /card_restrictions(.:format)                                card_restrictions#create
+#                     new_card_restriction GET        /card_restrictions/new(.:format)                            card_restrictions#new
+#                    edit_card_restriction GET        /card_restrictions/:id/edit(.:format)                       card_restrictions#edit
+#                         card_restriction GET        /card_restrictions/:id(.:format)                            card_restrictions#show
+#                                          PATCH      /card_restrictions/:id(.:format)                            card_restrictions#update
+#                                          PUT        /card_restrictions/:id(.:format)                            card_restrictions#update
+#                                          DELETE     /card_restrictions/:id(.:format)                            card_restrictions#destroy
 #                         companies_notify GET        /companies/notify(.:format)                                 companies#notify
 #                      company_add_balance POST       /companies/:company_id/add_balance(.:format)                companies#add_balance
 #                                companies GET        /companies(.:format)                                        companies#index
@@ -456,6 +473,9 @@
 #                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
+#            statements_company_statements GET        /statements/company_statements(.:format)                    statements#company_statements
+#               statements_company_summary GET        /statements/company_summary(.:format)                       statements#company_summary
+#              statements_policies_summary GET        /statements/policies_summary(.:format)                      statements#policies_summary
 #                                          GET        /statements/:id/summary(.:format)                           statements#summary
 #                         export_statement GET        /export/:id/statements(.:format)                            export#statement
 #                               statements GET        /statements(.:format)                                       statements#index
@@ -483,7 +503,7 @@
 #
 
 Rails.application.routes.draw do
-  
+
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -596,6 +616,8 @@ Rails.application.routes.draw do
   resources :categories
 
   resources :export_preferences
+
+  resources :card_restrictions
 
   get 'companies/notify', to: 'companies#notify'
   resources :companies do

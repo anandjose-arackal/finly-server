@@ -47,6 +47,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -104,6 +106,7 @@ class User < ActiveRecord::Base
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications
+  has_one :dummy_restriction
 
   has_many :notifier_type_configurations
 
@@ -183,6 +186,7 @@ class User < ActiveRecord::Base
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
+    self.build_dummy_restriction(product_code_id: ProductCombination.id_for(:fuel), card_limits_attributes: [{period_id: 1}, {period_id: 2}, {period_id: 3}]).save
   end
 
   def payments
