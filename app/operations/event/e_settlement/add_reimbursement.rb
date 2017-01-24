@@ -1,7 +1,7 @@
 class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
 
   def event_id
-    NotifierType.settlement_add_reimbursement_id
+    NotifierType.id_for(:settlement_add_reimbursement)
   end
 
   def send_push_notification(user)
@@ -10,8 +10,8 @@ class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
 
   def set_notification(user)
     payment.reports.each do |report|
-      notification = user.notifications.create( notification_type_id: NotificationType.payment_id,
-                                                action_type_id: NotificationActionType.notify_credit_reimbursement_id,
+      notification = user.notifications.create( notification_type_id: NotificationType.id_for(:payment),
+                                                action_type_id: NotificationActionType.id_for(:notify_credit_reimbursement),
                                                 action_user_id: payment.initiating_user.id,
                                                 object_id: report.id,
                                                 object_type: "Report",

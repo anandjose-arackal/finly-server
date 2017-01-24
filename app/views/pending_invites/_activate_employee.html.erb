@@ -89,10 +89,15 @@
 
               <label style="font-weight: 500">State:</label>
               <div>
-                <% unless @pending_user.profile.state_id.blank? %>
-                  <% selected_state = @pending_user.profile.state_id %>
-                <% end %>
-                <%= select_tag "user[profile_attributes][state_id]", options_for_select(@states.collect {|s| [ s[:name], s[:code] ] }, selected_state || "" )%>
+                <select class="form-control" name="user[profile_attributes][state_id]">
+                  <% @states.each do |state| %>
+                    <option value="<%= state.id %>"
+                    <% if @pending_user.profile.state_id == state.id %>
+                      selected
+                    <% end %>
+                    ><%= state.name %></option>
+                  <% end %>
+                </select>
               </div><br />
 
               <label style="font-weight: 500">Pin Code:</label>
@@ -133,7 +138,11 @@
 
                 <label style="font-weight: 500">State:</label>
                 <div>
-                  <%= select_tag "user[profile_attributes][state_id]", options_for_select(@states.collect {|s| [ s.id, s.name ] })%>
+                  <select class="form-control" name="user[profile_attributes][state_id]">
+                    <% @states.each do |state| %>
+                        <option value="<%= state.id %>"><%= state.name %></option>
+                    <% end %>
+                  </select>
                 </div><br />
 
                 <label style="font-weight: 500">Pin Code:</label>

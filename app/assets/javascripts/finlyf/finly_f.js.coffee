@@ -512,6 +512,7 @@ $(document).ready ->
       evt.preventDefault()
       amount = $(modal).find('input[name=amount]').val()
       password = $(modal).find('input[type=password]').val()
+      note = $(modal).find('textarea[name=note]').val()
 
       url = $(this).attr('data-url')
 
@@ -522,6 +523,7 @@ $(document).ready ->
         data: {
           amount: amount
           password: password
+          note: note
           view: 'personal'
           to_user_id: to_user_id
         }

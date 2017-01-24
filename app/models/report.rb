@@ -81,7 +81,7 @@ class Report < ActiveRecord::Base
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
   # scope for reports being shown in settlements page
-  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id, ReportStatus.reimbursement_confirmed_id]}
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -284,7 +284,7 @@ class Report < ActiveRecord::Base
 
   def final_approver
     return nil unless self.approved? or self.reimbursed? or self.reimbursement_confirmed? or self.closed?
-    tracks = self.tracks.with_action(ReportTrackingAction.approve_id)
+    tracks = self.tracks.with_action(ReportTrackingAction.id_for(:approve))
     if tracks.present?
       return tracks.last.action_user
     end

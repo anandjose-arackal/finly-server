@@ -606,12 +606,15 @@ class FinlyF.Views.User extends Backbone.View
 
     amount = $(modal).find("input[name=amount]").val()
     password = $(modal).find("input[name=password]").val()
+    note = $(modal).find('textarea[name=note]').val()
+
     data = {
       view: _this.params.view
       authenticity_token: $("#authenticity_token").val()
       # to_user_id: _this.model.get('id')
       amount: amount
       password: password
+      note: note
       # action_type: action_type
     }
 

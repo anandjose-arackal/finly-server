@@ -52,7 +52,7 @@ class Report::Retract < Report::Base
                                   action_user_role_id: role_id,
                                   modified_user: prev_controlling_user,
                                   modified_user_role_id: prev_controlling_user_role,
-                                  report_tracking_action_id: ReportTrackingAction.retract_id,
+                                  report_tracking_action_id: ReportTrackingAction.id_for(:retract),
                                   report_status_id: ReportStatus.retracted_id
       track.save
       report.expenses.each do |expense|

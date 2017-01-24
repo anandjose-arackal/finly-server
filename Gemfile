@@ -15,6 +15,10 @@ gem 'stomp', '1.4.3'
 # grm for mocking and stubbing in test cases
 gem 'mocha', '1.2.1'
 
+# gem for crash reports
+gem 'rollbar'
+gem 'oj', '~> 2.12.14'
+
 # gem for admin panel
 gem 'activeadmin', '1.0.0.pre4', git: 'https://github.com/activeadmin/activeadmin.git'
 

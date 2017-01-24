@@ -26,7 +26,7 @@ class Report::ReimburseConfirm < Report::Base
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user: user,
                                   modified_user_role_id: UserRole.id_for(:employee),
-                                  report_tracking_action_id: ReportTrackingAction.reimbursement_confirmed_id,
+                                  report_tracking_action_id: ReportTrackingAction.id_for(:reimbursement_confirmed),
                                   report_status_id: ReportStatus.reimbursement_confirmed_id
       track.save
       return true
