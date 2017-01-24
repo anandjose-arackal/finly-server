@@ -151,11 +151,12 @@ json.restrictions do
     end
   end
   json.limits do
-    json.array! @result.c_limits.each do |limit|
+    json.array! @result.c_limits.each do |limit|  
       json.limit_id limit.id
       json.period_id limit.period_id
+      json.period_name limit.period_name
       json.amount limit.amount
-      # json.transactions limit.transactions
+      json.transactions limit.transaction_limit
     end
   end
 end

@@ -20,6 +20,11 @@ class Period < ActiveRecord::Base
     self.name
   end
 
+  def period_name
+
+    self.name
+  end
+
   def self.id_for(item)
     VALUES[item]
   end

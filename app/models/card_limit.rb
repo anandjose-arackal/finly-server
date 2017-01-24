@@ -17,4 +17,6 @@ class CardLimit < ActiveRecord::Base
 
   belongs_to :amount
   belongs_to :period
+
+  delegate :period_name, to: :period  
 end

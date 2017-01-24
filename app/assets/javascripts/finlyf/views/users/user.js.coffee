@@ -982,7 +982,7 @@ class FinlyF.Views.User extends Backbone.View
     $(restrictions_div).find('.item-attr-preview').addClass('hide')
     $(restrictions_div).find('.item-attr-edit').addClass('show')
 
-    selects = $(policy).find("select.item-attr-edit")
+    selects = $(restrictions_div).find("select.item-attr-edit")
     for select in selects
       $(select).val($(select).attr('data-default-value'))
 
