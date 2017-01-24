@@ -85,60 +85,84 @@ class User::Wallet::Credit < User::Wallet::Base
     payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
     case initiating_account
-    when :virtual_account
-      if target_account == :wallet
+      when :virtual_account
+        if target_account == :wallet
 
-        if target_user.wallet.add_funds(self.amount)
-          # Credit company wallet balance when funds are transferred from virtual account to wallet
-          user.company.account.funds_credited_to_wallet(self.amount)
+          if target_user.wallet.add_funds(self.amount)
+            # Credit company wallet balance when funds are transferred from virtual account to wallet
+            user.company.account.funds_credited_to_wallet(self.amount)
 
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_wallet)
-          self.payment = Payment.create payment_attributes
-        else
-          add_message :error, target_user.wallet.errors.full_messages
-        end
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_wallet)
+            self.payment = Payment.create payment_attributes
+          else
+            add_message :error, target_user.wallet.errors.full_messages
+          end
 
-      elsif target_account == :card
+        elsif target_account == :card
 
-        credit_presenter = ItzCash::Credit.(target_user, params)
-        unless credit_presenter.success?
-          add_message :error, credit_presenter.messages[:error]
-          return
-        end
-        payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_card)
-        self.payment = Payment.create payment_attributes
-
-      end
-    when :wallet
-
-      if target_account == :wallet
-        if initiating_user.wallet.subtract_funds(self.amount)
-          target_user.wallet.add_funds(self.amount)
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_wallet)
+          credit_presenter = ItzCash::Credit.(target_user, params)
+          unless credit_presenter.success?
+            add_message :error, credit_presenter.messages[:error]
+            return
+          end
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_virtual_account_to_card)
           self.payment = Payment.create payment_attributes
 
-          add_message :success, 'Credit successful'
-        else
-          add_message :error, initiating_user.wallet.errors.full_messages
         end
+      when :wallet
 
-      elsif target_account == :card
+        if target_account == :wallet
+          if initiating_user.wallet.subtract_funds(self.amount)
+            target_user.wallet.add_funds(self.amount)
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_wallet)
+            self.payment = Payment.create payment_attributes
 
-        credit_presenter = ItzCash::Credit.(target_user, params)
-        if credit_presenter.success?
-          initiating_user.wallet.subtract_funds(self.amount)
-          # Reduce company wallet balance when funds are transferred from wallet to card
-          user.company.account.funds_debited_from_wallet(self.amount)
+            add_message :success, 'Credit successful'
+          else
+            add_message :error, initiating_user.wallet.errors.full_messages
+          end
 
-          payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_card)
-          self.payment = Payment.create payment_attributes
+        elsif target_account == :card
 
-          add_message :success, 'Credit successful'
-        else
-          add_message :error, credit_presenter.messages[:error]
+          credit_presenter = ItzCash::Credit.(target_user, params)
+          if credit_presenter.success?
+            initiating_user.wallet.subtract_funds(self.amount)
+            # Reduce company wallet balance when funds are transferred from wallet to card
+            user.company.account.funds_debited_from_wallet(self.amount)
+
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_wallet_to_card)
+            self.payment = Payment.create payment_attributes
+
+            add_message :success, 'Credit successful'
+          else
+            add_message :error, credit_presenter.messages[:error]
+          end
+
         end
+      when :card
+        if target_account == :card
 
-      end
+          # first reduce the amount from the card holder's balance
+          debit_presenter = ItzCash::Debit.(initiating_user, params)
+          # if the debit is successful, i.e. if the money has been reduced from the card holder's account
+          if debit_presenter.success?
+            # now add the money to the target user's card
+            credit_presenter = ItzCash::Credit.(target_user, params)
+            unless credit_presenter.success?
+              # restore the money to the initiating user's card, and show error message
+              credit_presenter
+            end
+          end
+        elsif target_account == :wallet
+          debit_presenter = ItzCash::Debit.(initiating_user, params)
+          if debit_presenter.success?
+            # i.e. the money was successfully deducted
+            # deducting money from the company balance
+            user.company.account.funds_debited_from_wallet(self.amount)
+            # add funds to target user waller
+            target_user.wallet.add_funds(self.amount)
+          end
+        end
     end
 
   end
