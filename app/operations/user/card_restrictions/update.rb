@@ -21,7 +21,7 @@ class User::CardRestrictions::Update < User::Base
 
   def validate
     unless selected_user
-
+      add_message :error, "User not found"
     end
   end
 
@@ -39,8 +39,8 @@ class User::CardRestrictions::Update < User::Base
 
   def set_updating_params
     params[:restrictions][:card_limits_attributes] = []
-    params[:restrictions][:limits].each do |limit|
-      params[:restrictions][:card_limits_attributes] << {amount: limit[:amount], period_id: limit[:period_id], transactions: limit[:transactions]}
+    params[:restrictions][:limits].each do |index, limit|
+      params[:restrictions][:card_limits_attributes] << {id: limit[:period_id], amount: limit[:budget], period_id: limit[:period_id], transactions: limit[:transactions]}
     end
   end
 
