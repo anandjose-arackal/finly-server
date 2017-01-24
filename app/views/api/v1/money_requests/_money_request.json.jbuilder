@@ -1,7 +1,7 @@
 json.extract! money_request, :id, :name, :submitted_at, :memo, :required_by_date
 json.status do
   json.id money_request.status_id
-  json.name result.status_name(money_request)
+  json.name @result.status_name(money_request)
 end
 json.user do
   json.id money_request.user_id
