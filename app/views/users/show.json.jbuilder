@@ -139,6 +139,11 @@ json.restrictions do
     json.id 3
     json.name "Fuel"
   end
+  json.product_codes do
+    json.array! @result.product_codes.each do |pc|
+      json.extract! pc, :id, :name
+    end
+  end
   json.limits do
     json.array! 4.times do |i|
       json.period_id (i+1)
