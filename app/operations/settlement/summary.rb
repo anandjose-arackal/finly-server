@@ -90,32 +90,59 @@ class Settlement::Summary < Settlement::Base
           credit_params[:from_account] = :virtual_account
           credit_params[:to_account] = :card
           actions[:credit_card_from_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+
+          # Card -> Virtual account
+          debit_params[:from_account] = :card
+          debit_params[:to_account] = :virtual_account
+          actions[:debit_card_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
         end
 
         # Wallet -> Virtual Account
         debit_params[:from_account] = :wallet
         debit_params[:to_account] = :virtual_account
         actions[:debit_wallet_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+
       end
       if selected_user != user
-        # Wallet -> Wallet
+        # User's Wallet -> Selected User's Wallet
         credit_params[:from_account] = :wallet
         credit_params[:to_account] = :wallet
         actions[:credit_wallet_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
 
-        # Wallet -> Wallet
+        # Selected User's Wallet -> User's Wallet
         debit_params[:from_account] = :wallet
         debit_params[:to_account] = :wallet
         actions[:debit_wallet_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+
+        # Selected User's card -> User's Card
+        debit_params[:from_account] = :card
+        debit_params[:to_account] = :card
+        actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+
+        # User's card -> Selected User's card
+        credit_params[:from_account] = :card
+        credit_params[:to_account] = :card
+        actions[:credit_card_to_card] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
       end
     end
 
     if is_card_assigned
+      # Credit actions
       # Wallet -> Card
       credit_params[:from_account] = :wallet
       credit_params[:to_account] = :card
       actions[:credit_card_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-      # Wallet Actions End
+
+      # Debit actions
+      # Wallet -> Card
+      debit_params[:from_account] = :wallet
+      debit_params[:to_account] = :card
+      actions[:debit_wallet_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+
+      # Card -> wallet
+      debit_params[:from_account] = :card
+      debit_params[:to_account] = :wallet
+      actions[:debit_card_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
     end
 
     if is_card_assigned
