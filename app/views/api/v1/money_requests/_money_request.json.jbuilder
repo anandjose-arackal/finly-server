@@ -12,8 +12,8 @@ json.policy do
   json.name money_request.policy.name rescue nil
 end
 json.payment_mode do
-  json.id = money_request.payment_mode_id
-  json.name = money_request.payment_mode.name rescue nil
+  json.id money_request.payment_mode_id
+  json.name money_request.payment_mode.name rescue nil
 end
 json.total_amount do
   json.value money_request.total_amount
