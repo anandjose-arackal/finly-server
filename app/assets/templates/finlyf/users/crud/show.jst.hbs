@@ -444,6 +444,26 @@
                 <form class="form-restrictions">
                   <div class="row no-margin" style="margin-bottom: 10px;">
                     <div class="col-sm-4">
+                      <label>Applied Product Code:</label>
+                    </div>
+
+                    <div class="col-sm-8">
+                      <div class="col-sm-6">
+                        <label class="item-attr-preview">
+                          {{item.restrictions.product_code.name}}
+                        </label>
+                        <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code.id}}"
+                          <option value="">None</option>
+                          {{#each item.restrictions.product_codes}}
+                            <option value="{{this.id}}">{{this.name}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row no-margin" style="margin-bottom: 10px;">
+                    <div class="col-sm-4">
                       <label>Available Channels:</label>
                     </div>
                     <div class="col-sm-8">
@@ -485,25 +505,7 @@
                     </div>
                   </div>
 
-                  <div class="row no-margin" style="margin-bottom: 10px;">
-                    <div class="col-sm-4">
-                      <label>Applied Product Code:</label>
-                    </div>
-
-                    <div class="col-sm-8">
-                      <div class="col-sm-6">
-                        <label class="item-attr-preview">
-                          {{item.restrictions.product_code.name}}
-                        </label>
-                        <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code.id}}"
-                          <option value="">None</option>
-                          {{#each item.restrictions.product_codes}}
-                            <option value="{{this.id}}">{{this.name}}</option>
-                          {{/each}}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
+                  
 
                   <div class="row no-margin">
                     <div class="col-sm-12">
