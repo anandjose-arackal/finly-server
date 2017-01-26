@@ -42,6 +42,7 @@ class Company::Statement::Summary < Company::Statement::Base
       items[:employees][:cash_in_hand_balance] += cash_in_hand_on_date(user, end_date)
     end
     items[:employees].each do |k, v|
+      next if k == :total
       items[:employees][:total] += v
     end
 

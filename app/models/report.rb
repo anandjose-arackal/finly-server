@@ -48,9 +48,11 @@ class Report < ActiveRecord::Base
   # Payment made as reimbursement
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursement_amount, class_name: 'Amount'
+  belongs_to :cash_in_hand_deduction, class_name: 'Payment'
+  belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
   validates :user, presence: true
-  validates :status, presence: true
+  # validates :status_id, presence: true
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
@@ -64,6 +66,7 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
+  scope :with_reimbursement_amount, -> {joins :reimbursement_amount}
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
