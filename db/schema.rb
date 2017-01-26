@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104094949) do
+ActiveRecord::Schema.define(version: 20170126114827) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -777,18 +777,22 @@ ActiveRecord::Schema.define(version: 20170104094949) do
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
 
   create_table "receipts", force: :cascade do |t|
-    t.integer  "expense_id",         limit: 4
-    t.integer  "user_id",            limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.string   "image_file_name",    limit: 255
-    t.string   "image_content_type", limit: 255
-    t.integer  "image_file_size",    limit: 4
+    t.integer  "expense_id",             limit: 4
+    t.integer  "user_id",                limit: 4
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.string   "image_file_name",        limit: 255
+    t.string   "image_content_type",     limit: 255
+    t.integer  "image_file_size",        limit: 4
     t.datetime "image_updated_at"
-    t.integer  "parent_id",          limit: 4
-    t.string   "parent_type",        limit: 255
-    t.text     "note",               limit: 65535
-    t.integer  "receipt_email_id",   limit: 4
+    t.integer  "parent_id",              limit: 4
+    t.string   "parent_type",            limit: 255
+    t.text     "note",                   limit: 65535
+    t.integer  "receipt_email_id",       limit: 4
+    t.string   "thumbnail_file_name",    limit: 255
+    t.string   "thumbnail_content_type", limit: 255
+    t.integer  "thumbnail_file_size",    limit: 4
+    t.datetime "thumbnail_updated_at"
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
@@ -944,7 +948,7 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-01-23', null: false
+    t.date     "date_of_birth",                   default: '2017-01-08', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

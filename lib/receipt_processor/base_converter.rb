@@ -18,8 +18,9 @@ module ReceiptProcessor
       @image_tmp_path = image_tmp_path
       if pdf?
         @converter = PDFConverter.new
-      elsif msdoc?
-        @converter = MSDocConverter.new
+        # Removing support for MSDoc as receipt
+        # elsif msdoc?
+        #   @converter = MSDocConverter.new
       elsif html?
         @converter = HTMLConverter.new
       elsif image?
