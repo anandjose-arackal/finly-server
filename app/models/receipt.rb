@@ -26,7 +26,7 @@ class Receipt < ActiveRecord::Base
 
   validates :image, presence: true
 
-  # Reference: http://stackoverflow.com/questions/20920212/generate-thumbnail-from-pdf-in-rails-paperclip
+  # Reference for adding more file types: http://stackoverflow.com/questions/20920212/generate-thumbnail-from-pdf-in-rails-paperclip
   has_attached_file :image, styles: lambda { |a| a.instance.check_file_type }, #{large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"},
                     default_url: '/assets/:style/missing.png'
   validates_attachment :image, content_type: {
