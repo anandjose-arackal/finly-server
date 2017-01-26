@@ -14,8 +14,8 @@ class Report::MarkAsReimbursed < Report::Base
   def init
     self.report = params[:report]
     self.payment = params[:payment]
-    self.cash_in_hand_deduction = params[:cash_in_hand_deduction]
-    self.status = params[:status] || Report.reimbursed_id
+    self.cash_in_hand_deduction = params[:from_cash_in_hand]
+    self.status = params[:status] || ReportStatus.reimbursed_id
     self.tracking_status = (params[:status]) ? ReportTrackingAction.id_for(:closed) : ReportTrackingAction.id_for(:reimbursed)
   end
 
@@ -44,6 +44,8 @@ class Report::MarkAsReimbursed < Report::Base
                            report_status_id: status,
                            payment: self.payment,
                            cash_in_hand_deduction: cash_in_hand_deduction
+    else
+      add_message :error, report.errors.full_messages
     end
   end
 

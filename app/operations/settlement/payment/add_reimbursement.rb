@@ -20,12 +20,12 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:from_outside_finly] and params[:payment][:from_outside_finly].to_d <= 0
-      add_message :error, 'Reimbursement amount cannot be less than or equal to 0'
+    if params[:payment][:from_cash_in_hand].to_f <0 or params[:payment][:from_outside_finly].to_f < 0
+      add_message :error, "Reimbursement amount or cash in hand deduction cannot be negative"
       return
     end
-    if params[:payment][:from_cash_in_hand] and params[:payment][:from_cash_in_hand].to_d <= 0
-      add_message :error, 'Reimbursement amount cannot be less than or equal to 0'
+    if params[:payment][:from_cash_in_hand].to_f == 0 and params[:payment][:from_outside_finly].to_f == 0
+      add_message :error, 'Reimbursement amount and cash in hand deduction cannot both be equal to 0'
       return
     end
     if params[:report_ids].blank?
@@ -105,7 +105,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
         to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
         # mark the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role, status: ReportStatus.closed_id})
+          Report::MarkAsReimbursed.new(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role, status: ReportStatus.closed_id})
         end
         return
       else
@@ -126,7 +126,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
         to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
         # mark all the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
+          Report::MarkAsReimbursed.new(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
         end
       else
         add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages

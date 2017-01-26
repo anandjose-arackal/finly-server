@@ -50,7 +50,7 @@ class Report < ActiveRecord::Base
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
   validates :user, presence: true
-  validates :status, presence: true
+  # validates :status_id, presence: true
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
