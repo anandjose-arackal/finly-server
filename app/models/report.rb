@@ -48,9 +48,11 @@ class Report < ActiveRecord::Base
   # Payment made as reimbursement
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursement_amount, class_name: 'Amount'
+  belongs_to :cash_in_hand_deduction, class_name: 'Payment'
+  belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
   validates :user, presence: true
-  validates :status, presence: true
+  # validates :status_id, presence: true
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
@@ -64,6 +66,7 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
+  scope :with_reimbursement_amount, -> {joins :reimbursement_amount}
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
@@ -83,7 +86,7 @@ class Report < ActiveRecord::Base
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
   # scope for reports being shown in settlements page
-  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id, ReportStatus.reimbursement_confirmed_id]}
 
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
   scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.closed_id]}
@@ -236,7 +239,7 @@ class Report < ActiveRecord::Base
 
   def final_approver
     return nil unless self.approved? or self.reimbursed? or self.reimbursement_confirmed? or self.closed?
-    tracks = self.tracks.with_action(ReportTrackingAction.approve_id)
+    tracks = self.tracks.with_action(ReportTrackingAction.id_for(:approve))
     if tracks.present?
       return tracks.last.action_user
     end

@@ -27,11 +27,12 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :modified_user, class_name: 'User'
   belongs_to :modified_user_role, class_name: 'UserRole'
   belongs_to :payment
+  belongs_to :cash_in_hand_deduction, class_name: "Payment"
 
   default_scope { order('created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
-  scope :without_take_control_action, -> { where.not report_tracking_action_id: ReportTrackingAction.take_control_id }
+  scope :without_take_control_action, -> { where.not report_tracking_action_id: ReportTrackingAction.id_for(:take_control) }
   scope :manager_role, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:manager)}", "#{ UserRole.id_for(:manager) }") }
   scope :finance_manager_role, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}", "#{ UserRole.id_for(:finance_manager) }") }
   scope :admin, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:admin)}", "#{ UserRole.id_for(:admin) }") }

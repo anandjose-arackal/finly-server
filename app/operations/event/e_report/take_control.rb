@@ -1,7 +1,7 @@
 class Event::EReport::TakeControl < Event::EReport::Base
 
   def event_id
-    NotifierType.report_take_control_id
+    NotifierType.id_for(:report_take_control)
   end
 
   def affected_users
@@ -25,8 +25,8 @@ class Event::EReport::TakeControl < Event::EReport::Base
     else
       view_role_id = nil
     end
-    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
-                                             action_type_id: NotificationActionType.notify_take_control_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                             action_type_id: NotificationActionType.id_for(:notify_take_control),
                                              action_user_id: (report.tracks.last.action_user.id rescue nil),
                                              object_id: report.id,
                                              object_type: "Report",

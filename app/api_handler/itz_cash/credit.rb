@@ -64,7 +64,7 @@ class ItzCash::Credit < ItzCash::Base
     # ResponseCode,SerialID,Amount,TransactionID,Message
     params[:response_code] = parsed_response[0]
     params[:serial_id] = parsed_response[1]
-    params[:amount]=parsed_response[2]
+    params[:amount] = parsed_response[2]
     params[:transaction_id]= parsed_response[3]
     params[:message]= parsed_response[4]
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)

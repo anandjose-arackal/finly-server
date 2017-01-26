@@ -1,0 +1,38 @@
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <div class="row no-margin">
+      <div class="col-sm-5"><h4>Withdraw Funds from User's Finly Money to:</h4> </div>
+
+
+      {{#if summary.actions.debit_wallet_to_wallet}}
+      <div class="col-sm-2 no-padding ">
+        <label>
+          <input type="radio" name="load_funds_card" class="funds-source" data-transfer-flow="withdraw-finlymoney-finlymoney" data-action="debit_wallet_to_wallet" data-url="{{summary.actions.debit_wallet_to_wallet}}">&nbsp;Your Finly Money
+        </label>
+      </div>
+      {{/if}}
+
+      {{#if summary.actions.debit_wallet_to_card}}
+      <div class="col-sm-2 no-padding">
+        <label>
+          <input type="radio" name="load_funds_card" class="funds-source" data-transfer-flow="withdraw-finlymoney-card" data-action="debit_wallet_to_card" data-url="{{summary.actions.debit_wallet_to_card}}">&nbsp;Your Card
+        </label>
+      </div>
+      {{/if}}
+
+      {{#if summary.actions.debit_wallet_to_virtual_account}}
+      <div class="col-sm-2 no-padding">
+        <label>
+          <input type="radio" name="load_funds_card" class="funds-source" data-transfer-flow="withdraw-finlymoney-companybalance" data-action="debit_wallet_to_virtual_account" data-url="{{summary.actions.debit_wallet_to_virtual_account}}">&nbsp;Company Balance
+        </label>
+      </div>
+      {{/if}}
+    </div> 
+
+    <div class="row no-margin">
+      <div class="col-sm-12 settlement-transfer-flow">
+
+      </div>
+    </div>
+  </div>
+</div>

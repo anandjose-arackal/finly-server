@@ -18,6 +18,12 @@ class ReportStatus < ActiveRecord::Base
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
 
+  STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, reimbursed: 6, reimbursement_confirmed: 7, closed: 8}
+
+  def self.id_for(status)
+    STATES[status]
+  end
+
   def status_name
     self.name
   end

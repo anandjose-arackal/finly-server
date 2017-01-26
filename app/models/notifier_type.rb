@@ -86,4 +86,12 @@ class NotifierType < ActiveRecord::Base
     end
   end
 
+  def self.id_for(sym)
+    ACTIONS.each do |action|
+      if action[:key] == sym
+        return (ACTIONS.find_index(action) + 1)
+      end
+    end
+  end
+
 end

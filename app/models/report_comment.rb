@@ -98,7 +98,7 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} confirmed that the reimbursement is received"
       when ReportCommentAction.id_for(:report_closed)
         # Report closed
-        comment = "Report is marked as closed"
+        comment = "Report has been marked as closed " + content
       when ReportCommentAction.id_for(:report_attach_receipt)
         # Report attach receipt
         comment = "#{name} attached a receipt to the report"

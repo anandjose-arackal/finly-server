@@ -29,7 +29,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def event_id
-    NotifierType.report_approve_id
+    NotifierType.id_for(:report_approve)
   end
 
   def affected_users
@@ -77,7 +77,7 @@ class Event::EReport::Approve < Event::EReport::Base
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     view_role_id = report.controlling_user_role_id
-    notification = user.notifications.create(notification_type_id: NotificationType.report_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                               action_type_id: notify_type,
                                               action_user_id: (report.tracks.last.action_user.id rescue nil),
                                               object_id: report.id,

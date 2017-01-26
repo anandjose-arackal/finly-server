@@ -57,7 +57,7 @@ class FinlyF.Views.UsersIndex extends Backbone.View
   render: ->
     $(@el).html(@templateSkeleton())
     $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
-    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
     FinlyF.structureActions(@el, @params) 
     @
 

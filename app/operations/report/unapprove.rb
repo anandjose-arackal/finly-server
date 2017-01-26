@@ -65,7 +65,7 @@ class Report::Unapprove < Report::Base
                            action_user_role_id: role_id,
                            modified_user: prev_controlling_user,
                            modified_user_role_id: prev_controlling_user_role,
-                           report_tracking_action_id: ReportTrackingAction.unapprove_id,
+                           report_tracking_action_id: ReportTrackingAction.id_for(:unapprove),
                            report_status_id: ReportStatus.processing_id
       return
     end
@@ -74,13 +74,14 @@ class Report::Unapprove < Report::Base
 
   def post_process
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_unapprove)
+    # not necessary anymore
     # Recalculate settlement when report is unapproved from an approved/closed state
-    if prev_status.approved? or prev_status.closed?
-      Settlement::Report::Unapproved.(user, report: report)
+    # if prev_status.approved? or prev_status.closed?
+    #   Settlement::Report::Unapproved.(user, report: report)
+    #
+    # end
 
-      Event::EReport::Unapprove.(self.user, report: report)
-    end
-
+    Event::EReport::Unapprove.(self.user, report: report)
     add_message :success, 'Report unapproved'
   end
 end

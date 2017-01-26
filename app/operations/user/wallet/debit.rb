@@ -93,6 +93,49 @@ class User::Wallet::Debit < User::Wallet::Base
           end
 
         end
+
+      when :card
+
+        if initiating_account == :virtual_account
+          debit_presenter = ItzCash::Debit.(target_user, params)
+          unless debit_presenter.success?
+            add_message :error, "Money debit failed, please try again later"
+          end
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_card_to_virtual_account)
+
+        elsif initiating_account == :wallet
+          debit_presenter = ItzCash::Debit.(target_user, params)
+          unless debit_presenter.success?
+            add_message :error, "Money debit failed, please try again later"
+          end
+          # the money has moved from the card to the virtual account already, now we need to move it from virtual account to wallet
+          # add funds to the initiating user's wallet
+          initiating_user.wallet.add_funds(self.amount)
+          # subtract this amount from the company funds
+          initiating_user.company.account.funds_credited_to_wallet(self.amount)
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_card_to_wallet)
+
+        elsif initiating_account == :card
+          # first reduce the amount from the card holder's balance
+          debit_presenter = ItzCash::Debit.(target_user, params)
+          # if the debit is successful, i.e. if the money has been reduced from the card holder's account
+          if debit_presenter.success?
+            # now add the money to the target user's card
+            credit_presenter = ItzCash::Credit.(initiating_user, params)
+            unless credit_presenter.success?
+              # throw error message saying debit is successful but credit was unsuccessful
+              add_message :error, "Amount could not be credited, the funds will be transferred to your company balance"
+              return
+            end
+          else
+            add_message :error, "Amount could not be debited, please try later"
+            return
+          end
+          payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_card_to_card)
+        end
+
+      when :virtual_account
+        # don't think this is a legit possibility.
     end
   end
 

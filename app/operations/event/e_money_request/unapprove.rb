@@ -1,7 +1,7 @@
 class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
 
   def event_id
-    NotifierType.money_request_unapprove_id
+    NotifierType.id_for(:money_request_unapprove)
   end
 
   def affected_users
@@ -20,8 +20,8 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
     else
       view_role_id = money_request.tracks.last.modified_user_role_id
     end
-    notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
-                                             action_type_id: NotificationActionType.notify_unapprove_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
+                                             action_type_id: NotificationActionType.id_for(:unapprove),
                                              action_user_id: self.user.id,
                                              object_id: money_request.id,
                                              object_type: "Advance Request",

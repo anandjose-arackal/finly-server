@@ -1,7 +1,7 @@
 class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
 
   def event_id
-    NotifierType.money_request_take_control_id
+    NotifierType.id_for(:money_request_take_control)
   end
 
   def affected_users
@@ -29,8 +29,8 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     else
       view_role_id = nil
     end
-    notification = user.notifications.create(notification_type_id: NotificationType.advance_request_id,
-                                             action_type_id: NotificationActionType.notify_take_control_id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
+                                             action_type_id: NotificationActionType.id_for(:notify_take_control),
                                              action_user_id: (money_request.tracks.last.action_user.id rescue nil),
                                              object_id: money_request.id,
                                              object_type: "Advance Request",
