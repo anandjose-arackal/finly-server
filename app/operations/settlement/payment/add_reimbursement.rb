@@ -105,7 +105,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
         to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
         # mark the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.new(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role, status: ReportStatus.closed_id})
+          Report::MarkAsReimbursed.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role, status: ReportStatus.closed_id})
         end
         return
       else
@@ -126,7 +126,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
         to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
         # mark all the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.new(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
+          Report::MarkAsReimbursed.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
         end
       else
         add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
