@@ -3,7 +3,7 @@ module ReceiptProcessor
   class PDFConverter
     def convert(doc, image_tmp_path)
       images = []
-      pdf_pages = Magick::ImageList.new(open(doc))
+      pdf_pages = Magick::ImageList.new(open(doc)) { self.density = 300 }
       pdf_pages.each_with_index do |pdf_page, index|
         updated_image_path = image_tmp_path.gsub(/(.*)\.(.*)$/, "\\1_#{index}.\\2")
         pdf_page.write updated_image_path
