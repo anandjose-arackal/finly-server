@@ -157,6 +157,7 @@ json.restrictions do
       json.period_name limit.period_name
       json.amount limit.amount
       json.transactions limit.transaction_limit
+      json.enabled !!(limit.amount or limit.transaction_limit)
     end
   end
 end
