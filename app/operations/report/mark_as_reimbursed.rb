@@ -51,7 +51,12 @@ class Report::MarkAsReimbursed < Report::Base
 
   def post_process
     if success?
-      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reimbursed), payment: self.payment
+      if payment.present?
+        report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_reimbursed), payment: self.payment
+      end
+      if cash_in_hand_deduction.present?
+        report.comments.create(user: user, report_comment_action_id: ReportCommentAction.id_for(:cash_in_hand_deduction_against_reimbursement), payment: self.cash_in_hand_deduction)
+      end
     end
   end
 end

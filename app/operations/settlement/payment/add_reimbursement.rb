@@ -137,6 +137,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   def post_process
     add_message :success, 'Reports reimbursed'
 
-    Event::ESettlement::AddReimbursement.(user, payment: self.payment)
+    event = Event::ESettlement::AddReimbursement.new(user, payment: self.payment, cash_in_hand_deduction: cash_deduction, from_cash_in_hand: cash_deduction)
+    event.run
   end
 end

@@ -29,7 +29,8 @@ class NotificationActionType < ActiveRecord::Base
              notify_credit_reimbursement: 17,
              notify_credit_cash_advance: 18,
              notify_take_control: 19,
-             notify_awaiting_approval: 20
+             notify_awaiting_approval: 20,
+             notify_cash_withdrawal_against_report_reimbursement: 21
             }
 
   self.class.instance_eval do
