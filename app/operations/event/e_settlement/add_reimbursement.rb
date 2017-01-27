@@ -49,15 +49,26 @@ class Event::ESettlement::AddReimbursement < Event::ESettlement::Base
   end
 
   def mailer_subject(user)
-    "A reimbursement of ₹#{payment.amount.value} has been processed"
+    "A reimbursement of your reports has been processed"
   end
 
   def mailer_body(user)
-    body = "This is to notify you that a reimbursement of ₹#{payment.amount.value} has been processed for the reports:<br>"
-    i = 1
-    self.payment.reimbursed_reports.each do |report|
-      body += "<br>#{i}. #{report.name}"
-      i += 1
+    body = ""
+    unless payment.nil?
+      body += "<br>This is to notify you that a reimbursement of ₹#{payment.amount.value} has been processed for the reports:<br>"
+      i = 1
+      self.payment.reimbursed_reports.each do |report|
+        body += "<br>#{i}. #{report.name}"
+        i += 1
+      end
+    end
+    unless cash_in_hand_deduction.nil?
+      body += "<br>This is to notify you that your cash on hand has been deducted against reimbursement for the following reports:<br>"
+      i = 1
+      self.cash_in_hand_deduction.cash_in_hand_settled_reports.each do |report|
+        body += "<br>#{i}. #{report.name}"
+        i += 1
+      end
     end
     body
   end
