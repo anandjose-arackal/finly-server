@@ -16,7 +16,7 @@ class ReportCommentAction < ActiveRecord::Base
              report_reject: 7, report_unapprove: 8, report_take_control: 9, report_update: 10, report_reimbursed: 11,
              report_reimbursement_confirmed: 12, report_closed: 13, report_attach_receipt: 14,
              report_detach_receipt: 15, expense_add: 16, expense_remove: 17, expense_reject: 18, expense_update: 19,
-             expense_attach_receipt: 20, expense_detach_receipt: 21, expense_update_receipt: 22}
+             expense_attach_receipt: 20, expense_detach_receipt: 21, expense_update_receipt: 22, cash_in_hand_deduction_against_reimbursement: 23}
 
   self.class.instance_eval do
     ACTIONS.each do |key, value|

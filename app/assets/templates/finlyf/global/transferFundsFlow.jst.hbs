@@ -1,0 +1,60 @@
+<div class="row no-margin">
+  {{#switch item.type}}
+    {{#case 'from_wallet_to_card'}}
+      <div class="col-sm-3 col-sm-offset-2">
+        <label class="grey-text">From:</label>
+        <h4 class="no-margin">Your Finly Money Balance</h4>
+        <h3 class="no-margin mt-5 current_user_wallet_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+      </div>
+
+      <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+      <div class="col-sm-2 col-sm-offset-2">
+        <label class="grey-text">To:</label>
+        <h4 class="no-margin">Your Card Balance</h4>
+        <h3 class="no-margin mt-5 current_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+      </div>
+    {{/case}}
+    {{#case 'from_card_to_wallet'}}
+      <div class="col-sm-3 col-sm-offset-2">
+        <label class="grey-text">From:</label>
+        <h4 class="no-margin">Your Card Balance</h4>
+        <h3 class="no-margin mt-5 current_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+      </div>
+
+      <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
+
+      <div class="col-sm-2 col-sm-offset-2">
+        <label class="grey-text">To:</label>
+        <h4 class="no-margin">Your Finly Money Balance</h4>
+        <h3 class="no-margin mt-5 current_user_wallet_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+      </div>
+    {{/case}}
+  {{/switch}}
+</div>
+
+
+
+<div class="col-sm-12"><hr /></div>
+<div class="row no-margin">
+  <div class="col-sm-8 col-sm-offset-2">
+    <div class="form-group">
+      <label class="control-form">Amount:</label>
+      <input type="number" name="amount" class="form-control card-funds-amount"/>
+    </div>
+
+    <div class="form-group">
+      <label class="control-form">Note:</label>
+      <textarea name="note" class="form-control note" placeholder="Optional Note"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="control-form">Password:</label>
+      <input type="password" name="password" class="form-control password"/>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-success btn-global-transfer" data-url="{{item.url}}" data-action-type="{{item.type}}">Transfer</button>
+    </div>
+  </div>
+</div>
