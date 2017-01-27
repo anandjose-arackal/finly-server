@@ -42,6 +42,7 @@ class Company::Statement::Summary < Company::Statement::Base
       items[:employees][:cash_in_hand_balance] += cash_in_hand_on_date(user, end_date)
     end
     items[:employees].each do |k, v|
+      next if k == :total
       items[:employees][:total] += v
     end
 
@@ -96,7 +97,9 @@ class Company::Statement::Summary < Company::Statement::Base
     end
     card_expenses = user.card_transactions.debits.where('transaction_timestamp > ?', start_date).joins(:billing_amount).sum(:value)
     card_load_amount = user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_card),
-                                                                                               PaymentType.id_for(:credit_from_wallet_to_card)]).joins(:amount).sum(:value)
+                                                                                               PaymentType.id_for(:credit_from_wallet_to_card),
+                                                                                               PaymentType.id_for(:debit_from_wallet_to_card),
+                                                                                               PaymentType.id_for(:debit_from_card_to_card)]).joins(:amount).sum(:value)
     balance = result.balance.to_f + card_load_amount - card_expenses
     precision_value  balance
   end
@@ -109,7 +112,7 @@ class Company::Statement::Summary < Company::Statement::Base
     end
     debt_clearances = selected_user.payments.where('date > ?', date).where(payment_type_id: PaymentType.id_for(:debt_clearance)).joins(:amount).sum(:value)
     added_cash_in_hand = selected_user.payments.where('date > ?', date).where(payment_type_id: PaymentType.id_for(:advance)).joins(:amount).sum(:value)
-    accounted_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved_id, ReportStatus.closed_id]).where(accounted: true).where('accounted_at > ?', date)
+    accounted_reports = selected_user.reports.where(report_status_id: [ReportStatus.closed_id, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id]).where(accounted: true).where('accounted_at > ?', date)
     report_amount = 0
     accounted_reports.each do |report|
       report_amount += report.total_amount(:only_manual_expenses) - report.reimbursement_amount.value
@@ -124,9 +127,11 @@ class Company::Statement::Summary < Company::Statement::Base
       return precision_value balance
     end
     debits = selected_user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_wallet),
-                                                                                              PaymentType.id_for(:debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
+                                                                                              PaymentType.id_for(:debit_from_wallet_to_virtual_account),
+                                                                                              PaymentType.id_for(:debit_from_wallet_to_card)]).joins(:amount).sum(:value)
     credits = selected_user.receiving_payments.where('date > ?', date).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_wallet),
-                                                                                               PaymentType.id_for(:credit_from_virtual_account_to_wallet)]).joins(:amount).sum(:value)
+                                                                                               PaymentType.id_for(:credit_from_virtual_account_to_wallet),
+                                                                                               PaymentType.id_for(:credit_from_card_to_wallet)]).joins(:amount).sum(:value)
     balance = balance + debits - credits
     precision_value balance
   end

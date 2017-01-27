@@ -1,7 +1,7 @@
 class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
 
   def event_id
-    NotifierType.id_for(:settlement_debt_clearance_id)
+    NotifierType.id_for(:settlement_debt_clearance)
   end
 
   def send_push_notification(user)

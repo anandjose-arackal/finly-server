@@ -1,6 +1,6 @@
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Credit < User::Wallet::Base
-  attr_accessor :initiating_user, :target_user, :initiating_account, :target_account, :amount, :payment
+  attr_accessor :initiating_user, :target_user, :from_account, :target_account, :amount, :payment
 
   def authorized_user_types
     if params.present? and params[:from_account].present? and params[:to_account].present?
@@ -24,7 +24,7 @@ class User::Wallet::Credit < User::Wallet::Base
   def init
     super
     self.amount= params[:amount].to_d rescue nil
-    self.initiating_account = params[:from_account].to_sym rescue nil
+    self.from_account = params[:from_account].to_sym rescue nil
     self.target_account = params[:to_account].to_sym rescue nil
     self.initiating_user = user
     self.target_user = params[:to_user]
@@ -46,7 +46,7 @@ class User::Wallet::Credit < User::Wallet::Base
     if initiating_user.blank? or target_user.blank?
       add_message :error, 'User not found'
     end
-    if initiating_account.blank? or target_account.blank?
+    if from_account.blank? or target_account.blank?
       add_message :error, 'Account cannot be blank'
     end
     return if has_errors?
@@ -54,13 +54,11 @@ class User::Wallet::Credit < User::Wallet::Base
       add_message :error, 'User is not associated with a card to initiate this transfer'
       return
     end
-    if initiating_account == :wallet and initiating_user.wallet.balance_value < self.amount
+    if from_account == :wallet and initiating_user.wallet.balance_value < self.amount
       add_message :error, 'Insufficient funds to initiate the transfer'
+      return
     end
-    unless (initiating_account == :virtual_account or initiating_account == :wallet) and (target_account == :card or target_account == :wallet)
-      add_message :error, 'Invalid Request'
-    end
-    if initiating_account == :virtual_account
+    if from_account == :virtual_account
       balance_presenter = Company::VirtualAccount::Balance.(user, params)
       if balance_presenter.success?
         balance_amount = balance_presenter.balance
@@ -84,7 +82,7 @@ class User::Wallet::Credit < User::Wallet::Base
     payment_attributes[:note] = params[:note]
     payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
 
-    case initiating_account
+    case from_account
       when :virtual_account
         if target_account == :wallet
 
@@ -141,7 +139,6 @@ class User::Wallet::Credit < User::Wallet::Base
         end
       when :card
         if target_account == :card
-
           # first reduce the amount from the card holder's balance
           debit_presenter = ItzCash::Debit.(initiating_user, params)
           # if the debit is successful, i.e. if the money has been reduced from the card holder's account
@@ -149,22 +146,37 @@ class User::Wallet::Credit < User::Wallet::Base
             # now add the money to the target user's card
             credit_presenter = ItzCash::Credit.(target_user, params)
             unless credit_presenter.success?
-              # restore the money to the initiating user's card, and show error message
-              credit_presenter
+              # throw error message saying debit is successful but credit was unsuccessful
+              add_message :error, "Amount could not be credited, the funds will be transferred to your company balance"
+              return
             end
+
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_card_to_card)
+
+            self.payment = Payment.create payment_attributes
+            add_message :success, 'Credit successful'
+
+          else
+            add_message :error, "Amount could not be debited, please try later"
+            return
           end
         elsif target_account == :wallet
           debit_presenter = ItzCash::Debit.(initiating_user, params)
           if debit_presenter.success?
             # i.e. the money was successfully deducted
             # deducting money from the company balance
-            user.company.account.funds_debited_from_wallet(self.amount)
+            user.company.account.funds_credited_to_wallet(self.amount)
             # add funds to target user waller
             target_user.wallet.add_funds(self.amount)
+            payment_attributes[:payment_type_id] = PaymentType.id_for(:credit_from_card_to_wallet)
+
+            self.payment = Payment.create payment_attributes
+            add_message :success, 'Credit successful'
+          else
+            add_message :error, "Could not debit funds, please try again later"
           end
         end
     end
-
   end
 
   def success
