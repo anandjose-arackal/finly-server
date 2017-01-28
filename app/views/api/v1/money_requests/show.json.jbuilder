@@ -44,3 +44,10 @@ json.forwardable_users do
     end
   end
 end
+
+json.payment_modes do
+  json.array! PaymentMode.all.each do |item|
+    json.id item.id
+    json.name item.name
+  end
+end
