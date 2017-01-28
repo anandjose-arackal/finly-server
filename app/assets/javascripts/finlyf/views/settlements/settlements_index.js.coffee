@@ -1376,7 +1376,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         
 
   settlementActionFinalize: (e) ->#Step 2 Action
-    # console.log "Hello there!"
+    # Only being used in reports
     e.preventDefault()
     _this = @
     target = e.currentTarget
@@ -1822,7 +1822,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     total = _.reduce(@settlementActionData.selectedReports, ((memo, value) ->
       memo + parseFloat((value.get('reimbursement_amount') || value.get('total_amount')))
     ), 0)
-    return total
+    return Math.round(total * 100)/100
 
   toggleLoadMoreUsers: (collection) ->
     # console.log "Loading", collection.models.length
