@@ -335,7 +335,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         #Stopping main loader
         summary = $(_this.el).find('.summary')
         FinlyF.stopMainLoader(summary)
-        # console.log "res", res
+        console.log "res", res
         if _this.view == 'personal'
           $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
         else
