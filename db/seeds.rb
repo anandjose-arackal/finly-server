@@ -262,32 +262,33 @@ if User.count == 0
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-
   ############################################################################################################
   ## User's for Venky's iOS testing
   v = []
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
-              password: "mobiletest123", paassword_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
-              mothers_maiden_name: Faker::Name.first_name,
-              role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-              profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                   address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   mothers_maiden_name: Faker::Name.first_name,
+                   role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Finance", email: "finance4@finlytest.io",
-              password: "mobiletest123", paassword_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
-              mothers_maiden_name: Faker::Name.first_name,
-              role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-              profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                   address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   mothers_maiden_name: Faker::Name.first_name,
+                   role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Employee", email: "kaley@finlytest.io",
-                   password: "mobiletest123", paassword_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
                    role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   #############################################################################################################
+
+
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
   m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
