@@ -97,7 +97,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
-    'click .item': 'showDetails'
+    # 'click .item': 'showDetails'
     'click .load-more': 'loadMore'
     'click .load-more-users': 'loadMoreUsers'
     'click .filter-status li a': 'filterStatus'
@@ -533,6 +533,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       @params.view = 'personal'
     if typeof @params.view_to_load == 'undefined'
       @params.view_to_load = 'payments'
+
+    console.log "Current Params are ", _this.params
     @collection.url = "/settlements/" + user_id.toString()
     @collection.fetch({
       reset: true,
@@ -639,12 +641,17 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
         report_container = $(modal).find('.settlement-action-items')
         #Load reports
-        @params.view_to_load = 'approved_reports'
-        @params.id = @user_id
+        params_approved_reports = {
+          view: _this.params.view
+          view_to_load: 'approved_reports'
+          id: _this.user_id
+        }
+        # @params.view_to_load = 'approved_reports'
+        # @params.id = @user_id
         # collection = new FinlyF.Collections.Settlements()
         @collectionSettlementReports.url = "/settlements/" + @user_id
         @collectionSettlementReports.fetch({
-          data: @params
+          data: params_approved_reports,
           reset: true,
           data: _this.params
           success: ->
@@ -667,11 +674,18 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @params.view_to_load = 'approved_money_requests'
         @params.id = @user_id
 
+
+        params_approved_money_requests = {
+          view: _this.params.view
+          view_to_load: 'approved_money_requests'
+          id: _this.user_id
+        }
+
         # @params.payment_mode_id = 1
         # collection = new FinlyF.Collections.Settlements()
         @collectionSettlementReports.url = "/settlements/" + @user_id
         @collectionSettlementReports.fetch({
-          data: @params
+          data: params_approved_money_requests,
           reset: true,
           data: _this.params
           success: ->
