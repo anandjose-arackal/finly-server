@@ -434,15 +434,6 @@ end
 
 unless Rails.env.production?
   if Card.count == 0
-    # Company.all.each do |company|
-    #   5.times do
-    #     number = random_mobile_number
-    #     company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
-    #                          product_code: 'NGPRHD',
-    #                          card_type_id: random_integer(1, 3))
-    #   end
-    # end
-
     User.all.each do |user|
       if user.id < 9
         number = "S0001774009#{(user.id - 1)}"
