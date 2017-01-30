@@ -45,6 +45,8 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-edit-restrictions': 'editRestrictions'
     'click .btn-update-restrictions': 'updateRestrictions'
 
+    'change .input-card-channel-type': 'toggleCardChannelLimits'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
@@ -1189,7 +1191,16 @@ class FinlyF.Views.User extends Backbone.View
       })
 
 
+  toggleCardChannelLimits: (e) ->
+    target = e.currentTarget
 
+    checked = $(target).prop('checked')
+    if checked
+      container = $(target).closest('.channel-container').find('.channel-limits')
+      $(container).slideDown('slow')
+    else
+      container = $(target).closest('.channel-container').find('.channel-limits')
+      $(container).slideUp('slow')
 
 
 #Features
