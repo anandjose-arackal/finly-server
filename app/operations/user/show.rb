@@ -110,7 +110,7 @@ class User::Show < User::Base
             # Selected User's card -> Virtual Account
             debit_params[:from_account] = :card
             debit_params[:to_account] = :virtual_account
-            actions[:debit_card_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+            actions[:debit_card_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
           end
 
           # Wallet -> Virtual Account
@@ -138,7 +138,7 @@ class User::Show < User::Base
             # Selected User's Card -> User's Card
             debit_params[:from_account] = :card
             debit_params[:to_account] = :card
-            actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+            actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
           end
         end
       end
@@ -164,7 +164,7 @@ class User::Show < User::Base
         # Selected User's Card -> User's Wallet
         debit_params[:from_account] = :card
         debit_params[:to_account] = :wallet
-        actions[:debit_card_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+        actions[:debit_card_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
 
 
         # Card Actions
