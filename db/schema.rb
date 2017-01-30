@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170130075404) do
+ActiveRecord::Schema.define(version: 20170130150951) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -142,16 +142,16 @@ ActiveRecord::Schema.define(version: 20170130075404) do
   add_index "card_fund_transactions", ["requesting_user"], name: "index_card_fund_transactions_on_requesting_user", using: :btree
 
   create_table "card_limits", force: :cascade do |t|
-    t.integer  "dummy_restriction_id", limit: 4
-    t.integer  "transaction_limit",    limit: 4
-    t.integer  "period_id",            limit: 4
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
-    t.integer  "budget_id",            limit: 4
-    t.integer  "limit_type_id",        limit: 4
+    t.integer  "card_restriction_id", limit: 4
+    t.integer  "transaction_limit",   limit: 4
+    t.integer  "period_id",           limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "budget_id",           limit: 4
+    t.integer  "limit_type_id",       limit: 4
   end
 
-  add_index "card_limits", ["dummy_restriction_id"], name: "index_card_limits_on_dummy_restriction_id", using: :btree
+  add_index "card_limits", ["card_restriction_id"], name: "index_card_limits_on_card_restriction_id", using: :btree
   add_index "card_limits", ["period_id"], name: "index_card_limits_on_period_id", using: :btree
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -1101,7 +1101,7 @@ ActiveRecord::Schema.define(version: 20170130075404) do
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
-  add_foreign_key "card_limits", "card_restrictions", column: "dummy_restriction_id"
+  add_foreign_key "card_limits", "card_restrictions"
   add_foreign_key "card_restrictions", "users"
   add_foreign_key "card_transactions", "cards"
   add_foreign_key "card_transactions", "expenses"
