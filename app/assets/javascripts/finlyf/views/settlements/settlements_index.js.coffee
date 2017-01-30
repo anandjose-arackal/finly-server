@@ -97,7 +97,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
   events:
     'click .navbar-btn-refresh': 'refetchCollection'
-    'click .item': 'showDetails'
+    # 'click .item': 'showDetails'
     'click .load-more': 'loadMore'
     'click .load-more-users': 'loadMoreUsers'
     'click .filter-status li a': 'filterStatus'
@@ -258,7 +258,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(@el).html(@templateSkeletonAdmin({item: @params}))
       $(@el).find('.filter-status li a[data-view=payments]').parent().addClass('active')
       $(@el).find(".settlements-index").html(@templateMainPayments())
-      $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar())
+      $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
 
     # $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     # $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
@@ -335,7 +335,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         #Stopping main loader
         summary = $(_this.el).find('.summary')
         FinlyF.stopMainLoader(summary)
-        # console.log "res", res
+        console.log "res", res
         if _this.view == 'personal'
           $(_this.el).find(".summary").html(_this.templateSummary({item: res}))
         else
@@ -533,6 +533,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       @params.view = 'personal'
     if typeof @params.view_to_load == 'undefined'
       @params.view_to_load = 'payments'
+
+    console.log "Current Params are ", _this.params
     @collection.url = "/settlements/" + user_id.toString()
     @collection.fetch({
       reset: true,
@@ -639,12 +641,17 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
 
         report_container = $(modal).find('.settlement-action-items')
         #Load reports
-        @params.view_to_load = 'approved_reports'
-        @params.id = @user_id
+        params_approved_reports = {
+          view: _this.params.view
+          view_to_load: 'approved_reports'
+          id: _this.user_id
+        }
+        # @params.view_to_load = 'approved_reports'
+        # @params.id = @user_id
         # collection = new FinlyF.Collections.Settlements()
         @collectionSettlementReports.url = "/settlements/" + @user_id
         @collectionSettlementReports.fetch({
-          data: @params
+          data: params_approved_reports,
           reset: true,
           data: _this.params
           success: ->
@@ -667,11 +674,18 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @params.view_to_load = 'approved_money_requests'
         @params.id = @user_id
 
+
+        params_approved_money_requests = {
+          view: _this.params.view
+          view_to_load: 'approved_money_requests'
+          id: _this.user_id
+        }
+
         # @params.payment_mode_id = 1
         # collection = new FinlyF.Collections.Settlements()
         @collectionSettlementReports.url = "/settlements/" + @user_id
         @collectionSettlementReports.fetch({
-          data: @params
+          data: params_approved_money_requests,
           reset: true,
           data: _this.params
           success: ->
@@ -1376,7 +1390,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         
 
   settlementActionFinalize: (e) ->#Step 2 Action
-    # console.log "Hello there!"
+    # Only being used in reports
     e.preventDefault()
     _this = @
     target = e.currentTarget
@@ -1822,7 +1836,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     total = _.reduce(@settlementActionData.selectedReports, ((memo, value) ->
       memo + parseFloat((value.get('reimbursement_amount') || value.get('total_amount')))
     ), 0)
-    return total
+    return Math.round(total * 100)/100
 
   toggleLoadMoreUsers: (collection) ->
     # console.log "Loading", collection.models.length

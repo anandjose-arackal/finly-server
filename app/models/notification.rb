@@ -96,9 +96,9 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.id_for(:notify_comment)
         action = " has a new comment"
       when NotificationActionType.id_for(:notify_cash_withdrawal)
-        action = " in hand withdrawn"
+        action = " on hand withdrawn"
       when NotificationActionType.id_for(:notify_cash_load)
-        action = " in hand added"
+        action = " on hand added"
       when NotificationActionType.id_for(:notify_atm_withdrawal)
         action = " withdrawn from ATM"
       when NotificationActionType.id_for(:notify_credit_advance_request)
@@ -107,6 +107,8 @@ class Notification < ActiveRecord::Base
         action += " credited"
       when NotificationActionType.id_for(:notify_debit)
         action += " debited"
+      when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
+        action += " reimbursement deducted from cash on hand"
       else
         # do nothing
     end
@@ -173,13 +175,15 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.id_for(:notify_atm_withdrawal)
         action = " withdrawn an amount of"
       when NotificationActionType.id_for(:notify_credit_reimbursement)
-        action = " credited reimbursement of"
+        action = " credited the reimbursement"
       when NotificationActionType.id_for(:notify_credit_advance_request)
         action = " credited an amount of"
       when NotificationActionType.id_for(:notify_credit)
         action = " credited an amount of"
       when NotificationActionType.id_for(:notify_debit)
         action = " debited an amount of"
+      when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
+        action = " withdrawn funds from your cash on hand against reimbursement"
       else
         action = ""
     end
@@ -199,7 +203,7 @@ class Notification < ActiveRecord::Base
     object_name = ""
     case object_type
       when "Report"
-        if action_type_id == NotificationActionType.id_for(:notify_credit_reimbursement)
+        if action_type_id == NotificationActionType.id_for(:notify_credit_reimbursement) || action_type_id == NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
           object = " for your report"
         else
           object = " report"
@@ -240,7 +244,14 @@ class Notification < ActiveRecord::Base
           object = " from your Finly account"
         end
       when "Payment"
-        object = " to your cash in hand"
+        case action_type_id
+          when NotificationActionType.id_for(:notify_cash_load)
+            object = " to your cash in hand"
+          when NotificationActionType.id_for(:notify_cash_withdrawal)
+            object = " from your cash in hand"
+          else
+            # do nothing
+        end
       else
         # do nothing
     end

@@ -8,4 +8,8 @@ class ItzCash::Debit < ItzCash::Credit
     Constants::ItzCash::TRANSACTION_TYPE_DEBIT
   end
 
+  def validate
+    super()
+  end
+
 end

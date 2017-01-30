@@ -146,7 +146,7 @@ class FinlyF.Views.Report extends Backbone.View
     #   $('<option/>', {
     #     value: $(option).attr('value')
     #     text: $(option).text()
-    #   }).appendTo(category_select) 
+    #   }).appendTo(category_select)
     
     $("#modal-new .modal-dialog").css("width", "60%") 
     $("#modal-new").modal('show')

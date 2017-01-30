@@ -10,7 +10,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def notification_affected_users
-    [report.user, report.controlling_for_user]
+    [report.controlling_for_user]
   end
 
   def send_push_notification(user)

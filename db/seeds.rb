@@ -237,14 +237,32 @@ if User.count == 0
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
+  ############################################################################################################
+  ## User's for Venky's iOS testing
+  v = []
+  v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   mothers_maiden_name: Faker::Name.first_name,
+                   role_mapping_attributes: [{user_role_id: UserRole.manager_id},{user_role_id: UserRole.employee_id}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+
+  v << User.create(company: Company.first, first_name: "Finly", last_name: "Finance", email: "finance4@finlytest.io",
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   mothers_maiden_name: Faker::Name.first_name,
+                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+
+  #############################################################################################################
+
   u = []
 
   # creating user0
   u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@finlytest.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: 4},
-                                             {user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                    team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
@@ -253,12 +271,21 @@ if User.count == 0
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
-                     role_mapping_attributes: [{user_role_id: 4},
-                                               {user_role_id: UserRole.employee_id}],
+                     role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
+
+  # User for Venky's testing
+  User.create(company: Company.first, first_name: "Finly", last_name: "Employee", email: "kaley@finlytest.io",
+              password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+              mothers_maiden_name: Faker::Name.first_name,
+              role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
+                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
+              team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
+              profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                   address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
@@ -413,15 +440,6 @@ end
 
 unless Rails.env.production?
   if Card.count == 0
-    # Company.all.each do |company|
-    #   5.times do
-    #     number = random_mobile_number
-    #     company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
-    #                          product_code: 'NGPRHD',
-    #                          card_type_id: random_integer(1, 3))
-    #   end
-    # end
-
     User.all.each do |user|
       if user.id < 9
         number = "S0001774009#{(user.id - 1)}"

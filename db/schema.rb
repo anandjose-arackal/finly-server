@@ -336,6 +336,16 @@ ActiveRecord::Schema.define(version: 20170124135621) do
   add_index "dummy_restrictions", ["product_code_id"], name: "index_dummy_restrictions_on_product_code_id", using: :btree
   add_index "dummy_restrictions", ["user_id"], name: "index_dummy_restrictions_on_user_id", using: :btree
 
+  create_table "enforce_policies", force: :cascade do |t|
+    t.integer  "enforceable_id",   limit: 4,   null: false
+    t.string   "enforceable_type", limit: 255, null: false
+    t.boolean  "enabled"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false

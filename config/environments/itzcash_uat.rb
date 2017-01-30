@@ -69,12 +69,12 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # ################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = { host: "180.179.138.175" }
+  config.action_mailer.default_url_options = { host: "uat.finly.io" }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
       address:              'smtp.sendgrid.net',
       port:                 587,
-      domain:               '180.179.138.175',
+      domain:               'uat.finly.io',
       user_name:            'vivekagb',
       password:             'idAr5APhk61X',
       # ssl:                  true,

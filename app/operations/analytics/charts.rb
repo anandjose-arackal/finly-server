@@ -1,7 +1,5 @@
 # basic analytics for the admins, managers, and finance_managers
 # 4 types of charts : user wise expenses (only for managers), merchant wise expenses, category wise expenses
-# user wise:
-
 
 class Analytics::Charts < BaseOperation
 
@@ -9,10 +7,19 @@ class Analytics::Charts < BaseOperation
 
   class Analytics::Charts::ChartsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :charts
+    attr_accessor :charts, :total, :unpaginated_charts
 
     def init
       self.charts = params[:charts]
+      self.total = params[:total]
+      self.charts = paginated_charts
+    end
+
+    def paginated_charts
+      page = params[:page].to_i
+      if params[:page].present?
+        return charts[0 + 20*(page - 1), 20]
+      end
     end
   end
 
@@ -23,6 +30,7 @@ class Analytics::Charts < BaseOperation
   has_scope :filter_amount, using: [:type, :value], type: :hash
   has_scope :filter_status_id
   has_scope :filter_date, using: [:from, :to], type: :hash
+  has_scope :filter_expense_type_id, type: :array
 
   attr_accessor :team_users, :user_ids, :field, :charts, :expenses, :role
 
@@ -44,11 +52,7 @@ class Analytics::Charts < BaseOperation
   end
 
   def authorize
-    # if user.admin? or user.manager? or user.finance_manager?
-    #   self.fields = [:user, :merchant, :category]
-    # else
-    #   self.fields = [:merchant, :category]
-    # end
+
   end
 
   def pre_process
@@ -60,7 +64,7 @@ class Analytics::Charts < BaseOperation
       self.expenses = Expense.where(user_id: user_ids)
     else
       self.user_ids = team_users.signed_up.pluck(:id)
-      self.expenses = Expense.admin_viewable.where(user_id: user_ids)
+      self.expenses = Expense.where(user_id: user_ids)
     end
     # applying the filters for which expenses are to be considered
     apply_filters
@@ -71,52 +75,98 @@ class Analytics::Charts < BaseOperation
   end
 
   def success
-    Analytics::Charts::ChartsPresenter.new(user, {charts: charts}, messages)
+    params[:charts] = charts
+    Analytics::Charts::ChartsPresenter.new(user, params, messages)
   end
 
 
   private
 
   def generate_charts(field)
-
+    # extracting the totals based on totals
+    self.expenses = status_wise_distribution
+    total = 0
     case field
       when 'category'
         set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:amount).group(:category_id).sum(:value)
         set.each do |key, value|
-          cat_name = Category.find(key).name
-          charts << {item: cat_name, total: precision_value(value)}
+          category = Category.find(key)
+          cat_name = category.name
+          charts << {item: cat_name, item_total: precision_value(value)}
+          total += precision_value(value)
         end
+        charts << {meta: true, total: total}
       when 'merchant'
-        # this already returns a hash with merchant name and total
+        # this already returns a hash with merchant name and total - and the expense types are already filtered
         manual_items = expenses.select('merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:manual_expense).joins(:amount).group(:merchant).sum(:value)
         card_items = expenses.select('editable_merchant as merchant_name, SUM(value) as merchant_sum, expenses.*').joins(:card_expense).joins(:amount).group(:editable_merchant).sum(:value)
         manual_items.each do |key, value|
-          self.charts << {item: key, total: precision_value(value)}
+          self.charts << {item: key, item_total: precision_value(value)}
+          total += precision_value(value)
         end
         card_items.each do |key, value|
-          self.charts << {item: key, total: precision_value(value)}
+          self.charts << {item: key, item_total: precision_value(value)}
+          total += precision_value(value)
         end
+        # total is calculated independent of the pagination
+        charts << {meta: true, total: total}
       when 'user'
         expense_sums = expenses.joins(:amount).group(:user_id).sum(:value)
         user_ids.each do |id|
-          user_name = User.find_by(id: id).name
+          user = User.find_by(id: id)
+          user_name = user.name
           expense_sum = expense_sums[id] ? precision_value(expense_sums[id]) : 0
-          charts << {item: user_name, total: expense_sum}
+          charts << {item: user_name, item_total: expense_sum}
+          total += expense_sum
         end
+        charts << {meta: true, total: total}
       else
         # default will be category wise breakdown
         set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:amount).group(:category_id).sum(:value)
         set.each do |key, value|
           cat_name = Category.find(key).name
-          charts << {item: cat_name, total: precision_value(value)}
+          charts << {item: cat_name, item_total: precision_value(value)}
+          total += precision_value(value)
         end
+        charts << {meta: true, item_total: total}
     end
     # sorting the charts in descending order of total
-    charts.sort_by! { |item| item[:total]}
+    charts.sort_by! { |item| item[:item_total] || item[:total] }
     charts.reverse!
   end
 
   def apply_filters
     self.expenses = apply_scopes(expenses, params)
   end
+
+  def status_wise_distribution
+    exp_ids = []
+    # i.e. if none of them are selected, show all of them
+    if params[:filter_expense_status_id].nil? or params[:filter_expense_status_id].empty?
+      params[:filter_expense_status_id] = ["1", "2", "3", "4"]
+    end
+    if params[:filter_expense_status_id]
+      params[:filter_expense_status_id].each do |status_id|
+        case status_id
+          when '1'
+            # i.e. all unreported expenses
+            exp_ids += expenses.where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id, ExpenseStatus.unsubmitted_id]).pluck(:id)
+          when '2'
+            r = Report.processing.all
+            exp_ids += expenses.where(report_id: r).pluck(:id)
+          when '3'
+            r = Report.approved.all
+            exp_ids += expenses.where(report_id: r).pluck(:id)
+          when '4'
+            r = Report.reimbursed_and_closed.all
+            exp_ids += expenses.where(report_id: r).pluck(:id)
+          else
+            # do nothing
+        end
+      end
+    end
+    exp_ids.uniq!
+    Expense.where(id: exp_ids)
+  end
+
 end

@@ -93,6 +93,7 @@ class User < ActiveRecord::Base
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable
+  has_one :enforce_policy, as: :enforceable
 
   has_many :cards, dependent: :destroy
   has_many :card_transactions
@@ -229,12 +230,12 @@ class User < ActiveRecord::Base
   end
 
   def finance_manager?
-    mapping = role_mapping
+    mapping = self.role_mapping
     mapping.finance_manager.present?
   end
 
   def manager?
-    mapping = role_mapping
+    mapping = self.role_mapping
     mapping.manager.present?
   end
 
@@ -320,6 +321,10 @@ class User < ActiveRecord::Base
 
   def otp_confirm
     self.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+  end
+
+  def enforce_policy_enabled?
+    self.enforce_policy.enabled
   end
 
   def superadmin?
