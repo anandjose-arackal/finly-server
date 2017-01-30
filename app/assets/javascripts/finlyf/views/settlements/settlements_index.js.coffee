@@ -258,7 +258,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       $(@el).html(@templateSkeletonAdmin({item: @params}))
       $(@el).find('.filter-status li a[data-view=payments]').parent().addClass('active')
       $(@el).find(".settlements-index").html(@templateMainPayments())
-      $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar())
+      $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
 
     # $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
     # $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
