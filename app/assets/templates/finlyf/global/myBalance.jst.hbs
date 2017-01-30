@@ -22,11 +22,11 @@
   {{#if item.current_user_card_details.assigned}}
     {{#if item.current_user_card_details.active}}
       &#8377;&nbsp;&nbsp;{{item.current_user_card}}
-      <button class="btn btn-success btn-load-unload-funds btn-sm" style="margin: 10px 0 0; position: relative; right: 35px;">Load/Unload Funds</button>
+      <button class="btn btn-success btn-load-unload-funds btn-sm" style="margin: 10px 0 0; position: relative;">Transfer Funds</button>
     {{else}}
       &#8377;&nbsp;&nbsp;{{item.current_user_card}}<br />
       (Blocked by {{item.current_user_card_details.disabled_by.name}})
-      <button disabled="disabled" class="btn btn-success btn-sm" style="margin: 10px 0 0; position: relative; right: 35px;">Load/Unload Funds</button>
+      <button disabled="disabled" class="btn btn-success btn-sm" style="margin: 10px 0 0; position: relative;">Transfer Funds</button>
     {{/if}}
   {{else}}
     Card Unassigned
