@@ -55,9 +55,20 @@
       {{/if}}
       </div>
 
-      <div class="col-sm-4 col-sm-offset-1">
-        <button class="btn-sm btn btn-success btn-settlement-summary-action wd125" data-action-type="load-funds-card">Load Funds</button>
-        <button class="btn-sm btn btn-danger btn-settlement-summary-action wd125" data-action-type="withdraw-funds-card">Withdraw Funds</button>
+      <div class="col-sm-6 col-sm-offset-1">
+        {{#if item.target_user_card.assigned}}
+          {{#if item.target_user_card.active}}
+            <button class="btn-sm btn btn-success btn-settlement-summary-action wd125" data-action-type="load-funds-card">Load Funds</button>
+            <button class="btn-sm btn btn-danger btn-settlement-summary-action wd125" data-action-type="withdraw-funds-card">Withdraw Funds</button>
+          {{else}}
+            <button disabled="disabled" class="btn-sm btn-settlement-summary-action btn btn-success wd125">Load Funds</button>
+            <button disabled="disabled" class="btn-sm btn-settlement-summary-action btn btn-danger wd125">Withdraw Funds</button>
+            <span>Blocked by <label>{{item.target_user_card.disabled_by.name}}({{item.target_user_card.disabled_by.role}})</label></span>
+          {{/if}}
+        {{else}}
+          <button disabled="disabled" class="btn-sm btn btn-settlement-summary-action btn-success wd125">Load Funds</button>
+          <button disabled="disabled" class="btn-sm btn btn-settlement-summary-action btn-danger wd125">Withdraw Funds</button>
+        {{/if}}
       </div>
     </div>
     <div class="row no-margin settlement-summary-item" style="border-bottom: none;">

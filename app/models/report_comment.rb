@@ -129,6 +129,12 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:expense_update_receipt)
         # adding a receipt to an expense
         comment = "#{name} updated a receipt on the expense at : #{expense.merchant_name}"
+      when ReportCommentAction.id_for(:cash_in_hand_deduction_against_reimbursement)
+        # deducing cash in hand for reimbursement
+        payment_id = payment.id rescue nil
+        comment = "#{name} has deducted your cash on hand against reimbursement for this report with Payment ID: #{payment_id}"
+      else
+        # do nothing
     end
     comment
   end

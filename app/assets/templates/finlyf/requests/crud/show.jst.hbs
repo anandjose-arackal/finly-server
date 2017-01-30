@@ -15,7 +15,9 @@
               {{/if}}
             </label>
             <select name="money_request[policy_id]" class="item-attr-edit item-policy item-policy-edit form-control" name="item-policy" data-default-value="{{item.policy_id}}">
-              <option value="">None</option>
+              {{#unless item.enforce_policy_enabled}}
+                <option value="">None</option>
+              {{/unless}}
               {{#each item.policies}}
                 <option value="{{this.id}}">{{this.name}}</option>
               {{/each}}

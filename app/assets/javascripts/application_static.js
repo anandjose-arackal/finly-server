@@ -16,6 +16,8 @@
 // require nprogress
 // require nprogress-turbolinks
 //= require ohsnap.min
+//= require drift-chat
+
 
 // NProgress.configure({
 //   showSpinner: false,

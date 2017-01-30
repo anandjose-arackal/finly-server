@@ -6,6 +6,8 @@ class FinlyF.Views.Analytic extends Backbone.View
   # events:
 
   initialize: (options) ->
+    if @model.get('meta')
+      $(@el).addClass('no-padding').removeClass('item analytic')
     # console.log "We're here"
 
   render: ->
