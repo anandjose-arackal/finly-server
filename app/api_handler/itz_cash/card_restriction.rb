@@ -42,7 +42,7 @@ class ItzCash::CardRestriction < ItzCash::Base
   end
 
   def success
-    
+
   end
 
   class ItzCash::CardRestriction::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
