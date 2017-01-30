@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170124135621) do
+ActiveRecord::Schema.define(version: 20170130075404) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -145,9 +145,10 @@ ActiveRecord::Schema.define(version: 20170124135621) do
     t.integer  "dummy_restriction_id", limit: 4
     t.integer  "transaction_limit",    limit: 4
     t.integer  "period_id",            limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.decimal  "budget",                         precision: 10
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.integer  "budget_id",            limit: 4
+    t.integer  "limit_type_id",        limit: 4
   end
 
   add_index "card_limits", ["dummy_restriction_id"], name: "index_card_limits_on_dummy_restriction_id", using: :btree
@@ -158,6 +159,19 @@ ActiveRecord::Schema.define(version: 20170124135621) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "card_restrictions", force: :cascade do |t|
+    t.integer  "user_id",         limit: 4
+    t.boolean  "channel_atm"
+    t.boolean  "channel_pos"
+    t.boolean  "channel_online"
+    t.integer  "product_code_id", limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "card_restrictions", ["product_code_id"], name: "index_card_restrictions_on_product_code_id", using: :btree
+  add_index "card_restrictions", ["user_id"], name: "index_card_restrictions_on_user_id", using: :btree
 
   create_table "card_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -231,6 +245,11 @@ ActiveRecord::Schema.define(version: 20170124135621) do
   end
 
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
+
+  create_table "channel_types", force: :cascade do |t|
+    t.string "name",         limit: 255
+    t.string "abbreviation", limit: 255
+  end
 
   create_table "companies", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -322,19 +341,6 @@ ActiveRecord::Schema.define(version: 20170124135621) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
-
-  create_table "dummy_restrictions", force: :cascade do |t|
-    t.integer  "user_id",         limit: 4
-    t.boolean  "channel_atm"
-    t.boolean  "channel_pos"
-    t.boolean  "channel_online"
-    t.integer  "product_code_id", limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "dummy_restrictions", ["product_code_id"], name: "index_dummy_restrictions_on_product_code_id", using: :btree
-  add_index "dummy_restrictions", ["user_id"], name: "index_dummy_restrictions_on_user_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
@@ -1095,7 +1101,8 @@ ActiveRecord::Schema.define(version: 20170124135621) do
   add_foreign_key "card_configurations", "card_statuses"
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
-  add_foreign_key "card_limits", "dummy_restrictions"
+  add_foreign_key "card_limits", "card_restrictions", column: "dummy_restriction_id"
+  add_foreign_key "card_restrictions", "users"
   add_foreign_key "card_transactions", "cards"
   add_foreign_key "card_transactions", "expenses"
   add_foreign_key "card_transactions", "users"
@@ -1109,7 +1116,6 @@ ActiveRecord::Schema.define(version: 20170124135621) do
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_tags", "companies"
-  add_foreign_key "dummy_restrictions", "users"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"

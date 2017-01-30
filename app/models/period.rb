@@ -21,7 +21,6 @@ class Period < ActiveRecord::Base
   end
 
   def period_name
-
     self.name
   end
 

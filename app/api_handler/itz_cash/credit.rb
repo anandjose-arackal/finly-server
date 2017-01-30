@@ -58,6 +58,7 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_process
+
   end
 
   def success

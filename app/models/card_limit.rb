@@ -8,14 +8,19 @@
 #  period_id            :integer
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  budget               :decimal(10, )
+#  budget_id            :integer
+#  limit_type_id        :integer
 #
 
 class CardLimit < ActiveRecord::Base
-  belongs_to :dummy_restriction
+  belongs_to :card_restriction
 
-  belongs_to :amount
+  belongs_to :budget, class_name: "Amount"
   belongs_to :period
 
-  delegate :period_name, to: :period  
+  belongs_to :limit_type_id, class_name: "ChannelType"
+
+  delegate :period_name, to: :period
+
+  accepts_nested_attributes_for :budget
 end
