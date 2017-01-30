@@ -49,7 +49,7 @@ class FinlyF.Views.User extends Backbone.View
     @params = options.params
     @page = options.page
     @parent = options.parent
-    @active_tab = @active_tab || '#tab-user-details'
+    @active_tab = @active_tab || '#tab-user-wallet-cards'
 
     if @page == 'user'
       @model = new FinlyF.Models.User({id: options.model_id})

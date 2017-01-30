@@ -1,276 +1,18 @@
 <div class="row-no-margin" style="height: 100%;">
   <div class="col-sm-2 no-padding" style="position: fixed; z-index: 1;">
     <ul class="nav nav-tabs user-tab-panes">
-      <li class="active"><a href="#tab-user-details" data-toggle="tab">Details</a></li>
-      <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
-      <li><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Account &amp; Cards</a></li>
-      {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
+      <li class="active"><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Account &amp; Cards</a></li>
       <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
       <li><a href="#tab-user-auto-submit-report" data-toggle="tab">Auto Submit</a> </li>
+      <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
+      <li><a href="#tab-user-details" data-toggle="tab">Details</a></li>
+      {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
     </ul>
   </div>
 
   <div class="col-sm-10 col-sm-offset-2 no-padding" style="height: 100%; z-index: 1; background: #fff; box-shadow: 0 0 30px 0 rgba(0,0,0,.1);">
     <div class="tab-content">
-      <div class="tab-pane active" id="tab-user-details">
-        <section class="user-info">
-          <div class="section-card">
-            <div class="row no-margin section-header">
-              <div class="col-sm-6">
-                <h4>User Info</h4>
-              </div>
-              {{#if item.user.editable}}
-                <div class="col-sm-6 text-right">
-                  {{#if item.actions.delete_invite}}
-                    <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
-                  {{/if}}
-                  {{#if item.actions.resend_invite}}
-                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="false" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
-                  {{/if}}
-                  {{#if item.actions.deactivate}}
-                    <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
-                  {{/if}}
-                  {{#if item.actions.activate}}
-                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
-                  {{/if}}
-                  {{#if item.user.activateable}}
-                    <button class="btn btn-sm btn-success btn-active-employee">Register User</button>
-                  {{/if}}
-                </div>
-              {{/if}}
-            </div>
-            <div class="row no-margin">
-              <div class="col-sm-8">
-                <form class="form-user-info">
-                  <div class="row">
-                    <div class="col-sm-3">Name</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{item.user.name}}</label>
-                      <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.user.name}}" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Email</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{item.user.email}}</label>
-                      <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.user.email}}" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Mobile</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">
-                        {{#if item.user.mobile_number}}
-                          {{item.user.mobile_number}}
-                        {{else}}
-                          Not Set
-                        {{/if}}
-                      </label>
-                      <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.user.mobile_number}}" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Gender</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">
-                        {{#if item.user.gender}}
-                          {{#if_eq item.user.gender 'm'}}Male{{else}}Female{{/if_eq}}
-                        {{else}}
-                          --
-                        {{/if}}
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Address</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">
-                        {{#if item.user.address}}
-                          {{item.user.address}}
-                        {{else}}
-                          --
-                        {{/if}}
-                      </label>
-                    </div>
-                  </div>
-
-                  <input type="hidden" name="type" value="details">
-                </form>
-              </div>
-            </div>
-          </div>
-          
-          
-        </section>
-      </div>
-      <div class="tab-pane" id="tab-user-roles">
-        <section class="user-roles">
-          <div class="section-card">
-            <div class="row no-margin section-header">
-              <div class="col-sm-6">
-                <h4>User Roles</h4>
-              </div>
-              <div class="col-sm-6 text-right">
-              {{#if item.user.editable}}
-                <button class="btn btn-sm btn-warning btn-edit-user" data-refresh-page="true"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
-              {{/if}}
-              </div>
-            </div> 
-            <div class="row no-margin" style="padding-bottom: 20px;">
-              <div class="col-sm-8">
-                <form class="form-user-roles">
-                
-                  <div class="row">
-                    <div class="col-sm-3">Admin?</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
-
-                      {{#if item.role.editable.admin}}
-
-                        {{#if item.role.admin}}
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
-                          </label>
-                        {{/if}}
-
-                      {{else}}
-
-                        {{#if item.role.admin}}
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
-                          </label>
-                        {{/if}}
-
-                      {{/if}}
-
-                      
-                      
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Manager?</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
-
-                      {{#if item.role.editable.manager}}
-                        {{#if item.role.manager}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{else}}
-
-                        {{#if item.role.manager}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{/if}}
-                      
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Finance Manager?</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
-
-                      {{#if item.role.editable.finance_manager}}
-
-                        {{#if item.role.finance_manager}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{else}}
-
-                        {{#if item.role.finance_manager}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{/if}}
-                      
-                    </div>
-                  </div>
-
-                  <input type="hidden" name="type" value="role">
-                </form>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="tab-pane" id="tab-user-wallet-cards">
+      <div class="tab-pane active" id="tab-user-wallet-cards">
         <section class="user-wallet" style="">
           <div class="section-card">
             <div class="row no-margin section-header">
@@ -593,9 +335,6 @@
         </section>
         {{/if}}
       </div>
-      {{!-- <div class="tab-pane" id="tab-user-cards">
-        
-      </div> --}}
       <div class="tab-pane" id="tab-user-policies">
         <section class="user-policies">
           <div class="enforce-policy section-card">
@@ -975,7 +714,6 @@
           {{/each}}
         </section>
       </div>
-
       <div class="tab-pane" id="tab-user-auto-submit-report">
         <section class="user-info">
           <div class="section-card" style="padding-bottom: 20px;">
@@ -1093,6 +831,266 @@
           </div><!-- section card -->
         </section>
       </div>
+      <div class="tab-pane" id="tab-user-roles">
+        <section class="user-roles">
+          <div class="section-card">
+            <div class="row no-margin section-header">
+              <div class="col-sm-6">
+                <h4>User Roles</h4>
+              </div>
+              <div class="col-sm-6 text-right">
+              {{#if item.user.editable}}
+                <button class="btn btn-sm btn-warning btn-edit-user" data-refresh-page="true"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+              {{/if}}
+              </div>
+            </div> 
+            <div class="row no-margin" style="padding-bottom: 20px;">
+              <div class="col-sm-8">
+                <form class="form-user-roles">
+                
+                  <div class="row">
+                    <div class="col-sm-3">Admin?</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
+
+                      {{#if item.role.editable.admin}}
+
+                        {{#if item.role.admin}}
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
+                          </label>
+                        {{/if}}
+
+                      {{else}}
+
+                        {{#if item.role.admin}}
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
+                          </label>
+                        {{/if}}
+
+                      {{/if}}
+
+                      
+                      
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Manager?</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
+
+                      {{#if item.role.editable.manager}}
+                        {{#if item.role.manager}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{else}}
+
+                        {{#if item.role.manager}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{/if}}
+                      
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Finance Manager?</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
+
+                      {{#if item.role.editable.finance_manager}}
+
+                        {{#if item.role.finance_manager}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{else}}
+
+                        {{#if item.role.finance_manager}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{/if}}
+                      
+                    </div>
+                  </div>
+
+                  <input type="hidden" name="type" value="role">
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="tab-pane" id="tab-user-details">
+        <section class="user-info">
+          <div class="section-card">
+            <div class="row no-margin section-header">
+              <div class="col-sm-6">
+                <h4>User Info</h4>
+              </div>
+              {{#if item.user.editable}}
+                <div class="col-sm-6 text-right">
+                  {{#if item.actions.delete_invite}}
+                    <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
+                  {{/if}}
+                  {{#if item.actions.resend_invite}}
+                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="false" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
+                  {{/if}}
+                  {{#if item.actions.deactivate}}
+                    <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
+                  {{/if}}
+                  {{#if item.actions.activate}}
+                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
+                  {{/if}}
+                  {{#if item.user.activateable}}
+                    <button class="btn btn-sm btn-success btn-active-employee">Register User</button>
+                  {{/if}}
+                </div>
+              {{/if}}
+            </div>
+            <div class="row no-margin">
+              <div class="col-sm-8">
+                <form class="form-user-info">
+                  <div class="row">
+                    <div class="col-sm-3">Name</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{item.user.name}}</label>
+                      <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.user.name}}" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Email</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{item.user.email}}</label>
+                      <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.user.email}}" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Mobile</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">
+                        {{#if item.user.mobile_number}}
+                          {{item.user.mobile_number}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>
+                      <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.user.mobile_number}}" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Gender</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">
+                        {{#if item.user.gender}}
+                          {{#if_eq item.user.gender 'm'}}Male{{else}}Female{{/if_eq}}
+                        {{else}}
+                          --
+                        {{/if}}
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Address</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">
+                        {{#if item.user.address}}
+                          {{item.user.address}}
+                        {{else}}
+                          --
+                        {{/if}}
+                      </label>
+                    </div>
+                  </div>
+
+                  <input type="hidden" name="type" value="details">
+                </form>
+              </div>
+            </div>
+          </div>
+          
+          
+        </section>
+      </div>
+      {{!-- <div class="tab-pane" id="tab-user-cards">
+      </div> --}}
     </div><!-- /tab-content -->
   </div>
 </div>
