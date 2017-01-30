@@ -49,6 +49,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -107,7 +108,7 @@ class User < ActiveRecord::Base
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications
-  has_one :dummy_restriction
+  has_one :card_restriction
 
   has_many :notifier_type_configurations
 

@@ -14,6 +14,7 @@
 #  updated_at  :datetime         not null
 #
 
+
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts

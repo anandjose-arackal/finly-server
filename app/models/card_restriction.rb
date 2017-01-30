@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: dummy_restrictions
+# Table name: card_restrictions
 #
 #  id              :integer          not null, primary key
 #  user_id         :integer
@@ -12,7 +12,7 @@
 #  updated_at      :datetime         not null
 #
 
-class DummyRestriction < ActiveRecord::Base
+class CardRestriction < ActiveRecord::Base
   belongs_to :user
 
   belongs_to :product_code, class_name: "ProductCombination"
@@ -20,4 +20,5 @@ class DummyRestriction < ActiveRecord::Base
   has_many :card_limits
 
   accepts_nested_attributes_for :card_limits
+
 end
