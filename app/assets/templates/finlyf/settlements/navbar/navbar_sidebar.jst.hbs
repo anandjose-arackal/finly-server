@@ -3,12 +3,12 @@
     <ul class="navbar-nav nav">
       <li>
         {{#switch item.filter_state}}
-          {{#case "1"}}<p class="navbar-text">Active</p>{{/case}}
-          {{#case "2"}}<p class="navbar-text">Pending</p>{{/case}}
-          {{#case "3"}}<p class="navbar-text">Inactive</p>{{/case}}
+          {{#case "1"}}<p class="navbar-text ml-0"><i class="fa fa-user" style="color: #2ECC71;"></i>&nbsp;Active</p>{{/case}}
+          {{#case "2"}}<p class="navbar-text ml-0"><i class="fa fa-user" style="color: #f1c40f;"></i>&nbsp;Pending</p>{{/case}}
+          {{#case "3"}}<p class="navbar-text ml-0"><i class="fa fa-user-times" style="color: #ED4D6A;"></i>&nbsp;Inactive</p>{{/case}}
         {{/switch}}
 
-        {{#if item.filter_state}}{{else}}<p class="navbar-text">Active</p>{{/if}}
+        {{#if item.filter_state}}{{else}}<p class="navbar-text ml-0"><i class="fa fa-user" style="color: #2ECC71;"></i>&nbsp;Active</p>{{/if}}
       </li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
