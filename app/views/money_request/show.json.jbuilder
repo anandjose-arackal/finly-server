@@ -8,9 +8,6 @@ json.status @result.status_name(@result.money_request)
 json.status_name @result.status_name(@result.money_request)
 json.manager_name @result.manager.name rescue ''
 json.finance_manager_name @result.finance_manager.name rescue ''
-# json.export_csv export_money_request_path(money_request_id: @result.money_request.id, view: params[:view],:format => :csv)
-# json.export_xls export_money_request_path(money_request_id: @result.money_request.id, view: params[:view],:format => :xls)
-# json.export_pdf export_money_request_path(money_request_id: @result.money_request.id, view: params[:view],:format => :pdf)
 json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
