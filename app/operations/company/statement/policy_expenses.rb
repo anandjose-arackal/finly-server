@@ -38,7 +38,7 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
       if policy.name.nil?
         self.items << default_policy_total(policy)
       else
-        r = Report.where(policy_id: policy.id).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+        r = Report.where(policy_id: policy.id).processed.where('approved_at >= ? and approved_at <= ?', start_date, end_date)
         r.each do |report|
           total += report.total_amount
         end
@@ -65,7 +65,7 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   def default_policy_total(policy)
     user_ids = user.company.users.pluck(:id)
-    r = Report.where(user_id: user_ids).where(policy_id: nil).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+    r = Report.where(user_id: user_ids).where(policy_id: nil).processed.where('approved_at > ? and approved_at <= ?', start_date, end_date)
     total = 0
     r.each do |report|
       total += report.total_amount

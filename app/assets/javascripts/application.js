@@ -19,6 +19,7 @@
 //= require bootbox
 //= require handlebars.runtime
 //= require ohsnap.min
+//= require drift-chat
 //// require_tree .
 
 // NProgress.configure({

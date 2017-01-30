@@ -136,14 +136,14 @@
 
 #ohsnap{
   bottom: 0;
-  left: auto;
+  left: 10px;
   margin-top: 60px;
   position: absolute;
   z-index: 1051;
   width: 33%;
   margin-right: auto;
   margin-left: auto;
-  right: 10px;
+  right: auto;
 }
 
 
@@ -155,10 +155,11 @@
   border-radius: 4px;
   // position: absolute;
   bottom: 0px;
-  right: 21px;
+  // right: 21px;
+  left: 21px;
   /* Each alert has its own width */
-  float: right;
-  clear: right;
+  float: left;
+  clear: left;
   z-index: 1051;//Above modal's z index
 }
 
@@ -207,11 +208,14 @@
 
 // Scheme FlatUIColors
 $brand-primary: #2980b9;
+// $brand-primary: #19AAD9;
 $brand-success: #2ECC71;
+// $brand-success: #39B26A;
 $brand-warning: #f1c40f;
 
 $brand-danger: #E74C3C;
 $brand-danger: #FC5F5F;
+// $brand-danger: #ED4D6A;
 
 $brand-info: #3498db;
 $brand-admin-primary: $brand-danger;
@@ -442,6 +446,15 @@ $brand-admin-primary: $brand-danger;
 }
 
 
+.wd250{
+  width: 250px;
+}
+
+.wd125{
+  width: 125px;
+}
+
+
 // Vertical Divider
 .navbar-nav .divider-vertical {
   height: 50px;
@@ -646,7 +659,9 @@ body {
 
 
 
-
+.ml-0{
+  margin-left: 0;
+}
 
 .mt-5{
   margin-top: 5px;

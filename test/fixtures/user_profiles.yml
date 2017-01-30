@@ -24,5 +24,4 @@
 #  pin_code            :string(255)      default(""), not null
 #
 
-
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

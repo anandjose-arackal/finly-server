@@ -34,6 +34,9 @@ class FinlyF.Views.User extends Backbone.View
     'click .btn-edit-auto-submit': 'editAutoSubmit'
     'click .btn-update-auto-submit': 'updateAutoSubmit'
 
+    'click .btn-edit-enforce-policy': 'editEnforcePolicy'
+    'click .btn-update-enforce-policy': 'updateEnforcePolicy'
+
     # Activating employee without email
     'click .btn-active-employee': 'activateEmployee'
 
@@ -98,7 +101,7 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').text('Update')
+    $(target).addClass('success btn-update-user').removeClass('warning btn-edit-user').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
 
   editAutoSubmit: (e) ->
     target = $(e.currentTarget)
@@ -108,7 +111,50 @@ class FinlyF.Views.User extends Backbone.View
     #edit
 
     #change edit button to update
-    $(target).addClass('btn-success btn-update-auto-submit').removeClass('btn-warning btn-edit-auto-submit').text('Update')
+    $(target).addClass('btn-success btn-update-auto-submit').removeClass('btn-warning btn-edit-auto-submit').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+
+  editEnforcePolicy: (e) ->
+    target = $(e.currentTarget)
+    container = $(target).closest('.section-card')
+    $(container).find('.item-attr-preview').addClass('hide')
+    $(container).find('.item-attr-edit').addClass('show')
+    #edit
+
+    #change edit button to update
+    $(target).addClass('btn-success btn-update-enforce-policy').removeClass('btn-warning btn-edit-auto-submit').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+
+  updateEnforcePolicy: (e) ->
+    _this = @
+    e.preventDefault()
+    target = $(e.currentTarget)
+    $(target).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;").attr('disabled', true)
+    form = $(target).closest('.section-card').find('form')
+    values = {}
+
+    _.each($(form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    values.view = @params.view
+
+    model = new FinlyF.Models.User({id: @model.get('id')})
+    model.save(values, {
+      data: values,
+      processData: true
+      success: (model, res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
+        else
+          $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeAttr('disabled')
+      error: (err) ->
+        console.log "Err", err
+        $(target).html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update").removeAttr('disabled')
+    })
+
 
   editPolicy: (e) ->
     target = $(e.currentTarget)
@@ -532,6 +578,39 @@ class FinlyF.Views.User extends Backbone.View
             $(modal).find('.current_user_wallet_balance').html("&#8377;&nbsp;" + res.current_user_wallet)
             $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
         })
+      when 'credit_card_from_card'
+        $(modal).html(@templateLoadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            current_user_card: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_card_balance').html("&#8377;&nbsp;" + res.current_user_card)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
+        })
+      when 'credit_wallet_from_card'
+        $(modal).html(@templateLoadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            current_user_card: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_card_balance').html("&#8377;&nbsp;" + res.current_user_card)
+            $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
+
       when 'debit_wallet_to_virtual_account'
         $(modal).html(@templateUnloadFunds({item: item}))
         $.ajax({
@@ -564,8 +643,72 @@ class FinlyF.Views.User extends Backbone.View
             $(modal).find('.current_user_wallet_balance').html("&#8377;&nbsp;" + res.current_user_wallet)
             $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
         })
-      
-    
+      when 'debit_wallet_to_card'
+        $(modal).html(@templateUnloadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_wallet: true
+            current_user_card: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_card_balance').html("&#8377;&nbsp;" + res.current_user_card)
+            $(modal).find('.target_user_wallet_balance').html("&#8377;&nbsp;" + res.target_user_wallet)
+        })
+      when 'debit_card_to_card'
+        $(modal).html(@templateUnloadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            current_user_card: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_card_balance').html("&#8377;&nbsp;" + res.current_user_card)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
+        }) 
+      when 'debit_card_to_wallet'
+        $(modal).html(@templateUnloadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            current_user_wallet: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.current_user_wallet_balance').html("&#8377;&nbsp;" + res.current_user_wallet)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
+        })  
+      when 'debit_card_to_virtual_account'
+        $(modal).html(@templateUnloadFunds({item: item}))
+        $.ajax({
+          url: 'users/' + _this.model.get('id') + '/balance'
+          data: {
+            view: _this.params.view
+            target_user_card: true
+            virtual_account: true
+          }
+          type: 'get',
+          dataType: 'json'
+          success: (res) ->
+            # console.log res
+            $(modal).find('.virtual_account_balance').html("&#8377;&nbsp;" + res.virtual_account)
+            $(modal).find('.target_user_card_balance').html("&#8377;&nbsp;" + res.target_user_card)
+        })  
+
+
     # if action_type == 'credit_card_from_virtual_account' || action_type == 'credit_card_from_wallet' || 
     #   $(modal).html(@templateLoadFunds({item: item}))
     # else if action_type == 'debit_card_to_company_credits' || action_type == 'debit_card_to_card'

@@ -36,14 +36,15 @@
           {{#if item.actions.unapprove}}
             <button class="btn btn-sm btn-danger btn-report-action" data-action-type="unapprove" data-url="{{item.actions.unapprove}}">Unapprove</button>
           {{/if}}
-
-          {{#if item.actions.reject}}
-            <button class="btn btn-sm btn-danger" data-action-type="reject" id="btnRejectRequest" data-url="{{item.actions.reject}}">Reject</button>
-          {{/if}}
+          
 
           {{#or item.actions.credit_card_from_virtual_account item.actions.credit_card_from_wallet}}
             <button class="btn btn-sm btn-success btn-approve-options">Approve</button>
           {{/or}}
+
+          {{#if item.actions.reject}}
+            <button class="btn btn-sm btn-danger" data-action-type="reject" id="btnRejectRequest" data-url="{{item.actions.reject}}">Reject</button>
+          {{/if}}
         </ul>   
       </div>
     </div>

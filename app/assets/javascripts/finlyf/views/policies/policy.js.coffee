@@ -5,6 +5,8 @@ class FinlyF.Views.Policy extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/policies/base/skeleton']
 
   templateAddCondition: HandlebarsTemplates['finlyf/policies/extras/addCondition']
+
+  templateMassActionSuccess: HandlebarsTemplates['finlyf/policies/extras/modalMassAction']
   
   events:
     'click .navigate-tab li a': 'navigateTab'
@@ -305,6 +307,10 @@ class FinlyF.Views.Policy extends Backbone.View
           FinlyF.snapNotify(res.messages)
           # $(modal).modoal('hide')
           _this.fetchTabContent()
+          modal = $(_this.el).find('#modal-confirm-mass-action')
+          $(modal).html(_this.templateMassActionSuccess({item: res}))
+          $(modal).modal('show')
+
         else 
           $(target).attr('disabled', false)
       error: (err) ->

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104094949) do
+ActiveRecord::Schema.define(version: 20170119122026) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -337,6 +337,16 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
+
+  create_table "enforce_policies", force: :cascade do |t|
+    t.integer  "enforceable_id",   limit: 4,   null: false
+    t.string   "enforceable_type", limit: 255, null: false
+    t.boolean  "enabled"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -844,6 +854,7 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.datetime "updated_at",                            null: false
     t.integer  "payment_id",                limit: 4
     t.integer  "action_user_role_id",       limit: 4
+    t.integer  "cash_in_hand_deduction_id", limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
@@ -875,6 +886,7 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.boolean  "auto_approve",                                           default: false, null: false
     t.date     "accounted_at"
     t.datetime "approved_at"
+    t.integer  "cash_in_hand_deduction_id",    limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -932,7 +944,7 @@ ActiveRecord::Schema.define(version: 20170104094949) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-01-19', null: false
+    t.date     "date_of_birth",                   default: '2017-01-30', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false
