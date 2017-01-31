@@ -12,7 +12,7 @@
 
     <div class="row no-margin" style="height: 35%;">
       <div class="col-sm-8">
-        <span class="settlement-summary-type">Advance Request:</span>
+        <span class="settlement-summary-type">Money Request:</span>
       </div>
       <div class="col-sm-4">
         <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_money_request}}</label>
@@ -35,7 +35,7 @@
   <div class="col-sm-6" style="height: 100%;">
     <div class="row no-margin" style="height: 35%;">
       <div class="col-sm-8">
-        <span class="settlement-summary-type">Cash in Hand:</span>
+        <span class="settlement-summary-type">Cash on Hand:</span>
       </div>
       <div class="col-sm-4">
         <label class="settlement-summary-value">&#8377;&nbsp;{{item.cash_in_hand}}</label>
@@ -64,7 +64,7 @@
       {{/if}}
 
       {{#if item.actions.credit_money_request}}
-        <button class="btn btn-sm btn-success btn-process-money-request btn-report-summary-action" data-url="{{item.actions.credit_money_request}}" style="width: 200px;">Credit Advance Request</button>
+        <button class="btn btn-sm btn-success btn-process-money-request btn-report-summary-action" data-url="{{item.actions.credit_money_request}}" style="width: 200px;">Credit Money Request</button>
       {{/if}}
     </div>
   </div>

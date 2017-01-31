@@ -1,7 +1,7 @@
 <div class="row-no-margin" style="height: 100%;">
   <div class="col-sm-2 no-padding" style="position: fixed; z-index: 1;">
     <ul class="nav nav-tabs user-tab-panes">
-      <li class="active"><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Account &amp; Cards</a></li>
+      <li class="active"><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Money &amp; Cards</a></li>
       <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
       <li><a href="#tab-user-auto-submit-report" data-toggle="tab">Auto Submit</a> </li>
       <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
@@ -16,7 +16,7 @@
         <section class="user-wallet" style="">
           <div class="section-card">
             <div class="row no-margin section-header">
-              <div class="col-sm-6"><h4>Finly Account</h4></div>
+              <div class="col-sm-6"><h4>Finly Money</h4></div>
             </div>
             <div class="row ">
               <div class="col-sm-6">
@@ -39,7 +39,7 @@
                         <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
                       {{/if}}
                       {{#if item.actions.credit_wallet_from_wallet}}
-                        <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Finly Account</a> </li>
+                        <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Finly Money</a> </li>
                       {{/if}}
                       {{#if item.actions.credit_wallet_from_card}}
                         <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_card}}" data-action-type="credit_wallet_from_card">From Your Card</a> </li>
@@ -59,7 +59,7 @@
                         <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
                       {{/if}}
                       {{#if item.actions.debit_wallet_to_wallet}}
-                        <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Finly Account</a> </li>
+                        <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Finly Money</a> </li>
                       {{/if}}
                       {{#if item.actions.debit_wallet_to_card}}
                         <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_card}}" data-action-type="debit_wallet_to_card">To Your Card</a> </li>
@@ -145,7 +145,7 @@
                                 <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
                               {{/if}}
                               {{#if item.actions.credit_card_from_wallet}}
-                                <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Finly Account</a> </li>
+                                <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Finly Money</a> </li>
                               {{/if}}
                             </ul>
                           </div>
@@ -161,7 +161,7 @@
                                 <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_card}}" data-action-type="debit_card_to_card">To Your Card</a> </li>
                               {{/if}}
                               {{#if item.actions.debit_card_to_wallet}}
-                                <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_wallet}}" data-action-type="debit_card_to_wallet">To Your Finly Account</a> </li>
+                                <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_wallet}}" data-action-type="debit_card_to_wallet">To Your Finly Money</a> </li>
                               {{/if}}
                               {{#if item.actions.debit_card_to_virtual_account}}
                                 <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_virtual_account}}" data-action-type="debit_card_to_virtual_account">To Company Credits</a> </li>
