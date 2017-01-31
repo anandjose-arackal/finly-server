@@ -1,6 +1,6 @@
 class User::CardRestrictions::Update < User::Base
 
-  attr_accessor :selected_user, :dummy_restriction, :update_params
+  attr_accessor :selected_user, :card_restriction, :update_params
 
   def authorized_user_types
     [:company_admin]
@@ -15,7 +15,7 @@ class User::CardRestrictions::Update < User::Base
   def init
     set_updating_params
     self.selected_user = user.company.users.find_by(id: params[:id])
-    self.dummy_restriction = selected_user.dummy_restriction
+    self.card_restriction = selected_user.card_restriction
     self.update_params = card_restriction_params
   end
 

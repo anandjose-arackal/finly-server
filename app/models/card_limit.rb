@@ -10,6 +10,7 @@
 #  updated_at          :datetime         not null
 #  budget_id           :integer
 #  limit_type_id       :integer
+#  enabled             :boolean
 #
 
 class CardLimit < ActiveRecord::Base
@@ -18,9 +19,11 @@ class CardLimit < ActiveRecord::Base
   belongs_to :budget, class_name: "Amount"
   belongs_to :period
 
-  belongs_to :limit_type_id, class_name: "ChannelType"
-
-  delegate :period_name, to: :period
+  belongs_to :limit_type, class_name: "ChannelType"
 
   accepts_nested_attributes_for :budget
+
+  delegate :budget_value, to: :budget
+  delegate :period_name, to: :period
+
 end

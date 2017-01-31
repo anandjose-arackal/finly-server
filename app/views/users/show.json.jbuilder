@@ -139,31 +139,38 @@ json.periods do
 end
 
 json.restrictions do
-  json.channel_atm true
-  json.channel_pos false
-  json.channel_ecom true
-  json.card_periods do
-    json.array! @result.card_periods do |period|
-      json.extract! period, :id, :name
-    end
+  json.channel_atm do
+    json.enabled @result.card_restriction.channel_atm
   end
-  json.product_code do
-    json.id 3
-    json.name "Fuel"
+  json.channel_ecom_pos do
+    json.enabled @result.card_restriction.channel_ecom_pos
   end
+  json.product_code_id @result.card_restriction.product_code_id
   json.product_codes do
-    json.array! @result.product_codes.each do |pc|
-      json.extract! pc, :id, :name
+    json.array! @result.product_codes.each do |product_code|
+      json.extract! product_code, :id, :name
     end
   end
   json.limits do
-    json.array! @result.c_limits.each do |limit|  
-      json.limit_id limit.id
-      json.period_id limit.period_id
-      json.period_name limit.period_name
-      json.amount limit.amount
-      json.transactions limit.transaction_limit
-      json.enabled !!(limit.amount or limit.transaction_limit)
+    json.atm_limits do
+      json.array! @result.card_limits.each do |limit|
+        json.id limit.id
+        json.period_id limit.period_id
+        json.period_name limit.period_name rescue nil
+        json.budget limit.budget_value rescue nil
+        json.transactions limit.transaction_limit
+        json.enabled limit.enabled
+      end
+    end
+    json.ecom_pos_limits do
+      json.array! @result.card_limits.each do |limit|
+        json.id limit.id
+        json.period_id limit.period_id
+        json.period_name limit.period_name rescue nil
+        json.budget limit.budget_value rescue nil
+        json.transactions limit.transaction_limit
+        json.enabled limit.enabled
+      end
     end
   end
 end
