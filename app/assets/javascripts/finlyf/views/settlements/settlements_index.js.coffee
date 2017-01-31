@@ -653,7 +653,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @collectionSettlementReports.fetch({
           data: params_approved_reports,
           reset: true,
-          data: _this.params
           success: ->
             _this.collectionSettlementReports.each((item) ->
               view_item = new FinlyF.Views.Settlement({ model: item, page: 'reimburse' })
@@ -687,7 +686,6 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @collectionSettlementReports.fetch({
           data: params_approved_money_requests,
           reset: true,
-          data: _this.params
           success: ->
             _this.collectionSettlementReports.each((item) ->
               console.log "each money request"
