@@ -576,6 +576,16 @@ $brand-admin-primary: $brand-danger;
   font-size: 20px;
 }
 
+.global-transfer-flow-arrow-div{
+  display: table;
+  font-size: 20px;
+  height: 75px;
+}
+
+.global-transfer-flow-arrow-div .global-transfer-flow-arrow{
+  display: table-cell;
+  vertical-align: middle;
+} 
 label.grey-text{
   color: #888;
   text-transform: uppercase;
