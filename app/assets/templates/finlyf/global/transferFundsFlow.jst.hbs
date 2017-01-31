@@ -13,6 +13,7 @@
         <label class="grey-text">To:</label>
         <h4 class="no-margin">Your Card Balance</h4>
         <h3 class="no-margin mt-5 current_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+        <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility"></label>
       </div>
     {{/case}}
     {{#case 'from_card_to_wallet'}}
@@ -20,6 +21,7 @@
         <label class="grey-text">From:</label>
         <h4 class="no-margin">Your Card Balance</h4>
         <h3 class="no-margin mt-5 current_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+        <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility"></label>
       </div>
 
       <div class="col-sm-2 text-center global-transfer-flow-arrow-div"><i class="fa fa-long-arrow-right global-transfer-flow-arrow"></i></div>
@@ -32,8 +34,6 @@
     {{/case}}
   {{/switch}}
 </div>
-
-
 
 <div class="col-sm-12"><hr /></div>
 <div class="row no-margin">

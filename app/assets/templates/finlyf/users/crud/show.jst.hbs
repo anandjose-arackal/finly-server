@@ -287,7 +287,7 @@
                           </div>
                           <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_ecom_pos.enabled}}display: none;{{/unless}}">
                             {{#each item.restrictions.limits.ecom_pos_limits}}
-                              <input type="hidden" name="restrictions[limits][ecom_pos_limits][{{@index}}][id]" value="{{this.limit_id}}">
+                              <input type="hidden" name="restrictions[limits][ecom_pos_limits][{{@index}}][id]" value="{{this.id}}">
                               <div class="col-sm-12">
                                 <div class="row no-margin">
                                   <div class="col-sm-1">Per</div>

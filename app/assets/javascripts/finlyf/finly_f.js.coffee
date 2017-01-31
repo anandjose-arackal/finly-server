@@ -582,6 +582,7 @@ $(document).ready ->
           # console.log "Balance Data", data
           $(modal).find(".current_user_card_balance").html("&#8377;&nbsp;" + data.current_user_card)
           $(modal).find(".current_user_wallet_balance").html("&#8377;&nbsp;" + data.current_user_wallet)
+          $(modal).find(".current_user_card_eligibility").html("&#8377;&nbsp;" + data.current_user_card_details.available_card_eligibility)
         error: (err) ->
           console.log err
       })
