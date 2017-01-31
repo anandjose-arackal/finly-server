@@ -235,18 +235,22 @@
                           <label>Available Channels:</label>
                         </div>
                         <div class="row no-margin channel-container">
-                          <div class="col-sm-12">
+                          <div class="col-sm-11 col-sm-offset-1">
                             <label class="item-attr-preview">
-                              {{#if item.restrictions.channel_atm.enabled}}
+                              {{#if item.restrictions.channel_atm}}
                                 <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
                               {{else}}
                                 <i class="fa fa-ban" style="color: #E74C3C;"></i>
                               {{/if}}
                               &nbsp;<span>ATM</span>
                             </label>
-                            <label class="item-attr-edit"><input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_atm.enabled}}checked="checked"{{/if}} name="restrictions[channel_atm][enabled]" value="1" />&nbsp;ATM</label>&nbsp;&nbsp;&nbsp;
+                            <span>&nbsp;&nbsp;&nbsp;ATM</span>
+                            <label class="item-attr-edit finly-switch">
+                              <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />
+                              <div class="finly-slider round"></div>
+                            </label>
                           </div>
-                          <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channle_atm.enabled}}display: none;{{/unless}}">
+                          <div class="col-sm-10 col-sm-offset-2 channel-limits" style="{{#unless item.restrictions.channle_atm.enabled}}display: none;{{/unless}}">
                             {{#each item.restrictions.limits.atm_limits}}
                               <input type="hidden" name="restrictions[limits][atm_limits][{{@index}}][id]" value="{{this.id}}">
                               <div class="col-sm-12">
@@ -276,14 +280,17 @@
                         <div class="row no-margin channel-container">
                           <div class="col-sm-12">
                             <label class="item-attr-preview">
-                              {{#if item.restrictions.channel_ecom_pos.enabled}}
+                              {{#if item.restrictions.channel_ecom_pos}}
                                 <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
                               {{else}}
                                 <i class="fa fa-ban" style="color: #E74C3C;"></i>
                               {{/if}}
                               &nbsp;<span>E-Commerce/POS</span>
                             </label>
-                            <label class="item-attr-edit"><input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_ecom_pos.enabled}}checked="checked"{{/if}} name="restrictions[channel_ecom_pos][enabled]" value="1" />&nbsp;E-Commerce/POS</label>
+                            <label class="item-attr-edit finly-switch">
+                              <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_ecom_pos}}checked="checked"{{/if}} name="restrictions[channel_ecom_pos]" value="1" />
+                              <div class="finly-slider round"></div>
+                            </label><span>&nbsp;&nbsp;&nbsp;E-Commerce/POS</span>
                           </div>
                           <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_ecom_pos.enabled}}display: none;{{/unless}}">
                             {{#each item.restrictions.limits.ecom_pos_limits}}
