@@ -51,6 +51,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -190,7 +191,12 @@ class User < ActiveRecord::Base
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
-    self.build_card_restriction(product_code_id: ProductCombination.id_for(:fuel), card_limits_attributes: [{period_id: 1}, {period_id: 2}, {period_id: 3}]).save
+    self.build_card_restriction(card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                        {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                        {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                        {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
+                                                        {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
+                                                        {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
   def payments
