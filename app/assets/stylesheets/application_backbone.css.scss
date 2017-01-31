@@ -630,8 +630,8 @@ label.grey-text{
 .finly-switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 26px;
 }
 
 /* Hide default HTML checkbox */
@@ -655,19 +655,20 @@ label.grey-text{
   content: "";
   height: 26px;
   width: 26px;
-  left: 4px;
-  bottom: 4px;
+  left: 0px;
+  bottom: 0px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, .11);
 }
 
 input:checked + .finly-slider {
-  background-color: #2196F3;
+  background-color: $brand-success;
 }
 
 input:focus + .finly-slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px $brand-success;
 }
 
 input:checked + .finly-slider:before {
