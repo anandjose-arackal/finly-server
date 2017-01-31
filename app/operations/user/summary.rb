@@ -1,7 +1,7 @@
 class User::Summary < User::Base
   attr_accessor :selected_user, :cards, :summary
 
-def pre_validate
+  def pre_validate
     unless user.present?
       add_message :error, 'User not found'
     end
@@ -54,15 +54,18 @@ def pre_validate
     summary[:personal] = {}
     summary[:personal][:unreported_expenses] = selected_user.expenses.unreported.count
     summary[:personal][:unsubmitted_reports] = selected_user.reports.open.count
+    summary[:personal][:unsubmitted_money_requests] = selected_user.money_requests.open.count
 
     if selected_user.manager?
       summary[:manager] = {}
       summary[:manager][:pending_reports] = selected_user.manager_reports.with_controlling_user_id(selected_user.id).count rescue 0
+      summary[:manager][:pending_money_requests] = selected_user.manager_money_requests.with_controlling_user_id(selected_user.id).count rescue 0
     end
 
     if selected_user.finance_manager?
       summary[:finance_manager] = {}
       summary[:finance_manager][:pending_reports] = selected_user.finance_reports.with_controlling_user_id(selected_user.id).count rescue 0
+      summary[:finance_manager][:pending_money_requests] = selected_user.finance_money_requests.with_controlling_user_id(selected_user.id).count rescue 0
     end
   end
 
