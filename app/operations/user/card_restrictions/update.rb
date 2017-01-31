@@ -26,8 +26,8 @@ class User::CardRestrictions::Update < User::Base
   end
 
   def process
-    unless dummy_restriction.update(update_params)
-      add_message :error, dummy_restriction.errors.full_messages
+    unless card_restriction.update(update_params)
+      add_message :error, card_restriction.errors.full_messages
     end
   end
 

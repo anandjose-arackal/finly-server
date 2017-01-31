@@ -26,4 +26,6 @@ class CardLimit < ActiveRecord::Base
   delegate :budget_value, to: :budget
   delegate :period_name, to: :period
 
+  scope :atm_limits, -> {where limit_type_id: ChannelType.id_for(:atm)}
+  scope :ecom_pos_limits, -> {where limit_type_id: ChannelType.id_for(:ecom_pos)}
 end
