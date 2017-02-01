@@ -18,7 +18,7 @@ class ProductCombination < ActiveRecord::Base
 
   TYPES = [
       'Transportation',
-      'Ground Transportation',
+      'Ground Transportation (Courier)',
       'Travel',
       'Hotel/Restaurant/Lodging',
       'Food/Meals',

@@ -243,7 +243,7 @@ if User.count == 0
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
-  ############################################################################################################
+  ##############################################################################################################################################
   ## User's for Venky's iOS testing
   v = []
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
@@ -260,7 +260,7 @@ if User.count == 0
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
-  #############################################################################################################
+  ##############################################################################################################################################
 
   u = []
 
@@ -283,7 +283,7 @@ if User.count == 0
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
-  # User for Venky's testing
+  ########################## Employee for Venky's testing ################################################################################
   User.create(company: Company.first, first_name: "Finly", last_name: "Employee", email: "kaley@finlytest.io",
               password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
               mothers_maiden_name: Faker::Name.first_name,
@@ -292,6 +292,8 @@ if User.count == 0
               team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+############################################################################################################################################
+
 
   User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
