@@ -2,24 +2,26 @@
   <div class="row no-margin">
     <div class="col-sm-8 no-padding" style="border-right: 1px solid #eee;">
       <div class="row no-margin">
-        <div class="col-sm-9"><h5>Reimbursement Pending</h5></div>
-        <div class="col-sm-3"><h5 class="requested_money">{{summary.pending_reimbursement}}</h5></div>
+        <div class="col-sm-8"><h4>Total Reimbursement Pending:</h4></div>
+        <div class="col-sm-4"><h4 class="requested_money">&#8377;&nbsp;{{summary.pending_reimbursement}}</h4></div>
       </div>
       <div class="row no-margin">
-        <div class="col-sm-9"><h5>Selected Reports' Total</h5></div>
-        <div class="col-sm-3"><h5 class="selected_items_total">0</h5></div>
+        <div class="col-sm-8"><h4>Selected Reimbursement Amount:</h4></div>
+        <div class="col-sm-4"><h4 class="selected_items_total">&#8377;&nbsp;0</h4></div>
       </div>
     </div>
 
     <div class="col-sm-4 no-padding text-center">
-      <button class="btn btn-sm btn-success btn-settlement-action step-2-action" data-action-type="credit_reimbursement" disabled="disabled">Credit Reports</button>
+      <button class="btn btn-sm btn-success btn-settlement-action step-2-action" data-action-type="credit_reimbursement" disabled="disabled">Process Reports</button>
     </div>
   </div>
+
+  <div class="row no-margin"><div class="col-sm-12"><hr /></div></div>
 
   <div class="row no-margin">
     <div class="col-sm-12 no-padding bg-accent-light" style="font-weight: bold;">
       <div class="col-md-5">
-        <div class="col-sm-2">{{!-- <input class="main-select-all" type="checkbox" /> --}}</div>
+        <div class="col-sm-2"><input class="main-select-all" type="checkbox" disabled="disabled" /></div>
         <div class="col-sm-10">Name</div>
       </div>
 

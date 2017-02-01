@@ -24,6 +24,8 @@
 //= require handlebars.runtime
 //= require finlyf/application_finlyf
 //= require ohsnap.min
+//= require drift-chat
+
 
 // NProgress.configure({
 //   showSpinner: false,

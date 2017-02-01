@@ -15,6 +15,13 @@ class MoneyRequest::Submit < MoneyRequest::Base
       messages[:error] << 'Cannot submit this money_request'
       return false
     end
+    # checking if policy is added if enforce policy is enabled
+    if user.enforce_policy_enabled?
+      if money_request.policy.nil?
+        add_message :error, "You have to select a policy for the advance request before submission"
+        return false
+      end
+    end
     # checking if the money_request has expenses
     unless money_request.total_amount> 0
       messages[:error] << 'Cannot submit an empty advance request'

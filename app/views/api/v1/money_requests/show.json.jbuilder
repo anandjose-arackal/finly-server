@@ -37,10 +37,17 @@ json.forwardable_users do
       end
       json.user_role do
         json.id item[:role_id]
-        json.name UserRole.name_for(item[:role_id])
+        json.name UserRole.name_for(item[:role_id]).to_s.humanize
       end
       json.position item[:pos]
       json.is_reviewer item[:reviewer]
     end
+  end
+end
+
+json.payment_modes do
+  json.array! PaymentMode.all.each do |item|
+    json.id item.id
+    json.name item.name
   end
 end

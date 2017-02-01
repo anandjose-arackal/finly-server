@@ -20,6 +20,8 @@
 
 
 
+
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -32,7 +34,7 @@ class Expense < ActiveRecord::Base
   belongs_to :category
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
-  belongs_to :surcharge, class_name: 'Z'
+  belongs_to :surcharge, class_name: 'Amount'
 
   has_many :receipts, as: :parent
 
@@ -138,6 +140,9 @@ class Expense < ActiveRecord::Base
     where('id IN (?) OR note like ?', expense_ids, "%#{value}%",)
     # joins(:card_expense).joins(:manual_expense).joins(:amount).select('expenses.*').where('editable_merchant like ? or merchant like ? OR note like ?', "%#{value}%", "%#{value}%", "%#{value}%")
   end
+
+  # scope for analytics
+  scope :filter_expense_status_id, -> {}
 
   scope :filter_receipt, -> (value) do
     expense_ids = Receipt.where(parent_type: Expense).uniq.pluck(:parent_id)

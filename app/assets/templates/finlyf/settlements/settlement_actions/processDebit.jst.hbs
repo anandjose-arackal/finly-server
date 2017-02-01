@@ -54,11 +54,11 @@
                   {{#if summary.actions.debit_cash_advance}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action' data-action-type="debit_cash_advance"/> Debit Cash in Hand
+                        <input type="radio" name='settlement_credit_action' data-action-type="debit_cash_advance"/> Debit Cash on Hand
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          Any cash which has been received from the User to the Company. This reduces the “Cash in Hand” value of the User.
+                          Any cash which has been received from the User to the Company. This reduces the “Cash ion Hand” value of the User.
                         </div>
                       </div>
                     </li>
@@ -67,20 +67,20 @@
                   {{#if summary.actions.debit_card_to_wallet}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_wallet" /> Debit from Card to Finly Account
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_card_to_wallet" /> Debit from Card to Finly Money
                       </label>
-                      <label class="hidden">Debit from User's Card to Your Finly Account.</label>
+                      <label class="hidden">Debit from User's Card to Your Finly Money.</label>
                     </li> 
                   {{/if}}
 
                   {{#if summary.actions.debit_wallet_to_wallet}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from User's Finly Account to Your Finly Account
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_wallet" /> Debit from User's Finly Money to Your Finly Money
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          Withdraw from User's Finly Account to My Finly Account.
+                          Withdraw from User's Finly Money to My Finly Money.
                         </div>
                       </div>
                     </li> 
@@ -89,11 +89,11 @@
                   {{#if summary.actions.debit_wallet_to_virtual_account}}
                     <li>
                       <label>
-                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_virtual_account" /> Debit from User's Finly Account to Company Credits
+                        <input type="radio" name='settlement_credit_action'data-action-type="debit_wallet_to_virtual_account" /> Debit from User's Finly Money to Company Credits
                       </label>
                       <div class="action-definition hidden">
                         <div class="bs-callout bs-callout-primary">
-                          Withdraw from User's Finly Account Back into Company Account.
+                          Withdraw from User's Finly Money Back into Company Account.
                         </div>
                       </div>
                     </li> 

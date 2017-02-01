@@ -15,6 +15,14 @@ class MoneyRequestStatus < ActiveRecord::Base
 
   VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6}
 
+  self.class.instance_eval do
+    VALUES.each do |key, value|
+      define_method "#{key}_id" do
+        value
+      end
+    end
+  end
+
   VALUES.each do |key, value|
     define_method "#{key}?" do
       self.id == value

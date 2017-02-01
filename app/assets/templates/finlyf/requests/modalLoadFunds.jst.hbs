@@ -4,9 +4,9 @@
       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       <h4 class="modal-title">
         {{#switch item.type}}
-          {{#case 'credit_wallet_from_virtual_account'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Finly Account{{/case}}
+          {{#case 'credit_wallet_from_virtual_account'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Finly Money{{/case}}
           {{#case 'credit_card_from_virtual_account'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Card{{/case}}
-          {{#case 'credit_wallet_from_wallet'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Finly Account{{/case}}
+          {{#case 'credit_wallet_from_wallet'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Finly Money{{/case}}
           {{#case 'credit_card_from_wallet'}}Load Cash into <strong>{{item.target_user_name}}</strong>'s Card{{/case}}
         {{/switch}}
       </h4>

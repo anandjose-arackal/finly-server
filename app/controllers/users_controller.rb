@@ -155,6 +155,9 @@ class UsersController < ApplicationController
       when 'auto_submit'
         operation = User::Configuration::AutoSubmit::Update.new(current_user, params)
         success_message = 'Configuration updated'
+      when 'enforce_policy'
+        operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
+        success_message = "Configuration Updated"
       else
         # do nothing, ha!
     end

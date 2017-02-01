@@ -24,6 +24,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     'click .btn-filter-expenses': 'filter'
     'click .filter-data-type': 'filterDataType'
 
+    'click .load-more': 'loadMore'
+
   initialize: (options) ->
     if options
       @params = options.params || {}
@@ -31,6 +33,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       @params = {}
     @params.view = @params.view || 'personal'
     @params.filter_analytics_type = @params.filter_analytics_type || 'category'
+    @params.page = 1
     _this = @
     @dump = []
     @collection = new FinlyF.Collections.Analytics()
@@ -38,6 +41,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       reset: true,
       data: _this.params,
       success: ->
+        _this.toggleLoadMore(_this.collection)
       error: ->
         console.log "Couldn't fetch Successfully."
     })
@@ -50,7 +54,7 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
     $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain({item: @params}))
     @params.filter_date_from = @params['filter_date[from]']
     @params.filter_date_to = @params['filter_date[to]']
-    @params.indexOnly = false#REF==2I
+    # @params.indexOnly = false#REF==2I
 
 
     $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
@@ -68,10 +72,13 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
 
   processItems: ->
     #Append all the expenses
-    # @dump = @collection.models.slice()
+    @dump = @collection.models.slice()
     # # console.log "Models - ", @collection.models.length
-    arr = @collection.pluck('total')
-    @max_total = Math.max.apply(Math,arr)
+    arr = @collection.pluck('item_total')
+    # console.log arr
+    # console.log arr.filter(Boolean)
+    # console.log arr
+    @max_total = Math.max.apply(Math,arr.filter(Boolean))
     $(@el).find("#items").html("")
     @collection.each(@appendItems, @)
 
@@ -83,13 +90,17 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       $(spinner).removeClass("fa-spin")
 
   appendItems: (item) ->
-    item.set('max_total', @max_total)
+    unless item.get('meta')
+      item.set('max_total', @max_total)
     #Creating view for each expense and appending them
     view_item = new FinlyF.Views.Analytic({
       model: item
       parent: @
     })
-    $(@el).find("#items").append(view_item.render().el)
+    if item.get('meta')
+      $(@el).find("#items-total").append(view_item.render().el)
+    else
+      $(@el).find("#items").append(view_item.render().el)
 
   refetchCollection: (e) ->
     #REFRESH
@@ -101,11 +112,16 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       target = e.currentTarget
       $(target).find("i").addClass("fa-spin")
 
+    @params.page = 1
+
     @collection.fetch({
       reset: true,
       data: _this.params,
       success: ->
-        # _this.toggleLoadMore(_this.collection)
+        _this.toggleLoadMore(_this.collection)
+        _this.dump.length = 0
+        _this.dump = _this.collection.models.slice()
+        _this.resetPageCount({selector: '.main .load-more', page: 1})
         # _this.dump.length = 0
         # _this.dump = _this.collection.models.slice()
         # _this.resetPageCount({selector: '.main .load-more', page: 1})
@@ -127,6 +143,21 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
 
     sidebar = $(@el).find(".sidebar")
     navbar_main = $(@el).find(".navbar-main")
+
+    expenses_status_ids = []
+
+    $(".sidebar .filter-expense-status-id:checked").each( ->
+      expenses_status_ids.push($(this).val())
+    )
+
+    expenses_type_ids = []
+
+    $(".sidebar .filter-expense-type-id:checked").each( ->
+      expenses_type_ids.push($(this).val())
+    )
+
+
+
     params = {
       'filter_merchant': $(".sidebar .filter-merchant").val() || ""
       'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
@@ -135,6 +166,8 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
       'filter_user_name': $(".sidebar .filter-user").val() || ""
       'filter_show_for': $(".sidebar .select-show-for").val() || ""
       'filter_analytics_type': $(navbar_main).find('li.filter-data-type.active').attr('data-show-type') || "category"
+      'filter_expense_status_id':  expenses_status_ids
+      'filter_expense_type_id': expenses_type_ids
     }
 
     # console.log "Will navigate now.", params
@@ -206,3 +239,44 @@ class FinlyF.Views.AnalyticsIndex extends Backbone.View
   changeView: (e) ->
     e.preventDefault()
     FinlyF.changeView(e)
+
+  loadMore: (e) ->
+    _this = @
+    target = $(e.currentTarget)
+    $(target).find('i').removeClass('fa-cloud-download').addClass('fa-spinner fa-pulse')
+    $(target).find('span').text('Loading....')
+    @params.page = (parseInt($(target).attr("data-page")) || 0 ) + 1
+
+    @collection.fetch({
+      data: _this.params,
+      reset: false,
+      success: ->
+        _this.toggleLoadMore(_this.collection)
+        $(target).find('i').addClass('fa-cloud-download').removeClass('fa-spinner fa-pulse')
+        $(target).find('span').text('Load More')
+        _this.resetPageCount({target: target, page: _this.params.page })
+
+        _this.dump = (_this.dump.concat(_this.collection.models.slice())).slice()
+
+        _this.collection.reset(_this.dump)
+
+      error: ->
+        console.log "Couldn't fetch Successfully."
+    })
+
+  toggleLoadMore: (collection) ->
+    # console.log "Loading", collection.models.length
+    if collection.models.length < 20
+      # console.log "Should hide"
+      $(@el).find('.load-more').css('display', 'none')
+    else
+      $(@el).find('.load-more').css('display', 'inline')
+
+  resetPageCount: (options) ->
+    if options.target
+      $(options.target).attr('data-page', options.page)
+    else if options.selector
+      $(options.selector).attr('data-page', options.page)
+    else
+      $('.main .load-more').attr('data-page', options.page)
+

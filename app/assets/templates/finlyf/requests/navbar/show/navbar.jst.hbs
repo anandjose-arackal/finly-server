@@ -3,13 +3,13 @@
     <div class="">
       <div class="col-sm-4 no-padding">
         <ul class="nav navbar-nav navbar-left">
-          <button class="btn-go-back btn btn-default btn-sm"><i class="fa fa-step-backward"></i>&nbsp;Go Back to Advance Requests</button>
+          <button class="btn-go-back btn btn-default btn-sm"><i class="fa fa-step-backward"></i>&nbsp;Go Back to Money Requests</button>
         </ul>
       </div>
       <div class="col-sm-4 text-center">
         <h4 class="item-name">
           <label class="item-attr-preview" style="margin-top: 5px;">{{item.name}}</label>
-          <input type="text" class="form-control text-center item-name-edit item-attr-edit" value="{{item.name}}" placeholder="Advance Request Name" style="font-size: 18px;font-weight: bold;" name="money_request[name]">
+          <input type="text" class="form-control text-center item-name-edit item-attr-edit" value="{{item.name}}" placeholder="Money Request Name" style="font-size: 18px;font-weight: bold;" name="money_request[name]">
         </h4>
       </div>
       <div class="col-sm-4">
@@ -36,14 +36,15 @@
           {{#if item.actions.unapprove}}
             <button class="btn btn-sm btn-danger btn-report-action" data-action-type="unapprove" data-url="{{item.actions.unapprove}}">Unapprove</button>
           {{/if}}
-
-          {{#if item.actions.reject}}
-            <button class="btn btn-sm btn-danger" data-action-type="reject" id="btnRejectRequest" data-url="{{item.actions.reject}}">Reject</button>
-          {{/if}}
+          
 
           {{#or item.actions.credit_card_from_virtual_account item.actions.credit_card_from_wallet}}
             <button class="btn btn-sm btn-success btn-approve-options">Approve</button>
           {{/or}}
+
+          {{#if item.actions.reject}}
+            <button class="btn btn-sm btn-danger" data-action-type="reject" id="btnRejectRequest" data-url="{{item.actions.reject}}">Reject</button>
+          {{/if}}
         </ul>   
       </div>
     </div>

@@ -39,7 +39,6 @@
         </select>
       </div> 
     </div> --}}
-
     <div class="row sidebar-element search_by_user">
       <div class="col-sm-12 sidebar-label">
         Search by User
@@ -49,10 +48,32 @@
         <span class="fa fa-search input-icon"></span> 
       </div>
     </div>
+
   {{/if_not_eq}}
 {{/if}}
-{{!-- {{item.filter_amount_type}} --}}
 
+<div class="row sidebar-element">
+    <div class="col-sm-12 sidebar-label">
+        Filter by Expense Status
+    </div>
+    <div class="col-sm-12">
+        <label><input type="checkbox" class="filter-expense-status-id" value="1" {{#ifIn "1" item.filter_expense_status_id }}checked="checked"{{/ifIn}}>&nbsp; Unreported</label><br />
+        <label><input type="checkbox" class="filter-expense-status-id" value="2" {{#ifIn "2" item.filter_expense_status_id }}checked="checked"{{/ifIn}}>&nbsp; Processing</label><br />
+        <label><input type="checkbox" class="filter-expense-status-id" value="3" {{#ifIn "3" item.filter_expense_status_id }}checked="checked"{{/ifIn}}>&nbsp; Approved</label><br />
+        <label><input type="checkbox" class="filter-expense-status-id" value="4" {{#ifIn "4" item.filter_expense_status_id }}checked="checked"{{/ifIn}}>&nbsp; Reimbursed</label>
+    </div>
+</div>
+
+<div class="row sidebar-element">
+    <div class="col-sm-12 sidebar-label">
+        Filter by Expense Type
+    </div>
+    <div class="col-sm-12">
+        <label><input type="checkbox" class="filter-expense-type-id" value="2" {{#ifIn "1" item.filter_expense_type_id }}checked="checked"{{/ifIn}}>&nbsp; Card</label><br />
+        <label><input type="checkbox" class="filter-expense-type-id" value="1" {{#ifIn "2" item.filter_expense_type_id }}checked="checked"{{/ifIn}}>&nbsp; Manual</label>
+    </div>
+</div>
+{{!-- {{item.filter_amount_type}} --}}
 
 <div class="row sidebar-element">
   <div class="col-sm-12 text-center">

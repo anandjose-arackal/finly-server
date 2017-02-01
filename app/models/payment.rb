@@ -22,7 +22,8 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_type
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :receiving_user, class_name: 'User'
-  has_many :reports, foreign_key: :reimbursement_id
+  has_many :reimbursed_reports, class_name: "Report", foreign_key: :reimbursement_id
+  has_many :cash_in_hand_settled_reports, class_name: "Report", foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
@@ -49,12 +50,15 @@ class Payment < ActiveRecord::Base
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
   # Personal are card transactions from own wallet to own card
-  scope :involving_user_credits, ->(user_id){ where.not('initiating_user_id != receiving_user_id AND initiating_user_id = ? AND payment_type_id IN (?)', user_id, [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
-                                                                                                                       PaymentType.id_for(:credit_from_virtual_account_to_card),
-                                                                                                                       PaymentType.id_for(:debit_from_wallet_to_virtual_account)]) }
-  scope :personal, -> { where "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
-  scope :non_personal, -> { where.not "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
-
+  # scope :involving_user_credits, ->(user_id){ where.not('initiating_user_id != receiving_user_id AND initiating_user_id = ? AND payment_type_id IN (?)', user_id, [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
+  #                                                                                                                      PaymentType.id_for(:credit_from_virtual_account_to_card),
+  #                                                                                                                      PaymentType.id_for(:debit_from_wallet_to_virtual_account)]) }
+  scope :personal, -> { where "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:debit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
+  scope :non_personal, -> { where.not "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:debit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
+  scope :non_settlement, -> {where.not("initiating_user_id = receiving_user_id AND payment_type_id IN (?)", [PaymentType.id_for(:credit_from_wallet_to_card),
+                                                                                                             PaymentType.id_for(:debit_from_wallet_to_card),
+                                                                                                             PaymentType.id_for(:credit_from_card_to_wallet),
+                                                                                                             PaymentType.id_for(:debit_from_card_to_wallet)]).where.not(payment_type_id: [PaymentType.id_for(:atm_withdrawal)])}
 
   # validates :amount_id, presence: true
   validates :date, presence: true

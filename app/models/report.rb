@@ -24,7 +24,9 @@
 #  auto_approve                 :boolean          default(FALSE), not null
 #  accounted_at                 :date
 #  approved_at                  :datetime
+#  cash_in_hand_deduction_id    :integer
 #
+
 
 
 
@@ -48,9 +50,11 @@ class Report < ActiveRecord::Base
   # Payment made as reimbursement
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursement_amount, class_name: 'Amount'
+  belongs_to :cash_in_hand_deduction, class_name: 'Payment'
+  belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
   validates :user, presence: true
-  validates :status, presence: true
+  # validates :status_id, presence: true
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
@@ -86,6 +90,9 @@ class Report < ActiveRecord::Base
   # scope for reports being shown in settlements page
   scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id, ReportStatus.reimbursement_confirmed_id]}
 
+  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+  scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
   scope :filter_report_id, ->(id) { where(id: id) }
@@ -116,6 +123,7 @@ class Report < ActiveRecord::Base
   before_destroy :clear_expenses
 
   attr_accessor :cache_users
+
 
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"

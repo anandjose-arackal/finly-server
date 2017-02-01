@@ -181,6 +181,18 @@ if CardType.count == 0
   CardType.create(id: 2, name: 'Virtual')
 end
 
+if ProductCombination.count == 0
+  ProductCombination::TYPES.each do |type|
+    ProductCombination.create(name: type)
+  end
+end
+
+if ChannelType.count == 0
+  ChannelType::TYPES.each do |k, v|
+    ChannelType.create(name: ChannelType::NAMES[v], abbreviation: k.to_s.upcase)
+  end
+end
+
 ##########################
 
 if Amount.count == 0
@@ -231,14 +243,32 @@ if User.count == 0
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
+  ##############################################################################################################################################
+  ## User's for Venky's iOS testing
+  v = []
+  v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   mothers_maiden_name: Faker::Name.first_name,
+                   role_mapping_attributes: [{user_role_id: UserRole.manager_id},{user_role_id: UserRole.employee_id}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+
+  v << User.create(company: Company.first, first_name: "Finly", last_name: "Finance", email: "finance4@finlytest.io",
+                   password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+                   mothers_maiden_name: Faker::Name.first_name,
+                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}],
+                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+
+  ##############################################################################################################################################
+
   u = []
 
   # creating user0
   u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@finlytest.io",
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: 4},
-                                             {user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                    team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
@@ -247,12 +277,23 @@ if User.count == 0
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@finlytest.io",
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
-                     role_mapping_attributes: [{user_role_id: 4},
-                                               {user_role_id: UserRole.employee_id}],
+                     role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
+
+  ########################## Employee for Venky's testing ################################################################################
+  User.create(company: Company.first, first_name: "Finly", last_name: "Employee", email: "kaley@finlytest.io",
+              password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
+              mothers_maiden_name: Faker::Name.first_name,
+              role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
+                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
+              team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
+              profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
+                                   address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+############################################################################################################################################
+
 
   User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
               password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
@@ -310,12 +351,6 @@ if Expense.count == 0
 
 end
 
-# if Receipt.count == 0
-#   receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-#                            user_id: 1)
-#   receipt.parent = Expense.where(user_id: 1).where(expense_type_id: 1).first
-#   receipt.save
-# end
 
 p = Policy.find(3)
 if p.rules_count == 0
@@ -341,7 +376,7 @@ if p.rules_count == 0
                              rule_type_id: 2)
 end
 
-# if Report.count == 0
+if Report.count == 0
 
   c.users.all.each do |user|
 
@@ -403,19 +438,10 @@ end
       end
     end
   end
-# end
+end
 
 unless Rails.env.production?
   if Card.count == 0
-    # Company.all.each do |company|
-    #   5.times do
-    #     number = random_mobile_number
-    #     company.cards.create(proxy: number, ending_number: '1234', description: 'Unassigned company card',
-    #                          product_code: 'NGPRHD',
-    #                          card_type_id: random_integer(1, 3))
-    #   end
-    # end
-
     User.all.each do |user|
       if user.id < 9
         number = "S0001774009#{(user.id - 1)}"
@@ -432,9 +458,9 @@ unless Rails.env.production?
       card = user.cards.first
       20.times do
 
-        trans_types = ["POS", "ATM", "Ecom"]
+        trans_types = ["POS", "Ecom"]
         trans_modes = ["Debit", "Credit"]
-        from_date = DateTime.parse("01-07-2016 12:00:00")
+        from_date = DateTime.parse("01-01-2017 12:00:00")
         to_date = DateTime.now
         random_amount = random_integer(50, 200) + 0.1234
         sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
