@@ -50,4 +50,8 @@ class ProductCombination < ActiveRecord::Base
     TYPES[id-1]
   end
 
+  def product_code_name
+    self.name
+  end
+
 end

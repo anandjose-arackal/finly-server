@@ -58,6 +58,15 @@ class ItzCash::CardRestriction < ItzCash::Base
     ItzCash::CardRestriction::SuccessPresenter.new(user, params, messages)
   end
 
+  def failure
+    if response_code.present? and not response_code.to_i == 0 and messages[:error].blank?
+      error_message = parsed_response[3] rescue nil
+      error_message = 'Unknown error while performing the action' if error_message.blank?
+      add_message :error, error_message
+    end
+    super
+  end
+
   class ItzCash::CardRestriction::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :limit_type, :description
 

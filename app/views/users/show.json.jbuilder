@@ -142,6 +142,7 @@ json.restrictions do
   json.channel_atm @result.card_restriction.channel_atm
   json.channel_ecom_pos @result.card_restriction.channel_ecom_pos
   json.product_code_id @result.card_restriction.product_code_id
+  json.product_code_name @result.card_restriction.product_code_name rescue nil
   json.product_codes do
     json.array! @result.product_codes.each do |product_code|
       json.extract! product_code, :id, :name

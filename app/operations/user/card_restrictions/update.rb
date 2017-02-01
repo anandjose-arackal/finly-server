@@ -68,7 +68,7 @@ class User::CardRestrictions::Update < User::Base
         add_message :error, card_restriction.errors.full_messages
       end
     else
-      add_message :error, "We're facing connectivity issues. Please try again after some time"
+      add_message :error, "We're facing connectivity issues. Please try again after some time" if messages[:error].empty?
       # reset all card limits
       reset_card_limits
     end
@@ -170,7 +170,10 @@ class User::CardRestrictions::Update < User::Base
                     channel_type: "ATM", channel_type_allowed: "N"}
     end
     restriction_api = ItzCash::CardRestriction.(selected_user, api_params)
-    return false unless restriction_api
+    unless restriction_api.success?
+      add_message :error, restriction_api.messages[:error]
+      return false
+    end
     # Setting the pos/atm restriction parameters
     if ecom_pos_enabled && ecom_pos_limits_present?
       daily_amount = ecom_pos_limit_params[0][:budget].to_i || 0
@@ -195,7 +198,10 @@ class User::CardRestrictions::Update < User::Base
                     channel_type: "POS", channel_type_allowed: "N"}
     end
     restriction_api = ItzCash::CardRestriction.(selected_user, api_params)
-    return false unless restriction_api
+    unless restriction_api.success?
+      add_message :error, restriction_api.messages[:error]
+      return false
+    end
     update_params.delete(:limits)
     true
   end
