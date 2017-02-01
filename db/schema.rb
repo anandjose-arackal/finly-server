@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170131080409) do
+ActiveRecord::Schema.define(version: 20170131194554) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -143,13 +143,13 @@ ActiveRecord::Schema.define(version: 20170131080409) do
 
   create_table "card_limits", force: :cascade do |t|
     t.integer  "card_restriction_id", limit: 4
-    t.integer  "transaction_limit",   limit: 4
+    t.integer  "transactions",        limit: 4
     t.integer  "period_id",           limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-    t.integer  "budget_id",           limit: 4
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.decimal  "budget",                        precision: 10
     t.integer  "limit_type_id",       limit: 4
-    t.boolean  "enabled"
+    t.boolean  "allowed"
   end
 
   add_index "card_limits", ["card_restriction_id"], name: "index_card_limits_on_card_restriction_id", using: :btree
@@ -950,7 +950,7 @@ ActiveRecord::Schema.define(version: 20170131080409) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-01-31', null: false
+    t.date     "date_of_birth",                   default: '2017-02-01', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

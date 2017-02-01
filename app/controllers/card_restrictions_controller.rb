@@ -6,11 +6,12 @@ class CardRestrictionsController < ApplicationController
 
   def update
     @result = User::CardRestrictions::Update.(current_user, params)
-    if @result.success?
-      flash[:success] = @result.messages[:success].to_sentence
-    else
-      flash[:error] = @result.messages[:error].to_sentence
-    end
+    # if @result.success?
+    #   flash[:success] = @result.messages[:success].to_sentence
+    # else
+    #   flash[:error] = @result.messages[:error].to_sentence
+    # end
+    respond
   end
 
   def destroy

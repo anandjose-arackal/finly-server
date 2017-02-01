@@ -139,12 +139,8 @@ json.periods do
 end
 
 json.restrictions do
-  json.channel_atm do
-    json.enabled @result.card_restriction.channel_atm
-  end
-  json.channel_ecom_pos do
-    json.enabled @result.card_restriction.channel_ecom_pos
-  end
+  json.channel_atm @result.card_restriction.channel_atm
+  json.channel_ecom_pos @result.card_restriction.channel_ecom_pos
   json.product_code_id @result.card_restriction.product_code_id
   json.product_codes do
     json.array! @result.product_codes.each do |product_code|
@@ -157,9 +153,9 @@ json.restrictions do
         json.id limit.id
         json.period_id limit.period_id
         json.period_name limit.period_name rescue nil
-        json.budget limit.budget_value rescue nil
-        json.transactions limit.transaction_limit
-        json.enabled limit.enabled
+        json.budget limit.budget
+        json.transactions limit.transactions
+        json.enabled limit.allowed
       end
     end
     json.ecom_pos_limits do
@@ -167,9 +163,9 @@ json.restrictions do
         json.id limit.id
         json.period_id limit.period_id
         json.period_name limit.period_name rescue nil
-        json.budget limit.budget_value rescue nil
-        json.transactions limit.transaction_limit
-        json.enabled limit.enabled
+        json.budget limit.budget
+        json.transactions limit.transactions
+        json.enabled limit.allowed
       end
     end
   end

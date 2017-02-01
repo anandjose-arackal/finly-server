@@ -22,13 +22,14 @@ class ItzCash::CardRestriction < ItzCash::Base
   def init
     super()
     self.card = user.cards.first
-    self.restriction_type = params[:channel_type_allowed]
+    self.restriction_type = params[:channel_type_allowed] # will always contain Y/N/I
     self.day_trans_limit = (params[:dailycount] > 0) ? params[:dailycount] : [params[:weeklycount], params[:monthlycount]].max.ceil
-    self.day_amount_limit = (params[:dailyamount] > 0) ? params[:dailyamount] : [[:weeklyamount], params[:monthlyamount]].max.ceil
-    self.week_trans_limit = (params[:weeklycount] > 0) ? params[:weeklycount] : [params[:dailycount]*7, params[:monthlyamount]].max.ceil
-    self.week_amount_limit = (params[:weeklyamount] > 0) ? params[:weeklyamount] : [[:dailyamount]*7, params[:monthlyamount]].max.ceil
-    self.month_trans_limit = (params[:monthlycount] > 0) ? params[:monthlycount] : [params[:dailycount]*32, params[:weeklycount]*5].max.ceil
-    self.month_amount_limit = (params[:monthlyamount] > 0) ? params[:monthlyamount] : [[:dailyamount]*32, params[:weeklyamount]*5].max.ceil
+    self.day_amount_limit = (params[:dailyamount] > 0) ? params[:dailyamount] : [params[:weeklyamount], params[:monthlyamount]].max.ceil
+    self.week_trans_limit = (params[:weeklycount] > 0) ? params[:weeklycount] : [params[:dailycount].to_i*7, params[:monthlyamount]].max.ceil
+    self.week_amount_limit = (params[:weeklyamount] > 0) ? params[:weeklyamount] : [params[:dailyamount].to_i*7, params[:monthlyamount]].max.ceil
+    self.month_trans_limit = (params[:monthlycount] > 0) ? params[:monthlycount] : [params[:dailycount].to_i*32, params[:weeklycount].to_i*5].max.ceil
+    self.month_amount_limit = (params[:monthlyamount] > 0) ? params[:monthlyamount] : [params[:dailyamount].to_i*32, params[:weeklyamount].to_i*5].max.ceil
+    post_initialize
   end
 
   def post_params
@@ -40,11 +41,11 @@ class ItzCash::CardRestriction < ItzCash::Base
   end
 
   def validate
-    if params[:limits][:dailyamount] < 0 || params[:limits][:monthlycount] < 0 || params[:limits][:weeklyamount] < 0
+    if params[:dailyamount] < 0 || params[:monthlycount] < 0 || params[:weeklyamount] < 0
       add_message :error, "Amount cannot be negative"
       return
     end
-    if params[:limits][:dailycount] < 0 || params[:limits][:weeklycount] < 0 || params[:limits][:monthlycount] < 0
+    if params[:dailycount] < 0 || params[:weeklycount] < 0 || params[:monthlycount] < 0
       add_message :error, "Number of transactions can not be negative"
     end
   end
@@ -64,8 +65,19 @@ class ItzCash::CardRestriction < ItzCash::Base
       self.response_code = params[:response_code]
       self.serial_id = params[:serial_id]
       self.limit_type = params[:limit_type]
-      self.description = :params[:description]
+      self.description = params[:description]
     end
+  end
+
+  private
+
+  def post_initialize
+    self.day_trans_limit = Constants::ItzCash::RESTRICTION_CONSTANT if day_trans_limit == 0
+    self.day_amount_limit = Constants::ItzCash::RESTRICTION_CONSTANT if day_amount_limit == 0
+    self.week_trans_limit = Constants::ItzCash::RESTRICTION_CONSTANT if week_trans_limit == 0
+    self.week_amount_limit = Constants::ItzCash::RESTRICTION_CONSTANT if week_amount_limit == 0
+    self.month_trans_limit = Constants::ItzCash::RESTRICTION_CONSTANT if month_trans_limit == 0
+    self.month_amount_limit = Constants::ItzCash::RESTRICTION_CONSTANT if month_amount_limit == 0
   end
 
 end

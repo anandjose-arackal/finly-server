@@ -97,6 +97,7 @@ class BaseHandler
     p = self.path
     param = self.post_params
     return unless p.present?
+
     begin
       self.response = self.connection.post p, param
       puts "response : #{self.response.body}"
