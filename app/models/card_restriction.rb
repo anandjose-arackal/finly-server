@@ -16,7 +16,7 @@
 class CardRestriction < ActiveRecord::Base
   belongs_to :user
 
-  belongs_to :product_code, class_name: "ProductCombination"
+  belongs_to :mcc_group
 
   has_many :card_limits
 
