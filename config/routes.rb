@@ -408,6 +408,8 @@
 #                             user_profile GET        /users/:user_id/profile(.:format)                           users#profile
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
+#           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
+#                              user_lookup GET        /users/:user_id/lookup(.:format)                            users#lookup
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -535,7 +537,10 @@ Rails.application.routes.draw do
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
 
-  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"}
+  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
+    # get 'login', to: 'sessions#new', as: :login
+    # post 'login', to: 'session#create', as: :login
+  end
 
   namespace :api do
     namespace :v0 do
@@ -699,6 +704,8 @@ Rails.application.routes.draw do
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
+    get 'lookup', to: 'users#lookup', as: :lookup
+
   end
 
   # routes for testing import
