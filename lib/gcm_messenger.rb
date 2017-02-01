@@ -47,11 +47,17 @@ class GcmMessenger
     type_id = nil
     view = nil
     case params[:event_id]
-      when NotifierType.report_submit_id, NotifierType.report_approve_id, NotifierType.report_retract_id,
-          NotifierType.report_reject_id, NotifierType.report_comment_id, NotifierType.report_reject_expense_id,
-          NotifierType.report_take_control_id, NotifierType.report_reimbursed_id
+      when NotifierType.id_for(:report_submit), NotifierType.id_for(:report_approve), NotifierType.id_for(:report_retract),
+          NotifierType.id_for(:report_reject), NotifierType.id_for(:report_comment), NotifierType.id_for(:report_reject_expense),
+          NotifierType.id_for(:report_take_control), NotifierType.id_for(:report_reimbursed)
         type = 'report'
         type_id = params[:report_id]
+        view = params[:view]
+      when NotifierType.id_for(:money_request_submit), NotifierType.id_for(:money_request_approve), NotifierType.id_for(:money_request_retract),
+          NotifierType.id_for(:money_request_reject), NotifierType.id_for(:money_request_comment), NotifierType.id_for(:unapprove),
+          NotifierType.id_for(:money_request_take_control)
+        type = 'money_request'
+        type_id = params[:money_request_id]
         view = params[:view]
       else
     end
