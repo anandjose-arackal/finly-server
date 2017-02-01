@@ -29,7 +29,7 @@ class ItzCash::CardRestriction < ItzCash::Base
     self.week_amount_limit = (params[:weeklyamount] > 0) ? params[:weeklyamount] : [params[:dailyamount].to_i*7, params[:monthlyamount]].max.ceil
     self.month_trans_limit = (params[:monthlycount] > 0) ? params[:monthlycount] : [params[:dailycount].to_i*32, params[:weeklycount].to_i*5].max.ceil
     self.month_amount_limit = (params[:monthlyamount] > 0) ? params[:monthlyamount] : [params[:dailyamount].to_i*32, params[:weeklyamount].to_i*5].max.ceil
-    post_initialize
+    post_initialize # this sets the limits to arbitrarily high values if they're not present
   end
 
   def post_params

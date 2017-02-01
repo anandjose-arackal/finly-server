@@ -142,7 +142,7 @@ class User::CardRestrictions::Update < User::Base
     # if card_restriction_params[:product_code_id].present?
     api_params = {}
     api_params[:serial_id] = selected_card.proxy
-    api_params[:product_code_id] = card_restriction_params[:product_code_id]
+    api_params[:product_code] = card_restriction_params[:product_code_id]
     api_params[:current_product_code] = selected_card.product_code
     # product_code_api = ItzCash::SetProductCode.(selected_user, api_params)
     # return false unless product_code_api.success?

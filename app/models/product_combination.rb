@@ -37,6 +37,11 @@ class ProductCombination < ActiveRecord::Base
       'Healthcare'
   ]
 
+  # todo - to be remapped once the new combinations are received from ItzCash
+  CODES = {1 => 'GPRESC',
+           2 => 'GPROL1',
+           3 => 'GPROL2'}
+
   def self.id_for(name)
     VALUES[name]
   end
