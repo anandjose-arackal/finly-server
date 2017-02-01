@@ -409,6 +409,7 @@
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
 #           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
+#                              user_lookup GET        /users/:user_id/lookup(.:format)                            users#lookup
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new

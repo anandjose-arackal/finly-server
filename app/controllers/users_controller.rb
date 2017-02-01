@@ -130,8 +130,8 @@ class UsersController < ApplicationController
   def lookup
     respond_to do |format|
       format.json {
-        @result = {messages: {error: "User not found"}}
-        @result = {messages: {error: "Your account has been deactivated"}}
+        @result = {messages: {error: ["User not found"]}}
+        @result = {messages: {error: ["Your account has been deactivated"]}}
         respond_with success: true, verified: false
       }
     end
