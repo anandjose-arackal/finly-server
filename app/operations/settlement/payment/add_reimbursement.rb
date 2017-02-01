@@ -76,8 +76,10 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
       return
     end
 
+    payment_date = Date.parse(payment_params[:date])
     # validating that the money deducted from cash in hand is actually less than the cash in hand on date of reimbursement
-    cash_in_hand = to_user.cash_in_hand(payment_params[:date]).value rescue 0
+    cash_in_hand = to_user.cash_in_hand(payment_date).value rescue 0
+
     if precision_value(cash_in_hand_deduction_amount) > precision_value(cash_in_hand)
       add_message :error, "You cannot deduct more cash than the employee has on #{payment_params[:date].to_s}"
     end
