@@ -29,6 +29,42 @@
 @import "bootstrap-sprockets";
 
 
+
+// New Login Screen
+.login-container{
+  background: white;
+  width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  min-height: 250px;
+  transition: max-height 0.5 ease;
+
+  .btn{
+    border-radius: 2px;
+  }
+
+  .user-image{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+    width: 100px;
+
+    img{
+      width: 100%;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
 // Oh snap codes
 
 .alert-red {

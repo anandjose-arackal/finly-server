@@ -20,9 +20,11 @@
 //= require handlebars.runtime
 //= require ohsnap.min
 //= require drift-chat
+//= require devise/login
 //// require_tree .
 
 // NProgress.configure({
 //     showSpinner: false,
 // });
+
 
