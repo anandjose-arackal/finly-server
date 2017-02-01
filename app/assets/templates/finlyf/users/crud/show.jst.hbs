@@ -218,9 +218,13 @@
                         <div class="col-sm-8">
                           <div class="col-sm-6">
                             <label class="item-attr-preview">
-                              {{item.restrictions.product_code.name}}
+                              {{#if item.restrictions.product_code_name}}
+                                {{item.restrictions.product_code_name}}
+                              {{else}}
+                                --
+                              {{/if}}
                             </label>
-                            <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code.id}}"
+                            <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code_id}}">
                               <option value="">None</option>
                               {{#each item.restrictions.product_codes}}
                                 <option value="{{this.id}}">{{this.name}}</option>
@@ -235,9 +239,9 @@
                           <label>Available Channels:</label>
                         </div>
 
-                        <div class="section-card col-sm-11 col-sm-offset-1 no-padding">
+                        <div class="section-card col-sm-11 col-sm-offset-1 no-padding channel-container">
                           <div class="row no-margin section-header">
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                               <label class="item-attr-preview">
                                 {{#if item.restrictions.channel_atm}}
                                   <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
@@ -246,21 +250,21 @@
                                 {{/if}}
                                 &nbsp;<span>ATM</span>
                               </label>
-                              <span class="item-attr-edit">&nbsp;&nbsp;&nbsp;ATM</span>
                               <label class="item-attr-edit finly-switch">
                                 <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />
                                 <div class="finly-slider round"></div>
                               </label>
+                              <h4 class="item-attr-edit" style="position: relative;top: -7px;">&nbsp;&nbsp;&nbsp;ATM</h4>
                             </div>
 
-                            <div class="col-sm-6">
+                            <div class="col-sm-8" style="margin-top: 10px;">
                               <p>Any transactions involving ATM.</p>
                             </div>
                           </div>
 
-                           <div class="row no-margin channel-container">
-                            {{!-- <div class="col-sm-10 col-sm-offset-2 channel-limits" style="{{#unless item.restrictions.channel_atm}}display: none;{{/unless}}"> --}}
-                            <div class="col-sm-10 col-sm-offset-2 channel-limits">
+                          <div class="row no-margin">
+                            <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_atm}}display: none;{{/unless}}">
+                            {{!-- <div class="col-sm-10 col-sm-offset-2 channel-limits"> --}}
                               {{#each item.restrictions.limits.atm_limits}}
                                 <input type="hidden" name="restrictions[limits][atm_limits][{{@index}}][id]" value="{{this.id}}">
                                 <div class="col-sm-12">
@@ -278,8 +282,8 @@
 
                                     <div class="col-sm-2">Budget</div>
                                     <div class="col-sm-2">
-                                      <label class="item-attr-preview">{{#if this.amount}}{{this.amount}}{{else}}--{{/if}}</label>
-                                      <input class="item-attr-edit form-control" type="number" name="restrictions[limits][atm_limits][{{@index}}][budget]" value="{{this.amount}}">
+                                      <label class="item-attr-preview">{{#if this.budget}}{{this.budget}}{{else}}--{{/if}}</label>
+                                      <input class="item-attr-edit form-control" type="number" name="restrictions[limits][atm_limits][{{@index}}][budget]" value="{{this.budget}}">
                                     </div>
                                   </div>
                                 </div>
@@ -288,9 +292,9 @@
                           </div>
                         </div>
                         
-                        <div class="section-card col-sm-11 col-sm-offset-1 no-paddign">
+                        <div class="section-card col-sm-11 col-sm-offset-1 no-padding channel-container">
                           <div class="section-header row no-margin">
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                               <label class="item-attr-preview">
                                 {{#if item.restrictions.channel_ecom_pos}}
                                   <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
@@ -299,21 +303,21 @@
                                 {{/if}}
                                 &nbsp;<span>E-Commerce/POS</span>
                               </label>
-                              <span class="item-attr-edit">&nbsp;&nbsp;&nbsp;E-Commerce/POS</span>
                               <label class="item-attr-edit finly-switch">
                                 <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_ecom_pos}}checked="checked"{{/if}} name="restrictions[channel_ecom_pos]" value="1" />
                                 <div class="finly-slider round"></div>
                               </label> 
+                              <h4 class="item-attr-edit" style="position: relative;top: -7px;">&nbsp;&nbsp;&nbsp;E-Commerce/POS</h4>
                             </div> 
 
-                            <div class="col-sm-6">
-                              <p>Any transactions done online or Point of Sell</p>
+                            <div class="col-sm-8" style="margin-top: 10px;">
+                              <p>Any transactions done online or through transaction machine.</p>
                             </div>
                           </div>
 
-                          <div class="row no-margin channel-container">
-                            {{!-- <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_ecom_pos}}display: none;{{/unless}}"> --}}
-                            <div class="col-sm-12 channel-limits">
+                          <div class="row no-margin">
+                            <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_ecom_pos}}display: none;{{/unless}}">
+                            {{!-- <div class="col-sm-12 channel-limits"> --}}
                               {{#each item.restrictions.limits.ecom_pos_limits}}
                                 <input type="hidden" name="restrictions[limits][ecom_pos_limits][{{@index}}][id]" value="{{this.id}}">
                                 <div class="col-sm-12">
@@ -331,8 +335,8 @@
 
                                     <div class="col-sm-2">Budget</div>
                                     <div class="col-sm-2">
-                                      <label class="item-attr-preview">{{#if this.amount}}{{this.amount}}{{else}}--{{/if}}</label>
-                                      <input class="item-attr-edit form-control" type="number" name="restrictions[limits][ecom_pos_limits][{{@index}}][budget]" value="{{this.amount}}">
+                                      <label class="item-attr-preview">{{#if this.budget}}{{this.budget}}{{else}}--{{/if}}</label>
+                                      <input class="item-attr-edit form-control" type="number" name="restrictions[limits][ecom_pos_limits][{{@index}}][budget]" value="{{this.budget}}">
                                     </div>
                                   </div>
                                 </div>
