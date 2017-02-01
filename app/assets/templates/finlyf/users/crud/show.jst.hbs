@@ -1,280 +1,22 @@
 <div class="row-no-margin" style="height: 100%;">
   <div class="col-sm-2 no-padding" style="position: fixed; z-index: 1;">
     <ul class="nav nav-tabs user-tab-panes">
-      <li class="active"><a href="#tab-user-details" data-toggle="tab">Details</a></li>
-      <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
-      <li><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Account &amp; Cards</a></li>
-      {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
+      <li class="active"><a href="#tab-user-wallet-cards" data-toggle="tab">Finly Money &amp; Cards</a></li>
       <li><a href="#tab-user-policies" data-toggle="tab">Policies</a></li>
       <li><a href="#tab-user-auto-submit-report" data-toggle="tab">Auto Submit</a> </li>
+      <li><a href="#tab-user-roles" data-toggle="tab">Roles</a></li>
+      <li><a href="#tab-user-details" data-toggle="tab">Details</a></li>
+      {{!-- <li><a href="#tab-user-cards" data-toggle="tab">Cards</a></li> --}}
     </ul>
   </div>
 
   <div class="col-sm-10 col-sm-offset-2 no-padding" style="height: 100%; z-index: 1; background: #fff; box-shadow: 0 0 30px 0 rgba(0,0,0,.1);">
     <div class="tab-content">
-      <div class="tab-pane active" id="tab-user-details">
-        <section class="user-info">
-          <div class="section-card">
-            <div class="row no-margin section-header">
-              <div class="col-sm-6">
-                <h4>User Info</h4>
-              </div>
-              {{#if item.user.editable}}
-                <div class="col-sm-6 text-right">
-                  {{#if item.actions.delete_invite}}
-                    <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
-                  {{/if}}
-                  {{#if item.actions.resend_invite}}
-                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="false" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
-                  {{/if}}
-                  {{#if item.actions.deactivate}}
-                    <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
-                  {{/if}}
-                  {{#if item.actions.activate}}
-                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
-                  {{/if}}
-                  {{#if item.user.activateable}}
-                    <button class="btn btn-sm btn-success btn-active-employee">Register User</button>
-                  {{/if}}
-                </div>
-              {{/if}}
-            </div>
-            <div class="row no-margin">
-              <div class="col-sm-8">
-                <form class="form-user-info">
-                  <div class="row">
-                    <div class="col-sm-3">Name</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{item.user.name}}</label>
-                      <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.user.name}}" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Email</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{item.user.email}}</label>
-                      <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.user.email}}" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Mobile</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">
-                        {{#if item.user.mobile_number}}
-                          {{item.user.mobile_number}}
-                        {{else}}
-                          Not Set
-                        {{/if}}
-                      </label>
-                      <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.user.mobile_number}}" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Gender</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">
-                        {{#if item.user.gender}}
-                          {{#if_eq item.user.gender 'm'}}Male{{else}}Female{{/if_eq}}
-                        {{else}}
-                          --
-                        {{/if}}
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Address</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">
-                        {{#if item.user.address}}
-                          {{item.user.address}}
-                        {{else}}
-                          --
-                        {{/if}}
-                      </label>
-                    </div>
-                  </div>
-
-                  <input type="hidden" name="type" value="details">
-                </form>
-              </div>
-            </div>
-          </div>
-          
-          
-        </section>
-      </div>
-      <div class="tab-pane" id="tab-user-roles">
-        <section class="user-roles">
-          <div class="section-card">
-            <div class="row no-margin section-header">
-              <div class="col-sm-6">
-                <h4>User Roles</h4>
-              </div>
-              <div class="col-sm-6 text-right">
-              {{#if item.user.editable}}
-                <button class="btn btn-sm btn-warning btn-edit-user" data-refresh-page="true"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
-              {{/if}}
-              </div>
-            </div> 
-            <div class="row no-margin" style="padding-bottom: 20px;">
-              <div class="col-sm-8">
-                <form class="form-user-roles">
-                
-                  <div class="row">
-                    <div class="col-sm-3">Admin?</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
-
-                      {{#if item.role.editable.admin}}
-
-                        {{#if item.role.admin}}
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
-                          </label>
-                        {{/if}}
-
-                      {{else}}
-
-                        {{#if item.role.admin}}
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
-                          </label>
-                        {{/if}}
-
-                      {{/if}}
-
-                      
-                      
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Manager?</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
-
-                      {{#if item.role.editable.manager}}
-                        {{#if item.role.manager}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{else}}
-
-                        {{#if item.role.manager}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{/if}}
-                      
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-sm-3">Finance Manager?</div>
-                    <div class="col-sm-9">
-                      <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
-
-                      {{#if item.role.editable.finance_manager}}
-
-                        {{#if item.role.finance_manager}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{else}}
-
-                        {{#if item.role.finance_manager}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
-                          </label>
-                        {{else}}
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
-                          </label>
-                          <label class="item-attr-edit">
-                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
-                          </label>
-                        {{/if}}
-
-                      {{/if}}
-                      
-                    </div>
-                  </div>
-
-                  <input type="hidden" name="type" value="role">
-                </form>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="tab-pane" id="tab-user-wallet-cards">
+      <div class="tab-pane active" id="tab-user-wallet-cards">
         <section class="user-wallet" style="">
           <div class="section-card">
             <div class="row no-margin section-header">
-              <div class="col-sm-6"><h4>Finly Account</h4></div>
+              <div class="col-sm-6"><h4>Finly Money</h4></div>
             </div>
             <div class="row ">
               <div class="col-sm-6">
@@ -297,7 +39,7 @@
                         <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_virtual_account}}" data-action-type="credit_wallet_from_virtual_account">From Company Credits</a> </li>
                       {{/if}}
                       {{#if item.actions.credit_wallet_from_wallet}}
-                        <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Finly Account</a> </li>
+                        <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">From Your Finly Money</a> </li>
                       {{/if}}
                       {{#if item.actions.credit_wallet_from_card}}
                         <li><a class="btn-card-action" data-url="{{item.actions.credit_wallet_from_card}}" data-action-type="credit_wallet_from_card">From Your Card</a> </li>
@@ -317,7 +59,7 @@
                         <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_virtual_account}}" data-action-type="debit_wallet_to_virtual_account">To Company Credits</a> </li>
                       {{/if}}
                       {{#if item.actions.debit_wallet_to_wallet}}
-                        <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Finly Account</a> </li>
+                        <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_wallet}}" data-action-type="debit_wallet_to_wallet">To Your Finly Money</a> </li>
                       {{/if}}
                       {{#if item.actions.debit_wallet_to_card}}
                         <li><a class="btn-card-action" data-url="{{item.actions.debit_wallet_to_card}}" data-action-type="debit_wallet_to_card">To Your Card</a> </li>
@@ -338,109 +80,274 @@
               <div class="col-sm-6"><h4 style="margin-bottom: 20px;">Assigned Cards</h4></div>
             </div>
 
-            <div class="row no-margin" style="padding-bottom: 15px;">
-              <div class="col-sm-6">
-                <div class="card text-center">
-                  <div class="logo">Finly</div>
-                  <div class="status">
-                    {{#if item.card.active}}
-                      <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71; cursor: default;"></i>&nbsp;&nbsp;<span>Active</span></label>
-                    {{else}}
-                      <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c; cursor: default;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
-                    {{/if}}
-                  </div>
-                  <div class="card-type">Expense Card</div>
-                  <div class="card-number">
-                    <span class="first-four">XXXX</span>
-                    <span class="second-four">XXXX</span>
-                    <span class="third-four">XXXX</span>
-                    <span class="fourth-four">{{item.card.ending_number}}</span>
-                  </div>
-                  <div class="user-name">{{item.user.name}}</div>
-                  <div class="visa"><i class="fa fa-cc-visa" style="cursor: default;"></i></div>
-                  
-                </div>
-              </div>
-
-              <div class="col-sm-6 card-actions">
-                <div class="row" style="margin-bottom: 25px;">
-                  <div class="col-sm-3" style="font-size: 16px;">
-                    Status:
-                  </div>
-                  <div class="col-sm-9" style="margin-top: -5px; font-size: 16px;">
-                    {{#if item.card.active}}
-                      <label class="control-label">Active</label>
-                    {{else}}
-                      <label class="control-label">Blocked</label>
-                    {{/if}}
-
-                    {{#if item.actions.deactivate_card}}
-                    &nbsp;&nbsp;&nbsp; <button class="btn btn-sm btn-danger btn-card-update-status no-margin" data-card-status-type="0">Block</button>
-                    {{/if}}
-                    {{#if item.actions.activate_card}}
-                    &nbsp;&nbsp;&nbsp;<button class="btn btn-sm btn-success btn-card-update-status no-margin" data-card-status-type="1">Unblock</button>
-                    {{/if}}
-                  </div>
-                </div>
-                <div class="row" style="margin-bottom: 25px;">
-                  <div class="col-sm-3" style="font-size: 16px;">
-                    Actions: 
-                  </div>
-                  <div class="col-sm-9">
-                    {{#if item.card.active}}
-                      {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
-                        <div class="dropdown">
-                          <button class="btn btn-sm btn-success" style="margin: 0;" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            Credit
-                            <span class="caret"></span>
-                          </button>
-
-                          <ul class="dropdown-menu" aria-labelledby="dLabel">
-                            {{#if item.actions.credit_card_from_card}}
-                              <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_card}}" data-action-type="credit_card_from_card">From Your Card</a> </li>
-                            {{/if}}
-                            {{#if item.actions.credit_card_from_virtual_account}}
-                              <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
-                            {{/if}}
-                            {{#if item.actions.credit_card_from_wallet}}
-                              <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Finly Account</a> </li>
-                            {{/if}}
-                          </ul>
-                        </div>
-
-                        <div class="dropdown">
-                          <button class="btn btn-sm btn-success" style="margin: 0;" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            Debit
-                            <span class="caret"></span>
-                          </button>
-
-                          <ul class="dropdown-menu" aria-labelledby="dLabel">
-                            {{#if item.actions.debit_card_to_card}}
-                              <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_card}}" data-action-type="debit_card_to_card">To Your Card</a> </li>
-                            {{/if}}
-                            {{#if item.actions.debit_card_to_wallet}}
-                              <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_wallet}}" data-action-type="debit_card_to_wallet">To Your Finly Account</a> </li>
-                            {{/if}}
-                            {{#if item.actions.debit_card_to_virtual_account}}
-                              <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_virtual_account}}" data-action-type="debit_card_to_virtual_account">To Company Credits</a> </li>
-                            {{/if}}
-                          </ul>
-                        </div>
-                      {{/ifCond}} 
-                    {{else}}
-                      <button class="btn btn-sm btn-success" disabled="disabled">Credit <span class="caret"></span></button>
-                      (Blocked by {{item.card.disabled_by.name}})
-                    {{/if}}
-                  </div>
-                </div>
-                <div class="row" style="margin-bottom: 25px;">
-                  <div class="col-sm-3" style="font-size: 16px;">
-                    Balance: 
-                  </div>
-                  <div class="col-sm-9" style="font-size: 16px;">
-                    <div class="card-balance">
-                      <label class="balance currency">&nbsp;</label>&nbsp;&nbsp;&nbsp;<i style="color: #4CAF50;" class="fa fa-refresh btn-card-request-balance"></i>
+            <div class="row no-margin bs-callout bs-callout-primary" style="padding-bottom: 15px;">
+              <div class="col-sm-12 no-padding">
+                <div class="col-sm-6">
+                  <div class="card text-center">
+                    <div class="logo">Finly</div>
+                    <div class="status">
+                      {{#if item.card.active}}
+                        <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71; cursor: default;"></i>&nbsp;&nbsp;<span>Active</span></label>
+                      {{else}}
+                        <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c; cursor: default;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
+                      {{/if}}
                     </div>
+                    <div class="card-type">Expense Card</div>
+                    <div class="card-number">
+                      <span class="first-four">XXXX</span>
+                      <span class="second-four">XXXX</span>
+                      <span class="third-four">XXXX</span>
+                      <span class="fourth-four">{{item.card.ending_number}}</span>
+                    </div>
+                    <div class="user-name">{{item.user.name}}</div>
+                    <div class="visa"><i class="fa fa-cc-visa" style="cursor: default;"></i></div>
+                  </div>
+                </div>
+
+                <div class="col-sm-6 card-actions">
+                  <div class="row" style="margin-bottom: 25px;">
+                    <div class="col-sm-3" style="font-size: 16px;">
+                      Status:
+                    </div>
+                    <div class="col-sm-9" style="margin-top: -5px; font-size: 16px;">
+                      {{#if item.card.active}}
+                        <label class="control-label">Active</label>
+                      {{else}}
+                        <label class="control-label">Blocked</label>
+                      {{/if}}
+
+                      {{#if item.actions.deactivate_card}}
+                      &nbsp;&nbsp;&nbsp; <button class="btn btn-sm btn-danger btn-card-update-status no-margin" data-card-status-type="0">Block</button>
+                      {{/if}}
+                      {{#if item.actions.activate_card}}
+                      &nbsp;&nbsp;&nbsp;<button class="btn btn-sm btn-success btn-card-update-status no-margin" data-card-status-type="1">Unblock</button>
+                      {{/if}}
+                    </div>
+                  </div>
+                  <div class="row" style="margin-bottom: 25px;">
+                    <div class="col-sm-3" style="font-size: 16px;">
+                      Actions: 
+                    </div>
+                    <div class="col-sm-9">
+                      {{#if item.card.active}}
+                        {{#ifCond item.actions.credit_card_from_virtual_account '||' item.actions.credit_card_from_wallet}}
+                          <div class="dropdown">
+                            <button class="btn btn-sm btn-success" style="margin: 0;" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                              Credit
+                              <span class="caret"></span>
+                            </button>
+
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                              {{#if item.actions.credit_card_from_card}}
+                                <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_card}}" data-action-type="credit_card_from_card">From Your Card</a> </li>
+                              {{/if}}
+                              {{#if item.actions.credit_card_from_virtual_account}}
+                                <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">From Company Credits</a> </li>
+                              {{/if}}
+                              {{#if item.actions.credit_card_from_wallet}}
+                                <li><a class="btn-card-action" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">From Your Finly Money</a> </li>
+                              {{/if}}
+                            </ul>
+                          </div>
+
+                          <div class="dropdown">
+                            <button class="btn btn-sm btn-success" style="margin: 0;" data-target="#" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                              Debit
+                              <span class="caret"></span>
+                            </button>
+
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                              {{#if item.actions.debit_card_to_card}}
+                                <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_card}}" data-action-type="debit_card_to_card">To Your Card</a> </li>
+                              {{/if}}
+                              {{#if item.actions.debit_card_to_wallet}}
+                                <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_wallet}}" data-action-type="debit_card_to_wallet">To Your Finly Money</a> </li>
+                              {{/if}}
+                              {{#if item.actions.debit_card_to_virtual_account}}
+                                <li><a class="btn-card-action" data-url="{{item.actions.debit_card_to_virtual_account}}" data-action-type="debit_card_to_virtual_account">To Company Credits</a> </li>
+                              {{/if}}
+                            </ul>
+                          </div>
+                        {{/ifCond}} 
+                      {{else}}
+                        <button class="btn btn-sm btn-success" disabled="disabled">Credit <span class="caret"></span></button>
+                        (Blocked by {{item.card.disabled_by.name}})
+                      {{/if}}
+                    </div>
+                  </div>
+                  <div class="row" style="margin-bottom: 25px;">
+                    <div class="col-sm-3" style="font-size: 16px;">
+                      Balance: 
+                    </div>
+                    <div class="col-sm-9" style="font-size: 16px;">
+                      <div class="card-balance">
+                        <label class="balance currency">&nbsp;</label>&nbsp;&nbsp;&nbsp;<i style="color: #4CAF50;" class="fa fa-refresh btn-card-request-balance"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row" style="margin-bottom: 25px;">
+                    <div class="col-sm-3" style="font-size: 16px;">
+                      Card Limit:
+                    </div>
+
+                    <div class="col-sm-9" style="font-size: 16px;">
+                      <label>&#8377;&nbsp;{{item.card.available_card_eligibility}}</label>
+                    </div>
+                  </div>
+                </div>
+              </div><!-- col-sm-12 -->
+              <div class="col-sm-12"><hr></div>
+
+              <div class="col-sm-12 no-padding">
+                <div class="row no-margin">
+                  <div class="col-sm-6">
+                    <h4>Restrictions</h4>
+                  </div>
+
+                  <div class="col-sm-6 text-right">
+                    <button class="btn btn-warning btn-sm btn-edit-restrictions"><i class="fa fa-edit"></i>&nbsp;Edit</button>
+                  </div>
+
+                  <div class="col-sm-12">
+                    <form class="form-restrictions">
+                      <div class="row no-margin" style="margin-bottom: 10px;">
+                        <div class="col-sm-4">
+                          <label>Applied Product Code:</label>
+                        </div>
+
+                        <div class="col-sm-8">
+                          <div class="col-sm-6">
+                            <label class="item-attr-preview">
+                              {{#if item.restrictions.product_code_name}}
+                                {{item.restrictions.product_code_name}}
+                              {{else}}
+                                --
+                              {{/if}}
+                            </label>
+                            <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code_id}}">
+                              <option value="">None</option>
+                              {{#each item.restrictions.product_codes}}
+                                <option value="{{this.id}}">{{this.name}}</option>
+                              {{/each}}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row no-margin" style="margin-bottom: 10px;">
+                        <div class="col-sm-12">
+                          <label>Available Channels:</label>
+                        </div>
+
+                        <div class="section-card col-sm-11 col-sm-offset-1 no-padding channel-container">
+                          <div class="row no-margin section-header">
+                            <div class="col-sm-4">
+                              <label class="item-attr-preview">
+                                {{#if item.restrictions.channel_atm}}
+                                  <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                                {{else}}
+                                  <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                                {{/if}}
+                                &nbsp;<span>ATM</span>
+                              </label>
+                              <label class="item-attr-edit finly-switch">
+                                <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_atm}}checked="checked"{{/if}} name="restrictions[channel_atm]" value="1" />
+                                <div class="finly-slider round"></div>
+                              </label>
+                              <h4 class="item-attr-edit" style="position: relative;top: -7px;">&nbsp;&nbsp;&nbsp;ATM</h4>
+                            </div>
+
+                            <div class="col-sm-8" style="margin-top: 10px;">
+                              <p>Any transactions involving ATM.</p>
+                            </div>
+                          </div>
+
+                          <div class="row no-margin">
+                            <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_atm}}display: none;{{/unless}}">
+                            {{!-- <div class="col-sm-10 col-sm-offset-2 channel-limits"> --}}
+                              {{#each item.restrictions.limits.atm_limits}}
+                                <input type="hidden" name="restrictions[limits][atm_limits][{{@index}}][id]" value="{{this.id}}">
+                                <div class="col-sm-12">
+                                  <div class="row no-margin">
+                                    <div class="col-sm-1">Per</div>
+                                    <div class="col-sm-2">
+                                      <label class="">{{this.period_name}}</label>
+                                    </div>
+
+                                    <div class="col-sm-2">Transactions:</div>
+                                    <div class="col-sm-2">
+                                      <label class="item-attr-preview">{{#if this.transactions}}{{this.transactions}}{{else}}--{{/if}}</label>
+                                      <input class="form-control item-attr-edit" type="number" name="restrictions[limits][atm_limits][{{@index}}][transactions]" value="{{this.transactions}}">
+                                    </div>
+
+                                    <div class="col-sm-2">Budget</div>
+                                    <div class="col-sm-2">
+                                      <label class="item-attr-preview">{{#if this.budget}}{{this.budget}}{{else}}--{{/if}}</label>
+                                      <input class="item-attr-edit form-control" type="number" name="restrictions[limits][atm_limits][{{@index}}][budget]" value="{{this.budget}}">
+                                    </div>
+                                  </div>
+                                </div>
+                              {{/each}} 
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="section-card col-sm-11 col-sm-offset-1 no-padding channel-container">
+                          <div class="section-header row no-margin">
+                            <div class="col-sm-4">
+                              <label class="item-attr-preview">
+                                {{#if item.restrictions.channel_ecom_pos}}
+                                  <i class="fa fa-check-circle" style="color: #2ECC71;"></i>
+                                {{else}}
+                                  <i class="fa fa-ban" style="color: #E74C3C;"></i>
+                                {{/if}}
+                                &nbsp;<span>E-Commerce/POS</span>
+                              </label>
+                              <label class="item-attr-edit finly-switch">
+                                <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_ecom_pos}}checked="checked"{{/if}} name="restrictions[channel_ecom_pos]" value="1" />
+                                <div class="finly-slider round"></div>
+                              </label> 
+                              <h4 class="item-attr-edit" style="position: relative;top: -7px;">&nbsp;&nbsp;&nbsp;E-Commerce/POS</h4>
+                            </div> 
+
+                            <div class="col-sm-8" style="margin-top: 10px;">
+                              <p>Any transactions done online or through transaction machine.</p>
+                            </div>
+                          </div>
+
+                          <div class="row no-margin">
+                            <div class="col-sm-12 channel-limits" style="{{#unless item.restrictions.channel_ecom_pos}}display: none;{{/unless}}">
+                            {{!-- <div class="col-sm-12 channel-limits"> --}}
+                              {{#each item.restrictions.limits.ecom_pos_limits}}
+                                <input type="hidden" name="restrictions[limits][ecom_pos_limits][{{@index}}][id]" value="{{this.id}}">
+                                <div class="col-sm-12">
+                                  <div class="row no-margin">
+                                    <div class="col-sm-1">Per</div>
+                                    <div class="col-sm-2">
+                                      <label class="">{{this.period_name}}</label>
+                                    </div>
+
+                                    <div class="col-sm-2">Transactions:</div>
+                                    <div class="col-sm-2">
+                                      <label class="item-attr-preview">{{#if this.transactions}}{{this.transactions}}{{else}}--{{/if}}</label>
+                                      <input class="form-control item-attr-edit" type="number" name="restrictions[limits][ecom_pos_limits][{{@index}}][transactions]" value="{{this.transactions}}">
+                                    </div>
+
+                                    <div class="col-sm-2">Budget</div>
+                                    <div class="col-sm-2">
+                                      <label class="item-attr-preview">{{#if this.budget}}{{this.budget}}{{else}}--{{/if}}</label>
+                                      <input class="item-attr-edit form-control" type="number" name="restrictions[limits][ecom_pos_limits][{{@index}}][budget]" value="{{this.budget}}">
+                                    </div>
+                                  </div>
+                                </div>
+                              {{/each}} 
+                            </div>
+                          </div>
+                        </div> 
+
+                          
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -467,9 +374,6 @@
         </section>
         {{/if}}
       </div>
-      {{!-- <div class="tab-pane" id="tab-user-cards">
-        
-      </div> --}}
       <div class="tab-pane" id="tab-user-policies">
         <section class="user-policies">
           <div class="enforce-policy section-card">
@@ -849,7 +753,6 @@
           {{/each}}
         </section>
       </div>
-
       <div class="tab-pane" id="tab-user-auto-submit-report">
         <section class="user-info">
           <div class="section-card" style="padding-bottom: 20px;">
@@ -967,6 +870,266 @@
           </div><!-- section card -->
         </section>
       </div>
+      <div class="tab-pane" id="tab-user-roles">
+        <section class="user-roles">
+          <div class="section-card">
+            <div class="row no-margin section-header">
+              <div class="col-sm-6">
+                <h4>User Roles</h4>
+              </div>
+              <div class="col-sm-6 text-right">
+              {{#if item.user.editable}}
+                <button class="btn btn-sm btn-warning btn-edit-user" data-refresh-page="true"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+              {{/if}}
+              </div>
+            </div> 
+            <div class="row no-margin" style="padding-bottom: 20px;">
+              <div class="col-sm-8">
+                <form class="form-user-roles">
+                
+                  <div class="row">
+                    <div class="col-sm-3">Admin?</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{#if item.role.admin}}Yes{{else}}No{{/if}}</label>
+
+                      {{#if item.role.editable.admin}}
+
+                        {{#if item.role.admin}}
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
+                          </label>
+                        {{/if}}
+
+                      {{else}}
+
+                        {{#if item.role.admin}}
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" />&nbsp;&nbsp;No  
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                            <input disabled="disabled" class="" type="radio" name="user_roles[admin]" value="0" checked="checked" />&nbsp;&nbsp;No  
+                          </label>
+                        {{/if}}
+
+                      {{/if}}
+
+                      
+                      
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Manager?</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{#if item.role.manager}}Yes{{else}}No{{/if}}</label>
+
+                      {{#if item.role.editable.manager}}
+                        {{#if item.role.manager}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{else}}
+
+                        {{#if item.role.manager}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{/if}}
+                      
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Finance Manager?</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{#if item.role.finance_manager}}Yes{{else}}No{{/if}}</label>
+
+                      {{#if item.role.editable.finance_manager}}
+
+                        {{#if item.role.finance_manager}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{else}}
+
+                        {{#if item.role.finance_manager}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" checked="checked" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" />&nbsp;&nbsp;No
+                          </label>
+                        {{else}}
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="1" />&nbsp;&nbsp;Yes
+                          </label>
+                          <label class="item-attr-edit">
+                             <input disabled="disabled" class="" type="radio" name="user_roles[finance_manager]" value="0" checked="checked" />&nbsp;&nbsp;No
+                          </label>
+                        {{/if}}
+
+                      {{/if}}
+                      
+                    </div>
+                  </div>
+
+                  <input type="hidden" name="type" value="role">
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="tab-pane" id="tab-user-details">
+        <section class="user-info">
+          <div class="section-card">
+            <div class="row no-margin section-header">
+              <div class="col-sm-6">
+                <h4>User Info</h4>
+              </div>
+              {{#if item.user.editable}}
+                <div class="col-sm-6 text-right">
+                  {{#if item.actions.delete_invite}}
+                    <button class="btn btn-danger btn-sm btn-user-action" data-method="DELETE" data-presence="false" data-type="" data-url="{{item.actions.delete_invite}}">Delete Invite</button>
+                  {{/if}}
+                  {{#if item.actions.resend_invite}}
+                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="false" data-type="resend" data-url="{{item.actions.resend_invite}}">Resend Invite</button>
+                  {{/if}}
+                  {{#if item.actions.deactivate}}
+                    <button class="btn btn-danger btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="false" data-url="{{item.actions.deactivate}}">Deactivate</button>
+                  {{/if}}
+                  {{#if item.actions.activate}}
+                    <button class="btn btn-success btn-sm btn-user-action" data-method="PUT" data-presence="true" data-require-password="true" data-type="state" data-state-active="true" data-url="{{item.actions.activate}}">Activate</button>
+                  {{/if}}
+                  {{#if item.user.activateable}}
+                    <button class="btn btn-sm btn-success btn-active-employee">Register User</button>
+                  {{/if}}
+                </div>
+              {{/if}}
+            </div>
+            <div class="row no-margin">
+              <div class="col-sm-8">
+                <form class="form-user-info">
+                  <div class="row">
+                    <div class="col-sm-3">Name</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{item.user.name}}</label>
+                      <input class="item-attr-edit form-control" type="text" name="user[name]" value="{{item.user.name}}" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Email</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">{{item.user.email}}</label>
+                      <input class="item-attr-edit form-control" type="text" disabled="disabled" name="" value="{{item.user.email}}" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Mobile</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">
+                        {{#if item.user.mobile_number}}
+                          {{item.user.mobile_number}}
+                        {{else}}
+                          Not Set
+                        {{/if}}
+                      </label>
+                      <input class="item-attr-edit form-control" type="text" name="user[mobile_number]" value="{{item.user.mobile_number}}" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Gender</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">
+                        {{#if item.user.gender}}
+                          {{#if_eq item.user.gender 'm'}}Male{{else}}Female{{/if_eq}}
+                        {{else}}
+                          --
+                        {{/if}}
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-3">Address</div>
+                    <div class="col-sm-9">
+                      <label class="item-attr-preview">
+                        {{#if item.user.address}}
+                          {{item.user.address}}
+                        {{else}}
+                          --
+                        {{/if}}
+                      </label>
+                    </div>
+                  </div>
+
+                  <input type="hidden" name="type" value="details">
+                </form>
+              </div>
+            </div>
+          </div>
+          
+          
+        </section>
+      </div>
+      {{!-- <div class="tab-pane" id="tab-user-cards">
+      </div> --}}
     </div><!-- /tab-content -->
   </div>
 </div>

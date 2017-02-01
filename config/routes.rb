@@ -295,6 +295,14 @@
 #                                          PATCH      /export_preferences/:id(.:format)                           export_preferences#update
 #                                          PUT        /export_preferences/:id(.:format)                           export_preferences#update
 #                                          DELETE     /export_preferences/:id(.:format)                           export_preferences#destroy
+#                        card_restrictions GET        /card_restrictions(.:format)                                card_restrictions#index
+#                                          POST       /card_restrictions(.:format)                                card_restrictions#create
+#                     new_card_restriction GET        /card_restrictions/new(.:format)                            card_restrictions#new
+#                    edit_card_restriction GET        /card_restrictions/:id/edit(.:format)                       card_restrictions#edit
+#                         card_restriction GET        /card_restrictions/:id(.:format)                            card_restrictions#show
+#                                          PATCH      /card_restrictions/:id(.:format)                            card_restrictions#update
+#                                          PUT        /card_restrictions/:id(.:format)                            card_restrictions#update
+#                                          DELETE     /card_restrictions/:id(.:format)                            card_restrictions#destroy
 #                         companies_notify GET        /companies/notify(.:format)                                 companies#notify
 #                      company_add_balance POST       /companies/:company_id/add_balance(.:format)                companies#add_balance
 #                                companies GET        /companies(.:format)                                        companies#index
@@ -495,7 +503,7 @@
 #
 
 Rails.application.routes.draw do
-  
+
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -608,6 +616,8 @@ Rails.application.routes.draw do
   resources :categories
 
   resources :export_preferences
+
+  resources :card_restrictions
 
   get 'companies/notify', to: 'companies#notify'
   resources :companies do

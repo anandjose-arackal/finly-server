@@ -9,13 +9,15 @@
 #  updated_at         :datetime         not null
 #  image_file_name    :string(255)
 #  image_content_type :string(255)
-#  image_file_size    :integermm
+#  image_file_size    :integer
 #  image_updated_at   :datetime
 #  parent_id          :integer
 #  parent_type        :string(255)
 #  note               :text(65535)
 #  receipt_email_id   :integer
 #
+
+
 
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
@@ -77,16 +79,5 @@ class Receipt < ActiveRecord::Base
       {}
     end
   end
-
-  private
-
-
-  # def validate_expense_user
-  #   if self.user && self.parent
-  #     if self.user.id != self.parent.user.id
-  #       errors.add(:base, "Parent expense does not belong to current user.")
-  #     end
-  #   end
-  # end
 
 end

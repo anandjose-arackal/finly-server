@@ -181,6 +181,18 @@ if CardType.count == 0
   CardType.create(id: 2, name: 'Virtual')
 end
 
+if ProductCombination.count == 0
+  ProductCombination::TYPES.each do |type|
+    ProductCombination.create(name: type)
+  end
+end
+
+if ChannelType.count == 0
+  ChannelType::TYPES.each do |k, v|
+    ChannelType.create(name: ChannelType::NAMES[v], abbreviation: k.to_s.upcase)
+  end
+end
+
 ##########################
 
 if Amount.count == 0
@@ -337,12 +349,6 @@ if Expense.count == 0
 
 end
 
-# if Receipt.count == 0
-#   receipt = Receipt.create(image: File.open(Rails.root + "app/assets/images/1363397.png", "r"),
-#                            user_id: 1)
-#   receipt.parent = Expense.where(user_id: 1).where(expense_type_id: 1).first
-#   receipt.save
-# end
 
 p = Policy.find(3)
 if p.rules_count == 0

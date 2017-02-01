@@ -42,11 +42,16 @@ class FinlyF.Views.User extends Backbone.View
 
     # 'shown.bs.modal #modal-import-employees': 'addAuthKey'
 
+    'click .btn-edit-restrictions': 'editRestrictions'
+    'click .btn-update-restrictions': 'updateRestrictions'
+
+    'change .input-card-channel-type': 'toggleCardChannelLimits'
+
   initialize: (options) ->
     @params = options.params
     @page = options.page
     @parent = options.parent
-    @active_tab = @active_tab || '#tab-user-details'
+    @active_tab = @active_tab || '#tab-user-wallet-cards'
 
     if @page == 'user'
       @model = new FinlyF.Models.User({id: options.model_id})
@@ -1114,8 +1119,88 @@ class FinlyF.Views.User extends Backbone.View
       })
     )
 
+  editRestrictions: (e) ->
+    e.preventDefault()
+    _this = @
+    target = $(e.currentTarget)
+    restrictions_div = $(target).closest('section').find('form.form-restrictions')
+    $(restrictions_div).find('.item-attr-preview').addClass('hide')
+    $(restrictions_div).find('.item-attr-edit').addClass('show')
+
+    selects = $(restrictions_div).find("select.item-attr-edit")
+    for select in selects
+      $(select).val($(select).attr('data-default-value'))
+
+    # # Preselect the limit periods
+    # period_selects = $(restrictions_div).find('select.select-limit-period')
+    # for period_select in period_selects
+    #   $(period_select).val($(period_select).attr('data-selected'))
+
+    # # Preselect Applied Product code
+    # product_code_select = $(restrictions_div).find("select[name=restrictions\\[product_code_id\\]")
+
+    # selects = $(restrictions_div).find("select.item-attr-edit")
+    # for select in selects
+    #   $(select).val($(select).attr('data-default-value'))
+    # # console.log selects.length 
+    #edit
+
+    #change edit button to update
+    $(target).addClass('btn-success btn-update-restrictions').removeClass('btn-warning btn-edit-restrictions').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+
+  updateRestrictions: (e) ->
+    e.preventDefault()
+    _this = @
+    target = e.currentTarget
+
+    $(target).attr('disabled', true).html("&nbsp;&nbsp;<i class='fa fa-spinner fa-spin'></i>&nbsp;&nbsp;")
+    form = $(target).closest('section').find('form.form-restrictions')
+    # form = $(policy).find('form')
+    values = {}
+
+    # _.each($(container).find('form').serializeArray(), (input) ->
+    _.each($(form).serializeArray(), (input) ->
+      values[ input.name ] = input.value
+    )
+    # console.log values
+    # values.authenticity_token = $("#authenticity_token").val()
+
+    # # console.log values
+    $.ajax({
+      url: '/card_restrictions/' + @model.get('id')
+      data: values
+      type: "PATCH"
+      dataType: 'json'
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        # console.log res
+        if res.success == true
+          # console.log "now it will fetch ", _this.params.view
+
+          $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+          _this.model.fetch({
+            data: {
+              view: _this.params.view
+            }
+          })
+        else
+          $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+      error: (err) ->
+        console.log "Err", err
+        $(target).removeAttr('disabled').html("<i class='fa fa-check-circle'></i>&nbsp;&nbsp;Update")
+      })
 
 
+  toggleCardChannelLimits: (e) ->
+    target = e.currentTarget
+
+    checked = $(target).prop('checked')
+    if checked
+      container = $(target).closest('.channel-container').find('.channel-limits')
+      $(container).slideDown('slow')
+    else
+      container = $(target).closest('.channel-container').find('.channel-limits')
+      $(container).slideUp('slow')
 
 
 #Features

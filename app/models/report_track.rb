@@ -14,7 +14,9 @@
 #  updated_at                :datetime         not null
 #  payment_id                :integer
 #  action_user_role_id       :integer
+#  cash_in_hand_deduction_id :integer
 #
+
 
 
 

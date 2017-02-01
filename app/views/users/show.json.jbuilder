@@ -102,6 +102,7 @@ json.card do
       json.role role_name
     end
   end
+  json.card_limit @result.card_limit
 end
 
 json.wallet do
@@ -134,5 +135,39 @@ end
 json.periods do
   json.array! @result.periods do |period|
     json.extract! period, :id, :name
+  end
+end
+
+json.restrictions do
+  json.channel_atm @result.card_restriction.channel_atm
+  json.channel_ecom_pos @result.card_restriction.channel_ecom_pos
+  json.product_code_id @result.card_restriction.product_code_id
+  json.product_code_name @result.card_restriction.product_code_name rescue nil
+  json.product_codes do
+    json.array! @result.product_codes.each do |product_code|
+      json.extract! product_code, :id, :name
+    end
+  end
+  json.limits do
+    json.atm_limits do
+      json.array! @result.card_limits.ecom_pos_limits.each do |limit|
+        json.id limit.id
+        json.period_id limit.period_id
+        json.period_name limit.period_name rescue nil
+        json.budget limit.budget
+        json.transactions limit.transactions
+        json.enabled limit.allowed
+      end
+    end
+    json.ecom_pos_limits do
+      json.array! @result.card_limits.atm_limits.each do |limit|
+        json.id limit.id
+        json.period_id limit.period_id
+        json.period_name limit.period_name rescue nil
+        json.budget limit.budget
+        json.transactions limit.transactions
+        json.enabled limit.allowed
+      end
+    end
   end
 end

@@ -14,6 +14,7 @@
       {{#case 'target_user_card'}}
         <h4 class="no-margin">User's Card</h4>
         <h3 class="no-margin mt-5 target_user_card currency" style="margin-bottom: 0;">₹&nbsp;{{item.target_user_card}}</h3>
+        <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility">&#8377;&nbsp;{{item.target_user_card_details.available_card_eligibility}}</label>
       {{/case}}
       {{#case 'target_user_wallet'}}
         <h4 class="no-margin">User's Finly Money</h4>
@@ -43,6 +44,7 @@
       {{#case 'target_user_card'}}
         <h4 class="no-margin">User's Card</h4>
         <h3 class="no-margin mt-5 target_user_card currency" style="margin-bottom: 0;">₹&nbsp;{{item.target_user_card}}</h3>
+        <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility">&#8377;&nbsp;{{item.target_user_card_details.available_card_eligibility}}</label>
       {{/case}}
       {{#case 'target_user_wallet'}}
         <h4 class="no-margin">User's Finly Money</h4>
@@ -51,6 +53,7 @@
       {{#case 'current_user_card'}}
         <h4 class="no-margin">Your Card</h4>
         <h3 class="no-margin mt-5 current_user_card currency" style="margin-bottom: 0;">₹&nbsp;{{item.current_user_card}}</h3>
+        <span style="color: #aaa;">Your Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility">&#8377;&nbsp;{{item.current_user_card_details.available_card_eligibility}}</label>
       {{/case}}
     {{/switch}}
     </h4>

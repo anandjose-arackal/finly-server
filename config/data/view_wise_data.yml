@@ -5,7 +5,7 @@ admin:
       - <span class="superscript">Company</span><br>Analytics: analytics
       - <span class="superscript">Company</span><br>Settlements: settlements
       - <span class="superscript">Company</span><br>Employees: employees
-      - <span class="superscript">Company</span><br>Advance Requests: requests
+      - <span class="superscript">Company</span><br>Money Requests: requests
       - <span class="superscript">Company</span><br>Reports: reports
       - <span class="superscript">Company</span><br>Expenses: expenses
 
@@ -24,7 +24,7 @@ personal:
     primary_navbar:
       - Analytics: analytics
       - Settlements: settlements
-      - Advance Requests: requests
+      - Money Requests: requests
       - Reports: reports
       - Receipts: receipts
       - Expenses: expenses
@@ -42,7 +42,7 @@ manager:
       # - Team Expenses: expenses
       # - Team Analytics: analytics
       - <span class="superscript">Team</span><br>Members: employees
-      - <span class="superscript">Team</span><br>Advance Requests: requests
+      - <span class="superscript">Team</span><br>Money Requests: requests
       - <span class="superscript">Team</span><br>Reports: reports
       - <span class="superscript">Team</span><br>Expenses: expenses
 
@@ -61,7 +61,7 @@ finance_manager:
       # - Analytics: analytics
       - <span class="superscript">Team</span><br>Settlements: settlements
       - <span class="superscript">Team</span><br>Members: employees
-      - <span class="superscript">Team</span><br>Advance Requests: requests
+      - <span class="superscript">Team</span><br>Money Requests: requests
       - <span class="superscript">Team</span><br>Reports: reports
       - <span class="superscript">Team</span><br>Expenses: expenses
 

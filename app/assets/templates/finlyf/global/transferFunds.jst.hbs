@@ -1,13 +1,13 @@
-<div class="row no-margin">
-  <div class="col-sm-6">
-    <label>
-      <input name="global-transfer-funds" class="funds-source" data-transfer-flow="from-wallet-to-card" data-action="from_wallet_to_card" type="radio">&nbsp;From Your Finly Money to Your Card
+<div class="row no-margin transfer-flow-container">
+  <div class="col-sm-6 no-padding transfer-flow-option" style="border-right: none;">
+    <label for="cog-transfer-funds-wallet-to-card">
+      <input name="global-transfer-funds" class="funds-source" data-transfer-flow="from-wallet-to-card" id="cog-transfer-funds-wallet-to-card" data-action="from_wallet_to_card" type="radio">&nbsp;From Your Finly Money to Your Card
     </label>
   </div>
 
-  <div class="col-sm-6">
-    <label>
-      <input name="global-transfer-funds" data-transfer-flow="from-card-to-wallet" data-action="from_card_to_wallet" type="radio">&nbsp;From Your Card to Your Finly Money
+  <div class="col-sm-6 no-padding transfer-flow-option">
+    <label for="cog-transfer-funds-card-to-wallet">
+      <input name="global-transfer-funds" data-transfer-flow="from-card-to-wallet" data-action="from_card_to_wallet" id="cog-transfer-funds-card-to-wallet" type="radio">&nbsp;From Your Card to Your Finly Money
     </label>
   </div>
 </div>
@@ -16,3 +16,25 @@
 
 </div>
 
+<style type="text/css">
+
+.transfer-flow-option{
+  border: 1px solid #2980B9;
+  height: 100px;
+  display: table;
+}
+
+.transfer-flow-option label{
+  height: 100%;
+  width: 100%;
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 20px;
+  cursor: pointer;
+}
+
+.transfer-flow-option label.active{
+  background: #FFF1DA;
+}
+
+</style>

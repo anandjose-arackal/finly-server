@@ -547,8 +547,15 @@ $(document).ready ->
   $("#modal-global-transfer").on('shown.bs.modal', (e) ->
     modal = this
     $("input[name=global-transfer-funds][type=radio]").on('change', (event_select_flow) ->
+      target = event_select_flow.currentTarget
+
+      transfer_flow_container = $(target).closest('.transfer-flow-container')
+      $(transfer_flow_container).find('.transfer-flow-option label').removeClass('active')
+
+      $(target).closest('label').addClass('active')
+
+
       user_id = $("#current_user_id").val()
-      # console.log "its working bitch!"
       flow_container = $(this).closest('.modal').find('.global-transfer-funds')
       action_type = $(this).attr('data-action')
       data = {}
@@ -575,6 +582,7 @@ $(document).ready ->
           # console.log "Balance Data", data
           $(modal).find(".current_user_card_balance").html("&#8377;&nbsp;" + data.current_user_card)
           $(modal).find(".current_user_wallet_balance").html("&#8377;&nbsp;" + data.current_user_wallet)
+          $(modal).find(".current_user_card_eligibility").html("&#8377;&nbsp;" + data.current_user_card_details.available_card_eligibility)
         error: (err) ->
           console.log err
       })

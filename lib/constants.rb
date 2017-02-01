@@ -44,6 +44,8 @@ module Constants
   class Constants::ItzCash
 
 
+    RESTRICTION_CONSTANT = 100000000
+
     MSG_QUEUE_USERNAME = "finly"
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"
 

@@ -1,5 +1,5 @@
 class User::Show < User::Base
-  attr_accessor :selected_user, :card
+  attr_accessor :selected_user, :card_presenter
 
   def pre_validate
     unless user.present?
@@ -19,7 +19,7 @@ class User::Show < User::Base
         if self.selected_user.blank?
           add_message :error, 'User not found'
         elsif self.selected_user.cards.present?
-          self.card = ItzCash::AccountDetails.(selected_user).card rescue nil
+          self.card_presenter = ItzCash::AccountDetails.(selected_user) rescue nil
         end
       else
         messages[:error] = operation.messages[:error]
@@ -29,7 +29,7 @@ class User::Show < User::Base
 
   def success
     params[:selected_user] = selected_user
-    params[:card] = card
+    params[:card_presenter] = card_presenter
     User::Show::Presenter.new(user, params, messages)
   end
 
@@ -38,7 +38,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :enforce_policy_enabled
+                  :periods, :auto_submit_config, :product_codes, :card_limit, :card_periods, :card_limits, :card_restriction
 
     def init
       self.selected_user = params[:selected_user]
@@ -53,10 +53,14 @@ class User::Show < User::Base
       self.actions = load_actions
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
-      self.card = params[:card]
+      self.card = params[:card_presenter].card rescue nil
       self.auto_submit_config = self.selected_user.auto_submit_config
       self.periods = Period.all
-      self.enforce_policy_enabled = user.enforce_policy_enabled?
+      self.card_periods = Period.limit(3)
+      self.product_codes = ProductCombination.all
+      self.card_limit = params[:card_presenter].available_card_eligibility rescue nil
+      self.card_restriction = selected_user.card_restriction rescue nil
+      self.card_limits = card_restriction.card_limits rescue nil
     end
 
     private
