@@ -141,11 +141,14 @@ class User::CardRestrictions::Update < User::Base
     # resetting the product code ID for the card
     # if card_restriction_params[:product_code_id].present?
     api_params = {}
-    api_params[:serial_id] = selected_card.proxy
-    api_params[:product_code] = card_restriction_params[:product_code_id]
-    api_params[:current_product_code] = selected_card.product_code
-    # product_code_api = ItzCash::SetProductCode.(selected_user, api_params)
-    # return false unless product_code_api.success?
+    api_params[:mcc_group_id] = card_restriction_params[:product_code_id]
+    if card_restriction_params[:product_code_id].present?
+      api_params[:mcc_restriction_type] = "Y"
+    else
+      api_params[:mcc_restriction_type] = "I"
+    end
+    product_code_api = ItzCash::SetMccCode.(selected_user, api_params)
+    return false unless product_code_api.success?
     # Setting the atm restriction parameters
     if atm_enabled && atm_limits_present?
       daily_amount = atm_limit_params[0][:budget].to_i || 0
