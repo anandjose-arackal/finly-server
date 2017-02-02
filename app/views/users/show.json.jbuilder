@@ -141,11 +141,11 @@ end
 json.restrictions do
   json.channel_atm @result.card_restriction.channel_atm
   json.channel_ecom_pos @result.card_restriction.channel_ecom_pos
-  json.product_code_id @result.card_restriction.product_code_id
-  json.product_code_name @result.card_restriction.product_code_name rescue nil
-  json.product_codes do
-    json.array! @result.product_codes.each do |product_code|
-      json.extract! product_code, :id, :name
+  json.mcc_group_id @result.card_restriction.mcc_group_id
+  json.mcc_group_name @result.card_restriction.mcc_group_name rescue nil
+  json.mcc_groups do
+    json.array! @result.mcc_groups.each do |mcc_group|
+      json.extract! mcc_group, :id, :name
     end
   end
   json.limits do

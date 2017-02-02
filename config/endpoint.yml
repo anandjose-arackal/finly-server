@@ -11,6 +11,8 @@ default: &default
     path: "user/servlet/CorporateBalanceServlet"
   itzcash_card_restriction:
     path: "user/servlet/NaradaSetTransactionLimitsServlet"
+  itzcash_mcc_group_restriction:
+    path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
@@ -41,6 +43,10 @@ itzcash_uat:
     path: "user/servlet/NaradaBlockUnblockServlet"
   itzcash_corporate_balance:
     path: "user/servlet/CorporateBalanceServlet"
+  itzcash_card_restriction:
+    path: "user/servlet/NaradaSetTransactionLimitsServlet"
+  itzcash_mcc_group_restriction:
+    path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"

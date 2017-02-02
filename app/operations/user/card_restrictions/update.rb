@@ -82,7 +82,7 @@ class User::CardRestrictions::Update < User::Base
   private
 
   def card_restriction_params
-    params.require(:restrictions).permit(:product_code_id, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget],
+    params.require(:restrictions).permit(:mcc_group_id, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget],
                                                                                                      ecom_pos_limits: [:id, :transactions, :budget]])
   end
 
@@ -139,16 +139,18 @@ class User::CardRestrictions::Update < User::Base
 
   def invoke_limit_apis
     # resetting the product code ID for the card
-    # if card_restriction_params[:product_code_id].present?
     api_params = {}
-    api_params[:mcc_group_id] = card_restriction_params[:product_code_id]
-    if card_restriction_params[:product_code_id].present?
-      api_params[:mcc_restriction_type] = "Y"
+    api_params[:mcc_group_id] = card_restriction_params[:mcc_group_id]
+    if card_restriction_params[:mcc_group_id].present?
+      api_params[:mcc_restriction_type] = "A"
     else
       api_params[:mcc_restriction_type] = "I"
     end
-    product_code_api = ItzCash::SetMccCode.(selected_user, api_params)
-    return false unless product_code_api.success?
+    mcc_group_api = ItzCash::SetMccCode.(selected_user, api_params)
+    unless mcc_group_api.success?
+      add_message :error, mcc_group_api.messages[:error]
+      return false
+    end
     # Setting the atm restriction parameters
     if atm_enabled && atm_limits_present?
       daily_amount = atm_limit_params[0][:budget].to_i || 0

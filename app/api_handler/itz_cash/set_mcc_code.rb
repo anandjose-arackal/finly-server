@@ -12,7 +12,12 @@ class ItzCash::SetMccCode < ItzCash::Base
     end
   end
 
+  def env_key
+    'itzcash_mcc_group_restriction'
+  end
+
   def init
+    super()
     self.selected_card = user.cards.first
   end
 
@@ -20,12 +25,13 @@ class ItzCash::SetMccCode < ItzCash::Base
   def post_params
     {serialid: selected_card.proxy, itzmodule: Constants::ItzCash::MODULE,
      terminalrestrictiontype: "I", terminalrestrictiongroup: "NA",
-     mccrestrictiontype: params[:mcc_restriction_type], mccrestrictiongroup: MccGroup.code_for(params[:mcc_group_code_id])}
+     mccrestrictiontype: params[:mcc_restriction_type], mccrestrictiongroup: MccGroup.code_for(params[:mcc_group_id])}
   end
 
   def validate
-    if MccGroup.code_for(params[:mcc_group_code]).nil?
-      add_message :error, "Invalid MCC group id. Please try again"
+    if MccGroup.code_for(params[:mcc_group_id]).nil? && params[:mcc_restriction_type] == "A"
+      add_message :error, "Invalid MCC group code. Please try again"
+      return false
     end
   end
 

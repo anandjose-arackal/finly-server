@@ -26,7 +26,19 @@ class MccGroup < ActiveRecord::Base
   end
 
   def self.code_for(id)
-    CODE_MAP[id][:code]
+    if id.is_a?(String)
+      id = id.to_i
+    end
+    code = CODE_MAP[id][:code] rescue nil
+    if code
+      return code
+    else
+      return "NA"
+    end
+  end
+
+  def mcc_group_name
+    self.name
   end
 
 end

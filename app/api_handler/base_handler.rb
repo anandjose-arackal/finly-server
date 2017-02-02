@@ -97,7 +97,6 @@ class BaseHandler
     p = self.path
     param = self.post_params
     return unless p.present?
-    # debugger
     begin
       self.response = self.connection.post p, param
       puts "response : #{self.response.body}"

@@ -22,6 +22,6 @@ class CardRestriction < ActiveRecord::Base
 
   accepts_nested_attributes_for :card_limits
 
-  delegate :product_code_name, to: :product_code
+  delegate :mcc_group_name, to: :mcc_group
 
 end
