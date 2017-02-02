@@ -37,17 +37,52 @@
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
-  min-height: 250px;
-  transition: max-height 0.5 ease;
+  min-height: 305px;
+  transition: max-height 1 ease;
 
   .btn{
     border-radius: 2px;
   }
 
+  .form-group{
+    margin-top: 10px;
+  }
+
+  .fa-arrow-left{
+    position: absolute;
+    left: 0;
+    top: 11px;
+    font-size: 15px;
+  }
+
+  // Steps
+  .steps-login{
+    width: 320px;
+  }
+
+  .step-lookup{
+    position: absolute;
+  }
+  .step-password{
+    display: none;
+    position: absolute;
+  }
+
+  .step-reset-password{
+    display: none;
+    position: absolute;
+  }
+
+  .step-verify-registration{
+    display: none;
+    position: absolute;
+  }
+
   .user-image{
+    margin-top: 35px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     width: 100px;
 
     img{
@@ -57,7 +92,18 @@
 }
 
 
+// Minimum Height classes
+.mh-305{
+  min-height: 305px;
+}
 
+.mh-350{
+  min-height: 350px;
+}
+
+.mh-420{
+  min-height: 420px;
+}
 
 
 
@@ -201,85 +247,6 @@ body {
 
 }
 
-.loginmodal-container {
-  padding: 30px;
-  max-width: 500px;
-  width: 100% !important;
-  background-color: #F7F7F7;
-  margin: 0 auto;
-  border-radius: 4px;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  font-family: sans-serif;
-}
-
-.loginmodal-container h1 {
-  text-align: center;
-  font-size: 1.8em;
-  font-family: sans-serif;
-}
-
-.loginmodal-container input[type=submit] {
-  width: 100%;
-  display: block;
-  margin-bottom: 10px;
-  position: relative;
-}
-
-.loginmodal-container input[type=text], input[type=password] {
-  height: 64px;
-  font-size: 14px;
-  font-weight: 100;
-  width: 100%;
-  margin-bottom: 10px;
-  -webkit-appearance: none;
-  background: #fff;
-  border: 1px solid #d9d9d9;
-  border-top: 1px solid #c0c0c0;
-  /* border-radius: 2px; */
-  padding: 0 8px 0 16px;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-}
-
-.loginmodal-container input[type=text]:hover, input[type=password]:hover {
-  border: 1px solid #b9b9b9;
-  border-top: 1px solid #a0a0a0;
-  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.loginmodal-submit {
-  /* border: 1px solid #3079ed; */
-  border: 0px;
-  color: #fff;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.1);
-  padding: 17px 0px;
-  background-color: #93c178;
-
-  font-family: sans-serif;
-  font-size: 14px;
-  /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#4787ed)); */
-}
-
-.loginmodal-submit:hover {
-  /* border: 1px solid #2f5bb7; */
-  border: 1px solid #93c178;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
-  background-color: #f7ef6a;
-  color: #555;
-  /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#357ae8)); */
-}
-
-.loginmodal-container a {
-  text-decoration: none;
-  color: #666;
-  text-align: center;
-  display: inline-block;
-  opacity: 0.6;
-  transition: opacity ease 0.5s;
-}
 
 .turbolinks-progress-bar {
   height: 4px;

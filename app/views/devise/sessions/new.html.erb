@@ -1,26 +1,94 @@
 <% provide(:title, "Finly: Log In") %>
-<img src="<%= image_url('/common/images/logos/logo_md.png') %>">
+<img src="<%#= image_url('/common/images/logos/logo_md.png') %>">
 
 <div class="container-fluid">
   
   <div class="row no-margin">
-    <div class="login-container">
-      <div class="step-lookup">
+    <div class="login-container mh-305">
+      <div class="step-lookup steps-login" data-height-class="mh-305">
         <div class="user-image">
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
         </div>
-        <form action="<%= user_lookup_path %>" method="post" id="form-lookup">
+        <form action="<%= lookup_path %>" id="form-lookup">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
           <div class="form-group">
-            <input type="text" name="user[email_mobile]" placeholder="Email ID or Mobile Number" class="form-control">
+            <label class="control-label">Email / 10 Digit Mobile Number</label>
+            <input type="text" name="email_mobile" placeholder="Email ID or Mobile Number" class="form-control">
           </div>
 
           <div class="form-group">
-            <input id="btn-lookup-username" type="submit" value="Proceed" class="btn-block btn btn-success btn-sm" />
+            <input id="btn-lookup-username" disabled="disabled" type="submit" value="Proceed" class="btn-block btn btn-success btn-sm" />
           </div>
         </form>  
       </div>
+
+
+      <div class="step-password steps-login">
+        <div class="user-image">
+          <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= user_session_path %>" method="post" id="form-login">
+          <div class="template-data">
+
+          </div>
+          
+          <div class="form-group">
+            <label class="control-label">Password</label>
+            <input type="password" name="user[password]" placeholder="" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <input id="btn-lookup-username" type="submit" value="Login" class="btn-block btn btn-success btn-sm" />
+          </div>
+        </form>  
+      </div>
+
+      <div class="step-verify-registration steps-login">
+        <div class="user-image">
+          <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= user_session_path %>" method="post" id="form-login">
+          <div class="template-data">
+            <h5>Your mobile is not yet verified. Please verify your mobile by providing OTP.</h5>
+          </div>
+          
+          <div class="form-group">
+            <div class="row no-margin">
+              
+              <div class="col-xs-12 no-padding"><label class="control-label">Your Mobile Number:</label></div>
+
+              <div class="col-xs-7 no-padding" style="padding-right: 10px">
+                <input type="number" disabled="disabled" name="user[mobile]" value="" class="form-control">
+              </div>
+              <div class="col-xs-5 no-padding"><button class="btn btn-sm btn-warning btn-block btn-send-otp" data-url="<%= send_verification_otp_path %>">Send OTP</button></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="row no-margin">
+              <div class="col-xs-12 no-padding"><label class="control-label">OTP:</label></div>
+
+              <div class="col-xs-7 no-padding" style="padding-right: 10px">
+                <input type="number" name="user[otp]" value="" class="input-otp form-control">
+              </div>
+              <div class="col-xs-5 no-padding"><button disabled="disabled" class="btn btn-sm btn-warning btn-block btn-resend-otp hidden" data-url="<%= send_verification_otp_path %>">Resend</button></div>  
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input type="submit" disabled="disabled" value="Verify Mobile" class="btn-block btn btn-success btn-sm btn-verify-otp" />
+          </div>
+        </form>  
+      </div>
+
+      <div class="step-reset-password steps-login">
+        
+
+      </div>
+
     </div>
   </div>
 </div>

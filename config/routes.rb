@@ -695,6 +695,7 @@ Rails.application.routes.draw do
   get 'users/user_security'
   #backbone partials for users ends
 
+  get 'lookup', to: 'users#lookup', as: :lookup
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details
@@ -704,7 +705,6 @@ Rails.application.routes.draw do
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
-    get 'lookup', to: 'users#lookup', as: :lookup
 
   end
 

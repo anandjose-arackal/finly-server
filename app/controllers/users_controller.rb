@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:lookup]
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
@@ -128,12 +128,16 @@ class UsersController < ApplicationController
   end
 
   def lookup
-    respond_to do |format|
-      format.json {
-        @result = {messages: {error: ["User not found"]}}
-        @result = {messages: {error: ["Your account has been deactivated"]}}
-        respond_with success: true, verified: false
+    result = {
+      messages:{
+        error: ["User not found"]
       }
+    }
+    # result = {messages: {error: ["Your account has been deactivated"]}}
+    result[:success] = true
+    result[:verified] = false
+    respond_to do |format|
+      format.json { render json: result.as_json}
     end
   end
 
