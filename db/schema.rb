@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170131194554) do
+ActiveRecord::Schema.define(version: 20170202112618) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -950,7 +950,7 @@ ActiveRecord::Schema.define(version: 20170131194554) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-02-01', null: false
+    t.date     "date_of_birth",                   default: '2017-02-02', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false
@@ -1058,7 +1058,6 @@ ActiveRecord::Schema.define(version: 20170131194554) do
     t.integer  "otp_count",              limit: 4,   default: 0,     null: false
     t.string   "first_name",             limit: 255, default: "",    null: false
     t.string   "last_name",              limit: 255, default: "",    null: false
-    t.boolean  "default_password"
     t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
   end

@@ -7,10 +7,10 @@
 #  channel_atm      :boolean
 #  channel_pos      :boolean
 #  channel_online   :boolean
+#  product_code_id  :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  channel_ecom_pos :boolean
-#  mcc_group_id     :integer
 #
 
 class CardRestriction < ActiveRecord::Base
