@@ -4,7 +4,7 @@
 <div class="modal-dialog">
   <div class="loginmodal-container">
 
-    <form  name="myForm" method="post" action="<%= user_session_path %>">
+    <form name="myForm" method="post" action="<%= user_session_path %>">
       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
       <input id="email" type="text" name="user[email]" placeholder="Email or Phone Number" title="Enter Email Address">
       <input id="password" type="password" name="user[password]" placeholder="Password" title="Enter Password">

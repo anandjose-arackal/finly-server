@@ -8,7 +8,7 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
   attr_accessor :invited_user, :accept_params
 
   def authorized_user_types
-    [:manager, :company_admin]
+    [:manager, :finance_manager, :company_admin]
   end
 
   def pre_validate

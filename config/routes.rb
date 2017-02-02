@@ -396,6 +396,9 @@
 #                       users_user_profile GET        /users/user_profile(.:format)                               users#user_profile
 #                       users_user_balance GET        /users/user_balance(.:format)                               users#user_balance
 #                      users_user_security GET        /users/user_security(.:format)                              users#user_security
+#                                   lookup GET        /lookup(.:format)                                           users#lookup
+#                    send_verification_otp GET        /send_verification_otp(.:format)                            users#send_verification_otp
+#                          verify_user_otp POST       /verify_user_otp(.:format)                                  users#verify_user_otp
 #                                    users GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                     user GET        /users/:id(.:format)                                        users#show
@@ -409,7 +412,6 @@
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
 #           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
-#                              user_lookup GET        /users/:user_id/lookup(.:format)                            users#lookup
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -695,6 +697,11 @@ Rails.application.routes.draw do
   get 'users/user_security'
   #backbone partials for users ends
 
+  # routes for lookup and first tome otp
+  get 'lookup', to: 'users#lookup', as: :lookup
+  get 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
+  post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
+
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     post 'user_details', to: 'users#user_details', as: :details
@@ -704,8 +711,6 @@ Rails.application.routes.draw do
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
-    get 'lookup', to: 'users#lookup', as: :lookup
-
   end
 
   # routes for testing import

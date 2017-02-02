@@ -101,30 +101,22 @@ class UsersController < ApplicationController
   end
 
   # action that sends the user an OTP before verifying it
-  def first_time_login
-    @user = User.find_by(mobile_number: params[:mobile_number])
-    respond_to do |format|
-      if @user.first_time_login?
-        # send success message via json
-        format.json { respond_with success: true}
-      else
-        # todo - error message, check this
-        format.json {respond_with success: false}
-      end
-    end
-
+  def send_verification_otp
+    @result = User::ManagerActivate::SendOtp.(nil, params)
+    respond
   end
 
-  def first_login_otp
-    @result = User::Login::SendFirstLoginOtp.(params)
-    if @result.success?
-      # redirecting to page where they can set their password
-      sign_in @result.user, :bypass => true
-      redirect_to user_set_password_path
-    else
-      flash[:error] = @result.messages[:error]
-      redirect_to request.referrer
-    end
+  def verify_user_otp
+    # todo - add verify OTP route. 
+    # @result = User::Login::SendFirstLoginOtp.(params)
+    # if @result.success?
+    #   # redirecting to page where they can set their password
+    #   sign_in @result.user, :bypass => true
+    #   redirect_to user_set_password_path
+    # else
+    #   flash[:error] = @result.messages[:error]
+    #   redirect_to request.referrer
+    # end
   end
 
   def lookup

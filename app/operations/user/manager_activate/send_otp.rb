@@ -4,18 +4,37 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
   OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
-  def authorized_user_types
-    [:manager, :company_admin]
+  # def authorized_user_types
+  #   [:manager, :company_admin]
+  # end
+
+  def pre_validate
+    if params.blank?
+      add_message :error, "Invalid input data"
+      return
+    end
+    if param[:user_id].blank? && user.blank?
+      add_message :error, "You do not have permission to perform this action"
+      return
+    end
+    if params[:user_id].blank? && params[:mobile_number].blank?
+      add_message :error, "Invalid parameters, trye again"
+    end
   end
 
   def init
-    self.selected_user = user.company.users.find_by(id: params[:user_id])
+    if params[:user_id]
+      self.selected_user = user.company.users.find_by(id: params[:user_id])
+    elsif params[:mobile_number]
+      self.selected_user = user.company.users.find_by(id: params[:user_id])
+    end
   end
 
-  def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << 'Invalid parameters. Try again'
-      return
+  def authorize
+    if params[:user_id]
+      unless user.manager? || user.finance_manager? || user.company_admin?
+        raise_unauthorized_exception
+      end
     end
   end
 
@@ -35,7 +54,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
   end
 
   def process
-    response = OtpVerification::Create.(user, mobile_number: selected_user.mobile_number)
+    response = OtpVerification::Create.(selected_user, mobile_number: selected_user.mobile_number)
     if response.success?
       otp = response.otp
       # have to save it without validation because update_attributes considers validations

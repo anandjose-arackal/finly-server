@@ -40,11 +40,9 @@
 #  otp_count              :integer          default(0), not null
 #  first_name             :string(255)      default(""), not null
 #  last_name              :string(255)      default(""), not null
-#  default_password       :boolean
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #
-
 
 require 'test_helper'
 
