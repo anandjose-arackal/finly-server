@@ -18,14 +18,15 @@
 
 
 
+
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 
-  belongs_to :user
-  belongs_to :manager, class_name: 'User'
-  belongs_to :finance_manager, class_name: 'User'
-  belongs_to :approves_to, class_name: 'User'
-  belongs_to :approves_finance_to, class_name: 'User'
+  belongs_to :user, dependent: :destroy
+  belongs_to :manager, class_name: 'User', dependent: :destroy
+  belongs_to :finance_manager, class_name: 'User', dependent: :destroy
+  belongs_to :approves_to, class_name: 'User', dependent: :destroy
+  belongs_to :approves_finance_to, class_name: 'User', dependent: :destroy
   belongs_to :greater_than_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :policy
   accepts_nested_attributes_for :greater_than_amount

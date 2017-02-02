@@ -13,7 +13,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
       add_message :error, "Invalid input data"
       return
     end
-    if params[:user_id].blank? && user.blank?
+    if params[:user_id].blank? && user.blank? && params[:mobile_number].blank?
       add_message :error, "You do not have permission to perform this action"
       return
     end
@@ -26,7 +26,8 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
     if params[:user_id]
       self.selected_user = user.company.users.find_by(id: params[:user_id])
     elsif params[:mobile_number]
-      self.selected_user = user.company.users.find_by(id: params[:user_id])
+      # todo - this flow may change when we implement the change number functionality in this screen
+      self.selected_user = User.find_by(mobile_number: params[:mobile_number])
     end
   end
 

@@ -14,7 +14,7 @@
 #
 
 class CardRestriction < ActiveRecord::Base
-  belongs_to :user
+  belongs_to :user, dependent: :destroy
 
   belongs_to :product_code, class_name: "ProductCombination"
 

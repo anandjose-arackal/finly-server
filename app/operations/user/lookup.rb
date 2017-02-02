@@ -4,34 +4,45 @@
 
 class User::Lookup < User::Base
 
-  attr_accessor :selected_user, :registered, :verified
+  attr_accessor :selected_user, :registered, :verified, :otp_verified
+
+  def self.call(params)
+    self.new(nil, params).run
+  end
 
   def pre_validate
 
   end
 
   def init
-    self.selected_user = User.find_by_email_or_mobile_number(login_params[:email])
+    self.selected_user = User.find_by_email(params[:email_mobile]) || User.find_by(mobile_number: params[:email_mobile])
   end
 
   def process
     if selected_user.nil?
+      add_message :error, "User not found"
       self.registered = false
       self.verified = false
       return
     else
-      self.registered = true
+      if selected_user.active?
+        self.registered = true
+      else
+        add_message :error, "Your account has been deactivated"
+        self.registered = false
+        self.verified = false
+        return
+      end
     end
-    if selected_user.first_name and selected_user.password
-      self.verified = true
-    else
-      self.verified = false
-    end
+
+    self.verified = selected_user.verified
+    self.otp_verified = selected_user.otp_verified
   end
 
   def success
     params[:registered] = registered
     params[:verified] = verified
+    User::Lookup::LookupPresenter.new(user, params, messages)
   end
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -46,7 +57,4 @@ class User::Lookup < User::Base
 
   private
 
-  def login_params
-    params.require(:user).permit(:email)
-  end
 end

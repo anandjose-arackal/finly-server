@@ -397,7 +397,7 @@
 #                       users_user_balance GET        /users/user_balance(.:format)                               users#user_balance
 #                      users_user_security GET        /users/user_security(.:format)                              users#user_security
 #                                   lookup GET        /lookup(.:format)                                           users#lookup
-#                    send_verification_otp GET        /send_verification_otp(.:format)                            users#send_verification_otp
+#                    send_verification_otp POST       /send_verification_otp(.:format)                            users#send_verification_otp
 #                          verify_user_otp POST       /verify_user_otp(.:format)                                  users#verify_user_otp
 #                                    users GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
