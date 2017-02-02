@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :authenticate_user!, except: [:lookup]
+  before_action :authenticate_user!, except: [:lookup, :send_verification_otp]
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show

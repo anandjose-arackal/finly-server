@@ -13,7 +13,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
       add_message :error, "Invalid input data"
       return
     end
-    if param[:user_id].blank? && user.blank?
+    if params[:user_id].blank? && user.blank?
       add_message :error, "You do not have permission to perform this action"
       return
     end

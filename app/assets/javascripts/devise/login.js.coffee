@@ -78,13 +78,13 @@ $(document).ready( ->
         #User is not verified
         stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
         $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val(formObjectData.email_mobile)
+        $(stepVerifyRegistration).find('input[name=mobile_number]').val(formObjectData.email_mobile)
 
         $(stepVerifyRegistration).show('slide', {direction: 'right'}, 200)
         $(loginContainer).removeClass('mh-305').addClass('mh-420')
     else
       # User is not found on the system
       # User might be deactivated by the admin
-
 
 
   # Validate Phone number or email format
@@ -99,8 +99,7 @@ $(document).ready( ->
       $(".login-container #btn-lookup-username").attr('disabled', 'disabled')
   )
 
-  #Validating OTP
-
+  #Validating OTP format
   $("input[type=number].input-otp").on('keyup', (e) ->
     val = $(@).val()
 
@@ -115,8 +114,7 @@ $(document).ready( ->
       $(".login-container .step-verify-registration .btn-verify-otp").attr('disabled')
   )
 
-
-
+  # Determining if user is registered, verified => Goes to handleLookup()
   $("#form-lookup").on('submit', (e) ->
     form = @
     e.preventDefault()
@@ -143,6 +141,7 @@ $(document).ready( ->
     })
   )
 
+  # Logging in User
   $("#form-login").on('submit', (e) ->
     form = @
     e.preventDefault()
@@ -177,14 +176,14 @@ $(document).ready( ->
     # )
   )
 
-
+  # Send OTP for the first time
   $(".btn-send-otp").on('click', (e) ->
     e.preventDefault()
     e.stopPropagation()
     button = @
     $(button).attr('disabled', 'disabled')
 
-    stepContainer = $(button).closest('steps-login')
+    stepContainer = $(button).closest('.steps-login')
 
     $.ajax({
       url: $(button).attr('data-url'),
@@ -192,7 +191,7 @@ $(document).ready( ->
       type: "POST",
       data: {
         authenticity_token: $("#authenticity_token").val()
-        mobile_number: $(stepContainer).find("input[name=user\\[mobile\\]]").val()
+        mobile_number: $(stepContainer).find("input[name=mobile_number]").val()
       },
       success: (res) ->
         Timer.startTimer()
@@ -203,7 +202,7 @@ $(document).ready( ->
     })
   )
 
-
+  # Resend OTPs after the first time
   $(".btn-resend-top").on('click', (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -211,20 +210,47 @@ $(document).ready( ->
 
     $(button).attr('disabled', 'disabled')
 
-    stepContainer = $(button).closest('steps-login')
+    stepContainer = $(button).closest('.steps-login')
     $.ajax({
       url: $(button).attr('data-url'),
       dataType: "JSON",
       type: "POST",
       data: {
         authenticity_token: $("#authenticity_token").val()
-        mobile_number: $(stepContainer).find("input[name=user\\[mobile\\]]").val()
+        mobile_number: $(stepContainer).find("input[name=mobile_number]").val()
       },
       success: (res) ->
         Timer.startTimer()
       error: (err) ->
         # Timer.startTimer()
         console.log("Error", err)
+    })
+  )
+
+  # Verify User OTP with database
+  $("#form-verify-user-otp").on('submit', (e) ->
+    form = @
+    e.preventDefault()
+    console.log "Prevented Verify User OTP Form"
+
+    stepVerifyUserOtp = $(form).closest('.steps-login')
+
+    # values = $(form).serialize()
+    formObjectData = $(form).serializeObject()
+    console.log formObjectData
+
+
+    $.ajax({
+      url: $(form).attr('action'),
+      # url: '/lookup',
+      type: $(form).attr('method'),
+      dataType: 'JSON',
+      data: formObjectData,
+      success: (res) ->
+        console.log "Will show password setting form"
+        # Show template for setting password for first time 
+      error: (err) ->
+        console.log "Error", err
     })
   )
 )

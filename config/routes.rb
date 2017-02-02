@@ -699,7 +699,7 @@ Rails.application.routes.draw do
 
   # routes for lookup and first tome otp
   get 'lookup', to: 'users#lookup', as: :lookup
-  get 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
+  post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
