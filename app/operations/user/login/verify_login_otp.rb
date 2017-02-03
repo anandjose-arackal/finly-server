@@ -38,7 +38,7 @@ class User::Login::VerifyLoginOtp < BaseOperation
 
   def process
     # skipping validations because users from the mobile number invite flow won't have their details filled in yet
-    selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true, verified: true)
+    selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     selected_user.save(validate: false)
   end
 

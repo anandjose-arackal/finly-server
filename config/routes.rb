@@ -399,6 +399,7 @@
 #                                   lookup GET        /lookup(.:format)                                           users#lookup
 #                    send_verification_otp POST       /send_verification_otp(.:format)                            users#send_verification_otp
 #                          verify_user_otp POST       /verify_user_otp(.:format)                                  users#verify_user_otp
+#                             set_password POST       /set_password(.:format)                                     passwords#set_new
 #                                    users GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                     user GET        /users/:id(.:format)                                        users#show
@@ -702,9 +703,7 @@ Rails.application.routes.draw do
   get 'lookup', to: 'users#lookup', as: :lookup
   post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
-  devise_scope :user do
-    post 'set_password', to: 'passwords#set_new', as: :set_password
-  end
+  post 'set_password', to: 'users#set_new_password', as: :set_password
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do

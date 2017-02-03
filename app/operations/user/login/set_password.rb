@@ -4,8 +4,12 @@ class User::Login::SetPassword < BaseOperation
 
   attr_accessor :password_params, :selected_user
 
+  def self.call(params)
+    super(nil, params)
+  end
+
   def pre_validate
-    if user.blank? or params.blank?
+    if params.blank?
       add_message :error, "Invalid parameters"
     end
   end
@@ -37,15 +41,16 @@ class User::Login::SetPassword < BaseOperation
   def process
     password_params.delete(:mobile_number)
     unless selected_user.update_attributes(password_params)
-      add_message :error, user.errors.full_messages.to_sentence
+      messages[:error] = user.errors.full_messages.to_sentence
     end
     # setting verified as true for this user
     selected_user.update_attributes(verified: true)
   end
 
-  def success
+  def post_process
     add_message :success, "Password set!"
   end
+
 
   private
 
