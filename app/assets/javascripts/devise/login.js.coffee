@@ -321,7 +321,7 @@ $(document).ready( ->
       data: formObjectData,
       success: (res) ->
         if res.success == true
-        handleResetPassword(res, formObjectData)
+          handleResetPassword(res, formObjectData)
         # console.log "Will show password setting form"
         # Show template for setting password for first time 
       error: (err) ->
