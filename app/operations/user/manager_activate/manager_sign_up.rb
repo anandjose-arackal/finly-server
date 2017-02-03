@@ -105,7 +105,6 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     # set a dummy password here which will get replaced on first sign up
     temp_password = generate_random_string(4)
     accept_params[:password] = accept_params[:password_confirmation] = temp_password
-    accept_params[:default_password] = true
   end
 
 
@@ -119,7 +118,7 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     end
     invited_user.accept_invitation!
     invited_user.confirm
-    invited_user.update_attributes(mobile_only_invite: false)
+    invited_user.update_attributes(verified: false)
     # activating the user's card
     if invited_user.cards.present?
       invited_user.cards.first.update_attributes(active: true)

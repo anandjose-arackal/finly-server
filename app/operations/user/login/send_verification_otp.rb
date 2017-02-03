@@ -1,4 +1,4 @@
-class User::SendVerificationOtp < BaseOperation
+class User::Login::SendVerificationOtp < BaseOperation
 
   attr_accessor :selected_user
 

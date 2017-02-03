@@ -1,3 +1,3 @@
-json.registered true
-json.verified false
+json.registered @result.registered
+json.verified @result.verified
 json.success @result.success?

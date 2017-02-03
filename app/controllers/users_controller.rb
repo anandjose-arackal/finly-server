@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :authenticate_user!, except: [:lookup, :send_verification_otp]
+  before_action :authenticate_user!, except: [:lookup, :send_verification_otp, :verify_user_otp]
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
@@ -103,12 +103,12 @@ class UsersController < ApplicationController
   # action that sends the user an OTP before verifying them
   # params: mobile_number
   def send_verification_otp
-    @result = User::Login::SendVerificationOtp.(nil, params)
+    @result = User::Login::SendVerificationOtp.(params)
     respond
   end
 
   def verify_user_otp
-    @result = User::Login::VerifyLoginOtp.(nil, params)
+    @result = User::Login::VerifyLoginOtp.(params)
     respond
     # @result = User::Login::SendFirstLoginOtp.(params)
     # if @result.success?
