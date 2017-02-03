@@ -209,7 +209,7 @@ $(document).ready( ->
   )
 
   # Resend OTPs after the first time
-  $(".btn-resend-top").on('click', (e) ->
+  $(".btn-resend-otp").on('click', (e) ->
     e.preventDefault()
     e.stopPropagation()
     button = @
@@ -293,8 +293,10 @@ $(document).ready( ->
       data: formObjectData,
       success: (res) ->
         console.log "Success", res
+        window.location.reload
       error: (err) ->
         console.log "Error", err
+        $(submit).removeAttr('disabled').val("Create Password & Login")
        
     })
 
@@ -302,8 +304,11 @@ $(document).ready( ->
 
   $(".a-forgot-password").on('click', (e) ->
     e.preventDefault()
-    a = @
-    container = $(@).closest('.steps-login')
-    $(container).find('.btn-reset-password').removeClass('hidden')
+
+    current_step = $(@).closest('.steps-login')
+    
+    # a = @
+    # container = $(@).closest('.steps-login')
+    # $(container).find('.btn-reset-password').removeClass('hidden')
   )
 )

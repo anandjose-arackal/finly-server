@@ -542,6 +542,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
     # get 'login', to: 'sessions#new', as: :login
     # post 'login', to: 'session#create', as: :login
+
   end
 
   namespace :api do
@@ -701,7 +702,9 @@ Rails.application.routes.draw do
   get 'lookup', to: 'users#lookup', as: :lookup
   post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
-  post 'set_password', to: 'passwords#set_new', as: :set_password
+  devise_scope :user do
+    post 'set_password', to: 'passwords#set_new', as: :set_password
+  end
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do

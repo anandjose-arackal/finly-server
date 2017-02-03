@@ -42,7 +42,7 @@
 #  last_name              :string(255)      default(""), not null
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
-#  verified               :boolean
+#  verified               :boolean          default(FALSE)
 #
 
 
