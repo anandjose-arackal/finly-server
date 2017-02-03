@@ -6,6 +6,11 @@ $(document).ready( ->
       templates: {
         templatePassword: HandlebarsTemplates['finlyf/global/login/password']
       }
+      regex: {
+        mobile_patt: /^\d{10}$/
+        email_patt: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        otp_patt: /^\d{6}$/
+      }
     }
   }
 
@@ -55,7 +60,7 @@ $(document).ready( ->
     previous_step_height = $(previous_step).attr('data-height-class')
     $(previous_step).closest('.login-container').addClass(previous_step_height)
 
-    $(loginContainer).removeClass('mh-350 mh-420').addClass(previous_step_height)
+    $(loginContainer).removeClass('mh-390 mh-420').addClass(previous_step_height)
 
   )
   # Hanlde Lookup
@@ -69,11 +74,16 @@ $(document).ready( ->
       $(stepLookup).hide('slide', {direction: 'left'}, 200)
       if res.verified == true
         # User is verified
+        if Finly.Login.regex.mobile_patt.test(formObjectData.email_mobile)
+          formObjectData.type = 'mobile'
+        else if Finly.Login.regex.email_patt.test(formObjectData.email_mobile)
+          formObjectData.type = 'email'
+
         stepPassword = $(loginContainer).find('.step-password')
         $(stepPassword).find('.template-data').html(Finly.Login.templates.templatePassword({item: formObjectData}))
         $(stepPassword).show('slide', {direction: 'right'}, 200)
 
-        $(loginContainer).removeClass('mh-305').addClass('mh-350')
+        $(loginContainer).removeClass('mh-305').addClass('mh-390')
       else
         #User is not verified
         stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
@@ -88,12 +98,10 @@ $(document).ready( ->
 
 
   # Validate Phone number or email format
-  $("input[name=email_mobile]").on('keyup', (e) ->
+  $("input[name=email_mobile]").on('keyup focusout focus click change', (e) ->
     val = $(@).val()
 
-    mobile_patt = /^\d{10}$/
-    email_patt = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    if mobile_patt.test(val) || email_patt.test(val)
+    if Finly.Login.regex.mobile_patt.test(val) || Finly.Login.regex.email_patt.test(val)
       $(".login-container #btn-lookup-username").removeAttr('disabled')
     else
       $(".login-container #btn-lookup-username").attr('disabled', 'disabled')
@@ -102,11 +110,7 @@ $(document).ready( ->
   #Validating OTP format
   $("input[type=number].input-otp").on('keyup', (e) ->
     val = $(@).val()
-
-    console.log "Entering data."
-
-    otp_patt = /^\d{6}$/
-    if otp_patt.test(val)
+    if Finly.Login.regex.otp_patt.test(val)
       console.log "Should remove attr"
       $(".login-container .step-verify-registration .btn-verify-otp").removeAttr('disabled')
     else
@@ -146,6 +150,7 @@ $(document).ready( ->
     form = @
     e.preventDefault()
     console.log "Prevented Login"
+    $(form).find("input[type=submit]").val("Logging In...").attr('disabled', 'disabled')
 
     stepLookup = $(form).closest('.step-lookup')
 
@@ -166,6 +171,7 @@ $(document).ready( ->
         # $(stepLookup).hide('slide', {direction: 'left'}, 200)
       error: (err) ->
         res = JSON.parse(err.responseText)
+        $(form).find("input[type=submit]").val("Login").removeAttr('disabled')
         alert res.error
     })
     # request.error((httpObj, textStatus) ->
@@ -227,11 +233,22 @@ $(document).ready( ->
     })
   )
 
+  handleResetPassword = (res, formObjectData) ->
+    # if res.success == true
+    stepVerifyUserOtp = $(document).find('.step-verify-registration')
+    stepResetPassword = $(document).find('.step-reset-password')
+
+    $(stepVerifyUserOtp).hide('slide', {direction: 'left'}, 200)
+    $(stepResetPassword).show('slide', {direction: 'right'}, 200)
+
+    $(stepResetPassword).find("input[name=user\\[mobile_number\\]]").val(formObjectData.mobile_number)
+
+
   # Verify User OTP with database
   $("#form-verify-user-otp").on('submit', (e) ->
     form = @
     e.preventDefault()
-    console.log "Prevented Verify User OTP Form"
+    # console.log "Prevented Verify User OTP Form"
 
     stepVerifyUserOtp = $(form).closest('.steps-login')
 
@@ -247,10 +264,46 @@ $(document).ready( ->
       dataType: 'JSON',
       data: formObjectData,
       success: (res) ->
-        console.log "Will show password setting form"
+        handleResetPassword(res, formObjectData)
+        # console.log "Will show password setting form"
         # Show template for setting password for first time 
       error: (err) ->
         console.log "Error", err
+        handleResetPassword(err, formObjectData)
     })
+  )
+
+  $("#form-reset-password").on('submit', (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    form = @
+
+    console.log "Prevented set password."
+
+    submit = $(form).find("input[type=submit]")
+    $(submit).attr('disabled', 'disabled').val("Please Wait...")
+
+
+    formObjectData = $(form).serializeObject()
+
+    $.ajax({
+      url: $(form).attr('action'),
+      type: $(form).attr('method'),
+      dataType: 'JSON',
+      data: formObjectData,
+      success: (res) ->
+        console.log "Success", res
+      error: (err) ->
+        console.log "Error", err
+       
+    })
+
+  )
+
+  $(".a-forgot-password").on('click', (e) ->
+    e.preventDefault()
+    a = @
+    container = $(@).closest('.steps-login')
+    $(container).find('.btn-reset-password').removeClass('hidden')
   )
 )
