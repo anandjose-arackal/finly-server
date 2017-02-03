@@ -11,13 +11,20 @@ $(document).ready( ->
         email_patt: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         otp_patt: /^\d{6}$/
       }
+      heights: [
+        'mh-340'
+        'mh-390'
+        'mh-405'
+        'mh-438'
+        'mh-455'
+      ]
     }
   }
 
   Timer = {
     initialize: ->
-      @button = $(".btn-resend-otp");
-      @time = 10;
+      @button = $(".btn-resend-otp")
+      @time = 10
       # this.startTimer();
     
 
@@ -60,7 +67,7 @@ $(document).ready( ->
     previous_step_height = $(previous_step).attr('data-height-class')
     $(previous_step).closest('.login-container').addClass(previous_step_height)
 
-    $(loginContainer).removeClass('mh-390 mh-420').addClass(previous_step_height)
+    $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(previous_step_height)
 
   )
   # Hanlde Lookup
@@ -80,19 +87,63 @@ $(document).ready( ->
           formObjectData.type = 'email'
 
         stepPassword = $(loginContainer).find('.step-password')
+        heightClass = $(stepPassword).attr('data-height-class')
         $(stepPassword).find('.template-data').html(Finly.Login.templates.templatePassword({item: formObjectData}))
         $(stepPassword).show('slide', {direction: 'right'}, 200)
 
-        $(loginContainer).removeClass('mh-305').addClass('mh-390')
+        $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
       else
+        stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
+        heightClass = $(stepVerifyRegistration).attr('data-height-class')
+
+        if Finly.Login.regex.mobile_patt.test(formObjectData.email_mobile)
+          # $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val(formObjectData.email_mobile)
+          $(stepVerifyRegistration).find('input[name=mobile_number]').val(formObjectData.email_mobile)
+        else if Finly.Login.regex.email_patt.test(formObjectData.email_mobile)
+          # $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val('')
+          $(stepVerifyRegistration).find('input[name=mobile_number]').val('').removeAttr('disabled')
         #User is not verified
+        
+        
+
+        $(stepVerifyRegistration).show('slide', {direction: 'right'}, 200)
+        $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
+    else
+      # User is not found on the system
+      # User might be deactivated by the admin
+
+  handleLookupReset = (res, formObjectData) ->
+    loginContainer = $(document).find('.login-container')
+    stepResetPasswordOption = $(document).find('.step-reset-password-options')
+
+    if res.success == true
+      if Finly.Login.regex.mobile_patt.test(formObjectData.email_mobile)
+        $(stepResetPasswordOption).hide('slide', {direction: 'left'}, 100)
         stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
         $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val(formObjectData.email_mobile)
         $(stepVerifyRegistration).find('input[name=mobile_number]').val(formObjectData.email_mobile)
 
         $(stepVerifyRegistration).show('slide', {direction: 'right'}, 200)
-        $(loginContainer).removeClass('mh-305').addClass('mh-420')
+        $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass('mh-420')
+      else if Finly.Login.regex.email_patt.test(formObjectData.email_mobile)
+        console.log "Something"
+        $.ajax({
+          url: "/users/password",
+          dataType: 'json',
+          type: "POST"
+          data: {
+            user: {
+              email: formObjectData.email_mobile
+            }
+            authenticity_token: $("#authenticity_token").val()
+          }
+          success: (res) ->
+            console.log "Res", res
+          error: (err) ->
+            console.log "Err", err
+        })
     else
+      console.log "User not found"
       # User is not found on the system
       # User might be deactivated by the admin
 
@@ -118,7 +169,7 @@ $(document).ready( ->
       $(".login-container .step-verify-registration .btn-verify-otp").attr('disabled')
   )
 
-  # Determining if user is registered, verified => Goes to handleLookup()
+  # Lookup: Determining if user is registered, verified => Goes to handleLookup()
   $("#form-lookup").on('submit', (e) ->
     form = @
     e.preventDefault()
@@ -235,14 +286,19 @@ $(document).ready( ->
 
   handleResetPassword = (res, formObjectData) ->
     # if res.success == true
+
+    loginContainer = $(document).find('.login-container')
     stepVerifyUserOtp = $(document).find('.step-verify-registration')
     stepResetPassword = $(document).find('.step-reset-password')
 
+    heightClass = $(stepResetPassword).attr('data-height-class')
+
     $(stepVerifyUserOtp).hide('slide', {direction: 'left'}, 200)
     $(stepResetPassword).show('slide', {direction: 'right'}, 200)
+    $(loginContainer).removeClass(Finly.Login.heights.join(' ')).addClass(heightClass)
+
 
     $(stepResetPassword).find("input[name=user\\[mobile_number\\]]").val(formObjectData.mobile_number)
-
 
   # Verify User OTP with database
   $("#form-verify-user-otp").on('submit', (e) ->
@@ -264,12 +320,13 @@ $(document).ready( ->
       dataType: 'JSON',
       data: formObjectData,
       success: (res) ->
+        if res.success == true
         handleResetPassword(res, formObjectData)
         # console.log "Will show password setting form"
         # Show template for setting password for first time 
       error: (err) ->
         console.log "Error", err
-        handleResetPassword(err, formObjectData)
+        # handleResetPassword(err, formObjectData)
     })
   )
 
@@ -303,12 +360,48 @@ $(document).ready( ->
   )
 
   $(".a-forgot-password").on('click', (e) ->
+    console.log "Shouldn't submit the form"
     e.preventDefault()
 
-    current_step = $(@).closest('.steps-login')
+    loginContainer = $(@).closest('.login-container')
+    stepCurrent = $(@).closest('.steps-login')
+    stepResetPasswordOption = $(document).find('.login-container .step-reset-password-options')
+
+    heightClass = $(stepResetPasswordOption).attr('data-height-class')
+
+    $(loginContainer).removeClass(Finly.Login.heights.join(' ')).addClass(heightClass)
     
+    $(stepCurrent).hide('slide', {direction: 'left'}, 100)
+    $(stepResetPasswordOption).show('slide', {direction: 'right'}, 200)
     # a = @
     # container = $(@).closest('.steps-login')
     # $(container).find('.btn-reset-password').removeClass('hidden')
+  )
+
+  $("#form-init-reset-password").on('submit', (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+
+    form = @
+    formObjectData = {}
+    active_pane = $(form).find(".tab-pane.active")
+    if $(active_pane).attr('data-reset-by') == 'mobile'
+      formObjectData.email_mobile = $(active_pane).find("input[name=user\\[mobile_number\\]]").val()
+    else if $(active_pane).attr('data-reset-by') == 'email'
+      formObjectData.email_mobile = $(active_pane).find("input[name=user\\[email\\]]").val()
+
+    $.ajax({
+      url: $(form).attr('action'),
+      # url: '/lookup',
+      dataType: 'JSON',
+      data: formObjectData,
+      success: (res) ->
+        handleLookupReset(res, formObjectData)
+        # handleLookUp(res, formObjectData)
+        # console.log "Respnose", res
+        # $(stepLookup).hide('slide', {direction: 'left'}, 200)
+      error: (err) ->
+        console.log "Error", err
+    })
   )
 )

@@ -50,6 +50,24 @@
     margin: -20px -20px 0;
   }
 
+  .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    border-bottom: 1px solid #eee;
+    background: #eee;
+  }
+
+  .nav-tabs > li > a {
+    border-radius: 1px 1px 0 0;
+    border-top: 3px solid transparent;
+  }
+
+  .tab-pane{
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    background: #eee;
+  }
+
   .btn{
     border-radius: 2px;
   }
@@ -101,7 +119,7 @@
     margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 25px;
+    margin-bottom: 42px;
     width: 100px;
 
     img{
@@ -112,12 +130,19 @@
 
 
 // Minimum Height classes
-.mh-305{
-  min-height: 305px;
+.mh-340{
+  min-height: 340px;
 }
 
-.mh-350{
-  min-height: 350px;
+.mh-455{
+  min-height: 455px;
+}
+
+.mh-405{
+  min-height: 405px;
+}
+.mh-438{
+  min-height: 438px;
 }
 
 .mh-390{
@@ -126,6 +151,10 @@
 
 .mh-420{
   min-height: 420px;
+}
+
+.mh-550{
+  min-height: 550px;
 }
 
 

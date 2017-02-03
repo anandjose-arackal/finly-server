@@ -4,9 +4,10 @@
 <div class="container-fluid">
   
   <div class="row no-margin">
-    <div class="login-container mh-305">
+    <div class="login-container mh-340">
       <span class="login-box-top"></span>
-      <div class="step-lookup steps-login" data-height-class="mh-305">
+
+      <div class="step-lookup steps-login" data-height-class="mh-340">
         <div class="user-image">
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
         </div>
@@ -20,12 +21,13 @@
 
           <div class="form-group">
             <input id="btn-lookup-username" disabled="disabled" type="submit" value="Proceed" class="btn-block btn btn-success btn-sm" />
+
+            <p class="text-right" style="margin-top: 5px;"><a class="a-forgot-password" href="#">Trouble Loggin In?</a></p>
           </div>
         </form>  
       </div>
 
-
-      <div class="step-password steps-login">
+      <div class="step-password steps-login" data-height-class="mh-390">
         <div class="user-image">
           <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
@@ -47,29 +49,50 @@
         </form>  
       </div>
 
-      <div class="step-reset-password-options steps-login">
+      <div class="step-reset-password-options steps-login" data-height-class="mh-455">
         <div class="user-image">
           <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
         </div>
-        <form action="<%= user_session_path %>" method="post" id="form-login">
+
+        <form action="<%= lookup_path %>" id="form-init-reset-password">
+
           <div class="template-data">
-
-          </div>
-          
-          <div class="form-group">
-            <label class="control-label">Password</label>
-            <p class="text-right" style="display: inline-block; float: right;"><a href="#">Forgot Password?</a></p>
-            <input type="password" name="user[password]" placeholder="" class="form-control">
+            <label>Please Select Email or Mobile to Recover Your Password</label>
           </div>
 
-          <div class="form-group">
-            <input id="btn-lookup-username" type="submit" value="Login" class="btn-block btn btn-success btn-sm" />
+
+          <ul class="nav nav-tabs nav-justified">
+            <li role="presentation" class="active"><a href="#reset-by-mobile" aria-controls="reset-by-mobile" role="tab" data-toggle="tab">Mobile</a></li>
+            <li role="presentation"><a href="#reset-by-email" aria-controls="reset-by-email" role="tab" data-toggle="tab">Email</a></li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="reset-by-mobile" data-reset-by="mobile">
+              <div class="form-group">
+                <label class="control-label">Mobile Number</label>
+                <input class="form-control" type="number" value="" name="user[mobile_number]" />
+              </div>
+
+              <div class="form-group">
+                <input class="btn btn-sm btn-block btn-success" type="submit" value="Proceed" />
+              </div>
+            </div>
+
+            <div class="tab-pane" id="reset-by-email" data-reset-by="email">
+              <div class="form-group">
+                <label class="control-label">Email</label>
+                <input class="form-control" type="text" value="" name="user[email]" />
+              </div>
+              <div class="form-group">
+                <input class="btn btn-sm btn-block btn-success btn-reset-password-email" type="submit" value="Send Password Reset Link" />
+              </div>
+            </div>
           </div>
         </form>  
       </div> 
 
-      <div class="step-verify-registration steps-login">
+      <div class="step-verify-registration steps-login" data-height-class="mh-438">
         <div class="user-image">
           <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
@@ -85,8 +108,8 @@
               <div class="col-xs-12 no-padding"><label class="control-label">Your Mobile Number:</label></div>
 
               <div class="col-xs-7 no-padding" style="padding-right: 10px">
-                <input type="number" disabled="disabled" name="user[mobile]" value="" class="form-control">
-                <input type="hidden" name="mobile_number" value="" />
+                <input type="number" disabled="disabled" name="mobile_number" value="" class="form-control">
+                <!-- <input type="hidden" name="mobile_number" value="" /> -->
               </div>
               <div class="col-xs-5 no-padding"><button class="btn btn-sm btn-warning btn-block btn-send-otp" data-url="<%= send_verification_otp_path %>">Send OTP</button></div>
             </div>
@@ -109,7 +132,7 @@
         </form>  
       </div>
 
-      <div class="step-reset-password steps-login">
+      <div class="step-reset-password steps-login" data-height-class="mh-405">
         <div class="user-image">
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
         </div>
@@ -149,3 +172,7 @@
 <script type="text/javascript">
   
 </script>
+
+<style type="text/css">
+  
+</style>
