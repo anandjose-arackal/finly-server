@@ -40,9 +40,6 @@ class PasswordsController < Devise::PasswordsController
       if Devise.sign_in_after_reset_password
         flash_message = resource.active_for_authentication? ? :updated : :updated_not_active
         set_flash_message!(:error, flash_message)
-        ## i.e. if the change is successful, modify the user so that default password is disabled
-        resource.update_attributes(default_password: false)
-        #######################################################################################
         sign_in(resource_name, resource)
       else
         set_flash_message!(:error, :updated_not_active)
@@ -56,8 +53,9 @@ class PasswordsController < Devise::PasswordsController
   end
 
   # action that lets mobile only users set their password for the first time
-  def set_password
-    @result = User::Password::SetPassword.(current_user, params)
+  # also the action that mobile users use to set their password if they've forgotten it
+  def set_new
+    @result = User::Login::SetPassword.(nil, params)
     if @result.success?
       # log in and redirect to root URL
       sign_in @result.user, :bypass => true

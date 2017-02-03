@@ -4,39 +4,23 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
   OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
-  # def authorized_user_types
-  #   [:manager, :company_admin]
-  # end
+  def authorized_user_types
+    [:manager, :finance_manager, :company_admin]
+  end
 
   def pre_validate
-    if params.blank?
+    if user.blank? || params.blank?
       add_message :error, "Invalid input data"
       return
-    end
-    if params[:user_id].blank? && user.blank? && params[:mobile_number].blank?
-      add_message :error, "You do not have permission to perform this action"
-      return
-    end
-    if params[:user_id].blank? && params[:mobile_number].blank?
-      add_message :error, "Invalid parameters, trye again"
     end
   end
 
   def init
-    if params[:user_id]
-      self.selected_user = user.company.users.find_by(id: params[:user_id])
-    elsif params[:mobile_number]
-      # todo - this flow may change when we implement the change number functionality in this screen
-      self.selected_user = User.find_by(mobile_number: params[:mobile_number])
-    end
+    self.selected_user = user.company.users.find_by(id: params[:user_id])
   end
 
   def authorize
-    if params[:user_id]
-      unless user.manager? || user.finance_manager? || user.company_admin?
-        raise_unauthorized_exception
-      end
-    end
+
   end
 
   def validate

@@ -100,14 +100,16 @@ class UsersController < ApplicationController
     respond
   end
 
-  # action that sends the user an OTP before verifying it
+  # action that sends the user an OTP before verifying them
+  # params: mobile_number
   def send_verification_otp
-    @result = User::ManagerActivate::SendOtp.(nil, params)
+    @result = User::Login::SendVerificationOtp.(nil, params)
     respond
   end
 
   def verify_user_otp
-    # todo - add verify OTP route.
+    @result = User::Login::VerifyLoginOtp.(nil, params)
+    respond
     # @result = User::Login::SendFirstLoginOtp.(params)
     # if @result.success?
     #   # redirecting to page where they can set their password
@@ -121,17 +123,6 @@ class UsersController < ApplicationController
 
   def lookup
     @result = User::Lookup.(params)
-    # result = {
-    #   messages:{
-    #     error: ["User not found"]
-    #   }
-    # }
-    # # result = {messages: {error: ["Your account has been deactivated"]}}
-    # result[:success] = true
-    # result[:verified] = false
-    # respond_to do |format|
-    #   format.json { render json: @result.as_json}
-    # end
     respond
   end
 

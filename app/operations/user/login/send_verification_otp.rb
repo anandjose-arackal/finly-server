@@ -1,4 +1,4 @@
-class User::SendFirstLoginOtp < BaseOperation
+class User::SendVerificationOtp < BaseOperation
 
   attr_accessor :selected_user
 
@@ -20,7 +20,6 @@ class User::SendFirstLoginOtp < BaseOperation
 
   def validate
     unless selected_user
-      # todo - log this as a mistake instead of throwing error
       add_message :error, "User not found"
       return
     end
@@ -39,7 +38,7 @@ class User::SendFirstLoginOtp < BaseOperation
   end
 
   def process
-    response = OtpVerification::Create.(user, mobile_number: selected_user.mobile_number)
+    response = OtpVerification::Create.(selected_user, mobile_number: selected_user.mobile_number)
     if response.success?
       otp = response.otp
       # have to save it without validation because update_attributes considers validations
