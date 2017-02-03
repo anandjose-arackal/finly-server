@@ -124,6 +124,18 @@ class UsersController < ApplicationController
   def lookup
     @result = User::Lookup.(params)
     respond
+    # result = {
+    #   messages:{
+    #     error: ["User not found"]
+    #   }
+    # }
+    # # result = {messages: {error: ["Your account has been deactivated"]}}
+    # result[:success] = true
+    # result[:verified] = false
+    # # result[:verified] = true
+    # respond_to do |format|
+    #   format.json { render json: result.as_json}
+    # end
   end
 
   private

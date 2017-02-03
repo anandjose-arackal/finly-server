@@ -39,9 +39,23 @@
   padding: 20px;
   min-height: 305px;
   transition: max-height 1 ease;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .3);
+
+  .login-box-top{
+    display: block;
+    background-color: #400090;
+    background: transparent -webkit-linear-gradient(left, #188fff 0, #400090 100%) repeat scroll 0 0;
+    background: transparent linear-gradient(to right, #188fff 0, #400090 100%) repeat scroll 0 0;
+    height: 4px;
+    margin: -20px -20px 0;
+  }
 
   .btn{
     border-radius: 2px;
+  }
+
+  label{
+    color: #888;
   }
 
   .form-group{
@@ -68,6 +82,11 @@
     position: absolute;
   }
 
+  .step-reset-password-options{
+    display: none;
+    position: absolute;
+  }
+
   .step-reset-password{
     display: none;
     position: absolute;
@@ -79,7 +98,7 @@
   }
 
   .user-image{
-    margin-top: 35px;
+    margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 25px;
@@ -99,6 +118,10 @@
 
 .mh-350{
   min-height: 350px;
+}
+
+.mh-390{
+  min-height: 390px;
 }
 
 .mh-420{

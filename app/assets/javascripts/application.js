@@ -20,6 +20,7 @@
 //= require handlebars.runtime
 //= require ohsnap.min
 // require drift-chat
+//= require finlyf/helpers/handlebars_helpers
 //= require_tree ../templates/finlyf/global/login
 //= require devise/login
 //// require_tree .

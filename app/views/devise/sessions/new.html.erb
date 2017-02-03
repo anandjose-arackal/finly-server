@@ -5,6 +5,7 @@
   
   <div class="row no-margin">
     <div class="login-container mh-305">
+      <span class="login-box-top"></span>
       <div class="step-lookup steps-login" data-height-class="mh-305">
         <div class="user-image">
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
@@ -36,6 +37,7 @@
           
           <div class="form-group">
             <label class="control-label">Password</label>
+            <p class="text-right" style="display: inline-block; float: right;"><a href="#" class="a-forgot-password">Forgot Password?</a></p>
             <input type="password" name="user[password]" placeholder="" class="form-control">
           </div>
 
@@ -44,6 +46,28 @@
           </div>
         </form>  
       </div>
+
+      <div class="step-reset-password-options steps-login">
+        <div class="user-image">
+          <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= user_session_path %>" method="post" id="form-login">
+          <div class="template-data">
+
+          </div>
+          
+          <div class="form-group">
+            <label class="control-label">Password</label>
+            <p class="text-right" style="display: inline-block; float: right;"><a href="#">Forgot Password?</a></p>
+            <input type="password" name="user[password]" placeholder="" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <input id="btn-lookup-username" type="submit" value="Login" class="btn-block btn btn-success btn-sm" />
+          </div>
+        </form>  
+      </div> 
 
       <div class="step-verify-registration steps-login">
         <div class="user-image">
@@ -89,25 +113,30 @@
         <div class="user-image">
           <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
         </div>
-        <form action="" method="post" id="form-reset-password">
+        <form action="<%= set_password_path %>" method="post" id="form-reset-password">
           <div class="template-data">
-            <h5>Your mobile is not yet verified. Please verify your mobile by providing OTP.</h5>
+            <div class="form-group">
+              <input type="hidden" name="user[mobile_number]" />
+            </div>
+
+
           </div>
           
           <div class="form-group">
-            <div class="row no-margin">
-              
-              <div class="col-xs-12 no-padding"><label class="control-label">Your Mobile Number:</label></div>
-
-              <div class="col-xs-7 no-padding" style="padding-right: 10px">
-                <input type="number" disabled="disabled" name="user[mobile]" value="" class="form-control">
-                <input type="hidden" name="user[mobile]" value="" />
-              </div>
-              <div class="col-xs-5 no-padding"><button class="btn btn-sm btn-warning btn-block btn-send-otp" data-url="<%=  %>">Send OTP</button></div>
-            </div>
+            <label class="control-label">Set Your New Password:</label>
+            <input type="password" name="user[password]" class="form-control" />
           </div>
-      </div>
 
+          <div class="form-group">
+            <label class="control-label">Re-enter New Password:</label>
+            <input type="password" name="user[password_confirmation]" class="form-control"/>
+          </div>
+
+          <div class="form-group">
+            <input type="submit" value="Create Password & Login" class="btn btn-block btn-success btn-small" />
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
