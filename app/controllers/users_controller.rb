@@ -118,6 +118,7 @@ class UsersController < ApplicationController
   def set_new_password
     @result = User::Login::SetPassword.(params)
     if @result.success?
+      # signing in the user so that he can be redirected to expenses screen
       sign_in @result.user, :bypass => true
     end
     respond

@@ -51,6 +51,18 @@ class User::Login::SetPassword < BaseOperation
     add_message :success, "Password set!"
   end
 
+  def success
+    User::Login::SetPassword::SuccessPresenter.new(selected_user, params, messages)
+  end
+
+  class User::Login::SetPassword::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+
+    def init
+
+    end
+  end
+
 
   private
 
