@@ -52,20 +52,6 @@ class PasswordsController < Devise::PasswordsController
     end
   end
 
-  # action that lets mobile only users set their password for the first time
-  # also the action that mobile users use to set their password if they've forgotten it
-  def set_new
-    @result = User::Login::SetPassword.(nil, params)
-    if @result.success?
-      # log in and redirect to root URL
-      sign_in @result.user, :bypass => true
-      redirect_to root_url
-    else
-      # show error message
-      flash[:error] = @result.messages[:error]
-      redirect_to request.referrer
-    end
-  end
 
 
 end

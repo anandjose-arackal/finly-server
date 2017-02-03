@@ -950,7 +950,7 @@ ActiveRecord::Schema.define(version: 20170202163153) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-02-02', null: false
+    t.date     "date_of_birth",                   default: '2017-02-03', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false
@@ -1060,7 +1060,7 @@ ActiveRecord::Schema.define(version: 20170202163153) do
     t.string   "last_name",              limit: 255, default: "",    null: false
     t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
-    t.boolean  "verified"
+    t.boolean  "verified",                           default: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
