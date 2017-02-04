@@ -499,6 +499,7 @@ end
 # temporary otp verification all numbers in db
 User.all.each do |user|
   user.otp_confirm
+  user.uodate verified: true
 end
 
 if AdminUser.count == 0
