@@ -128,7 +128,7 @@ $(document).ready( ->
           $(stepVerifyRegistration).find('input[name=mobile_number]').val(formObjectData.email_mobile)
         else if Finly.Login.regex.email_patt.test(formObjectData.email_mobile)
           # $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val('')
-          $(stepVerifyRegistration).find('input[name=mobile_number]').val('').removeAttr('disabled')
+          $(stepVerifyRegistration).find('input[name=mobile_number]').val('').removeAttr('readonly')
         #User is not verified
         
         
