@@ -118,6 +118,8 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     end
     invited_user.accept_invitation!
     invited_user.confirm
+    # because the User's phone number has been verified officially
+    invited_user.otp_confirm
     invited_user.update_attributes(verified: false)
     # activating the user's card
     if invited_user.cards.present?
