@@ -45,6 +45,9 @@ class User::CardRestrictions::Update < User::Base
     if update_params[:channel_ecom_pos].nil?
       update_params[:channel_ecom_pos] = nil
     end
+    if update_params[:mcc_restriction_type].nil?
+      update_params[:mcc_restriction_type] = nil
+    end
   end
 
   def process
@@ -82,7 +85,7 @@ class User::CardRestrictions::Update < User::Base
   private
 
   def card_restriction_params
-    params.require(:restrictions).permit(:mcc_group_id, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget],
+    params.require(:restrictions).permit(:mcc_group_id, :mcc_restriction_type, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget],
                                                                                                      ecom_pos_limits: [:id, :transactions, :budget]])
   end
 
@@ -142,7 +145,7 @@ class User::CardRestrictions::Update < User::Base
     api_params = {}
     api_params[:mcc_group_id] = card_restriction_params[:mcc_group_id]
     if card_restriction_params[:mcc_group_id].present?
-      api_params[:mcc_restriction_type] = "A"
+      api_params[:mcc_restriction_type] = card_restriction_params[:mcc_restriction_type]
     else
       api_params[:mcc_restriction_type] = "I"
     end

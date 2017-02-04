@@ -142,6 +142,7 @@ json.restrictions do
   json.channel_atm @result.card_restriction.channel_atm
   json.channel_ecom_pos @result.card_restriction.channel_ecom_pos
   json.mcc_group_id @result.card_restriction.mcc_group_id
+  json.mcc_restriction_type @result.card_restriction.mcc_restriction_type
   json.mcc_group_name @result.card_restriction.mcc_group_name rescue nil
   json.mcc_groups do
     json.array! @result.mcc_groups.each do |mcc_group|
