@@ -1,5 +1,6 @@
 $(document).ready( ->
-  $("input[name=email_mobile]").focus().val("")
+  $(document).find("input[type=text][type=number][type=password]").val("")
+  $("input[name=email_mobile]").focus()
 
   Finly = {
     Login: {
@@ -18,6 +19,32 @@ $(document).ready( ->
         'mh-438'
         'mh-455'
       ]
+      snapNotify: (obj) ->
+        ohSnapX()
+        for type, messages of obj
+          switch type
+            when 'error'
+              color = 'red'
+              container = 'ohsnap-priority'
+            when 'success'
+              color = 'green'
+              container = 'ohsnap'
+            when 'failure'
+              color: 'orange'
+              container = 'ohsnap-priority'
+            when 'message'
+              color: 'blue'
+              container = 'ohsnap'
+            when 'notice'
+              color: 'blue'
+              container = 'ohsnap'
+            else
+              color: 'blue'
+              container = 'ohsnap'
+          if messages.length
+            for message in messages
+              # console.log "Message ", message, "Color:", color, "container", container
+              ohSnap(message, {color: color, 'duration': '9000', 'container-id': container})
     }
   }
 
@@ -109,6 +136,7 @@ $(document).ready( ->
         $(stepVerifyRegistration).show('slide', {direction: 'right'}, 200)
         $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
     else
+      Finly.Login.snapNotify(res.messages)
       # User is not found on the system
       # User might be deactivated by the admin
 
@@ -143,7 +171,7 @@ $(document).ready( ->
             console.log "Err", err
         })
     else
-      console.log "User not found"
+      Finly.Login.snapNotify(res.messages)
       # User is not found on the system
       # User might be deactivated by the admin
 
@@ -215,15 +243,15 @@ $(document).ready( ->
       type: $(form).attr('method'),
       data: values,
       success: (res) ->
-        console.log res
-        window.location.reload()
-        # if res.success == true
-        #   console.log "Respnose", res, "Logged in"
-        # $(stepLookup).hide('slide', {direction: 'left'}, 200)
+        if res.success == true
+          window.location.reload()
+        else
+          $(form).find("input[type=submit]").val("Login").removeAttr('disabled')
       error: (err) ->
         res = JSON.parse(err.responseText)
         $(form).find("input[type=submit]").val("Login").removeAttr('disabled')
-        alert res.error
+        # alert res.error
+        ohSnap(res.error, {color: 'red', 'duration': '9000', 'container-id': 'ohsnap-priority'})
     })
     # request.error((httpObj, textStatus) ->
     #   if(httpObj.status==401)
@@ -320,6 +348,7 @@ $(document).ready( ->
       dataType: 'JSON',
       data: formObjectData,
       success: (res) ->
+        Finly.Login.snapNotify(res.messages)
         if res.success == true
           handleResetPassword(res, formObjectData)
         # console.log "Will show password setting form"
@@ -349,10 +378,13 @@ $(document).ready( ->
       dataType: 'JSON',
       data: formObjectData,
       success: (res) ->
-        console.log "Success", res
-        window.location.reload
+        Finly.Login.snapNotify(res.messages)
+        # console.log "Success", res
+        if res.success == true
+          window.location.reload()
+        else
+          $(submit).removeAttr('disabled').val("Create Password & Login")
       error: (err) ->
-        console.log "Error", err
         $(submit).removeAttr('disabled').val("Create Password & Login")
        
     })
@@ -360,14 +392,30 @@ $(document).ready( ->
   )
 
   $(".a-forgot-password").on('click', (e) ->
-    console.log "Shouldn't submit the form"
+    # console.log "Shouldn't submit the form"
     e.preventDefault()
+    e.stopPropagation()
 
     loginContainer = $(@).closest('.login-container')
     stepCurrent = $(@).closest('.steps-login')
     stepResetPasswordOption = $(document).find('.login-container .step-reset-password-options')
-
     heightClass = $(stepResetPasswordOption).attr('data-height-class')
+
+
+    if $(stepCurrent).hasClass('step-lookup')
+      email_mobile = $(stepCurrent).find("input[name=email_mobile]").val()
+      # Extract email_mobile if any
+    else if $(stepCurrent).hasClass('step-password')
+      # Extract from Label
+      email_mobile = $(stepCurrent).find("input[name=user\\[email\\]]").val()
+
+    if Finly.Login.regex.mobile_patt.test(email_mobile)
+      $('a[href="#reset-by-mobile"]').tab('show')
+      $(stepResetPasswordOption).find("input[name=user\\[mobile_number\\]]").val(email_mobile)
+    else if Finly.Login.regex.email_patt.test(email_mobile)
+      $('a[href="#reset-by-email"]').tab('show')
+      $(stepResetPasswordOption).find("input[name=user\\[email\\]]").val(email_mobile)
+
 
     $(loginContainer).removeClass(Finly.Login.heights.join(' ')).addClass(heightClass)
     
