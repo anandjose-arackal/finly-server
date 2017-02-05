@@ -212,21 +212,36 @@
                     <form class="form-restrictions">
                       <div class="row no-margin" style="margin-bottom: 10px;">
                         <div class="col-sm-4">
-                          <label>Applied Product Code:</label>
+                          <label>Applied Category Restriction:</label>
                         </div>
 
-                        <div class="col-sm-8">
+                        <div class="col-sm-3">
+                            <label for="" class="item-attr-preview">
+                                {{#switch item.restrictions.mcc_restriction_type}}
+                                  {{#case 'A'}} Allowed {{/case}}
+                                  {{#case 'R'}} Disallowed {{/case}}
+                                  {{#case 'NA'}}{{/case}}
+                                {{/switch}}
+                            </label>
+                            <label for="" class="item-attr-edit">
+                                <input type="radio" value="A" name="restrictions[mcc_restriction_type]" />&nbsp;Allow
+                            </label>
+                            <label for="" class="item-attr-edit">
+                                <input type="radio" value="R" name="restrictions[mcc_restriction_type]" />&nbsp;Disallow
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
                           <div class="col-sm-6">
                             <label class="item-attr-preview">
-                              {{#if item.restrictions.product_code_name}}
-                                {{item.restrictions.product_code_name}}
+                              {{#if item.restrictions.mcc_group_name}}
+                                {{item.restrictions.mcc_group_name}}
                               {{else}}
-                                --
+                                No restriction
                               {{/if}}
                             </label>
-                            <select class="form-control item-attr-edit" name="restrictions[product_code_id]" style="width: 200px;" data-default-value="{{item.restrictions.product_code_id}}">
+                            <select class="form-control item-attr-edit" name="restrictions[mcc_group_id]" style="width: 200px;" data-default-value="{{item.restrictions.mcc_group_id}}">
                               <option value="">None</option>
-                              {{#each item.restrictions.product_codes}}
+                              {{#each item.restrictions.mcc_groups}}
                                 <option value="{{this.id}}">{{this.name}}</option>
                               {{/each}}
                             </select>

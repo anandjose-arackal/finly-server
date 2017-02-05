@@ -38,7 +38,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :product_codes, :card_limit, :card_periods, :card_limits, :card_restriction
+                  :periods, :auto_submit_config, :mcc_groups, :card_limit, :card_periods, :card_limits, :card_restriction
 
     def init
       self.selected_user = params[:selected_user]
@@ -57,7 +57,7 @@ class User::Show < User::Base
       self.auto_submit_config = self.selected_user.auto_submit_config
       self.periods = Period.all
       self.card_periods = Period.limit(3)
-      self.product_codes = ProductCombination.all
+      self.mcc_groups = MccGroup.all
       self.card_limit = params[:card_presenter].available_card_eligibility rescue nil
       self.card_restriction = selected_user.card_restriction rescue nil
       self.card_limits = card_restriction.card_limits rescue nil
