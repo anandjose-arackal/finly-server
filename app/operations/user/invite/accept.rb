@@ -124,6 +124,7 @@ class User::Invite::Accept < User::Invite::Base
   def pre_process
     # setting the verified flag to be true
     accept_params[:verified] = true
+    accept_params[:active] = true
   end
 
   def process

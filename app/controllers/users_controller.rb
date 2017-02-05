@@ -68,8 +68,6 @@ class UsersController < ApplicationController
     else
       # flash[:error] = @result.messages[:error].first rescue nil
     end
-    # redirect_to request.referrer
-    # redirect_to request.referrer
     respond
   end
 
@@ -127,18 +125,6 @@ class UsersController < ApplicationController
   def lookup
     @result = User::Lookup.(params)
     respond
-    # result = {
-    #   messages:{
-    #     error: ["User not found"]
-    #   }
-    # }
-    # # result = {messages: {error: ["Your account has been deactivated"]}}
-    # result[:success] = true
-    # result[:verified] = false
-    # # result[:verified] = true
-    # respond_to do |format|
-    #   format.json { render json: result.as_json}
-    # end
   end
 
   private

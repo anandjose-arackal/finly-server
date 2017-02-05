@@ -12,9 +12,9 @@ class SessionsController < Devise::SessionsController
     set_flash_message!(:notice, :signed_in)
     sign_in(resource_name, resource)
     # adding the user as a resource
-    @result = resource
+    @user = resource
     respond_to do |format|
-      format.json { render json: {success: true}}
+      format.json { render json: {success: true, otp_verified: @user.otp_verified}}
     end
   end
 

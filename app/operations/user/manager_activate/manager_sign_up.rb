@@ -105,6 +105,7 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     # set a dummy password here which will get replaced on first sign up
     temp_password = generate_random_string(4)
     accept_params[:password] = accept_params[:password_confirmation] = temp_password
+    accept_params[:active] = true
   end
 
 
