@@ -399,7 +399,7 @@
 #                                   lookup GET        /lookup(.:format)                                           users#lookup
 #                    send_verification_otp POST       /send_verification_otp(.:format)                            users#send_verification_otp
 #                          verify_user_otp POST       /verify_user_otp(.:format)                                  users#verify_user_otp
-#                             set_password POST       /set_password(.:format)                                     passwords#set_new
+#                             set_password POST       /set_password(.:format)                                     users#set_new_password
 #                                    users GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                     user GET        /users/:id(.:format)                                        users#show

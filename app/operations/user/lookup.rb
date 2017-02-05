@@ -23,9 +23,10 @@ class User::Lookup < User::Base
       add_message :error, "User not found"
       self.registered = false
       return
-    elsif selected_user.first_name.nil?
+    elsif selected_user.first_name.blank?
       self.registered = false
       add_message :error, "You have not signed up with Finly yet! Plese contact your manager for further details"
+      return
     else
       if selected_user.active?
         self.registered = true
@@ -35,7 +36,6 @@ class User::Lookup < User::Base
         return
       end
     end
-
     self.verified = selected_user.verified
     self.otp_verified = selected_user.otp_verified
   end
