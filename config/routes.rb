@@ -109,9 +109,9 @@
 #                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
 #                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
 #                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
-#                         new_user_session GET        /users/sign_in(.:format)                                    devise/sessions#new
-#                             user_session POST       /users/sign_in(.:format)                                    devise/sessions#create
-#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   devise/sessions#destroy
+#                         new_user_session GET        /users/sign_in(.:format)                                    sessions#new
+#                             user_session POST       /users/sign_in(.:format)                                    sessions#create
+#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   sessions#destroy
 #                            user_password POST       /users/password(.:format)                                   passwords#create
 #                        new_user_password GET        /users/password/new(.:format)                               passwords#new
 #                       edit_user_password GET        /users/password/edit(.:format)                              passwords#edit
@@ -396,6 +396,10 @@
 #                       users_user_profile GET        /users/user_profile(.:format)                               users#user_profile
 #                       users_user_balance GET        /users/user_balance(.:format)                               users#user_balance
 #                      users_user_security GET        /users/user_security(.:format)                              users#user_security
+#                                   lookup GET        /lookup(.:format)                                           users#lookup
+#                    send_verification_otp POST       /send_verification_otp(.:format)                            users#send_verification_otp
+#                          verify_user_otp POST       /verify_user_otp(.:format)                                  users#verify_user_otp
+#                             set_password POST       /set_password(.:format)                                     passwords#set_new
 #                                    users GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                     user GET        /users/:id(.:format)                                        users#show
@@ -408,6 +412,7 @@
 #                             user_profile GET        /users/:user_id/profile(.:format)                           users#profile
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
+#           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -535,7 +540,11 @@ Rails.application.routes.draw do
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
 
-  devise_for :users, controllers: {passwords: "passwords"}
+  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
+    # get 'login', to: 'sessions#new', as: :login
+    # post 'login', to: 'session#create', as: :login
+
+  end
 
   namespace :api do
     namespace :v0 do
@@ -684,11 +693,17 @@ Rails.application.routes.draw do
 
   get 'users/get_managers', to: 'users#get_managers'
 
-  #Backbone parials
+  #Backbone partials
   get 'users/user_profile'
   get 'users/user_balance'
   get 'users/user_security'
   #backbone partials for users ends
+
+  # routes for lookup and first tome otp
+  get 'lookup', to: 'users#lookup', as: :lookup
+  post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
+  post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
+  post 'set_password', to: 'users#set_new_password', as: :set_password
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
@@ -698,6 +713,7 @@ Rails.application.routes.draw do
     get 'profile', to: 'users#profile', as: :profile
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
+    get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
 
   # routes for testing import

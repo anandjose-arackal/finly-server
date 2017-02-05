@@ -36,10 +36,7 @@ class OtpController < ApplicationController
       flash[:failure] = @result.messages[:error].first rescue nil
       respond response: :failure
     end
-    # result = {success: true}
-    # respond_to do |format|
-    #   format.json {render json: result.as_json}
-    # end
   end
+
 
 end
