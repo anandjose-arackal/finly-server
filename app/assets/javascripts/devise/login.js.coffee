@@ -76,6 +76,12 @@ $(document).ready( ->
       $(_this.button).attr('disabled', false).html("Resend OTP").addClass('btn-success')
       clearInterval(_this.timer)
 
+    resetEverything: ->
+      _this = @
+      if @timer
+        clearInterval(@timer)
+      $(@button).attr('disabled', 'disabled').addClass('hidden')
+
     disableVerification: ->
       # // $("")
   }
@@ -120,8 +126,11 @@ $(document).ready( ->
 
         $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
       else
+        #User is not verified
         stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
         heightClass = $(stepVerifyRegistration).attr('data-height-class')
+        $(stepVerifyRegistration).find("button.btn-send-otp").removeAttr('disabled')
+        Timer.resetEverything()
 
         if Finly.Login.regex.mobile_patt.test(formObjectData.email_mobile)
           # $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val(formObjectData.email_mobile)
@@ -129,7 +138,6 @@ $(document).ready( ->
         else if Finly.Login.regex.email_patt.test(formObjectData.email_mobile)
           # $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val('')
           $(stepVerifyRegistration).find('input[name=mobile_number]').val('').removeAttr('readonly')
-        #User is not verified
         
         
 
@@ -148,11 +156,12 @@ $(document).ready( ->
       if Finly.Login.regex.mobile_patt.test(formObjectData.email_mobile)
         $(stepResetPasswordOption).hide('slide', {direction: 'left'}, 100)
         stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
+        heightClass = $(stepVerifyRegistration).attr('data-height-class')
         $(stepVerifyRegistration).find('input[name=user\\[mobile\\]]').val(formObjectData.email_mobile)
         $(stepVerifyRegistration).find('input[name=mobile_number]').val(formObjectData.email_mobile)
 
         $(stepVerifyRegistration).show('slide', {direction: 'right'}, 200)
-        $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass('mh-420')
+        $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
       else if Finly.Login.regex.email_patt.test(formObjectData.email_mobile)
         console.log "Something"
         $.ajax({
@@ -279,7 +288,11 @@ $(document).ready( ->
         mobile_number: $(stepContainer).find("input[name=mobile_number]").val()
       },
       success: (res) ->
-        Timer.startTimer()
+        Finly.Login.snapNotify(res.messages)
+        if res.success == true
+          Timer.startTimer()
+        else
+          $(button).removeAttr('disabled')
       error: (err) ->
         # Timer.startTimer()
         $(button).removeAttr('disabled')
@@ -416,7 +429,7 @@ $(document).ready( ->
       $('a[href="#reset-by-email"]').tab('show')
       $(stepResetPasswordOption).find("input[name=user\\[email\\]]").val(email_mobile)
 
-
+    console.log 'Adding Height', heightClass
     $(loginContainer).removeClass(Finly.Login.heights.join(' ')).addClass(heightClass)
     
     $(stepCurrent).hide('slide', {direction: 'left'}, 100)
