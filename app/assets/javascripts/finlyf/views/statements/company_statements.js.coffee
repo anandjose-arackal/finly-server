@@ -5,7 +5,9 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
   templateNavbarMain: HandlebarsTemplates['finlyf/statements/company/navbar/navbar_main']
   templateNavbarSidebar: HandlebarsTemplates['finlyf/statements/company/navbar/navbar_sidebar']
 
-  # templateMainSummary: HandlebarsTemplates['finlyf/statements/company/crud/mainSummary']
+  templatePoliciesSummary: HandlebarsTemplates['finlyf/statements/company/crud/policiesSummary']
+  templateCompanyTransactionSummary: HandlebarsTemplates['finlyf/statements/company/crud/companyTransactionsSummary']
+  templateCompanyBalanceSummary: HandlebarsTemplates['finlyf/statements/company/crud/companyBalanceSummary']
   # templateMainTransactions: HandlebarsTemplates['finlyf/statements/crud/mainTransactions']
 
   events:
@@ -13,15 +15,20 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
     'change input.filter-date-from, input.filter-date-to': 'fetchScopedData'
     'click .btn-export-transactions': 'exportTransactions'
 
+    'click .navigate-tab li a': 'navigateTab'
+
   initialize: (options) ->
+    console.log "Init, ", options
     _this = @
     if options
       if options.params
         @params = options.params
       else
         @params = {}
+    else
+      @params = {}
 
-    @params.statement_type = 'company_balance_summary'
+    @params.statement_type = @params.statement_type || 'company_policies_summary'
     today = new Date()
     @params.filter_date_from = @formatDate(new Date(today.getTime() - 30*24*60*60*1000))
     @params.filter_date_to = @formatDate(today)
@@ -60,38 +67,62 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
     @fetchTabData()
 
   fetchTabData: ->
+    current_tab = $(@el).find('.sidebar .statements-type li[data-tab-navigate="' + @params.statement_type + '"]')
+
+    $(current_tab).addClass('active').siblings("li").removeClass('active')
+    main = $(@el).find('.main')
+    # FinlyF.startMainLoader(main)
+
+
+
     # Will change this one..
     $(@el).find(".navbar-main").html(@templateNavbarMain({item: @params}))
     $(@el).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
     _this = @
     switch @params.statement_type
       when 'company_balance_summary'
-        url = '/statements/' + @user + '/summary'
+        url = '/statements/' + 'company_balance_summary'
       when 'company_transactions_summary'
-        url = '/statements/' + @user
-      when 'policy_expenses'
-        url = '/statements/' + @user + '/summary'
+        url = '/statements/' + 'company_transactions_summary'
+      when 'company_policies_summary'
+        url = '/statements/' + 'company_policies_summary'
       else
         @params.statement_type = 'company_balance_summary'
-        # url = 
-
+        url = '/statements/' + 'company_balance_summary'
 
     $.ajax({
       url: url
-      
+      dataType: 'json'
       data: @params
       success: (res) ->
-
         FinlyF.stopMainLoader($(_this.el).find('.main'))
         _this.populateSummary(res)
       error: (err) ->
         console.log "Err", err
     })
+
+  navigateTab: (e) ->
+
+    e.preventDefault()
+    li = $(e.currentTarget).parent()
+
+    statement_type = $(li).attr('data-tab-navigate')
+
+    @params.statement_type = statement_type
+    @fetchTabData()
     
 
   populateSummary: (item) ->
+    switch @params.statement_type
+      when 'company_balance_summary'
+        $(@el).find(".main").html(@templateMainSummary({item: item}))
+      when 'company_transactions_summary'
+        $(@el).find(".main").html(@templateMainSummary({item: item}))
+      when 'company_policies_summary'
+        $(@el).find(".main").html(@templatePoliciesSummary({item: item}))
+
+
     if @params.statement_type == 'summary'
-      $(@el).find(".main").html(@templateMainSummary({item: item}))
     else
       $(@el).find(".main").html(@templateMainTransactions({item: item}))
 
