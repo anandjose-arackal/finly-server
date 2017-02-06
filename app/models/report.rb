@@ -286,6 +286,14 @@ class Report < ActiveRecord::Base
     cash.value - report_total < 0
   end
 
+  # def card_amount
+  #   total = 0
+  #   self.expenses.only_manual_expenses.each do |e|
+  #     total += e.amount_value
+  #   end
+  #   total
+  # end
+
   private
 
   def controller_has_role

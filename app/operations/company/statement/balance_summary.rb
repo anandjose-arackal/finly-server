@@ -1,4 +1,4 @@
-class Company::Statement::Summary < Company::Statement::Base
+class Company::Statement::BalanceSummary < Company::Statement::Base
 
   attr_accessor :items
 
@@ -66,10 +66,10 @@ class Company::Statement::Summary < Company::Statement::Base
   end
 
   def success
-    Company::Statement::Summary::SummaryPresenter.new(user, {items: items}, messages)
+    Company::Statement::BalanceSummary::SummaryPresenter.new(user, {items: items}, messages)
   end
 
-  class Company::Statement::Summary::SummaryPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Company::Statement::BalanceSummary::SummaryPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :items
 
