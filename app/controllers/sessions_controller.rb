@@ -9,7 +9,7 @@ class SessionsController < Devise::SessionsController
   def create
     # super()
     self.resource = warden.authenticate!(auth_options)
-    set_flash_message!(:notice, :signed_in)
+    # set_flash_message!(:notice, :signed_in)
     sign_in(resource_name, resource)
     # adding the user as a resource
     @user = resource
