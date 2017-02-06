@@ -16,6 +16,7 @@
 #  active              :boolean
 #  disable_note        :text(65535)
 #  product_code        :string(255)      not null
+#  balance_id          :integer
 #
 
 class Card < ActiveRecord::Base
@@ -26,12 +27,18 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   has_many :transactions, class_name: 'CardTransaction'
 
+  belongs_to :balance, class_name: "Amount"
+
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
+
+  before_create do
+
+  end
 
   # before_save do
   #   if self.proxy
