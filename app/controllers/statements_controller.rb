@@ -28,25 +28,25 @@ class StatementsController < ApplicationController
   end
 
   # Company Statements
-  def company_statements
+  def company_balance_summary
     @result = Company::Statement::Summary.(current_user, params)
     respond_to do |format|
       format.html {render partial: 'company_statements'}
     end
   end
 
-  def company_summary
+  def company_transactions_summary
     @result = Company::Statement::Summary.(current_user, params)
     respond_to do |format|
       format.html {render partial: 'company_summary'}
     end
   end
 
-  def policies_summary
+  def company_policies_summary
     @result = Company::Statement::PolicyExpenses.(current_user, params)
     # debugger
     respond_to do |format|
-      format.html {render partial: 'policies_summary'}
+      format.json {}
     end
   end
 end
