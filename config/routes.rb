@@ -753,7 +753,7 @@ Rails.application.routes.draw do
   end
 
 
-  get 'statements/company_balance_summary' => 'statements#company_balabce_summary'
+  get 'statements/company_balance_summary' => 'statements#company_balance_summary'
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 

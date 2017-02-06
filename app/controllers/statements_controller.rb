@@ -29,9 +29,9 @@ class StatementsController < ApplicationController
 
   # Company Statements
   def company_balance_summary
-    @result = Company::Statement::Summary.(current_user, params)
+    @result = Company::Statement::BalanceSummary.(current_user, params)
     respond_to do |format|
-      format.html {render partial: 'company_statements'}
+      format.json {}
     end
   end
 
