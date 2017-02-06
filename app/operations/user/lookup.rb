@@ -22,15 +22,16 @@ class User::Lookup < User::Base
     if selected_user.nil?
       add_message :error, "User not found"
       self.registered = false
-      self.verified = false
       return
+    elsif selected_user.first_name.nil?
+      self.registered = false
+      add_message :error, "You have not signed up with Finly yet! Plese contact your manager for further details"
     else
       if selected_user.active?
         self.registered = true
       else
         add_message :error, "Your account has been deactivated"
         self.registered = false
-        self.verified = false
         return
       end
     end
@@ -42,16 +43,18 @@ class User::Lookup < User::Base
   def success
     params[:registered] = registered
     params[:verified] = verified
+    params[:otp_verified] = otp_verified
     User::Lookup::LookupPresenter.new(user, params, messages)
   end
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :verified, :registered
+    attr_accessor :verified, :registered, :otp_verified
 
     def init
       self.verified = params[:verified]
       self.registered = params[:registered]
+      self.otp_verified = params[:otp_verified]
     end
   end
 
