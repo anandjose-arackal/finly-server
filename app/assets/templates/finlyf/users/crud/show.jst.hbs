@@ -224,10 +224,18 @@
                                 {{/switch}}
                             </label>
                             <label for="" class="item-attr-edit">
-                                <input type="radio" value="A" name="restrictions[mcc_restriction_type]" />&nbsp;Allow
+                                <input type="radio" value="A"
+                                       {{#if_eq item.restrictions.mcc_restriction_type "A" }}
+                                           checked="checked"
+                                       {{/if_eq}}
+                                       name="restrictions[mcc_restriction_type]" />&nbsp;Allow
                             </label>
                             <label for="" class="item-attr-edit">
-                                <input type="radio" value="R" name="restrictions[mcc_restriction_type]" />&nbsp;Disallow
+                                <input type="radio" value="R"
+                                        {{#if_eq item.restrictions.mcc_restriction_type "R" }}
+                                           checked="checked"
+                                        {{/if_eq}}
+                                       name="restrictions[mcc_restriction_type]" />&nbsp;Disallow
                             </label>
                         </div>
                         <div class="col-sm-4">
