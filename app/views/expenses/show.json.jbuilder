@@ -6,6 +6,7 @@ json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 json.receipts @result.expense.receipts do |receipt|
   json.id receipt.id
   json.image do
+    json.file_type receipt.file_format
     json.original receipt.image.url
     json.thumb receipt.image.url(:thumb)
   end

@@ -70,7 +70,13 @@ end
 
 json.receipts @result.expenses do |expense|
   unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
-    json.url expense.receipts.first.image.url
+    json.image do
+      json.file_type expense.receipts.first.file_format
+      json.original expense.receipts.first.image.url
+      json.thumb expense.receipts.first.image.url(:thumb)
+    end
+    # json.url expense.receipts.first.image.url
+    # json.file_type expense.receipts.first.file_format
     json.date expense.date.strftime('%d %b %Y')
     json.merchant_name expense.merchant_name
     json.amount_value expense.amount.precision_value

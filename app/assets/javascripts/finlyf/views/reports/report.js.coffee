@@ -701,10 +701,15 @@ class FinlyF.Views.Report extends Backbone.View
   previewReceipt: (e) ->
     target = e.currentTarget
 
-    image_url = $(target).find("img").attr('src')
+    image_url = $(target).find("img").attr('data-original')
+    file_type = $(target).find("img").attr("data-file-type")
+
 
     item = {
-      url: image_url
+      image: {
+        original: image_url
+        file_type: file_type
+      }
     }
 
     $("#modal-receipt-preview").html(@templateReceiptPreview({item: item}))

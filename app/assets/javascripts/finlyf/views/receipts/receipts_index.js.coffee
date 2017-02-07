@@ -170,10 +170,21 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     target = $(e.currentTarget)
     model_id = $(target).find('input.select-item').attr('data-item-id')
     receipt = @collection.get(model_id)
+    # console.log receipt.get('url').split('.').pop()
+    # if receipt.get('url').split('.').pop().indexOf('pdf') != -1
+    #   receipt.set('file_type', 'pdf')
 
     modal = $(@el).find("#modal-receipt-preview")
     $(modal).html(@templatePreviewReceipt({item: receipt.toJSON()}))
     $(modal).modal('show')
+    # pdf = receipt.get('url')
+    # $(modal).find(".pdf").html('<embed class="fullFrame" ' +'type="application/pdf" ' +'src="' + pdf + '"></embed>').dialog({
+    #   autoOpen: true,
+    #   modal: true,
+    #   height: 400,
+    #   width: 400,
+    #   # title: "Resume"
+    # })
     
     # items = $(@el).find("#items .item")
     # for item in items

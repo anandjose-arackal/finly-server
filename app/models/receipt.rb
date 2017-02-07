@@ -80,4 +80,14 @@ class Receipt < ActiveRecord::Base
     end
   end
 
+  def file_format
+    if self.image_content_type == 'application/pdf'
+    type = "pdf"
+  elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.image_content_type)
+    type = "image"
+  else
+    type = "image"
+  end 
+  end
+
 end
