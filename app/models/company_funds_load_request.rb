@@ -25,4 +25,9 @@ class CompanyFundsLoadRequest < ActiveRecord::Base
   validates :amount, presence: true
 
   accepts_nested_attributes_for :amount
+
+  delegate :amount_value, to: :amount
+  delegate :requested_by_user_name, to: :requested_by_user
+
+  scope :with_amount, -> {joins(:amount).select('expenses.*, amount.*')}
 end
