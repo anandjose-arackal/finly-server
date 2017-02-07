@@ -14,11 +14,10 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
     'click li.filter-statement-type': 'filterStatementType'
     'change input.filter-date-from, input.filter-date-to': 'fetchScopedData'
     'click .btn-export-transactions': 'exportTransactions'
-
     'click .navigate-tab li a': 'navigateTab'
 
   initialize: (options) ->
-    console.log "Init, ", options
+    # console.log "Init, ", options
     _this = @
     if options
       if options.params
@@ -115,20 +114,14 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
   populateSummary: (item) ->
     switch @params.statement_type
       when 'company_balance_summary'
-        $(@el).find(".main").html(@templateMainSummary({item: item}))
+        $(@el).find(".main").html(@templateCompanyBalanceSummary({item: item}))
       when 'company_transactions_summary'
-        $(@el).find(".main").html(@templateMainSummary({item: item}))
+        $(@el).find(".main").html(@templateCompanyTransactionSummary({item: item}))
       when 'company_policies_summary'
         $(@el).find(".main").html(@templatePoliciesSummary({item: item}))
 
-
-    if @params.statement_type == 'summary'
-    else
-      $(@el).find(".main").html(@templateMainTransactions({item: item}))
-
   populateUserData: (item) ->
     $(@el).find(".sidebar").html(@templateSidebar({item: item}))
-
 
   filterStatementType: (e) ->
     FinlyF.startMainLoader($(@el).find('.main'))
