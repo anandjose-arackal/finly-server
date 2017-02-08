@@ -16,7 +16,7 @@
 #  active              :boolean
 #  disable_note        :text(65535)
 #  product_code        :string(255)      not null
-#  balance_id          :integer
+#  card_balance_id     :integer
 #
 
 

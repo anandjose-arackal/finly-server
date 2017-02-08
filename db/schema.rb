@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170208132824) do
+ActiveRecord::Schema.define(version: 20170208152811) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -241,7 +241,7 @@ ActiveRecord::Schema.define(version: 20170208132824) do
     t.boolean  "active"
     t.text     "disable_note",        limit: 65535
     t.string   "product_code",        limit: 255,   null: false
-    t.integer  "balance_id",          limit: 4
+    t.integer  "card_balance_id",     limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -969,7 +969,7 @@ ActiveRecord::Schema.define(version: 20170208132824) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-02-06', null: false
+    t.date     "date_of_birth",                   default: '2017-02-08', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

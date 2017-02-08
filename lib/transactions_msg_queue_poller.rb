@@ -11,7 +11,7 @@ class TransactionsMsgQueuePoller
       mq_server_address = ENV["MSG_QUEUE_ADDRESS_TESTING"]
     end
 
-    error_logger = Logger.new("#{Rails.root}/log/msg_queue_errors.log")
+    error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
 
     client = Stomp::Connection.new(username, password, mq_server_address, 61613, true)
     client.subscribe("/queue/FinlyQueue")
