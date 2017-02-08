@@ -240,6 +240,13 @@ $brand-admin-primary: $brand-danger;
 
 #primary-navbar{
   background: $brand-primary;
+
+  // @media all and (min-width: 1024px) {
+  //   .navbar-nav > li > a{
+  //     font-size: 12px;
+  //   }
+  // }
+  
 } 
 .admin{
   #primary-navbar{
