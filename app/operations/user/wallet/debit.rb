@@ -114,6 +114,7 @@ class User::Wallet::Debit < User::Wallet::Base
           debit_presenter = ItzCash::Debit.(target_user, params)
           unless debit_presenter.success?
             add_message :error, "Money debit failed, please try again later"
+            return
           end
           payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_card_to_virtual_account)
 
@@ -125,6 +126,7 @@ class User::Wallet::Debit < User::Wallet::Base
           debit_presenter = ItzCash::Debit.(target_user, params)
           unless debit_presenter.success?
             add_message :error, "Money debit failed, please try again later"
+            return
           end
           # the money has moved from the card to the virtual account already, now we need to move it from virtual account to wallet
           # add funds to the initiating user's wallet
