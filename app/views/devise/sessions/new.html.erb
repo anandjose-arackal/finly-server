@@ -1,87 +1,178 @@
-<% provide(:title, "Log In") %>
-<body>
-<img src="<%= image_url('/common/images/logos/logo_md.png') %>">
-<div class="modal-dialog">
-  <div class="loginmodal-container">
+<% provide(:title, "Finly: Log In") %>
+<img src="<%#= image_url('/common/images/logos/logo_md.png') %>">
 
-    <form  name="myForm" method="post" action="<%= user_session_path %>">
-      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-      <input id="email" type="text" name="user[email]" placeholder="Email or Phone Number" title="Enter Email Address">
-      <input id="password" type="password" name="user[password]" placeholder="Password" title="Enter Password">
-      <input id="submit_login" type="submit" name="login" class="login loginmodal-submit" value="LOG IN">
-    </form>
+<div class="container-fluid">
+  
+  <div class="row no-margin">
+    <div class="login-container mh-340">
+      <span class="login-box-top"></span>
+
+      <div class="step-lookup steps-login" data-height-class="mh-340">
+        <div class="user-image">
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= lookup_path %>" id="form-lookup">
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+          <div class="form-group">
+            <label class="control-label">Email / 10 Digit Mobile Number</label>
+            <input type="text" name="email_mobile" placeholder="Email ID or Mobile Number" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <input id="btn-lookup-username" disabled="disabled" type="submit" value="Proceed" class="btn-block btn btn-success btn-sm" />
+
+            <p class="text-right" style="margin-top: 5px;"><a class="a-forgot-password" href="#">Forgot Password?</a></p>
+          </div>
+        </form>  
+      </div>
+
+      <div class="step-password steps-login" data-height-class="mh-390">
+        <div class="user-image">
+          <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= user_session_path %>" method="post" id="form-login">
+          <div class="template-data">
+
+          </div>
+          
+          <div class="form-group">
+            <label class="control-label">Password</label>
+            <p class="text-right" style="display: inline-block; float: right;"><a href="#" class="a-forgot-password">Forgot Password?</a></p>
+            <input type="password" name="user[password]" placeholder="" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <input id="btn-lookup-username" type="submit" value="Login" class="btn-block btn btn-success btn-sm" />
+          </div>
+        </form>  
+      </div>
+
+      <div class="step-reset-password-options steps-login" data-height-class="mh-455">
+        <div class="user-image">
+          <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+
+        <form action="<%= lookup_path %>" id="form-init-reset-password">
+
+          <div class="template-data">
+            <label>Please Select Email or Mobile to Recover Your Password</label>
+          </div>
+
+
+          <ul class="nav nav-tabs nav-justified">
+            <li role="presentation" class="active"><a href="#reset-by-mobile" aria-controls="reset-by-mobile" role="tab" data-toggle="tab">Mobile</a></li>
+            <li role="presentation"><a href="#reset-by-email" aria-controls="reset-by-email" role="tab" data-toggle="tab">Email</a></li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="reset-by-mobile" data-reset-by="mobile">
+              <div class="form-group">
+                <label class="control-label">Mobile Number</label>
+                <input class="form-control" type="number" value="" name="user[mobile_number]" />
+              </div>
+
+              <div class="form-group">
+                <input class="btn btn-sm btn-block btn-success" type="submit" value="Proceed" />
+              </div>
+            </div>
+
+            <div class="tab-pane" id="reset-by-email" data-reset-by="email">
+              <div class="form-group">
+                <label class="control-label">Email</label>
+                <input class="form-control" type="text" value="" name="user[email]" />
+              </div>
+              <div class="form-group">
+                <input class="btn btn-sm btn-block btn-success btn-reset-password-email" type="submit" value="Send Password Reset Link" />
+              </div>
+            </div>
+          </div>
+        </form>  
+      </div> 
+
+      <div class="step-verify-registration steps-login" data-height-class="mh-438">
+        <div class="user-image">
+          <i class="fa fa-arrow-left" data-back-to="step-lookup"></i>
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= verify_user_otp_path %>" method="post" id="form-verify-user-otp">
+          <div class="template-data">
+            <h5>You need to verify your mobile number before you proceed</h5>
+          </div>
+          
+          <div class="form-group">
+            <div class="row no-margin">
+              
+              <div class="col-xs-12 no-padding"><label class="control-label">Your Mobile Number:</label></div>
+
+              <div class="col-xs-7 no-padding" style="padding-right: 10px">
+                <input type="number" readonly="readonly" name="mobile_number" value="" class="form-control">
+                <!-- <input type="hidden" name="mobile_number" value="" /> -->
+              </div>
+              <div class="col-xs-5 no-padding"><button class="btn btn-sm btn-warning btn-block btn-send-otp" data-url="<%= send_verification_otp_path %>">Send OTP</button></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="row no-margin">
+              <div class="col-xs-12 no-padding"><label class="control-label">OTP:</label></div>
+
+              <div class="col-xs-7 no-padding" style="padding-right: 10px">
+                <input type="number" name="otp" value="" class="input-otp form-control">
+              </div>
+              <div class="col-xs-5 no-padding"><button disabled="disabled" class="btn btn-sm btn-warning btn-block btn-resend-otp hidden" data-url="<%= send_verification_otp_path %>">Resend</button></div>  
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input type="submit" disabled="disabled" value="Verify Mobile" class="btn-block btn btn-success btn-sm btn-verify-otp" />
+          </div>
+        </form>  
+      </div>
+
+      <div class="step-reset-password steps-login" data-height-class="mh-405">
+        <div class="user-image">
+          <img src="<%= image_url('/common/images/profile_pic.png') %>" class="img img-circle">
+        </div>
+        <form action="<%= set_password_path %>" method="post" id="form-reset-password">
+          <div class="template-data">
+            <div class="form-group">
+              <input type="hidden" name="user[mobile_number]" />
+            </div>
+
+
+          </div>
+          
+          <div class="form-group">
+            <label class="control-label">Set Your New Password:</label>
+            <input type="password" name="user[password]" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label class="control-label">Re-enter New Password:</label>
+            <input type="password" name="user[password_confirmation]" class="form-control"/>
+          </div>
+
+          <div class="form-group">
+            <input type="submit" value="Set New Password & Login" class="btn btn-block btn-success btn-small" />
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
-<a id="forgot_password_anchor" href="<%= new_user_password_path %>">
-  <h6 id="forgot_password_text"> Forgot Password? </h6></a>
 
-</body>
-<style>
-
-  .topbarContainer {
-    visibility: hidden;
-  }
-
-  img{
-    margin-top: -150px;
-    width: 25%;
-    margin-right: auto;
-    margin-left: 35.5%;
-  }
-
-  body {
-
-    background-color: #46568b;
-    position: absolute;
-    margin: 160px 0px 0 0px;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-
-  }
-
-
-
-  .loginmodal-submit {
-    /* border: 1px solid #3079ed; */
-    border: 0px;
-    color: #fff;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
-    background-color: #93c178;
-    padding: 17px 0px;
-    font-family: sans-serif;
-    font-size: 14px;
-    /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#4787ed)); */
-  }
-
-  .loginmodal-submit:hover {
-    /* border: 1px solid #2f5bb7; */
-    border: 1px solid #93c178;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.3);
-    background-color: #f7ef6a;
-    color: #555;
-    /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#357ae8)); */
-  }
+<style type="text/css">
 
 </style>
 
-
-<script>
-  function validateForm() {
-
-    var email = document.forms["myForm"]['user[email]'].value;
-    var password = document.forms["myForm"]['user[password]'].value;
-
-    if (email == null || email == "") {
-      alert("Email must be filled out");
-      return false;
-    }
-    if (password == null || password == "") {
-      alert("Password must be filled out");
-      return false;
-    }
-  }
-
+<script type="text/javascript">
+  
 </script>
+
+<style type="text/css">
+  
+</style>

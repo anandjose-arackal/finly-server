@@ -2,21 +2,25 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
   attr_accessor :selected_user
 
-  OTP_RESEND_TIMER = 60
+  OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
   def authorized_user_types
-    [:manager, :company_admin]
+    [:manager, :finance_manager, :company_admin]
+  end
+
+  def pre_validate
+    if user.blank? || params.blank?
+      add_message :error, "Invalid input data"
+      return
+    end
   end
 
   def init
     self.selected_user = user.company.users.find_by(id: params[:user_id])
   end
 
-  def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << 'Invalid parameters. Try again'
-      return
-    end
+  def authorize
+
   end
 
   def validate
@@ -35,7 +39,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
   end
 
   def process
-    response = OtpVerification::Create.(user, mobile_number: selected_user.mobile_number)
+    response = OtpVerification::Create.(selected_user, mobile_number: selected_user.mobile_number)
     if response.success?
       otp = response.otp
       # have to save it without validation because update_attributes considers validations
@@ -45,9 +49,5 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
       messages[:error] = response.messages[:error]
     end
   end
-
-  # def success
-  #   true
-  # end
 
 end

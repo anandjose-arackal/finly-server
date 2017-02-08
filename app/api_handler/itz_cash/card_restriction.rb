@@ -23,10 +23,18 @@ class ItzCash::CardRestriction < ItzCash::Base
     super()
     self.card = user.cards.first
     self.restriction_type = params[:channel_type_allowed] # will always contain Y/N/I
-    self.day_trans_limit = (params[:dailycount] > 0) ? params[:dailycount] : [params[:weeklycount], params[:monthlycount]].max.ceil
-    self.day_amount_limit = (params[:dailyamount] > 0) ? params[:dailyamount] : [params[:weeklyamount], params[:monthlyamount]].max.ceil
-    self.week_trans_limit = (params[:weeklycount] > 0) ? params[:weeklycount] : [params[:dailycount].to_i*7, params[:monthlyamount]].max.ceil
-    self.week_amount_limit = (params[:weeklyamount] > 0) ? params[:weeklyamount] : [params[:dailyamount].to_i*7, params[:monthlyamount]].max.ceil
+    self.day_trans_limit = (params[:dailycount] > 0) ? params[:dailycount] : [params[:weeklycount].to_i, params[:monthlycount].to_i].max.ceil
+    self.day_amount_limit = (params[:dailyamount] > 0) ? params[:dailyamount] : [params[:weeklyamount].to_i, params[:monthlyamount].to_i].max.ceil
+    self.week_trans_limit = if params[:weeklycount] > 0
+                              params[:weeklycount]
+                            else
+                              params[:monthlycount].to_i > 0 ? params[:monthlycount] : ([params[:dailycount].to_i*7, params[:monthlycount].to_i].max.ceil)
+                            end
+    self.week_amount_limit = if params[:weeklyamount] > 0
+                               params[:weeklyamount]
+                             else
+                               params[:monthlyamount].to_i > 0 ? params[:monthlyamount] : ([params[:dailyamount].to_i*7, params[:monthlyamount].to_i].max.ceil)
+                             end
     self.month_trans_limit = (params[:monthlycount] > 0) ? params[:monthlycount] : [params[:dailycount].to_i*32, params[:weeklycount].to_i*5].max.ceil
     self.month_amount_limit = (params[:monthlyamount] > 0) ? params[:monthlyamount] : [params[:dailyamount].to_i*32, params[:weeklyamount].to_i*5].max.ceil
     post_initialize # this sets the limits to arbitrarily high values if they're not present
@@ -41,7 +49,7 @@ class ItzCash::CardRestriction < ItzCash::Base
   end
 
   def validate
-    if params[:dailyamount] < 0 || params[:monthlycount] < 0 || params[:weeklyamount] < 0
+    if params[:dailyamount] < 0 || params[:monthlyamount] < 0 || params[:weeklyamount] < 0
       add_message :error, "Amount cannot be negative"
       return
     end
@@ -49,6 +57,11 @@ class ItzCash::CardRestriction < ItzCash::Base
       add_message :error, "Number of transactions can not be negative"
     end
   end
+
+  # def process
+  #   super()
+  #   debugger
+  # end
 
   def success
     params[:response_code] = parsed_response[0]

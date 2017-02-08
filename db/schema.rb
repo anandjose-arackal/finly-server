@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170131194554) do
+ActiveRecord::Schema.define(version: 20170203143136) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -162,17 +162,17 @@ ActiveRecord::Schema.define(version: 20170131194554) do
   end
 
   create_table "card_restrictions", force: :cascade do |t|
-    t.integer  "user_id",          limit: 4
+    t.integer  "user_id",              limit: 4
     t.boolean  "channel_atm"
     t.boolean  "channel_pos"
     t.boolean  "channel_online"
-    t.integer  "product_code_id",  limit: 4
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.boolean  "channel_ecom_pos"
+    t.integer  "mcc_group_id",         limit: 4
+    t.string   "mcc_restriction_type", limit: 255
   end
 
-  add_index "card_restrictions", ["product_code_id"], name: "index_card_restrictions_on_product_code_id", using: :btree
   add_index "card_restrictions", ["user_id"], name: "index_card_restrictions_on_user_id", using: :btree
 
   create_table "card_statuses", force: :cascade do |t|
@@ -447,6 +447,13 @@ ActiveRecord::Schema.define(version: 20170131194554) do
   end
 
   add_index "mcc_category_mappings", ["category_id"], name: "index_mcc_category_mappings_on_category_id", using: :btree
+
+  create_table "mcc_groups", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "code",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "money_request_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -950,7 +957,7 @@ ActiveRecord::Schema.define(version: 20170131194554) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-02-01', null: false
+    t.date     "date_of_birth",                   default: '2017-02-06', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false
@@ -1058,9 +1065,9 @@ ActiveRecord::Schema.define(version: 20170131194554) do
     t.integer  "otp_count",              limit: 4,   default: 0,     null: false
     t.string   "first_name",             limit: 255, default: "",    null: false
     t.string   "last_name",              limit: 255, default: "",    null: false
-    t.boolean  "default_password"
     t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
+    t.boolean  "verified",                           default: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

@@ -121,6 +121,12 @@ class User::Invite::Accept < User::Invite::Base
 
   end
 
+  def pre_process
+    # setting the verified flag to be true
+    accept_params[:verified] = true
+    accept_params[:active] = true
+  end
+
   def process
     self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present? and invited_user.valid?

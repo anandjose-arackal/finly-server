@@ -40,16 +40,10 @@
 #  otp_count              :integer          default(0), not null
 #  first_name             :string(255)      default(""), not null
 #  last_name              :string(255)      default(""), not null
-#  default_password       :boolean
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
+#  verified               :boolean          default(FALSE)
 #
-
-
-
-
-
-
 
 
 
@@ -289,6 +283,10 @@ class User < ActiveRecord::Base
   # activates the user in devise
   def activate
     self.confirm
+  end
+
+  def first_time_login?
+    !self.default_password
   end
 
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
