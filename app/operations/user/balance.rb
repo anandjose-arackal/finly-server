@@ -46,7 +46,7 @@ class User::Balance < User::Base
     # Wallet
     self.balances[:target_user_wallet] = User::Wallet::Balance.(user, for_user: target_user) if params[:target_user_wallet] or params[:target_user_all]
     self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]
-    # debugger
+
     # Card
     if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
       presenter = User::PrepaidCard::Show.(user, user: target_user)
@@ -62,10 +62,6 @@ class User::Balance < User::Base
     # Cash In Hand
     self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
     self.balances[:current_user_cash_in_hand] = user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:current_user_cash_in_hand] or params[:current_user_all]
-
-    # Pending Reimbursement
-    self.balances[:target_user_pending_reimbursement] = target_user.balance_sheet.pending_reimbursement.amount_value if params[:target_user_pending_reimbursement] or params[:target_user_all]
-    self.balances[:current_user_pending_reimbursement] = user.balance_sheet.pending_reimbursement.amount_value if params[:current_user_pending_reimbursement] or params[:current_user_all]
 
     # Pending Cash Advance
     self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_advance_request] or params[:target_user_all]

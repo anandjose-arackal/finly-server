@@ -600,6 +600,7 @@ Rails.application.routes.draw do
         post 'gcm/register', to: 'gcm#create'
         post 'gcm/unregister', to: 'gcm#delete'
       end
+      get 'balances', to: 'users#balance'
     end
   end
 
