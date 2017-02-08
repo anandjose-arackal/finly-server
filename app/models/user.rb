@@ -47,6 +47,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -203,6 +204,8 @@ class User < ActiveRecord::Base
     name = first_name
     "#{name} #{last_name}"
   end
+
+  alias_method :requested_by_user_name, :name
 
   def name_shortened
     "#{first_name[0]}#{last_name[0]}".upcase

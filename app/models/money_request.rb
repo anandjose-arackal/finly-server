@@ -28,6 +28,7 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -67,6 +68,10 @@ class MoneyRequest < ActiveRecord::Base
   scope :without_payment, -> { where payment_id: nil }
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
+
+  # scoping by payment type - cash or card
+  scope :via_cash_only, -> {where payment_mode_id: PaymentMode.id_for(:cash)}
+  scope :via_card_only, -> {where payment_mode_id: PaymentMode.id_for(:card)}
 
   scope :filter_status, ->(status_id) { where status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }

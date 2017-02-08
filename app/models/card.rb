@@ -16,6 +16,7 @@
 #  active              :boolean
 #  disable_note        :text(65535)
 #  product_code        :string(255)      not null
+#  card_balance_id     :integer
 #
 
 class Card < ActiveRecord::Base
@@ -26,12 +27,28 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   has_many :transactions, class_name: 'CardTransaction'
 
+  has_many :card_balance_history
+
+  belongs_to :card_balance, class_name: "Amount"
+
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
 
+  delegate :card_balance_value, to: :card_balance
+
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
+
+  after_create do
+    user = self.user
+    balance_amount = ItzCash::AccountDetails.(user, {}).balance rescue 0
+    unless self.card_balance
+      balance = Amount.create!(value: balance_amount, currency_id: Currency.first.id)
+      self.update_attributes(card_balance_id: balance.id)
+    end
+    self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
+  end
 
   # before_save do
   #   if self.proxy

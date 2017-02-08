@@ -29,10 +29,6 @@
 
 
 
-
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -285,6 +281,14 @@ class Report < ActiveRecord::Base
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
   end
+
+  # def card_amount
+  #   total = 0
+  #   self.expenses.only_manual_expenses.each do |e|
+  #     total += e.amount_value
+  #   end
+  #   total
+  # end
 
   private
 

@@ -1,6 +1,7 @@
 class FinlyF.Views.Statement extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/statements/base/skeleton']
   templateSidebar: HandlebarsTemplates['finlyf/statements/sidebar/sidebar']
+  templateNavbarSidebar: HandlebarsTemplates['finlyf/statements/navbar/navbarSidebar']
   templateNavbarMain: HandlebarsTemplates['finlyf/statements/navbar/navbar_main']
 
   templateMainSummary: HandlebarsTemplates['finlyf/statements/crud/mainSummary']
@@ -41,6 +42,7 @@ class FinlyF.Views.Statement extends Backbone.View
 
   render: ->
     $(@el).html(@templateSkeleton({item: @params}))
+    $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar())
     $(@el).find(".sidebar").html(@templateSidebar())
 
     FinlyF.structureActions(@el, @params)
@@ -58,6 +60,8 @@ class FinlyF.Views.Statement extends Backbone.View
 
   fetchTabData: ->
     $(@el).find(".navbar-main").html(@templateNavbarMain({item: @params}))
+    $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar({item: @params}))
+
     $(@el).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
     _this = @
     switch @params.statement_type

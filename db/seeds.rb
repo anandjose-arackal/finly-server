@@ -447,7 +447,7 @@ if Report.count == 0
 end
 
 unless Rails.env.production?
-  if Card.count == 0
+  # if Card.count == 0
     User.all.each do |user|
       if user.id < 9
         number = "S0001774009#{(user.id - 1)}"
@@ -455,7 +455,7 @@ unless Rails.env.production?
                           card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
       end
     end
-  end
+  # end
 
 # creating some junk transactions and card expenses for testing
   if CardTransaction.count == 0
@@ -524,7 +524,7 @@ end
 #       trans_types = ["POS", "ATM", "Ecom"]
 #       trans_modes = ["Debit", "Credit"]
 #       from_date = Date.parse("01-01-2016 12:00:00")
-#       to_date = DateTime.now
+#       to_date = DateTime.nowk
 #       random_amount = random_integer(50,200) + 0.1234
 #       sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5,10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0,2000)%2]},#{card.proxy},RBLRUP"
 #

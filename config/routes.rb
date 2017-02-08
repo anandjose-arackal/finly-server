@@ -478,9 +478,9 @@
 #                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
-#            statements_company_statements GET        /statements/company_statements(.:format)                    statements#company_statements
-#               statements_company_summary GET        /statements/company_summary(.:format)                       statements#company_summary
-#              statements_policies_summary GET        /statements/policies_summary(.:format)                      statements#policies_summary
+#       statements_company_balance_summary GET        /statements/company_balance_summary(.:format)               statements#company_balance_summary
+#  statements_company_transactions_summary GET        /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
+#      statements_company_policies_summary GET        /statements/company_policies_summary(.:format)              statements#company_policies_summary
 #                                          GET        /statements/:id/summary(.:format)                           statements#summary
 #                         export_statement GET        /export/:id/statements(.:format)                            export#statement
 #                               statements GET        /statements(.:format)                                       statements#index
@@ -752,9 +752,11 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'statements/company_statements' => 'statements#company_statements'
-  get 'statements/company_summary' => 'statements#company_summary'
-  get 'statements/policies_summary' => 'statements#policies_summary'
+
+  get 'statements/company_balance_summary' => 'statements#company_balance_summary'
+  get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
+  get 'statements/company_policies_summary' => 'statements#company_policies_summary'
+
   get 'statements/:id/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
