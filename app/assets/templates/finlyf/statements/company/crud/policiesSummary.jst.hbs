@@ -1,0 +1,30 @@
+<table class="table table-striped" style="border: 1px solid #ddd;">
+  <thead>
+    <tr>
+      <td>#</td>
+      <td>Policy Name</td>
+      <td>Amount(INR)</td>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each item}}
+      <tr>
+        <td>{{add @index 1}}</td>
+        <td>{{this.name}}</td>
+        <td>&#8377;&nbsp;{{this.total}}</td>
+      </tr>
+
+      <tr>
+        <td></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;Via Card</td>
+        <td>&#8377;&nbsp;{{this.via_card}}</td>
+      </tr>
+
+      <tr>
+        <td></td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;Via Cash</td>
+        <td>&#8377;&nbsp;{{this.via_cash}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

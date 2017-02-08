@@ -1,0 +1,78 @@
+<table class="table table-striped" style="border: 1px solid #ddd;">
+  <thead>
+    <tr>
+      <td>Type</td>
+      <td>Description</td>
+      <td>Amount(INR)</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Company Account Opening Balance:</td>
+      <td></td>
+      <td>{{item.company_account_opening_balance}}</td>
+    </tr>
+
+    <tr>
+      <td>Company Account Details</td>
+      <td>
+        <p>Total Account Load via NEFT / Cheque</p>
+        <ul>
+          <li>Date - </li>
+          <li>Date - </li>
+        </ul>
+      </td>
+      <td>
+        <p>{{item.total_account_load_via_NEFT}}</p>
+        <ul>
+          <li></li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Transfers to Company Account</td>
+
+      <td>
+        <ul>
+          <li>Total</li>
+          {{#each item.transfer_to_company_account.admin_transfers}}
+            <li>Admin {{add @index 1}} - {{this.name}}</li>
+          {{/each}}
+        </ul>        
+      </td>
+
+      <td>
+        <ul>
+          <li>{{item.transfers_to_company_account.total}}</li>
+          {{#each item.transfer_to_company_account.admin_transfers}}
+            <li>&#8733;&nbsp;{{this.amount}}</li>
+          {{/each}}
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Total Amount Transferred</td>
+      <td>
+        <ul>
+          <li>To Finly Expense Cards</li>
+          <li>To Finly Money</li>
+        </ul>
+      </td>
+
+      <td>
+        <ul>
+          <li>{{item.total_amount_transferred.to_finly_cards}}</li>
+          <li>{{item.total_amount_transferred.to_finly_money}}</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Account Closing Balance</td>
+      <td></td>
+      <td>{{item.company_account.closing_balance}}</td>
+    </tr>
+  </tbody>
+</table>

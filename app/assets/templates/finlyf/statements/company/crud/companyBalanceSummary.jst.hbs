@@ -1,0 +1,78 @@
+<table class="table table-striped" style="border: 1px solid #ddd;">
+  <thead>
+    <tr>
+      <td>Type</td>
+      <td>Status as on {{item.current_date}}</td>
+      <td>Amount(INR)</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Company Balance:</td>
+      <td>{{item.current_company_balance}}</td>
+    </tr>
+
+    <tr>
+      <td>2</td>
+      <td>Total Amount with Employees</td>
+      <td>{{item.total_amount_with_employees.total}}</td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td><li>Total Amount on Cards</li></td>
+      <td>{{item.total_amount_with_employees.in_cards}}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><li>Total Amount on Finly Accounts</li></td>
+      <td>{{item.total_amount_with_employees.in_finly_money}}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><li>Total Cash on Employees Hand</li></td>
+      <td>{{item.total_amount_with_employees.in_cash_on_hand}}</td>
+    </tr>
+
+    <tr>
+      <td>3</td>
+      <td>Money Request Awaiting Settlement</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Via Card</td>
+      <td>{{item.money_requests_awaiting_settlement.via_card}}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Via Cash</td>
+      <td>{{item.money_requests_awaiting_settlement.via_cash}}</td>
+    </tr>
+
+    <tr>
+      <td>3</td>
+      <td>Reports Awaiting Settlement</td>
+      <td>{{item.reports_awaiting_settlement}}</td>
+    </tr>
+
+    <tr>
+      <td>4</td>
+      <td>Unreported Expenses</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td>Via Card</td>
+      <td>{{item.unreported_expenses.via_card_number}}&nbsp;|&nbsp;{{item.unreported_expenses.via_card_total}}</td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td>Via Cash</td>
+      <td>{{item.unreported_expenses.via_cash_number}}&nbsp;|&nbsp;{{item.unreported_expenses.via_cash_total}}</td>
+    </tr>
+  </tbody>
+</table>
