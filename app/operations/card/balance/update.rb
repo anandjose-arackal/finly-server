@@ -1,8 +1,9 @@
-# action that updates the card balance history after a particular messages queue entry
+# action that updates the card balance history after a particular messages queue entry, and also updates the currenct
+# card's balance
 
 class Card::Balance::Update < BaseOperation
 
-  attr_accessor :history
+  attr_accessor :history, :card, :balance
 
   class Card::Balance::Update::HistoryPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -14,15 +15,13 @@ class Card::Balance::Update < BaseOperation
   end
 
   def initialize(params, messages = {})
-    self.params = params
+    self.params = (ActionController::Parameters.new(params) or {})
     self.messages = messages
   end
 
   def init
     self.card = Card.find_by(proxy: params[:card_proxy])
-    if card
-      self.balance_id = card.card_balance_history.amount_id
-    end
+    self.balance = params[:amount_attributes][:value]
   end
 
   def validate
@@ -36,18 +35,18 @@ class Card::Balance::Update < BaseOperation
     unless history.save
       add_message :error, card.errors.full_messages
     end
+    card.card_balance.update_attributes(value: balance)
   end
 
   def success
     params[:history] = history
+    Card::Balance::Update::HistoryPresenter.new(user, params, messages)
   end
 
   private
 
   def history_update_params
-    p = params.permit(:timestamp, amount_attributes: [:value, :currency_id])
-    p[:amount_attributes][:id] = balance_id
-    p.permit!
+    params.permit(:timestamp, amount_attributes: [:value, :currency_id])
   end
 
 end

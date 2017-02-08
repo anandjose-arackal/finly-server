@@ -19,6 +19,7 @@ class BalanceMsgQueuePoller
     puts "Subscribed!"
 
     loop do
+
       message = client.receive
 
       puts message.body
@@ -26,11 +27,10 @@ class BalanceMsgQueuePoller
       delimiter = ","
 
       data = message.body.split(delimiter)
-
-      # for the split between merchant city and merchant name
+      
 
       balance_update_params = {card_proxy: data[1],
-                               balance_attributes: {value: data[2], currency_id: 1},
+                               amount_attributes: {value: data[2], currency_id: 1},
                                timestamp: data[3]
                               }
 
