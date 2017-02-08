@@ -6,7 +6,7 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
   templateNavbarSidebar: HandlebarsTemplates['finlyf/statements/company/navbar/navbar_sidebar']
 
   templatePoliciesSummary: HandlebarsTemplates['finlyf/statements/company/crud/policiesSummary']
-  templateCompanyTransactionSummary: HandlebarsTemplates['finlyf/statements/company/crud/companyTransactionsSummary']
+  templateCompanyTransactionSummary: HandlebarsTemplates['finlyf/statements/company/crud/companyTransactionSummary']
   templateCompanyBalanceSummary: HandlebarsTemplates['finlyf/statements/company/crud/companyBalanceSummary']
   # templateMainTransactions: HandlebarsTemplates['finlyf/statements/crud/mainTransactions']
 
