@@ -3,7 +3,7 @@ item = @result.items
 json.company_account_opening_balance item[:company_account_opening_balance]
 json.company_account_closing_balance item[:company_account_closing_balance]
 json.company_account_details do
-  json.total_account_load_via_NEFT item[:company_account_details][:total_account_load_via_NEFT]
+  json.total_account_load_via_NEFT item[:total_account_load_via_NEFT]
   json.loads do
     json.array! item[:company_account_details][:loads] do |load|
       json.date load[:date]

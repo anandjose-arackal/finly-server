@@ -10,22 +10,25 @@
     <tr>
       <td>Company Account Opening Balance:</td>
       <td></td>
-      <td>{{item.company_account_opening_balance}}</td>
+      <td>&#8377;&nbsp;{{item.company_account_opening_balance}}</td>
     </tr>
 
-    <tr>
+    <tr rowspan="4">
       <td>Company Account Details</td>
       <td>
         <p>Total Account Load via NEFT / Cheque</p>
         <ul>
-          <li>Date - </li>
-          <li>Date - </li>
+          {{#each item.company_account_details.loads}}
+            <li>Date - {{this.date}} </li>
+          {{/each}}
         </ul>
       </td>
       <td>
-        <p>{{item.total_account_load_via_NEFT}}</p>
+        <p>&#8377;&nbsp;{{item.company_account_details.total_account_load_via_NEFT}}</p>
         <ul>
-          <li></li>
+          {{#each item.company_account_details.loads}}
+            <li>&#8377;&nbsp;{{this.amount}}</li>
+          {{/each}}
         </ul>
       </td>
     </tr>
@@ -34,19 +37,41 @@
       <td>Transfers to Company Account</td>
 
       <td>
+        <p>Total</p>
         <ul>
-          <li>Total</li>
-          {{#each item.transfer_to_company_account.admin_transfers}}
+          {{#each item.transfers_to_company_account.admin_transfers}}
             <li>Admin {{add @index 1}} - {{this.name}}</li>
           {{/each}}
         </ul>        
       </td>
 
       <td>
+        <p>&#8377;&nbsp;{{item.transfers_to_company_account.total}}</p>
         <ul>
-          <li>{{item.transfers_to_company_account.total}}</li>
-          {{#each item.transfer_to_company_account.admin_transfers}}
-            <li>&#8733;&nbsp;{{this.amount}}</li>
+          {{#each item.transfers_to_company_account.admin_transfers}}
+            <li>&#8377;&nbsp;{{this.amount}}</li>
+          {{/each}}
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Transfers from Company Account</td>
+
+      <td>
+        <p>Total</p>
+        <ul>
+          {{#each item.transfers_from_company_account.admin_transfers}}
+            <li>Admin {{add @index 1}} - {{this.name}}</li>
+          {{/each}}
+        </ul>        
+      </td>
+
+      <td>
+        <p>&#8377;&nbsp;{{item.transfers_from_company_account.total}}</p>
+        <ul>
+          {{#each item.transfers_from_company_account.admin_transfers}}
+            <li>&#8377;&nbsp;{{this.amount}}</li>
           {{/each}}
         </ul>
       </td>
@@ -63,8 +88,8 @@
 
       <td>
         <ul>
-          <li>{{item.total_amount_transferred.to_finly_cards}}</li>
-          <li>{{item.total_amount_transferred.to_finly_money}}</li>
+          <li>&#8377;&nbsp;{{item.total_amount_transferred.to_finly_cards}}</li>
+          <li>&#8377;&nbsp;{{item.total_amount_transferred.to_finly_money}}</li>
         </ul>
       </td>
     </tr>
@@ -72,7 +97,7 @@
     <tr>
       <td>Account Closing Balance</td>
       <td></td>
-      <td>{{item.company_account.closing_balance}}</td>
+      <td>&#8377;&nbsp;{{item.company_account_closing_balance}}</td>
     </tr>
   </tbody>
 </table>

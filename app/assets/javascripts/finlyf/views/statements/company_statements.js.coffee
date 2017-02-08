@@ -50,9 +50,10 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
     console.log "In render"
     $(@el).html(@templateSkeleton({item: @params}))
     $(@el).find(".sidebar").html(@templateSidebar())
-    $(@e).find(".navbar-sidebar").html(@templateNavbarSidebar())
+    $(@el).find(".navbar-sidebar").html(@templateNavbarSidebar())
 
     FinlyF.structureActions(@el, @params)
+    $(@el).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
     @fetchTabData()
     @
 
@@ -70,6 +71,7 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
 
     $(current_tab).addClass('active').siblings("li").removeClass('active')
     main = $(@el).find('.main')
+    FinlyF.startMainLoader(main)
     # FinlyF.startMainLoader(main)
 
 
@@ -77,6 +79,8 @@ class FinlyF.Views.CompanyStatements extends Backbone.View
     # Will change this one..
     $(@el).find(".navbar-main").html(@templateNavbarMain({item: @params}))
     $(@el).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
+    
+    
     _this = @
     switch @params.statement_type
       when 'company_balance_summary'
