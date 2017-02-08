@@ -34,6 +34,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
     items[:total_account_load_via_NEFT] = 0
 
     items[:company_account_details][:loads] = []
+
     company.fund_load_requests.where('date >= ? AND date <= ?', start_date, end_date).each do |transfer|
       items[:company_account_details][:loads] << {date: transfer.date, amount: transfer.amount_value}
       items[:total_account_load_via_NEFT] += transfer.amount_value

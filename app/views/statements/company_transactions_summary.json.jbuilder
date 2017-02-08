@@ -11,6 +11,15 @@ json.company_account_details do
     end
   end
 end
+json.transfers_from_company_account do
+  json.total item[:transfers_from_company_account][:total]
+  json.admin_transfers do
+    json.array! item[:transfers_from_company_account][:admin_transfers] do |transfer|
+      json.name transfer[:name]
+      json.amount transfer[:amount]
+    end
+  end
+end
 json.transfers_to_company_account do
   json.total item[:transfers_to_company_account][:total]
   json.admin_transfers do

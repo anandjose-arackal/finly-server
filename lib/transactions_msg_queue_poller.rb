@@ -1,4 +1,4 @@
-class MsgQueuePoller
+class TransactionsMsgQueuePoller
 
   def self.run
     username = ENV["MSG_QUEUE_USERNAME"]
@@ -23,7 +23,9 @@ class MsgQueuePoller
 
       puts message.body
 
-      data = message.body.split(",")
+      delimiter = "$"
+
+      data = message.body.split(delimiter)
 
       # for the split between merchant city and merchant name
       name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
