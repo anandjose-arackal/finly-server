@@ -14,6 +14,6 @@ json.reports_awaiting_settlement item[:reports_awaiting_settlement]
 json.unreported_expenses do
   json.via_card_total item[:unreported_expenses][:via_card_total]
   json.via_card_number item[:unreported_expenses][:via_card_number]
-  json.via_cash_total item[:unreported_expenses][:via_cash_count]
+  json.via_cash_number item[:unreported_expenses][:via_cash_number]
   json.via_cash_total item[:unreported_expenses][:via_cash_total]
 end
