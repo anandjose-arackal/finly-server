@@ -69,6 +69,10 @@ class User::Balance < User::Base
 
     # pending approved reports
     self.balances[:target_user_approved_reports] = target_user.reports.approved.count
+    self.balances[:pending_reports_total] = 0
+    target_user.reports.approved.each do |report|
+      balances[:pending_reports_total] += report.total_amount(:only_manual_expenses)
+    end
 
   end
 
