@@ -67,6 +67,9 @@ class User::Balance < User::Base
     self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_advance_request] or params[:target_user_all]
     self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.amount_value if params[:current_user_pending_advance_request] or params[:current_user_all]
 
+    # pending approved reports
+    self.balances[:target_user_approved_reports] = target_user.reports.approved.count
+
   end
 
   def success
