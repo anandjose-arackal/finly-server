@@ -6,6 +6,8 @@ end
 json.user do
   json.id money_request.user_id
   json.name money_request.user.name
+  json.email money_request.user.email
+  json.mobile_number money_request.user.mobile_number
 end
 json.policy do
   json.id money_request.policy_id

@@ -35,7 +35,7 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
       return
     end
     case params[:type].to_sym
-      when :update
+     when :update
         @result = MoneyRequest::Update.(current_user, params)
       when :submit
         @result = MoneyRequest::Submit.(current_user, params)
@@ -47,10 +47,9 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
         @result = MoneyRequest::Reject.(current_user, params)
       when :unapprove
         @result = MoneyRequest::Unapprove.(current_user, params)
-      when :transfer
-        @result = MoneyRequest::Card::Transfer.(current_user, params)
       when :credit
-        @result = MoneyRequest::Card::Credit.(current_user, params)
+        # from_account: wallet / virtual_account
+        @result = MoneyRequest::PrepaidCard::Credit.(current_user, params)
       when :approve_and_forward_to
         @result = MoneyRequest::ApproveAndForward.(current_user, params)
       when :take_control
