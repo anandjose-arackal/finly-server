@@ -313,6 +313,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     # Remove if any attached exisiting receipts
     $(target).find('.attach-receipt-field').val('')
+    $(target).find('.btn-attach-existing-receipts').removeClass('hidden')
 
     # $(close_button).css('display', 'none')
 
@@ -656,11 +657,13 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
       $(modal_expense).find('#preview-image').attr('src', receipt_img)
       $(modal_expense).find('.attach-receipt-field').val(receipt_id)
       $(modal_expense).find('.remove-uploaded-receipt').removeClass('hidden')
+      $(modal_expense).find(".btn-attach-existing-receipts").addClass('hidden')
     else if @attachReceiptInto == 'expenseShow'
       expense_show = $(@el).find("#item-show-details")
       $(expense_show).find('#edit-preview-image').attr('src', receipt_img)
       $(expense_show).find('.attach-receipt-field').val(receipt_id)
       $(expense_show).find('.detach-uploaded-receipt').removeClass('hidden')
+      $(expense_show).find(".btn-attach-existing-receipts").addClass('hidden')
 
 
 

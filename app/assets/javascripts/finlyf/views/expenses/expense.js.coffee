@@ -160,6 +160,7 @@ class FinlyF.Views.Expense extends Backbone.View
     input2 = input.after(input.clone())
     $(input2).attr('type', 'text').attr('name', "expense[receipts_attributes]").attr('id', 'edit-expense-receipt-upload-text').val(null)
     # $(input).attr('type', 'text').val(null)
+    $(target).find('.btn-attach-existing-receipts').removeClass('hidden')
 
   showUploadedReceipt: (e) ->
     # console.log "hello from jkljfklasd"
@@ -174,6 +175,8 @@ class FinlyF.Views.Expense extends Backbone.View
     $(image).attr('src', image_url)
     $(close_button).removeClass('hidden')
     $(target).find("#edit-expense-receipt-upload-text").remove()
+
+    $(target).find('.btn-attach-existing-receipts').addClass('hidden')
     # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
 
   processUploadReceipt: (e) ->

@@ -68,7 +68,7 @@
       
     <div class="col-sm-4 no-padding text-center upload-receipt">
       <input type="hidden" name="receipt_id" class="attach-receipt-field" />
-      <label class="text-center control-label">Receipt</label><button class="btn btn-xs btn-attach-existing-receipts" data-attach-receipt-into="modal">Add Existing Receipts</button><br />
+      <label class="text-center control-label">Receipt</label><br />
       <i class="remove-uploaded-receipt fa fa-times-circle hidden" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: 14px;right: 19px;"></i>
       <label for="expense-receipt-upload">
         <!-- <i class="fa fa-times-circle" id="remove-preview-image"></i> -->
@@ -79,6 +79,7 @@
       {{else}}
         <input type="file" id="expense-receipt-upload" accept="image/x-png, image/gif, image/jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image"/>
       {{/if}}
+      <button class="btn btn-xs btn-attach-existing-receipts" data-attach-receipt-into="modal">Add Existing Receipts</button>
     </div>
   </div>
 </form>

@@ -187,6 +187,8 @@ class FinlyF.Views.Report extends Backbone.View
     image_url = window.URL.createObjectURL(file.files[0])
     $(image).attr('src', image_url)
     $(close_button).removeClass('hidden')
+
+    $(target).find('.btn-attach-existing-receipts').addClass('hidden')
     # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
 
   # New expense
@@ -203,6 +205,8 @@ class FinlyF.Views.Report extends Backbone.View
 
     $(image).attr('src', '/assets/images/receipt-placeholder.png')
     input.replaceWith(input.val('').clone(true))
+
+    $(target).find('.btn-attach-existing-receipts').removeClass('hidden')
 
     # $(close_button).css('display', 'none')
 
@@ -368,11 +372,14 @@ class FinlyF.Views.Report extends Backbone.View
       $(modal_expense).find('#preview-image').attr('src', receipt_img)
       $(modal_expense).find('.attach-receipt-field').val(receipt_id)
       $(modal_expense).find('.remove-uploaded-receipt').removeClass('hidden')
+
+      $(modal_expense).find('.btn-attach-existing-receipts').addClass('hidden')
     else if @attachReceiptInto == 'expenseShow'
       expense_show = $(@el).find("#item-show-details")
       $(expense_show).find('#edit-preview-image').attr('src', receipt_img)
       $(expense_show).find('.attach-receipt-field').val(receipt_id)
       $(expense_show).find('.detach-uploaded-receipt').removeClass('hidden')
+      $(expense_show).find('.btn-attach-existing-receipts').addClass('hidden')
 
     # -=================================
 
