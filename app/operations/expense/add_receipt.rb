@@ -34,7 +34,7 @@ class Expense::AddReceipt < Expense::Base
     self.receipt = user.receipts.build(receipt_params)
     receipt.parent = expense
     unless receipt.save
-      messages[:error] << "DB Error. Try again."
+      messages[:error] = receipt.errors.full_messages
     end
   end
 

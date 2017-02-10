@@ -68,10 +68,12 @@ class User::Balance < User::Base
     self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.amount_value if params[:current_user_pending_advance_request] or params[:current_user_all]
 
     # pending approved reports
-    self.balances[:target_user_approved_reports] = target_user.reports.approved.count
-    self.balances[:pending_reports_total] = 0
-    target_user.reports.approved.each do |report|
-      balances[:pending_reports_total] += report.total_amount(:only_manual_expenses)
+    if target_user
+      self.balances[:target_user_approved_reports] = target_user.reports.approved.count
+      self.balances[:pending_reports_total] = 0
+      target_user.reports.approved.each do |report|
+        balances[:pending_reports_total] += report.total_amount(:only_manual_expenses)
+      end
     end
 
   end

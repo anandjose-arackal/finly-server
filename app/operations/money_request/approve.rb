@@ -94,7 +94,6 @@ class MoneyRequest::Approve < MoneyRequest::Base
       money_request.reload
     end
 
-    # todo sending notifications
     Event::EMoneyRequest::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:cash)
