@@ -41,7 +41,8 @@ class User::Login::SetPassword < BaseOperation
   def process
     password_params.delete(:mobile_number)
     unless selected_user.update_attributes(password_params)
-      messages[:error] = user.errors.full_messages.to_sentence
+      messages[:error] << selected_user.errors.full_messages.to_sentence
+      return
     end
     # setting verified as true for this user
     selected_user.update_attributes(verified: true)
