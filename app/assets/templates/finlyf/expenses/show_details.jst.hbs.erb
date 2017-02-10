@@ -120,6 +120,8 @@
     </div>
 
     <div class="item-receipt item-attr-edit text-center">
+      <input type="hidden" name="receipt_id" class="attach-receipt-field" />
+      <button class="btn btn-xs btn-attach-existing-receipts" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
       {{#if item.receipts}}
         <i class="detach-uploaded-receipt fa fa-times-circle" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
         <label for="edit-expense-receipt-upload">

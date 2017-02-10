@@ -4,7 +4,7 @@ class FinlyF.Views.Expense extends Backbone.View
   templateShow: HandlebarsTemplates['finlyf/expenses/show']
   templateShowDetails: HandlebarsTemplates['finlyf/expenses/show_details']
   templatePreviewReceipt: HandlebarsTemplates['finlyf/expenses/extras/preview']
-  className: 'item col-md-12'
+  className: 'item expense col-md-12'
 
   events:
     'click .select-item.expense': 'toggleSelect'

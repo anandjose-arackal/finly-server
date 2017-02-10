@@ -13,6 +13,8 @@ class FinlyF.Views.Report extends Backbone.View
   templateShowExpense: HandlebarsTemplates['finlyf/reports/expenses/show']
   templateExistingExpense: HandlebarsTemplates['finlyf/reports/expenses/existingExpenses']
   templateReceiptPreview: HandlebarsTemplates['finlyf/reports/extras/previewReceipt']
+  templateExistingReceipts: HandlebarsTemplates['finlyf/expenses/extras/existingReceipts']
+
   className: 'item col-sm-12 report'
 
   events:
@@ -26,7 +28,7 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-create-expense': 'createExpense'
     'click .btn-post-comment': 'postComment'
 
-    'click .receipt': 'previewReceipt'
+    'click .report-receipt': 'previewReceipt'
 
     'click .btn-confirm-delete-report': 'confirmDelete'
     'click .btn-edit-item': 'edit'
@@ -53,6 +55,13 @@ class FinlyF.Views.Report extends Backbone.View
     'click .btn-go-back': 'goBacktoPreviousPage'
 
     'shown.bs.modal #modal-mp': 'fixHeight'
+    'shown.bs.modal #modal-attach-receipts': 'fixHeight'
+
+
+
+    # Receipts
+    'click .btn-attach-existing-receipts': 'existingReceipts'
+    'click .confirm-add-existing-receipt': 'addExistingReceipt'
 
   initialize: (options) ->
     # console.log "we're here in report show", options
@@ -85,6 +94,7 @@ class FinlyF.Views.Report extends Backbone.View
     @model.on('sync', @populateDetails, @)
     @model.on('change', @showSaveOption, @)
     @on('expense:selected', @showExpenseSelectOption, @)#REF==3I
+    @on('receipt:selected', @showReceiptSelectOption, @)
     
 
   render: ->
@@ -303,6 +313,68 @@ class FinlyF.Views.Report extends Backbone.View
       error: (err) ->
         console.log "Error", err
     })
+
+  # ========================================
+
+
+  existingReceipts: (e) ->
+    e.preventDefault()
+    target = e.currentTarget
+    @attachReceiptInto = $(target).attr('data-attach-receipt-into')
+    # report_id = $(e.currentTarget).attr('data-item-id')
+    receipts_view = new FinlyF.Views.ReceiptsIndex({
+      indexOnly: true
+      parent: @
+    })
+    $(@el).find("#modal-attach-receipts").html(@templateExistingReceipts())
+    $(@el).find("#modal-attach-receipts .modal-content .modal-body").html(receipts_view.render().el)
+    $(@el).find("#modal-attach-receipts").modal('show')
+    $(@el).find("#modal-attach-receipts .datepicker").datepicker({dateFormat: "dd-mm-yy"})
+
+  showReceiptSelectOption: (e) ->
+    console.log "Shwoing receipt select options"
+    modal_header = $(@el).find("#modal-attach-receipts .modal-content .modal-header")
+    container = $(@el).find("#modal-attach-receipts .modal-content .modal-body")
+    items = $(container).find("#items .item.receipt")
+
+    flag = false
+    for item in items
+      if $(item).find('.select-receipt-to-attach').prop('checked')
+        flag = true
+    if flag == true
+      $(modal_header).find('.confirm-add-existing-receipt').css("display", 'inline')
+    else
+      $(modal_header).find('.confirm-add-existing-receipt').css("display", 'none')
+
+  addExistingReceipt: (e) ->
+    _this = @
+    modal = $(@el).find("#modal-attach-receipts")
+    modal_header = $(modal).find(".modal-content .modal-header")
+    container = $(modal).find(".modal-content .modal-body")
+    items = $(container).find("#items .item.receipt")
+
+    # expense_ids = []
+    receipt_id = null
+    for item in items
+      receipt = $(item).find('.select-receipt-to-attach')
+      if $(receipt).prop('checked')
+        receipt_id = $(receipt).val()
+        receipt_img = $(item).find('img').attr('src')
+        break
+
+    $(modal).modal('hide') 
+    if @attachReceiptInto == 'modal'
+      modal_expense = $(@el).find("#modal-new")
+      $(modal_expense).find('#preview-image').attr('src', receipt_img)
+      $(modal_expense).find('.attach-receipt-field').val(receipt_id)
+      $(modal_expense).find('.remove-uploaded-receipt').removeClass('hidden')
+    else if @attachReceiptInto == 'expenseShow'
+      expense_show = $(@el).find("#item-show-details")
+      $(expense_show).find('#edit-preview-image').attr('src', receipt_img)
+      $(expense_show).find('.attach-receipt-field').val(receipt_id)
+      $(expense_show).find('.detach-uploaded-receipt').removeClass('hidden')
+
+    # -=================================
 
 
   edit: (e) ->
@@ -726,6 +798,6 @@ class FinlyF.Views.Report extends Backbone.View
     # Fixing height issue
     modal = e.currentTarget
 
-    container_height = $(modal).find(".container-main.container-expenses").height()
+    container_height = $(modal).find(".container-main.container-expenses .sidebar").height()
     # console.log "Container height", container_height
-    $(modal).find(".index-only-main").height(container_height - 5)
+    $(modal).find(".index-only-main").height(container_height)
