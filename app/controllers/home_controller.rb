@@ -4,8 +4,10 @@ class HomeController < ApplicationController
   # before_action :check_first_login
 
   def index
-    unless logged_in?
-      redirect_to welcome_path
+    if signed_in?
+      render 'index'
+    else
+      render 'welcome'
     end
   end
 
@@ -30,8 +32,12 @@ class HomeController < ApplicationController
   def resolve_layout
     case action_name
     when "index"
-      "backbone"
-    when "welcome", "about"
+      if logged_in?
+        "backbone"
+      else
+        "static"
+      end
+    when "about"
       "static"
     else
       "application"
