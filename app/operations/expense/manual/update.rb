@@ -5,7 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
-  attr_accessor :old_amount, :editable_attrs
+  attr_accessor :old_amount, :editable_attrs, :receipt
 
   def pre_validate
     if params.blank? or user.blank?
@@ -52,6 +52,9 @@ class Expense::Manual::Update < Expense::Manual::Base
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
         self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
       end
+      if params[:receipt_id].present?
+        self.receipt = user.receipts.find_by(id: params[:receipt_id])
+      end
     end
   end
 
@@ -74,11 +77,14 @@ class Expense::Manual::Update < Expense::Manual::Base
   end
 
   def process
-    unless expense.update(updated_expense_params)
+    if expense.update(updated_expense_params)
+      if receipt
+        receipt.parent = expense
+        receipt.save
+      end
+    else
       add_message :error, self.expense.errors.full_messages
-      return false
     end
-    true
   end
 
   def post_process
