@@ -29,7 +29,11 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     content = comment.content
     comment_user = comment.user
     message = "#{comment_user.name} added a comment: #{content}"
-    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
+    view = nil
+    if user.id != report.user_id
+      view = UserRole.id_for(report.tracks.with_modified_user(user.id).first.modified_user_role_id) rescue nil
+    end
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
@@ -43,8 +47,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first
-                                            )
+                                             view_role_id: roles.first)
     notification.save
   end
 
