@@ -2,7 +2,7 @@
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
 class Expense::ExCard::Update < Expense::ExCard::Base
-  attr_accessor :updated_expense_params, :editable_attrs
+  attr_accessor :updated_expense_params, :editable_attrs, :receipt
 
   def pre_validate
     if user.blank? or params.blank?
@@ -36,6 +36,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
         self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
       end
+      if params[:receipt_id]
+        self.receipt = user.receipts.find_by(id: params[:receipt_id])
+      end
     end
   end
 
@@ -60,9 +63,13 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
 
   def process
-    unless expense.update(updated_expense_params)
+    if expense.update(updated_expense_params)
+      if receipt
+        receipt.parent = expense
+        receipt.save
+      end
+    else
       messages[:error] = self.expense.errors.full_messages
-      return false
     end
   end
 

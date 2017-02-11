@@ -1,4 +1,10 @@
 <div class="receipt-container">
+  {{#if item.indexOnly}}
+    <div class="row no-margin">
+      <input type="radio" value="{{item.id}}" class="select-receipt-to-attach" name="select_receipt_to_attach" class="">
+      <span class="hidden">Selected</span>
+    </div>
+  {{/if}}
   <div class="receipt-image">
     <input type="hidden" class="select-item" data-item-id="{{item.id}}"/>
     <img class="img-responsive" src="{{item.image.thumb}}" style=""/>

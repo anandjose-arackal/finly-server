@@ -206,6 +206,7 @@ window.FinlyF =
             $(navbar_right).find('#navbar-notification-count').text(res)
         error: (err) ->
           console.log "Err", err
+        
       })
 
 

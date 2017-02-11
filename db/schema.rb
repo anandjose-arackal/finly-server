@@ -969,7 +969,11 @@ ActiveRecord::Schema.define(version: 20170208152811) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+<<<<<<< HEAD
     t.date     "date_of_birth",                   default: '2017-02-08', null: false
+=======
+    t.date     "date_of_birth",                   default: '2017-02-10', null: false
+>>>>>>> 5417b29791f9540451c019c8498ae9497289cd04
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false

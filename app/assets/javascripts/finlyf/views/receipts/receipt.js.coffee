@@ -2,7 +2,7 @@ class FinlyF.Views.Receipt extends Backbone.View
   template: HandlebarsTemplates['finlyf/receipts/crud/receipt']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
   # templateShowDetails: HandlebarsTemplates['finlyf/reports/crud/show_details']
-  className: 'item col-sm-3'
+  className: 'item receipt col-sm-3'
 
   events:
     # 'click .select-item': 'toggleSelect'
@@ -11,6 +11,7 @@ class FinlyF.Views.Receipt extends Backbone.View
 
   initialize: (options) ->
     @parent = options.parent
+    @indexOnly = @parent.indexOnly
     _this = @
     @preview = options.preview
     if @preview
@@ -22,6 +23,7 @@ class FinlyF.Views.Receipt extends Backbone.View
 
   render: ->
     # console.log "rendering receipt"
+    @model.set('indexOnly', @indexOnly)
     unless @preview
       $(@el).html(@template({ item: @model.toJSON() }))
     else
