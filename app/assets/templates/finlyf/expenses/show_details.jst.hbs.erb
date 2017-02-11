@@ -128,13 +128,17 @@
 
         <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image.thumb}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         </label>
-        <button class="btn btn-xs btn-attach-existing-receipts hidden" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
+        <div class="text-center">
+          <button class="btn btn-warning btn-sm btn-attach-existing-receipts hidden" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
+        </div>
       {{else}}
         <i class="detach-uploaded-receipt fa fa-times-circle hidden" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
         <label for="edit-expense-receipt-upload">
         <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         </label>
-        <button class="btn btn-xs btn-attach-existing-receipts" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
+        <div class="text-center">
+          <button class="btn btn-warning btn-sm btn-attach-existing-receipts" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
+        </div>
       {{/if}}
 
       <input type="file" id="edit-expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" />

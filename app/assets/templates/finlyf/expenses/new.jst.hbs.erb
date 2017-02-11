@@ -79,7 +79,9 @@
       {{else}}
         <input type="file" id="expense-receipt-upload" accept="image/x-png, image/gif, image/jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image"/>
       {{/if}}
-      <button class="btn btn-xs btn-attach-existing-receipts" data-attach-receipt-into="modal">Add Existing Receipts</button>
+      <div class="text-center">
+        <button class="btn btn-sm btn-warning btn-attach-existing-receipts" data-attach-receipt-into="modal">Add Existing Receipts</button>
+      </div>
     </div>
   </div>
 </form>

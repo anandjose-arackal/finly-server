@@ -186,14 +186,14 @@ $(document).ready( ->
 
 
   # Validate Phone number or email format
-  $("input[name=email_mobile]").on('keyup focusout focus click change', (e) ->
-    val = $(@).val()
+  # $("input[name=email_mobile]").on('keyup focusout focus click change', (e) ->
+  #   val = $(@).val()
 
-    if Finly.Login.regex.mobile_patt.test(val) || Finly.Login.regex.email_patt.test(val)
-      $(".login-container #btn-lookup-username").removeAttr('disabled')
-    else
-      $(".login-container #btn-lookup-username").attr('disabled', 'disabled')
-  )
+  #   if Finly.Login.regex.mobile_patt.test(val) || Finly.Login.regex.email_patt.test(val)
+  #     $(".login-container #btn-lookup-username").removeAttr('disabled')
+  #   else
+  #     $(".login-container #btn-lookup-username").attr('disabled', 'disabled')
+  # )
 
   #Validating OTP format
   $("input[type=number].input-otp").on('keyup', (e) ->
@@ -210,27 +210,27 @@ $(document).ready( ->
   $("#form-lookup").on('submit', (e) ->
     form = @
     e.preventDefault()
-    console.log "PRevented"
 
-    stepLookup = $(form).closest('.step-lookup')
+    email_mobile = $(@).find("input[name=email_mobile]").val()
+    unless Finly.Login.regex.mobile_patt.test(email_mobile) || Finly.Login.regex.email_patt.test(email_mobile)
+      # $(".login-container #btn-lookup-username").removeAttr('disabled')
+      ohSnap('Enter A Valid Email Or 10 Digit Mobile Number', {color: 'red', 'duration': '9000', 'container-id': 'ohsnap-priority'})
+    else
+      stepLookup = $(form).closest('.step-lookup')
+      formObjectData = $(form).serializeObject()
 
-    # values = $(form).serialize()
-    formObjectData = $(form).serializeObject()
-    console.log formObjectData
-
-
-    $.ajax({
-      url: $(form).attr('action'),
-      # url: '/lookup',
-      dataType: 'JSON',
-      data: formObjectData,
-      success: (res) ->
-        handleLookUp(res, formObjectData)
-        # console.log "Respnose", res
-        # $(stepLookup).hide('slide', {direction: 'left'}, 200)
-      error: (err) ->
-        console.log "Error", err
-    })
+      $.ajax({
+        url: $(form).attr('action'),
+        # url: '/lookup',
+        dataType: 'JSON',
+        data: formObjectData,
+        success: (res) ->
+          handleLookUp(res, formObjectData)
+          # console.log "Respnose", res
+          # $(stepLookup).hide('slide', {direction: 'left'}, 200)
+        error: (err) ->
+          console.log "Error", err
+      })
   )
 
   # Logging in User
