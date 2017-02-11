@@ -16,9 +16,9 @@ class User::Balance < User::Base
 
   def init
     self.target_user = (params[:target_user] or params[:user])
-    if self.target_user.blank? and (params[:target_user_id].present? or params[:user_id] or params[:id].present?)
+    if self.target_user.blank? and (params[:target_user_id].present? or params[:user_id].present? or params[:id].present?)
       user_id = (params[:target_user_id] or params[:user_id] or params[:id])
-      if user_id == user.id
+      if user_id.to_i == user.id
         self.target_user = user
       else
         self.target_user = User::Index.(user, params).team.with_id(user_id).first rescue nil
@@ -27,7 +27,7 @@ class User::Balance < User::Base
   end
 
   def validate
-    if target_user.blank? and (params[:target_user_id].present? or params[:user_id] or params[:id].present? or
+    if target_user.blank? and (params[:target_user_id].present? or params[:user_id].present? or params[:id].present? or
                                params[:target_user].present? or params[:user].present?)
       add_message :error, 'User not found'
     end
