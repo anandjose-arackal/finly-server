@@ -28,7 +28,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   def send_push_notification(user)
     content = comment.content
     comment_user = comment.user
-    message = "#{comment_user.name} added a comment: #{content}"
+    message = "#{comment_user.name} added a comment: '#{content}' in report '#{report.name}'"
     view = nil
     if user.id != report.user_id
       view = UserRole.id_for(report.tracks.with_modified_user(user.id).first.modified_user_role_id) rescue nil
