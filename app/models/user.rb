@@ -95,7 +95,7 @@ class User < ActiveRecord::Base
   has_one :enforce_policy, as: :enforceable
 
   has_many :cards, dependent: :destroy
-  has_many :card_transactions
+  has_many :card_transactions, dependent: :destroy
 
   has_many :money_requests
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
@@ -105,8 +105,8 @@ class User < ActiveRecord::Base
   has_many :manager_money_requests, -> { distinct }, source: :money_request, through: :manager_money_request_tracks
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
-  has_many :notifications
-  has_one :card_restriction
+  has_many :notifications, dependent: :destroy
+  has_one :card_restriction, dependent: :destroy
 
   has_many :notifier_type_configurations
 
@@ -174,8 +174,8 @@ class User < ActiveRecord::Base
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
   }
 
-  scope :signed_up, -> { where invitation_token: nil }
-  scope :pending, -> { where.not(invitation_token: nil) }
+  scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
+  scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
@@ -232,8 +232,9 @@ class User < ActiveRecord::Base
     admin_policies.with_id(policy_id).present?
   end
 
+  # todo - temporarily disabling policy admin screen for the admin? role
   def admin?
-    company_admin? or policy_admin?
+    company_admin?
   end
 
   def finance_manager?

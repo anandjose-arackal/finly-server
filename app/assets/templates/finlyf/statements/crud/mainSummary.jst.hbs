@@ -8,7 +8,7 @@
       </div>
       <div class="row no-margin">
         <div class="col-sm-12">
-          <table class="table table-striped" style="border: 1px solid #ddd;">
+          <table class="table table-striped table-bordered" style="border: 1px solid #ddd;">
             <thead>
               <tr>
                 <td>Type</td>
@@ -25,74 +25,112 @@
               </tr>
               <tr role="row">
                 <td><strong>User Account Status Details</strong></td>
-                <td>Account Load</td>
-                <td>&#8377;&nbsp;{{item.user_account_status_details.account_load}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>Account Load</td>
+                      </tr>
+                      <tr>
+                        <td>Account Withdrawal</td>
+                      </tr>
+                      <tr>
+                        <td>Account Transfer (to Other User Accounts)</td>
+                      </tr>
+                      <tr>
+                        <td>Account Transfer (to Other Cards)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.user_account_status_details.account_load}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.user_account_status_details.account_withdrawal}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.user_account_status_details.account_transfer_to_other_accounts}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.user_account_status_details.account_transfer_to_other_cards}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
-              <tr role="row">
-                <td></td>
-                <td>Account Withdrawal</td>
-                <td>&#8377;&nbsp;{{item.user_account_status_details.account_withdrawal}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td>Account Transfer (to Other User Accounts)</td>
-                <td>&#8377;&nbsp;{{item.user_account_status_details.account_transfer_to_other_accounts}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td>Account Transfer (to Other Cards)</td>
-                <td>&#8377;&nbsp;{{item.user_account_status_details.account_transfer_to_other_cards}}</td>
-              </tr>
+
               <tr role="row">
                 <td><strong>Transferred to Card</strong></td>
-                <td>From Own Account</td>
-                <td>&#8377;&nbsp;{{item.transferred_to_card.from_own_account}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>From Own Account</td>
+                      </tr>
+                      <tr>
+                        <td>From Other Accounts</td>
+                      </tr>
+                      <tr>
+                        <td>From Company Account</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.transferred_to_card.from_own_account}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.transferred_to_card.from_other_accounts}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.transferred_to_card.from_company_account}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
-              <tr role="row">
-                <td></td>
-                <td>From Other Accounts</td>
-                <td>&#8377;&nbsp;{{item.transferred_to_card.from_other_accounts}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td>From Company Account</td>
-                <td>&#8377;&nbsp;{{item.transferred_to_card.from_company_account}}</td>
-              </tr>
+                
               <tr role="row">
                 <td><strong>Spent from Card</strong></td>
-                <td>ATM Withdrawals</td>
-                <td>&#8377;&nbsp;{{item.spent_from_card.atm}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>ATM Withdrawals</td>
+                      </tr>
+                      <tr>
+                        <td>POS Expenses</td>
+                      </tr>
+                      <tr>
+                        <td>Online Expenses</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.spent_from_card.atm}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.spent_from_card.pos}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.spent_from_card.online}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
-              <tr role="row">
-                <td></td>
-                <td>POS Expenses</td>
-                <td>&#8377;&nbsp;{{item.spent_from_card.pos}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td>Online Expenses</td>
-                <td>&#8377;&nbsp;{{item.spent_from_card.online}}</td>
-              </tr>
-              {{!-- <tr role="row">
-                <td></td>
-                <td>Reversals</td>
-                <td>{{item.table1.reversals}}</td>
-              </tr>
-              <tr role="row">
-                <td><strong>Bank Charges</strong></td>
-                <td>ATM Withdrawal Fee</td>
-                <td>{{item.table1.atm_fees}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td>Fuel Surcharge</td>
-                <td>{{item.table1.surcharge}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td>Other Surcharges [ eg. IRCTC]</td>
-                <td>{{item.table1.other_surcharges}}</td>
-              </tr> --}}
+                
               <tr role="row">
                 <td><strong>= Account Closing Balance</strong></td>
                 <td></td>
@@ -107,7 +145,8 @@
                 <td><strong>= Cash on Hand</strong></td>
                 <td></td>
                 <td>&#8377;&nbsp;{{item.closing_cash_in_hand}}</td>
-              </tr></tbody>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -126,7 +165,7 @@
       </div>
       <div class="row no-margin">
         <div class="col-sm-12">
-          <table class="table table-striped" style="border: 1px solid #ddd;">
+          <table class="table table-striped table-bordered" style="border: 1px solid #ddd;">
             <thead>
               <tr>
                 <td>Type</td>
@@ -147,30 +186,65 @@
               </tr>
               <tr role="row">
                 <td><strong>Total amount transacted with employee within this period</strong></td>
-                <td>Card Load</td>
-                <td>&#8377;&nbsp;{{item.amount_transacted.card_load}}</td>
-              </tr>
-              
-              <tr role="row">
-                <td></td>
-                <td>Paid to employee via Cash/ NEFT</td>
-                <td>&#8377;&nbsp;{{item.amount_transacted.paid_to_employee}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td><span>Received from employee via Cash/ NEFT</span></td>
-                <td>&#8377;&nbsp;{{item.amount_transacted.paid_by_employee}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>Card Load</td>
+                      </tr>
+                      <tr>
+                        <td>Paid to employee via Cash/ NEFT</td>
+                      </tr>
+                      <tr>
+                        <td><span>Received from employee via Cash/ NEFT</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.amount_transacted.card_load}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.amount_transacted.paid_to_employee}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.amount_transacted.paid_by_employee}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
               <tr role="row">
                 <td><strong>Total Verified Expenses</strong></td>
-                <td>Verified Card Expenses</td>
-                <td>&#8377;&nbsp;{{item.total_verified_expenses.verified_card_expenses}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>Verified Card Expenses</td>
+                      </tr>
+                      <tr>
+                        <td>Verified Cash Expenses</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.total_verified_expenses.verified_card_expenses}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.total_verified_expenses.verified_cash_expenses}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
-              <tr role="row">
-                <td></td>
-                <td>Verified Cash Expenses</td>
-                <td>&#8377;&nbsp;{{item.total_verified_expenses.verified_cash_expenses}}</td>
-              </tr>
+                
               <tr role="row">
                 <td>
                   <p><strong>= Closing Card Balance</strong></p>
@@ -178,6 +252,7 @@
                 <td></td>
                 <td>&#8377;&nbsp;{{item.closing_card_balance}}</td>
               </tr>
+
               <tr role="row">
                 <td><strong>= Remaining Cash with the Employee</strong></td>
                 <td></td>
@@ -202,7 +277,7 @@
       </div>
       <div class="row no-margin">
         <div class="col-sm-12">
-          <table class="table table-striped" style="border: 1px solid #ddd;">
+          <table class="table table-striped table-bordered" style="border: 1px solid #ddd;">
             <thead>
               <tr>
                 <td>Type</td>
@@ -217,43 +292,35 @@
                 <td></td>
                 <td>&#8377;&nbsp;{{item.opening_card_balance}}</td>
               </tr>
-              {{!-- <tr role="row">
-                <td><span><strong>Cash on Hand Calculation</strong></span></td>
-                <td><span>Paid via Cash/ NEFT</span></td>
-                <td>{{item.table3.declined_card_expenses}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td><span>Received Cash/ NEFT</span></td>
-                <td>{{item.table3.declined_cash_expenses}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td><span>ATM Withdrawals</span></td>
-                <td>{{item.table3.total_unverified_card_reversal}}</td>
-              </tr> --}}
-              
+
               <tr role="row">
                 <td><strong>Declined Expenses</strong></td>
-                <td>Card Expenses</td>
-                <td>&#8377;&nbsp;{{item.declined_expenses.declined_card_expenses}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>Card Expenses</td>
+                      </tr>
+                      <tr>
+                        <td>Cash Expenses</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.declined_expenses.declined_card_expenses}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.declined_expenses.declined_cash_expenses}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
-              <tr role="row">
-                <td></td>
-                <td>Cash Expenses</td>
-                <td>&#8377;&nbsp;{{item.declined_expenses.declined_cash_expenses}}</td>
-              </tr>
-              
-              {{!-- <tr role="row">
-                <td><strong>Reversal</strong></td>
-                <td>Total unverified card Reversal</td>
-                <td>{{item.table3.pending_cash_expenses}}</td>
-              </tr>
-              <tr role="row">
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr> --}}  
+
               <tr role="row">
                 <td><strong>Unreported Card Expenses</strong></td>
                 <td>Unreported Card Expenses</td>
@@ -261,15 +328,32 @@
               </tr>
               <tr role="row">
                 <td><strong>Card Expenses in Processing</strong></td>
-                <td>Pending Card Expenses</td>
-                <td>&#8377;&nbsp;{{item.processing_expenses.pending_card_expenses}}</td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>Pending Card Expenses</td>
+                      </tr>
+                      <tr>
+                        <td>Pending Cash Expenses</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding-imp">
+                  <table class="table table-striped table-nested">
+                    <tbody>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.processing_expenses.pending_card_expenses}}</td>
+                      </tr>
+                      <tr>
+                        <td>&#8377;&nbsp;{{item.processing_expenses.pending_cash_expenses}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
               </tr>
-              <tr role="row">
-                <td></td>
-                <td>Pending Cash Expenses</td>
-                <td>&#8377;&nbsp;{{item.processing_expenses.pending_cash_expenses}}</td>
-              </tr>
-              
+
               <tr role="row">
                 <td>
                   <p><strong>= Closing Card Balance</strong></p>
