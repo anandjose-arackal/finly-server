@@ -3,7 +3,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
 
   def init
     super
-    self.comment = self.report.comments.last rescue nil
+    self.comment = self.report.comments.first rescue nil
   end
 
   def validate
