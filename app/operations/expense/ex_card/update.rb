@@ -87,7 +87,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
                            merchant_name: expense.merchant_name,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count
-    }
+                          }
   end
 
 end
