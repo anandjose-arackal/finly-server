@@ -15,11 +15,11 @@
 #
 
 class CardRestriction < ActiveRecord::Base
-  belongs_to :user, dependent: :destroy
+  belongs_to :user
 
   belongs_to :mcc_group
 
-  has_many :card_limits
+  has_many :card_limits, dependent: :destroy
 
   accepts_nested_attributes_for :card_limits
 
