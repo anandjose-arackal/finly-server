@@ -5,7 +5,7 @@ json.data do
   json.refresh_token @auth_grant.refresh_token
   json.expires_in @auth_grant.expires_in
   json.user do
-    json.extract! @auth_grant.user, :id, :name, :email
+    json.extract! @auth_grant.user, :id, :name, :email, :mobile_number
     json.roles @auth_grant.user.user_roles, :id, :name
   end
   json.company do
