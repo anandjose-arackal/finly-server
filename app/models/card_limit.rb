@@ -14,7 +14,7 @@
 #
 
 class CardLimit < ActiveRecord::Base
-  belongs_to :card_restriction, dependent: :destroy
+  belongs_to :card_restriction
 
   belongs_to :period
 
