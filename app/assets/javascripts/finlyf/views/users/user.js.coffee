@@ -80,6 +80,8 @@ class FinlyF.Views.User extends Backbone.View
   populateDetails: ->
     # console.log "here we are in after sync"
     # console.log @model.toJSON()
+    @model.set('view', @params.view)
+    # console.log @model.toJSON()
     $(@el).html(@templateShow({item: @model.toJSON()}))
     FinlyF.stopMainLoader(@el)
     # console.log("Active Tab: ", @active_tab)
