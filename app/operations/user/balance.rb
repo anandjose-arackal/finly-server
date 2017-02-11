@@ -16,7 +16,7 @@ class User::Balance < User::Base
 
   def init
     self.target_user = (params[:target_user] or params[:user])
-    if self.target_user.blank? and params[:target_user_id].present? or params[:user_id] or params[:id].present?
+    if self.target_user.blank? and (params[:target_user_id].present? or params[:user_id] or params[:id].present?)
       user_id = (params[:target_user_id] or params[:user_id] or params[:id])
       if user_id == user.id
         self.target_user = user
