@@ -49,7 +49,7 @@ class GcmMessenger
     case params[:event_id]
       when NotifierType.id_for(:report_submit), NotifierType.id_for(:report_approve), NotifierType.id_for(:report_retract),
           NotifierType.id_for(:report_reject), NotifierType.id_for(:report_comment), NotifierType.id_for(:report_reject_expense),
-          NotifierType.id_for(:report_take_control), NotifierType.id_for(:report_reimbursed)
+          NotifierType.id_for(:report_take_control), NotifierType.id_for(:report_reimbursed), NotifierType.id_for(:report_unapprove)
         type = 'report'
         type_id = params[:report_id]
         view = params[:view]
