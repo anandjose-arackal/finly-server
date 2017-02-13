@@ -21,7 +21,7 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
       view_role_id = money_request.tracks.last.modified_user_role_id
     end
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
-                                             action_type_id: NotificationActionType.id_for(:unapprove),
+                                             action_type_id: NotificationActionType.id_for(:notify_unapprove),
                                              action_user_id: self.user.id,
                                              object_id: money_request.id,
                                              object_type: "Advance Request",

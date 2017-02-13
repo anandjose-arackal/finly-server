@@ -75,13 +75,13 @@ class Notification < ActiveRecord::Base
     case self.action_type_id
       when NotificationActionType.id_for(:notify_submit)
         action = " submitted"
-      when NotificationActionType.id_for(:notify_approve  )
+      when NotificationActionType.id_for(:notify_approve)
         action = " approved"
       when NotificationActionType.id_for(:notify_awaiting_approval)
         action += " awaiting approval"
       when NotificationActionType.id_for(:notify_reject)
         action = " rejected"
-      when NotificationActionType.id_for(:notify_retracted)
+      when NotificationActionType.id_for(:notify_retract)
         action = " retracted"
       when NotificationActionType.id_for(:notify_unapprove)
         action = " unapproved"
@@ -151,7 +151,7 @@ class Notification < ActiveRecord::Base
         action = " approved"
       when NotificationActionType.id_for(:notify_reject)
         action = " rejected"
-      when NotificationActionType.id_for(:notify_retracted)
+      when NotificationActionType.id_for(:notify_retract)
         action = " retracted"
       when NotificationActionType.id_for(:notify_unapprove)
         action = " unapproved"

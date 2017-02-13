@@ -51,7 +51,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       end
 
       if unique.is_a?(String)
-        result_hash[i] = "This mobile number is already taken"
+        result_hash[i] = unique
       elsif User.exists?(invitee.id)
         if error_messages.present?
           result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
@@ -102,7 +102,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       if manager.nil?
         manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       end
-      unless manager and manager.manager? and manager.company_id == user.company_id
+      unless manager&.manager? and manager.company_id == user.company_id
         errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
@@ -112,7 +112,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       if finance_manager.nil?
         finance_manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       end
-      unless finance_manager and finance_manager.finance_manager? and finance_manager.company_id == user.company_id
+      unless finance_manager&.finance_manager? and finance_manager.company_id == user.company_id
         errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
@@ -122,7 +122,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       if approves_to.nil?
         approves_to = User.find_by(mobile_number: row[import_fields[:mobile_number]])
       end
-      unless approves_to and approves_to.manager? and approves_to.company_id == user.company_id
+      unless approves_to&.manager? and approves_to.company_id == user.company_id
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
@@ -132,7 +132,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       if approves_finance_to.nil?
         approves_finance_to = User.find_by(mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
       end
-      unless approves_finance_to and approves_finance_to.finance_manager? and approves_finance_to.company_id == user.company_id
+      unless approves_finance_to&.finance_manager? and approves_finance_to.company_id == user.company_id
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil
       end
