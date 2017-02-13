@@ -30,6 +30,8 @@ class Superadmin::User::Create < Superadmin::User::Base
     new_user.skip_confirmation_notification!
     if new_user.save
       new_user.activate
+      new_user.update_attribute(:verified, true)
+      new_user.otp_verified
       messages[:success] << "New user created"
     else
       messages[:error] = new_user.errors.full_messages
