@@ -14,9 +14,10 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def send_push_notification(user)
-    return if user.id == report.controlling_user_id
+    return unless user.id == report.controlling_for_user_id
     message = "#{self.report.controlling_user.name} has taken control of the report : #{self.report.name}"
-    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
+    view = UserRole.name_for(self.report.controlling_for_user_role_id)
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)

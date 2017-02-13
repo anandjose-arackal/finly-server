@@ -19,7 +19,8 @@ class Event::EReport::Unapprove < Event::EReport::Base
   def send_push_notification(user)
     return if user.id == report.controlling_user_id
     message = "#{self.report.controlling_user.name} unapproved the report: #{self.report.name}"
-    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
+    view = UserRole.name_for(self.report.tracks.last.modified_user_role_id)
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
