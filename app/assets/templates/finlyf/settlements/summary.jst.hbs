@@ -1,19 +1,19 @@
 <div class="col-sm-12 no-padding" style="height: 100%; padding: 10px 0;">
   <div class="col-sm-6" style="height: 100%;border-right: 1px solid #bbb;">
     <div class="row no-margin" style="height: 35%;">
-      <div class="col-sm-8">
-        <span class="settlement-summary-type">Pending Reimbursement:</span>
+      <div class="col-sm-6">
+        <span class="settlement-summary-type">Approved Reports</span>
       </div>
-      <div class="col-sm-4">
-        <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_reimbursement}}</label>
+      <div class="col-sm-6">
+        <label class="settlement-summary-value"> {{item.pending_reimbursement}} reports (&#8377;&nbsp;{{item.pending_reports_total}})</label>
       </div>
     </div>
 
     <div class="row no-margin" style="height: 35%;">
-      <div class="col-sm-8">
-        <span class="settlement-summary-type">Advance Request:</span>
+      <div class="col-sm-6">
+        <span class="settlement-summary-type">Money Requests:</span>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-6">
         <label class="settlement-summary-value">&#8377;&nbsp;{{item.pending_money_request}}</label>
       </div>
     </div>
@@ -21,34 +21,34 @@
 
   <div class="col-sm-6" style="height: 100%;">
     <div class="row no-margin" style="height: 35%;">
-      <div class="col-sm-8">
-        <span class="settlement-summary-type">Cash in Hand:</span>
+      <div class="col-sm-7">
+        <span class="settlement-summary-type">Cash on Hand:</span>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-5">
         <label class="settlement-summary-value">&#8377;&nbsp;{{item.cash_in_hand}}</label>
 
       </div>
     </div>
 
     <div class="row no-margin" style="height: 35%;">
-      <div class="col-sm-8">
+      <div class="col-sm-7">
         <span class="settlement-summary-type">Card Balance:</span>
       </div>
       {{#if item.card_balance}}
-        <div class="col-sm-4">
+        <div class="col-sm-5">
           <label class="settlement-summary-value">&#8377;&nbsp;{{item.card_balance}}</label>
         </div>
       {{else}}
-        <div class="col-sm-4">
+        <div class="col-sm-5">
           <label class="settlement-summary-value">Not Assigned</label>
         </div>
       {{/if}}
     </div>
     <div class="row no-margin" style="height: 35%;">
-      <div class="col-sm-8">
-        <span class="settlement-summary-type">Finly Account Balance:</span>
+      <div class="col-sm-7">
+        <span class="settlement-summary-type">Finly Money Balance:</span>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-5">
         <label class="settlement-summary-value">&#8377;&nbsp;{{item.wallet_balance}}</label>
       </div>
     </div>

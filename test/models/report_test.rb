@@ -23,6 +23,8 @@
 #  auto_submit                  :boolean          default(FALSE), not null
 #  auto_approve                 :boolean          default(FALSE), not null
 #  accounted_at                 :date
+#  approved_at                  :datetime
+#  cash_in_hand_deduction_id    :integer
 #
 
 

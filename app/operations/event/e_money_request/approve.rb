@@ -78,7 +78,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     view_role_id = money_request.controlling_user_role_id
-    notification = user.notifications.create(notification_type_id: NotificationType.id,
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
                                              action_type_id: notify_type,
                                              action_user_id: (money_request.tracks.last.action_user.id rescue nil),
                                              object_id: money_request.id,

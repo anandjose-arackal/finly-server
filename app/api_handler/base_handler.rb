@@ -97,6 +97,7 @@ class BaseHandler
     p = self.path
     param = self.post_params
     return unless p.present?
+    # debugger
     begin
       self.response = self.connection.post p, param
       puts "response : #{self.response.body}"
@@ -227,6 +228,7 @@ class BaseHandler
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger # log requests to STDOUT
+      faraday.options[:timeout] = 60 # time out is 60 seconds
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
   end

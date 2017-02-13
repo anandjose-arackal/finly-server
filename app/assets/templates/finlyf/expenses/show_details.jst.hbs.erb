@@ -111,7 +111,7 @@
   <div class="receipt-area col-sm-5 no-padding">
     <div class="item-receipt text-center item-attr-preview">
       {{#each item.receipts}}
-        <img src="{{this.image_url}}" class="receipt-image img-responsive" style="max-width: 200px; max-height: 200px; display: inline;" />
+        <img src="{{this.image.thumb}}" class="receipt-image img-responsive" style="max-width: 200px; max-height: 200px; display: inline;" />
       {{else}}
         <div class="receipt-placeholder text-center" style="">
           <img src="<%= image_url('no-receipt-placeholder.png') %>" style="max-width: 200px; max-height: 200px;">
@@ -120,16 +120,25 @@
     </div>
 
     <div class="item-receipt item-attr-edit text-center">
+      <input type="hidden" name="receipt_id" class="attach-receipt-field" />
+      
       {{#if item.receipts}}
         <i class="detach-uploaded-receipt fa fa-times-circle" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
         <label for="edit-expense-receipt-upload">
 
-        <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image_url}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+        <img class="preview-image img-responsive" id="edit-preview-image" src="{{item.receipts.0.image.thumb}}" alt="Click to upload image" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         </label>
+        <div class="text-center">
+          <button class="btn btn-warning btn-sm btn-attach-existing-receipts hidden" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
+        </div>
       {{else}}
+        <i class="detach-uploaded-receipt fa fa-times-circle hidden" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
         <label for="edit-expense-receipt-upload">
         <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         </label>
+        <div class="text-center">
+          <button class="btn btn-warning btn-sm btn-attach-existing-receipts" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>
+        </div>
       {{/if}}
 
       <input type="file" id="edit-expense-receipt-upload" accept=".png, .jpg, .jpeg" name="expense[receipts_attributes][image]" class="form-control input-upload-image" />

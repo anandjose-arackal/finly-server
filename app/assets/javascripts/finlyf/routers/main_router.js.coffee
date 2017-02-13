@@ -21,6 +21,7 @@ class FinlyF.Routers.Main extends Backbone.Router
     'settlements/:user/params=:query': 'settlements_show'
 
     'statements/:user/params=:query': 'statements'
+    'company_statements/params=:query': 'companyStatements'
     'employees/params=:query': 'users'
     'employees': 'users'
     'analytics': 'analytics'
@@ -213,6 +214,24 @@ class FinlyF.Routers.Main extends Backbone.Router
       params = {}
     view = new FinlyF.Views.Statement({
       user: user,
+      params: params
+    })
+    $("#backbone-container").html(view.render().el)
+    # summary = $("#backbone-container  .main .summary")
+    # main = $("#backbone-container .settlements-content")
+    # FinlyF.startMainLoader(main)
+    # FinlyF.startMainLoader(summary)
+    @features()
+
+  companyStatements: (query) ->
+    if typeof query != 'undefined'
+      if query != null
+        params = JSON.parse(query)
+      else
+        params = {}
+    else
+      params = {}
+    view = new FinlyF.Views.CompanyStatements({
       params: params
     })
     $("#backbone-container").html(view.render().el)

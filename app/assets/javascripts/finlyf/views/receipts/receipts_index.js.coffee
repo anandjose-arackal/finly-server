@@ -1,5 +1,6 @@
 class FinlyF.Views.ReceiptsIndex extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/base/skeleton']
+  templateSkeletonIndexOnly: HandlebarsTemplates['finlyf/base/skeletonIndexOnly']
 
   #navbar
   templateNavbarSidebar: HandlebarsTemplates['finlyf/receipts/navbar/navbar_sidebar']
@@ -20,7 +21,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     'click .navbar-btn-refresh': 'refetchCollection'
     'click .main-select-all:checkbox': 'toggleSelectAll'
     # 'click .item': 'showDetails'
-    'click .item': 'selectCurrent'
+    'click .item.receipt': 'selectCurrent'
     'click .close-details': 'closeDetails'
     'click .btn-new': 'new'
     # 'click .btn-create': 'create'
@@ -44,8 +45,12 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   initialize: (options) ->
     if options
       @params = options.params || {}
+      @indexOnly = options.indexOnly || false
+      if options.parent
+        @parent = options.parent
     else
       @params = {}
+      @indexOnly = false
     @params.view = @params.view || 'personal'
     @params.page = 1
     _this = @
@@ -65,16 +70,19 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   render: ->
     # console.log "Step 3. Rendering."
     #Appending Partials to Skeleton
-
-    $(@el).html(@templateSkeleton())
-    $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
-    $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
-
-    @params.filter_date_from = @params['filter_date[from]']
-    @params.filter_date_to = @params['filter_date[to]']
-    $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
-    $(@el).find(".main").html(@templateMain())
-    FinlyF.structureActions(@el, @params)
+    unless @indexOnly
+      $(@el).html(@templateSkeleton())
+      $(@el).find(".secondary-navbar .navbar-sidebar").html(@templateNavbarSidebar())
+      $(@el).find(".secondary-navbar .navbar-main").html(@templateNavbarMain())
+      @params.filter_date_from = @params['filter_date[from]']
+      @params.filter_date_to = @params['filter_date[to]']
+      $(@el).find(".sidebar").html(@templateSidebar({item: @params}))
+      $(@el).find(".main").html(@templateMain())
+      FinlyF.structureActions(@el, @params)
+    else
+      $(@el).html(@templateSkeletonIndexOnly())
+      $(@el).find('.sidebar').html(@templateSidebar({item: {indexOnly: true}}))#REF==2I
+      $(@el).find('.index-only-main').html(@templateMain({ item: {indexOnly: true }}))#REF==1I
     @
 
   loadMore: (e) ->
@@ -128,6 +136,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     view_item = new FinlyF.Views.Receipt({
       model: item
       parent: @
+      # indexOnly: @indexOnly
     })
     $(@el).find("#items").append(view_item.render().el)
 
@@ -169,20 +178,30 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
   selectCurrent: (e) ->
     target = $(e.currentTarget)
     model_id = $(target).find('input.select-item').attr('data-item-id')
-    receipt = @collection.get(model_id)
 
-    modal = $(@el).find("#modal-receipt-preview")
-    $(modal).html(@templatePreviewReceipt({item: receipt.toJSON()}))
-    $(modal).modal('show')
+    unless @indexOnly
+      receipt = @collection.get(model_id)
+      # console.log receipt.get('url').split('.').pop()
+      # if receipt.get('url').split('.').pop().indexOf('pdf') != -1
+      #   receipt.set('file_type', 'pdf')
+
+      modal = $(@el).find("#modal-receipt-preview")
+      $(modal).html(@templatePreviewReceipt({item: receipt.toJSON()}))
+      $(modal).modal('show')
+    else
+      items_container = $(target).closest("#items")
+      items = $(items_container).find('.item.receipt')
+      $(items).removeClass("highlight")
+      $(items).find("input[name=select_receipt_to_attach]").prop('checked', false).siblings('span').addClass('hidden')
+      # $(items_contain)
+
+      $(target).addClass('highlight')
+      $(target).find("input[name=select_receipt_to_attach]").prop('checked', true).siblings('span').removeClass('hidden')
+
+      @parent.trigger('receipt:selected')#REF==3I
+
+
     
-    # items = $(@el).find("#items .item")
-    # for item in items
-    #   $(item).find('.select-item').prop('checked', false)
-    #   $(item).removeClass('selected')
-
-    # $(e.currentTarget).find('.select-item').prop('checked', true)
-    # $(e.currentTarget).closest('.item').addClass('selected')
-    # @receiptSelectOptions()
 
   new: ->
     $("#modal-new .modal-body").html(@templateNew)

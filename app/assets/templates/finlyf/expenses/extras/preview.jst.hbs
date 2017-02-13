@@ -6,7 +6,14 @@
     </div>
     <div class="modal-body">
       <div class="row no-margin">
-        <img src="{{item.receipts.[0].image_url}}" class="img-responsive" style="margin-left: auto; margin-right: auto;">
+        {{#if_eq item.receipts.[0].image.file_type 'pdf'}}
+          <div class="pdf">
+            <embed style="width: 100%; height: 500px;" type="application/pdf" src={{item.receipts.[0].image.original}}></embed>
+          </div>
+        {{else}}
+          <img src="{{item.receipts.[0].image.original}}" class="img-responsive" style="margin-left: auto; margin-right: auto;">
+        {{/if_eq}}
+        
       </div>
     </div>
   </div><!-- /.modal-content -->

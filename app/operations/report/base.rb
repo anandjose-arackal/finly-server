@@ -53,11 +53,19 @@ class Report::Base < BaseOperation
       self.dates = report.date_as_string
       self.comments = report.comments
       self.actions = load_actions
-      self.policies = report.user.policies
+      self.policies = retrieve_policies
       self.selected_policy = report.versioned_policy
       self.manager = User::Team::Approver.(report.user, report: report, type: :manager)
       self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
+    end
+
+    def retrieve_policies
+      if report.user.enforce_policy_enabled?
+        return report.user.policies.non_default
+      else
+        return report.user.policies
+      end
     end
 
     def status_name(report)

@@ -4,7 +4,7 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   # company admin or policy admin can access this operation
   def authorized_user_types
-    [:admin]
+    [:company_admin]
   end
 
   def pre_validate
@@ -17,11 +17,12 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
     super()
     self.company = user.company
     self.items = []
-    if user.company_admin?
-      self.policies = company.policies
-    elsif user.policy_admin?
-      self.policies = user.admin_policies
-    end
+    self.policies = company.policies
+    # if user.company_admin?
+    #   self.policies = company.policies
+    # elsif user.policy_admin?
+    #   self.policies = user.admin_policies
+    # end
   end
 
   def validate
@@ -34,16 +35,24 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   def process
     policies.each do |policy|
-      total = 0
+      card_total = 0
+      cash_total = 0
       if policy.name.nil?
-        self.items << default_policy_total(policy)
+        name = "None"
+        totals = default_policy_total(policy)
+        card_total = totals[0]
+        cash_total = totals[1]
       else
-        r = Report.where(policy_id: policy.id).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+        name = policy.name
+        r = Report.where(policy_id: policy.id).processed.where('approved_at >= ? and approved_at <= ?', start_date, end_date)
         r.each do |report|
-          total += report.total_amount
+          card_total += report.total_amount(:only_card_expenses)
         end
-        self.items << {policy => total}
+        r.each do |report|
+          cash_total += report.total_amount(:only_manual_expenses)
+        end
       end
+      self.items << {name: name, total: (card_total + cash_total), via_card: card_total, via_cash: cash_total}
     end
   end
 
@@ -65,12 +74,14 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   def default_policy_total(policy)
     user_ids = user.company.users.pluck(:id)
-    r = Report.where(user_id: user_ids).where(policy_id: nil).approved.where('approved_at > ? and approved_at <= ?', start_date, end_date)
-    total = 0
+    r = Report.where(user_id: user_ids).where(policy_id: nil).processed.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+    card_total = 0
+    cash_total = 0
     r.each do |report|
-      total += report.total_amount
+      card_total += report.total_amount(:only_card_expenses)
+      cash_total += report.total_amount(:only_cash_expenses)
     end
-    {policy => total}
+    [card_total, cash_total]
   end
 
 end

@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:lookup, :send_verification_otp, :verify_user_otp, :set_new_password]
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
@@ -33,26 +33,6 @@ class UsersController < ApplicationController
     # params[:id] = current_user.id
     @result = User::Team::GetManagers.new(current_user, params).run
     respond
-  end
-
-  # def profile
-  #   ap params
-  #   @result = User::Profile.(current_user, params)
-  # end
-
-  def edit_default_password
-
-  end
-
-  def update_default_password
-    @result = User::ManagerActivate::ReplaceDefaultPassword.(current_user, params)
-    if @result.success?
-      sign_in @result.user, :bypass => true
-      redirect_to root_url
-    else
-      flash[:error] = @result.messages[:error].to_sentence
-      redirect_to request.referrer
-    end
   end
 
 
@@ -88,8 +68,6 @@ class UsersController < ApplicationController
     else
       # flash[:error] = @result.messages[:error].first rescue nil
     end
-    # redirect_to request.referrer
-    # redirect_to request.referrer
     respond
   end
 
@@ -112,7 +90,45 @@ class UsersController < ApplicationController
     respond
   end
 
+  # action that sends the user an OTP before verifying them
+  # params: mobile_number
+  def send_verification_otp
+    @result = User::Login::SendVerificationOtp.(params)
+    respond
+  end
+
+  def verify_user_otp
+    @result = User::Login::VerifyLoginOtp.(params)
+    respond
+    # @result = User::Login::SendFirstLoginOtp.(params)
+    # if @result.success?
+    #   # redirecting to page where they can set their password
+    #   sign_in @result.user, :bypass => true
+    #   redirect_to user_set_password_path
+    # else
+    #   flash[:error] = @result.messages[:error]
+    #   redirect_to request.referrer
+    # end
+  end
+
+  # action that lets mobile only users set their password for the first time
+  # also the action that mobile users use to set their password if they've forgotten it
+  def set_new_password
+    @result = User::Login::SetPassword.(params)
+    if @result.success?
+      # signing in the user so that he can be redirected to expenses screen
+      sign_in @result.user, :bypass => true
+    end
+    respond
+  end
+
+  def lookup
+    @result = User::Lookup.(params)
+    respond
+  end
+
   private
+
   def update_handler(type = nil)
     unless type
       respond(response: :failure, message: 'Error while updating data')
@@ -139,6 +155,9 @@ class UsersController < ApplicationController
       when 'auto_submit'
         operation = User::Configuration::AutoSubmit::Update.new(current_user, params)
         success_message = 'Configuration updated'
+      when 'enforce_policy'
+        operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
+        success_message = "Configuration Updated"
       else
         # do nothing, ha!
     end

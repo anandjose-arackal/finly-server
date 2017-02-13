@@ -14,7 +14,9 @@ window.FinlyF =
   }
   initialize: ->
     FinlyF.Global.templates.templateBalance = HandlebarsTemplates['finlyf/global/myBalance']
-    FinlyF.Global.templates.templateWalletToCard = HandlebarsTemplates['finlyf/global/walletToCard']
+    FinlyF.Global.templates.templateTransferFunds = HandlebarsTemplates['finlyf/global/transferFunds']
+    FinlyF.Global.templates.templateTransferFundsFlow = HandlebarsTemplates['finlyf/global/transferFundsFlow']
+
     FinlyF.Global.templates.templateUserNavProfile = HandlebarsTemplates['finlyf/global/userNavProfile']
     FinlyF.Global.templates.templateNotifications = HandlebarsTemplates['finlyf/global/templateNotifications']
     FinlyF.Global.templates.templateNoResultsFound = HandlebarsTemplates['finlyf/global/noResultsFound']
@@ -164,9 +166,9 @@ window.FinlyF =
         success: (data) ->
           $(_this).find('.navbar-balance').html(FinlyF.Global.templates.templateBalance({item: data}))
 
-          $(".btn-transfer-wallet-to-card").on('click', (e) ->
+          $(".btn-load-unload-funds").on('click', (e) ->
             $("#modal-global-transfer").modal('show')
-            $("#modal-global-transfer").find('.modal-body').html(FinlyF.Global.templates.templateWalletToCard({item: data}))
+            $("#modal-global-transfer").find('.modal-body').html(FinlyF.Global.templates.templateTransferFunds({item: data}))
           )
         error: (err) ->
           console.log err
@@ -204,6 +206,7 @@ window.FinlyF =
             $(navbar_right).find('#navbar-notification-count').text(res)
         error: (err) ->
           console.log "Err", err
+        
       })
 
 
@@ -321,17 +324,20 @@ window.FinlyF =
           virtual_account: true
           # view: 'admin'
         success: (data) ->
+          console.log("hello there!1")
           $(_this).find('.navbar-balance').html(FinlyF.Global.templates.templateBalance({item: data}))
+          console.log("hello there!")
           # Finly.Gobal.balance_data = data
 
 
-          $(".btn-transfer-wallet-to-card").on('click', (e) ->
+          $(".btn-load-unload-funds").on('click', (e) ->
+            console.log "click"
             # $("#modal-balance").modal('hide')
             # $.ajax({
 
             # })
             $("#modal-global-transfer").modal('show')
-            $("#modal-global-transfer").find('.modal-body').html(FinlyF.Global.templates.templateWalletToCard({item: data}))
+            $("#modal-global-transfer").find('.modal-body').html(FinlyF.Global.templates.templateTransferFunds({item: data}))
           )
           # console.log data
         error: (err) ->
@@ -502,43 +508,127 @@ $(document).ready ->
   #   $("#modal-global-transfer").modal('show')
   #   $("#modal-global-transfer").find('.modal-body').html(templateWalletToCard({item: balance_data}))
   # )
+  confirmTransferFunds = (e) ->
+    target = e.currentTarget
+    $(target).attr('disabled', true)
+    e.preventDefault()
+    modal = $(target).closest('.modal')
+    amount = $(modal).find('input[name=amount]').val()
+    password = $(modal).find('input[type=password]').val()
+    note = $(modal).find('textarea[name=note]').val()
+
+    url = $(target).attr('data-url')
+
+
+    to_user_id = $("#current_user_id").val()
+
+    $.ajax({
+      url: url,
+      type: 'post'
+      dataType: 'json'
+      data: {
+        amount: amount
+        password: password
+        note: note
+        view: 'personal'
+        to_user_id: to_user_id
+      }
+      success: (res) ->
+        FinlyF.snapNotify(res.messages)
+        if res.success == true
+          $(modal).modal('hide')
+        else
+          $(target).attr('disabled', false)
+      error: (err) ->
+        console.log "Error", err
+        $(target).attr('disabled', false)
+        
+    })
 
   $("#modal-global-transfer").on('shown.bs.modal', (e) ->
     modal = this
-    to_user_id = $("#current_user_id").val()
-    $(".btn-transfer-wallet-to-card").on('click', (evt) ->
-      $(this).attr('disabled', true)
-      target = this
-      evt.preventDefault()
-      amount = $(modal).find('input[name=amount]').val()
-      password = $(modal).find('input[type=password]').val()
-      note = $(modal).find('textarea[name=note]').val()
+    $("input[name=global-transfer-funds][type=radio]").on('change', (event_select_flow) ->
+      target = event_select_flow.currentTarget
 
-      url = $(this).attr('data-url')
+      transfer_flow_container = $(target).closest('.transfer-flow-container')
+      $(transfer_flow_container).find('.transfer-flow-option label').removeClass('active')
+
+      $(target).closest('label').addClass('active')
+
+
+      user_id = $("#current_user_id").val()
+      flow_container = $(this).closest('.modal').find('.global-transfer-funds')
+      action_type = $(this).attr('data-action')
+      data = {}
+      data.type = action_type
+
+      switch action_type
+        when 'from_wallet_to_card'
+          data.url = "/cards/update_balance?action_type=1&from_account=wallet&to_account=card&view=personal"
+        when 'from_card_to_wallet'
+          data.url = "/cards/update_balance?action_type=1&from_account=card&to_account=wallet&view=personal"
+          # ...
+
+      $(flow_container).html(FinlyF.Global.templates.templateTransferFundsFlow({item: data}))
 
       $.ajax({
-        url: url,
-        type: 'post'
-        dataType: 'json'
-        data: {
-          amount: amount
-          password: password
-          note: note
-          view: 'personal'
-          to_user_id: to_user_id
-        }
-        success: (res) ->
-          FinlyF.snapNotify(res.messages)
-          if res.success == true
-            $(modal).modal('hide')
-          else
-            $(target).attr('disabled', false)
+        dataType: "json"
+        type : 'get'
+        url: '/users/' + user_id + '/balance'
+        data:
+          authenticity_token: $("#authenticity_token").val()
+          current_user_wallet: true
+          current_user_card: true
+        success: (data) ->
+          # console.log "Balance Data", data
+          $(modal).find(".current_user_card_balance").html("&#8377;&nbsp;" + data.current_user_card)
+          $(modal).find(".current_user_wallet_balance").html("&#8377;&nbsp;" + data.current_user_wallet)
+          $(modal).find(".current_user_card_eligibility").html("&#8377;&nbsp;" + data.current_user_card_details.available_card_eligibility)
         error: (err) ->
-          console.log "Error", err
-          $(target).attr('disabled', false)
-          
+          console.log err
       })
 
+      $(".btn-global-transfer").on('click', (evt) ->
+        confirmTransferFunds(evt)
+      ) 
+        
+      
     )
 
+
+
+    # $(".btn-global-transfer").on('click', (evt) ->
+    #   $(this).attr('disabled', true)
+    #   target = this
+    #   evt.preventDefault()
+    #   amount = $(modal).find('input[name=amount]').val()
+    #   password = $(modal).find('input[type=password]').val()
+    #   note = $(modal).find('textarea[name=note]').val()
+
+    #   url = $(this).attr('data-url')
+
+    #   $.ajax({
+    #     url: url,
+    #     type: 'post'
+    #     dataType: 'json'
+    #     data: {
+    #       amount: amount
+    #       password: password
+    #       note: note
+    #       view: 'personal'
+    #       to_user_id: to_user_id
+    #     }
+    #     success: (res) ->
+    #       FinlyF.snapNotify(res.messages)
+    #       if res.success == true
+    #         $(modal).modal('hide')
+    #       else
+    #         $(target).attr('disabled', false)
+    #     error: (err) ->
+    #       console.log "Error", err
+    #       $(target).attr('disabled', false)
+          
+    #   })
+
+    # )
   )

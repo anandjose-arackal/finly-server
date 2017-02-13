@@ -5,25 +5,14 @@ class PasswordsController < Devise::PasswordsController
   end
 
   def create
-    if params[:user][:email] =~ Constants::VALID_EMAIL_FORMAT
-      self.resource = resource_class.send_reset_password_instructions(resource_params)
-      yield resource if block_given?
+    self.resource = resource_class.send_reset_password_instructions(resource_params)
+    yield resource if block_given?
 
-      if successfully_sent?(resource)
-        respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name))
-      else
-        flash[:error] = resource.errors.full_messages.to_sentence
-        respond_with(resource)
-      end
+    if successfully_sent?(resource)
+      respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name))
     else
-      @result = User::TemporaryPassword.(params)
-      if @result.success?
-        flash[:notice] = @result.messages[:success].to_sentence
-        redirect_to new_user_session_path
-      else
-        flash[:error] = @result.messages[:error].to_sentence
-        redirect_to request.referrer
-      end
+      flash[:error] = resource.errors.full_messages.to_sentence
+      respond_with(resource)
     end
   end
 
@@ -40,9 +29,6 @@ class PasswordsController < Devise::PasswordsController
       if Devise.sign_in_after_reset_password
         flash_message = resource.active_for_authentication? ? :updated : :updated_not_active
         set_flash_message!(:error, flash_message)
-        ## i.e. if the change is successful, modify the user so that default password is disabled
-        resource.update_attributes(default_password: false)
-        #######################################################################################
         sign_in(resource_name, resource)
       else
         set_flash_message!(:error, :updated_not_active)
@@ -54,6 +40,7 @@ class PasswordsController < Devise::PasswordsController
       respond_with resource
     end
   end
+
 
 
 end

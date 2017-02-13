@@ -20,5 +20,10 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
     @result = User::Summary.(current_user, params)
     respond
   end
+  
+  def balance
+    @result = User::Balance.(current_user, params)
+    respond
+  end
 
 end

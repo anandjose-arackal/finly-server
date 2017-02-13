@@ -13,7 +13,6 @@
 
 
 
-
 class BalanceSheet < ActiveRecord::Base
   belongs_to :user
   belongs_to :cash_in_hand, class_name: 'Amount'

@@ -19,9 +19,29 @@
 //= require bootbox
 //= require handlebars.runtime
 //= require ohsnap.min
+// require drift-chat
+//= require finlyf/helpers/handlebars_helpers
+//= require_tree ../templates/finlyf/global/login
+//= require devise/login
 //// require_tree .
 
 // NProgress.configure({
 //     showSpinner: false,
 // });
 
+
+$.fn.serializeObject = function(){
+  var o = {};
+  var a = this.serializeArray();
+  $.each(a, function() {
+    if (o[this.name] !== undefined) {
+      if (!o[this.name].push) {
+        o[this.name] = [o[this.name]];
+      }
+      o[this.name].push(this.value || '');
+    } else {
+      o[this.name] = this.value || '';
+    }
+  });
+  return o;
+};

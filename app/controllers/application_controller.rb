@@ -166,18 +166,6 @@ class ApplicationController < ActionController::Base
     # devise_parameter_sanitizer.permit(:account_update, keys: [:name])
   end
 
-  def after_sign_in_path(resource)
-    # puts "REROUTING AFTER LOGIN AND CURRENT USER IS TYPE: " + current_user.user_type_id
-    if resource.is_a?(User)
-      if current_user.admin?
-        admin_company_expenses_path
-      elsif current_user.manager?
-        admin_expenses_path
-      else
-        user_expenses_path(current_user)
-      end
-    end
-  end
 
   def after_sign_out_path_for(resource)
     root_url
@@ -193,18 +181,18 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_otp
-    if logged_in? and not current_user.otp_verified and not params[:controller] == 'otp' and not
-    params[:controller].include?('devise') and not params[:controller] == 'pending_invites'
+    if logged_in? && !current_user.otp_verified && !(params[:controller] == 'otp') and not
+    params[:controller] == 'sessions' and not params[:controller] == 'pending_invites'
       params[:type] = 'verification'
       User::Verification::Otp::Create.(current_user, params)
       redirect_to verify_mobile_path
     end
   end
 
-  def check_first_time_login
-    if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
-      redirect_to edit_default_password_path
-    end
-  end
+  # def check_first_time_login
+  #   if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
+  #     redirect_to edit_default_password_path
+  #   end
+  # end
 
 end

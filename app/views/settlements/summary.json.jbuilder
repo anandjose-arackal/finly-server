@@ -1,4 +1,5 @@
-json.pending_reimbursement @result.balances[:target_user_pending_reimbursement]
+json.pending_reimbursement @result.balances[:target_user_approved_reports]
+json.pending_reports_total @result.balances[:target_user_pending_reports_total]
 json.pending_money_request @result.balances[:target_user_pending_advance_request]
 json.cash_in_hand @result.balances[:target_user_cash_in_hand]
 json.wallet_balance @result.balances[:target_user_wallet]

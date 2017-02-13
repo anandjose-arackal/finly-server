@@ -4,3 +4,4 @@ json.policy_name policy_name
 json.user_name report.user.name
 json.company_id report.user.company_id
 json.status_name result.status_name(report)
+json.auto_submit report.auto_submit

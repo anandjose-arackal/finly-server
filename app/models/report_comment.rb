@@ -21,6 +21,7 @@
 
 
 
+
 class ReportComment < ActiveRecord::Base
   belongs_to :report
   belongs_to :user
@@ -98,7 +99,7 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} confirmed that the reimbursement is received"
       when ReportCommentAction.id_for(:report_closed)
         # Report closed
-        comment = "Report is marked as closed"
+        comment = "Report has been marked as closed " + content
       when ReportCommentAction.id_for(:report_attach_receipt)
         # Report attach receipt
         comment = "#{name} attached a receipt to the report"
@@ -129,6 +130,12 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:expense_update_receipt)
         # adding a receipt to an expense
         comment = "#{name} updated a receipt on the expense at : #{expense.merchant_name}"
+      when ReportCommentAction.id_for(:cash_in_hand_deduction_against_reimbursement)
+        # deducing cash in hand for reimbursement
+        payment_id = payment.id rescue nil
+        comment = "#{name} has deducted your cash on hand against reimbursement for this report with Payment ID: #{payment_id}"
+      else
+        # do nothing
     end
     comment
   end

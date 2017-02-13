@@ -109,9 +109,9 @@
 #                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
 #                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
 #                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
-#                         new_user_session GET        /users/sign_in(.:format)                                    devise/sessions#new
-#                             user_session POST       /users/sign_in(.:format)                                    devise/sessions#create
-#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   devise/sessions#destroy
+#                         new_user_session GET        /users/sign_in(.:format)                                    sessions#new
+#                             user_session POST       /users/sign_in(.:format)                                    sessions#create
+#                     destroy_user_session DELETE     /users/sign_out(.:format)                                   sessions#destroy
 #                            user_password POST       /users/password(.:format)                                   passwords#create
 #                        new_user_password GET        /users/password/new(.:format)                               passwords#new
 #                       edit_user_password GET        /users/password/edit(.:format)                              passwords#edit
@@ -238,8 +238,17 @@
 #                                          DELETE     /api/v1/receipts/:id(.:format)                              api/v1/receipts#destroy
 #                             api_v1_users GET        /api/v1/users(.:format)                                     api/v1/users#index
 #                              api_v1_user GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
-#                                   api_v1 POST       /api/v1/cards/:id/balance/update(.:format)                  api/v1/cards#update_balance
-#                                          POST       /api/v1/cards/:id/status/update(.:format)                   api/v1/cards#update_status
+#                 api_v1_user_user_summary GET        /api/v1/users/:user_id/summary(.:format)                    api/v1/users#summary
+#                                          GET        /api/v1/users(.:format)                                     api/v1/users#index
+#                                          POST       /api/v1/users(.:format)                                     api/v1/users#create
+#                          new_api_v1_user GET        /api/v1/users/new(.:format)                                 api/v1/users#new
+#                         edit_api_v1_user GET        /api/v1/users/:id/edit(.:format)                            api/v1/users#edit
+#                                          GET        /api/v1/users/:id(.:format)                                 api/v1/users#show
+#                                          PATCH      /api/v1/users/:id(.:format)                                 api/v1/users#update
+#                                          PUT        /api/v1/users/:id(.:format)                                 api/v1/users#update
+#                                          DELETE     /api/v1/users/:id(.:format)                                 api/v1/users#destroy
+#              api_v1_cards_balance_update POST       /api/v1/cards/balance/update(.:format)                      api/v1/cards#update_balance
+#               api_v1_cards_status_update POST       /api/v1/cards/status/update(.:format)                       api/v1/cards#update_status
 #          api_v1_configuration_categories GET        /api/v1/configuration/categories(.:format)                  api/v1/configuration/category#index
 #        api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
 #      api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
@@ -286,6 +295,14 @@
 #                                          PATCH      /export_preferences/:id(.:format)                           export_preferences#update
 #                                          PUT        /export_preferences/:id(.:format)                           export_preferences#update
 #                                          DELETE     /export_preferences/:id(.:format)                           export_preferences#destroy
+#                        card_restrictions GET        /card_restrictions(.:format)                                card_restrictions#index
+#                                          POST       /card_restrictions(.:format)                                card_restrictions#create
+#                     new_card_restriction GET        /card_restrictions/new(.:format)                            card_restrictions#new
+#                    edit_card_restriction GET        /card_restrictions/:id/edit(.:format)                       card_restrictions#edit
+#                         card_restriction GET        /card_restrictions/:id(.:format)                            card_restrictions#show
+#                                          PATCH      /card_restrictions/:id(.:format)                            card_restrictions#update
+#                                          PUT        /card_restrictions/:id(.:format)                            card_restrictions#update
+#                                          DELETE     /card_restrictions/:id(.:format)                            card_restrictions#destroy
 #                         companies_notify GET        /companies/notify(.:format)                                 companies#notify
 #                      company_add_balance POST       /companies/:company_id/add_balance(.:format)                companies#add_balance
 #                                companies GET        /companies(.:format)                                        companies#index
@@ -379,6 +396,10 @@
 #                       users_user_profile GET        /users/user_profile(.:format)                               users#user_profile
 #                       users_user_balance GET        /users/user_balance(.:format)                               users#user_balance
 #                      users_user_security GET        /users/user_security(.:format)                              users#user_security
+#                                   lookup GET        /lookup(.:format)                                           users#lookup
+#                    send_verification_otp POST       /send_verification_otp(.:format)                            users#send_verification_otp
+#                          verify_user_otp POST       /verify_user_otp(.:format)                                  users#verify_user_otp
+#                             set_password POST       /set_password(.:format)                                     users#set_new_password
 #                                    users GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                     user GET        /users/:id(.:format)                                        users#show
@@ -391,6 +412,7 @@
 #                             user_profile GET        /users/:user_id/profile(.:format)                           users#profile
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
+#           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -456,6 +478,9 @@
 #                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
 #                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
+#       statements_company_balance_summary GET        /statements/company_balance_summary(.:format)               statements#company_balance_summary
+#  statements_company_transactions_summary GET        /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
+#      statements_company_policies_summary GET        /statements/company_policies_summary(.:format)              statements#company_policies_summary
 #                                          GET        /statements/:id/summary(.:format)                           statements#summary
 #                         export_statement GET        /export/:id/statements(.:format)                            export#statement
 #                               statements GET        /statements(.:format)                                       statements#index
@@ -483,7 +508,7 @@
 #
 
 Rails.application.routes.draw do
-  
+
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -515,7 +540,11 @@ Rails.application.routes.draw do
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
 
-  devise_for :users, controllers: {passwords: "passwords"}
+  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
+    # get 'login', to: 'sessions#new', as: :login
+    # post 'login', to: 'session#create', as: :login
+
+  end
 
   namespace :api do
     namespace :v0 do
@@ -571,6 +600,7 @@ Rails.application.routes.draw do
         post 'gcm/register', to: 'gcm#create'
         post 'gcm/unregister', to: 'gcm#delete'
       end
+      get 'balances', to: 'users#balance'
     end
   end
 
@@ -596,6 +626,8 @@ Rails.application.routes.draw do
   resources :categories
 
   resources :export_preferences
+
+  resources :card_restrictions
 
   get 'companies/notify', to: 'companies#notify'
   resources :companies do
@@ -662,11 +694,17 @@ Rails.application.routes.draw do
 
   get 'users/get_managers', to: 'users#get_managers'
 
-  #Backbone parials
+  #Backbone partials
   get 'users/user_profile'
   get 'users/user_balance'
   get 'users/user_security'
   #backbone partials for users ends
+
+  # routes for lookup and first tome otp
+  get 'lookup', to: 'users#lookup', as: :lookup
+  post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
+  post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
+  post 'set_password', to: 'users#set_new_password', as: :set_password
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
@@ -676,6 +714,7 @@ Rails.application.routes.draw do
     get 'profile', to: 'users#profile', as: :profile
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
+    get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
 
   # routes for testing import
@@ -714,9 +753,11 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'statements/company_statements' => 'statements#company_statements'
-  get 'statements/company_summary' => 'statements#company_summary'
-  get 'statements/policies_summary' => 'statements#policies_summary'
+
+  get 'statements/company_balance_summary' => 'statements#company_balance_summary'
+  get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
+  get 'statements/company_policies_summary' => 'statements#company_policies_summary'
+
   get 'statements/:id/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements

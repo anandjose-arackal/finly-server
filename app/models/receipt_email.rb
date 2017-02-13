@@ -15,6 +15,7 @@
 #
 
 
+require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
   has_many :receipt_email_attachments
@@ -23,24 +24,26 @@ class ReceiptEmail < ActiveRecord::Base
   validates :user_id, presence: true
 
   def save_receipt_image
-    if receipt_email_attachments.any?
-      receipt_email_attachments.each do |email_attachment|
-        image_tmp_path = "#{Rails.root}/tmp/pdfs/#{email_attachment.original_attachment_file_name}".gsub(/\..*$/, '.jpg')
-        document_converter = ReceiptProcessor::BaseConverter.new  email_attachment.original_attachment.path,
-                                                                  email_attachment.original_attachment_content_type,
+    FileUtils.mkdir_p "#{Rails.root}/tmp/images"
+
+      if receipt_email_attachments.any?
+        receipt_email_attachments.each do |email_attachment|
+          image_tmp_path = "#{Rails.root}/tmp/images/#{email_attachment.original_attachment_file_name}".gsub(/\..*$/, '.jpg')
+          document_converter = ReceiptProcessor::BaseConverter.new  email_attachment.original_attachment.path,
+                                                                    email_attachment.original_attachment_content_type,
+                                                                    image_tmp_path
+          document_converter.convert do |images|
+            images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject) }
+          end
+        end
+      else
+        image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
+        document_converter = ReceiptProcessor::BaseConverter.new  raw_html,
+                                                                  ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                   image_tmp_path
         document_converter.convert do |images|
-          images.each { |image| receipts.create(user_id: user_id, image: image) }
+          images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject) }
         end
       end
-    else
-      image_tmp_path = "#{Rails.root}/tmp/html_to_image/#{id}.jpg"
-      document_converter = ReceiptProcessor::BaseConverter.new  raw_html,
-                                                                ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
-                                                                image_tmp_path
-      document_converter.convert do |images|
-        images.each { |image| receipts.create(user_id: user_id, image: image) }
-      end
-    end
   end
 end

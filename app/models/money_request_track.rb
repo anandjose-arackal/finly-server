@@ -19,6 +19,8 @@
 
 
 
+
+
 class MoneyRequestTrack < ActiveRecord::Base
 
   belongs_to :money_request
@@ -34,8 +36,8 @@ class MoneyRequestTrack < ActiveRecord::Base
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
   scope :without_take_control_action, -> { where.not money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control) }
-  scope :manager_role, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:manager)}", "#{ UserRole.id_for(:manager) }") }
-  scope :finance_manager_role, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}", "#{ UserRole.id_for(:finance_manager) }") }
+  scope :manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:manager)}") }
+  scope :finance_manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}") }
   scope :admin, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:admin)}", "#{ UserRole.id_for(:admin) }") }
   scope :owner, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:employee)}", "#{ UserRole.id_for(:employee) }") }
   scope :with_action, ->(action_id) { where money_request_tracking_action_id: action_id }

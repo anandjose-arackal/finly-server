@@ -19,8 +19,6 @@
 
 
 
-
-
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
@@ -30,12 +28,12 @@ class Receipt < ActiveRecord::Base
 
   validates :image, presence: true
 
-  # validate :validate_expense_user
-
-  has_attached_file :image, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"},
-    default_url: "/assets/:style/missing.png"
+  # Reference for adding more file types: http://stackoverflow.com/questions/20920212/generate-thumbnail-from-pdf-in-rails-paperclip
+  has_attached_file :image, styles: lambda { |a| a.instance.check_file_type }, #{large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"},
+                    default_url: '/assets/:style/missing.png'
   validates_attachment :image, content_type: {
-      content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+      # content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+      content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
   }
 
   scope :with_id, ->(id) { where id: id }
@@ -43,7 +41,7 @@ class Receipt < ActiveRecord::Base
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?
       type_val = :created_at
-      date_from = "1990-01-01" if date_from.blank?
+      date_from = '1990-01-01' if date_from.blank?
       date_to = DateUtils.local_date if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date + 1 if date_to.present?
@@ -56,19 +54,40 @@ class Receipt < ActiveRecord::Base
     self.image_file_name
   end
 
-  def belongs_to?(user)
-    user.receipts.find_by(id: self.id)
+  def is_image?
+    self.image_content_type =~ %r(image)
   end
 
-  private
+  def is_pdf?
+    self.image_file_name =~ %r{\.(pdf)$}i
+  end
 
+  def check_file_type
+    if self.is_image?
+      {
+          :thumb => "500x500>",
+          large: "2160x2160>",
+          normal: "1080x1080>"
+      }
+    elsif self.is_pdf?
+      {
+          :thumb => ["500x500>", :png],
+          :normal => ["1080x1080>", :png],
+          :large => ["2160x2160>", :png]
+      }
+    else
+      {}
+    end
+  end
 
-  # def validate_expense_user
-  #   if self.user && self.parent
-  #     if self.user.id != self.parent.user.id
-  #       errors.add(:base, "Parent expense does not belong to current user.")
-  #     end
-  #   end
-  # end
+  def file_format
+    if self.image_content_type == 'application/pdf'
+    type = "pdf"
+  elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.image_content_type)
+    type = "image"
+  else
+    type = "image"
+  end 
+  end
 
 end

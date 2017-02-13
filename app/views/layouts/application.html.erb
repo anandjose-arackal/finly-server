@@ -4,7 +4,7 @@
 <head>
   <title>Finly</title>
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
-
+  <%= favicon_link_tag '/common/images/favicon.png' %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
@@ -17,6 +17,7 @@
   <![endif]-->
 
   <%= csrf_meta_tags %>
+
 </head>
 
 <script>
@@ -30,7 +31,7 @@
 
 </script>
 
-<body style="background: #3F51B5 !important">
+<body style="background: #fff">
   <%= render 'shared/header' %>
   <%= snap_flash %>
   <%= yield %>

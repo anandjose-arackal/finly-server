@@ -5,11 +5,15 @@ json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 
 json.receipts @result.expense.receipts do |receipt|
   json.id receipt.id
-  json.image_url receipt.image.url
+  json.image do
+    json.file_type receipt.file_format
+    json.original receipt.image.url
+    json.thumb receipt.image.url(:thumb)
+  end
 end
 
 json.violations @result.violation
 
 json.editable @result.editable
 
-json.deletable ((params[:view].nil? or params[:view] == 'personal') and @result.expense.manual_expense?)
+json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.manual_expense? && @result.expense.report_id.nil?)
