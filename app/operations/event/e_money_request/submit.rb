@@ -9,9 +9,10 @@ class Event::EMoneyRequest::Submit < Event::EMoneyRequest::Base
   end
 
   def send_push_notification(user)
-    return if user.id == money_request.user.id
-    message = "#{self.money_request.user.name} has submitted the Advance Request: #{self.money_request.name}"
-    GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
+    return if user.id == money_request.user_id
+    message = "#{self.money_request.user.name} has submitted the Money Request: #{self.money_request.name}"
+    view = UserRole.name_for(money_request.controlling_user_role_id)
+    GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
 
   def notification_affected_users

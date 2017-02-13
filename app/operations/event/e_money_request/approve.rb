@@ -53,6 +53,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
   end
 
   def send_push_notification(user)
+    view = nil
     if approved
       return unless user == money_request.user
       if auto_approve
@@ -63,8 +64,9 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     else
       return unless user == money_request.controlling_user
       message = "Advance Request is awaiting your approval: #{self.money_request.name}"
+      view = UserRole.name_for(report.controlling_user_role_id)
     end
-    GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
+    GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)

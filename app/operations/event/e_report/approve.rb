@@ -88,8 +88,7 @@ class Event::EReport::Approve < Event::EReport::Base
                                               path_object_type: "Report",
                                               read: false,
                                               timestamp: DateUtils.local_date_time,
-                                              view_role_id: view_role_id
-                                             )
+                                              view_role_id: view_role_id)
     notification.save
   end
 
