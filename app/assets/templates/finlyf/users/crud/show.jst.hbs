@@ -405,7 +405,11 @@
                 <h4>Enforce Policy</h4>
               </div>
               <div class="col-sm-6 text-right">
-                <button class="btn btn-sm btn-warning btn-edit-enforce-policy"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+                {{#if_eq item.view 'admin'}}
+                  <button class="btn btn-sm btn-warning btn-edit-enforce-policy"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+                {{else}}
+                  <button class="btn btn-sm btn-warning" disabled="disabled"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+                {{/if_eq}}
               </div>
             </div>
 
@@ -784,7 +788,11 @@
                 <h4>Auto Submission of Reports</h4>
               </div>
               <div class="col-sm-6 text-right">
-                <button class="btn btn-sm btn-warning btn-edit-auto-submit" data-refresh-page="false"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+                {{#if_eq item.view 'admin'}} 
+                  <button class="btn btn-sm btn-warning btn-edit-auto-submit" data-refresh-page="false"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+                {{else}}
+                  <button class="btn btn-sm btn-warning" disabled="disabled" data-refresh-page="false"><i class="fa fa-edit"></i>&nbsp;&nbsp;Edit</button>
+                {{/if_eq}}
               </div>
             </div>
             <div class="row no-margin">
