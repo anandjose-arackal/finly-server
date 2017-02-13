@@ -106,7 +106,6 @@ class User < ActiveRecord::Base
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications, dependent: :destroy
-  has_one :card_restriction, dependent: :destroy
 
   has_many :notifier_type_configurations
 

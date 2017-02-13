@@ -7,7 +7,7 @@ module Constants
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
-  ITZCASH_EMAIL_ID = 'sreeram.nr@finly.io'
+  ITZCASH_EMAIL_ID = 'veekshith.rai@finly.io'
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finlytest.io', 'admin@finlytest.io']
 

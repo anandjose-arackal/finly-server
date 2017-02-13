@@ -27,6 +27,8 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   has_many :transactions, class_name: 'CardTransaction'
 
+  has_one :card_restriction, dependent: :destroy
+
   has_many :card_balance_history
 
   belongs_to :card_balance, class_name: "Amount"
@@ -48,6 +50,9 @@ class Card < ActiveRecord::Base
       self.update_attributes(card_balance_id: balance.id)
     end
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
+
+    # building card restriction
+
   end
 
   # before_save do
