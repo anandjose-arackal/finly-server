@@ -41,7 +41,6 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     else
       self.role = UserRole.finance_manager_id
     end
-    params[:indirect_associations] = true
     team = User::Team::Index.(user, params)
     unless team.include?(to_user)
       raise_unauthorized_exception

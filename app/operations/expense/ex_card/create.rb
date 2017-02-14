@@ -54,7 +54,8 @@ class Expense::ExCard::Create < Expense::ExCard::Base
 
     params[:amount_attributes] = {value: transaction.billing_amount_value, currency_id: 1} # todo - temporary, will change once currencies are implemented
     params[:card_expense_attributes] = {editable_merchant: transaction[:merchant_name],
-                                        surcharge_attributes: {value: (transaction.billing_amount_value - transaction.transaction_amount_value), currency_id: 1}
+                                        surcharge_attributes: {value: (transaction.billing_amount_value - transaction.transaction_amount_value), currency_id: 1},
+                                        card_transaction_id: transaction.id
                                        }
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
@@ -67,7 +68,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
 
     params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date,
                   amount_attributes: [:value, :currency_id],
-                  card_expense_attributes: [:editable_merchant, surcharge_attributes: [:value, :currency_id]])
+                  card_expense_attributes: [:editable_merchant, :card_transaction_id, surcharge_attributes: [:value, :currency_id]])
   end
 
 

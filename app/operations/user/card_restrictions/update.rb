@@ -21,8 +21,8 @@ class User::CardRestrictions::Update < User::Base
   def init
     self.selected_user = user.company.users.find_by(id: params[:id])
     self.selected_card = selected_user.cards.first
-    self.card_restriction = selected_user.card_restriction
-    self.card_limits = selected_user.card_restriction.card_limits
+    self.card_restriction = selected_card.card_restriction
+    self.card_limits = selected_card.card_restriction.card_limits
     self.update_params = card_restriction_params
     self.atm_enabled = !!update_params[:channel_atm]
     self.ecom_pos_enabled = !!update_params[:channel_ecom_pos]
