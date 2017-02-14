@@ -22,6 +22,7 @@
 
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -63,6 +64,7 @@ class Expense < ActiveRecord::Base
   # validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
+  validate :at_least_one_type
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
@@ -255,6 +257,21 @@ class Expense < ActiveRecord::Base
   def no_future_date
     if date.present? and date > DateUtils.local_date
       errors.add(:date, 'cannot be in the future!')
+    end
+  end
+
+  def at_least_one_type
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        if self.manual_expense.nil?
+          errors.add(:expense, "needs to have an associated manual expense")
+        end
+      when ExpenseType.id_for(:card)
+        if self.card_expense.nil?
+          errors.add(:expense, "needs to have an associated card expense")
+        end
+      else
+        errors.add(:expense, "type is invalid")
     end
   end
 

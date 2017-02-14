@@ -27,6 +27,8 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   has_many :transactions, class_name: 'CardTransaction'
 
+  has_one :card_restriction, dependent: :destroy
+
   has_many :card_balance_history
 
   belongs_to :card_balance, class_name: "Amount"
@@ -48,15 +50,16 @@ class Card < ActiveRecord::Base
       self.update_attributes(card_balance_id: balance.id)
     end
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
+
+    # building card restriction
+    self.build_card_restriction(channel_atm: true, channel_ecom_pos: true, card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                                                                    {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                                                                    {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                                                                    {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
+                                                                                                    {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
+                                                                                                    {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
-  # before_save do
-  #   if self.proxy
-  #     self.ending_number = proxy.last(4)
-  #   else
-  #     self.ending_number = ""
-  #   end
-  # end
 
   attr_accessor :balance, :available_card_eligibility
 

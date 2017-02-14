@@ -16,9 +16,9 @@ class User::Balance < User::Base
 
   def init
     self.target_user = (params[:target_user] or params[:user])
-    if self.target_user.blank? and params[:target_user_id].present? or params[:user_id] or params[:id].present?
+    if self.target_user.blank? and (params[:target_user_id].present? or params[:user_id].present? or params[:id].present?)
       user_id = (params[:target_user_id] or params[:user_id] or params[:id])
-      if user_id == user.id
+      if user_id.to_i == user.id
         self.target_user = user
       else
         self.target_user = User::Index.(user, params).team.with_id(user_id).first rescue nil
@@ -27,15 +27,14 @@ class User::Balance < User::Base
   end
 
   def validate
-    # if target_user.blank?
-    #   add_message :error, 'User not found'
-    # end
+    if target_user.blank? and (params[:target_user_id].present? or params[:user_id].present? or params[:id].present? or
+                               params[:target_user].present? or params[:user].present?)
+      add_message :error, 'User not found'
+    end
   end
 
   def process
-    target_user_card_assigned = false
     current_user_card_assigned = false
-    target_user_card_assigned = target_user.cards.present? if target_user.present?
     current_user_card_assigned = user.cards.present? if user.present?
 
     self.balances={}
@@ -44,15 +43,9 @@ class User::Balance < User::Base
     self.balances[:virtual_account] = Company::VirtualAccount::Balance.(user).balance rescue nil if params[:virtual_account] and user.company_admin?
 
     # Wallet
-    self.balances[:target_user_wallet] = User::Wallet::Balance.(user, for_user: target_user) if params[:target_user_wallet] or params[:target_user_all]
     self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]
 
     # Card
-    if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
-      presenter = User::PrepaidCard::Show.(user, user: target_user)
-      self.balances[:target_user_card] = presenter.balance rescue nil
-      self.balances[:target_user_card_eligibility] = presenter.available_card_eligibility rescue nil
-    end
     if current_user_card_assigned and (params[:current_user_card] or params[:current_user_all])
       presenter = User::PrepaidCard::Show.(user, user: user)
       self.balances[:current_user_card] = presenter.balance rescue nil
@@ -60,19 +53,47 @@ class User::Balance < User::Base
     end
 
     # Cash In Hand
-    self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
     self.balances[:current_user_cash_in_hand] = user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Cash Advance
-    self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_advance_request] or params[:target_user_all]
     self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.amount_value if params[:current_user_pending_advance_request] or params[:current_user_all]
 
     # pending approved reports
-    if target_user
-      self.balances[:target_user_approved_reports] = target_user.reports.approved.count
-      self.balances[:pending_reports_total] = 0
-      target_user.reports.approved.each do |report|
-        balances[:pending_reports_total] += report.total_amount(:only_manual_expenses)
+    if params[:current_user_pending_reports] or params[:current_user_all]
+      self.balances[:current_user_approved_reports] = user.reports.approved.count
+      self.balances[:current_user_pending_reports_total] = 0
+      user.reports.approved.each do |report|
+        balances[:current_user_pending_reports_total] += report.total_amount(:only_manual_expenses)
+      end
+    end
+
+    if target_user.present?
+      target_user_card_assigned = false
+      target_user_card_assigned = target_user.cards.present? if target_user.present?
+
+      # Wallet
+      self.balances[:target_user_wallet] = User::Wallet::Balance.(user, for_user: target_user) if params[:target_user_wallet] or params[:target_user_all]
+
+      # Card
+      if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
+        presenter = User::PrepaidCard::Show.(user, user: target_user)
+        self.balances[:target_user_card] = presenter.balance rescue nil
+        self.balances[:target_user_card_eligibility] = presenter.available_card_eligibility rescue nil
+      end
+      
+      # Cash In Hand
+      self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
+
+      # Pending Cash Advance
+      self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_advance_request] or params[:target_user_all]
+
+      # pending approved reports
+      if params[:target_user_pending_reports] or params[:target_user_all]
+        self.balances[:target_user_approved_reports] = target_user.reports.approved.count
+        self.balances[:target_user_pending_reports_total] = 0
+        target_user.reports.approved.each do |report|
+          balances[:target_user_pending_reports_total] += report.total_amount(:only_manual_expenses)
+        end
       end
     end
 

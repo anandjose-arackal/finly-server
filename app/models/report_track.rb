@@ -21,6 +21,7 @@
 
 
 
+
 class ReportTrack < ActiveRecord::Base
   belongs_to :report
   belongs_to :report_status
@@ -42,6 +43,7 @@ class ReportTrack < ActiveRecord::Base
   scope :owner, -> { where('modified_user_role_id = ? OR action_user_role_id = ?', "#{UserRole.id_for(:employee)}", "#{ UserRole.id_for(:employee) }") }
   scope :with_action, ->(action_id) { where report_tracking_action_id: action_id }
   scope :with_action_user_role, ->(role_id) { where action_user_role_id: role_id }
+  scope :with_modified_user_role, ->(role_id) { where modified_user_role_id: role_id }
   scope :involving_user, ->(user_id) {where 'action_user_id = ? OR modified_user_id = ?', user_id, user_id }
 
 end

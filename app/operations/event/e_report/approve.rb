@@ -52,6 +52,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def send_push_notification(user)
+    view = nil
     if approved
       return unless user == report.user
       if auto_approve
@@ -62,8 +63,9 @@ class Event::EReport::Approve < Event::EReport::Base
     else
       return unless user == report.controlling_user
       message = "Report is awaiting your approval: #{self.report.name}"
+      view = UserRole.name_for(report.controlling_user_role_id)
     end
-    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
+    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
