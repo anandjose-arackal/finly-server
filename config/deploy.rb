@@ -34,22 +34,22 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
-namespace :deploy do
+# namespace :deploy do
 
-  desc "Fixing user card restriction association"
-  task :card_restrictions_association_fix do
-    on roles(:app) do
-      within "#{current_path}" do
-        with rails_env: "staging" do
-          execute :rake, "update:association_fix"
-        end
-      end
-    end
-  end
+#   desc "Fixing user card restriction association"
+#   task :card_restrictions_association_fix do
+#     on roles(:app) do
+#       within "#{current_path}" do
+#         with rails_env: "staging" do
+#           execute :rake, "update:association_fix"
+#         end
+#       end
+#     end
+#   end
   
-end
+# end
 
-after 'deploy', 'deploy:card_restrictions_association_fix'
+# after 'deploy', 'deploy:card_restrictions_association_fix'
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
