@@ -31,7 +31,6 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def init
     id = (params[:id] or params[:to_user_id])
-    params[:indirect_associations] = true
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
     money_request_id = (params[:money_request_id] or params[:money_request_ids])
