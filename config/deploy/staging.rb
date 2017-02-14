@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '192.168.81.184', user: 'vivek', roles: %w{web app db}, port: 22
+server 'staging.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
