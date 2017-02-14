@@ -25,6 +25,7 @@
 #  accounted_at                 :date
 #  approved_at                  :datetime
 #  cash_in_hand_deduction_id    :integer
+#  submitted_amount_id          :integer
 #
 
 

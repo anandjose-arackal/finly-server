@@ -59,7 +59,8 @@ class User::Show < User::Base
       self.card_periods = Period.limit(3)
       self.mcc_groups = MccGroup.all
       self.card_limit = params[:card_presenter].available_card_eligibility rescue nil
-      self.card_restriction = selected_user.card_restriction rescue nil
+      selected_card = selected_user.cards.first rescue nil
+      self.card_restriction = selected_card.card_restriction rescue nil
       self.card_limits = card_restriction.card_limits rescue nil
     end
 
