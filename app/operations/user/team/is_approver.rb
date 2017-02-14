@@ -59,25 +59,12 @@ class User::Team::IsApprover < User::Team::Base
   def process_for_user
     if self.type == :manager
       type = :has_manager
-      type_approves = :has_approves_to
     else
-      # type == :finance_manager
       type = :has_finance_manager
-      type_approves = :has_approves_finance_to
     end
     emp = UserManagerMapping.send(type, for_user.id).with_user(for_user.id)
     if emp.present?
       return true
-    end
-    if params[:indirect_associations]
-      approves_to_ids = UserManagerMapping.send(type_approves, for_user.id).pluck(:id)
-      while approves_to_ids.present?
-        emp = UserManagerMapping.send(type, approves_to_ids).with_user(for_user.id)
-        if emp.present?
-          return true
-        end
-        approves_to_ids = UserManagerMapping.send(type_approves, approves_to_ids).pluck(:id)
-      end
     end
     false
   end
