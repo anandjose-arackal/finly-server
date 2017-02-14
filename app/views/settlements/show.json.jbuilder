@@ -11,9 +11,9 @@ json.array! @result.items do |item|
     json.status item.status_name
     json.total_amount item.total_amount
   elsif item.is_a?(Payment)
-      payment_type_id = item.payment_type_id
-      payment_type_s = PaymentType.name_for(payment_type_id)
-      if([PaymentType.id_for(:credit_from_virtual_account_to_wallet),
+    payment_type_id = item.payment_type_id
+    payment_type_s = PaymentType.name_for(payment_type_id)
+    if([PaymentType.id_for(:credit_from_virtual_account_to_wallet),
         PaymentType.id_for(:credit_from_virtual_account_to_card),
         PaymentType.id_for(:credit_from_wallet_to_wallet),
         PaymentType.id_for(:credit_from_wallet_to_card),
