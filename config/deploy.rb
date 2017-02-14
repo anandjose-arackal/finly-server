@@ -6,13 +6,13 @@ set :application, 'finly-server'
 set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :master
-set :deploy_to, '/home/viveka/app'
+set :deploy_to, '/home/vivek/app'
 set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
-# set :rails_env, "staging"
-set :rails_env, "production"
+set :rails_env, "staging"
+# set :rails_env, "production"
 # set :rails_env, "production"
 # set :rvm_type, :user
 # set :rvm_ruby_version, 'ruby-2.3.1' # Edit this if you are using MRI Ruby
@@ -33,6 +33,23 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+
+namespace :deploy do
+
+  desc "Fixing user card restriction association"
+  task :card_restrictions_association_fix do
+    on roles(:app) do
+      within "#{current_path}" do
+        with rails_env: "staging" do
+          execute :rake, "update:association_fix"
+        end
+      end
+    end
+  end
+  
+end
+
+after 'deploy', 'deploy:card_restrictions_association_fix'
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
