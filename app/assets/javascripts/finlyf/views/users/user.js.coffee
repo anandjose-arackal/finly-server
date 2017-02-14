@@ -81,6 +81,10 @@ class FinlyF.Views.User extends Backbone.View
     # console.log "here we are in after sync"
     # console.log @model.toJSON()
     @model.set('view', @params.view)
+    if @params.filter_state == '2'
+      @active_tab = '#tab-user-details'
+    else
+      @active_tab = @active_tab || '#tab-user-wallet-cards'
     # console.log @model.toJSON()
     $(@el).html(@templateShow({item: @model.toJSON()}))
     FinlyF.stopMainLoader(@el)
