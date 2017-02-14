@@ -11,7 +11,9 @@ json.array! @result.items do |item|
     json.status item.status_name
     json.total_amount item.total_amount
   elsif item.is_a?(Payment)
-    if([PaymentType.id_for(:credit_from_virtual_account_to_wallet),
+      payment_type_id = item.payment_type_id
+      payment_type_s = PaymentType.name_for(payment_type_id)
+      if([PaymentType.id_for(:credit_from_virtual_account_to_wallet),
         PaymentType.id_for(:credit_from_virtual_account_to_card),
         PaymentType.id_for(:credit_from_wallet_to_wallet),
         PaymentType.id_for(:credit_from_wallet_to_card),
@@ -32,11 +34,9 @@ json.array! @result.items do |item|
       json.payment_amount item.amount.value
       json.receiving_user item.receiving_user.name
       json.initiating_user item.initiating_user.name
-      payment_type_id = item.payment_type_id
-      payment_type_s = PaymentType.name_for(payment_type_id)
+      json.payment_type payment_type_s
+      json.total_amount item.total_amount
     end
-    json.payment_type payment_type_s
-    json.total_amount item.total_amount
   elsif item.is_a?(MoneyRequest)
     json.extract! item, :id, :name, :memo, :required_by_date
     json.type 'money_request'
