@@ -1,7 +1,6 @@
 
 json.array! @result.items do |item|
   # json.merge! item.attributes
-  json.total_amount item.total_amount
   if item.is_a?(Report)
     json.extract! item, :id, :name
     json.type 'report'
@@ -10,14 +9,8 @@ json.array! @result.items do |item|
     end
     json.reimbursement_amount item.reimbursement_amount.value
     json.status item.status_name
+    json.total_amount item.total_amount
   elsif item.is_a?(Payment)
-    json.extract! item, :note, :date
-    json.type 'payment'
-    json.payment_amount item.amount.value
-    json.receiving_user item.receiving_user.name
-    json.initiating_user item.initiating_user.name
-    payment_type_id = item.payment_type_id
-    payment_type_s = PaymentType.name_for(payment_type_id)
     if([PaymentType.id_for(:credit_from_virtual_account_to_wallet),
         PaymentType.id_for(:credit_from_virtual_account_to_card),
         PaymentType.id_for(:credit_from_wallet_to_wallet),
@@ -34,8 +27,16 @@ json.array! @result.items do |item|
       else
         next
       end
+      json.extract! item, :note, :date
+      json.type 'payment'
+      json.payment_amount item.amount.value
+      json.receiving_user item.receiving_user.name
+      json.initiating_user item.initiating_user.name
+      payment_type_id = item.payment_type_id
+      payment_type_s = PaymentType.name_for(payment_type_id)
     end
     json.payment_type payment_type_s
+    json.total_amount item.total_amount
   elsif item.is_a?(MoneyRequest)
     json.extract! item, :id, :name, :memo, :required_by_date
     json.type 'money_request'
@@ -48,6 +49,7 @@ json.array! @result.items do |item|
     json.request_amount item.total_amount
     json.status item.status_name
     json.payment_mode item.payment_mode_name
+    json.total_amount item.total_amount
   end
 
   # json.merge! report.attributes
