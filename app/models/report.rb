@@ -31,6 +31,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -119,6 +120,8 @@ class Report < ActiveRecord::Base
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   delegate :status_name, to: :status
+
+  delegate :submitted_amount_value, to: :submitted_amount
 
   before_save :handle_name
 
