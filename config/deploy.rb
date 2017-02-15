@@ -12,7 +12,7 @@ set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 # set :rails_env, "staging"
-set :rails_env, "production"
+set :rails_env, 'production'
 # set :rvm_type, :user
 # set :rvm_ruby_version, 'ruby-2.3.1' # Edit this if you are using MRI Ruby
 
@@ -32,6 +32,16 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+
+
+# Example: cap staging rake:invoke task=rebuild_table_abc
+namespace :rake do
+  desc 'Run a task on a remote server'
+  # run like: cap staging rake:invoke task=a_certain_task
+  task :invoke do
+    run("cd #{deploy_to}/current; /usr/bin/env rake #{ENV['task']} RAILS_ENV=#{rails_env}")
+  end
+end
 
 # after 'deploy', 'deploy:card_restrictions_association_fix'
 
