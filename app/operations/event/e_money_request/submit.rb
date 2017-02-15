@@ -29,8 +29,7 @@ class Event::EMoneyRequest::Submit < Event::EMoneyRequest::Base
                                              path_object_type: "Advance Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: money_request.controlling_user_role_id
-    )
+                                             view_role_id: money_request.controlling_user_role_id)
     notification.save
   end
 

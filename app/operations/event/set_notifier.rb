@@ -102,7 +102,7 @@ class Event::SetNotifier < Event::Base
 
   def load_configuration(user)
     return nil if user.blank?
-    user.event_configurations.with_event(event_id).first rescue nil
+    user.notifier_type_configurations.with_event(event_id).first rescue nil
   end
 
   def allow_mailer(user, configuration)

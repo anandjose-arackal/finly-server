@@ -80,7 +80,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
 
     add_message :success, 'Advance Request Submitted'
-
+    
     Event::EMoneyRequest::Submit.(user, money_request: money_request)
   end
 
