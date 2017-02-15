@@ -34,13 +34,13 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
 
   def set_notification(user)
     roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
-    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: self.user.id,
                                              object_id: money_request.id,
-                                             object_type: "Advance Request",
+                                             object_type: "Money Request",
                                              path_object_id: money_request.id,
-                                             path_object_type: "Advance Request",
+                                             path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: roles.first
@@ -50,17 +50,17 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
 
   def mailer_subject(user)
     comment_user = comment.user
-    "#{comment_user.name} has commented on the Advance Request: #{self.money_request.name}"
+    "#{comment_user.name} has commented on the Money Request: #{self.money_request.name}"
   end
 
   def mailer_body(user)
     content = comment.content
     comment_user = comment.user
-    "#{comment_user.name} has comment on the Advance Request '#{self.money_request.name}'<br/><br/>'#{content}'"
+    "#{comment_user.name} has comment on the Money Request '#{self.money_request.name}'<br/><br/>'#{content}'"
   end
 
   def mailer_button_name(user)
-    'View Advance Request'
+    'View Money Request'
   end
 
 end

@@ -6,10 +6,10 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
       add_message :error, 'User not found'
     end
     if params.blank? or params[:money_request].blank?
-      add_message :error, 'Advance Request not found'
+      add_message :error, 'Money Request not found'
     end
     unless params[:money_request].is_a?(::MoneyRequest)
-      add_message :error, 'Error loading Advance Request'
+      add_message :error, 'Error loading Money Request'
     end
   end
 
@@ -19,7 +19,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
 
   def validate
     unless self.money_request.present?
-      add_message :error, 'Advance Request not found'
+      add_message :error, 'Money Request not found'
     end
   end
 
@@ -40,9 +40,9 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
   def mailer_button_name(user)
     if money_request.controlling_user_id.present? and
         user.id == money_request.controlling_user_id and not user.id == money_request.user.id
-      'Review Advance Request'
+      'Review Money Request'
     else
-      'View Advance Request'
+      'View Money Request'
     end
   end
 

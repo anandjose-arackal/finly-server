@@ -10,7 +10,7 @@ class User::Team::FinalFinanceManager < User::Team::Base
     end
 
     if params[:report].present? and params[:money_request].present?
-      messages[:error] << 'You can only request for finance manager for either report or advance request'
+      messages[:error] << 'You can only request for finance manager for either report or money request'
     end
   end
 

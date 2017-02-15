@@ -23,7 +23,7 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
 
   def validate_payment_mode
     unless money_request.payment_mode_id == PaymentMode.id_for(:card)
-      add_message :error, 'Error approving and forwarding advance request. Use approve action'
+      add_message :error, 'Error approving and forwarding money request. Use approve action'
     end
   end
 
@@ -61,7 +61,7 @@ class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
     Event::EMoneyRequest::Approve.(self.user, money_request: self.money_request)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:card)
-      add_message :success, 'Successfully approved and forwarded the advance request'
+      add_message :success, 'Successfully approved and forwarded the money request'
     end
   end
 

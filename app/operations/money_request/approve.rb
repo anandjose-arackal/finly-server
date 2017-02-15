@@ -40,7 +40,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
 
   def validate_payment_mode
     unless money_request.payment_mode_id == PaymentMode.id_for(:cash)
-      messages[:error] << 'Error approving advance request. Use approve and forward action'
+      messages[:error] << 'Error approving money request. Use approve and forward action'
     end
   end
 
@@ -97,7 +97,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
     Event::EMoneyRequest::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:cash)
-      messages[:success] << 'Successfully approved the advance request'
+      messages[:success] << 'Successfully approved the money request'
     end
   end
 end

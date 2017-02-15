@@ -55,8 +55,8 @@ class Notification < ActiveRecord::Base
     case object_type
       when "Report"
         object = "Report"
-      when "Advance Request"
-        object = "Advance Request"
+      when "Money Request"
+        object = "Money Request"
       when "Expense"
         object = "Expense"
       when "Card"
@@ -216,13 +216,13 @@ class Notification < ActiveRecord::Base
         if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
           object_name += " and is awaiting your further approval"
         end
-      when "Advance Request"
+      when "Money Request"
         if action_type_id == NotificationActionType.id_for(:notify_credit_advance_request)
-          object = " for an advance request"
+          object = " for an money request"
           mr = MoneyRequest.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         else
-          object = " advance request"
+          object = " money request"
           mr = MoneyRequest.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         end
@@ -287,7 +287,7 @@ class Notification < ActiveRecord::Base
         else
           path = "reports/#{self.path_object_id}"
         end
-      when "Advance Request"
+      when "Money Request"
         path_object = MoneyRequest.find_by(id: self.path_object_id)
         if path_object.is_deleted?
           path = "requests"
@@ -333,7 +333,7 @@ class Notification < ActiveRecord::Base
     case object_type
       when "Report"
         object = Report.find_by(id: object_id)
-      when "Advance Request"
+      when "Money Request"
         object = MoneyRequest.find_by(id: object_id)
       else
         return ""
@@ -343,12 +343,12 @@ class Notification < ActiveRecord::Base
       return ""
     elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)
       return " a" if object_type == "Report"
-      return " an" if object_type == "Advance Request"
+      return " an" if object_type == "Money Request"
     # below condition is only if we're showing notification for an action performed on one's own object. eg. Submit, Approve etc.
     # elsif self.action_user_id == owner.id
     #   return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
     #   return " a" if object_type == "Report"
-    #   return " an" if object_type == "Advance Request"
+    #   return " an" if object_type == "Money Request"
     elsif self.user_id == owner.id
       return " your"
     else

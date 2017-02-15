@@ -3,11 +3,11 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
 
   def pre_validate
     if params.blank? or params[:money_request].blank?
-      add_message :error, 'Advance Request not found'
+      add_message :error, 'Money Request not found'
       return
     end
     unless params[:money_request].is_a?(::MoneyRequest)
-      add_message :error, 'Error loading Advance Request'
+      add_message :error, 'Error loading Money Request'
     end
     unless user.present? or params[:auto_approve]
       add_message :error, 'User not found'
@@ -57,13 +57,13 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     if approved
       return unless user == money_request.user
       if auto_approve
-        message = "Advance Request auto-approved: #{self.money_request.name}"
+        message = "Money Request auto-approved: #{self.money_request.name}"
       else
-        message = "Advance Request approved: #{self.money_request.name}"
+        message = "Money Request approved: #{self.money_request.name}"
       end
     else
       return unless user == money_request.controlling_user
-      message = "Advance Request is awaiting your approval: #{self.money_request.name}"
+      message = "Money Request is awaiting your approval: #{self.money_request.name}"
       view = UserRole.name_for(money_request.controlling_user_role_id)
     end
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
@@ -80,13 +80,13 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     view_role_id = money_request.controlling_user_role_id
-    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: notify_type,
                                              action_user_id: (money_request.tracks.last.action_user.id rescue nil),
                                              object_id: money_request.id,
-                                             object_type: "Advance Request",
+                                             object_type: "Money Request",
                                              path_object_id: money_request.id,
-                                             path_object_type: "Advance Request",
+                                             path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: view_role_id
@@ -101,12 +101,12 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     else
       if approved and user.id == self.money_request.user.id
         if auto_approve
-          return "Congratulations! Your Advance Request #{money_request.name} has been auto-approved"
+          return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
         else
-          "Congratulations! Your Advance Request #{money_request.name} has been approved"
+          "Congratulations! Your Money Request #{money_request.name} has been approved"
         end
       else
-        "#{approving_user.name} has approved the Advance Request: #{self.money_request.name}"
+        "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
       end
     end
   end
@@ -118,12 +118,12 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     else
       if approved and user.id == money_request.user.id
         if auto_approve
-          return "Congratulations! Your Advance Request #{money_request.name} has been auto-approved"
+          return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
         else
-          message = "Congratulations! Your Advance Request #{money_request.name} has been approved"
+          message = "Congratulations! Your Money Request #{money_request.name} has been approved"
         end
       else
-        message = "#{user.name} has approved the Advance Request '#{self.money_request.name}' and is currently waiting for your approval"
+        message = "#{user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
       end
     end
     message

@@ -18,13 +18,13 @@ class MoneyRequest::Submit < MoneyRequest::Base
     # checking if policy is added if enforce policy is enabled
     if user.enforce_policy_enabled?
       if money_request.policy.nil?
-        add_message :error, "You have to select a policy for the advance request before submission"
+        add_message :error, "You have to select a policy for the money request before submission"
         return false
       end
     end
     # checking if the money_request has expenses
     unless money_request.total_amount> 0
-      messages[:error] << 'Cannot submit an empty advance request'
+      messages[:error] << 'Cannot submit an empty money request'
     end
   end
 
@@ -79,7 +79,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
     # adding comment regarding the change in status of this money request
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
 
-    add_message :success, 'Advance Request Submitted'
+    add_message :success, 'Money Request Submitted'
     
     Event::EMoneyRequest::Submit.(user, money_request: money_request)
   end

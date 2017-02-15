@@ -19,4 +19,9 @@ namespace :patch do
     notifiers.update_all(configurable_push_notification: true, has_push_notification: true)
   end
 
+  desc '15-02-2017: Rename advance request to money request in database'
+  task rename_advance_request_to_money_request: :environment do
+    NotificationType.find(7).update_attribute(:name, "money_request")
+  end
+
 end

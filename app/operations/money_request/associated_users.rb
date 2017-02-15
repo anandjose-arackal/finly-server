@@ -9,7 +9,7 @@ class MoneyRequest::AssociatedUsers < MoneyRequest::Base
       add_message :error, 'User not found'
     end
     if params.blank? or (params[:id].blank? and params[:money_request_id].blank? and params[:money_request].blank?)
-      add_message :error, 'Advance Request not found'
+      add_message :error, 'Money Request not found'
     end
   end
 

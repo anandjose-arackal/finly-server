@@ -19,13 +19,13 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
 
   def set_notification(user)
     roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
-    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:advance_request),
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_retract),
                                              action_user_id: money_request.user_id,
                                              object_id: money_request.id,
-                                             object_type: "Advance Request",
+                                             object_type: "Money Request",
                                              path_object_id: money_request.id,
-                                             path_object_type: "Advance Request",
+                                             path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: roles.first)
@@ -34,17 +34,17 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
 
   def mailer_subject(user)
     if user.id == money_request.user.id
-      "Advance Request retracted : #{self.money_request.name}"
+      "Money Request retracted : #{self.money_request.name}"
     else
-      "#{money_request.user.name} has retracted the Advance Request: #{self.money_request.name}"
+      "#{money_request.user.name} has retracted the Money Request: #{self.money_request.name}"
     end
   end
 
   def mailer_body(user)
     if user.id == money_request.user.id
-      "You have successfully retracted the Advance Request : #{self.money_request.name}"
+      "You have successfully retracted the Money Request : #{self.money_request.name}"
     else
-      "#{money_request.user.name} has retracted the Advance Request '#{self.money_request.name}'."
+      "#{money_request.user.name} has retracted the Money Request '#{self.money_request.name}'."
     end
   end
 
