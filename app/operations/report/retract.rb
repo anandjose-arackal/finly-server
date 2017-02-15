@@ -65,6 +65,8 @@ class Report::Retract < Report::Base
 
   def post_process
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
+    # destroying the submitted amount field
+    report.submitted_amount.destroy
 
     Event::EReport::Retract.(user, report: report, from_user: from_user)
 

@@ -55,7 +55,7 @@ class Report < ActiveRecord::Base
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
-
+  accepts_nested_attributes_for :submitted_amount
 
   validates :user, presence: true
   validate :is_employee

@@ -51,13 +51,16 @@ class MoneyRequest::Retract < MoneyRequest::Base
                                   modified_user_role_id: prev_controlling_user_role,
                                   money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:retract),
                                   status_id: MoneyRequestStatus.id_for(:retracted)
-      money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)
     else
       messages[:error] = money_request.errors.full_messages
     end
   end
 
   def post_process
+    money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)
+
+    # destroying the submitted amount field
+    money_request.submitted_amount.destroy
     Event::EMoneyRequest::Retract.(self.user, money_request: self.money_request)
   end
 
