@@ -27,7 +27,7 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
     message = "#{comment_user.name} added a comment: '#{content}' in money request '#{money_request.name}'"
     view = nil
     if user.id != money_request.user_id
-      view = UserRole.id_for(money_request.tracks.with_modified_user(user.id).first.modified_user_role_id) rescue nil
+      view = UserRole.name_for(money_request.tracks.with_modified_user(user.id).first.modified_user_role_id) rescue nil
     end
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end

@@ -54,7 +54,7 @@ class GcmMessenger
         type_id = params[:report_id]
         view = params[:view]
       when NotifierType.id_for(:money_request_submit), NotifierType.id_for(:money_request_approve), NotifierType.id_for(:money_request_retract),
-          NotifierType.id_for(:money_request_reject), NotifierType.id_for(:money_request_comment), NotifierType.id_for(:unapprove),
+          NotifierType.id_for(:money_request_reject), NotifierType.id_for(:money_request_comment), NotifierType.id_for(:money_request_unapprove),
           NotifierType.id_for(:money_request_take_control)
         type = 'money_request'
         type_id = params[:money_request_id]
