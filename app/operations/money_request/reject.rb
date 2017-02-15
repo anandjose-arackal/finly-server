@@ -65,16 +65,20 @@ class MoneyRequest::Reject < MoneyRequest::Base
                                   modified_user_role_id: reject_to_user_role_id,
                                   money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:reject),
                                   status_id: status
-      money_request.comments.create user: user,
-                                    comment_action_id: MoneyRequestCommentAction.id_for(:reject),
-                                    rejected_to_id: reject_to_user.id,
-                                    content: params[:reject_note]
       return
     end
     add_message :error, money_request.errors.full_messages
   end
 
   def post_process
+    money_request.comments.create user: user,
+                                  comment_action_id: MoneyRequestCommentAction.id_for(:reject),
+                                  rejected_to_id: reject_to_user.id,
+                                  content: params[:reject_note]
+
+    # destroying the submitted amount field
+    money_request.submitted_amount.destroy
+
     Event::EMoneyRequest::Reject.(self.user, money_request: self.money_request)
   end
 

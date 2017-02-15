@@ -19,6 +19,7 @@
 
 
 
+
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 

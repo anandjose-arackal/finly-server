@@ -93,13 +93,18 @@ class Report::Submit < Report::Base
       end
       return true
     end
+    submitted_amount_attributes = {value: report.total_amount, currency_id: 1}
+    if report.submitted_amount
+      submitted_amount_attributes[:id] = report.submitted_amount_id
+    end
     submitted_at = DateTime.now
     if report.update_attributes report_status_id: ReportStatus.processing_id,
                                 controlling_user_id: manager.id,
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: manager_role_id,
                                 controlling_for_user_role_id: nil,
-                                submitted_at: submitted_at
+                                submitted_at: submitted_at,
+                                submitted_amount_attributes: submitted_amount_attributes
       report.tracks.create action_user: user,
                            action_user_role_id: UserRole.id_for(:employee),
                            modified_user_id: report.controlling_user_id,

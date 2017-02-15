@@ -9,7 +9,7 @@ class User::CardRestrictions::Update < User::Base
 
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :manager, :finance_manager]
   end
 
   def pre_validate

@@ -71,8 +71,8 @@ production:
   itzcash_card_restriction:
     base_url: "https://freedomcard.itzcash.com"
     path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
-#  itzcash_mcc_group_restriction:
-#    path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
+  itzcash_mcc_group_restriction:
+    path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
