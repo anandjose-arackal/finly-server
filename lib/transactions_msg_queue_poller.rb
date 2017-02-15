@@ -58,7 +58,6 @@ class TransactionsMsgQueuePoller
         rescued = true
       end
 
-
       # if the creation of an entry on the transaction table fails, log it in a file
       if not rescued and @result.transaction.nil?
         begin

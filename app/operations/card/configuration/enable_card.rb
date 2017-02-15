@@ -34,28 +34,28 @@ class Card::Configuration::EnableCard < Card::Base
   def validate
     # i.e. it's manager view
     if employee.nil? and params[:self].nil?
-      messages[:error] << "Employee does not exist."
+      messages[:error] << "Employee does not exist"
     end
     # i.e. if the card is already deactivated
     if card.active
-      messages[:error] << "Card is already active."
+      messages[:error] << "Card is already active"
     end
   end
 
   def authorize
     if user.admin? and !!params[:self]
       unless employee.company_id == user.company_id
-        messages[:error] << "You are not an admin for this employee."
+        messages[:error] << 'You are not an admin for this employee'
       end
       # if manager view, user must be employee's manager
     elsif user.manager? and !params[:self]
-      unless User::Team::Index.call(user, 3, indirect_associations: true).include?(employee) and card.disabled_by_role_id >= 3
-        messages[:error] << "You are not authorized to enable this card."
+      unless User::Team::Index.call(user, 3).include?(employee) and card.disabled_by_role_id >= 3
+        messages[:error] << 'You are not authorized to enable this card'
       end
       # if employee, he must own the card and should have been disabled by him
     elsif user.employee? and params[:self]
       unless card.user_id == user.id and card.disabled_by_role_id >= 4
-        messages[:error] << "You are not authorized to enable this card."
+        messages[:error] << 'You are not authorized to enable this card'
       end
     end
   end

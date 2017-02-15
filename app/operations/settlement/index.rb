@@ -8,7 +8,6 @@ class Settlement::Index < Settlement::Base
   end
 
   def process
-    params[:indirect_associations] = true
     operation = User::Team::Index.new(user, params)
     user_team = operation.run
     unless operation.success?

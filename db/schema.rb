@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170208152811) do
+ActiveRecord::Schema.define(version: 20170214191956) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -173,7 +173,7 @@ ActiveRecord::Schema.define(version: 20170208152811) do
   end
 
   create_table "card_restrictions", force: :cascade do |t|
-    t.integer  "user_id",              limit: 4
+    t.integer  "card_id",              limit: 4
     t.boolean  "channel_atm"
     t.boolean  "channel_pos"
     t.boolean  "channel_online"
@@ -184,7 +184,7 @@ ActiveRecord::Schema.define(version: 20170208152811) do
     t.string   "mcc_restriction_type", limit: 255
   end
 
-  add_index "card_restrictions", ["user_id"], name: "index_card_restrictions_on_user_id", using: :btree
+  add_index "card_restrictions", ["card_id"], name: "index_card_restrictions_on_card_id", using: :btree
 
   create_table "card_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -568,6 +568,7 @@ ActiveRecord::Schema.define(version: 20170208152811) do
     t.datetime "created_at",                                                             null: false
     t.datetime "updated_at",                                                             null: false
     t.boolean  "is_deleted",                                             default: false, null: false
+    t.integer  "submitted_amount_id",          limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -912,6 +913,7 @@ ActiveRecord::Schema.define(version: 20170208152811) do
     t.date     "accounted_at"
     t.datetime "approved_at"
     t.integer  "cash_in_hand_deduction_id",    limit: 4
+    t.integer  "submitted_amount_id",          limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -969,7 +971,7 @@ ActiveRecord::Schema.define(version: 20170208152811) do
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-02-11', null: false
+    t.date     "date_of_birth",                   default: '2017-02-15', null: false
     t.string   "gender",              limit: 255,                        null: false
     t.string   "address_1",           limit: 255, default: "",           null: false
     t.string   "address_2",           limit: 255, default: "",           null: false
@@ -1125,7 +1127,7 @@ ActiveRecord::Schema.define(version: 20170208152811) do
   add_foreign_key "card_expenses", "card_transactions"
   add_foreign_key "card_expenses", "expenses"
   add_foreign_key "card_limits", "card_restrictions"
-  add_foreign_key "card_restrictions", "users"
+  add_foreign_key "card_restrictions", "cards"
   add_foreign_key "card_transactions", "cards"
   add_foreign_key "card_transactions", "expenses"
   add_foreign_key "card_transactions", "users"

@@ -21,6 +21,7 @@
 
 
 
+
 class ReportTrack < ActiveRecord::Base
   belongs_to :report
   belongs_to :report_status

@@ -139,11 +139,13 @@ class User::Wallet::Debit < User::Wallet::Base
 
         elsif to_account == :card
           # first reduce the amount from the card holder's balance
+          # duplicating the params hash first
+          debit_params = params.deep_dup
           debit_presenter = ItzCash::Debit.(target_user, params)
           # if the debit is successful, i.e. if the money has been reduced from the card holder's account
           if debit_presenter.success?
             # now add the money to the target user's card
-            credit_presenter = ItzCash::Credit.(initiating_user, params)
+            credit_presenter = ItzCash::Credit.(initiating_user, debit_params)
             unless credit_presenter.success?
               # throw error message saying debit is successful but credit was unsuccessful
               add_message :error, "Amount could not be credited, the funds will be transferred to your company balance"

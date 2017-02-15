@@ -252,6 +252,7 @@
 #          api_v1_configuration_categories GET        /api/v1/configuration/categories(.:format)                  api/v1/configuration/category#index
 #        api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
 #      api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
+#                          api_v1_balances GET        /api/v1/balances(.:format)                                  api/v1/users#balance
 #                   policies_expense_rules GET        /policies/expense_rules(.:format)                           policies#expense_rules
 #                    policies_budget_rules GET        /policies/budget_rules(.:format)                            policies#budget_rules
 #                  policies_policy_members GET        /policies/policy_members(.:format)                          policies#policy_members
