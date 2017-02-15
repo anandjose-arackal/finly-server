@@ -79,6 +79,8 @@ class Report::Reject < Report::Base
                                       rejected_to_id: reject_to_user.id, content: params[:reject_note]
       comment.save
     end
+    # destroying the submitted amount field
+    report.submitted_amount.destroy
 
     Event::EReport::Reject.(user, report: report)
     messages[:success] << "Report rejected"

@@ -42,7 +42,12 @@ class User::Team::Base < BaseOperation
     end
 
     self.currency_id = 1 # todo - temporary, will change when currencies is implemented
-    self.amount_value = self.report.total_amount
+    # self.amount_value = self.report.total_amount
+    if report.submitted_amount
+      self.amount_value = self.report.submitted_amount_value
+    else
+      self.amount_value = self.report.total_amount
+    end
   end
 
   def load_money_request
@@ -53,7 +58,12 @@ class User::Team::Base < BaseOperation
       self.policy_id = nil
     end
     self.currency_id = 1
-    self.amount_value = self.money_request.total_amount
+    # self.amount_value = self.money_request.total_amount
+    if money_request.submitted_amount
+      self.amount_value = self.money_request.submitted_amount_value
+    else
+      self.amount_value = self.money_request.total_amount
+    end
   end
 
   class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter

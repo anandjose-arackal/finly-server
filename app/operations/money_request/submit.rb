@@ -56,6 +56,10 @@ class MoneyRequest::Submit < MoneyRequest::Base
       money_request.reload
       return
     end
+    submitted_amount_attributes = {value: money_request.total_amount, currency_id: 1}
+    if money_request.submitted_amount
+      submitted_amount_attributes[:id] = money_request.submitted_amount_id
+    end
     submitted_at = DateTime.now
     manager_id = manager.id rescue nil
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
@@ -63,7 +67,8 @@ class MoneyRequest::Submit < MoneyRequest::Base
                                        controlling_for_user_id: nil,
                                        controlling_user_role_id: manager_role_id,
                                        controlling_for_user_role_id: nil,
-                                       submitted_at: submitted_at
+                                       submitted_at: submitted_at,
+                                       submitted_amount_attributes: {value: money_request.total_amount, currency_id: 1}
       money_request.tracks.create action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user_id: money_request.controlling_user_id,
