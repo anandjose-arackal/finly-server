@@ -135,12 +135,12 @@ gem 'awesome_print', '1.7.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', '9.0.6'
-  gem 'capistrano', '3.6.1'
+  gem 'capistrano', '3.7.2'
   gem 'capistrano3-puma', '1.2.1'
-  gem 'capistrano-rails', '1.2.0', require: false
+  gem 'capistrano-rails', '1.2.2', require: false
   gem 'capistrano-bundler', '1.2.0', require: false
   gem 'capistrano-rvm', '0.1.2'
-  gem 'capistrano-rbenv', '2.0.4'
+  gem 'capistrano-rbenv', '2.1.0'
   gem 'hirb', '0.7.3'
 
 end

@@ -1,18 +1,18 @@
 # config valid only for current version of Capistrano
-lock '3.6.1'
+lock '3.7.2'
 
 set :application, 'finly-server'
 
 set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :master
-set :deploy_to, '/home/viveka/app'
+set :deploy_to, '/home/vivek/app'
 set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 # set :rails_env, "staging"
-set :rails_env, 'production'
+set :rails_env, 'local_vm'
 # set :rvm_type, :user
 # set :rvm_ruby_version, 'ruby-2.3.1' # Edit this if you are using MRI Ruby
 

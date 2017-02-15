@@ -26,6 +26,9 @@ staging:
 development:
   <<: *default
 
+local_vm:
+  <<: *default
+
 test:
   <<: *default
 
