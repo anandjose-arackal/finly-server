@@ -1,6 +1,6 @@
-namespace :update do
+namespace :patch do
   
-  desc "Fixing user card restriction association"
+  desc '14-02-2017: Fixing user card restriction association'
   task association_fix: :environment do
     User.all.each do |user|
       res = CardRestriction.find_by(card_id: user.id)
