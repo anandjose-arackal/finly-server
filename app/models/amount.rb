@@ -39,6 +39,7 @@ class Amount < ActiveRecord::Base
   alias_method :pending_reimbursement_value, :amount_value
   alias_method :billing_amount_value, :amount_value
   alias_method :card_balance_value, :amount_value
+  alias_method :submitted_amount_value, :amount_value
 
   def greater_than_amount_value
     self.value

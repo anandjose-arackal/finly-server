@@ -29,7 +29,7 @@ class Card < ActiveRecord::Base
 
   has_one :card_restriction, dependent: :destroy
 
-  has_many :card_balance_history
+  has_many :card_balance_history, dependent: :destroy
 
   belongs_to :card_balance, class_name: "Amount"
 
