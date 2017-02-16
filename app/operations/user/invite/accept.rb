@@ -87,6 +87,12 @@ class User::Invite::Accept < User::Invite::Base
       return
     end
 
+    # validation for date of borth being greater than 1990
+    if Date.parse(date_of_birth) < Date.parse('01-01-1900')
+      add_message :error, "Date of birth entered is invalid"
+      return
+    end
+
     if State.with_id(state_id).first.name.blank?
       add_message :error, 'Invalid state selected'
       return

@@ -7,6 +7,7 @@ class Import::Base < BaseOperation
       csv << header
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
+        row = row.map(&:to_s)
         row << result_hash[i]
         csv << row
       end

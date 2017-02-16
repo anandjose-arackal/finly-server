@@ -19,7 +19,7 @@ Gemfile.lock
 # all local executables
 /bin
 
-/.idea/
+/.idea/*
 .vagrant/
 #Vagrantfile
 #bootstrap.sh

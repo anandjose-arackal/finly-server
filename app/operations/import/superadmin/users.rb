@@ -47,6 +47,7 @@ class Import::Superadmin::Users < Import::Base
   end
 
   def validate
+    # todo - add a validation for company id in each row
 
   end
 
@@ -58,16 +59,23 @@ class Import::Superadmin::Users < Import::Base
       error_messages = params[:error_messages]
       params.delete(:error_messages)
 
+      if company_id_blank?(row)
+        result_hash[i] = "Company ID cannot be blank"
+        next
+      end
+
       unique = mobile_number_valid?(row[import_fields[:mobile_number]])
 
       if unique == true
         if type == 'email'
           self.invitee = User.invite!(params)
+          debugger
         elsif type == 'mobile'
           self.invitee = User.invite!(params, user) do |u|
             u.skip_invitation
             u.update_attribute(:email, "")
             u.update_attribute(:mobile_only_invite, true)
+            debugger
             # send welcome message to invitee
             WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
           end
@@ -95,6 +103,14 @@ class Import::Superadmin::Users < Import::Base
 
   private
 
+  def company_id_blank?(row)
+    if row[import_fields[:company_id]].present?
+      return false
+    else
+      return true
+    end
+  end
+
   # generating the parameters that enable the user to be invited
   def process_row(row)
     errors = []
@@ -102,6 +118,7 @@ class Import::Superadmin::Users < Import::Base
     # converting all elements to strings
     row.each_with_index do |element, index|
       if element.is_a?(Numeric)
+        row[index] = element.to_i.to_s
         row[index] = element.to_i.to_s
       end
     end
@@ -126,7 +143,7 @@ class Import::Superadmin::Users < Import::Base
       if manager.nil?
         manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       end
-      unless manager and manager.manager? and manager.company_id == row[import_fields[:company_id]]
+      unless manager&.manager? and manager.company_id == row[import_fields[:company_id]]
         errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
@@ -136,7 +153,7 @@ class Import::Superadmin::Users < Import::Base
       if finance_manager.nil?
         finance_manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       end
-      unless finance_manager and finance_manager.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
+      unless finance_manager&.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
         errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
@@ -146,7 +163,7 @@ class Import::Superadmin::Users < Import::Base
       if approves_to.nil?
         approves_to = User.find_by(mobile_number: row[import_fields[:mobile_number]])
       end
-      unless approves_to and approves_to.manager? and approves_to.company_id == row[import_fields[:company_id]]
+      unless approves_to&.manager? and approves_to.company_id == row[import_fields[:company_id]]
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
@@ -156,7 +173,7 @@ class Import::Superadmin::Users < Import::Base
       if approves_finance_to.nil?
         approves_finance_to = User.find_by(mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
       end
-      unless approves_finance_to and approves_finance_to.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
+      unless approves_finance_to&.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil
       end
@@ -203,7 +220,7 @@ class Import::Superadmin::Users < Import::Base
   end
 
   def import_fields
-    { 
+    {
       :first_name => 0,
       :last_name => 1,
       :email => 2,
@@ -230,6 +247,3 @@ class Import::Superadmin::Users < Import::Base
   end
 
 end
-
-
-
