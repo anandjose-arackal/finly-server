@@ -141,7 +141,7 @@ class User::Wallet::Credit < User::Wallet::Base
         if target_account == :card
           # first reduce the amount from the card holder's balance
           # duplicating the params hash first
-          debit_params = params
+          debit_params = params.deep_dup
           debit_presenter = ItzCash::Debit.(initiating_user, params)
           # if the debit is successful, i.e. if the money has been reduced from the card holder's account
           if debit_presenter.success?

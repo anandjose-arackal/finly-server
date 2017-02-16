@@ -16,6 +16,9 @@ Gemfile.lock
 /tmp
 /public/system/receipts/*
 
+# all local executables
+/bin
+
 /.idea/
 .vagrant/
 #Vagrantfile
