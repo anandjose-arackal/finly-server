@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 
   before_action :authenticate_user!, except: [:lookup, :send_verification_otp, :verify_user_otp, :set_new_password]
+  allow_oauth!
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
@@ -123,8 +124,14 @@ class UsersController < ApplicationController
   end
 
   def lookup
+    cookies.delete :user_name
     @result = User::Lookup.(params)
     respond
+  end
+
+  def menu_data
+    # Helps the front end app to get user specific yaml data from view_wise_data.yml
+    render partial: 'menu_data'
   end
 
   private

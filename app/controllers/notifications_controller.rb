@@ -1,4 +1,5 @@
 class NotificationsController < ApplicationController
+  allow_oauth!
 
   def index
     @result = Notification::Index.(current_user, params)

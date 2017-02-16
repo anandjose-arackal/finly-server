@@ -509,6 +509,7 @@
 #
 
 Rails.application.routes.draw do
+  get 'menu_data', to: "users#menu_data"
 
 
   devise_for :admin_users, ActiveAdmin::Devise.config
