@@ -38,7 +38,8 @@ class ReceiptEmail < ActiveRecord::Base
         end
       else
         image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
-        document_converter = ReceiptProcessor::BaseConverter.new  raw_html,
+        raw_html_text = raw_html.read
+        document_converter = ReceiptProcessor::BaseConverter.new  raw_html_text,
                                                                   ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                   image_tmp_path
         document_converter.convert do |images|
@@ -46,4 +47,5 @@ class ReceiptEmail < ActiveRecord::Base
         end
       end
   end
+
 end
