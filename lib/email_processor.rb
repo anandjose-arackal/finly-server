@@ -1,3 +1,4 @@
+require 'fake_file_i_o'
 # Encapsulates functionality for receiving emails
 class EmailProcessor
   def initialize(email)
