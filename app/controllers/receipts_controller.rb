@@ -1,6 +1,7 @@
 class ReceiptsController < ApplicationController
 
   before_action :authenticate_user!
+  allow_oauth!
 
   def index
     @result = Receipt::Index.(current_user, params)
