@@ -22,6 +22,8 @@ class EmailProcessor
       receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", @email.raw_body)
       receipt_email.raw_html = FakeFileIO.new("#{id}_raw_html.txt", @email.raw_html)
       receipt_email.raw_header = FakeFileIO.new("#{id}_raw_headers.txt", @email.raw_headers)
+      receipt_email.valid?
+      puts "Receipt Parse save errors : #{receipt_email.errors.full_messages}"
       receipt_email.save
       if @email.attachments.any?
         @email.attachments.each do |attachment|
