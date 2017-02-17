@@ -7,12 +7,29 @@ class EmailProcessor
   def process
     user = User.find_by_email(@email.from[:email])
     if user.present?
-      receipt_email = user.receipt_emails.create  subject: @email.subject,
-                                                  body: @email.body,
-                                                  raw_text: @email.raw_body,
-                                                  raw_html: @email.raw_html,
-                                                  raw_headers: @email.raw_headers,
-                                                  sent_at: DateTime.parse(@email.headers['Date'])
+      # receipt_email = user.receipt_emails.create  subject: @email.subject,
+      #                                             body: @email.body,
+      #                                             raw_text: @email.raw_body,
+      #                                             raw_html: @email.raw_html,
+      #                                             raw_headers: @email.raw_headers,
+      #                                             sent_at: DateTime.parse(@email.headers['Date'])
+
+      receipt_email = user.receipt_emails.build subject: @email.body,
+                                                 sent_at: DateTime.parse(@email.headers['Date'])
+      date = Date.today
+      day = '%02d' % date.day
+      month = '%02d' % date.month
+      year = '%04d' % date.year
+      name = "#{user.id}_#{day}_#{month}_#{year}"
+      receipt_email.body = StringIO.new(@email.body)
+      receipt_email.body_file_name = "#{name}_body.txt"
+      receipt_email.raw_text = StringIO.new(@email.body)
+      receipt_email.raw_text_file_name = "#{name}_raw_body.txt"
+      receipt_email.raw_html = StringIO.new(@email.body)
+      receipt_email.raw_html_file_name = "#{name}_raw_html.txt"
+      receipt_email.raw_headers = StringIO.new(@email.body)
+      receipt_email.raw_headers_file_name = "#{name}_raw_headers.txt"
+      receipt_email.save
       if @email.attachments.any?
         @email.attachments.each do |attachment|
           receipt_email.receipt_email_attachments.create(original_attachment: attachment)
