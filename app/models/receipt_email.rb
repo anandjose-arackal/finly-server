@@ -63,7 +63,7 @@ class ReceiptEmail < ActiveRecord::Base
         end
       else
         image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
-        raw_html_text = Paperclip.io_adapters.for(raw_html).read
+        raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
         document_converter = ReceiptProcessor::BaseConverter.new  raw_html_text,
                                                                   ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                   image_tmp_path
