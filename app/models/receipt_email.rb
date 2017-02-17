@@ -18,19 +18,19 @@
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
-  has_many :receipt_email_attachments
+  has_many :receipt_email_attachments, dependent: :destroy
   belongs_to :user
 
   validates :user_id, presence: true
 
   has_attached_file :body
-  validates_attachment  :body, presence: true, content_type: /\*\/.txt\z/
+  validates_attachment  :body, presence: true
   has_attached_file :raw_text
-  validates_attachment  :raw_text, presence: true, content_type: /\*\/.txt\z/
+  validates_attachment  :raw_text, presence: true
   has_attached_file :raw_html
-  validates_attachment  :raw_html, presence: true, content_type: /\*\/.txt\z/
+  validates_attachment  :raw_html, presence: true
   has_attached_file :raw_headers
-  validates_attachment  :raw_headers, presence: true, content_type: /\*\/.txt\z/
+  validates_attachment  :raw_headers, presence: true
 
   def save_receipt_image
     FileUtils.mkdir_p "#{Rails.root}/tmp/images"
