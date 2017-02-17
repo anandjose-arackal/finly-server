@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170217102116) do
+ActiveRecord::Schema.define(version: 20170217113720) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -789,11 +789,11 @@ ActiveRecord::Schema.define(version: 20170217102116) do
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
 
   create_table "receipt_emails", force: :cascade do |t|
-    t.string   "subject",                 limit: 255
+    t.text     "subject",                 limit: 65535
     t.datetime "sent_at"
     t.integer  "user_id",                 limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.string   "body_file_name",          limit: 255
     t.string   "body_content_type",       limit: 255
     t.integer  "body_file_size",          limit: 4

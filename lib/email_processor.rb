@@ -14,7 +14,7 @@ class EmailProcessor
       #                                             raw_headers: @email.raw_headers,
       #                                             sent_at: DateTime.parse(@email.headers['Date'])
 
-      receipt_email = user.receipt_emails.build subject: @email.body,
+      receipt_email = user.receipt_emails.build  subject: @email.subject,
                                                  sent_at: DateTime.parse(@email.headers['Date'])
       date = Date.today
       day = '%02d' % date.day

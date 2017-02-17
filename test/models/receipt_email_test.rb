@@ -3,7 +3,7 @@
 # Table name: receipt_emails
 #
 #  id                      :integer          not null, primary key
-#  subject                 :string(255)
+#  subject                 :text(65535)
 #  sent_at                 :datetime
 #  user_id                 :integer
 #  created_at              :datetime         not null
