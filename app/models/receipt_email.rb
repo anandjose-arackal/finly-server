@@ -36,16 +36,12 @@ class ReceiptEmail < ActiveRecord::Base
   validates :user_id, presence: true
 
   has_attached_file :body
-  validates_attachment  :body
   validates_attachment_content_type :body, :content_type => 'text/plain'
   has_attached_file :raw_text
-  validates_attachment  :raw_text
   validates_attachment_content_type :raw_text, :content_type => 'text/plain'
   has_attached_file :raw_html
-  validates_attachment  :raw_html
   validates_attachment_content_type :raw_html, :content_type => 'text/plain'
   has_attached_file :raw_header
-  validates_attachment  :raw_header
   validates_attachment_content_type :raw_header, :content_type => 'text/plain'
 
   def save_receipt_image
