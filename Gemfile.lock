@@ -117,6 +117,9 @@ GEM
     capistrano-bundler (1.2.0)
       capistrano (~> 3.1)
       sshkit (~> 1.2)
+    capistrano-crono (0.1.2)
+      capistrano (>= 3.0.0)
+      crono
     capistrano-harrow (0.5.3)
     capistrano-rails (1.2.2)
       capistrano (~> 3.1)
@@ -127,6 +130,9 @@ GEM
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
+    capistrano-sidekiq (0.10.0)
+      capistrano
+      sidekiq (>= 3.4)
     capistrano3-puma (1.2.1)
       capistrano (~> 3.0)
       puma (>= 2.6)
@@ -414,9 +420,11 @@ DEPENDENCIES
   byebug (= 9.0.6)
   capistrano (= 3.7.2)
   capistrano-bundler (= 1.2.0)
+  capistrano-crono (= 0.1.2)
   capistrano-rails (= 1.2.2)
   capistrano-rbenv (= 2.1.0)
   capistrano-rvm (= 0.1.2)
+  capistrano-sidekiq
   capistrano3-puma (= 1.2.1)
   coffee-rails (= 4.1.1)
   crono (= 1.0.3)

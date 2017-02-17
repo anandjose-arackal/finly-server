@@ -141,6 +141,8 @@ group :development, :test do
   gem 'capistrano-bundler', '1.2.0', require: false
   gem 'capistrano-rvm', '0.1.2'
   gem 'capistrano-rbenv', '2.1.0'
+  gem 'capistrano-crono', '0.1.2'
+  gem 'capistrano-sidekiq', '0.10.0'
   gem 'hirb', '0.7.3'
 
 end
