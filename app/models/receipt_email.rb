@@ -35,14 +35,20 @@ class ReceiptEmail < ActiveRecord::Base
 
   validates :user_id, presence: true
 
+  # BODY_CONTENT_TYPES = ['text/plain', 'text/html', 'message/rfc822', 'multipart/alternative', 'message/partial']
+
   has_attached_file :body
-  validates_attachment_content_type :body, :content_type => 'text/plain'
+  do_not_validate_attachment_file_type :body
+  # validates_attachment_content_type :body, :content_type => BODY_CONTENT_TYPES
   has_attached_file :raw_text
-  validates_attachment_content_type :raw_text, :content_type => 'text/plain'
+  do_not_validate_attachment_file_type :raw_text
+  # validates_attachment_content_type :raw_text, :content_type => BODY_CONTENT_TYPES
   has_attached_file :raw_html
-  validates_attachment_content_type :raw_html, :content_type => 'text/plain'
+  do_not_validate_attachment_file_type :raw_html
+  # validates_attachment_content_type :raw_html, :content_type => BODY_CONTENT_TYPES
   has_attached_file :raw_header
-  validates_attachment_content_type :raw_header, :content_type => 'text/plain'
+  do_not_validate_attachment_file_type :raw_header
+  # validates_attachment_content_type :raw_header, :content_type => BODY_CONTENT_TYPES
 
   def save_receipt_image
     FileUtils.mkdir_p "#{Rails.root}/tmp/images"
