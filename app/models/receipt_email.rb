@@ -44,9 +44,9 @@ class ReceiptEmail < ActiveRecord::Base
   has_attached_file :raw_html
   validates_attachment  :raw_html, presence: true
   validates_attachment_content_type :raw_html, :content_type => 'text/plain'
-  has_attached_file :raw_headers
-  validates_attachment  :raw_headers, presence: true
-  validates_attachment_content_type :raw_headers, :content_type => 'text/plain'
+  has_attached_file :raw_header
+  validates_attachment  :raw_header, presence: true
+  validates_attachment_content_type :raw_header, :content_type => 'text/plain'
 
   def save_receipt_image
     FileUtils.mkdir_p "#{Rails.root}/tmp/images"
