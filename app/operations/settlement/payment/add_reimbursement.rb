@@ -64,7 +64,9 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   end
 
   def validate
-    validate_date payment_params[:date]
+    unless validate_date payment_params[:date]
+      return false
+    end
 
     if params[:password].blank?
       add_message :error, 'You need to provide your password to initiate this transfer'

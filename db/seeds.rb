@@ -462,7 +462,7 @@ unless Rails.env.production?
     User.all.each do |user|
       next unless user.cards.present?
       card = user.cards.first
-      20.times do
+      10.times do
 
         trans_types = ["POS", "Ecom"]
         trans_modes = ["Debit", "Credit"]
@@ -493,7 +493,7 @@ unless Rails.env.production?
                         product_code: data[11]
         }
 
-        trans = Card::Transaction::Create.(trans_params).transaction
+        Card::Transaction::Create.(trans_params)
       end
 
     end
@@ -553,5 +553,3 @@ end
 #       trans = Card::Transaction::Create.(trans_params).transaction
 #     end
 # end
-
-
