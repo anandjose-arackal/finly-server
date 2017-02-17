@@ -24,4 +24,9 @@ namespace :patch do
     NotificationType.find(7).update_attribute(:name, "money_request")
   end
 
+  desc '17-02-2017: Destroy all receipts with email attachment'
+  task rename_advance_request_to_money_request: :environment do
+    
+  end
+
 end

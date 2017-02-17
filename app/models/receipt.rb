@@ -23,7 +23,7 @@
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
-  belongs_to :receipt_email
+  belongs_to :receipt_email, dependent: :destroy
 
   validates :user_id, presence: true
 
@@ -88,7 +88,7 @@ class Receipt < ActiveRecord::Base
     type = "image"
   else
     type = "image"
-  end 
+  end
   end
 
 end
