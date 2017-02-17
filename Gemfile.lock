@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/activeadmin/activeadmin.git
-  revision: 01db1a68bf1f224776df01befa64f9eb756af0b5
+  revision: 8ddc07eefb9c4c39f96e1ad990fe7789555fd4ff
   specs:
     activeadmin (1.0.0.pre4)
       arbre (~> 1.0, >= 1.0.2)
@@ -424,7 +424,7 @@ DEPENDENCIES
   capistrano-rails (= 1.2.2)
   capistrano-rbenv (= 2.1.0)
   capistrano-rvm (= 0.1.2)
-  capistrano-sidekiq
+  capistrano-sidekiq (= 0.10.0)
   capistrano3-puma (= 1.2.1)
   coffee-rails (= 4.1.1)
   crono (= 1.0.3)
