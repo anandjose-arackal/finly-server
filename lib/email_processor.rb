@@ -17,11 +17,10 @@ class EmailProcessor
       receipt_email = user.receipt_emails.create  subject: @email.subject,
                                                  sent_at: DateTime.parse(@email.headers['Date'])
       id = receipt_email.id
-      name = "#{id}"
-      receipt_email.body = get_temp_file("#{name}_body.txt", @email.body)
-      receipt_email.raw_text = get_temp_file("#{name}_raw_body.txt", @email.body)
-      receipt_email.raw_html = get_temp_file("#{name}_raw_html.txt", @email.body)
-      receipt_email.raw_header = get_temp_file("#{name}_raw_headers.txt", @email.body)
+      receipt_email.body = get_temp_file("#{id}_body.txt", @email.body)
+      receipt_email.raw_text = get_temp_file("#{id}_raw_body.txt", @email.raw_body)
+      receipt_email.raw_html = get_temp_file("#{id}_raw_html.txt", @email.raw_html)
+      receipt_email.raw_header = get_temp_file("#{id}_raw_headers.txt", @email.raw_headers)
       receipt_email.save
       if @email.attachments.any?
         @email.attachments.each do |attachment|
@@ -36,5 +35,6 @@ class EmailProcessor
   def get_temp_file(temp_name, string)
     file = Tempfile.new([temp_name, '.txt'])
     file.write(string.force_encoding(Encoding::UTF_8))
+    file
   end
 end
