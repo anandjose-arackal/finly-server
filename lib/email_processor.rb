@@ -17,14 +17,10 @@ class EmailProcessor
       receipt_email = user.receipt_emails.create  subject: @email.subject,
                                                  sent_at: DateTime.parse(@email.headers['Date'])
       id = receipt_email.id
-      receipt_email.body = StringIO.new(@email.body)
-      receipt_email.body_file_name = "#{id}_body.txt"
-      receipt_email.raw_text = StringIO.new(@email.raw_body)
-      receipt_email.raw_text_file_name = "#{id}_raw_body.txt"
-      receipt_email.raw_html = StringIO.new(@email.raw_html)
-      receipt_email.raw_html_file_name = "#{id}_raw_html.txt"
-      receipt_email.raw_header = StringIO.new(@email.raw_headers)
-      receipt_email.raw_header_file_name = "#{id}_raw_headers.txt"
+      receipt_email.body = get_temp_file "#{id}_body.txt", @email.body
+      receipt_email.raw_text = get_temp_file "#{id}_raw_text.txt", @email.raw_body
+      receipt_email.raw_html = get_temp_file "#{id}_raw_html.txt", @email.raw_html
+      receipt_email.raw_header = get_temp_file "#{id}_raw_header.txt", @email.raw_headers
       receipt_email.save
       if @email.attachments.any?
         @email.attachments.each do |attachment|
@@ -33,5 +29,11 @@ class EmailProcessor
       end
       receipt_email.save_receipt_image
     end
+  end
+
+  protected
+  def get_temp_file(filename, string)
+    file = Tempfile.new( [filename, '.txt'] )
+    file.write( string.force_encoding('utf-8') )
   end
 end
