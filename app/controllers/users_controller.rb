@@ -71,11 +71,6 @@ class UsersController < ApplicationController
     respond
   end
 
-  # placeholder action for importing file
-  def mass_import
-
-  end
-
   # action that imports from a CSV or Excel file for mass invitations
   def import
     import_op = Import::CompanyAdmin::Users.new(current_user, params)
@@ -100,15 +95,6 @@ class UsersController < ApplicationController
   def verify_user_otp
     @result = User::Login::VerifyLoginOtp.(params)
     respond
-    # @result = User::Login::SendFirstLoginOtp.(params)
-    # if @result.success?
-    #   # redirecting to page where they can set their password
-    #   sign_in @result.user, :bypass => true
-    #   redirect_to user_set_password_path
-    # else
-    #   flash[:error] = @result.messages[:error]
-    #   redirect_to request.referrer
-    # end
   end
 
   # action that lets mobile only users set their password for the first time
