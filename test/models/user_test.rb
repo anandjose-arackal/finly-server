@@ -38,8 +38,8 @@
 #  otp_verified_at        :datetime
 #  otp_verified           :boolean          default(FALSE), not null
 #  otp_count              :integer          default(0), not null
-#  first_name             :string(255)      default(""), not null
-#  last_name              :string(255)      default(""), not null
+#  first_name             :string(255)
+#  last_name              :string(255)
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)

@@ -27,8 +27,8 @@ class EmailProcessor
       receipt_email.raw_text_file_name = "#{name}_raw_body.txt"
       receipt_email.raw_html = StringIO.new(@email.body)
       receipt_email.raw_html_file_name = "#{name}_raw_html.txt"
-      receipt_email.raw_headers = StringIO.new(@email.body)
-      receipt_email.raw_headers_file_name = "#{name}_raw_headers.txt"
+      receipt_email.raw_header = StringIO.new(@email.body)
+      receipt_email.raw_header_file_name = "#{name}_raw_headers.txt"
       receipt_email.save
       if @email.attachments.any?
         @email.attachments.each do |attachment|
