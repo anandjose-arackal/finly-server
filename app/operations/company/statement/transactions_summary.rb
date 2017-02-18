@@ -61,12 +61,20 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
     items[:total_amount_transferred] = {}
     items[:total_amount_transferred][:to_finly_cards] = 0
     items[:total_amount_transferred][:to_finly_money] = 0
+    items[:total_amount_transferred][:from_finly_cards] = 0
+    items[:total_amount_transferred][:from_finly_money] = 0
     company.users.each do |user|
-      card_total = user.receiving_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_card)]).joins(:amount).sum(:value)
-      items[:total_amount_transferred][:to_finly_cards] += card_total
+      to_card_total = user.receiving_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_card)]).joins(:amount).sum(:value)
+      items[:total_amount_transferred][:to_finly_cards] += to_card_total
 
-      finly_money_total = user.receiving_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_wallet)]).joins(:amount).sum(:value)
-      items[:total_amount_transferred][:to_finly_money] += finly_money_total
+      from_card_total = user.receiving_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debit_from_card_to_virtual_account)]).joins(:amount).sum(:value)
+      items[:total_amount_transferred][:from_finly_cards] += from_card_total
+
+      from_finly_money_total = user.receiving_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
+      items[:total_amount_transferred][:from_finly_money] += from_finly_money_total
+
+      to_finly_money_total = user.receiving_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:credit_from_virtual_account_to_wallet)]).joins(:amount).sum(:value)
+      items[:total_amount_transferred][:to_finly_money] += to_finly_money_total
     end
 
     items[:company_account_opening_balance] = items[:company_account_closing_balance] + items[:transfers_to_company_account][:total] - items[:transfers_from_company_account][:total]
