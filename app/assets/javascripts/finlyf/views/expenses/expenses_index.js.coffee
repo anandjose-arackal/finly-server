@@ -464,7 +464,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     # console.log "Will navigate now."
     if @params.view
-      params.view = @params.view
+      params.view = @params.view || 'personal'
 
     if $(target).attr('data-navigate')
       if $.parseJSON($(target).attr('data-navigate')) == true

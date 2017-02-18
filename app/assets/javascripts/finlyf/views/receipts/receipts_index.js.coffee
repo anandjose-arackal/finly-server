@@ -42,7 +42,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
 
     #Filters
     'keyup .filter-merchant': 'autoComplete'
-    'click .btn-filter': 'filter'
+    'click .btn-filter-receipts': 'filter'
 
   initialize: (options) ->
     if options
@@ -252,14 +252,39 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     params.view = @params.view
     FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
 
-  filter: ->
+  filter: (e) ->
+    loader_div = $(@el).find('.main')
+    FinlyF.startMainLoader(loader_div)
+
+    if e
+      e.preventDefault()
+      target = e.currentTarget
+
     sidebar = $(@el).find(".sidebar")
     params = {
-      'filter_date[from]': $(".sidebar .filter-date-from").val() || ""
-      'filter_date[to]': $(".sidebar .filter-date-to").val() || ""
+      'filter_date[from]': $(@el).find(".sidebar .filter-date-from").val() || ""
+      'filter_date[to]': $(@el).find(".sidebar .filter-date-to").val() || ""
     }
 
-    FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
+    if @params.view
+      params.view = @params.view || 'personal'
+
+    if $(target).attr('data-navigate')
+      if $.parseJSON($(target).attr('data-navigate')) == true
+        FinlyF.primary_router.navigate('receipts/params=' + JSON.stringify(params), {trigger: true})
+      else
+        # Navigate by refetching & resetting collection with params
+        @collection.fetch({
+          reset: true,
+          data: params,
+          done: ->
+            FinlyF.stopMainLoader()
+        })
+
+
+
+
+
 
   navigate: (e) ->
     unless $(e.currentTarget).hasClass('non-backbone-link')

@@ -586,6 +586,54 @@ $brand-admin-primary: $brand-danger;
 }
 
 
+// Receipts
+.item.selected .receipt-container{
+  background: #F4F560;
+}
+
+.item.receipt, .report-receipt{
+  background: transparent;
+  padding: 0;
+  height: 370px;
+  margin-bottom: 2px;
+}
+
+.receipt .well{
+  height: 370px;
+  padding: 10px;
+  margin: 0;
+
+  .receipt-img{
+    height: 250px;
+
+    img{
+      max-height: 250px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .receipt-details{
+    height: 100px;
+    h4, h5{
+      border-top: 1px solid #ddd;
+      margin-top: 0;
+      padding-top: 10px;
+      padding-left: 10px;
+    }
+    p{
+      margin-bottom: 0;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    p.disabled-text{
+      color: #bdbdbd;
+    }
+  }
+}
+
+
+
 //backboned css
 //balance modal transfer flow arrow
 .transfer-flow{
@@ -875,6 +923,11 @@ body {
 
 .table-nested > thead > tr > th, .table-nested > thead > tr > td, .table-nested > tbody > tr > th, .table-nested > tbody > tr > td, .table-nested > tfoot > tr > th, .table-nested > tfoot > tr > td {
   // padding: 0;
+}
+
+// Jquery UI components override
+#ui-datepicker-div{
+  z-index: 1051 !important;
 }
 // Hopefully Obsolete codes
 

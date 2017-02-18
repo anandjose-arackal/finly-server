@@ -18,12 +18,19 @@
   </div>
 </div>
 
-
-<div class="row sidebar-element">
-  <div class="col-sm-12 text-center">
-    <button class="btn-default btn btn-sm btn-filter">Apply Filter</button>
+{{#unless item.indexOnly}}
+  <div class="row sidebar-element">
+    <div class="col-sm-12 text-center">
+      <button class="btn btn-sm btn-default btn-filter-receipts" data-navigate="true">Apply Filter</button>
+    </div>
   </div>
-</div>
+{{else}}
+  <div class="row sidebar-element">
+    <div class="col-sm-12 text-center">
+      <button class="btn-default btn btn-sm btn-filter-receipts" data-navigate="false">Apply Filter</button>
+    </div>
+  </div>
+{{/unless}}
 
 <style type="text/css">
   ul.nav-stacked > li > a{
