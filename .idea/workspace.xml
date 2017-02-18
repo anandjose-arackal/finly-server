@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="Fixed import numbers">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.rakeTasks" afterPath="$PROJECT_DIR$/.idea/.rakeTasks" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.generators" afterPath="$PROJECT_DIR$/.idea/.generators" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Finly.iml" afterPath="$PROJECT_DIR$/.idea/Finly.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/expense/ex_card/create.rb" afterPath="$PROJECT_DIR$/app/operations/expense/ex_card/create.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/expense/ex_card/update.rb" afterPath="$PROJECT_DIR$/app/operations/expense/ex_card/update.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/payment/add_debt_to_company_clearance.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/add_debt_to_company_clearance.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/payment/add_reimbursement.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/payment/add_reimbursement.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/settlement/show.rb" afterPath="$PROJECT_DIR$/app/operations/settlement/show.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/settlements/show.json.jbuilder" afterPath="$PROJECT_DIR$/app/views/settlements/show.json.jbuilder" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/card.rb" afterPath="$PROJECT_DIR$/app/models/card.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/report.rb" afterPath="$PROJECT_DIR$/app/models/report.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/analytics/charts.rb" afterPath="$PROJECT_DIR$/app/operations/analytics/charts.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/import/superadmin/users.rb" afterPath="$PROJECT_DIR$/app/operations/import/superadmin/users.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/lookup.rb" afterPath="$PROJECT_DIR$/app/operations/user/lookup.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/operations/user/profile.rb" afterPath="$PROJECT_DIR$/app/operations/user/profile.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/deploy.rb" afterPath="$PROJECT_DIR$/config/deploy.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/seeds.rb" afterPath="$PROJECT_DIR$/db/seeds.rb" />
     </list>
     <list id="7d878649-6630-420c-bf50-2b6db9b1c134" name="New changelist" comment="" />
     <ignored path="Finly.iws" />
@@ -51,8 +50,8 @@
       <file leaf-file-name="endpoint.yml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/endpoint.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="147">
-              <caret line="45" column="50" lean-forward="true" selection-start-line="45" selection-start-column="50" selection-end-line="45" selection-end-column="50" />
+            <state relative-caret-position="810">
+              <caret line="45" column="50" lean-forward="false" selection-start-line="45" selection-start-column="50" selection-end-line="45" selection-end-column="50" />
               <folding />
             </state>
           </provider>
@@ -61,28 +60,50 @@
       <file leaf-file-name="users.rb" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/operations/import/superadmin/users.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="226">
-              <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="738">
+              <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+              <folding>
+                <marker date="1487412757774" expanded="true" signature="781:9759" ph=" ... end" />
+                <marker date="1487412757774" expanded="true" signature="2517:3489" ph=" ... end" />
+                <marker date="1487412757774" expanded="true" signature="2517:3483" ph="do ... end" />
+                <marker date="1487412757774" expanded="true" signature="2608:3086" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="2634:3076" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="2978:3064" ph="do ... end" />
+                <marker date="1487412757774" expanded="true" signature="3094:3475" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="3195:3388" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="3509:3590" ph=" ... end" />
+                <marker date="1487412757774" expanded="true" signature="3631:3739" ph=" ... end" />
+                <marker date="1487412757774" expanded="true" signature="3636:3733" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="3828:9137" ph=" ... end" />
+                <marker date="1487412757774" expanded="true" signature="3911:4058" ph="do ... end" />
+                <marker date="1487412757774" expanded="true" signature="3937:4050" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="4173:4340" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="4345:4536" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="4541:4702" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="4819:5271" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="4954:5076" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="5083:5263" ph="unless ... end" />
+                <marker date="1487412757774" expanded="true" signature="5276:5816" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="5435:5573" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="5580:5808" ph="unless ... end" />
+                <marker date="1487412757774" expanded="true" signature="5821:6264" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="5948:6063" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="6070:6256" ph="unless ... end" />
+                <marker date="1487412757774" expanded="true" signature="6269:6817" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="6420:6568" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="6575:6809" ph="unless ... end" />
+                <marker date="1487412757774" expanded="true" signature="8599:9108" ph="if ... end" />
+                <marker date="1487412757774" expanded="true" signature="9158:9754" ph=" ... end" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="add_reimbursement.rb" pinned="false" current-in-tab="false">
+      <file leaf-file-name="add_reimbursement.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/operations/settlement/payment/add_reimbursement.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="66" column="13" lean-forward="false" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base.rb" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/operations/settlement/base.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-62">
-              <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+            <state relative-caret-position="316">
+              <caret line="92" column="0" lean-forward="true" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -91,9 +112,80 @@
       <file leaf-file-name="user.rb" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/models/user.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18">
-              <caret line="82" column="82" lean-forward="false" selection-start-line="82" selection-start-column="82" selection-end-line="82" selection-end-column="82" />
-              <folding />
+            <state relative-caret-position="1962">
+              <caret line="109" column="0" lean-forward="false" selection-start-line="109" selection-start-column="0" selection-end-line="109" selection-end-column="0" />
+              <folding>
+                <marker date="1487397799992" expanded="true" signature="1927:13932" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="1980:2095" ph="##..." />
+                <marker date="1487397799992" expanded="true" signature="3154:3163" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="3594:3606" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="3687:3703" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="3795:3807" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="3896:3920" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="4012:4024" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="4954:4966" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="5068:5084" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="5189:5201" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="5311:5335" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="5440:5452" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="6577:6598" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="6640:6672" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="6706:6731" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="6764:6974" ph="do ... end" />
+                <marker date="1487397799992" expanded="true" signature="7009:7048" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7086:7107" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7132:7155" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7183:7262" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7298:7385" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7411:7488" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7515:7559" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7580:7602" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7631:7658" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="7662:7835" ph="##..." />
+                <marker date="1487397799992" expanded="true" signature="7869:8108" ph="do ... end" />
+                <marker date="1487397799992" expanded="true" signature="8144:8784" ph="do ... end" />
+                <marker date="1487397799992" expanded="true" signature="8151:8778" ph="case ... end" />
+                <marker date="1487397799992" expanded="true" signature="8190:8249" ph="##..." />
+                <marker date="1487397799992" expanded="true" signature="8611:8672" ph="##..." />
+                <marker date="1487397799992" expanded="true" signature="8818:8898" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="8923:9024" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="9046:9140" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="9169:9244" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="9271:9315" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="9348:9419" ph="{ ... }" />
+                <marker date="1487397799992" expanded="true" signature="9436:9923" ph="do ... end" />
+                <marker date="1487397799992" expanded="true" signature="9939:9981" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="9993:10105" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10174:10225" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10238:10264" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10286:10324" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10328:10462" ph="##..." />
+                <marker date="1487397799992" expanded="true" signature="10496:10703" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10501:10563" ph="if ... end" />
+                <marker date="1487397799992" expanded="true" signature="10591:10650" ph="if ... end" />
+                <marker date="1487397799992" expanded="true" signature="10790:10815" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10839:10914" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="10930:10997" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11014:11077" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11093:11155" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11181:11290" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11307:11327" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11351:11384" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11418:11480" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11555:11571" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11595:11649" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11698:11721" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11746:11779" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="11911:12813" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13031:13100" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13272:13363" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13392:13481" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13500:13594" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13625:13663" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13682:13787" ph=" ... end" />
+                <marker date="1487397799992" expanded="true" signature="13687:13781" ph="if ... end" />
+                <marker date="1487397799992" expanded="true" signature="13802:13927" ph="##..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -122,7 +214,7 @@
         <entry file="file://$PROJECT_DIR$/app/models/money_request.rb">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1026">
-              <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+              <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -261,9 +353,10 @@
     <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="24" />
+    <option name="x" value="1920" />
+    <option name="y" value="52" />
     <option name="width" value="1920" />
-    <option name="height" value="1056" />
+    <option name="height" value="1028" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -563,7 +656,9 @@
       <workItem from="1487243605686" duration="3815000" />
       <workItem from="1487258262688" duration="4168000" />
       <workItem from="1487316565334" duration="1757000" />
-      <workItem from="1487320525597" duration="2104000" />
+      <workItem from="1487320525597" duration="3800000" />
+      <workItem from="1487394695957" duration="1983000" />
+      <workItem from="1487396885118" duration="4597000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <created>1467012839750</created>
@@ -768,11 +863,18 @@
       <option name="project" value="LOCAL" />
       <updated>1487260012517</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Started User profile attributes feature.">
+      <created>1487339836957</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1487339836957</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129266000" />
+    <option name="totallyTimeSpent" value="137542000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -784,14 +886,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
-    <editor active="false" />
+    <frame x="1920" y="52" width="1920" height="1028" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1456777" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.631524" sideWeight="0.50213444" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299763" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.631524" sideWeight="0.49786553" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.65031314" sideWeight="0.49786553" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30375782" sideWeight="0.47865528" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
@@ -860,7 +962,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added test cases for ExpenseService" />
     <MESSAGE value="Added seeds for expenses." />
     <MESSAGE value="Merged origin and modified expense test a bit." />
     <MESSAGE value="added a test case." />
@@ -885,7 +986,8 @@
     <MESSAGE value="Fixed expense search bug. Because I'm an idiot." />
     <MESSAGE value="Bug fixes." />
     <MESSAGE value="Added company id validation for importing users." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added company id validation for importing users." />
+    <MESSAGE value="Started User profile attributes feature." />
+    <option name="LAST_COMMIT_MESSAGE" value="Started User profile attributes feature." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1169,7 +1271,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="594">
           <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1177,15 +1278,149 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="558">
           <caret line="31" column="20" lean-forward="false" selection-start-line="31" selection-start-column="20" selection-end-line="31" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/endpoint.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="45" column="50" lean-forward="true" selection-start-line="45" selection-start-column="50" selection-end-line="45" selection-end-column="50" />
+        <state relative-caret-position="810">
+          <caret line="45" column="50" lean-forward="false" selection-start-line="45" selection-start-column="50" selection-end-line="45" selection-end-column="50" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/operations/settlement/base.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="35" lean-forward="false" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/operations/import/superadmin/users.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="738">
+          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding>
+            <marker date="1487412757774" expanded="true" signature="781:9759" ph=" ... end" />
+            <marker date="1487412757774" expanded="true" signature="2517:3489" ph=" ... end" />
+            <marker date="1487412757774" expanded="true" signature="2517:3483" ph="do ... end" />
+            <marker date="1487412757774" expanded="true" signature="2608:3086" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="2634:3076" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="2978:3064" ph="do ... end" />
+            <marker date="1487412757774" expanded="true" signature="3094:3475" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="3195:3388" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="3509:3590" ph=" ... end" />
+            <marker date="1487412757774" expanded="true" signature="3631:3739" ph=" ... end" />
+            <marker date="1487412757774" expanded="true" signature="3636:3733" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="3828:9137" ph=" ... end" />
+            <marker date="1487412757774" expanded="true" signature="3911:4058" ph="do ... end" />
+            <marker date="1487412757774" expanded="true" signature="3937:4050" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="4173:4340" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="4345:4536" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="4541:4702" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="4819:5271" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="4954:5076" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="5083:5263" ph="unless ... end" />
+            <marker date="1487412757774" expanded="true" signature="5276:5816" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="5435:5573" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="5580:5808" ph="unless ... end" />
+            <marker date="1487412757774" expanded="true" signature="5821:6264" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="5948:6063" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="6070:6256" ph="unless ... end" />
+            <marker date="1487412757774" expanded="true" signature="6269:6817" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="6420:6568" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="6575:6809" ph="unless ... end" />
+            <marker date="1487412757774" expanded="true" signature="8599:9108" ph="if ... end" />
+            <marker date="1487412757774" expanded="true" signature="9158:9754" ph=" ... end" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/operations/settlement/payment/add_reimbursement.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="92" column="0" lean-forward="true" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/user.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1962">
+          <caret line="109" column="0" lean-forward="false" selection-start-line="109" selection-start-column="0" selection-end-line="109" selection-end-column="0" />
+          <folding>
+            <marker date="1487397799992" expanded="true" signature="1927:13932" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="1980:2095" ph="##..." />
+            <marker date="1487397799992" expanded="true" signature="3154:3163" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="3594:3606" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="3687:3703" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="3795:3807" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="3896:3920" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="4012:4024" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="4954:4966" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="5068:5084" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="5189:5201" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="5311:5335" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="5440:5452" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="6577:6598" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="6640:6672" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="6706:6731" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="6764:6974" ph="do ... end" />
+            <marker date="1487397799992" expanded="true" signature="7009:7048" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7086:7107" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7132:7155" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7183:7262" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7298:7385" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7411:7488" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7515:7559" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7580:7602" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7631:7658" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="7662:7835" ph="##..." />
+            <marker date="1487397799992" expanded="true" signature="7869:8108" ph="do ... end" />
+            <marker date="1487397799992" expanded="true" signature="8144:8784" ph="do ... end" />
+            <marker date="1487397799992" expanded="true" signature="8151:8778" ph="case ... end" />
+            <marker date="1487397799992" expanded="true" signature="8190:8249" ph="##..." />
+            <marker date="1487397799992" expanded="true" signature="8611:8672" ph="##..." />
+            <marker date="1487397799992" expanded="true" signature="8818:8898" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="8923:9024" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="9046:9140" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="9169:9244" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="9271:9315" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="9348:9419" ph="{ ... }" />
+            <marker date="1487397799992" expanded="true" signature="9436:9923" ph="do ... end" />
+            <marker date="1487397799992" expanded="true" signature="9939:9981" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="9993:10105" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10174:10225" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10238:10264" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10286:10324" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10328:10462" ph="##..." />
+            <marker date="1487397799992" expanded="true" signature="10496:10703" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10501:10563" ph="if ... end" />
+            <marker date="1487397799992" expanded="true" signature="10591:10650" ph="if ... end" />
+            <marker date="1487397799992" expanded="true" signature="10790:10815" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10839:10914" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="10930:10997" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11014:11077" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11093:11155" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11181:11290" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11307:11327" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11351:11384" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11418:11480" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11555:11571" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11595:11649" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11698:11721" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11746:11779" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="11911:12813" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13031:13100" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13272:13363" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13392:13481" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13500:13594" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13625:13663" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13682:13787" ph=" ... end" />
+            <marker date="1487397799992" expanded="true" signature="13687:13781" ph="if ... end" />
+            <marker date="1487397799992" expanded="true" signature="13802:13927" ph="##..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1208,7 +1443,7 @@
     <entry file="file://$PROJECT_DIR$/app/models/money_request.rb">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1026">
-          <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+          <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1231,38 +1466,6 @@
           <folding>
             <marker date="1487247391241" expanded="true" signature="1258:1325" ph="##..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/user.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="82" column="82" lean-forward="false" selection-start-line="82" selection-start-column="82" selection-end-line="82" selection-end-column="82" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/operations/import/superadmin/users.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/operations/settlement/payment/add_reimbursement.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="66" column="13" lean-forward="false" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/operations/settlement/base.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-62">
-          <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
-          <folding />
         </state>
       </provider>
     </entry>

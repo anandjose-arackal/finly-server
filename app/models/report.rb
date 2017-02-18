@@ -95,7 +95,7 @@ class Report < ActiveRecord::Base
   scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id, ReportStatus.reimbursement_confirmed_id]}
 
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
-  scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+  scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id]}
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
