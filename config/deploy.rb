@@ -7,17 +7,17 @@ set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/f
 
 set :branch, ENV['BRANCH'] || :master
 
-case "#{fetch(:stage)}"
-  when "itzcash_production"
+case fetch(:stage)
+  when :itzcash_production
     set :deploy_to, '/home/viveka/app'
     set :rails_env, 'production'
-  when "itzcash_uat"
+  when :itzcash_uat
     set :deploy_to, '/home/sreeramn/finly-server'
     set :rails_env, 'itzcash_uat'
-  when "staging"
+  when :staging
     set :deploy_to, '/home/viveka/app'
     set :rails_env, 'staging'
-  when "local_vm"
+  when :local_vm
     set :deploy_to, '/home/vivek/app'
     set :rails_env, 'local_vm'
 end
