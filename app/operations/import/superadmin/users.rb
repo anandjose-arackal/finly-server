@@ -47,8 +47,24 @@ class Import::Superadmin::Users < Import::Base
   end
 
   def validate
-    # todo - add a validation for company id in each row
+    # add a validation for company id in each row
+    (2..sheet.last_row).each do |i|
+      row = sheet.row(i)
+      # validating company id of the new user Type 1
+      if company_id_blank?(row)
+        result_hash[i] = 1
+        next
+      end
 
+      # validating that the card being assigned is unique Type 2
+      User.all.each do |user|
+        proxy = user.cards.first.proxy rescue ""
+        if row[import_fields[:card_serial_id]] == proxy
+          result_hash[i] = 2
+          next
+        end
+      end
+    end
   end
 
   def process
@@ -59,9 +75,19 @@ class Import::Superadmin::Users < Import::Base
       error_messages = params[:error_messages]
       params.delete(:error_messages)
 
-      if company_id_blank?(row)
-        result_hash[i] = "Company ID cannot be blank"
-        next
+      if result_hash[i].present?
+        case result_hash[i]
+          when 1
+            # i.e. company id not unique
+            result_hash[i] = "Company ID cannot be blank"
+            next
+          when 2
+            # i.e. card has already been taken
+            error_messages << "Card has already been assigned to another user"
+            params.delete(:cards_attributes)
+          else
+            #code
+        end
       end
 
       unique = mobile_number_valid?(row[import_fields[:mobile_number]])
@@ -69,13 +95,11 @@ class Import::Superadmin::Users < Import::Base
       if unique == true
         if type == 'email'
           self.invitee = User.invite!(params)
-          debugger
         elsif type == 'mobile'
           self.invitee = User.invite!(params, user) do |u|
             u.skip_invitation
             u.update_attribute(:email, "")
             u.update_attribute(:mobile_only_invite, true)
-            debugger
             # send welcome message to invitee
             WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
           end

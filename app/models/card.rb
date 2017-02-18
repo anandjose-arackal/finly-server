@@ -67,4 +67,6 @@ class Card < ActiveRecord::Base
     self.proxy
   end
 
+  private
+
 end
