@@ -39,6 +39,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       if params[:receipt_id]
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
+
+      # adding the associated card expense id for the card expense
+      self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
     end
   end
 
