@@ -9,6 +9,7 @@ class ExpensesController < ApplicationController
   end
 
   def show
+    debugger
     @result = Expense::Show.(current_user, params)
     respond
   end
