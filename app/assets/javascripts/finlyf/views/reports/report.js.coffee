@@ -3,7 +3,6 @@ class FinlyF.Views.Report extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/reports/base/reportShowSkeleton']
   templateShowNavbar: HandlebarsTemplates['finlyf/reports/navbar/show/navbar']
 
-
   template: HandlebarsTemplates['finlyf/reports/crud/report']
   templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
