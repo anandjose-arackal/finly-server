@@ -29,7 +29,7 @@ json.transfers_to_company_account do
     end
   end
 end
-json.total_amount_transferred_from_virtual_account do
+json.total_amount_transferred_from_company_account do
   json.to_finly_cards item[:total_amount_transferred][:to_finly_cards]
   json.to_finly_money item[:total_amount_transferred][:to_finly_money]
 end
