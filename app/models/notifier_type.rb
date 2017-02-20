@@ -76,7 +76,9 @@ class NotifierType < ActiveRecord::Base
              {key: :money_request_take_control, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :money_request_unapprove, has_push_notification: true, has_mailer: true,
-              configurable_push_notification: true, configurable_mailer: true}]
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :card_transaction, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: false}]
 
   self.class.instance_eval do
     ACTIONS.each do |item|

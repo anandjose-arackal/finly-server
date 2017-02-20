@@ -48,4 +48,12 @@ class CardTransaction < ActiveRecord::Base
   scope :debits, -> {where transaction_type: 'Debit'}
   scope :credits, -> {where transaction_type: 'Credit'}
 
+  def atm_withdrawal?
+    self.payment_type_id == PaymentType.id_for(:atm_withdrawal)
+  end
+
+  def expense?
+    !(atm_withdrawal?) and self.expense.present? 
+  end
+
 end

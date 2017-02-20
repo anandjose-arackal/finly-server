@@ -1,5 +1,4 @@
 class Card::Transaction::Create < BaseOperation
-
   attr_accessor :card, :card_owner, :type, :mode, :transaction
 
   class Card::Transaction::TransactionPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -97,6 +96,9 @@ class Card::Transaction::Create < BaseOperation
 
   def post_process
     # send mailer regarding usage of card?
+    params = self.params
+    params[:transaction] = self.transaction
+    Event::ECard::ETransaction::Create.(self.user, params)
   end
 
   def success
