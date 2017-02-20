@@ -64,7 +64,7 @@ class Card::Transaction::Create < BaseOperation
               add_message :error, transaction.errors.full_messages
               return false
             end
-            # add to cash in hand
+            # add to cash on hand
             if user.payments.create(amount_attributes: {value: params[:billing_amount_attributes][:value], currency_id: 1},
                                     date: DateUtils.local_date,
                                     payment_type_id: PaymentType.id_for(:atm_withdrawal),
@@ -74,7 +74,7 @@ class Card::Transaction::Create < BaseOperation
               user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
               return true
             else
-              add_message :error, "Could not add credited amount to cash in hand"
+              add_message :error, "Could not add credited amount to cash on hand"
               transaction.expensed = false
               transaction.error_message = @result.messages[:error]
               transaction.save
@@ -96,6 +96,7 @@ class Card::Transaction::Create < BaseOperation
 
   def post_process
     # send mailer regarding usage of card?
+    return unless success?
     params = self.params
     params[:transaction] = self.transaction
     Event::ECard::ETransaction::Create.(self.user, params)

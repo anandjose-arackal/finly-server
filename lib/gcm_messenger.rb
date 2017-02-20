@@ -43,25 +43,36 @@ class GcmMessenger
   end
 
   def generate_json_payload(params)
-    type = nil
-    type_id = nil
-    view = nil
+    payload = {}
+    payload[:type] = nil
+    payload[:type_id] = nil
+    payload[:view] = nil
+    payload[:message] = params[:message]
     case params[:event_id]
       when NotifierType.id_for(:report_submit), NotifierType.id_for(:report_approve), NotifierType.id_for(:report_retract),
           NotifierType.id_for(:report_reject), NotifierType.id_for(:report_comment), NotifierType.id_for(:report_reject_expense),
           NotifierType.id_for(:report_take_control), NotifierType.id_for(:report_reimbursed), NotifierType.id_for(:report_unapprove)
-        type = 'report'
-        type_id = params[:report_id]
-        view = params[:view]
+        payload[:type] = 'report'
+        payload[:type_id] = params[:report_id]
+        payload[:view] = params[:view]
       when NotifierType.id_for(:money_request_submit), NotifierType.id_for(:money_request_approve), NotifierType.id_for(:money_request_retract),
           NotifierType.id_for(:money_request_reject), NotifierType.id_for(:money_request_comment), NotifierType.id_for(:money_request_unapprove),
           NotifierType.id_for(:money_request_take_control)
-        type = 'money_request'
-        type_id = params[:money_request_id]
-        view = params[:view]
+        payload[:type] = 'money_request'
+        payload[:type_id] = params[:money_request_id]
+        payload[:view] = params[:view]
+      when NotifierType.id_for(:card_transaction)
+        payload[:type] = 'card_transaction'
+        if params[:atm_withdrawal]
+          payload[:sub_type] = 'card_atm_withdrawal'
+          payload[:type_id] = nil
+        elsif params[:expense]
+          payload[:sub_type] = 'card_expense'
+          payload[:type_id] = params[:expense_id]
+        end
       else
     end
-    {message: params[:message], type: type, type_id: type_id, view: view}
+    payload
   end
 
 end

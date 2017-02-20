@@ -101,4 +101,7 @@ class ExternalUrlController < ApplicationController
     end
   end
 
+  def transaction
+  end
+
 end
