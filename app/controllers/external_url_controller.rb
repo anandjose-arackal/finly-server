@@ -102,6 +102,17 @@ class ExternalUrlController < ApplicationController
   end
 
   def transaction
+    id = params[:id]
+    if id.blank?
+      redirect_to root_path
+      return
+    end
+    expense = current_user.expenses.with_id(id).first rescue nil
+    if expense.blank?
+      redirect_to root_path
+      return
+    end
+    redirect_to "#{root_url}#expenses/params={\"preview\":true, \"id\":#{expense.id}}"
   end
 
 end
