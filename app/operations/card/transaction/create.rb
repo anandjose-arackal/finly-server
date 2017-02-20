@@ -42,13 +42,13 @@ class Card::Transaction::Create < BaseOperation
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
-              messages[:error] = transaction.errors.full_messages
+              add_message :error, transaction.errors.full_messages
               return false
             end
             # create the associated card expense for this transaction
             @result = Expense::ExCard::Create.(transaction, card)
             unless @result.success?
-              messages[:error] = @result.messages[:error]
+              add_message :error, @result.messages[:error]
               transaction.expensed = false
               transaction.error_message = @result.messages[:error]
               transaction.save
@@ -61,7 +61,7 @@ class Card::Transaction::Create < BaseOperation
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
-              messages[:error] = transaction.errors.full_messages
+              add_message :error, transaction.errors.full_messages
               return false
             end
             # add to cash in hand
@@ -74,7 +74,7 @@ class Card::Transaction::Create < BaseOperation
               user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
               return true
             else
-              messages[:error] = "Could not add credited amount to cash in hand"
+              add_message :error, "Could not add credited amount to cash in hand"
               transaction.expensed = false
               transaction.error_message = @result.messages[:error]
               transaction.save
@@ -86,7 +86,7 @@ class Card::Transaction::Create < BaseOperation
       when "CREDIT"
         self.transaction = CardTransaction.new(params)
         unless transaction.save
-          messages[:error] = transaction.errors.full_messages
+          add_message :error, transaction.errors.full_messages
         end
         # gets added to user's card balance, so do nothing
       else
