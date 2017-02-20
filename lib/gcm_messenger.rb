@@ -45,7 +45,7 @@ class GcmMessenger
   def generate_json_payload(params)
     payload = {}
     payload[:type] = nil
-    payload[:type_id] = nil
+    payload[:type_id] = '0'
     payload[:view] = nil
     payload[:message] = params[:message]
     case params[:event_id]
@@ -65,7 +65,6 @@ class GcmMessenger
         payload[:type] = 'card_transaction'
         if params[:atm_withdrawal]
           payload[:sub_type] = 'card_atm_withdrawal'
-          payload[:type_id] = nil
         elsif params[:expense]
           payload[:sub_type] = 'card_expense'
           payload[:type_id] = params[:expense_id]
