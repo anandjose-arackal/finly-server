@@ -22,7 +22,10 @@ class User::Team::FinalFinanceManager < User::Team::Base
   def process
     params[:type] = :finance_manager
     m = User::Team::Approver.(user, params)
-    while m.present?
+    used_ids = []
+    # used_ids is to prevent circular loop when User A is assigned as User B's manager, and user B is assigned as User A's manager
+    while m.present? and not used_ids.include?(m.id)
+      used_ids << m.id
       params[:type] = :approves_finance_to
       m = User::Team::Approver.(m, params)
     end

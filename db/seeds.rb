@@ -131,9 +131,8 @@ if NotifierType.count == 0
 end
 
 if Currency.count == 0
-  Currency.create(id: 1, country: 'India', country_code: 'INR', symbol: '₹')
+  Currency.create id: 1, country: 'India', country_code: 'INR', symbol: '₹'
 end
-
 
 if ExpenseType.count ==0
   ExpenseType.create(id: 1, name: "Manual")

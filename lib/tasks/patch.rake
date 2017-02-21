@@ -24,4 +24,13 @@ namespace :patch do
     NotificationType.find(7).update_attribute(:name, "money_request")
   end
 
+  desc '20-02-2017: Adding a dB entry for card_transaction in NotifierType'
+  task add_card_transaction_notifier_type: :environment do
+    item = NotifierType::ACTIONS.last
+    NotifierType.create id: (NotifierType::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
+                        has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
+                        configurable_push_notification: item[:configurable_push_notification],
+                        configurable_mailer: item[:configurable_mailer]
+  end
+
 end
