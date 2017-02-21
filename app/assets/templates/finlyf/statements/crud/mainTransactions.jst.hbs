@@ -32,14 +32,14 @@
             <td>{{#if this.date}}{{this.date}}{{else}}-{{/if}}</td>
             <td>{{#if this.transaction_type}}{{this.transaction_type}}{{else}}-{{/if}}</td>
             <td>{{#if this.merchant}}{{this.merchant}}{{else}}-{{/if}}</td>
-            <td>{{#if this.debit_amount}}&#8377;&nbsp;{{this.debit_amount}}{{else}}-{{/if}}</td>
-            <td>{{#if this.credit_amount}}&#8377;&nbsp;{{this.credit_amount}}{{else}}-{{/if}}</td>
+            <td>{{#if this.debit_amount}}{{this.debit_amount}}{{else}}-{{/if}}</td>
+            <td>{{#if this.credit_amount}}{{this.credit_amount}}{{else}}-{{/if}}</td>
             {{!-- <td>{{#if this.balance}}{{this.balance}}{{else}}-{{/if}}</td> --}}
             <td>{{#if this.category}}{{this.category}}{{else}}-{{/if}}</td>
             <td>{{#if this.status}}{{this.status}}{{else}}-{{/if}}</td>
           </tr>
           {{/each}}
-        </tbody> 
+        </tbody>
       </table>
     </div>
   </div>
@@ -54,5 +54,3 @@ thead th{
   font-weight: normal;
 }
 </style>
-
-  
