@@ -341,6 +341,9 @@ class FinlyF.Routers.Main extends Backbone.Router
     $(".datepicker").datepicker({
       dateFormat: "dd-mm-yy"
     })
+
+    $('body').removeClass('modal-open');
+    $('.modal-backdrop').remove();
     
     $('.dropdown-menu .no-hide-bs-dropdown').click((e) ->
       e.stopPropagation()
