@@ -4,9 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/app/controllers/policies_controller.rb" line="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="Fixed import numbers">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="44625e31-f295-43a9-b603-b502897ede9d" name="Default" comment="Fixed import numbers" />
     <list id="7d878649-6630-420c-bf50-2b6db9b1c134" name="New changelist" comment="" />
     <ignored path="Finly.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -81,8 +79,8 @@
       <file leaf-file-name="statements_controller.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/controllers/statements_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="46" column="3" lean-forward="true" selection-start-line="46" selection-start-column="3" selection-end-line="46" selection-end-column="3" />
+            <state relative-caret-position="468">
+              <caret line="32" column="26" lean-forward="true" selection-start-line="32" selection-start-column="26" selection-end-line="32" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -173,7 +171,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/controllers/api/v1/receipts_controller.rb" />
         <option value="$PROJECT_DIR$/config/initializers/opro.rb" />
         <option value="$PROJECT_DIR$/app/controllers/api/v1/expenses_controller.rb" />
         <option value="$PROJECT_DIR$/log/development.log" />
@@ -224,6 +221,7 @@
         <option value="$PROJECT_DIR$/app/operations/company/statement/transactions_summary.rb" />
         <option value="$PROJECT_DIR$/app/views/statements/company_transactions_summary.json.jbuilder" />
         <option value="$PROJECT_DIR$/app/operations/user/card_restrictions/update.rb" />
+        <option value="$PROJECT_DIR$/app/controllers/statements_controller.rb" />
       </list>
     </option>
   </component>
@@ -623,7 +621,7 @@
       <workItem from="1487320525597" duration="3800000" />
       <workItem from="1487394695957" duration="1983000" />
       <workItem from="1487396885118" duration="16602000" />
-      <workItem from="1487677678823" duration="124000" />
+      <workItem from="1487677678823" duration="758000" />
     </task>
     <task id="LOCAL-00001" summary="First commit">
       <created>1467012839750</created>
@@ -874,7 +872,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="149671000" />
+    <option name="totallyTimeSpent" value="150305000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -886,7 +884,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
+    <frame x="0" y="24" width="1920" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14727855" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
@@ -1468,8 +1466,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/statements_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="46" column="3" lean-forward="true" selection-start-line="46" selection-start-column="3" selection-end-line="46" selection-end-column="3" />
+        <state relative-caret-position="468">
+          <caret line="32" column="26" lean-forward="true" selection-start-line="32" selection-start-column="26" selection-end-line="32" selection-end-column="26" />
           <folding />
         </state>
       </provider>
