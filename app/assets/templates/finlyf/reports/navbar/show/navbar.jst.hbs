@@ -6,13 +6,8 @@
           <button class="btn-go-back btn btn-default btn-sm"><i class="fa fa-step-backward"></i>&nbsp;Go Back to Reports</button>
         </ul>
       </div>
-      <div class="col-sm-4 text-center">
-        <h4 class="item-name">
-          <label class="item-attr-preview" style="margin-top: 5px;">{{item.name}}</label>
-          <input type="text" class="form-control text-center item-name-edit item-attr-edit" value="{{item.name}}" placeholder="Report Name" style="font-size: 18px;font-weight: bold;">
-        </h4>
-      </div>
-      <div class="col-sm-4">
+      
+      <div class="col-sm-4 col-sm-offset-4">
         <ul class="nav navbar-nav navbar-right">
           {{#if item.actions.take_control}}
             <button class="btn btn-warning btn-sm" id="btnTakeControlReport" data-toggle="modal" data-target="#modal-confirm-take-control" data-url="{{item.actions.take_control}}">Take Control&nbsp;&nbsp;<i class="fa fa-edit"></i></button>

@@ -155,7 +155,7 @@ class FinlyF.Views.Expense extends Backbone.View
     input = $(target).find('input[type=file]#edit-expense-receipt-upload')
     image = $(target).find("img#edit-preview-image")
 
-    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    $(image).attr('src', '/common/images/receipt-placeholder.png')
     # input.replaceWith(input.val(null).clone(true))
     input2 = input.after(input.clone())
     $(input2).attr('type', 'text').attr('name', "expense[receipts_attributes]").attr('id', 'edit-expense-receipt-upload-text').val(null)
