@@ -17,7 +17,13 @@ class ExportController < ApplicationController
       format.pdf {
         @result = Report::Show.(current_user, params)
         @report = @result.report
+        # render 'report.pdf.erb'
         render pdf: "report-#{@report.name}", layout: "pdf.html.erb"
+      }
+      format.html {
+        @result = Report::Show.(current_user, params)
+        @report = @result.report
+        render 'report.pdf.erb'
       }
     end
   end
