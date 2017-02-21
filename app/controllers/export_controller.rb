@@ -7,7 +7,7 @@ class ExportController < ApplicationController
     respond_to do |format|
       format.csv {
         @report = Export::Report::AsCsv.(current_user, params)
-        send_data @report.data
+        send_data @report.data, filename: "#{@report.report_names}"
       }
       format.xls {
         @report = Export::Report::AsXml.(current_user, params)

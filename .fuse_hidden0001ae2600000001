@@ -1,0 +1,77 @@
+Subscribed!
+
+on_miscerr
+{:cur_host=>"180.179.138.163", :cur_port=>61613, :cur_login=>"finly", :cur_passcode=>"Li3Wp4yk", :cur_ssl=>false, :cur_recondelay=>5, :cur_parseto=>5, :cur_conattempts=>0, :cur_failure=>#<Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:9 >, :openstat=>true}
+es1_oldrecv: receive failed: Connection reset by peer @ io_fillbuf - fd:9 
+
+on_miscerr
+{:cur_host=>"180.179.138.163", :cur_port=>61613, :cur_login=>"finly", :cur_passcode=>"Li3Wp4yk", :cur_ssl=>false, :cur_recondelay=>5, :cur_parseto=>5, :cur_conattempts=>0, :cur_failure=>#<Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:9 >, :openstat=>true}
+es1_oldrecv: receive failed: Connection reset by peer @ io_fillbuf - fd:9 
+/home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `<top (required)>': uninitialized constant BanalceMsgQueuePoller (NameError)
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `eval'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `<top (required)>'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:123:in `require'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:123:in `require_command!'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:90:in `runner'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:39:in `run_command!'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands.rb:17:in `<top (required)>'
+	from bin/rails:4:in `require'
+	from bin/rails:4:in `<main>'
+Subscribed!
+BAL1487670463470,S00017740090,1848.00,21-Feb-2017 15:17:41
+
+on_miscerr
+{:cur_host=>"180.179.138.163", :cur_port=>61613, :cur_login=>"finly", :cur_passcode=>"Li3Wp4yk", :cur_ssl=>false, :cur_recondelay=>5, :cur_parseto=>5, :cur_conattempts=>0, :cur_failure=>#<Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:11 >, :openstat=>true}
+es1_oldrecv: receive failed: Connection reset by peer @ io_fillbuf - fd:11 
+
+on_miscerr
+{:cur_host=>"180.179.138.163", :cur_port=>61613, :cur_login=>"finly", :cur_passcode=>"Li3Wp4yk", :cur_ssl=>false, :cur_recondelay=>5, :cur_parseto=>5, :cur_conattempts=>0, :cur_failure=>#<Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:11 >, :openstat=>true}
+es1_oldrecv: receive failed: Connection reset by peer @ io_fillbuf - fd:11 
+
+on_miscerr
+{:cur_host=>"180.179.138.163", :cur_port=>61613, :cur_login=>"finly", :cur_passcode=>"Li3Wp4yk", :cur_ssl=>false, :cur_recondelay=>5, :cur_parseto=>5, :cur_conattempts=>0, :cur_failure=>#<Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:11 >, :openstat=>true}
+es1_oldrecv: receive failed: Connection reset by peer @ io_fillbuf - fd:11 
+
+on_miscerr
+{:cur_host=>"180.179.138.163", :cur_port=>61613, :cur_login=>"finly", :cur_passcode=>"Li3Wp4yk", :cur_ssl=>false, :cur_recondelay=>5, :cur_parseto=>5, :cur_conattempts=>0, :cur_failure=>#<Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:11 >, :openstat=>true}
+es1_oldrecv: receive failed: Connection reset by peer @ io_fillbuf - fd:11 
+/home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:465:in `gets': Interrupt
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:465:in `_init_line_read'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:36:in `block in _receive'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:20:in `synchronize'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:20:in `_receive'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/utils.rb:242:in `__old_receive'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/stomp/connection.rb:477:in `receive'
+	from /media/sda4/Projects/Finly/finly-server/lib/transactions_msg_queue_poller.rb:22:in `block in run'
+	from /media/sda4/Projects/Finly/finly-server/lib/transactions_msg_queue_poller.rb:21:in `loop'
+	from /media/sda4/Projects/Finly/finly-server/lib/transactions_msg_queue_poller.rb:21:in `run'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `<top (required)>'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `eval'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `<top (required)>'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:123:in `require'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:123:in `require_command!'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:90:in `runner'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:39:in `run_command!'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands.rb:17:in `<top (required)>'
+	from bin/rails:4:in `require'
+	from bin/rails:4:in `<main>'
+/home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:465:in `gets': Interrupt
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:465:in `_init_line_read'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:36:in `block in _receive'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:20:in `synchronize'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/netio.rb:20:in `_receive'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/connection/utils.rb:242:in `__old_receive'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/stomp-1.4.3/lib/stomp/connection.rb:477:in `receive'
+	from /media/sda4/Projects/Finly/finly-server/lib/balance_msg_queue_poller.rb:23:in `block in run'
+	from /media/sda4/Projects/Finly/finly-server/lib/balance_msg_queue_poller.rb:21:in `loop'
+	from /media/sda4/Projects/Finly/finly-server/lib/balance_msg_queue_poller.rb:21:in `run'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `<top (required)>'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `eval'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/runner.rb:62:in `<top (required)>'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:123:in `require'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:123:in `require_command!'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:90:in `runner'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands/commands_tasks.rb:39:in `run_command!'
+	from /home/sreeram/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0/gems/railties-4.2.6/lib/rails/commands.rb:17:in `<top (required)>'
+	from bin/rails:4:in `require'
+	from bin/rails:4:in `<main>'

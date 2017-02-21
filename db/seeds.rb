@@ -464,7 +464,7 @@ unless Rails.env.production?
       card = user.cards.first
       10.times do
 
-        trans_types = ["POS", "Ecom"]
+        trans_types = ["POS", "Ecom", "ATM"]
         trans_modes = ["Debit", "Credit"]
         from_date = DateTime.parse("01-01-2017 12:00:00")
         to_date = DateTime.now

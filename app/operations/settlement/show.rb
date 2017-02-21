@@ -35,9 +35,9 @@ class Settlement::Show < Settlement::Base
 
   def success
     params[:selected_user] = selected_user
-    params[:reports] = reports
-    params[:payments] = payments
-    params[:money_requests] = money_requests
+    params[:reports] = reports.reorder(updated_at: :desc) if reports.present?
+    params[:payments] = payments.reorder(updated_at: :desc) if payments.present?
+    params[:money_requests] = money_requests.reorder(updated_at: :desc) if money_requests.present?
     params[:type] = type
     Settlement::Show::Presenter.new(user, params, messages)
   end

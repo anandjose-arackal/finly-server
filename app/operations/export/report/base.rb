@@ -3,11 +3,12 @@ class Export::Report::Base < Export::Base
 
 
   class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :data, :header
+    attr_accessor :data, :header, :report_names
 
     def init
       self.data = params[:data]
       self.header = params[:header]
+      self.report_names = params[:report_names]
     end
 
   end
@@ -20,10 +21,6 @@ class Export::Report::Base < Export::Base
       self.field = params[:preference]
       self.result = params[:result]
     end
-  end
-
-  def authorized_user_types
-    [:company_admin]
   end
 
   def pre_validate
