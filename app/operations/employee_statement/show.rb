@@ -72,15 +72,18 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   end
 
   def retrieve_transaction_type(transaction)
+    trans_mode = transaction.transaction_mode.upcase rescue nil
     if transaction.transaction_type == "Credit"
       return "Load"
     elsif transaction.transaction_type == "Debit"
-      if transaction.transaction_mode == "POS"
+      if trans_mode == "POS"
         return "POS Transaction"
-      elsif transaction.transaction_mode == "ATM"
+      elsif trans_mode == "ATM"
         return "ATM Withdrawal"
-      else
+      elsif trans_mode == 'ECOM'
         return "Online Transaction"
+      else
+        return "Withdrawal"
       end
     end
   end

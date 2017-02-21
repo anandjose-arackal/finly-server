@@ -4,7 +4,7 @@
 
 class Export::Report::AsCsv < Export::Report::Base
 
-  attr_accessor :reports, :preferences, :result
+  attr_accessor :reports, :preferences, :result, :report_names
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -39,8 +39,17 @@ class Export::Report::AsCsv < Export::Report::Base
     end
   end
 
+  def post_process
+    #adding report names in the name of the file
+    names = []
+    reports.each do |report|
+      names << report.name
+    end
+    self.report_names = names.to_sentence
+  end
+
   def success
-    Export::Base::ExportPresenter.new(user, {data: result}, messages)
+    Export::Base::ExportPresenter.new(user, {data: result, report_names: report_names}, messages)
   end
 
 end

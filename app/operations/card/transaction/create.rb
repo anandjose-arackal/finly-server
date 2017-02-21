@@ -81,7 +81,7 @@ class Card::Transaction::Create < BaseOperation
               return false
             end
           else
-            # do nothing
+            # In this case it's a manual debit, so do nothing
         end
       when "CREDIT"
         self.transaction = CardTransaction.new(params)
