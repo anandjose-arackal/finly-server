@@ -11,7 +11,7 @@ case fetch(:stage)
   when :itzcash_production
     set :deploy_to, '/home/viveka/app'
     set :rails_env, 'production'
-  when :itzcash_uat
+  when :itzcash
     set :deploy_to, '/home/sreeramn/finly-server'
     set :rails_env, 'itzcash_uat'
   when :staging
@@ -21,6 +21,7 @@ case fetch(:stage)
     set :deploy_to, '/home/vivek/app'
     set :rails_env, 'local_vm'
 end
+
 set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
