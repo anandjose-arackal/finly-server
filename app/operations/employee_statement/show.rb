@@ -24,8 +24,8 @@ class EmployeeStatement::Show < EmployeeStatement::Base
           date: Time.parse(transaction.transaction_timestamp.to_s).strftime('%d/%m/%y: %H:%M:%S'),
           transaction_type: retrieve_transaction_type(transaction),
           merchant: retrieve_merchant_name(transaction),
-          debit_amount: (transaction.transaction_type == 'Debit') ? "#{transaction.billing_amount.currency.symbol} " + transaction.billing_amount_value.to_s : '--' ,
-          credit_amount: (transaction.transaction_type == 'Credit') ? "#{transaction.billing_amount.currency.symbol} " + transaction.billing_amount_value.to_s : '--' ,
+          debit_amount: (transaction.transaction_type == 'Debit') ? "#{transaction.billing_amount.currency.symbol} " + transaction.billing_amount_value.to_s : '- -' ,
+          credit_amount: (transaction.transaction_type == 'Credit') ? "#{transaction.billing_amount.currency.symbol} " + transaction.billing_amount_value.to_s : '- -' ,
           # balance: (0), # todo need to be decided
           category: transaction_category(transaction),
           status: transaction_status(transaction)
