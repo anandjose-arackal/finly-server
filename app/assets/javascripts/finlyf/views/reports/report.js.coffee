@@ -796,7 +796,13 @@ class FinlyF.Views.Report extends Backbone.View
 
   goBacktoPreviousPage: (e) ->
     e.preventDefault()
-    Backbone.history.history.back()
+    if Backbone.history.history.length == 1
+      params = {
+        view: @current_view
+      }
+      FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+    else
+      Backbone.history.history.back()
 
   fixHeight: (e) ->
     # console.log $(e.currentTarget).find(".container-main.container-expenses").height()
