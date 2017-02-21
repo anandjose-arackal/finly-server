@@ -15,7 +15,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
   templateSummary: HandlebarsTemplates['finlyf/settlements/summary']
   templateSummaryAdmin: HandlebarsTemplates['finlyf/settlements/summaryAdmin']
   templateMainReports: HandlebarsTemplates['finlyf/settlements/crud/indexReports']
-  templateMain: HandlebarsTemplates['finlyf/settlements/crud/index']
+  templateMain: HandlebarsTemplates['finlyf/settlements/mainAdmin']
   templateMainPayments: HandlebarsTemplates['finlyf/settlements/crud/indexPayments']
   templateMainMoneyRequests: HandlebarsTemplates['finlyf/settlements/crud/indexMoneyRequests']
   templateMainRequestsApproved: HandlebarsTemplates['finlyf/settlements/crud/indexRequestsApproved']
@@ -168,7 +168,7 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         @params.id = @user
 
         unless @params.view_to_load
-          @params.view_to_load = 'reports'
+          @params.view_to_load = 'payments'
         
         @collection.url = @collection.url + "/" + @user.toString()
         @collection.fetch({
@@ -513,6 +513,27 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     e.preventDefault()
 
   userSettlements: (e) ->
+    if typeof @params.view == 'undefined'
+      @params.view = 'personal'
+    if typeof @params.view_to_load == 'undefined'
+      @params.view_to_load = 'payments'
+
+    unless $(@el).find('.settlements-content').length
+      $(@el).find(".main").html(@templateMain({item: @params}))
+
+      if @params.view_to_load == "payments"
+        $(@el).find(".settlements-index").html(@templateMainPayments())
+      else if @params.view_to_load == "money_requests"
+        $(@el).find(".settlements-index").html(@templateMainMoneyRequests({item: @params}))
+      # else if @params.view_to_load == "approved_money_request"
+      #   $(@el).find(".settlements-index").html(@templateMainRequestsApproved({item: @params}))
+      else if @params.view_to_load == 'reports'
+        $(@el).find(".settlements-index").html(@templateMainReports())
+      else
+        $(@el).find(".settlements-index").html(@templateMainReports())
+
+        
+      
     $(@el).find('.settlements-content').css('display', 'block')
     # Show main loader
     settlements_content = $(@el).find(".settlements-content")
@@ -529,10 +550,10 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
     @user_id = user_id
     # console.log "User id is", user_id
     # console.log @collection.url
-    if typeof @params.view == 'undefined'
-      @params.view = 'personal'
-    if typeof @params.view_to_load == 'undefined'
-      @params.view_to_load = 'payments'
+    # if typeof @params.view == 'undefined'
+    #   @params.view = 'personal'
+    # if typeof @params.view_to_load == 'undefined'
+    #   @params.view_to_load = 'payments'
 
     console.log "Current Params are ", _this.params
     @collection.url = "/settlements/" + user_id.toString()
@@ -1219,6 +1240,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'credit_card_from_virtual_account'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = @selectedUserSummary.user_details.name + "'s Card"
@@ -1233,6 +1259,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'credit_card_from_card'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = @selectedUserSummary.user_details.name + "'s Card"
@@ -1248,6 +1279,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'debit_card_to_wallet'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = "Your Finly Money"
@@ -1263,6 +1299,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'debit_card_to_card'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = "Your Card"
@@ -1278,6 +1319,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'debit_card_to_virtual_account'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = "Company Balance"
@@ -1293,6 +1339,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'credit_wallet_from_wallet'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = @selectedUserSummary.user_details.name + "'s Finly Money"
@@ -1308,6 +1359,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'credit_wallet_from_card'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = @selectedUserSummary.user_details.name + "'s Finly Money"
@@ -1323,6 +1379,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'credit_wallet_from_virtual_account'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = @selectedUserSummary.user_details.name + "'s Finly Money"
@@ -1338,6 +1399,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'debit_wallet_to_wallet'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = "Your Finly Money"
@@ -1353,6 +1419,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'debit_wallet_to_card'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = "Your Card"
@@ -1368,6 +1439,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
       when 'debit_wallet_to_virtual_account'
         _this.settlementActionData.transfer.amount = $(modal_body).find('input[name=amount]').val()
         _this.settlementActionData.transfer.to = "Company Balance"
@@ -1383,6 +1459,11 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
         summary.userData = @selectedUserSummary
         summary.actionData = @settlementActionData
         $(modal_body).find('.settlement-step-final .panel-body').html(@tConfirmTransferSummary({summary: summary}))
+
+        # Setting default date and making date field disabled
+        panel_body = $(modal_body).find('.settlement-step-final .panel-body')
+        date_field = $(panel_body).find('input[name=date]')
+        $(date_field).attr('disabled', true).datepicker({dateFormat: "dd-mm-yy"}).datepicker("setDate", new Date())
 
     $(modal_body).find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
         

@@ -570,7 +570,14 @@ class FinlyF.Views.Request extends Backbone.View
 
   goBacktoPreviousPage: (e) ->
     e.preventDefault()
-    Backbone.history.history.back()
+    if Backbone.history.history.length == 1
+      params = {
+        view: @current_view
+      }
+      FinlyF.primary_router.navigate('requests/params=' + JSON.stringify(params), {trigger: true})
+    else
+      Backbone.history.history.back()
+    
 
   approveOptions: (e) ->
     e.preventDefault()

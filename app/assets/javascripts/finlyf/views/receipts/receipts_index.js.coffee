@@ -211,6 +211,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $("#modal-new .modal-dialog").css("width", "30%")
     # $("#modal-new").attr('data-backdrop', true)
     $("#modal-new").modal('show')
+    $("#modal-new").find('.modal-header h4.modal-title').text("New Receipt")
 
   create: (e)->
     target = e.currentTarget
@@ -359,6 +360,8 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     $("#modal-new .modal-body textarea[name=expense\\[note\\]]").val(selected_receipt.get('note'))
 
     $("#modal-new .modal-body input[name=expense\\[amount_attributes\\]\\[value\\]]").focus()
+
+    $("#modal-new").find('.modal-header h4.modal-title').text("New Expense")
 
   existingReceipts: (e) ->
     e.preventDefault()
