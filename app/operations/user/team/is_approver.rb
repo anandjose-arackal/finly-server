@@ -82,10 +82,13 @@ class User::Team::IsApprover < User::Team::Base
     params = {type: self.type}
     params[symbol] = obj
     m = User::Team::Approver.(for_user, params)
-    while m.present?
+    used_ids = []
+    # used_ids is to prevent circular loop when User A is assigned as User B's manager, and user B is assigned as User A's manager
+    while m.present? and not used_ids.include?(m.id)
       if m.id == self.user.id
         return true
       end
+      used_ids << m.id
       if self.type == :manager
         params[:type] = :approves_to
       else

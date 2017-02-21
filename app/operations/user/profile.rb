@@ -6,16 +6,6 @@ class User::Profile < User::Base
 
     def init
       self.assigned_policies = user.policies
-      self.mappings = retrieve_mappings
-    end
-
-    def retrieve_policies
-      map = {}
-      assigned_policies.each do |policy|
-        if policy.default?
-          
-        end
-      end
     end
   end
 

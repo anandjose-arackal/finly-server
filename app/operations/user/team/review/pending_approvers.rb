@@ -71,7 +71,10 @@ class User::Team::Review::PendingApprovers < User::Team::Base
 
     if manager_role == ::UserRole.id_for(:manager)
       params[:type] = :approves_to
-      while manager.present?
+      used_ids = []
+      # used_ids is to prevent circular loop when User A is assigned as User B's manager, and user B is assigned as User A's manager
+      while manager.present? and not used_ids.include?(manager.id)
+        used_ids << manager.id
         manager = User::Team::Approver.(manager, params)
         add_approver manager, manager_role, true if manager.present?
       end
@@ -86,7 +89,10 @@ class User::Team::Review::PendingApprovers < User::Team::Base
     end
 
     params[:type] = :approves_finance_to
-    while manager.present?
+    used_ids = []
+    # used_ids is to prevent circular loop when User A is assigned as User B's manager, and user B is assigned as User A's manager
+    while manager.present? and not used_ids.include?(manager.id)
+      used_ids << manager.id
       manager = User::Team::Approver.(manager, params)
       add_approver manager, manager_role, true if manager.present?
     end
