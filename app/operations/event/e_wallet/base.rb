@@ -77,6 +77,7 @@ class Event::EWallet::Base < Event::SetNotifier
   end
 
   private
+
   def load_payment_types
     case payment.payment_type_id
       when PaymentType.id_for(:credit_from_virtual_account_to_wallet)
@@ -97,6 +98,15 @@ class Event::EWallet::Base < Event::SetNotifier
       when PaymentType.id_for(:debit_from_wallet_to_virtual_account)
         self.from_account = :wallet
         self.to_account = :virtual_account
+      when PaymentType.id_for(:debit_from_card_to_virtual_account)
+        self.from_account = :card
+        self.to_account = :virtual_account
+      when PaymentType.id_for(:debit_from_card_to_wallet)
+        self.from_account = :card
+        self.to_account = :wallet
+      when PaymentType.id_for(:debit_from_card_to_card)
+        self.from_account = :card
+        self.to_account = :card
     end
     self.from_account_s = from_account.to_s
     self.to_account_s = to_account.to_s
