@@ -105,13 +105,13 @@
 
 
           <label class="radio-inline" style="margin-left: 36px">
-            <input type="radio" name="payment[payment_type]" value="<%= PaymentType.id_for(:advance) %>" checked="checked">Cash
+            <input type="radio" name="payment[payment_type]" value="<%= PaymentType.id_for(:add_cash_on_hand) %>" checked="checked">Cash
             advance
           </label>
 
           <div style="margin-top: 16px">
             <label class="radio-inline">
-              <input type="radio" name="payment[payment_type]" value="<%= PaymentType.id_for(:debt_clearance) %>">Debt
+              <input type="radio" name="payment[payment_type]" value="<%= PaymentType.id_for(:deduct_cash_on_hand) %>">Debt
               Clearance
             </label>
           </div>

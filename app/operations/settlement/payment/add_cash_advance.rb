@@ -75,7 +75,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def process
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
-                                          payment_type_id: PaymentType.id_for(:advance),
+                                          payment_type_id: PaymentType.id_for(:add_cash_on_hand),
                                           date: payment_param[:date], note: payment_param[:note],
                                           amount_attributes: {value: payment_param[:amount],
                                                               currency_id: payment_param[:currency_id]})

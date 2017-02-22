@@ -2,8 +2,9 @@
 <html>
 <head>
   <title><%=@report.name%></title>
-  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", media: "all", "data-turbolinks-track" => true %>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
   <!-- <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css"> -->
   <style>
   table{
@@ -184,7 +185,8 @@
 		<h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Receipts</label></h1>
     <% @report.expenses.filter_receipt('present').each do |expense| %>
         <div class="img-responsive" style="text-align: center;">
-  				<img src="<%=expense.receipts.first.image.url%>" style="max-width: 100%; height: auto;">
+  				<%=wicked_pdf_image_tag(expense.receipts.first.image.url, :style=>"max-width:100%; height:auto;")%>
+          <p class="text-center">Merchant: <%=expense.merchant_name %> | Amount: <%=expense.amount_value%></p>
   			</div>
     <% end %>
 	</div>
