@@ -33,4 +33,10 @@ namespace :patch do
                         configurable_mailer: item[:configurable_mailer]
   end
 
+  desc "22-02-2017: Renaming the 'advance' and 'debt clearance' payment types to 'add cash on hand' and 'deduct cash on hand'"
+  task rename_payment_types: :environment do
+    PaymentType.first.update(name: "add_cash_on_hand")
+    PaymentType.second.update(name: "deduct_cash_on_hand")
+  end
+
 end

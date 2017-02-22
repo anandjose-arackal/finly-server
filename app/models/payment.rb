@@ -34,14 +34,14 @@ class Payment < ActiveRecord::Base
   default_scope {order date: :desc, created_at: :desc}
 
   scope :atm_withdrawals, -> {where payment_type_id: PaymentType.id_for(:atm_withdrawal)}
-  scope :advance, -> { where payment_type_id: PaymentType.id_for(:advance) }
+  scope :advance, -> { where payment_type_id: PaymentType.id_for(:add_cash_on_hand) }
   scope :reimbursement, -> { where payment_type_id: PaymentType.id_for(:reimbursement) }
-  scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:debt_clearance) }
+  scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:deduct_cash_on_hand) }
   scope :settlement, -> { where payment_type_id: PaymentType.id_for(:settlement) }
   scope :involving_user, ->(user_id){ where('receiving_user_id = ? OR initiating_user_id = ?', user_id, user_id) }
   scope :received_by_user, ->(user_id) { where receiving_user_id: user_id }
   scope :initiated_by_user, ->(user_id) { where initiating_user_id: user_id }
-  scope :transferred_cash_to_user, -> { where payment_type: [PaymentType.id_for(:advance),
+  scope :transferred_cash_to_user, -> { where payment_type: [PaymentType.id_for(:add_cash_on_hand),
                                                              PaymentType.id_for(:reimbursement),
                                                              PaymentType.id_for(:settlement),
                                                              PaymentType.id_for(:atm_withdrawal)] }
@@ -66,7 +66,7 @@ class Payment < ActiveRecord::Base
   validates :receiving_user_id, presence: true
 
   def advance?
-    self.payment_type_id == PaymentType.id_for(:advance)
+    self.payment_type_id == PaymentType.id_for(:add_cash_on_hand)
   end
 
   def reimbursement?
@@ -74,7 +74,7 @@ class Payment < ActiveRecord::Base
   end
 
   def debt_clearance?
-    self.payment_type_id == PaymentType.id_for(:debt_clearance)
+    self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand)
   end
 
   def settlement?

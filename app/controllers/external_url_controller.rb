@@ -5,6 +5,7 @@ class ExternalUrlController < ApplicationController
   def report
     id = params[:id]
     report = current_user.reports.with_id(id).first rescue nil
+    params[:view] = 'personal'
     # todo use report controlling user to figure out user role for report
     if report.blank? && current_user.manager?
         params[:view] = 'manager'
@@ -38,6 +39,7 @@ class ExternalUrlController < ApplicationController
   def money_request
     id = params[:id]
     money_request = current_user.money_requests.with_id(id).first rescue nil
+    params[:view] = 'personal'
     # todo use money_request controlling user to figure out user role for money_request
     if money_request.blank? and current_user.manager?
       params[:view] = 'manager'
@@ -75,6 +77,7 @@ class ExternalUrlController < ApplicationController
       redirect_to "#{root_url}#settlements/#{id}"
       return
     end
+    params[:view] = 'personal'
     if user.blank? and current_user.manager?
       params[:view] = 'manager'
       result = User::Show.(current_user, params)

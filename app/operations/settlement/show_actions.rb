@@ -36,8 +36,8 @@ class Settlement::ShowActions < Settlement::Base
       actions = {}
       actions[:add_reimbursement] = {url: Rails.application.routes.url_helpers.settlements_path(payment_type: PaymentType.id_for(:reimbursement).to_s)}
       actions[:settle] = {url: Rails.application.routes.url_helpers.settlements_path(payment_type: PaymentType.id_for(:settlement))}
-      actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(payment_type: PaymentType.id_for(:debt_clearance))}
-      actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(payment_type: PaymentType.id_for(:advance))}
+      actions[:debt_to_clearance] = {url: Rails.application.routes.url_helpers.settlements_path(payment_type: PaymentType.id_for(:deduct_cash_on_hand))}
+      actions[:add_cash_advance] = {url: Rails.application.routes.url_helpers.settlements_path(payment_type: PaymentType.id_for(:add_cash_on_hand))}
 
       actions
     end
