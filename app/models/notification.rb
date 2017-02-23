@@ -264,7 +264,7 @@ class Notification < ActiveRecord::Base
 
   def generate_link(user)
 
-    base = Constants::BASE_URL
+    # base = Constants::BASE_URL
     view = ""
     # debugger
     case view_role_id
@@ -317,7 +317,7 @@ class Notification < ActiveRecord::Base
     end
     suffix += "}"
 
-    return base + path + suffix
+    return "#" + path + suffix
 
   end
 

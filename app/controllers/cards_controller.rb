@@ -1,4 +1,5 @@
 class CardsController < ApplicationController
+  allow_oauth!
 
   # params = {user_id: 1}
   def details
