@@ -27,11 +27,11 @@ class ExportController < ApplicationController
   def statement
     respond_to do |format|
       format.csv {
-        @employee_statement = Export::CardStatement::AsCsv.(current_user, params)
+        @employee_statement = Export::CardStatement::AsCsv.(@user, params)
         send_data @employee_statement.data
       }
       format.xls {
-        @employee_statement = Export::CardStatement::AsXls.(current_user, params)
+        @employee_statement = Export::CardStatement::AsXls.(@user, params)
         @header = @employee_statement.header
         @data = @employee_statement.data
       }
