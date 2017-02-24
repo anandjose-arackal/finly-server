@@ -64,7 +64,7 @@ class UsersController < ApplicationController
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
     @result = update_password_op.run
     if @result.success?
-      sign_in @result.user, :bypass => true
+      # sign_in @result.user, :bypass => true
       # flash[:success] = @result.messages[:success].first rescue nil
     else
       # flash[:error] = @result.messages[:error].first rescue nil
