@@ -8,8 +8,10 @@ class RequestFormatter
       parse_receipt user, params
       return map if params[:receipt].blank?
       map[:expense] = {} if map[:expense].blank?
+      receipt = params[:receipt]
+      receipt = '' if receipt == 'nil'
       map[:expense][:receipts_attributes]= []
-      map[:expense][:receipts_attributes][0] = params[:receipt]
+      map[:expense][:receipts_attributes][0] = receipt
     end
     Formatter.handle_api_nil map
     map
@@ -32,7 +34,7 @@ class RequestFormatter
   end
 
   def self.parse_receipt(user, params)
-    if params[:receipt].present?
+    if params[:receipt].present? and not params[:receipt] == 'nil'
       image = extract_receipt_image(params)
       params[:receipt] = {}
       params[:receipt][:image] = image

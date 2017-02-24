@@ -3,7 +3,6 @@ class FinlyF.Views.Report extends Backbone.View
   templateSkeleton: HandlebarsTemplates['finlyf/reports/base/reportShowSkeleton']
   templateShowNavbar: HandlebarsTemplates['finlyf/reports/navbar/show/navbar']
 
-
   template: HandlebarsTemplates['finlyf/reports/crud/report']
   templateLoadingAnimation: HandlebarsTemplates['finlyf/base/loadingAnimation']
   # templateShow: HandlebarsTemplates['finlyf/reports/crud/show']
@@ -797,7 +796,13 @@ class FinlyF.Views.Report extends Backbone.View
 
   goBacktoPreviousPage: (e) ->
     e.preventDefault()
-    Backbone.history.history.back()
+    if Backbone.history.history.length == 1
+      params = {
+        view: @current_view
+      }
+      FinlyF.primary_router.navigate('reports/params=' + JSON.stringify(params), {trigger: true})
+    else
+      Backbone.history.history.back()
 
   fixHeight: (e) ->
     # console.log $(e.currentTarget).find(".container-main.container-expenses").height()

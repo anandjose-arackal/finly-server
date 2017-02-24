@@ -5,8 +5,14 @@ expense:
   report_id: <%= params[:report_id] %>
   date: <%= params[:date] %>
   category_id: <%= params[:category_id] %>
+  <% type = params[:type].present? ? params[:type] : nil %>
+  <% if type == '1' or type == 1 %>
   manual_expense_attributes:
     merchant: <%= params[:merchant] %>
+  <% elsif type == '2' or type == 2 %>
+  card_expense_attributes:
+    editable_merchant: <%= params[:merchant] %>
+  <% end %>
   <% if params[:amount].present? %>
   amount_attributes:
     value: <%= params[:amount] %>

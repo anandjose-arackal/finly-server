@@ -60,8 +60,15 @@
 
     <div class="row item-body">
       <div class="col-sm-6">
+        <div class="row no-margin" style="border-bottom: 1px solid #ddd;margin-bottom: 10px;font-size: 16px;">
+          <div class="col-sm-6"><label>Name:</label></div>
+          <div class="col-sm-6">
+            <label class="item-attr-preview">{{item.name}}</label>
+            <input type="text" class="form-control item-name-edit item-attr-edit" value="{{item.name}}" placeholder="Report Name" style="font-size: 16px;font-weight: bold; margin-bottom: 5px;">
+          </div>
+        </div>
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Policy</label></div>
+          <div class="col-sm-6"><label class="control-label">Policy:</label></div>
           <div class="col-sm-6 item-policy">
             <label class="control-label item-attr-preview">
               {{#if item.policy}}
@@ -81,14 +88,14 @@
           </div>
         </div>
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Memo</label></div>
+          <div class="col-sm-6"><label class="control-label">Memo:</label></div>
           <div class="col-sm-6">
             <label class="control-label item-attr-preview">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</label>
             <textarea class="item-attr-edit form-control item-memo-edit" name="item-memo">{{item.memo}}</textarea>
           </div>
         </div>
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Status</label></div>
+          <div class="col-sm-6"><label class="control-label">Status:</label></div>
           <div class="col-sm-6">
             {{#switch item.status}}
               {{#case 'Open'}}<span class="label label-default">{{item.status}}</span>{{/case}}
@@ -105,27 +112,27 @@
         </div>
 
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">From</label></div>
+          <div class="col-sm-6"><label class="control-label">From:</label></div>
           <div class="col-sm-6">{{item.user_name}}</div>   
         </div>
 
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">To Manager</label></div>
+          <div class="col-sm-6"><label class="control-label">To Manager:</label></div>
           <div class="col-sm-6"><label>{{#if item.manager_name}}{{item.manager_name}}{{else}}--{{/if}}</label></div>
         </div>
 
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">To Finance Manager</label></div>
+          <div class="col-sm-6"><label class="control-label">To Finance Manager:</label></div>
           <div class="col-sm-6"><label>{{#if item.finance_manager_name}}{{item.finance_manager_name}}{{else}}--{{/if}}</label></div>
         </div>
 
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Date</label></div>
+          <div class="col-sm-6"><label class="control-label">Date:</label></div>
           <div class="col-sm-6">{{item.date}}</div>   
         </div>
 
         <div class="row no-margin">
-          <div class="col-sm-6"><label class="control-label">Expenditure</label></div>
+          <div class="col-sm-6"><label class="control-label">Expenditure:</label></div>
           <div class="col-sm-6"><label>&#8377;&nbsp;{{item.total}}</label></div>
         </div>
         

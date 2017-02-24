@@ -4,7 +4,7 @@ class Expense::Manual::Base < Expense::Base
   def manual_expense_params
     receipts = nil
     return {} unless params[:expense].present?
-    if params[:expense][:receipts_attributes].present?
+    if params[:expense][:receipts_attributes].present? and params[:expense][:receipts_attributes][0].present? and not params[:expense][:receipts_attributes][0].kind_of?(String)
       if params[:expense][:receipts_attributes].is_a?(Array)
         params[:expense][:receipts_attributes][0][:user_id] = user.id
       else

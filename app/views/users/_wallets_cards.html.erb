@@ -4,7 +4,7 @@
     <div class="section-card" style="padding-bottom: 20px;">
       <div class="row no-margin section-header" style="margin-bottom: 15px;">
         <div class="col-sm-12">
-          <h4>Finly Account</h4>
+          <h4>Finly Money</h4>
         </div>
       </div>
 
@@ -38,6 +38,9 @@
 
         <div class="col-sm-12">
           <div class="row no-margin" style="padding: 10px;">
+            <% if current_user.cards.length == 0 %>
+              <p>You do not have any cards assigned to you.</p>
+            <% end %>
             <% current_user.cards.each do |card| %>
               <div class="col-sm-6">
                 <div class="card text-center" style="display: inline-block;">
@@ -94,7 +97,6 @@
                   </tr> -->
                 </table>
               </div>
-
             <% end %>
 
           </div>
