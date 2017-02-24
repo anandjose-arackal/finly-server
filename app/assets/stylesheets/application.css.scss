@@ -27,7 +27,26 @@
 
 @import "bootstrap";
 @import "bootstrap-sprockets";
+.navbar-inverse{
+  color: white;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: #46568b;
+  background: #423689;
+  background: #061735;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: white;
+    border-bottom: 3px solid transparent;
+}
 
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  /*color: #fff;*/
+  /*font-weight: bold;*/
+  border-bottom: 3px solid #CD925A;
+  border-bottom: 3px solid #F4F560;
+  background-color: transparent;
+}
 
 
 // New Login Screen
