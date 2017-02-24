@@ -35,7 +35,15 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
 
   def update
     param = RequestFormatter.api_expense(current_user, params)
-    @result = Expense::Manual::Update.(current_user, param)
+    case params[:type]
+      when '1'
+        @result = Expense::Manual::Update.(current_user, param)
+      when '2'
+        @result = Expense::ExCard::Update.(current_user, param)
+      else
+        respond render: :failure
+        return
+    end
     @result.config[:mobile_api] = true
     if @result.success?
       if @result.expense.report_id.present?

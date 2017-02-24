@@ -1,9 +1,7 @@
 class Expense::ExCard::Base < Expense::Base
   attr_accessor :transaction, :card
 
-
   class Expense::ExCard::Base::CardExpensePresenter < BaseOperation::BasePresenter::SuccessPresenter
-
     attr_accessor :expense
 
     def init
@@ -11,11 +9,10 @@ class Expense::ExCard::Base < Expense::Base
     end
   end
 
-
   def update_card_expense_params
     receipts = nil
     return {} unless params[:expense].present?
-    if params[:expense][:receipts_attributes].present?
+    if params[:expense][:receipts_attributes].present? and params[:expense][:receipts_attributes][0].present? and not params[:expense][:receipts_attributes][0].kind_of?(String)
       if params[:expense][:receipts_attributes].is_a?(Array)
         params[:expense][:receipts_attributes][0][:user_id] = user.id
       else

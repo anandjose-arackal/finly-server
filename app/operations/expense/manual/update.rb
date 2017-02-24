@@ -40,7 +40,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
       updated_expense_params.delete(:receipts_attributes)
     end
-
     if expense
       if self.updated_expense_params[:amount_attributes].present? and self.updated_expense_params[:amount_attributes][:value].present? and
           expense.amount_id.present?
@@ -102,8 +101,7 @@ class Expense::Manual::Update < Expense::Manual::Base
                            merchant_name: expense.merchant_name,
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count
-    }
+                           receipt: expense.receipts.count}
   end
 
 end
