@@ -46,7 +46,7 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
     end
     @result.config[:mobile_api] = true
     if @result.success?
-      if @result.expense.report_id.present?
+      if @result.expense.reload.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'api/v0/reports/show'
       else
