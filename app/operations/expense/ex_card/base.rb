@@ -12,10 +12,10 @@ class Expense::ExCard::Base < Expense::Base
   def update_card_expense_params
     receipts = nil
     return {} unless params[:expense].present?
-    if params[:expense][:receipts_attributes].present? and params[:expense][:receipts_attributes][0].present? and not params[:expense][:receipts_attributes][0].kind_of?(String)
-      if params[:expense][:receipts_attributes].is_a?(Array)
+    if params[:expense][:receipts_attributes].present?
+      if params[:expense][:receipts_attributes].is_a?(Array) and params[:expense][:receipts_attributes][0].present? and params[:expense][:receipts_attributes][0].kind_of?(Hash)
         params[:expense][:receipts_attributes][0][:user_id] = user.id
-      else
+      elsif params[:expense][:receipts_attributes].kind_of?(Hash)
         params[:expense][:receipts_attributes][:user_id] = user.id
       end
     end
