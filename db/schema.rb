@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170223130453) do
+ActiveRecord::Schema.define(version: 20170225071032) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -986,7 +986,7 @@ ActiveRecord::Schema.define(version: 20170223130453) do
     t.integer  "card_balance_id",            limit: 4
     t.integer  "card_withdrawal_id",         limit: 4
     t.integer  "card_load_id",               limit: 4
-    t.integer  "card_spend_id",              limit: 4
+    t.integer  "card_expenses_id",           limit: 4
     t.integer  "finly_money_balance_id",     limit: 4
     t.integer  "finly_money_withdrawal_id",  limit: 4
     t.integer  "finly_money_load_id",        limit: 4
@@ -995,11 +995,12 @@ ActiveRecord::Schema.define(version: 20170223130453) do
     t.integer  "cash_on_hand_load_id",       limit: 4
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
+    t.integer  "card_atm_withdrawal_id",     limit: 4
   end
 
   add_index "user_balance_histories", ["card_balance_id"], name: "index_user_balance_histories_on_card_balance_id", using: :btree
+  add_index "user_balance_histories", ["card_expenses_id"], name: "index_user_balance_histories_on_card_expenses_id", using: :btree
   add_index "user_balance_histories", ["card_load_id"], name: "index_user_balance_histories_on_card_load_id", using: :btree
-  add_index "user_balance_histories", ["card_spend_id"], name: "index_user_balance_histories_on_card_spend_id", using: :btree
   add_index "user_balance_histories", ["card_withdrawal_id"], name: "index_user_balance_histories_on_card_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["cash_on_hand_balance_id"], name: "index_user_balance_histories_on_cash_on_hand_balance_id", using: :btree
   add_index "user_balance_histories", ["cash_on_hand_load_id"], name: "index_user_balance_histories_on_cash_on_hand_load_id", using: :btree

@@ -111,6 +111,8 @@ class User < ActiveRecord::Base
 
   has_many :notifier_type_configurations
 
+  has_many :user_balance_histories
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
@@ -290,8 +292,8 @@ class User < ActiveRecord::Base
   end
 
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
-  def cash_in_hand(date = nil)
-    cash = self.balance_sheet.cash_in_hand
+  def cash_on_hand(date = nil)
+    cash = self.balance_sheet.cash_on_hand
     return cash if date.blank? or date == DateUtils.local_date
     payments = self.payments.made_after(date).with_amount
     payments_to_user = payments.transferred_cash_to_user.sum(:value)

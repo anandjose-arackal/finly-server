@@ -9,7 +9,7 @@
 #  card_balance_id            :integer
 #  card_withdrawal_id         :integer
 #  card_load_id               :integer
-#  card_spend_id              :integer
+#  card_expenses_id           :integer
 #  finly_money_balance_id     :integer
 #  finly_money_withdrawal_id  :integer
 #  finly_money_load_id        :integer
@@ -18,6 +18,7 @@
 #  cash_on_hand_load_id       :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  card_atm_withdrawal_id     :integer
 #
 
 require 'test_helper'
