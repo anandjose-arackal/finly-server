@@ -40,6 +40,15 @@ class Amount < ActiveRecord::Base
   alias_method :billing_amount_value, :amount_value
   alias_method :card_balance_value, :amount_value
   alias_method :submitted_amount_value, :amount_value
+  alias_method :cash_on_hand_load_value, :amount_value
+  alias_method :cash_on_hand_withdrawal_value, :amount_value
+  alias_method :cash_on_hand_balance_value, :amount_value
+  alias_method :card_load_value, :amount_value
+  alias_method :card_withdrawal_value, :amount_value
+  alias_method :card_expenses_value, :amount_value
+  alias_method :finly_money_load_value, :amount_value
+  alias_method :finly_money_balance_value, :amount_value
+  alias_method :finly_money_withdrawal_value, :amount_value
 
   def greater_than_amount_value
     self.value

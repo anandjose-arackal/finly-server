@@ -180,11 +180,6 @@ if CardType.count == 0
   CardType.create(id: 2, name: 'Virtual')
 end
 
-# if ProductCombination.count == 0
-#   ProductCombination::TYPES.each do |type|
-#     ProductCombination.create(name: type)
-#   end
-# end
 
 if MccGroup.count == 0
   MccGroup::CODE_MAP.each do |key, value|

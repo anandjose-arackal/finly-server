@@ -30,7 +30,7 @@ class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 
-  belongs_to :expense
+  belongs_to :expense, dependent: :destroy
 
   belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :card_amount, class_name: 'Amount', dependent: :destroy
