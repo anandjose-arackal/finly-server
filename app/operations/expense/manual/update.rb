@@ -52,6 +52,7 @@ class Expense::Manual::Update < Expense::Manual::Base
         self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
       end
       if params[:receipt_id].present?
+        # If a new receipt is attached from existing receipts, remove the old receipt
         self.old_receipt = expense.receipts.first if expense.receipts.present?
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
