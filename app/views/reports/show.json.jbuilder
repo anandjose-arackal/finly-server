@@ -60,7 +60,6 @@ json.expense_sections categorized_expense do |category|
     json.date expense.date.strftime('%d %b %y')
     json.violations do
       items = @result.violations[expense.id]
-      # debugger
       json.blocking_present (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
       json.warning_present (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
       json.items items

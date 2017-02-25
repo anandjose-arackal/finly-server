@@ -97,7 +97,6 @@ class BaseHandler
     p = self.path
     param = self.post_params
     return unless p.present?
-    # debugger
     begin
       self.response = self.connection.post p, param
       puts "response : #{self.response.body}"
@@ -134,7 +133,7 @@ class BaseHandler
   end
 
   def success?
-    self.process_complete and not has_errors? and not self.timeout and not self.response.blank? and self.response.status == 200 
+    self.process_complete and not has_errors? and not self.timeout and not self.response.blank? and self.response.status == 200
   end
 
   def failure?
