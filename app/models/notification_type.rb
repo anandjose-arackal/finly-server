@@ -10,7 +10,7 @@
 
 class NotificationType < ActiveRecord::Base
 
-  VALUES = {user: 1, report: 2, payment: 3, card: 4, expense: 5, settlement: 6, advance_request: 7, wallet: 8}
+  VALUES = {user: 1, report: 2, payment: 3, card: 4, expense: 5, settlement: 6, money_request: 7, wallet: 8}
 
   self.class.instance_eval do
     VALUES.each do |key, value|
