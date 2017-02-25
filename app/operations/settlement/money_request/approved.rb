@@ -8,7 +8,7 @@ class Settlement::MoneyRequest::Approved < MoneyRequest::Base
 
   def pre_validate
     if params.blank?
-      add_message :error, 'Advance Request not found'
+      add_message :error, 'Money Request not found'
       return
     end
     if user.blank? and not params[:auto_approve]
@@ -31,7 +31,7 @@ class Settlement::MoneyRequest::Approved < MoneyRequest::Base
       messages[:error] << 'Error while adding money to pending cash advance'
     end
     if money_request.accounted
-      messages[:error] << 'Advance Request has already been accounted'
+      messages[:error] << 'Money Request has already been accounted'
     end
   end
 

@@ -1,4 +1,3 @@
-
 json.array! @result.items do |item|
   # json.merge! item.attributes
   if item.is_a?(Report)
@@ -29,14 +28,14 @@ json.array! @result.items do |item|
       else
         next
       end
-      json.extract! item, :note, :date
-      json.type 'payment'
-      json.payment_amount item.amount.value
-      json.receiving_user item.receiving_user.name
-      json.initiating_user item.initiating_user.name
-      json.payment_type payment_type_s
-      json.total_amount item.total_amount
     end
+    json.extract! item, :note, :date
+    json.type 'payment'
+    json.payment_amount item.amount.value
+    json.receiving_user item.receiving_user.name
+    json.initiating_user item.initiating_user.name
+    json.payment_type payment_type_s
+    json.total_amount item.total_amount
   elsif item.is_a?(MoneyRequest)
     json.extract! item, :id, :name, :memo, :required_by_date
     json.type 'money_request'

@@ -17,7 +17,7 @@ gem 'mocha', '1.2.1'
 
 # gem for crash reports
 gem 'rollbar'
-gem 'oj', '~> 2.12.14'
+gem 'oj', '~> 2.18.1'
 
 # gem for admin panel
 gem 'activeadmin', '1.0.0.pre4', git: 'https://github.com/activeadmin/activeadmin.git'
@@ -135,12 +135,14 @@ gem 'awesome_print', '1.7.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', '9.0.6'
-  gem 'capistrano', '3.6.1'
+  gem 'capistrano', '3.7.2'
   gem 'capistrano3-puma', '1.2.1'
-  gem 'capistrano-rails', '1.2.0', require: false
+  gem 'capistrano-rails', '1.2.2', require: false
   gem 'capistrano-bundler', '1.2.0', require: false
   gem 'capistrano-rvm', '0.1.2'
-  gem 'capistrano-rbenv', '2.0.4'
+  gem 'capistrano-rbenv', '2.1.0'
+  gem 'capistrano-crono', '0.1.2'
+  gem 'capistrano-sidekiq', '0.10.0'
   gem 'hirb', '0.7.3'
 
 end
@@ -148,7 +150,10 @@ end
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
+  gem 'foreman', '0.83.0'
 end
+
+# gem 'backup', '3.4.0'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

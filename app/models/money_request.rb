@@ -30,6 +30,8 @@
 
 
 
+
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -52,6 +54,8 @@ class MoneyRequest < ActiveRecord::Base
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
+  accepts_nested_attributes_for :submitted_amount
+  delegate :submitted_amount_value, to: :submitted_amount
 
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }

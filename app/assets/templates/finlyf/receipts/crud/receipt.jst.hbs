@@ -1,24 +1,24 @@
-<div class="receipt-container">
+<div class="well">
   {{#if item.indexOnly}}
     <div class="row no-margin">
       <input type="radio" value="{{item.id}}" class="select-receipt-to-attach" name="select_receipt_to_attach" class="">
       <span class="hidden">Selected</span>
     </div>
   {{/if}}
-  <div class="receipt-image">
-    <input type="hidden" class="select-item" data-item-id="{{item.id}}"/>
-    <img class="img-responsive" src="{{item.image.thumb}}" style=""/>
+  <input type="hidden" class="select-item" data-item-id="{{item.id}}"/>
+  <div class="receipt-img">
+    <img class="img-responsive" src="{{item.image.thumb}}" alt="">
   </div>
-  <div class="row no-margin receipt-details">
-    <div class="col-sm-9">
-      <h4>{{item.image_updated_at}}</h4>
-    </div>
-    <div class="col-sm-12">
-      {{#if item.note}}
-        {{item.note}}
-      {{else}}
+  <div class="receipt-details">
+    <h4>{{item.image_updated_at}}</h4>
+    {{#if item.note}}
+      <p>
+        {{sub_string item.note 0 70}}
+      </p>
+    {{else}}
+      <p class="disabled-text">
         No note found!
-      {{/if}}
-    </div>
+      </p>
+    {{/if}}   
   </div>
 </div>

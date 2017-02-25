@@ -23,6 +23,7 @@
 
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -139,7 +140,7 @@ class Expense < ActiveRecord::Base
     expense_ids = ManualExpense.where('merchant like ?', "%#{value}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{value}%").pluck(:expense_id)
 
-    where('id IN (?) OR note like ?', expense_ids, "%#{value}%",)
+    where('id IN (?) OR note like ?', expense_ids, "%#{value}%")
     # joins(:card_expense).joins(:manual_expense).joins(:amount).select('expenses.*').where('editable_merchant like ? or merchant like ? OR note like ?', "%#{value}%", "%#{value}%", "%#{value}%")
   end
 

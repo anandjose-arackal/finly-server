@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Report</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" media="print" href="print.css">
+  <style>
+  table{
+    table-layout: fixed;
+  }
+  td{
+    overflow-wrap: break-word;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+</style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+
+  <h1 style="text-align: center; font-size: 16px;"><label>Enormous Marble Shoes</label></h1>
+    <div class="col-sm-12">
+      <table class="table table-bordered table-condensed">
+        <tr>
+          <td width="25%"><label>Policy</label></td>
+          <td width="25%"><%= @report.policy.name rescue "None" %></td>
+
+          <td width="25%"><label>From</label></td>
+          <td width="25%"><%= @report.user.name%></td>
+        </tr>
+
+        <tr>
+          <td width="25%"><label>Memo</label></td>
+          <td width="25%"><%= @report.memo %></td>
+
+          <td width="25%"><label>To manager</label></td>
+          <td width="25%"><%= @result.manager%></td>
+        </tr>
+
+        <tr>
+          <td width="25%"><label>Status</label></td>
+          <td width="25%"><%=@report.status_name%></td>
+
+          <td width="25%"><label>To Finance Manager</label></td>
+          <td width="25%"><%=@result.finance_manager%></td>
+        </tr>
+
+        <tr>
+          <td width="25%"><label>Date</label></td>
+          <td width="25%">21 Feb 2017</td>
+
+          <td width="25%"><label>Total Amount:</label></td>
+          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%=@report.total_amount%></td>
+        </tr>
+      </table>
+    </div>
+
+    <h1 style="margin-left: 12px; font-size: 14px;"><label>Expenses</label></h1>
+
+    <% @result.expenses_category_sorted.each do |section| %>
+
+      <div class="col-sm-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <td colspan="5"><label width="100%"><%=section[:section_name]%></label></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background-color: #DCDCDC;" class="table_header">
+              <td width="20%"><label>SI. No.</label></td>
+              <td width="20%"><label>Date</label></td>
+              <td width="20%"><label>Merchant</label></td>
+              <td width="20%"><label>Note</label></td>
+              <td width="20%"><label>Total</label></td>
+            </tr>
+            <% section[:expenses].each do |expense| %>
+
+              <tr>
+                <td width="20%">1&nbsp;<i class="fa fa-money"></i></td>
+                <td width="20%"><%= expense.date%></td>
+                <td width="20%"><%= expense.merchant_name%></td>
+                <td width="20%"><%= expense.note%></td>
+                <td width="20%"><i class="fa fa-inr">&nbsp;</i><%=expense.amount_value%></td>
+              </tr>
+
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>
+
+<h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Comments</label></h1>
+<div class="col-sm-12">
+  <% @report.comments.each do |comment| %>
+
+    <div class="row" style="width: 100%">
+      <div class="col-sm-2">
+        <label><%=comment.user.name if comment.user%></label> |&nbsp;
+        <span style="font-size: 11px; color: #aaa;"><%=comment.created_at%></span>
+      </div>
+
+      <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
+        <%=comment.generate(current_user)%>
+      </div>
+    </div>
+
+  <% end %>
+  <!-- <div class="row" style="width: 100%">
+    <div class="col-sm-2">
+      <label>Rajeev</label> |&nbsp;
+      <span style="font-size: 11px; color: #aaa;">13 Apr 2017 at 05:00 PM</span>
+    </div>
+
+    <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+      proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </div>
+  </div>
+  <div class="row" style="width: 100%">
+    <div class="col-sm-2">
+      <label>Rajeev</label> |&nbsp;
+      <span style="font-size: 11px; color: #aaa;">13 Apr 2017 at 05:00 PM</span>
+    </div>
+
+    <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+      proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </div>
+  </div>
+  <div class="row" style="width: 100%">
+    <div class="col-sm-2">
+      <label>Rajeev</label> |&nbsp;
+      <span style="font-size: 11px; color: #aaa;">13 Apr 2017 at 05:00 PM</span>
+    </div>
+
+    <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+      proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </div>
+  </div> -->
+</div>
+
+</body>
+</html>

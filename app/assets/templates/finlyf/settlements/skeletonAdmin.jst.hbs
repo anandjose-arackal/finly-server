@@ -60,42 +60,6 @@
   background: #FFF1DA;
 }
 
-.item.col-sm-3, .receipt{
-  padding: 20px;
-  border: none;
-  background: transparent;
-  color: #555;
-  /*padding: 10px;*/
-  /*background: red;*/
-}
-
-.item.col-sm-3 .receipt-container, .receipt .receipt-container {
-  padding: 10px;
-  background: white;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
-}
-
-.item.col-sm-3 .receipt-container .receipt-details, .receipt .receipt-container .receipt-details{
-  /*padding: 10px;*/
-  margin-top: 10px;
-  border-top: 1px solid #ccc;
-}
-.item.col-sm-3 .receipt-container .receipt-details h4{
-  font-size: 15px;
-  padding-top: 0;
-}
-
-.item.col-sm-3 .receipt-container .receipt-image, .receipt, .receipt-container .receipt-image{
-  overflow:hidden;
-  height: 250px;
-  padding-bottom: 10px;
-}
-
-.item.col-sm-3 .receipt-container .receipt-image img, .receipt .receipt-container .receipt-image img{
-  /*border: 3px solid #efefef;*/
-  padding: 10px;
-}
-
 .sidebar{
   height: calc(100% - 100px);
   background: #fff;
@@ -495,30 +459,15 @@ ul.settlement-actions li label{
   </div>
 
   <div class="col-sm-9 col-sm-offset-3 main">
+    <div class="text-center" style="margin-top: 60px; color: #676767;">
+      <img src="/common/images/employees.png" style="height: 200px;filter: opacity(0.7);">
 
-    <div class="summary row no-margin" style="background: #fbfbfb; color: #333; margin-bottom: 0px; height: 190px;box-shadow: 0 0 2px -1px rgba(0, 0, 0, 0.5);border-bottom: 3px solid #fff;">
-      <div class="col-sm-10 col-sm-offset-1">
-        <h1>Select a user to see settlement details.</h1>
-      </div>
-    </div>  
-    
-    <div class="row no-margin settlements-content" style="height: calc(100% - 200px); display:none;">
-      <div class="container-fluid"> 
-        <ul class="nav nav-pills filter-status">
-          <li class="{{#if_eq item.view_to_load 'payments'}}active{{/if_eq}}"><a href="#" data-view="payments">Settlements History</a></li>
-          <li class="{{#if_eq item.view_to_load 'reports'}}active{{/if_eq}}"><a href="#" data-view="reports">Reports</a></li>
-          {{!-- <li class="{{#if_eq item.view_to_load 'reimbursed'}}active{{/if_eq}}"><a href="#" data-view="reimbursed">Reimbursed Reports</a></li>
-          <li class="{{#if_eq item.view_to_load 'closed'}}active{{/if_eq}}"><a href="#" data-view="closed">Closed Reports</a></li>
-          <li class="{{#if_eq item.view_to_load 'credited_money_request'}}active{{/if_eq}}"><a href="#" data-view="credited_money_request">Credited Requests</a></li> --}}
-          <li class="{{#if_eq item.view_to_load 'money_requests'}}active{{/if_eq}}"><a href="#" data-view="money_requests">Money Requests</a></li>
-        </ul>
-      </div>
-
-      <div class="settlements-index" style="height: 100%; overflow-y: scroll;"></div>
+      <h3>No User Selected</h3>
+      <p style="font-size: 18px;">Please select a user from the left to see details.</p>
     </div>
   </div>
 
-  <div class="modal fade" tabindex="-1" role="dialog" id="modal-settlements">
+  <div class="modal fade" tabindex="-1" role="dialog" id="modal-settlements" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog" role="document" style="width: 60%;">
       <div class="modal-content">
         

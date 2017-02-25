@@ -18,13 +18,13 @@ class MoneyRequest::Submit < MoneyRequest::Base
     # checking if policy is added if enforce policy is enabled
     if user.enforce_policy_enabled?
       if money_request.policy.nil?
-        add_message :error, "You have to select a policy for the advance request before submission"
+        add_message :error, "You have to select a policy for the money request before submission"
         return false
       end
     end
     # checking if the money_request has expenses
     unless money_request.total_amount> 0
-      messages[:error] << 'Cannot submit an empty advance request'
+      messages[:error] << 'Cannot submit an empty money request'
     end
   end
 
@@ -56,6 +56,10 @@ class MoneyRequest::Submit < MoneyRequest::Base
       money_request.reload
       return
     end
+    submitted_amount_attributes = {value: money_request.total_amount, currency_id: 1}
+    if money_request.submitted_amount
+      submitted_amount_attributes[:id] = money_request.submitted_amount_id
+    end
     submitted_at = DateTime.now
     manager_id = manager.id rescue nil
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
@@ -63,7 +67,8 @@ class MoneyRequest::Submit < MoneyRequest::Base
                                        controlling_for_user_id: nil,
                                        controlling_user_role_id: manager_role_id,
                                        controlling_for_user_role_id: nil,
-                                       submitted_at: submitted_at
+                                       submitted_at: submitted_at,
+                                       submitted_amount_attributes: {value: money_request.total_amount, currency_id: 1}
       money_request.tracks.create action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user_id: money_request.controlling_user_id,
@@ -79,8 +84,8 @@ class MoneyRequest::Submit < MoneyRequest::Base
     # adding comment regarding the change in status of this money request
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
 
-    add_message :success, 'Advance Request Submitted'
-
+    add_message :success, 'Money Request Submitted'
+    
     Event::EMoneyRequest::Submit.(user, money_request: money_request)
   end
 

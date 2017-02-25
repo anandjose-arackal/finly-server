@@ -68,12 +68,8 @@ class User::Team::Index < User::Team::Base
     end
     return if manager_association.blank? or approves_to_association.blank?
     user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:user_id)
-    # adding members invited by this particular user
-    user_ids += user.company.users.invited_by(user.id)
     user_ids.uniq! if user_ids.present?
-    # if user_ids.present?
-      self.response = user.company.users.with_id(user_ids)
-    # end
+    self.response = user.company.users.with_id(user_ids)
   end
 
   def retrieve

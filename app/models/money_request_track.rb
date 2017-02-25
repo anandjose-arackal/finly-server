@@ -21,6 +21,7 @@
 
 
 
+
 class MoneyRequestTrack < ActiveRecord::Base
 
   belongs_to :money_request
@@ -43,5 +44,6 @@ class MoneyRequestTrack < ActiveRecord::Base
   scope :with_action, ->(action_id) { where money_request_tracking_action_id: action_id }
   scope :with_action_user, ->(action_user_id) {where action_user_id: action_user_id}
   scope :involving_user, ->(user_id) {where 'action_user_id = ? OR modified_user_id = ?', user_id, user_id }
+  scope :with_modified_user, -> (user_id) {where modified_user_id: user_id}
 
 end

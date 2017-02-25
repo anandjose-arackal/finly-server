@@ -64,7 +64,9 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   end
 
   def validate
-    validate_date payment_params[:date]
+    unless validate_date payment_params[:date]
+      return false
+    end
 
     if params[:password].blank?
       add_message :error, 'You need to provide your password to initiate this transfer'
@@ -96,7 +98,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
                                   amount_attributes: {value: reimbursement_amount, currency_id: payment_params[:currency_id]})
     # deducting cash in hand given in the params
     self.cash_deduction = to_user.payments.build(initiating_user: user, receiving_user: to_user,
-                                                 payment_type_id: PaymentType.id_for(:debt_clearance),
+                                                 payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
                                                  date: payment_params[:date], note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
                                                  amount_attributes: {value: cash_in_hand_deduction_amount, currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet

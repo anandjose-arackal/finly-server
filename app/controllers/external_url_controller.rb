@@ -5,18 +5,19 @@ class ExternalUrlController < ApplicationController
   def report
     id = params[:id]
     report = current_user.reports.with_id(id).first rescue nil
+    params[:view] = 'personal'
     # todo use report controlling user to figure out user role for report
-    if report.blank? and current_user.manager?
-      params[:view] = 'manager'
-      result = Report::Show.(current_user, params)
-      if result.success?
-        report = result.report
-      end
+    if report.blank? && current_user.manager?
+        params[:view] = 'manager'
+        result = Report::Show.(current_user, params) rescue nil
+        if result&.success?
+          report = result.report
+        end
     end
     if report.blank? and current_user.finance_manager?
       params[:view] = 'finance_manager'
-      result = Report::Show.(current_user, params)
-      if result.success?
+      result = Report::Show.(current_user, params) rescue nil
+      if result&.success?
         report = result.report
       end
     end
@@ -38,18 +39,19 @@ class ExternalUrlController < ApplicationController
   def money_request
     id = params[:id]
     money_request = current_user.money_requests.with_id(id).first rescue nil
+    params[:view] = 'personal'
     # todo use money_request controlling user to figure out user role for money_request
     if money_request.blank? and current_user.manager?
       params[:view] = 'manager'
-      result = MoneyRequest::Show.(current_user, params)
-      if result.success?
+      result = MoneyRequest::Show.(current_user, params) rescue nil
+      if result&.success?
         money_request = result.money_request
       end
     end
     if money_request.blank? and current_user.finance_manager?
       params[:view] = 'finance_manager'
-      result = MoneyRequest::Show.(current_user, params)
-      if result.success?
+      result = MoneyRequest::Show.(current_user, params) rescue nil
+      if result&.success?
         money_request = result.money_request
       end
     end
@@ -75,6 +77,7 @@ class ExternalUrlController < ApplicationController
       redirect_to "#{root_url}#settlements/#{id}"
       return
     end
+    params[:view] = 'personal'
     if user.blank? and current_user.manager?
       params[:view] = 'manager'
       result = User::Show.(current_user, params)
@@ -99,6 +102,20 @@ class ExternalUrlController < ApplicationController
     if user.present?
       redirect_to "#{root_url}#settlements/params={\"view\":\"#{params[:view]}\"}"
     end
+  end
+
+  def transaction
+    id = params[:id]
+    if id.blank?
+      redirect_to root_path
+      return
+    end
+    expense = current_user.expenses.with_id(id).first rescue nil
+    if expense.blank?
+      redirect_to root_path
+      return
+    end
+    redirect_to "#{root_url}#expenses/params={\"preview\":true, \"id\":#{expense.id}}"
   end
 
 end

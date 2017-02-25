@@ -70,6 +70,9 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
   end
 
   def comment
+    if params[:content].present? and (params[:content] == "" or params[:content] == 'nil')
+      params[:content] = nil
+    end
     @result = MoneyRequest::Comment::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?

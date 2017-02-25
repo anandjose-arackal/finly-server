@@ -1,5 +1,5 @@
 class Expense::Index < Expense::Base
-  attr_accessor :role_id, :expenses
+  attr_accessor :role_id, :expenses, :expense_filters
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -16,6 +16,7 @@ class Expense::Index < Expense::Base
     if self.role_id.blank? and params[:view].present?
       self.role_id = UserRole::VALUES[params[:view].to_sym]
     end
+    self.expense_filters = []
   end
 
   def authorize
@@ -23,6 +24,16 @@ class Expense::Index < Expense::Base
       raise_unauthorized_exception if not user.has_role?(self.role_id) and not (role_id == UserRole.id_for(:admin) and user.policy_admin?)
     elsif not user.employee?
       raise_unauthorized_exception
+    end
+  end
+
+  def pre_process
+    # removing all 'filter_*' because we son't them applied on the user index screen
+    params.each do |key, value|
+      if key.to_s.include?("filter_")
+        expense_filters << {key => value}
+        params.delete(key)
+      end
     end
   end
 
@@ -49,6 +60,13 @@ class Expense::Index < Expense::Base
   end
 
   def post_process
+    # adding the stored filters here before applying scopes
+    expense_filters.each do |filter|
+      filter.each do |key, value|
+        params[key] = value
+      end
+    end
+
     if self.expenses.present?
       self.expenses = self.expenses.exclude_deleted rescue self.expenses
     end

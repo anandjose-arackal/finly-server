@@ -56,7 +56,7 @@ class User::Balance < User::Base
     self.balances[:current_user_cash_in_hand] = user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Cash Advance
-    self.balances[:current_user_pending_advance_request] = user.balance_sheet.pending_advance.amount_value if params[:current_user_pending_advance_request] or params[:current_user_all]
+    self.balances[:current_user_pending_money_request] = user.balance_sheet.pending_advance.amount_value if params[:current_user_pending_money_request] or params[:current_user_all]
 
     # pending approved reports
     if params[:current_user_pending_reports] or params[:current_user_all]
@@ -80,12 +80,12 @@ class User::Balance < User::Base
         self.balances[:target_user_card] = presenter.balance rescue nil
         self.balances[:target_user_card_eligibility] = presenter.available_card_eligibility rescue nil
       end
-      
+
       # Cash In Hand
       self.balances[:target_user_cash_in_hand] = target_user.balance_sheet.cash_in_hand.amount_value rescue nil if params[:target_user_cash_in_hand] or params[:target_user_all]
 
       # Pending Cash Advance
-      self.balances[:target_user_pending_advance_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_advance_request] or params[:target_user_all]
+      self.balances[:target_user_pending_money_request] = target_user.balance_sheet.pending_advance.amount_value if params[:target_user_pending_money_request] or params[:target_user_all]
 
       # pending approved reports
       if params[:target_user_pending_reports] or params[:target_user_all]

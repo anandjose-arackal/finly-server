@@ -154,6 +154,9 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
   end
 
   def comment
+    if params[:content].present? and (params[:content] == "" or params[:content] == 'nil')
+      params[:content] = nil
+    end
     @result = Report::Comment::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?

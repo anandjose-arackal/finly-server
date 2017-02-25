@@ -9,7 +9,7 @@ class User::CardRestrictions::Update < User::Base
 
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :manager, :finance_manager]
   end
 
   def pre_validate
@@ -149,11 +149,11 @@ class User::CardRestrictions::Update < User::Base
     else
       api_params[:mcc_restriction_type] = "I"
     end
-    mcc_group_api = ItzCash::SetMccCode.(selected_user, api_params)
-    unless mcc_group_api.success?
-      add_message :error, mcc_group_api.messages[:error]
-      return false
-    end
+    # mcc_group_api = ItzCash::SetMccCode.(selected_user, api_params)
+    # unless mcc_group_api.success?
+    #   add_message :error, mcc_group_api.messages[:error]
+    #   return false
+    # end
     # Setting the atm restriction parameters
     if atm_enabled && atm_limits_present?
       daily_amount = atm_limit_params[0][:budget].to_i || 0

@@ -38,12 +38,13 @@
 #  otp_verified_at        :datetime
 #  otp_verified           :boolean          default(FALSE), not null
 #  otp_count              :integer          default(0), not null
-#  first_name             :string(255)      default(""), not null
-#  last_name              :string(255)      default(""), not null
+#  first_name             :string(255)
+#  last_name              :string(255)
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)
 #
+
 
 
 
@@ -92,8 +93,8 @@ class User < ActiveRecord::Base
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
   has_many :invitations, :class_name => 'User', :as => :invited_by
-  has_one :auto_submit_config, as: :submitable
-  has_one :enforce_policy, as: :enforceable
+  has_one :auto_submit_config, as: :submitable, dependent: :destroy
+  has_one :enforce_policy, as: :enforceable, dependent: :destroy
 
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy

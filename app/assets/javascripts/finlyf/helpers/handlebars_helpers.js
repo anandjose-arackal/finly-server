@@ -33,6 +33,11 @@ Handlebars.registerHelper('add', function(){
   return total;
 })
 
+Handlebars.registerHelper('sub_string', function(passedString, start, end){
+  var theString = passedString.substring(start,(end-3)) + "..."
+  return new Handlebars.SafeString(theString);
+})
+
 Handlebars.registerHelper("switch", function(value, options) {
     this._switch_value_ = value;
     var html = options.fn(this); // Process the body of the switch block

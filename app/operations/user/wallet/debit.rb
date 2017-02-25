@@ -28,8 +28,12 @@ class User::Wallet::Debit < User::Wallet::Base
     self.initiating_user = user
     self.target_user = params[:from_user]
     if target_user.blank? and params[:from_user_id].present?
-      users = User::Team::Index.(user, params)
-      self.target_user = (users.with_id(params[:from_user_id]).first rescue nil) if users.present?
+      if params[:from_user_id].to_i == user.id
+        self.target_user = user
+      else
+        users = User::Team::Index.(user, params)
+        self.target_user = (users.with_id(params[:from_user_id]).first rescue nil) if users.present?
+      end
     end
   end
 

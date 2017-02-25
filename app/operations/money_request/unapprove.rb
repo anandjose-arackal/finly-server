@@ -62,9 +62,9 @@ class MoneyRequest::Unapprove < MoneyRequest::Base
   def post_process
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
 
-    if prev_status.approved?
-      Event::EMoneyRequest::Unapprove.(self.user, money_request: self.money_request)
+    Event::EMoneyRequest::Unapprove.(self.user, money_request: self.money_request)
 
+    if prev_status.approved?
       # Recalculate settlement when money_request is unapproved from an approved/closed state
       Settlement::MoneyRequest::Unapproved.(user, money_request: money_request)
     end

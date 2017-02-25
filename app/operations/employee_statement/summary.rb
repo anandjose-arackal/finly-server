@@ -72,9 +72,9 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
                                                                                                                                                                             PaymentType.id_for(:credit_from_card_to_card)]).joins(:amount).sum(:value)
     items[:amount_transacted][:card_load] += precision_value selected_user.initiating_payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_card),
                                                                                                                                                                             PaymentType.id_for(:debit_from_card_to_card)]).joins(:amount).sum(:value)
-    items[:amount_transacted][:paid_to_employee] = precision_value selected_user.payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:advance),
+    items[:amount_transacted][:paid_to_employee] = precision_value selected_user.payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:add_cash_on_hand),
                                                                                                                                                                          PaymentType .id_for(:reimbursement)]).joins(:amount).sum(:value)
-    items[:amount_transacted][:paid_by_employee] = precision_value selected_user.payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:debt_clearance)]).joins(:amount).sum(:value) # todo - check if this should include settlement
+    items[:amount_transacted][:paid_by_employee] = precision_value selected_user.payments.where('date >= ? AND date <= ?', start_date, end_date).where(payment_type_id: [PaymentType.id_for(:deduct_cash_on_hand)]).joins(:amount).sum(:value) # todo - check if this should include settlement
 
     items[:total_verified_expenses] = {}
     items[:total_verified_expenses][:verified_card_expenses] = verified_card_expenses(selected_user)
@@ -207,8 +207,8 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
     unless date
       return balance
     end
-    debt_clearances = selected_user.payments.where('date >= ?', date).where(payment_type_id: PaymentType.id_for(:debt_clearance)).joins(:amount).sum(:value)
-    added_cash_in_hand = selected_user.payments.where('date >= ?', date).where(payment_type_id: PaymentType.id_for(:advance)).joins(:amount).sum(:value)
+    debt_clearances = selected_user.payments.where('date >= ?', date).where(payment_type_id: PaymentType.id_for(:deduct_cash_on_hand)).joins(:amount).sum(:value)
+    added_cash_in_hand = selected_user.payments.where('date >= ?', date).where(payment_type_id: PaymentType.id_for(:add_cash_on_hand)).joins(:amount).sum(:value)
     accounted_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved_id, ReportStatus.closed_id]).where(accounted: true).where('accounted_at >= ?', date)
     report_amount = 0
     accounted_reports.each do |report|

@@ -9,7 +9,7 @@
           <label class="control-label">Amount</label>
         </div>
         <div class="col-sm-7">
-          <input type="number" name="expense[amount_attributes][value]" class="form-control" />
+          <input type="number" name="expense[amount_attributes][value]" class="form-control" tabindex="1" />
           <input type="hidden" name="expense[amount_attributes][currency_id]" class="form-control" value="1" />
         </div>
       </div>
@@ -19,7 +19,7 @@
           <label class="control-label">Merchant</label>
         </div>
         <div class="col-sm-7">
-          <input type="text" name="expense[manual_expense_attributes][merchant]" class="form-control filter-merchant" />
+          <input type="text" name="expense[manual_expense_attributes][merchant]" class="form-control filter-merchant" tabindex="2" />
         </div>
       </div>
 
@@ -28,7 +28,7 @@
           <label class="control-label">Date</label>
         </div>
         <div class="col-sm-7">
-          <input type="text" name="expense[date]" class="form-control datepicker" />
+          <input type="text" name="expense[date]" class="form-control datepicker" tabindex="3" />
         </div>
       </div>
 
@@ -38,7 +38,7 @@
           <label class="control-label">Category</label>
         </div>
         <div class="col-sm-7">
-          <select name="expense[category_id]" class="newExpenseCategory form-control">
+          <select name="expense[category_id]" class="newExpenseCategory form-control" tabindex="4">
           </select>
         </div>
       </div>
@@ -48,14 +48,14 @@
           <label class="control-label">Note</label>
         </div>
         <div class="col-sm-7">
-          <textarea class="form-control" placeholder="Note..." name="expense[note]"></textarea>
+          <textarea class="form-control" placeholder="Note..." name="expense[note]" tabindex="5"></textarea>
         </div>
       </div>
 
       <div class="row no-margin form-group">
         <div class="col-sm-7 col-sm-offset-5 text-center">
           
-          <buttun class="btn-create-expense btn btn-primary" style="width: 100px;">Create</buttun>
+          <buttun class="btn-create-expense btn btn-primary" style="width: 100px;" tabindex="6">Create</buttun>
         </div>
         
       </div>      

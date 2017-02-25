@@ -295,6 +295,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     image_url = window.URL.createObjectURL(file.files[0])
     $(image).attr('src', image_url)
     $(close_button).removeClass('hidden')
+    $(target).find('.btn-attach-existing-receipts').addClass('hidden')
     # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
 
   removeUploadedReceipt: (e) ->
@@ -463,7 +464,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
 
     # console.log "Will navigate now."
     if @params.view
-      params.view = @params.view
+      params.view = @params.view || 'personal'
 
     if $(target).attr('data-navigate')
       if $.parseJSON($(target).attr('data-navigate')) == true

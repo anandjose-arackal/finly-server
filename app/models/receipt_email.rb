@@ -2,26 +2,53 @@
 #
 # Table name: receipt_emails
 #
-#  id          :integer          not null, primary key
-#  subject     :string(255)
-#  body        :text(65535)
-#  raw_text    :text(65535)
-#  raw_html    :text(65535)
-#  raw_headers :text(65535)
-#  sent_at     :datetime
-#  user_id     :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  id                      :integer          not null, primary key
+#  subject                 :text(65535)
+#  sent_at                 :datetime
+#  user_id                 :integer
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  body_file_name          :string(255)
+#  body_content_type       :string(255)
+#  body_file_size          :integer
+#  body_updated_at         :datetime
+#  raw_text_file_name      :string(255)
+#  raw_text_content_type   :string(255)
+#  raw_text_file_size      :integer
+#  raw_text_updated_at     :datetime
+#  raw_html_file_name      :string(255)
+#  raw_html_content_type   :string(255)
+#  raw_html_file_size      :integer
+#  raw_html_updated_at     :datetime
+#  raw_header_file_name    :string(255)
+#  raw_header_content_type :string(255)
+#  raw_header_file_size    :integer
+#  raw_header_updated_at   :datetime
 #
 
 
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
-  has_many :receipt_email_attachments
+  has_many :receipt_email_attachments, dependent: :destroy
   belongs_to :user
 
   validates :user_id, presence: true
+
+  # BODY_CONTENT_TYPES = ['text/plain', 'text/html', 'message/rfc822', 'multipart/alternative', 'message/partial']
+
+  has_attached_file :body
+  do_not_validate_attachment_file_type :body
+  # validates_attachment_content_type :body, :content_type => BODY_CONTENT_TYPES
+  has_attached_file :raw_text
+  do_not_validate_attachment_file_type :raw_text
+  # validates_attachment_content_type :raw_text, :content_type => BODY_CONTENT_TYPES
+  has_attached_file :raw_html
+  do_not_validate_attachment_file_type :raw_html
+  # validates_attachment_content_type :raw_html, :content_type => BODY_CONTENT_TYPES
+  has_attached_file :raw_header
+  do_not_validate_attachment_file_type :raw_header
+  # validates_attachment_content_type :raw_header, :content_type => BODY_CONTENT_TYPES
 
   def save_receipt_image
     FileUtils.mkdir_p "#{Rails.root}/tmp/images"
@@ -38,7 +65,8 @@ class ReceiptEmail < ActiveRecord::Base
         end
       else
         image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
-        document_converter = ReceiptProcessor::BaseConverter.new  raw_html,
+        raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
+        document_converter = ReceiptProcessor::BaseConverter.new  raw_html_text,
                                                                   ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                   image_tmp_path
         document_converter.convert do |images|
@@ -46,4 +74,5 @@ class ReceiptEmail < ActiveRecord::Base
         end
       end
   end
+
 end

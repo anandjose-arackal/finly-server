@@ -2,7 +2,7 @@ class User::Profile < User::Base
 
   class User::Profile::ProfilePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :assigned_policies
+    attr_accessor :assigned_policies, :mappings
 
     def init
       self.assigned_policies = user.policies

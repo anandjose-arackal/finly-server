@@ -23,7 +23,7 @@
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
-  belongs_to :receipt_email
+  belongs_to :receipt_email, dependent: :destroy
 
   validates :user_id, presence: true
 
@@ -84,11 +84,11 @@ class Receipt < ActiveRecord::Base
   def file_format
     if self.image_content_type == 'application/pdf'
     type = "pdf"
-  elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.image_content_type)
-    type = "image"
-  else
-    type = "image"
-  end 
+    elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.image_content_type)
+      type = "image"
+    else
+      type = "image"
+    end
   end
 
 end

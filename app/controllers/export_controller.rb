@@ -6,11 +6,10 @@ class ExportController < ApplicationController
   allow_oauth!
 
   def report
-    # debugger
     respond_to do |format|
       format.csv {
         @report = Export::Report::AsCsv.(@user, params)
-        send_data @report.data
+        send_data @report.data, filename: "#{@report.report_names}"
       }
       format.xls {
         @report = Export::Report::AsXml.(@user, params)
@@ -18,8 +17,9 @@ class ExportController < ApplicationController
         @data = @report.data
       }
       format.pdf {
-        @report = Report::Show.new(@user, params).run
-        render pdf: "report-#{@report.report.name}", layout: "pdf.html.erb"
+        @result = Report::Show.(@user, params)
+        @report = @result.report
+        render pdf: "report-#{@report.name}", layout: "pdf.html.erb"
       }
     end
   end

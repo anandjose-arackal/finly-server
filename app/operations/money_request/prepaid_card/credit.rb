@@ -40,7 +40,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       add_message :error, 'You do not have the permission to transfer the funds'
     end
     unless money_request.processing?
-      add_message :error, 'The advance request cannot be credited as it is not in processing state'
+      add_message :error, 'The money request cannot be credited as it is not in processing state'
     end
     if to_user.blank?
       add_message :error, 'User not found to transfer the funds!'

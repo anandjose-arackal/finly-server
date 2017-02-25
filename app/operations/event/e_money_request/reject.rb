@@ -23,20 +23,20 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
 
   def send_push_notification(user)
     return unless user.id == money_request.user_id
-    message = "#{rejecting_user.name} rejected the Advance Request: #{self.money_request.name}"
+    message = "#{rejecting_user.name} rejected the Money Request: #{self.money_request.name}"
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id
   end
 
   def set_notification(user)
     roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
     notification = user.notifications.build(user: user,
-                                            notification_type_id: NotificationType.id_for(:advance_request),
+                                            notification_type_id: NotificationType.id_for(:money_request),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
                                             action_user_id: money_request.tracks.last.action_user.id,
                                             object_id: money_request.id,
-                                            object_type: 'Advance Request',
+                                            object_type: 'Money Request',
                                             path_object_id: money_request.id,
-                                            path_object_type: 'Advance Request',
+                                            path_object_type: 'Money Request',
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
                                             view_role_id: roles.first
@@ -46,17 +46,17 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
 
   def mailer_subject(user)
     unless user == self.rejecting_user
-      "#{rejecting_user.name} has rejected the Advance Request: #{self.money_request.name}"
+      "#{rejecting_user.name} has rejected the Money Request: #{self.money_request.name}"
     else
-      "You rejected the Advance Request : #{self.money_request.name}"
+      "You rejected the Money Request : #{self.money_request.name}"
     end
   end
 
   def mailer_body(user)
     unless user == self.rejecting_user
-      "#{rejecting_user.name} has rejected the Advance Request: '#{self.money_request.name}'"
+      "#{rejecting_user.name} has rejected the Money Request: '#{self.money_request.name}'"
     else
-      "You have rejected the Advance Request : #{self.money_request.name}"
+      "You have rejected the Money Request : #{self.money_request.name}"
     end
   end
 

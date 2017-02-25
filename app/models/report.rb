@@ -31,6 +31,8 @@
 
 
 
+
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -54,7 +56,7 @@ class Report < ActiveRecord::Base
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
-
+  accepts_nested_attributes_for :submitted_amount
 
   validates :user, presence: true
   validate :is_employee
@@ -93,7 +95,7 @@ class Report < ActiveRecord::Base
   scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id, ReportStatus.reimbursement_confirmed_id]}
 
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
-  scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.closed_id]}
+  scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id]}
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -119,6 +121,8 @@ class Report < ActiveRecord::Base
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   delegate :status_name, to: :status
+
+  delegate :submitted_amount_value, to: :submitted_amount
 
   before_save :handle_name
 

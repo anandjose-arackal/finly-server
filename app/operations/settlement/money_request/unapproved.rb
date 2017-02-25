@@ -20,13 +20,13 @@ class Settlement::MoneyRequest::Unapproved < MoneyRequest::Base
 
   def validate
     if money_request.credited?
-      messages[:error] << 'Advance Request has already been processed'
+      messages[:error] << 'Money Request has already been processed'
     end
     unless money_request.processing?
       messages[:error] << 'Cannot reduce pending cash advance as the request in not in processing state'
     end
     unless money_request.accounted
-      messages[:error] << 'Advance Request has not yet been accounted'
+      messages[:error] << 'Money Request has not yet been accounted'
     end
   end
 

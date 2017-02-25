@@ -16,7 +16,10 @@ Gemfile.lock
 /tmp
 /public/system/receipts/*
 
-/.idea/
+# all local executables
+/bin
+
+/.idea/*
 .vagrant/
 #Vagrantfile
 #bootstrap.sh

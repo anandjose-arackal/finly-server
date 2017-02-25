@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170214191956) do
+ActiveRecord::Schema.define(version: 20170217113720) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -789,15 +789,27 @@ ActiveRecord::Schema.define(version: 20170214191956) do
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
 
   create_table "receipt_emails", force: :cascade do |t|
-    t.string   "subject",     limit: 255
-    t.text     "body",        limit: 65535
-    t.text     "raw_text",    limit: 65535
-    t.text     "raw_html",    limit: 65535
-    t.text     "raw_headers", limit: 65535
+    t.text     "subject",                 limit: 65535
     t.datetime "sent_at"
-    t.integer  "user_id",     limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.integer  "user_id",                 limit: 4
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.string   "body_file_name",          limit: 255
+    t.string   "body_content_type",       limit: 255
+    t.integer  "body_file_size",          limit: 4
+    t.datetime "body_updated_at"
+    t.string   "raw_text_file_name",      limit: 255
+    t.string   "raw_text_content_type",   limit: 255
+    t.integer  "raw_text_file_size",      limit: 4
+    t.datetime "raw_text_updated_at"
+    t.string   "raw_html_file_name",      limit: 255
+    t.string   "raw_html_content_type",   limit: 255
+    t.integer  "raw_html_file_size",      limit: 4
+    t.datetime "raw_html_updated_at"
+    t.string   "raw_header_file_name",    limit: 255
+    t.string   "raw_header_content_type", limit: 255
+    t.integer  "raw_header_file_size",    limit: 4
+    t.datetime "raw_header_updated_at"
   end
 
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
@@ -969,15 +981,15 @@ ActiveRecord::Schema.define(version: 20170214191956) do
     t.integer  "employee_id",         limit: 4
     t.integer  "payroll_id",          limit: 4
     t.integer  "default_currency_id", limit: 4
-    t.datetime "created_at",                                             null: false
-    t.datetime "updated_at",                                             null: false
-    t.date     "date_of_birth",                   default: '2017-02-15', null: false
-    t.string   "gender",              limit: 255,                        null: false
-    t.string   "address_1",           limit: 255, default: "",           null: false
-    t.string   "address_2",           limit: 255, default: "",           null: false
-    t.string   "city",                limit: 255, default: "",           null: false
-    t.integer  "state_id",            limit: 4,   default: 1,            null: false
-    t.string   "pin_code",            limit: 255, default: "",           null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.date     "date_of_birth"
+    t.string   "gender",              limit: 255, null: false
+    t.string   "address_1",           limit: 255
+    t.string   "address_2",           limit: 255
+    t.string   "city",                limit: 255
+    t.integer  "state_id",            limit: 4
+    t.string   "pin_code",            limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
@@ -1077,8 +1089,8 @@ ActiveRecord::Schema.define(version: 20170214191956) do
     t.datetime "otp_verified_at"
     t.boolean  "otp_verified",                       default: false, null: false
     t.integer  "otp_count",              limit: 4,   default: 0,     null: false
-    t.string   "first_name",             limit: 255, default: "",    null: false
-    t.string   "last_name",              limit: 255, default: "",    null: false
+    t.string   "first_name",             limit: 255
+    t.string   "last_name",              limit: 255
     t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
     t.boolean  "verified",                           default: false

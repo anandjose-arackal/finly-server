@@ -48,4 +48,20 @@ class CardTransaction < ActiveRecord::Base
   scope :debits, -> {where transaction_type: 'Debit'}
   scope :credits, -> {where transaction_type: 'Credit'}
 
+  def credit?
+    self.transaction_type == 'Credit'
+  end
+
+  def debit?
+    self.transaction_type == 'Debit'
+  end
+
+  def atm_withdrawal?
+    debit? and transaction_mode == 'ATM'
+  end
+
+  def expense?
+    debit? and (transaction_mode == 'POS' or transaction_mode == "ECOM")
+  end
+
 end

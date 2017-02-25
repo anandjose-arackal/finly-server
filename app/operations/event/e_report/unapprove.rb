@@ -5,15 +5,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
   end
 
   def affected_users
-    # prev_user = params[:from_user]
-    # users = [self.report.controlling_user]
-    # users << prev_user if prev_user.present?
-    # users
     [self.report.controlling_user, self.report.tracks.last.modified_user]
-  end
-
-  def notification_affected_users
-    [report.controlling_user, report.tracks.last.modified_user]
   end
 
   def send_push_notification(user)

@@ -47,7 +47,24 @@ class Import::Superadmin::Users < Import::Base
   end
 
   def validate
+    # add a validation for company id in each row
+    (2..sheet.last_row).each do |i|
+      row = sheet.row(i)
+      # validating company id of the new user Type 1
+      if company_id_blank?(row)
+        result_hash[i] = 1
+        next
+      end
 
+      # validating that the card being assigned is unique Type 2
+      User.all.each do |user|
+        proxy = user.cards.first.proxy rescue ""
+        if row[import_fields[:card_serial_id]] == proxy
+          result_hash[i] = 2
+          next
+        end
+      end
+    end
   end
 
   def process
@@ -57,6 +74,21 @@ class Import::Superadmin::Users < Import::Base
       self.params = process_row(row)
       error_messages = params[:error_messages]
       params.delete(:error_messages)
+
+      if result_hash[i].present?
+        case result_hash[i]
+          when 1
+            # i.e. company id not unique
+            result_hash[i] = "Company ID cannot be blank"
+            next
+          when 2
+            # i.e. card has already been taken
+            error_messages << "Card has already been assigned to another user"
+            params.delete(:cards_attributes)
+          else
+            #code
+        end
+      end
 
       unique = mobile_number_valid?(row[import_fields[:mobile_number]])
 
@@ -95,6 +127,14 @@ class Import::Superadmin::Users < Import::Base
 
   private
 
+  def company_id_blank?(row)
+    if row[import_fields[:company_id]].present?
+      return false
+    else
+      return true
+    end
+  end
+
   # generating the parameters that enable the user to be invited
   def process_row(row)
     errors = []
@@ -102,6 +142,7 @@ class Import::Superadmin::Users < Import::Base
     # converting all elements to strings
     row.each_with_index do |element, index|
       if element.is_a?(Numeric)
+        row[index] = element.to_i.to_s
         row[index] = element.to_i.to_s
       end
     end
@@ -126,7 +167,7 @@ class Import::Superadmin::Users < Import::Base
       if manager.nil?
         manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       end
-      unless manager and manager.manager? and manager.company_id == row[import_fields[:company_id]]
+      unless manager&.manager? and manager.company_id == row[import_fields[:company_id]]
         errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
@@ -136,7 +177,7 @@ class Import::Superadmin::Users < Import::Base
       if finance_manager.nil?
         finance_manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
       end
-      unless finance_manager and finance_manager.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
+      unless finance_manager&.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
         errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
@@ -146,7 +187,7 @@ class Import::Superadmin::Users < Import::Base
       if approves_to.nil?
         approves_to = User.find_by(mobile_number: row[import_fields[:mobile_number]])
       end
-      unless approves_to and approves_to.manager? and approves_to.company_id == row[import_fields[:company_id]]
+      unless approves_to&.manager? and approves_to.company_id == row[import_fields[:company_id]]
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
@@ -156,7 +197,7 @@ class Import::Superadmin::Users < Import::Base
       if approves_finance_to.nil?
         approves_finance_to = User.find_by(mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
       end
-      unless approves_finance_to and approves_finance_to.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
+      unless approves_finance_to&.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil
       end
@@ -203,7 +244,7 @@ class Import::Superadmin::Users < Import::Base
   end
 
   def import_fields
-    { 
+    {
       :first_name => 0,
       :last_name => 1,
       :email => 2,
@@ -230,6 +271,3 @@ class Import::Superadmin::Users < Import::Base
   end
 
 end
-
-
-
