@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170217113720) do
+ActiveRecord::Schema.define(version: 20170225100312) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -213,11 +213,9 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.boolean  "expensed",                            default: true
     t.text     "error_message",         limit: 65535
     t.integer  "billing_amount_id",     limit: 4
-    t.integer  "expense_id",            limit: 4
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
-  add_index "card_transactions", ["expense_id"], name: "index_card_transactions_on_expense_id", using: :btree
   add_index "card_transactions", ["transaction_amount_id"], name: "index_card_transactions_on_transaction_amount_id", using: :btree
   add_index "card_transactions", ["user_id"], name: "index_card_transactions_on_user_id", using: :btree
 
@@ -1141,7 +1139,6 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_foreign_key "card_limits", "card_restrictions"
   add_foreign_key "card_restrictions", "cards"
   add_foreign_key "card_transactions", "cards"
-  add_foreign_key "card_transactions", "expenses"
   add_foreign_key "card_transactions", "users"
   add_foreign_key "cards", "card_types"
   add_foreign_key "cards", "companies"

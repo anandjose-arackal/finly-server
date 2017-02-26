@@ -18,8 +18,6 @@ class CardExpense < ActiveRecord::Base
 
   accepts_nested_attributes_for :surcharge
 
-  # validates :card_transaction_id, presence: true
-
   def surcharge_amount
     self.surcharge.value
   end

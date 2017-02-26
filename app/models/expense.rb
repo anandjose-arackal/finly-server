@@ -42,7 +42,6 @@ class Expense < ActiveRecord::Base
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
-  has_one :card_transaction
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :manual_expense
@@ -247,12 +246,7 @@ class Expense < ActiveRecord::Base
 
   private
 
-  # only employees can create an expense
-  # def created_by
-  #   unless self.user.employee?
-  #     errors.add(:expense, 'can only be created by employees')
-  #   end
-  # end
+
 
   # cannot add an expense with future date
   def no_future_date
