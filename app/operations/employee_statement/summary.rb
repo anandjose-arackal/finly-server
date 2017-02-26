@@ -60,7 +60,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
                                          + items[:user_account_status_details][:account_transfer_to_other_cards]
                                          + items[:transferred_to_card][:from_own_account])
 
-    
+
     # table 2
 
     items[:opening_card_balance] = card_balance_on_date(start_date)

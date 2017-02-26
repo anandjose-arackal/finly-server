@@ -207,7 +207,6 @@ module ApplicationHelper
       end
     end
     javascript_tag flash_messages.join("\n").html_safe
-    # debugger
   end
 
   def snap_flash_without(options = {})
@@ -226,7 +225,6 @@ module ApplicationHelper
       end
     end
     flash_messages
-    # debugger
   end
 
   def load_yaml
