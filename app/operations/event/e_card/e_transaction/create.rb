@@ -14,9 +14,9 @@ class Event::ECard::ETransaction::Create < Event::ECard::ETransaction::Base
     param[:transaction_id] = self.transaction.id
     param[:atm_withdrawal] = self.transaction.atm_withdrawal?
     param[:expense] = self.transaction.expense?
-    param[:expense_id] = self.transaction.expense_id
+    param[:expense_id] = self.transaction.card_expense.expense_id
     if transaction.expense?
-      param[:message] = "You have used your Finly Expense Card at #{transaction.expense.merchant_name} for of ₹#{transaction.billing_amount.value}"
+      param[:message] = "You have used your Finly Expense Card at #{transaction.card_expense.expense.merchant_name} for of ₹#{transaction.billing_amount.value}"
     elsif transaction.atm_withdrawal?
       param[:message] = "You have withdrawn ₹#{transaction.billing_amount.value} at an ATM"
     end
@@ -41,7 +41,7 @@ class Event::ECard::ETransaction::Create < Event::ECard::ETransaction::Base
   def mailer_body(user)
     return unless transaction.atm_withdrawal? or transaction.expense?
     if transaction.expense?
-      return "This is to inform you that you have used your Finly Expense Card at #{self.transaction.expense.merchant_name} for an amount of ₹#{self.transaction.billing_amount.value}"
+      return "This is to inform you that you have used your Finly Expense Card at #{self.transaction.card_expense.expense.merchant_name} for an amount of ₹#{self.transaction.billing_amount.value}"
     elsif transaction.atm_withdrawal?
       return "This is to inform you that an amount of ₹#{self.transaction.billing_amount.value} has been withdrawn through the ATM using Finly Expense Cards"
     end

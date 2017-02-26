@@ -60,7 +60,6 @@ class ItzCash::CardRestriction < ItzCash::Base
 
   # def process
   #   super()
-  #   debugger
   # end
 
   def success

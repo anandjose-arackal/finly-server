@@ -50,5 +50,5 @@ class UserBalanceHistory < ActiveRecord::Base
   delegate :cash_on_hand_load_value, to: :cash_on_hand_load
   delegate :cash_on_hand_withdrawal_value, to: :cash_on_hand_withdrawal
   delegate :cash_on_hand_balance_value, to: :cash_on_hand_balance
-  
+
 end

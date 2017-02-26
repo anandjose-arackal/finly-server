@@ -1,18 +1,30 @@
 class Formatter
 
-  def self.handle_api_nil(hash)
-    hash.each do |key, value|
-      if value.kind_of?(Hash)
-        handle_api_nil value
-      elsif value.kind_of?(Array)
-        value.each do |v|
-          handle_api_nil v
-        end
-      elsif value.is_a?(String) and value == 'nil'
-        hash[key] = nil
+  def self.handle_api_nil(value)
+    # hash.each do |key, value|
+    #   if value.kind_of?(Hash)
+    #     handle_api_nil value
+    #   elsif value.kind_of?(Array)
+    #     value.each do |v|
+    #       handle_api_nil v
+    #     end
+    #   elsif value.is_a?(String) and value == 'nil'
+    #     hash[key] = nil
+    #   end
+    # end
+    
+    if value.is_a?(Hash)
+      value.each do |key, v|
+        value[key] = handle_api_nil v
       end
+    elsif value.kind_of?(Array)
+      value.each do |v|
+        value[value.index(v)] = handle_api_nil v if value.index(v)
+      end
+    elsif value.kind_of?(String) and value == 'nil'
+      return nil
     end
-    hash
+    value
   end
 
 # Delete all null values in a hash/array

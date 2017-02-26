@@ -53,7 +53,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   end
 
   def transaction_status(transaction)
-    expense = transaction.expense rescue nil
+    expense = transaction.card_expense.expense rescue nil
     unless expense
       return "N/A"
     end
@@ -69,7 +69,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   end
 
   def transaction_category(transaction)
-    expense = transaction.expense rescue nil
+    expense = transaction.card_expense.expense rescue nil
     unless expense
       return "N/A"
     end

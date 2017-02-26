@@ -2,7 +2,6 @@ class AutocompleteController < ApplicationController
   def merchant
     merchants = Autocomplete::Merchant.(current_user, params)
 
-    # debugger
     respond_to do |format|
       format.json {render json: merchants.as_json }
     end

@@ -30,7 +30,10 @@ class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 
-  belongs_to :expense, dependent: :destroy
+
+  has_one :card_expense, dependent: :destroy
+
+  validates :reference_id, uniqueness: { scope: [:transaction_type] }
 
   belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :card_amount, class_name: 'Amount', dependent: :destroy

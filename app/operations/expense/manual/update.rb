@@ -5,7 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
-  attr_accessor :old_amount, :editable_attrs, :receipt
+  attr_accessor :old_amount, :editable_attrs, :receipt, :old_receipt
 
   def pre_validate
     if params.blank? or user.blank?
@@ -40,7 +40,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
       updated_expense_params.delete(:receipts_attributes)
     end
-
     if expense
       if self.updated_expense_params[:amount_attributes].present? and self.updated_expense_params[:amount_attributes][:value].present? and
           expense.amount_id.present?
@@ -53,6 +52,8 @@ class Expense::Manual::Update < Expense::Manual::Base
         self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
       end
       if params[:receipt_id].present?
+        # If a new receipt is attached from existing receipts, remove the old receipt
+        self.old_receipt = expense.receipts.first if expense.receipts.present?
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end
@@ -80,7 +81,12 @@ class Expense::Manual::Update < Expense::Manual::Base
     if expense.update(updated_expense_params)
       if receipt
         receipt.parent = expense
-        receipt.save
+        if receipt.save
+          if old_receipt.present?
+            old_receipt.parent = nil
+            old_receipt.save
+          end
+        end
       end
     else
       add_message :error, self.expense.errors.full_messages
@@ -102,8 +108,7 @@ class Expense::Manual::Update < Expense::Manual::Base
                            merchant_name: expense.merchant_name,
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count
-    }
+                           receipt: expense.receipts.count}
   end
 
 end

@@ -2,7 +2,7 @@
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
 class Expense::ExCard::Update < Expense::ExCard::Base
-  attr_accessor :updated_expense_params, :editable_attrs, :receipt
+  attr_accessor :updated_expense_params, :editable_attrs, :receipt, :old_receipt
 
   def pre_validate
     if user.blank? or params.blank?
@@ -37,11 +37,12 @@ class Expense::ExCard::Update < Expense::ExCard::Base
         self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
       end
       if params[:receipt_id]
+        # If a new receipt is attached from existing receipts, remove the old receipt
+        self.old_receipt = expense.receipts.first if expense.receipts.present?
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
-
       # adding the associated card expense id for the card expense
-      self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id
+      self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id if self.updated_expense_params[:card_expense_attributes].present?
     end
   end
 
@@ -69,7 +70,12 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     if expense.update(updated_expense_params)
       if receipt
         receipt.parent = expense
-        receipt.save
+        if receipt.save
+          if old_receipt.present?
+            old_receipt.parent = nil
+            old_receipt.save
+          end
+        end
       end
     else
       messages[:error] = self.expense.errors.full_messages
