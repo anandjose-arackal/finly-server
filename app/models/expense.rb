@@ -182,6 +182,8 @@ class Expense < ActiveRecord::Base
       when 1
         return self.manual_expense.merchant
       when 2
+        # todo - temporary
+        return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
       else
         # do nothing

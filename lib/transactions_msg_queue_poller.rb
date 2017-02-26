@@ -57,7 +57,7 @@ class TransactionsMsgQueuePoller
         trans = CardTransaction.create(trans_params)
         rescued = true
       end
-      
+
       # if the operation is a failure, the transaction key was being added to the hash, so explicitly removing it.
       trans_params.delete(:transaction)
 
@@ -72,7 +72,7 @@ class TransactionsMsgQueuePoller
           error_logger.error("Following transaction could not be created : #{message.body} because of following errors: #{error.message}")
         end
       elsif @result.failure?
-        error_logger.error("Transaction couldn't be created because of the following errors: #{@result.messages[:error].to_sentence}")
+        error_logger.error("Following transaction : #{message.body} couldn't be created because of the following errors: #{@result.messages[:error].to_sentence}")
       end
     end
 
