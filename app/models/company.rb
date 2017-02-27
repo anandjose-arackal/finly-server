@@ -7,7 +7,6 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  active     :boolean          default(TRUE), not null
-#  d_code     :string(255)
 #
 
 class Company < ActiveRecord::Base
@@ -24,6 +23,7 @@ class Company < ActiveRecord::Base
   has_one :account, class_name: 'CompanyAccount'
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
+  has_many :company_transactions
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

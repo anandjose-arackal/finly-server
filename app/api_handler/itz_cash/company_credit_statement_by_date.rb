@@ -1,3 +1,4 @@
+# params = {start_date, end_date}
 class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
   attr_accessor :start_date, :end_date, :company
 
@@ -11,11 +12,11 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
       add_message :error, 'Company not found'
       return
     end
-    if params.blank? or params[:start_date].blank? or (not params[:start_date].kind_of?(Date) and not params[:start_date].kind_of(DateTime))
+    if params.blank? or params[:start_date].blank? or (not params[:start_date].kind_of?(Date) and not params[:start_date].kind_of?(DateTime))
       add_message :error, 'Error in request. Please try again'
       return
     end
-    if params.blank? or params[:end_date].blank? or (not params[:end_date].kind_of?(Date) and not params[:end_date].kind_of(DateTime))
+    if params.blank? or params[:end_date].blank? or (not params[:end_date].kind_of?(Date) and not params[:end_date].kind_of?(DateTime))
       add_message :error, 'Error in request. Please try again'
       return
     end
@@ -76,11 +77,11 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
         if transaction.present?
           request_id = transaction[0].squish
           merchant_name = transaction[1].squish
-          transaction_date = transaction[2].squish
-          transaction_amount = transaction[3].squish
+          transaction_date = "#{transaction[2].squish} +5:30".to_datetime
+          transaction_amount = transaction[3].squish.to_d
           transaction_type = transaction[4].squish
           transaction_id = transaction[5].squish
-          balance = transaction[6].to_d
+          balance = transaction[6].squish.to_d
           size =  params[:transactions].size
           params[:transactions][size] = {request_id: request_id,
                                         merchant_name: merchant_name,
