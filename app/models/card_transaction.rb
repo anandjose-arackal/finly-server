@@ -63,7 +63,7 @@ class CardTransaction < ActiveRecord::Base
   end
 
   def expense?
-    debit? and (transaction_mode == 'POS' or transaction_mode == "ECOM")
+    debit? and (transaction_mode == 'POS' or transaction_mode == 'ECOM')
   end
 
 end

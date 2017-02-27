@@ -23,8 +23,10 @@ class Company < ActiveRecord::Base
   has_many :export_preferences, dependent: :destroy
   has_one :account, class_name: 'CompanyAccount'
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
+  has_one :itz_cash_property
 
   accepts_nested_attributes_for :configuration
+  accepts_nested_attributes_for :itz_cash_property
 
   after_create :init_config_present
 

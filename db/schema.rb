@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170225100312) do
+ActiveRecord::Schema.define(version: 20170227104216) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -268,7 +268,6 @@ ActiveRecord::Schema.define(version: 20170225100312) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.boolean  "active",                 default: true, null: false
-    t.string   "d_code",     limit: 255
   end
 
   create_table "company_accounts", force: :cascade do |t|
@@ -439,6 +438,16 @@ ActiveRecord::Schema.define(version: 20170225100312) do
 
   add_index "export_preferences", ["company_id"], name: "index_export_preferences_on_company_id", using: :btree
   add_index "export_preferences", ["export_field_id"], name: "index_export_preferences_on_export_field_id", using: :btree
+
+  create_table "itz_cash_properties", force: :cascade do |t|
+    t.string   "d_code",          limit: 255
+    t.string   "easy_account_no", limit: 255
+    t.integer  "company_id",      limit: 4,   null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
 
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
@@ -1162,6 +1171,7 @@ ActiveRecord::Schema.define(version: 20170225100312) do
   add_foreign_key "expenses", "users"
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
+  add_foreign_key "itz_cash_properties", "companies"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
   add_foreign_key "money_request_comments", "expenses"
