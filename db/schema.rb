@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170225100312) do
+ActiveRecord::Schema.define(version: 20170227123029) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -128,9 +128,10 @@ ActiveRecord::Schema.define(version: 20170225100312) do
     t.text     "editable_merchant",   limit: 65535
     t.integer  "card_transaction_id", limit: 4
     t.integer  "expense_id",          limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.integer  "surcharge_id",        limit: 4
+    t.boolean  "is_deleted",                        default: false
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -199,8 +200,8 @@ ActiveRecord::Schema.define(version: 20170225100312) do
     t.string   "transaction_type",      limit: 255
     t.text     "post_data",             limit: 65535
     t.integer  "transaction_amount_id", limit: 4
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
     t.string   "reference_id",          limit: 255
     t.string   "auth_transaction_id",   limit: 255
     t.string   "transaction_mode",      limit: 255
@@ -213,6 +214,7 @@ ActiveRecord::Schema.define(version: 20170225100312) do
     t.boolean  "expensed",                            default: true
     t.text     "error_message",         limit: 65535
     t.integer  "billing_amount_id",     limit: 4
+    t.boolean  "is_deleted",                          default: false
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -282,6 +284,37 @@ ActiveRecord::Schema.define(version: 20170225100312) do
   add_index "company_accounts", ["company"], name: "index_company_accounts_on_company", using: :btree
   add_index "company_accounts", ["company_id"], name: "index_company_accounts_on_company_id", using: :btree
   add_index "company_accounts", ["wallet_balance_id"], name: "index_company_accounts_on_wallet_balance_id", using: :btree
+
+  create_table "company_balance_histories", force: :cascade do |t|
+    t.integer  "company_id",                limit: 4
+    t.integer  "neft_transfer_id",          limit: 4
+    t.integer  "company_balance_id",        limit: 4
+    t.integer  "company_withdrawal_id",     limit: 4
+    t.integer  "company_load_id",           limit: 4
+    t.integer  "card_load_id",              limit: 4
+    t.integer  "card_withdrawal_id",        limit: 4
+    t.integer  "card_balance_id",           limit: 4
+    t.integer  "card_expenses_id",          limit: 4
+    t.integer  "finly_money_balance_id",    limit: 4
+    t.integer  "finly_money_withdrawal_id", limit: 4
+    t.integer  "finly_money_load_id",       limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "card_atm_withdrawal_id",    limit: 4
+  end
+
+  add_index "company_balance_histories", ["card_balance_id"], name: "index_company_balance_histories_on_card_balance_id", using: :btree
+  add_index "company_balance_histories", ["card_expenses_id"], name: "index_company_balance_histories_on_card_expenses_id", using: :btree
+  add_index "company_balance_histories", ["card_load_id"], name: "index_company_balance_histories_on_card_load_id", using: :btree
+  add_index "company_balance_histories", ["card_withdrawal_id"], name: "index_company_balance_histories_on_card_withdrawal_id", using: :btree
+  add_index "company_balance_histories", ["company_balance_id"], name: "index_company_balance_histories_on_company_balance_id", using: :btree
+  add_index "company_balance_histories", ["company_id"], name: "index_company_balance_histories_on_company_id", using: :btree
+  add_index "company_balance_histories", ["company_load_id"], name: "index_company_balance_histories_on_company_load_id", using: :btree
+  add_index "company_balance_histories", ["company_withdrawal_id"], name: "index_company_balance_histories_on_company_withdrawal_id", using: :btree
+  add_index "company_balance_histories", ["finly_money_balance_id"], name: "index_company_balance_histories_on_finly_money_balance_id", using: :btree
+  add_index "company_balance_histories", ["finly_money_load_id"], name: "index_company_balance_histories_on_finly_money_load_id", using: :btree
+  add_index "company_balance_histories", ["finly_money_withdrawal_id"], name: "index_company_balance_histories_on_finly_money_withdrawal_id", using: :btree
+  add_index "company_balance_histories", ["neft_transfer_id"], name: "index_company_balance_histories_on_neft_transfer_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                   null: false
@@ -443,8 +476,9 @@ ActiveRecord::Schema.define(version: 20170225100312) do
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
     t.string   "merchant",   limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
   end
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
@@ -947,6 +981,38 @@ ActiveRecord::Schema.define(version: 20170225100312) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "user_balance_histories", force: :cascade do |t|
+    t.datetime "date"
+    t.integer  "user_id",                    limit: 4
+    t.integer  "company_id",                 limit: 4
+    t.integer  "card_balance_id",            limit: 4
+    t.integer  "card_withdrawal_id",         limit: 4
+    t.integer  "card_load_id",               limit: 4
+    t.integer  "card_expenses_id",           limit: 4
+    t.integer  "finly_money_balance_id",     limit: 4
+    t.integer  "finly_money_withdrawal_id",  limit: 4
+    t.integer  "finly_money_load_id",        limit: 4
+    t.integer  "cash_on_hand_balance_id",    limit: 4
+    t.integer  "cash_on_hand_withdrawal_id", limit: 4
+    t.integer  "cash_on_hand_load_id",       limit: 4
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.integer  "card_atm_withdrawal_id",     limit: 4
+  end
+
+  add_index "user_balance_histories", ["card_balance_id"], name: "index_user_balance_histories_on_card_balance_id", using: :btree
+  add_index "user_balance_histories", ["card_expenses_id"], name: "index_user_balance_histories_on_card_expenses_id", using: :btree
+  add_index "user_balance_histories", ["card_load_id"], name: "index_user_balance_histories_on_card_load_id", using: :btree
+  add_index "user_balance_histories", ["card_withdrawal_id"], name: "index_user_balance_histories_on_card_withdrawal_id", using: :btree
+  add_index "user_balance_histories", ["cash_on_hand_balance_id"], name: "index_user_balance_histories_on_cash_on_hand_balance_id", using: :btree
+  add_index "user_balance_histories", ["cash_on_hand_load_id"], name: "index_user_balance_histories_on_cash_on_hand_load_id", using: :btree
+  add_index "user_balance_histories", ["cash_on_hand_withdrawal_id"], name: "index_user_balance_histories_on_cash_on_hand_withdrawal_id", using: :btree
+  add_index "user_balance_histories", ["company_id"], name: "index_user_balance_histories_on_company_id", using: :btree
+  add_index "user_balance_histories", ["finly_money_balance_id"], name: "index_user_balance_histories_on_finly_money_balance_id", using: :btree
+  add_index "user_balance_histories", ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id", using: :btree
+  add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
+  add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
+
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "manager_id",             limit: 4
@@ -1145,6 +1211,7 @@ ActiveRecord::Schema.define(version: 20170225100312) do
   add_foreign_key "cards", "users"
   add_foreign_key "categories", "companies"
   add_foreign_key "company_accounts", "companies"
+  add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_funds_load_requests", "amounts"
@@ -1203,6 +1270,8 @@ ActiveRecord::Schema.define(version: 20170225100312) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "user_balance_histories", "companies"
+  add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"

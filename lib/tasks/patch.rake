@@ -39,4 +39,16 @@ namespace :patch do
     PaymentType.second.update(name: "deduct_cash_on_hand")
   end
 
+  desc "27-02-2017: Destroying all the junk transactions that were created by ItzCash's Message Queue Fiasco"
+  task destroy_junk_transactions: :environment do
+    start_time = DateTime.parse('25-02-2017 00:00 +05:30')
+    end_time = DateTime.parse('25-02-2017 05:00 +05:30')
+    company = Company.find_by(name: "Finly")
+    company.users.each do |user|
+      user.card_transactions.where('created_at >= ? && created_at <= ?', start_time, end_time).each do |trans|
+        trans.destroy
+      end
+    end
+  end
+
 end

@@ -500,6 +500,7 @@
 #                      external_url_report GET        /external/reports/:id(.:format)                             external_url#report
 #               external_url_money_request GET        /external/requests/:id(.:format)                            external_url#money_request
 #                  external_url_settlement GET        /external/settlements/:id(.:format)                         external_url#payment
+#                 external_url_transaction GET        /external/transaction/:id(.:format)                         external_url#transaction
 #                                analytics GET        /analytics(.:format)                                        analytics#show
 #                                          GET        /companies/notify(.:format)                                 companies#notify
 #                            notifications GET        /notifications(.:format)                                    notifications#index
