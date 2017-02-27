@@ -23,7 +23,6 @@
 #  expensed              :boolean          default(TRUE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
-#  expense_id            :integer
 #
 
 class CardTransaction < ActiveRecord::Base
