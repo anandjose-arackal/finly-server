@@ -1,4 +1,4 @@
-class ItzCash ::CompanyCreditStatementByDate < ItzCash::Base
+class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
   attr_accessor :start_date, :end_date, :company
 
   def initialize(company, params={})
@@ -11,99 +11,97 @@ class ItzCash ::CompanyCreditStatementByDate < ItzCash::Base
       add_message :error, 'Company not found'
       return
     end
-    if user.cards.blank?
-      add_message :error, 'A card has not been assigned to the user'
+    if params.blank? or params[:start_date].blank? or (not params[:start_date].kind_of?(Date) and not params[:start_date].kind_of(DateTime))
+      add_message :error, 'Error in request. Please try again'
       return
     end
-    if params.blank? or params[:amount].blank?
-      add_message :error, 'Amount cannot be blank'
+    if params.blank? or params[:end_date].blank? or (not params[:end_date].kind_of?(Date) and not params[:end_date].kind_of(DateTime))
+      add_message :error, 'Error in request. Please try again'
       return
     end
-    if user.company.d_code.blank?
+    if company.d_code.blank?
       add_message :error, 'Company has not been configured to initiate the transfer'
     end
   end
 
   def env_key
-    'itzcash_credit_debit'
+    'itzcash_company_statement_by_date'
   end
 
   def post_params
-    card = user.cards.first
-    serial_id = card.serial_id
-    {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: user.company.d_code,
-     merchanttypekey: merchant_type_key,
-     reftransid: Generator.new_transaction_id, productcode: card.product_code, amount: amount,
-     transactiontype: transaction_type}
-  end
+    itzmodule = Constants::ItzCash::MODULE
+    dcode = company.d_code
+    easy_account_no = company.easy_account_no
 
-  def merchant_type_key
-    Constants::ItzCash::MERCHANT_TYPE_KEY_CREDIT
-  end
-
-  def transaction_type
-    Constants::ItzCash::TRANSACTION_TYPE_CREDIT
+    {dcode: dcode, easyaccountno: easy_account_no, itzmodule: itzmodule, startdate: start_date, enddate: end_date}
   end
 
   def init
     super
-    self.amount = params[:amount].to_d rescue nil
-    # Convert amount value in paise
-    self.amount = (self.amount * 100) if self.amount
+    if self.company.easy_account_no.blank?
+      response = ItzCash::VirtualAccountBalance.(company)
+
+      unless response.success?
+        add_message :error, response.messages[:error]
+        return
+      end
+
+      if response.company.itz_cash_property.easy_account_no.blank? or response.company.itz_cash_property.easy_account_no.blank?
+        company.itz_cash_property.easy_account_no = response.wallets.first[:account_number]
+        company.save
+      end
+    end
+    self.start_date = params[:start_date].strftime("%d%m%y")
+    self.end_date = params[:end_date].strftime("%d%m%y")
   end
 
   def validate
-    if self.amount.blank?
-      add_message :error, 'Amount cannot be blank'
+    if self.company.d_code.blank? or self.company.easy_account_no.blank?
+      add_message :error, 'Error loading configuration'
       return
     end
-    if self.amount <= 0
-      add_message :error, 'Amount cannot be less than or equal to 0'
+    if self.start_date.blank? or self.end_date.blank?
+      add_message :error, 'Error loading configuration'
     end
-  end
-
-  def post_process
-
   end
 
   def success
-    # ResponseCode,SerialID,Amount,TransactionID,Message
     params[:response_code] = parsed_response[0]
-    params[:serial_id] = parsed_response[1]
-    params[:amount] = parsed_response[2]
-    params[:transaction_id]= parsed_response[3]
-    params[:message]= parsed_response[4]
-    ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
-  end
-
-  def failure
-    # Check if credit failed because amount is greater than remaining eligibility
-    if self.parsed_response.present? and (parsed_response[0] == -3004 or parsed_response[0] == '-3004')
-      response = ItzCash::AccountDetails.(user, params)
-      if response.success? and response.available_card_eligibility < (self.amount / 100)
-        if response.available_card_eligibility < 1
-          add_message :error, 'Card has reached its maximum transferable limit'
-        else
-          add_message :error, "The given amount exceeds the eligibility limit of the card. You can only transfer upto ₹#{response.available_card_eligibility}"
+    params[:transactions] = []
+    description = parsed_response[1]
+    if description.size > 1
+      transactions = description.split('|')
+      transactions.each do |transaction_string|
+        transaction = transaction_string.split('$')
+        if transaction.present?
+          request_id = transaction[0].squish
+          merchant_name = transaction[1].squish
+          transaction_date = transaction[2].squish
+          transaction_amount = transaction[3].squish
+          transaction_type = transaction[4].squish
+          transaction_id = transaction[5].squish
+          balance = transaction[6].to_d
+          size =  params[:transactions].size
+          params[:transactions][size] = {request_id: request_id,
+                                        merchant_name: merchant_name,
+                                        transaction_date: transaction_date,
+                                        transaction_amount: transaction_amount,
+                                        transaction_type: transaction_type,
+                                        transaction_id: transaction_id,
+                                        balance: balance}
         end
       end
     end
-    super
+
+    ItzCash::CompanyCreditStatementByDate::SuccessPresenter.new(self.user, params, messages)
   end
 
-  def success_response_code
-    [0, 2, 300, 301]
-  end
-
-  class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
-    attr_accessor :response_code, :serial_id, :amount, :transaction_id, :message
+  class ItzCash::CompanyCreditStatementByDate::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
+    attr_accessor :response_code, :transactions
 
     def init
       self.response_code = params[:response_code]
-      self.serial_id = params[:serial_id]
-      self.amount = params[:amount]
-      self.transaction_id = params[:transaction_id]
-      self.message = params[:message]
+      self.transactions = params[:transactions]
     end
 
   end

@@ -28,6 +28,8 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
 
+  delegate :d_code, :easy_account_no, to: :itz_cash_property
+
   after_create :init_config_present
 
   validates :name, presence: true
