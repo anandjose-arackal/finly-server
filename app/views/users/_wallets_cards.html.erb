@@ -27,7 +27,7 @@
 
 
   <div class="col-sm-12 no-padding">
-    <div class="section-card">
+    <div class="section-card" <%= "style=min-height:350px;" if current_user.cards.length >= 0 %>>
       <div class="row no-margin section-header" style="margin-bottom: 15px;">
         <div class="col-sm-12">
           <h4>Cards</h4>
@@ -42,9 +42,8 @@
               <p>You do not have any cards assigned to you.</p>
             <% end %>
             <% current_user.cards.each do |card| %>
-              <div class="col-sm-6">
+              <div class="col-sm-6" style="min-width: 400px;min-height: 250px;">
                 <div class="card text-center" style="display: inline-block;">
-                  <div class="logo">Finly</div>
                   <div class="status">
                     <% if card.active %>
                       <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label>
@@ -60,11 +59,10 @@
                     <span class="fourth-four"><%= card.ending_number %></span>
                   </div>
                   <div class="user-name"><%= card.user.name %></div>
-                  <div class="visa"><i class="fa fa-cc-visa"></i></div>
                 </div>
               </div>
 
-              <div class="col-sm-6">
+              <div class="col-sm-6" margin-top: 10px;>
 
                 <table class="">
                   <tr>
@@ -243,21 +241,22 @@
 
 <style type="text/css">
 
-/*Unique Styles to be moved to main css file*/
-  .card{
+.card {
     width: 400px;
-    position: relative;
-    /*background: papayawhip;*/
-    background: #3F51B5;
+    position: absolute;
+    background: url(/common/images/card.png);
     color: white;
     padding: 20px;
-    height: 235px;
-    border-radius: 14px;
+    height: 252px;
+    margin-left: 0;
+    margin-right: auto;
+    background-size: cover;
   }
 
   .card .status{
-    position: absolute;
-    top: 26px;
+    position: relative;
+    /*top: 26px;*/
+    text-align: right;
   }
 
   .card .status i{
@@ -269,41 +268,31 @@
     font-weight: normal;
   }
 
-  .card .logo{
-    position: absolute;
-    font-family: 'Bree Serif' !important;
-    font-size: 30px;color: white;
-    right: 20px;
-    top: 15px;
-  }
+  
 
   .card .user-name{
-    position: absolute;
-    top: 74%;
-    left: 40px;
+    position: relative;
+    top: 35%;
+    left: 15px;
+    text-align: left;
   }
 
-  .card .visa{
-    position: absolute;
-    right: 19px;
-    bottom: 7px;
-    font-size: 35px;
-  }
+  
 
   .card .card-type{
-    position: absolute;
+    position: relative;
     text-transform: uppercase;
-    top: 42%;
-    left: 40px;
-
+    top: 27%;
+    left: 15px;
+    text-align: left;
   }
   .card-number{
-    font-size: 28px;
-    /*margin-top: 29px;*/
+    font-size: 29px;
     font-family: monospace;
-    position: absolute;
-    top: 50%;
-    left: 40px;
+    position: relative;
+    top: 28%;
+    left: 15px;
+    text-align: left;
   }
 
   .card-balance{

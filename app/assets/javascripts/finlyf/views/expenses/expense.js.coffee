@@ -172,7 +172,14 @@ class FinlyF.Views.Expense extends Backbone.View
     close_button = $(target).find('.detach-uploaded-receipt')
     image = $(target).find("img#edit-preview-image")
     image_url = window.URL.createObjectURL(file.files[0])
-    $(image).attr('src', image_url)
+
+    dot_position = $(file).val().lastIndexOf('.')
+    format = $(file).val().substring(dot_position + 1)
+    if format == 'pdf'
+      $(image).attr('src', '/common/images/pdf-preview.png')
+    else
+      $(image).attr('src', image_url)
+      
     $(close_button).removeClass('hidden')
     $(target).find("#edit-expense-receipt-upload-text").remove()
 

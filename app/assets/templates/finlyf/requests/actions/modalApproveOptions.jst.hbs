@@ -28,6 +28,9 @@
                   </button>
 
                   <ul class="dropdown-menu" aria-labelledby="dLabel">
+                    {{#if item.actions.credit_card_from_card}}
+                      <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_card}}" data-action-type="credit_card_from_card">{{item.user_name}}'s Card from Your Card</a> </li>
+                    {{/if}}
                     {{#if item.actions.credit_card_from_wallet}}
                       <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_wallet}}" data-action-type="credit_card_from_wallet">{{item.user_name}}'s Card from Your Finly Money</a> </li>
                     {{/if}}
@@ -35,6 +38,9 @@
                       <li><a class="btn-transfer" data-url="{{item.actions.credit_card_from_virtual_account}}" data-action-type="credit_card_from_virtual_account">{{item.user_name}}'s Card from Company Credits</a> </li>
                     {{/if}}
                    <li class="divider"></li>
+                    {{#if item.actions.credit_wallet_from_card}}
+                      <li><a class="btn-transfer" data-url="{{item.actions.credit_wallet_from_card}}" data-action-type="credit_wallet_from_card">{{item.user_name}}'s Finly Money from Your Card</a></li>
+                    {{/if}}
                     {{#if item.actions.credit_wallet_from_wallet}}
                       <li><a class="btn-transfer" data-url="{{item.actions.credit_wallet_from_wallet}}" data-action-type="credit_wallet_from_wallet">{{item.user_name}}'s Finly Money from Your Finly Money</a> </li>
                     {{/if}}
