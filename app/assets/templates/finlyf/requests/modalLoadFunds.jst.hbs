@@ -29,6 +29,8 @@
               <label class="grey-text">To:</label>
               <h4 class="no-margin">User's&nbsp;Card&nbsp;Balance</h4>
               <h3 class="no-margin mt-5 target_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+
+              <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="target_user_card_eligibility"></label>
             </div>
           {{/case}}
 
@@ -37,6 +39,8 @@
               <label class="grey-text">From:</label>
               <h4 class="no-margin">Your&nbsp;Card&nbsp;Balance</h4>
               <h3 class="no-margin mt-5 current_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+
+              <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility"></label>
             </div>
 
             <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
@@ -45,6 +49,7 @@
               <label class="grey-text">To:</label>
               <h4 class="no-margin">User's&nbsp;Card&nbsp;Balance</h4>
               <h3 class="no-margin mt-5 target_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+              <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="target_user_card_eligibility"></label>
             </div>
           {{/case}}
 
@@ -61,15 +66,19 @@
               <label class="grey-text">To:</label>
               <h4 class="no-margin">User's&nbsp;Card&nbsp;Balance</h4>
               <h3 class="no-margin mt-5 target_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+              <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="target_user_card_eligibility"></label>
+
             </div>
           {{/case}}
 
 
-          {{#case 'credit_card_from_virtual_account'}}
+          {{#case 'credit_wallet_from_card'}}
             <div class="col-sm-3 col-sm-offset-2">
               <label class="grey-text">From:</label>
               <h4 class="no-margin">Your&nbsp;Card&nbsp;Balance</h4>
               <h3 class="no-margin mt-5 current_user_card_balance currency" style="margin-bottom: 0;"><i class="fa fa-spin fa-spinner"></i></h3>
+              <span style="color: #aaa;">Available Card Eligibility:</span>&nbsp;<label class="current_user_card_eligibility"></label>
+
             </div>
 
             <div class="transfer-flow"><i class="fa fa-long-arrow-right"></i></div>
