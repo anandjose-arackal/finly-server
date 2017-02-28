@@ -467,6 +467,8 @@ $(document).ready( ->
       dataType: 'JSON',
       data: formObjectData,
       success: (res) ->
+        # Finly.Login.snapNotify(res.messages)
+        # if res.success == true
         handleLookupReset(res, formObjectData)
         # handleLookUp(res, formObjectData)
         # console.log "Respnose", res
