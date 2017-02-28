@@ -151,6 +151,7 @@ $(document).ready( ->
   handleLookupReset = (res, formObjectData) ->
     loginContainer = $(document).find('.login-container')
     stepResetPasswordOption = $(document).find('.step-reset-password-options')
+    stepLookup = $(document).find(".step-lookup")
 
     if res.success == true
       if Finly.Login.regex.mobile_patt.test(formObjectData.email_mobile)
@@ -175,6 +176,15 @@ $(document).ready( ->
             authenticity_token: $("#authenticity_token").val()
           }
           success: (res) ->
+            Finly.Login.snapNotify(res.messages)
+            if res.success == true
+              $(stepResetPasswordOption).hide('slide', {direction: 'right'}, 200)
+              $(stepLookup).show('slide', {direction: 'left'}, 200)
+              heightClass = $(stepLookup).attr('data-height-class')
+              $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
+
+
+
             console.log "Res", res
           error: (err) ->
             console.log "Err", err
