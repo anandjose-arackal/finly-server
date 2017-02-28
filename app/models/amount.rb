@@ -50,6 +50,25 @@ class Amount < ActiveRecord::Base
   alias_method :finly_money_balance_value, :amount_value
   alias_method :finly_money_withdrawal_value, :amount_value
 
+  alias_method :company_balance_value, :amount_value
+  alias_method :company_load_from_card_value, :amount_value
+  alias_method :company_load_from_wallet, :amount_value
+  alias_method :company_withdrawal_to_card_value, :amount_value
+  alias_method :company_withdrawal_to_wallet_value, :amount_value
+  alias_method :card_withdrawal_to_card_value, :amount_value
+  alias_method :card_withdrawal_to_wallet_value, :amount_value
+  alias_method :card_withdrawal_to_virtual_account_value, :amount_value
+  alias_method :card_load_from_card_value, :amount_value
+  alias_method :card_load_from_wallet_value, :amount_value
+  alias_method :card_load_from_virtual_account_value, :amount_value
+  alias_method :wallet_load_from_card_value, :amount_value
+  alias_method :wallet_load_from_wallet_value, :amount_value
+  alias_method :wallet_load_from_virtual_account_value, :amount_value
+  alias_method :wallet_withdrawal_to_card_value, :amount_value
+  alias_method :wallet_withdrawal_to_wallet_value, :amount_value
+  alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
+  alias_method :wallet_balance_value, :amount_value
+
   def greater_than_amount_value
     self.value
   end

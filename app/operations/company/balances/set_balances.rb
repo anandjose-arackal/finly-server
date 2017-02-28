@@ -30,7 +30,7 @@ class Company::Balances::SetBalances < BaseOperation
   def extract_balance_params(company)
     neft_transfer_total = 0
 
-    self.company_admin = compnay.users.only_admins.first
+    self.company_admin = company.users.only_admins.first
     current_company_balance = Company::VirtualAccount::Balance.(company_admin)
     # summing up all withdrawals from card or wallet to company account
     transfers_to_company_account = 0

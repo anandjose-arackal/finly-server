@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170227073019) do
+ActiveRecord::Schema.define(version: 20170228115519) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -284,35 +284,48 @@ ActiveRecord::Schema.define(version: 20170227073019) do
   add_index "company_accounts", ["wallet_balance_id"], name: "index_company_accounts_on_wallet_balance_id", using: :btree
 
   create_table "company_balance_histories", force: :cascade do |t|
-    t.integer  "company_id",                limit: 4
-    t.integer  "neft_transfer_id",          limit: 4
-    t.integer  "company_balance_id",        limit: 4
-    t.integer  "company_withdrawal_id",     limit: 4
-    t.integer  "company_load_id",           limit: 4
-    t.integer  "card_load_id",              limit: 4
-    t.integer  "card_withdrawal_id",        limit: 4
-    t.integer  "card_balance_id",           limit: 4
-    t.integer  "card_expenses_id",          limit: 4
-    t.integer  "finly_money_balance_id",    limit: 4
-    t.integer  "finly_money_withdrawal_id", limit: 4
-    t.integer  "finly_money_load_id",       limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.integer  "card_atm_withdrawal_id",    limit: 4
+    t.integer  "company_id",                              limit: 4
+    t.integer  "neft_transfer_id",                        limit: 4
+    t.integer  "company_balance_id",                      limit: 4
+    t.integer  "company_withdrawal_to_card_id",           limit: 4
+    t.integer  "company_load_from_card_id",               limit: 4
+    t.integer  "card_load_from_wallet_id",                limit: 4
+    t.integer  "card_withdrawal_to_wallet_id",            limit: 4
+    t.integer  "card_balance_id",                         limit: 4
+    t.integer  "card_expenses_id",                        limit: 4
+    t.integer  "finly_money_balance_id",                  limit: 4
+    t.integer  "wallet_load_from_wallet_id",              limit: 4
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.integer  "card_atm_withdrawal_id",                  limit: 4
+    t.integer  "company_withdrawal_to_wallet_id",         limit: 4
+    t.integer  "company_load_from_wallet_id",             limit: 4
+    t.integer  "card_withdrawal_to_card_id",              limit: 4
+    t.integer  "card_withdrawal_to_virtual_account_id",   limit: 4
+    t.integer  "card_load_from_card_id",                  limit: 4
+    t.integer  "card_load_from_virtual_account_id",       limit: 4
+    t.integer  "wallet_withdrawal_to_wallet_id",          limit: 4
+    t.integer  "wallet_withdrawal_to_card_id",            limit: 4
+    t.integer  "wallet_withdrawal_to_virtual_account_id", limit: 4
+    t.integer  "wallet_load_from_card_id",                limit: 4
+    t.integer  "wallet_load_from_virtual_account_id",     limit: 4
   end
 
   add_index "company_balance_histories", ["card_balance_id"], name: "index_company_balance_histories_on_card_balance_id", using: :btree
   add_index "company_balance_histories", ["card_expenses_id"], name: "index_company_balance_histories_on_card_expenses_id", using: :btree
-  add_index "company_balance_histories", ["card_load_id"], name: "index_company_balance_histories_on_card_load_id", using: :btree
-  add_index "company_balance_histories", ["card_withdrawal_id"], name: "index_company_balance_histories_on_card_withdrawal_id", using: :btree
+  add_index "company_balance_histories", ["card_load_from_wallet_id"], name: "index_company_balance_histories_on_card_load_from_wallet_id", using: :btree
+  add_index "company_balance_histories", ["card_withdrawal_to_wallet_id"], name: "index_company_balance_histories_on_card_withdrawal_to_wallet_id", using: :btree
   add_index "company_balance_histories", ["company_balance_id"], name: "index_company_balance_histories_on_company_balance_id", using: :btree
   add_index "company_balance_histories", ["company_id"], name: "index_company_balance_histories_on_company_id", using: :btree
-  add_index "company_balance_histories", ["company_load_id"], name: "index_company_balance_histories_on_company_load_id", using: :btree
-  add_index "company_balance_histories", ["company_withdrawal_id"], name: "index_company_balance_histories_on_company_withdrawal_id", using: :btree
+  add_index "company_balance_histories", ["company_load_from_card_id"], name: "index_company_balance_histories_on_company_load_from_card_id", using: :btree
+  add_index "company_balance_histories", ["company_withdrawal_to_card_id"], name: "index_company_balance_histories_on_company_withdrawal_to_card_id", using: :btree
   add_index "company_balance_histories", ["finly_money_balance_id"], name: "index_company_balance_histories_on_finly_money_balance_id", using: :btree
-  add_index "company_balance_histories", ["finly_money_load_id"], name: "index_company_balance_histories_on_finly_money_load_id", using: :btree
-  add_index "company_balance_histories", ["finly_money_withdrawal_id"], name: "index_company_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "company_balance_histories", ["neft_transfer_id"], name: "index_company_balance_histories_on_neft_transfer_id", using: :btree
+  add_index "company_balance_histories", ["wallet_load_from_virtual_account_id"], name: "index_wal_load_on_company_history", using: :btree
+  add_index "company_balance_histories", ["wallet_load_from_wallet_id"], name: "index_company_balance_histories_on_wallet_load_from_wallet_id", using: :btree
+  add_index "company_balance_histories", ["wallet_withdrawal_to_card_id"], name: "index_wal_2_card_on_company_history", using: :btree
+  add_index "company_balance_histories", ["wallet_withdrawal_to_virtual_account_id"], name: "index_wal_2_va_on_company_history", using: :btree
+  add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                   null: false
