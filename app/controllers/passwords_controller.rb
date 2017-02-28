@@ -1,5 +1,7 @@
 class PasswordsController < Devise::PasswordsController
 
+  respond_to :json
+
   def new
     super()
   end
@@ -9,7 +11,7 @@ class PasswordsController < Devise::PasswordsController
     yield resource if block_given?
 
     if successfully_sent?(resource)
-      respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name))
+      render json: {succes: true, message: "Password reset link sent successfully"}
     else
       flash[:error] = resource.errors.full_messages.to_sentence
       respond_with(resource)
@@ -40,7 +42,6 @@ class PasswordsController < Devise::PasswordsController
       respond_with resource
     end
   end
-
 
 
 end
