@@ -19,7 +19,6 @@
 #         @result = MoneyRequest::Approve.(@manager, id: @money_request.id)
 #       end
 #     end
-#     # debugger
 #     assert @result.money_request.processing?
 #     assert @result.money_request.controlling_user.id, User.find_by_email('manager1@finlytest.io').id
 #   end

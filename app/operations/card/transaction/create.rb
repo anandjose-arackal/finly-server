@@ -10,6 +10,10 @@ class Card::Transaction::Create < BaseOperation
 
   end
 
+  def authorized_user_types
+
+  end
+
   def initialize(params, messages={})
     self.params = params
     self.messages = messages
@@ -26,7 +30,7 @@ class Card::Transaction::Create < BaseOperation
 
   def authorize
     unless card and user
-      raise_unauthorized_exception
+      add_message :error, "Card or User not found in the system"
     end
   end
 
@@ -54,7 +58,7 @@ class Card::Transaction::Create < BaseOperation
               transaction.save
               return false
             end
-            transaction.expense = @result.expense
+            transaction.card_expense = @result.expense.card_expense
             transaction.save
             return true
           when "ATM"

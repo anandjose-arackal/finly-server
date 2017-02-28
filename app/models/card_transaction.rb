@@ -23,14 +23,18 @@
 #  expensed              :boolean          default(TRUE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
-#  expense_id            :integer
+#  is_deleted            :boolean          default(FALSE)
 #
 
 class CardTransaction < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :user
   belongs_to :card
 
-  belongs_to :expense
+  has_one :card_expense, dependent: :destroy
+
+  validates :reference_id, uniqueness: { scope: [:transaction_type] }
 
   belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :card_amount, class_name: 'Amount', dependent: :destroy

@@ -20,7 +20,6 @@
 #         @result = MoneyRequest::Unapprove.(@manager, id: @money_request.id)
 #       end
 #     end
-#     # debugger
 #     assert @result.money_request.processing?
 #     assert @result.money_request.controlling_user.id, @manager.id
 #   end

@@ -19,7 +19,6 @@ class Event::EWallet::Credit < Event::EWallet::Base
   end
 
   def set_notification(user)
-    # debugger
     case to_account
       when :wallet
         object = "Wallet"
