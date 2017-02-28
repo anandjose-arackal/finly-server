@@ -9,9 +9,12 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  surcharge_id        :integer
+#  is_deleted          :boolean          default(FALSE)
 #
 
 class CardExpense < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :card_transaction
   belongs_to :expense # foreign key would be expense_id
   belongs_to :surcharge, class_name: 'Amount'

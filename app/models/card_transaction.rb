@@ -23,9 +23,12 @@
 #  expensed              :boolean          default(TRUE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
+#  is_deleted            :boolean          default(FALSE)
 #
 
 class CardTransaction < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :user
   belongs_to :card
 

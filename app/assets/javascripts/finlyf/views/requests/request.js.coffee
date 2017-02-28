@@ -375,6 +375,7 @@ class FinlyF.Views.Request extends Backbone.View
         # target_user_id: user_id
         authenticity_token: $("#authenticity_token").val()
         current_user_wallet: true
+        current_user_card: true
         target_user_card: true
         target_user_wallet: true
         virtual_account: true

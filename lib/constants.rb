@@ -9,9 +9,9 @@ module Constants
   # todo - needs to be edited once we get the account details.
   ITZCASH_EMAIL_ID = 'veekshith.rai@finly.io'
 
-  PRODUCT_DEMO_EMAIL_ID = 'veekshith.rai@finly.io'
+  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'balakumar.rajaram@finly.io']
 
-  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finlytest.io', 'admin@finlytest.io']
+  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
 
