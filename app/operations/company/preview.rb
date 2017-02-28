@@ -19,7 +19,9 @@ class Company::Preview < BaseOperation
     messages[:success] = "Thank you for the request! We will contact you soon"
     # trigger mailer acknowledging the preview request.
     DemoMailer.delay.preview_welcome(preview_company)
-    DemoMailer.delay.notify_preview(preview_company)
+    Constants::PRODUCT_DEMO_EMAIL_ID.each do |recipient_email|
+      DemoMailer.delay.notify_preview(preview_company, recipient_email)
+    end
   end
 
   def success

@@ -18,7 +18,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       add_message :error, 'From Account not defined'
       return
     end
-    unless params[:from_account].to_sym == :wallet or params[:from_account].to_sym == :virtual_account
+    unless params[:from_account].to_sym == :wallet || params[:from_account].to_sym == :virtual_account || params[:from_account].to_sym == :card
       add_message :error, 'Invalid account type'
     end
     if params[:to_account].present? and not params[:to_account].to_sym == :card and not params[:to_account].to_sym == :wallet
