@@ -24,7 +24,6 @@
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
 #  is_deleted            :boolean          default(FALSE)
-#
 
 class CardTransaction < ActiveRecord::Base
   include SoftDeletable
@@ -69,7 +68,7 @@ class CardTransaction < ActiveRecord::Base
   end
 
   def expense?
-    debit? and (transaction_mode == 'POS' or transaction_mode == "ECOM")
+    debit? and (transaction_mode == 'POS' or transaction_mode == 'ECOM')
   end
 
 end

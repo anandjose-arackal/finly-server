@@ -18,12 +18,6 @@
 #  is_deleted           :boolean          default(FALSE), not null
 #
 
-
-
-
-
-  
-
 include MathUtil
 
 class Expense < ActiveRecord::Base
