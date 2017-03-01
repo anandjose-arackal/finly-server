@@ -153,7 +153,7 @@ group :development do
   gem 'foreman', '0.83.0'
 end
 
-gem 'backup', '3.4.0'
+# gem 'backup', '3.4.0'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
