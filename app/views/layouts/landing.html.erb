@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Finly</title>
+  <%= stylesheet_link_tag 'application_static', media: 'all', 'data-turbolinks-track' => true %>
+  <%= favicon_link_tag '/common/images/favicon.png' %>
+  <%= javascript_include_tag 'application_static', 'data-turbolinks-track' => true %>
+  <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700" rel="stylesheet"> 
+
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <%= yield %>
+</body>
+</html>

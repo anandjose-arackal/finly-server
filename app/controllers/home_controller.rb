@@ -11,6 +11,10 @@ class HomeController < ApplicationController
     end
   end
 
+  def landing
+
+  end
+
   def welcome
     if logged_in?
       redirect_to root_path
@@ -39,6 +43,8 @@ class HomeController < ApplicationController
       end
     when "about"
       "static"
+    when "landing"
+      'landing'
     else
       "application"
     end

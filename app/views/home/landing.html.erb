@@ -1,0 +1,348 @@
+<!--Navigation bar-->
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="index.html">
+      <img src="/common/images/logos/logo_black_xs.png" class="img-responsive" style="height: 28px;">
+    </a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#feature">About</a></li>
+      <li><a href="#organisations">Solutions</a></li>
+      <li><a href="#courses">Resources</a></li>
+      <li><a href="#pricing">FAQ</a></li>
+      <li><a href="#" data-target="#login" data-toggle="modal">Blog</a></li>
+      <li><a href="#footer" class="navbar-request-demo"><i class="fa fa-phone"></i>&nbsp;&nbsp;Request for a demo</a></li>
+      <li><a href="/users/sign_in" class="btn-round btn-border-blue">Login</a></li>
+    </ul>
+    </div>
+  </div>
+</nav>
+<!--/ Navigation bar-->
+
+
+<!--Modal box-->
+<div class="modal fade" id="login" role="dialog">
+  <div class="modal-dialog modal-sm">
+  
+    <!-- Modal content no 1-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-center form-title">Login</h4>
+      </div>
+      <div class="modal-body padtrbl">
+
+        <div class="login-box-body">
+          <p class="login-box-msg">Sign in to start your session</p>
+          <div class="form-group">
+            <form name="" id="loginForm">
+             <div class="form-group has-feedback"> <!----- username -------------->
+                  <input class="form-control" placeholder="Username"  id="loginid" type="text" autocomplete="off" /> 
+        <span style="display:none;font-weight:bold; position:absolute;color: red;position: absolute;padding:4px;font-size: 11px;background-color:rgba(128, 128, 128, 0.26);z-index: 17;  right: 27px; top: 5px;" id="span_loginid"></span><!---Alredy exists  ! -->
+                  <span class="glyphicon glyphicon-user form-control-feedback"></span>
+              </div>
+              <div class="form-group has-feedback"><!----- password -------------->
+                  <input class="form-control" placeholder="Password" id="loginpsw" type="password" autocomplete="off" />
+        <span style="display:none;font-weight:bold; position:absolute;color: grey;position: absolute;padding:4px;font-size: 11px;background-color:rgba(128, 128, 128, 0.26);z-index: 17;  right: 27px; top: 5px;" id="span_loginpsw"></span><!---Alredy exists  ! -->
+                  <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+              </div>
+              <div class="row">
+                  <div class="col-xs-12">
+                      <div class="checkbox icheck">
+                          <label>
+                            <input type="checkbox" id="loginrem" > Remember Me
+                          </label>
+                      </div>
+                  </div>
+                  <div class="col-xs-12">
+                      <button type="button" class="btn btn-green btn-block btn-flat" onclick="userlogin()">Sign In</button>
+                  </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!--/ Modal box-->
+
+
+<!--Banner-->
+<div class="banner">
+  <div class="bg-color">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-xs-offset-1">
+          <h1>Simplifying Business Expense Management. One Snap at a time.</h1>
+
+          <div class="banner-dynamic">
+            <h4>Be a part of the digital cashless economy with</h4>
+            <h3>Easy cash disbursement</h3>
+          </div>
+
+          <div class="banner-options">
+            <button class="btn-round btn-border-white">Play Video</button>
+            <button class="btn-round btn-translucent-white">Request for a demo</button>
+          </div>
+        </div>
+
+        <div class="col-xs-6 banner-image">
+          <img src="/common/images/landing/banner/main-lg.png" class="img-responsive">
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!--/ Banner-->
+
+
+<!--What is Finly-->
+<section id ="what-is-finly" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">What is Finly?</h1>
+        <h2>What is Finly?</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem nesciunt vitae,<br> maiores, magni dolorum aliquam.</p>
+      </div>
+    </div>
+    <div class="section-info">
+      <div class="row">
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/card-swipe-lg.png" class="img-responsive">
+          <p>Employees use Finly’s card / Cash to spend for the company.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/mobile-picture-lg.png" class="img-responsive">
+          <p>Mobile application to instantly snap a picture of the bill</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/computer-accept-lg.png" class="img-responsive">
+          <p>Mobile application or web application to approve/reject the report</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/app-integration-lg.png" class="img-responsive">
+          <p>Finance manager syncs this data to Tally/Quickbooks immediately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!--/ What is Finly -->
+
+
+<!--How Finly Can Help You-->
+<section id ="how-finly-can-help" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">How Finly Can Help You?</h1>
+        <h2>How Finly Can Help You?</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem nesciunt vitae,<br> maiores, magni dolorum aliquam. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+    </div>
+
+    <div class="feature-image">
+      <img src="/common/images/landing/how_finly_can_help/group-lg.png" class="img-responsive">
+    </div>
+
+    <div class="row">
+      <div class="col-xs-10 col-xs-offset-1">
+        <div>
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Sales</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Admin</a></li>
+            <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Marketing</a></li>
+            <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Fieldworders</a></li>
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="home">...</div>
+            <div role="tabpanel" class="tab-pane" id="profile">...</div>
+            <div role="tabpanel" class="tab-pane" id="messages">...</div>
+            <div role="tabpanel" class="tab-pane" id="settings">...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</section>
+<!--/ How Finly Can Help You-->
+
+
+<!--Features & Benefits-->
+<section id="features-benefits">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">Featues &amp; Benefits</h1>
+        <h2>Features &amp; Benefits</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem nesciunt vitae,<br> maiores, magni dolorum aliquam. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+    </div>
+
+    <div class="section-info">
+      <div class="row">
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/calendar-lg.png" class="img-responsive">
+          <h4>Superfast Reporting</h4>
+          <p>Cash expenses can be reported on the fly using the mobile app. Card expenses are automatically reported.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/control-lg.png" class="img-responsive">
+          <h4>Complete Control</h4>
+          <p>Our powerful policy engine allows you to have control even before the 5spend happens using the card by allowing you to set budgets and spend.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/realtime-lg.png" class="img-responsive">
+          <h4>Realtime Visibility</h4>
+          <p>The Analytics Dashboard gives complete real time visibility into who is spending how much money within your organization.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/mobile-lg.png" class="img-responsive">
+          <h4>Instant Disbursement</h4>
+          <p>All transfers are real time 365 days 24/7. Empower your employees with Finly Expense cards and make instant transfers at the click of a button.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row sub-section finly-expense-card">
+      <div class="col-xs-10 col-xs-offset-1">
+        <div class="well">
+          <h3>Finly Expense Cards</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+          <img src="/common/images/landing/features_benefits/finly-card-md.png" class="img-responsive">
+          <ul class="finly-expense-card-features">
+            <li>No bank account required</li>
+            <li>Turn on/off cards on the fly</li>
+            <li>Set Budget and transaction restrictions</li>
+            <li>Preferential usage: set places it can be used in atms, pos, online</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!--/ Features & Benefits-->
+
+
+<!--Security Measures-->
+<section id="security-measures" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">How Secure is Finly?</h1>
+        <h2>How Secure is Finly?</h2>
+      </div>
+    </div>
+
+    <div class="row security-features">
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/visa-card-lg.png" class="img-responsive">
+        <h4>VISA Card</h4>
+        <p>Employees use Finly’s card / Cash to spend for the company..</p>
+      </div>
+
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/fraud-monitoring-lg.png" class="img-responsive">
+        <h4>24x7 Fraud Monitoring</h4>
+        <p>Employees use Finly’s Card / Cash to spend for the company.</p>
+      </div>
+
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/security-lg.png" class="img-responsive">
+        <h4>Bank-Level Security</h4>
+        <p>Employees use Finly’s card / Cash to spend for the company.</p>
+      </div>
+    </div>
+    <div class="row security-features">
+      <div class="col-xs-4 col-xs-offset-2 text-center">
+        <img src="/common/images/landing/security/itzcash-partner-lg.png" class="img-responsive">
+        <h4>ItzCash Partner</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/reserve-bank-lg.png" class="img-responsive">
+        <h4>We Abide by RBI Guidelines</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!--/ Security Measures-->
+
+
+<!--Footer-->
+<footer id="footer" class="footer">
+  <div class="container text-center">
+
+  <h3>Sign Your Company Up for Early Access!</h3>
+
+  <form class="mc-trial row">
+    <div class="form-group col-md-3 col-md-offset-2 col-sm-4">
+      <div class=" controls">
+        <input name="name" placeholder="Enter Your Name" class="form-control" type="text">
+      </div>
+    </div><!-- End email input -->
+    <div class="form-group col-md-3 col-sm-4">
+      <div class=" controls">
+        <input name="EMAIL" placeholder="Enter Your email" class="form-control" type="email">
+      </div>
+    </div><!-- End email input -->
+    <div class="col-md-2 col-sm-4">
+      <p>
+        <button name="submit" type="submit" class="btn btn-block btn-submit">
+        Submit <i class="fa fa-arrow-right"></i></button>
+      </p>
+    </div>
+  </form><!-- End newsletter-form -->
+  <ul class="social-links">
+    <li><a href="#link"><i class="fa fa-twitter fa-fw"></i></a></li>
+    <li><a href="#link"><i class="fa fa-facebook fa-fw"></i></a></li>
+    <li><a href="#link"><i class="fa fa-google-plus fa-fw"></i></a></li>
+    <li><a href="#link"><i class="fa fa-dribbble fa-fw"></i></a></li>
+    <li><a href="#link"><i class="fa fa-linkedin fa-fw"></i></a></li>
+  </ul>
+  </div>
+</footer>
+<!--/ Footer-->
+    
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.easing.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="contactform/contactform.js"></script>
+    
+  </body>
