@@ -14,13 +14,6 @@
 # Crono.perform(TestJob).every 2.days, at: '15:30'
 #
 
-class Backup
-  def perform
-    Rake::Task['backup:execute'].invoke
-  end
-end
-
 Crono.perform(ReportAutoSubmit).every 1.day, at: {hour: 00, min: 1}
 Crono.perform(UpdateUserBalances).every 1.day, at: {hour: 00, min: 10}
 Crono.perform(UpdateCompanyBalances).every 1.day, at: {hour: 00, min: 20}
-Crono.perform(Backup).every 1.day, at: {hour: 00, min: 30}
