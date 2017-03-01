@@ -7,10 +7,13 @@
 #  merchant   :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  is_deleted :boolean          default(FALSE)
 #
 
 
 class ManualExpense < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :expense # foreign key expense_id
 
   validates :merchant, presence: true

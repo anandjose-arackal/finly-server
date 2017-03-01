@@ -43,6 +43,7 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     #Filters
     'keyup .filter-merchant': 'autoComplete'
     'click .btn-filter-receipts': 'filter'
+    'change input#receipt-image-upload': 'showUploadedReceipt'
 
   initialize: (options) ->
     if options
@@ -212,6 +213,27 @@ class FinlyF.Views.ReceiptsIndex extends Backbone.View
     # $("#modal-new").attr('data-backdrop', true)
     $("#modal-new").modal('show')
     $("#modal-new").find('.modal-header h4.modal-title').text("New Receipt")
+
+  showUploadedReceipt: (e) ->
+    file = e.currentTarget
+
+    target = $(e.currentTarget).closest('.upload-receipt')
+    # input = $(target).find('input[type=file]#expense-receipt-upload')
+    # close_button = $(target).find('.remove-uploaded-receipt')
+    image = $(target).find("img#preview-image")
+    image_url = window.URL.createObjectURL(file.files[0])
+
+    dot_position = $(file).val().lastIndexOf('.')
+    format = $(file).val().substring(dot_position + 1)
+    if format == 'pdf'
+      $(image).attr('src', '/common/images/pdf-preview.png')
+    else
+      $(image).attr('src', image_url)
+
+    # $(close_button).removeClass('hidden')
+
+    # $(target).find('.btn-attach-existing-receipts').addClass('hidden')
+
 
   create: (e)->
     target = e.currentTarget

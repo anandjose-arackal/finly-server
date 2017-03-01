@@ -15,7 +15,7 @@ case fetch(:stage)
     set :deploy_to, '/home/sreeramn/finly-server'
     set :rails_env, 'itzcash_uat'
   when :staging
-    set :deploy_to, '/home/viveka/app'
+    set :deploy_to, '/home/centos/app'
     set :rails_env, 'staging'
   when :local_vm
     set :deploy_to, '/home/vivek/app'

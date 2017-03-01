@@ -7,7 +7,6 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  active     :boolean          default(TRUE), not null
-#  d_code     :string(255)
 #
 
 class Company < ActiveRecord::Base
@@ -23,8 +22,13 @@ class Company < ActiveRecord::Base
   has_many :export_preferences, dependent: :destroy
   has_one :account, class_name: 'CompanyAccount'
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
+  has_one :itz_cash_property
+  has_many :company_transactions
 
   accepts_nested_attributes_for :configuration
+  accepts_nested_attributes_for :itz_cash_property
+
+  # delegate :d_code, :easy_account_no, to: :itz_cash_property
 
   after_create :init_config_present
 
@@ -57,6 +61,16 @@ class Company < ActiveRecord::Base
 
   def finance_managers
     users.with_roles.only_finance_managers
+  end
+
+  def d_code
+    return nil if itz_cash_property.blank?
+    itz_cash_property.d_code
+  end
+
+  def easy_account_no
+    return nil if itz_cash_property.blank?
+    itz_cash_property.easy_account_no
   end
 
   private

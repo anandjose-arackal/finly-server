@@ -85,13 +85,13 @@ class MoneyRequestComment < ActiveRecord::Base
         comment = "#{name} commented : #{content}"
       when MoneyRequestCommentAction.id_for(:update)
         comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
-      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_wallet)
+      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_card_to_wallet)
         payment_id = payment.id rescue nil
         comment = "#{name} credited #{name_rec} wallet with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , with a note : #{payment.note}"
         end
-      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_card), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_card)
+      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_card), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_card), MoneyRequestCommentAction.id_for(:credited_from_card_to_card)
         payment_id = payment.id rescue nil
         comment = "#{name} credited #{name_rec} card with Payment ID : #{payment_id}"
         if payment.note.present?

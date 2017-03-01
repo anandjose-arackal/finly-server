@@ -141,7 +141,6 @@ class Notification < ActiveRecord::Base
     end
 
     object_prep = retrieve_object_preposition
-    # debugger
 
     content += prep # short for preposition
     case self.action_type_id
@@ -266,7 +265,6 @@ class Notification < ActiveRecord::Base
 
     # base = Constants::BASE_URL
     view = ""
-    # debugger
     case view_role_id
       when 3
         view = "\"manager\""

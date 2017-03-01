@@ -65,7 +65,6 @@ class PoliciesController < ApplicationController
 
   def invitable_users
     @result = Policy::InvitableUsers.(current_user, params)
-    # debugger
     respond_to do |format|
       format.html {render partial: 'users'}
     end
@@ -81,7 +80,6 @@ class PoliciesController < ApplicationController
     # @result = User::Show.(current_user, params)
     @managers = User::Team::GetManagers.(current_user, params)
     # respond
-    # debugger
     respond_to do |format|
       format.html {render partial: 'policy_member_settings'}
     end

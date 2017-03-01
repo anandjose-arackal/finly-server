@@ -97,8 +97,9 @@ class BaseHandler
     p = self.path
     param = self.post_params
     return unless p.present?
-    # debugger
     begin
+      puts "Posting Path : #{p}"
+      puts "Post Params: #{param}"
       self.response = self.connection.post p, param
       puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
@@ -134,7 +135,7 @@ class BaseHandler
   end
 
   def success?
-    self.process_complete and not has_errors? and not self.timeout and not self.response.blank? and self.response.status == 200 
+    self.process_complete and not has_errors? and not self.timeout and not self.response.blank? and self.response.status == 200
   end
 
   def failure?

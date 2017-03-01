@@ -278,22 +278,22 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     $("#modal-new").find(".datepicker").datepicker({dateFormat: "dd-mm-yy"})
 
     category_select = $("#modal-new .modal-body").find(".newExpenseCategory")
-    
     FinlyF.appendCategoriesTo(category_select)
-
-  
-    
-    
 
   showUploadedReceipt: (e) ->
     file = e.currentTarget
-
     target = $(e.currentTarget).closest('.upload-receipt')
     # input = $(target).find('input[type=file]#expense-receipt-upload')
     close_button = $(target).find('.remove-uploaded-receipt')
     image = $(target).find("img#preview-image")
     image_url = window.URL.createObjectURL(file.files[0])
-    $(image).attr('src', image_url)
+
+    dot_position = $(file).val().lastIndexOf('.')
+    format = $(file).val().substring(dot_position + 1)
+    if format == 'pdf'
+      $(image).attr('src', '/common/images/pdf-preview.png')
+    else
+      $(image).attr('src', image_url)
     $(close_button).removeClass('hidden')
     $(target).find('.btn-attach-existing-receipts').addClass('hidden')
     # $(e.currentTarget)window.URL.createObjectURL(this.files[0])
@@ -309,7 +309,7 @@ class FinlyF.Views.ExpensesIndex extends Backbone.View
     input = $(target).find('input[type=file]#expense-receipt-upload')
     image = $(target).find("img#preview-image")
 
-    $(image).attr('src', '/assets/images/receipt-placeholder.png')
+    $(image).attr('src', '/common/images/receipt-placeholder.png')
     input.replaceWith(input.val('').clone(true))
 
     # Remove if any attached exisiting receipts

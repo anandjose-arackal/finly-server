@@ -45,7 +45,6 @@ class StatementsController < ApplicationController
 
   def company_policies_summary
     @result = Company::Statement::PolicyExpenses.(current_user, params)
-    # debugger
     respond_to do |format|
       format.json {}
     end
