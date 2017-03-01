@@ -2,22 +2,32 @@
 #
 # Table name: company_balance_histories
 #
-#  id                        :integer          not null, primary key
-#  company_id                :integer
-#  neft_transfer_id          :integer
-#  company_balance_id        :integer
-#  company_withdrawal_id     :integer
-#  company_load_id           :integer
-#  card_load_id              :integer
-#  card_withdrawal_id        :integer
-#  card_balance_id           :integer
-#  card_expenses_id          :integer
-#  wallet_balance_id    :integer
-#  wallet_withdrawal_id :integer
-#  wallet_load_id       :integer
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  card_atm_withdrawal_id    :integer
+#  id                                      :integer          not null, primary key
+#  company_id                              :integer
+#  neft_transfer_id                        :integer
+#  company_balance_id                      :integer
+#  company_withdrawal_to_card_id           :integer
+#  company_load_from_card_id               :integer
+#  card_load_from_wallet_id                :integer
+#  card_withdrawal_to_wallet_id            :integer
+#  card_balance_id                         :integer
+#  card_expenses_id                        :integer
+#  finly_money_balance_id                  :integer
+#  wallet_load_from_wallet_id              :integer
+#  created_at                              :datetime         not null
+#  updated_at                              :datetime         not null
+#  card_atm_withdrawal_id                  :integer
+#  company_withdrawal_to_wallet_id         :integer
+#  company_load_from_wallet_id             :integer
+#  card_withdrawal_to_card_id              :integer
+#  card_withdrawal_to_virtual_account_id   :integer
+#  card_load_from_card_id                  :integer
+#  card_load_from_virtual_account_id       :integer
+#  wallet_withdrawal_to_wallet_id          :integer
+#  wallet_withdrawal_to_card_id            :integer
+#  wallet_withdrawal_to_virtual_account_id :integer
+#  wallet_load_from_card_id                :integer
+#  wallet_load_from_virtual_account_id     :integer
 #
 
 class CompanyBalanceHistory < ActiveRecord::Base
@@ -47,9 +57,9 @@ class CompanyBalanceHistory < ActiveRecord::Base
   belongs_to :wallet_load_from_wallet, class_name: "Amount"
 
 
-  accepts_nested_attributes_for :neft_transfer, 
-                                :company_balance, 
-                                :company_withdrawal_to_card, :compay_withdrawal_to_wallet, 
+  accepts_nested_attributes_for :neft_transfer,
+                                :company_balance,
+                                :company_withdrawal_to_card, :company_withdrawal_to_wallet,
                                 :company_load_from_card, :company_load_from_wallet,
                                 :card_load_from_virtual_account, :card_load_from_wallet, :card_load_from_card,
                                 :card_withdrawal_to_card, :card_withdrawal_to_wallet, :card_withdrawal_to_virtual_account,
@@ -61,7 +71,7 @@ class CompanyBalanceHistory < ActiveRecord::Base
 
   delegate :company_balance_value, to: :company_balance
   delegate :company_load_from_card_value, to: :company_load_from_card
-  delegate :company_load_from_wallet, to: :company_load_from_wallet
+  delegate :company_load_from_wallet_value, to: :company_load_from_wallet
   delegate :company_withdrawal_to_card_value, to: :company_withdrawal_to_card
   delegate :company_withdrawal_to_wallet_value, to: :company_withdrawal_to_wallet
   delegate :card_balance_value, to: :card_balance

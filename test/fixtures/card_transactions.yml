@@ -27,6 +27,7 @@
 #  is_deleted            :boolean          default(FALSE)
 #
 
+
 # == Schema Information
 #
 # Table name: card_transactions

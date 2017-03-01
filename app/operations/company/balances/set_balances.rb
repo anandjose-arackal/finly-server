@@ -32,7 +32,6 @@ class Company::Balances::SetBalances < BaseOperation
 
     self.company_admin = company.users.only_admins.first
     current_company_balance = Company::VirtualAccount::Balance.(company_admin)
-    # summing up all withdrawals from card or wallet to company account
     company_withdrawal_to_card = 0
     company_withdrawal_to_wallet = 0
     company_load_from_card = 0
@@ -85,15 +84,26 @@ class Company::Balances::SetBalances < BaseOperation
     {
       company_id: company.id,
       date: params[:date],
+      neft_transfer_attributes: {value: neft_transfer_total, currency: Currency.first},
       company_balance_attributes: {value: current_company_balance, currency: Currency.first},
-      company_withdrawal_attributes: {value: transfers_from_company_account, currency: Currency.first},
-      company_load_attributes: {value: transfers_to_company_account, currency: Currency.first},
-      card_withdrawal_attributes: {value: company_cards_withdrawal, currency: Currency.first},
-      card_load_attributes: {value: company_cards_load, currency: Currency.first},
-      card_balance_attributes: {value: company_cards_balance, currency: Currency.first},
-      finly_money_load_attributes: {value: company_finly_money_load, currency: Currency.first},
-      finly_money_withdrawal_attributes: {value: company_finly_money_withdrawal, currency: Currency.first},
-      finly_money_balance_attributes: {value: company_finly_money_balance, currency: Currency.first}
+      company_withdrawal_to_card_attributes: {value: company_withdrawal_to_card, currency: Currency.first},
+      company_withdrawal_to_wallet_attributes: {value: company_withdrawal_to_wallet, currency: Currency.first},
+      company_load_from_card_attributes: {value: company_load_from_card, currency: Currency.first},
+      company_load_from_wallet_attributes: {value: company_load_from_wallet, currency: Currency.first},
+      card_withdrawal_to_virtual_account_attributes: {value: card_withdrawal_to_virtual_account, currency: Currency.first},
+      card_withdrawal_to_card_attributes: {value: card_withdrawal_to_card, currency: Currency.first},
+      card_withdrawal_to_wallet_attributes: {value: card_withdrawal_to_wallet, currency: Currency.first},
+      card_load_from_virtual_account_attributes: {value: card_load_from_virtual_account, currency: Currency.first},
+      card_load_from_card_attributes: {value: card_load_from_card, currency: Currency.first},
+      card_load_from_wallet_attributes: {value: card_load_from_wallet, currency: Currency.first},
+      card_balance_attributes: {value: card_balance_total, currency: Currency.first},
+      wallet_load_from_card_attributes: {value: wallet_load_from_card, currency: Currency.first},
+      wallet_load_from_virtual_account_attributes: {value: wallet_load_from_virtual_account, currency: Currency.first},
+      wallet_load_from_wallet_attributes: {value: wallet_load_from_wallet, currency: Currency.first},
+      wallet_withdrawal_to_card_attributes: {value: wallet_withdrawal_to_card, currency: Currency.first},
+      wallet_withdrawal_to_virtual_account_attributes: {value: wallet_withdrawal_to_virtual_account, currency: Currency.first},
+      wallet_withdrawal_to_wallet_attributes: {value: wallet_withdrawal_to_wallet, currency: Currency.first},
+      wallet_balance_attributes: {value: wallet_balance_total, currency: Currency.first}
     }
 
   end
