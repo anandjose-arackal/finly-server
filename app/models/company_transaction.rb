@@ -21,17 +21,18 @@ class CompanyTransaction < ActiveRecord::Base
   belongs_to :balance_amount, class_name: 'Amount'
 
   validates :company, presence: true
-  validates :transaction_id, uniqueness: { scope: [:transaction_type] }, presence: true
+  validates :transaction_id, uniqueness: true, presence: true
   validates :merchant_name, presence: true
   validates :transaction_date, presence: true
-  validates :transaction_amount_id, presence: true
+  validates :transaction_amount, presence: true
   validates :transaction_type, presence: true
   validates :transaction_id, presence: true
-  validates :balance_amount_id, presence: true
+  validates :balance_amount, presence: true
 
   accepts_nested_attributes_for :balance_amount
   accepts_nested_attributes_for :transaction_amount
 
-  scope :with_date_range, ->(start_date, end_date) { where('transaction_date > ? AND transaction <= ?', start_date, end_date) }
+  scope :with_date_range, ->(start_date, end_date) { where('transaction_date >= ? AND transaction_date <= ?', start_date, end_date) }
+  scope :sort_date, -> (type){ order transaction_date: type}
 
 end

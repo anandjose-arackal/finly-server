@@ -1,3 +1,8 @@
+#
+# Params -> start_date(DateTime object), end_date(DateTime Object)
+# Query is date >= start_date && date <= end_date
+#
+
 class Company::Transaction::Show < Company::Base
   attr_accessor :start_date, :end_date, :last_transaction_date, :last_transaction, :required_transactions
 
@@ -32,16 +37,20 @@ class Company::Transaction::Show < Company::Base
       self.start_date = params[:start_date]
     end
 
+    # If end date is not defined, set current date as end date
     if self.end_date.blank?
-      self.end_date = Date.today
+      self.end_date = DateTime.now
     end
 
+    # If start date is not defined, set the end date as starting date
     if start_date.blank?
-      self.start_date = self.end_date - 1
+      self.start_date = self.end_date
     end
 
+    # If the no transactions are recorded for the company, to ensure we have all transactions we set the starting date as the day company was created
+    # If company transactions are defined, fetch all transaction from the last date the transaction was recorded
     if company.company_transactions.present?
-      self.last_transaction = company.company_transactions.last
+      self.last_transaction = company.company_transactions.sort_date(:asc).last
       self.last_transaction_date = last_transaction.transaction_date
     else
       self.last_transaction_date = company.created_at
@@ -54,29 +63,36 @@ class Company::Transaction::Show < Company::Base
     end
   end
 
-  def process
-    # Update the table with all new statements
-    if last_transaction_date < end_date
-      response = ItzCash::CompanyCreditStatementByDate.(company, start_date: start_date, end_date: end_date)
-      unless response.success?
-        add_message :error, response.messages[:error]
-        return
-      end
-      transactions = response.transactions
-      transactions.each do |t|
-        company.company_transactions.create request_id: t[:request_id], merchant_name: t[:merchant_name],
-                                            transaction_date: t[:transaction_date],
-                                            transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
-                                            transaction_type: t[:transaction_type],
-                                            transaction_id: t[:transaction_id],
-                                            balance_amount_attributes: {value: t[:balance], currency_id: 1}
-      end
+  def validate
+    if self.start_date > self.end_date
+      add_message :error, 'Starting date cannot be after end date'
     end
-    self.required_transactions = company.company_transactions.with_date_range(start_date, end_date)
+  end
+
+  def process
+    # Update the table with all new statements. To ensure we do not miss out on any transaction we query all
+    # transactions for (last_transaction_date - 1), all duplicate transactions will anyway be discarded.
+    # todo if date difference is exceeding 20, split in sizes of 20s
+    response = ItzCash::CompanyCreditStatementByDate.(company, start_date: last_transaction_date - 1, end_date: Date.today + 1)
+    unless response.success?
+      add_message :error, response.messages[:error]
+      return
+    end
+    transactions = response.transactions
+    # Store all company transactions. All duplicate transactions will not be fetched
+    transactions.each do |t|
+      company.company_transactions.create request_id: t[:request_id], merchant_name: t[:merchant_name],
+                                          transaction_date: t[:transaction_date],
+                                          transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
+                                          transaction_type: t[:transaction_type],
+                                          transaction_id: t[:transaction_id],
+                                          balance_amount_attributes: {value: t[:balance], currency_id: 1}
+    end
+    self.required_transactions = company.company_transactions.with_date_range(start_date.beginning_of_day, end_date.end_of_day)
   end
 
   def success
-    Company::Transaction::Show::SuccessPresenter.(company, transactions: self.required_transactions)
+    Company::Transaction::Show::SuccessPresenter.new(company, transactions: self.required_transactions)
   end
 
   class Company::Transaction::Show::SuccessPresenter < Company::Base::CompanyPresenter

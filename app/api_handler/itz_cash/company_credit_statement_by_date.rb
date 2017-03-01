@@ -12,11 +12,13 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
       add_message :error, 'Company not found'
       return
     end
-    if params.blank? or params[:start_date].blank? or (not params[:start_date].kind_of?(Date) and not params[:start_date].kind_of?(DateTime))
+    if params.blank? or params[:start_date].blank? or (not params[:start_date].kind_of?(Date) and
+        not params[:start_date].kind_of?(DateTime) and not params[:start_date].kind_of?(ActiveSupport::TimeWithZone))
       add_message :error, 'Error in request. Please try again'
       return
     end
-    if params.blank? or params[:end_date].blank? or (not params[:end_date].kind_of?(Date) and not params[:end_date].kind_of?(DateTime))
+    if params.blank? or params[:end_date].blank? or (not params[:end_date].kind_of?(Date) and not params[:end_date].kind_of?(DateTime) and
+        not params[:end_date].kind_of?(ActiveSupport::TimeWithZone))
       add_message :error, 'Error in request. Please try again'
       return
     end
@@ -34,6 +36,7 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
     dcode = company.d_code
     easy_account_no = company.easy_account_no
 
+    # ItzCash queries for all transactions -> date > start_date && date <= end_date
     {dcode: dcode, easyaccountno: easy_account_no, itzmodule: itzmodule, startdate: start_date, enddate: end_date}
   end
 
@@ -52,8 +55,8 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
         company.save
       end
     end
-    self.start_date = params[:start_date].strftime("%d%m%y")
-    self.end_date = params[:end_date].strftime("%d%m%y")
+    self.start_date = params[:start_date].strftime("%d%m%Y")
+    self.end_date = params[:end_date].strftime("%d%m%Y")
   end
 
   def validate
@@ -71,13 +74,15 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
     params[:transactions] = []
     description = parsed_response[1]
     if description.size > 1
+      # All transactions are delimited by '|'
       transactions = description.split('|')
       transactions.each do |transaction_string|
+        # All fields within a transactions are delimited by '$'
         transaction = transaction_string.split('$')
         if transaction.present?
           request_id = transaction[0].squish
           merchant_name = transaction[1].squish
-          transaction_date = "#{transaction[2].squish} +5:30".to_datetime
+          transaction_date = transaction[2].squish
           transaction_amount = transaction[3].squish.to_d
           transaction_type = transaction[4].squish
           transaction_id = transaction[5].squish

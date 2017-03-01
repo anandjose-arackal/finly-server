@@ -14,7 +14,7 @@ default: &default
   itzcash_mcc_group_restriction:
     path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
   itzcash_company_statement_by_date:
-    path: "user/servlet/CorporateTransactionStatementServlet"
+    path: "user/servlet/CorporateTransactionStatementByDateRangeServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
