@@ -123,8 +123,12 @@ $(document).ready( ->
         heightClass = $(stepPassword).attr('data-height-class')
         $(stepPassword).find('.template-data').html(Finly.Login.templates.templatePassword({item: formObjectData}))
         $(stepPassword).show('slide', {direction: 'right'}, 200)
-
         $(loginContainer).removeClass(Finly.Login.heights.join(" ")).addClass(heightClass)
+        setTimeout(->
+          $(stepPassword).find("input[type=password]").focus()
+        , 300)
+        # $(stepPassword).find("input[type=password]").focus()
+
       else
         #User is not verified
         stepVerifyRegistration = $(loginContainer).find('.step-verify-registration')
