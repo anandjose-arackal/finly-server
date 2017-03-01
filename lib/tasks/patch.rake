@@ -51,4 +51,9 @@ namespace :patch do
     end
   end
 
+  desc '02-03-2017: Manually updated company d_code from company.d_code to company.itz_cash_property.d_code'
+  task rename_payment_types: :environment do
+    # manually updated company d_code from company.d_code to company.itz_cash_property.d_code
+  end
+
 end
