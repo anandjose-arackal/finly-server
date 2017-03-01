@@ -39,6 +39,16 @@ class Superadmin::CompaniesController < ApplicationController
     @companies = Company.all
   end
 
+  def update
+    @result = Superadmin::Company::Update.(current_user, params)
+    if @result.success?
+      flash[:success] = "Compny updated"
+    else
+      flash[:error] = @result.messages[:error]
+    end
+    redirect_to request.referrer
+  end
+
   def import
     import_op = Import::Superadmin::Users.new(current_user, params)
     @result = import_op.run

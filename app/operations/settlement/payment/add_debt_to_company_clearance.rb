@@ -50,7 +50,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   def validate
     value = nil
     value = payment_params[:amount].to_f if payment_params[:amount].present?
-    cash_in_hand_on_date = to_user.cash_in_hand(payment_params[:date].to_date)
+    cash_in_hand_on_date = to_user.cash_on_hand(payment_params[:date].to_date)
     unless value <= cash_in_hand_on_date.value
       add_message :error, "User does not have sufficient cash in hand on #{payment_params[:date]} for the following payment"
     end
@@ -59,7 +59,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     unless validate_date payment_params[:date]
       return false
     end
-    
+
   end
 
   def process

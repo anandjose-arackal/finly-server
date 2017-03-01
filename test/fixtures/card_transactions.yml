@@ -1,3 +1,4 @@
+
 # == Schema Information
 #
 # Table name: card_transactions
@@ -23,8 +24,8 @@
 #  expensed              :boolean          default(TRUE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
-#  is_deleted            :boolean          default(FALSE)
 #
+
 
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

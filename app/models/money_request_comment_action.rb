@@ -10,6 +10,7 @@
 
 
 
+
 class MoneyRequestCommentAction < ActiveRecord::Base
 
   ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4,

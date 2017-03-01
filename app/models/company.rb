@@ -25,10 +25,10 @@ class Company < ActiveRecord::Base
   has_one :itz_cash_property
   has_many :company_transactions
 
+  has_many :company_balance_histories
+
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
-
-  # delegate :d_code, :easy_account_no, to: :itz_cash_property
 
   after_create :init_config_present
 

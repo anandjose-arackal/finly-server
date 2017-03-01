@@ -21,7 +21,7 @@ class CardExpense < ActiveRecord::Base
 
   accepts_nested_attributes_for :surcharge
 
-  around_destroy :destroy_associated_expense
+  # validates :card_transaction_id, presence: true
 
   def surcharge_amount
     self.surcharge.value
@@ -33,16 +33,6 @@ class CardExpense < ActiveRecord::Base
 
   scope :merchant_like, -> (merchant, expense_ids) do
     where(expense_id: expense_ids).where('lower(editable_merchant) LIKE ?', "%#{merchant.downcase}%").pluck(:editable_merchant)
-  end
-
-  private
-
-  # method tod estroy an orphaned expense if there is not assocyed manual expense
-  def destroy_associated_expense
-    expense = self.expense
-    yield
-    expense.reload
-    expense.destroy if expense.card_expense.nil?
   end
 
 end

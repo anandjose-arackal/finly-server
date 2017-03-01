@@ -32,6 +32,7 @@ class CardTransaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 
+
   has_one :card_expense, dependent: :destroy
 
   validates :reference_id, uniqueness: { scope: [:transaction_type] }
@@ -42,6 +43,9 @@ class CardTransaction < ActiveRecord::Base
 
   delegate :transaction_amount_value, to: :transaction_amount
   delegate :billing_amount_value, to: :billing_amount
+
+  # i.e. a combination of reference ID and transaction type should be unique
+  validates_uniqueness_of :reference_id, scope: [:transaction_type]
 
   accepts_nested_attributes_for :transaction_amount
   accepts_nested_attributes_for :card_amount
