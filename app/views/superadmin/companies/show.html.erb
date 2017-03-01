@@ -4,6 +4,30 @@
 
     <h3>Company: <%=@result.company.name%></h3>
 
+    <form accept-charset="UTF-8" id="newCompanyForm" action="<%= superadmin_company_path(@result.company.id) %>" method="post">
+      <input name="utf8" type="hidden" value="&#x2713;"/>
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+      <input name="_method" type="hidden" value="patch">
+
+      <h3>Company Details</h3>
+
+      <p>Company Name: </p>
+      <input class="form-control" type="text" name="company[name]" placeholder="Name" title="Company name" value="<%=@result.company.name%>">
+
+      <br/><br/>
+
+      <input class="form-control" type="text" name="company[itz_cash_property_attributes][d_code]" placeholder="D Code" title="Company D-Code" value="<%=@result.company.d_code%>">
+
+      <br/><br/>
+
+      <div>
+        <button id="submitButton" class="btn-default" style="border-radius: 1px; height: 40px"> UPDATE</button>
+      </div>
+
+    </form>
+
+    <br/><br/>
+
     <button class="btn btn-sm btn-warning btn-import-employees" onclick="showInviteModal()">Import Employees</button>
 
     <br/><br/>
