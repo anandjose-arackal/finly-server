@@ -205,7 +205,7 @@ if Amount.count == 0
 end
 
 if Company.count == 0
-  c = Company.create(name: 'Finly Test', d_code: 'D000000360')
+  c = Company.create(name: 'Finly Test', itz_cash_property_attributes: { d_code: 'D000000360'})
   c.reload
 else
   c = Company.first
