@@ -28,7 +28,7 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
 
-  delegate :d_code, :easy_account_no, to: :itz_cash_property
+  # delegate :d_code, :easy_account_no, to: :itz_cash_property
 
   after_create :init_config_present
 
@@ -61,6 +61,16 @@ class Company < ActiveRecord::Base
 
   def finance_managers
     users.with_roles.only_finance_managers
+  end
+
+  def d_code
+    return nil if itz_cash_property.blank?
+    itz_cash_property.d_code
+  end
+
+  def easy_account_no
+    return nil if itz_cash_property.blank?
+    itz_cash_property.easy_account_no
   end
 
   private
