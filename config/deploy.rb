@@ -54,7 +54,7 @@ after 'deploy', 'runner:restart'
 namespace :runner do
   task :restart do
     on roles(:app) do
-      execute "sh $HOME/app/current/msgqueue_restart.sh #{fetch(:rails_env)}"
+      sh "$HOME/app/current/msgqueue_restart.sh #{fetch(:rails_env)}"
     end
   end
 end
