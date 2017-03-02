@@ -22,7 +22,6 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
 
   def process
     # table 1
-    # items[:user_account_opening_balance] = user_account_balance(start_date)
 
     # Virtual account details
     items[:user_account_status_details] = {}

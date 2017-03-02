@@ -42,7 +42,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   def retrieve_merchant_name(transaction)
     trans_mode = transaction.transaction_mode.upcase rescue nil
     if transaction.transaction_type == "Debit"
-      if ["ATM", "POS", "ECOM"].include?(trans_mode)
+      if ["POS", "ECOM"].include?(trans_mode)
         return transaction.merchant_name
       else
         return "N/A"
