@@ -43,7 +43,9 @@
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)
+#  otp_request_type_id    :integer
 #
+
 
 
 
@@ -112,6 +114,8 @@ class User < ActiveRecord::Base
   has_many :notifier_type_configurations
 
   has_many :user_balance_histories
+
+  belongs_to :otp_request_type
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping

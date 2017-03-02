@@ -43,6 +43,7 @@
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)
+#  otp_request_type_id    :integer
 #
 
 # one kind of user for each user type
