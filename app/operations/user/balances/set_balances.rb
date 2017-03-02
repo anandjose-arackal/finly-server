@@ -51,7 +51,7 @@ class User::Balances::SetBalances < BaseOperation
     finly_money_withdrawal += selected_user.initiating_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card),
                                                                                                                    PaymentType.id_for(:credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
 
-    cash_on_hand_balance = selected_user.cash_on_hand.value
+    cash_on_hand_balance = selected_user.cash_in_hand.value
     cash_on_hand_load = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:add_cash_on_hand)).joins(:amount).sum(:value)
     cash_on_hand_withdrawal = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:deduct_cash_on_hand)).joins(:amount).sum(:value)
     {company_id: selected_user.company_id,
