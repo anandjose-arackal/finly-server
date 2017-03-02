@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Check if the pid file exists
 if [ -f $HOME/app/shared/tmp/pids/transaction_queue.pid ]
 then
