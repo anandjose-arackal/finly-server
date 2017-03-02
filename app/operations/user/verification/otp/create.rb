@@ -39,7 +39,7 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
   def pre_process
     # generating the random 6 digit OTP for a particular user and storing it in the message
     # if the last OTP was sent less than 30 minutes ago, send the same OTP back
-    if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at < 15.minutes.ago
+    if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago
       self.otp = selected_user.otp
       self.message = "#{otp} is your verification code."
     # else send the a new OTP after generating it
@@ -55,7 +55,7 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
       selected_user.update_attributes(otp_count: (selected_user.otp_count+1))
       # further update the otp and sent_at only if a new type of otp has been requested
       if selected_user.otp != otp
-        selected_user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type: otp_request_type_id)
+        selected_user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id)
       end
     else
       messages[:error] = response.messages[:error]
