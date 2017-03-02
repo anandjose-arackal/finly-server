@@ -1,5 +1,26 @@
-kill -TERM $(cat $HOME/app/shared/tmp/pids/transaction_queue.pid)
-RAILS_ENV=production nohup rails runner TransactionsMsgQueuePoller.run > $HOME/app/shared/log/transactions_msg_queue_poller.log 2>&1 & echo $! > $HOME/app/shared/tmp/pids/transaction_queue.pid
+#!/usr/bin/env bash
+# Check if the pid file exists
+if [ -f $HOME/app/shared/tmp/pids/transaction_queue.pid ]
+then
+    # Check if the process exists
+    if  ps -p $(cat $HOME/app/shared/tmp/pids/transaction_queue.pid) > /dev/null
+    then
+        # Kill process
+        kill -TERM $(cat $HOME/app/shared/tmp/pids/transaction_queue.pid)
+     fi
+fi
+cd $HOME/app/current && ( export RBENV_ROOT="$HOME/.rbenv" RBENV_VERSION="2.3.1" RACK_ENV="$1" ; nohup $HOME/.rbenv/bin/rbenv exec rails runner TransactionsMsgQueuePoller.run >> $HOME/app/shared/log/transactions_msg_queue_poller.log 2>&1 & echo $! > $HOME/app/shared/tmp/pids/transaction_queue.pid )
 
-kill -TERM $(cat $HOME/app/shared/tmp/pids/balance_queue.pid)
-RAILS_ENV=production nohup rails runner BalanceMsgQueuePoller.run > $HOME/app/shared/log/balance_msg_queue_poller.log 2>&1 & echo $! > $HOME/app/shared/tmp/pids/balance_queue.pid
+# Check if the pid file exists
+if [ -f $HOME/app/shared/tmp/pids/balance_queue.pid ]
+then
+    # Check if the process exists
+    if  ps -p $(cat $HOME/app/shared/tmp/pids/balance_queue.pid) > /dev/null
+    then
+        # Kill process
+        kill -TERM $(cat $HOME/app/shared/tmp/pids/balance_queue.pid)
+     fi
+fi
+cd $HOME/app/current && ( export RBENV_ROOT="$HOME/.rbenv" RBENV_VERSION="2.3.1" RACK_ENV="$1" ; nohup $HOME/.rbenv/bin/rbenv exec rails runner BalanceMsgQueuePoller.run >> $HOME/app/shared/log/balance_msg_queue_poller.log 2>&1 & echo $! > $HOME/app/shared/tmp/pids/balance_queue.pid )
+
+#ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/shared/msgqueue_restart.sh'
