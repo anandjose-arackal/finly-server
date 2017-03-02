@@ -292,7 +292,7 @@ class User < ActiveRecord::Base
   end
 
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
-  def cash_on_hand(date = nil)
+  def cash_in_hand(date = nil)
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == DateUtils.local_date
     payments = self.payments.made_after(date).with_amount
