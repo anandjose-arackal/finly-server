@@ -53,9 +53,9 @@ after 'deploy', 'runner:restart'
 # Restart runner
 namespace :runner do
   task :restart do
-    on roles(:app) do
-      run("sh $HOME/app/current/msgqueue_restart.sh")
-      run("sh $HOME/app/current/balance_queue_restart.sh")
+    on roles(:app), in: :sequence do
+      `ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/current/msgqueue_restart.sh #{fetch(:rails_env)}'`
+      # execute("sh app/shared/msgqueue_restart.sh production")
     end
   end
 end
