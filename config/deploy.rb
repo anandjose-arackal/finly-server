@@ -54,8 +54,8 @@ after 'deploy', 'runner:restart'
 namespace :runner do
   task :restart do
     on roles(:app) do
-      execute("sh $HOME/app/current/msgqueue_restart.sh")
-      execute("sh $HOME/app/current/balance_queue_restart.sh")
+      run("sh $HOME/app/current/msgqueue_restart.sh")
+      run("sh $HOME/app/current/balance_queue_restart.sh")
     end
   end
 end
