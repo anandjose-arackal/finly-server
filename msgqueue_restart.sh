@@ -26,8 +26,9 @@ then
     ENV=production
     echo "MsgQueueRestartScript: Environment not passed. Restarting queue in Production Environment"
 fi
-restart_process $ENV transaction_queue.pid TransactionsMsgQueuePoller.run transactions_msg_queue_poller.log
+
 restart_process $ENV balance_queue.pid BalanceMsgQueuePoller.run balance_msg_queue_poller.log
+restart_process $ENV transaction_queue.pid TransactionsMsgQueuePoller.run transactions_msg_queue_poller.log
 
 ## Check if the pid file exists
 #if [ -f $HOME/app/shared/tmp/pids/transaction_queue.pid ]
