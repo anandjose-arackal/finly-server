@@ -19,7 +19,7 @@ case fetch(:stage)
     set :rails_env, 'staging'
   when :local_vm
     set :deploy_to, '/home/vivek/app'
-    set :rails_env, 'staging'
+    set :rails_env, 'local_vm'
 end
 
 set :pty, true
@@ -48,15 +48,25 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
+after 'deploy', 'runner:restart'
+
 #
-# # Example: cap staging rake:invoke task=rebuild_table_abc
-# namespace :rake do
-#   desc 'Run a task on a remote server'
-#   # run like: cap staging rake:invoke task=a_certain_task
-#   task :invoke do
-#     run("cd #{deploy_to}/current; /usr/bin/env rake #{ENV['task']} RAILS_ENV=#{rails_env}")
-#   end
-# end
+# Example: cap staging rake:invoke task=rebuild_table_abc
+namespace :runner do
+  desc 'Run a task on a remote server'
+  # run like: cap staging rake:invoke task=a_certain_task
+  task :restart do
+    # run("cd #{deploy_to}/current; /usr/bin/env rake #{ENV['task']} RAILS_ENV=#{rails_env}")
+    # Restart Transaction Runner
+    run 'sh $HOME/app/current/msgqueue_restart.sh'
+    # run 'kill -TERM $(cat $HOME/app/shared/tmp/pids/transaction_queue.pid)'
+    # run 'cd $HOME/app/current && ( export RBENV_ROOT="$HOME/.rbenv" RBENV_VERSION="2.3.1" RACK_ENV="production" ; nohup $HOME/.rbenv/bin/rbenv exec rails runner TransactionsMsgQueuePoller.run > $HOME/app/shared/log/transactions_msg_queue_poller.log 2>&1 & echo $! > $HOME/app/shared/tmp/pids/transaction_queue.pid )'
+    #
+    # # Restart Balance Runner
+    # run 'kill -TERM $(cat $HOME/app/shared/tmp/pids/balance_queue.pid)'
+    # run 'cd $HOME/app/current && ( export RBENV_ROOT="$HOME/.rbenv" RBENV_VERSION="2.3.1" RACK_ENV="production" ; nohup $HOME/.rbenv/bin/rbenv exec rails runner BalanceMsgQueuePoller.run > $HOME/app/shared/log/balance_msg_queue_poller.log 2>&1 & echo $! > $HOME/app/shared/tmp/pids/balance_queue.pid )'
+  end
+end
 
 # after 'deploy', 'deploy:card_restrictions_association_fix'
 
