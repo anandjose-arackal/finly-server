@@ -14,5 +14,9 @@ class CardBalanceHistory < ActiveRecord::Base
   belongs_to :card
   belongs_to :amount
 
+  validates :card_id, presence: true
+  validates :amount_id, presence: true
+
+
   accepts_nested_attributes_for :amount
 end
