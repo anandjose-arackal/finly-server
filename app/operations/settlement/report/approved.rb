@@ -45,7 +45,7 @@ class Settlement::Report::Approved < Report::Base
       pending_reimbursement = total_non_card_amount - cash_in_hand.value
       new_cash_in_hand_value = 0
     end
-    report.user.balance_sheet.subtract_cash_in_hand (total_non_card_amount - pending_reimbursement), currency
+    # report.user.balance_sheet.subtract_cash_in_hand (total_non_card_amount - pending_reimbursement), currency
     report.user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)

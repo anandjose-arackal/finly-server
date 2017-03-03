@@ -16,6 +16,9 @@ class Report::Base < BaseOperation
   def init
     id = (params[:id] or params[:report_id])
     self.report = Report::Index.(user, params).reports.with_id(id).first rescue nil
+
+    # todo - temporary fix for notifications
+    # self.report = Report::Index.(user, params).reports.unscoped.with_id(id).first rescue nil
     # self.report = Report.find_by(id: params[:report_id])
   end
 
