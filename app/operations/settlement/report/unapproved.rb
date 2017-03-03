@@ -32,7 +32,6 @@ class Settlement::Report::Unapproved < Report::Base
     currency = Currency.first.id
     pending_reimbursement = 0
     pending_reimbursement = report.reimbursement_amount.value if report.reimbursement_amount.present?
-    # report.user.balance_sheet.add_cash_in_hand (total_amount - pending_reimbursement), currency
     report.user.balance_sheet.subtract_pending_reimbursement pending_reimbursement, currency
     report.reimbursement_amount.update(value: 0) if report.reimbursement_amount.present?
     unless report.update_attributes(accounted: false)
