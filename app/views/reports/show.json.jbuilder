@@ -9,6 +9,7 @@ json.export_csv export_report_path(report_id: @result.report.id, view: params[:v
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
 json.enforce_policy_enabled @result.report.user.enforce_policy_enabled?
+json.deleted @result.report.is_deleted
 
 policy_id = nil
 policy_name = nil
