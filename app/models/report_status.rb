@@ -19,7 +19,7 @@ class ReportStatus < ActiveRecord::Base
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
 
-  STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, reimbursed: 6, reimbursement_confirmed: 7, closed: 8}
+  STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, settled: 6, settlement_confirmed: 7, closed: 8}
 
   def self.id_for(status)
     STATES[status]
@@ -81,11 +81,11 @@ class ReportStatus < ActiveRecord::Base
     5
   end
 
-  def self.reimbursed_id
+  def self.settled_id
     6
   end
 
-  def self.reimbursement_confirmed_id
+  def self.settlement_confirmed_id
     7
   end
 

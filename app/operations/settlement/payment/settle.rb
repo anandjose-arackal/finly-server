@@ -83,7 +83,7 @@ class Settlement::Payment::Settle < Settlement::Payment::Base
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.subtract_pending_reimbursement param[:amount], param[:currency_id] and balance_sheet.subtract_cash_in_hand param[:amount], param[:currency_id]
       reports.each do |report|
-        Report::MarkAsReimbursed.(user, {payment: payment, report: report, role_id: role})
+        Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
       end
       return true
     end

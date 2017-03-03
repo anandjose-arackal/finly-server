@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170302104916) do
+ActiveRecord::Schema.define(version: 20170303122322) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -995,7 +995,6 @@ ActiveRecord::Schema.define(version: 20170302104916) do
     t.datetime "created_at",                                                             null: false
     t.datetime "updated_at",                                                             null: false
     t.integer  "reimbursement_id",             limit: 4
-    t.integer  "reimbursement_amount_id",      limit: 4
     t.boolean  "accounted",                                              default: false, null: false
     t.boolean  "archived",                                               default: false, null: false
     t.boolean  "is_deleted",                                             default: false, null: false
@@ -1005,6 +1004,8 @@ ActiveRecord::Schema.define(version: 20170302104916) do
     t.datetime "approved_at"
     t.integer  "cash_in_hand_deduction_id",    limit: 4
     t.integer  "submitted_amount_id",          limit: 4
+    t.integer  "cash_expenses_total_id",       limit: 4
+    t.integer  "card_expenses_total_id",       limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

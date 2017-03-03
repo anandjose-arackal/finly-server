@@ -108,7 +108,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
         to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
         # mark the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role, status: ReportStatus.closed_id})
+          Report::MarkAsSettled.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role})
         end
         return
       else
@@ -118,7 +118,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
       if payment.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
         # mark the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.(user, {payment: payment, report: report, role_id: role})
+          Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
         end
       else
         add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
@@ -129,7 +129,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
         to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
         # mark all the reports as reimbursed
         reports.each do |report|
-          Report::MarkAsReimbursed.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
+          Report::MarkAsSettled.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
         end
       else
         add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
@@ -138,7 +138,7 @@ class Settlement::Payment::AddReimbursement < Settlement::Payment::Base
   end
 
   def post_process
-    add_message :success, 'Reports reimbursed'
+    add_message :success, 'Reports settled'
 
     event = Event::ESettlement::AddReimbursement.new(user, payment: self.payment, cash_in_hand_deduction: cash_deduction, from_cash_in_hand: cash_deduction)
     event.run

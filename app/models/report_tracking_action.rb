@@ -22,8 +22,8 @@ class ReportTrackingAction < ActiveRecord::Base
              reject: 6,
              unapprove: 7,
              take_control: 8,
-             reimbursed: 9,
-             reimbursement_confirmed: 10,
+             settled: 9,
+             settlement_confirmed: 10,
              closed: 11
             }
 

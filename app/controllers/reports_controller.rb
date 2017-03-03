@@ -84,7 +84,7 @@ class ReportsController < ApplicationController
   end
 
   def reimbursement_confirm
-    @result = Report::ReimburseConfirm.(current_user, params)
+    @result = Report::SettlementConfirm.(current_user, params)
     respond render: :show
   end
 

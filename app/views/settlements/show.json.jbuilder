@@ -7,6 +7,8 @@ json.array! @result.items do |item|
       json.final_approver item.final_approver.name
     end
     json.reimbursement_amount item.reimbursement_amount.value
+    json.card_expenses_total item.card_expenses_total.value rescue 0
+    json.cash_expenses_total item.cash_expenses_total.value rescue 0
     json.status item.status_name
     json.total_amount item.total_amount
   elsif item.is_a?(Payment)

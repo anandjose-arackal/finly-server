@@ -50,7 +50,8 @@ class Report < ActiveRecord::Base
   has_many :receipts, as: :parent
   # Payment made as reimbursement
   belongs_to :reimbursement, class_name: 'Payment'
-  belongs_to :reimbursement_amount, class_name: 'Amount'
+  belongs_to :cash_expenses_total, class_name: 'Amount'
+  belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
@@ -159,12 +160,12 @@ class Report < ActiveRecord::Base
     self.status_id == ReportStatus.approved_id
   end
 
-  def reimbursed?
-    self.status_id == ReportStatus.reimbursed_id
+  def settled?
+    self.status_id == ReportStatus.settled_id
   end
 
-  def reimbursement_confirmed?
-    self.status_id == ReportStatus.reimbursement_confirmed_id
+  def settlement_confirmed?
+    self.status_id == ReportStatus.settlement_confirmed_id
   end
 
   def closed?
