@@ -16,7 +16,6 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  reimbursement_id             :integer
-#  reimbursement_amount_id      :integer
 #  accounted                    :boolean          default(FALSE), not null
 #  archived                     :boolean          default(FALSE), not null
 #  is_deleted                   :boolean          default(FALSE), not null
@@ -26,10 +25,9 @@
 #  approved_at                  :datetime
 #  cash_in_hand_deduction_id    :integer
 #  submitted_amount_id          :integer
+#  cash_expenses_total_id       :integer
+#  card_expenses_total_id       :integer
 #
-
-
-
 
 
 
@@ -58,6 +56,8 @@ class Report < ActiveRecord::Base
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
   accepts_nested_attributes_for :submitted_amount
+  accepts_nested_attributes_for :cash_expenses_total
+  accepts_nested_attributes_for :card_expenses_total
 
   validates :user, presence: true
   validate :is_employee
@@ -73,7 +73,8 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :reimbursement_amount }
-  scope :with_reimbursement_amount, -> {joins :reimbursement_amount}
+  scope :with_cash_expenses_total, -> {joins :cash_expenses_total}
+  scope :with_cash_expenses_total, -> {joins :card_expenses_total}
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }

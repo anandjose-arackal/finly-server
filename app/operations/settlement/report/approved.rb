@@ -34,9 +34,11 @@ class Settlement::Report::Approved < Report::Base
 
   def process
     balance_sheet = report.user.balance_sheet
-    total_non_card_amount = report.total_amount(:only_manual_expenses)
+    total_cash_amount = report.total_amount(:only_manual_expenses)
+    total_card_amount = report.total_amount(:only_card_expenses)
     currency = Currency.first # todo - temporary until currency is implemented
-    pending_reimbursement = total_non_card_amount
+    pending_reimbursement = total_cash_amount
+
     report.user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
     if report.reimbursement_amount.blank?
       report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)

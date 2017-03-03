@@ -83,7 +83,7 @@ class ReportsController < ApplicationController
     # render_flash_message
   end
 
-  def reimbursement_confirm
+  def settlement_confirm
     @result = Report::SettlementConfirm.(current_user, params)
     respond render: :show
   end

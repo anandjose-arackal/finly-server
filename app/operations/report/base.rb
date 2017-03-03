@@ -132,7 +132,7 @@ class Report::Base < BaseOperation
         elsif self.report.processing?
           actions[:retract] = {url: Rails.application.routes.url_helpers.report_retract_path(report_id: report.id, view: params[:view])}
         elsif self.report.reimbursed?
-          actions[:reimbursement_confirm] = {url: Rails.application.routes.url_helpers.report_reimbursement_confirm_path(report_id: report.id, view: params[:view])}
+          actions[:settlement_confirm] = {url: Rails.application.routes.url_helpers.report_settlement_confirm_path(report_id: report.id, view: params[:view])}
         end
       end
       actions
