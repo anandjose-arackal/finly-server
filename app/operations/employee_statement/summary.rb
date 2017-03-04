@@ -1,3 +1,4 @@
+# todo - whole thing needs to be rewritten
 
 class EmployeeStatement::Summary < EmployeeStatement::Base
   include MathUtil
@@ -128,7 +129,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       return 0
     end
     total = 0
-    approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
+    approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
       card_ex = report.expenses.only_card_expenses.where('date >= ? AND date <= ?', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_ex
@@ -141,7 +142,7 @@ class EmployeeStatement::Summary < EmployeeStatement::Base
       return 0
     end
     total = 0
-    approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id])
+    approved_reports = selected_user.reports.where(report_status_id: [ReportStatus.approved, ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id])
     approved_reports.each do |report|
       card_manual = report.expenses.only_manual_expenses.where('date >= ? AND date <= ? ', start_date, end_date).joins(:amount).sum(:value) rescue 0
       total += card_manual

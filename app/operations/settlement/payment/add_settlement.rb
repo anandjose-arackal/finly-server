@@ -84,6 +84,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     if precision_value(cash_in_hand_deduction_amount) > precision_value(cash_in_hand)
       add_message :error, "You cannot deduct more cash than the employee has on #{payment_params[:date].to_s}"
     end
+
     # checking if cash in hand deduction + settlement amount matches up with report total
     self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
     unless report_total == precision_value(reimbursement_amount + cash_in_hand_deduction_amount).to_f
@@ -103,7 +104,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
                                                  amount_attributes: {value: cash_in_hand_deduction_amount, currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
     if reimbursement_amount == 0
-      if cash_deduction.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
+      if cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
         # subtract the respective amount from the user's cash in hand
         to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
         # mark the reports as reimbursed
@@ -115,7 +116,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         add_message :error, cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
       end
     elsif cash_in_hand_deduction_amount == 0
-      if payment.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
+      if payment.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
         # mark the reports as reimbursed
         reports.each do |report|
           Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
@@ -124,7 +125,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
       end
     else
-      if payment.save and cash_deduction.save and balance_sheet.subtract_pending_reimbursement report_total, Currency.first.id
+      if payment.save and cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
         # subtract the respective amount from the user's cash in hand
         to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
         # mark all the reports as reimbursed

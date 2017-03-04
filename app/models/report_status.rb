@@ -50,12 +50,12 @@ class ReportStatus < ActiveRecord::Base
     self.id == ReportStatus.approved_id
   end
 
-  def reimbursed?
-    self.id == ReportStatus.reimbursed_id
+  def settled?
+    self.id == ReportStatus.settled_id
   end
 
-  def reimbursement_confirmed?
-    self.id == ReportStatus.reimbursement_confirmed_id
+  def settlement_confirmed?
+    self.id == ReportStatus.settlement_confirmed_id
   end
 
   def closed?

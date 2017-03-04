@@ -110,7 +110,6 @@ class Report::Approve < Report::Base
 
       # set the reimbursement amount of the report
       unless report.processing?
-
         Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
       end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170303122322) do
+ActiveRecord::Schema.define(version: 20170304141723) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -72,16 +72,16 @@ ActiveRecord::Schema.define(version: 20170303122322) do
   add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree
 
   create_table "balance_sheets", force: :cascade do |t|
-    t.integer  "user_id",                  limit: 4
-    t.integer  "cash_in_hand_id",          limit: 4
-    t.integer  "pending_reimbursement_id", limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-    t.integer  "pending_advance_id",       limit: 4
+    t.integer  "user_id",                   limit: 4
+    t.integer  "cash_in_hand_id",           limit: 4
+    t.integer  "approved_reports_total_id", limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "pending_advance_id",        limit: 4
   end
 
+  add_index "balance_sheets", ["approved_reports_total_id"], name: "index_balance_sheets_on_approved_reports_total_id", using: :btree
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
-  add_index "balance_sheets", ["pending_reimbursement_id"], name: "index_balance_sheets_on_pending_reimbursement_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|

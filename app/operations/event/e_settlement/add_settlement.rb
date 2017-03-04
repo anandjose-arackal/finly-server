@@ -3,7 +3,7 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
   attr_accessor :cash_in_hand_deduction
 
   def event_id
-    NotifierType.id_for(:settlement_add_reimbursement)
+    NotifierType.id_for(:settlement_add_settlement)
   end
 
   def send_push_notification(user)
@@ -49,7 +49,7 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
   end
 
   def mailer_subject(user)
-    "A reimbursement of your reports has been processed"
+    "A settlement of your reports has been processed"
   end
 
   def mailer_body(user)
@@ -64,7 +64,7 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
     end
     unless cash_in_hand_deduction.nil?
       body += "<br>This is to notify you that your cash on hand has been deducted against reimbursement for the following reports:<br>"
-      i = 1
+      i =
       self.cash_in_hand_deduction.cash_in_hand_settled_reports.each do |report|
         body += "<br>#{i}. #{report.name}"
         i += 1

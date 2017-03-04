@@ -37,25 +37,25 @@ class Settlement::Report::Approved < Report::Base
     total_cash_amount = report.total_amount(:only_manual_expenses)
     total_card_amount = report.total_amount(:only_card_expenses)
     currency = Currency.first # todo - temporary until currency is implemented
-    pending_reimbursement = total_cash_amount
-
-    report.user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
-    if report.reimbursement_amount.blank?
-      report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
+    cash_expenses_total = total_cash_amount
+    balance_sheet.add_approved_reports_total cash_expenses_total, currency
+    if report.cash_expenses_total.blank?
+      report_amount = Amount.new(value: cash_expenses_total, currency: Currency.first)
       unless report_amount.save
         messages[:error] = report_amount.errors.full_messages
         return
       end
-      report.reimbursement_amount = report_amount
+      report.cash_expenses_total = report_amount
     else
-      report_amount = report.reimbursement_amount
-      report_amount.value = pending_reimbursement
+      report_amount = report.cash_expenses_total
+      report_amount.value = cash_expenses_total
       report_amount.currency = currency
       unless report_amount.save
         messages[:error] = report_amount.errors.full_messages
         return
       end
     end
+
     report.accounted = true
     report.accounted_at = DateUtils.local_date
     unless report.save

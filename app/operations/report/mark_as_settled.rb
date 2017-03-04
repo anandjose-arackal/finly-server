@@ -20,7 +20,7 @@ class Report::MarkAsSettled < Report::Base
   end
 
   def validate
-    unless report.reimbursement_pending?
+    unless report.settlement_pending?
       messages[:error] << 'Report cannot be reimbursed at this stage'
     end
     unless payment.present? or cash_in_hand_deduction.present?
