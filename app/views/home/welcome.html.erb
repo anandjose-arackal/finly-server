@@ -1,173 +1,488 @@
-<div class="jumbotron" style="min-height: 600px;">
+<!--Navigation bar-->
+<nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
-    <div style="">
-      <img class="img-responsive" src="/common/images/logos/logo_lg.png" style="height: 145px; margin-top: 100px; margin-left: auto; margin-right: auto;">
+    <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="index.html">
+      <img src="/common/images/logos/logo_black_xs.png" class="img-responsive" style="height: 28px;">
+    </a>
     </div>
-
-
-    <div class="text-center" style=" margin-bottom: 20px; margin-top: 30px;">
-      <h1 style="font-size: 40px; color: #F2EC5C; font-weight: 200;">Expense Management for Businesses made Simple</h1>
-      <p style="color: rgb(204, 204, 204); margin-bottom: 50px; font-size: 16px; width: 500px; margin-left: auto; margin-right: auto;">Simplify expense management and payables processing so you can focus on the important things — like growing your business!</p>
-      <a class="btn-ghost-round btn-request-demo" href="#">Schedule a Demo</a>
+    <div class="collapse navbar-collapse" id="myNavbar">
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/about">About</a></li>
+      <li><a href="#how-finly-can-help">Solutions</a></li>
+      <!-- <li><a href="#courses">Resources</a></li>
+      <li><a href="#pricing">FAQ</a></li>
+      <li><a href="#" data-target="#login" data-toggle="modal">Blog</a></li> -->
+      <li><a href="#footer" data-toggle="modal" data-target="#modal-request-demo" class="navbar-request-demo"><i class="fa fa-phone"></i>&nbsp;&nbsp;Request for a demo</a></li>
+      <li><a href="/users/sign_in" class="btn-round btn-border-blue">Login to Finly</a></li>
+    </ul>
     </div>
+  </div>
+</nav>
+<!--/ Navigation bar-->
 
+
+<!--Modal Video-->
+<div class="modal fade" id="modal-play-video" role="dialog">
+  <div class="modal-dialog" style="width: 640px;">
+  
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-center form-title">See How Finly Works</h4>
+      </div>
+      <div class="modal-body" style="padding: 0; height: 360px;">
+        <iframe width="638" height="360" src="https://www.youtube.com/embed/wZLhSkYB9f8" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div> 
   </div>
 </div>
-<div class="jumbotron" id="" style="background: #EEF5F9;">
-  <div class="container">
-    <div class="row text-center no-margin">
-      <h2>Features &amp; Benefits</h2>
-    </div>
+<!--/ Modal box-->
 
-    <div class="row no-margin landing-feature">
-      <div class="col-lg-5 col-lg-offset-1">
-        <h3 style="">Super Fast Reporting</h3>
-        <p>
-          Employees can generate expense reports on the fly for the expenses incurred, have them reviewed by their manager and claim reimbursements 10x faster than traditional process.
-        </p>
+<!--Modal Demo-->
+<div class="modal fade" id="modal-request-demo" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-center form-title">Request For a Demo</h4>
       </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-horizontal form-request-demo">
+              <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+              <fieldset>
 
-      <div class="col-lg-6 text-center">
-        <%= image_tag("landing/features/stopwatch.png", class: "img-responsive", style: "height: 250px; margin-top: -40px; display: inline;") %>
-      </div>
-    </div>
-    <div class="row no-margin landing-feature">
-      <div class="col-lg-6 text-center">
-        <!-- Image/Animation -->
-        <%= image_tag("landing/features/policy.png", class: "img-responsive", style: "height: 230px; display: inline;") %>
-      </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="name">Name</label>  
+                  <div class="col-md-4">
+                  <input id="name" name="preview[name]" placeholder="Your Name" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-      <div class="col-lg-5">
-        <h3 style="">Policy Compliance</h3>
-        <p>
-          Flexibility to set expense reporting compliance rules and enforce your own spending policies. Spending limits and expense policies are built right into the system, so your employees will know immediately when an expense report falls outside company policy.
-        </p>
-      </div>
-    </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="email">Email</label>  
+                  <div class="col-md-4">
+                  <input id="email" name="preview[email]" placeholder="Your Work Email" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-    <div class="row no-margin landing-feature">
-      <div class="col-lg-5 col-lg-offset-1">
-        <h3 style="">Streamlined Workflow</h3>
-        <p>
-          Design a multi-level approval workflow to meet your organization’s needs. Approval workflow gives our clients the opportunity to set defined approval paths with various routing rules including approval limits and special approval rules.
-        </p>
-      </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
+                  <div class="col-md-4">
+                  <input id="phonenumber" name="preview[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-      <div class="col-lg-6 text-center">
-        <%= image_tag("landing/features/streamline.png", class: "img-responsive", style: "height: 230px; display: inline;") %>
-      </div>
-    </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="company_name">Company Name</label>  
+                  <div class="col-md-4">
+                  <input id="company_name" name="preview[company]" placeholder="Your Company" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-    <div class="row no-margin landing-feature">
-      <div class="col-lg-6 text-center">
+                <!-- Button -->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="submit"></label>
+                  <div class="col-md-4">
+                    <button id="submit" name="submit" class="btn btn-primary">Request For Demo</button>
+                  </div>
+                </div>
 
-        <%= image_tag("landing/features/sync.png", class: "img-responsive", style: "display:inline; height: 200px;") %>
-      </div>
-
-      <div class="col-lg-5">
-        <h3 style="">Synchronize</h3>
-        <p>
-          Integrates with your accounting system, allowing you to cut time spent on data entry and easily export the data you need, be it in excel or in PDF format.
-        </p>
-      </div>
-    </div>
-
-    <div class="row no-margin landing-feature">
-      <div class="col-lg-5 col-lg-offset-1">
-        <h3 style="">Mobile</h3>
-        <p>
-          Never lose a receipt again! Snap pictures of receipts on the go Create and submit expense reports from your phone Free mobile app for Android.
-        </p>
-      </div>
-
-      <div class="col-lg-6 text-center">
-        <%= image_tag("landing/features/mobile.png", class: "img-responsive", style: "display:inline; height: 200px; clip: rect(0, 100px, 200px, 0);") %>
-      </div>
-    </div>
-
-    <div class="row no-margin landing-feature">
-      <div class="col-lg-6 text-center">
-        <%= image_tag("landing/features/analysis.png", class: "img-responsive", style: "display:inline; height: 250px;") %>
-      </div>
-
-      <div class="col-lg-5">
-        <h3 style="">Thorough Analysis</h3>
-        <p>
-          Analyze overall expense spending for opportunities to reduce costs and get better insight into company's spend.
-        </p>
-      </div>
-    </div>
-
-
-  </div>
-</div>
-
-
-<!-- Testimonials -->
-<!-- <div class="jumbotron" style="min-height: 200px; background: #FEE252;">
-  <div class="container">
-    <h2 class="text-center" style="color: white; text-shadow: none; font-size: 25px;">What people are saying</h2>
-
-  </div>
-</div> -->
-<!-- End Testimonials -->
-
-
-<div class="jumbotron" style="background-color: #F2F2F2; color: white;" id="section-schedule-demo">
-  <div class="container">
-    <h2 class="text-center" style="color: #456B9F;">Schedule a Demo</h2>
-    <div class="row">
-      <div class="col-lg-6 text-center">
-        <%= image_tag("landing/contact-us.png", class: 'img-responsive', style: "height: 290px; display: inline;") %>
-      </div>
-
-      <div class="col-lg-5 col-lg-offset-1">
-        <div style="display: inline-block; vertical-align: middle; height: 100%;">
-          <p style="color: #565656; font-size: 24px; font-weight: 500;">Interested in scheduling a demo?<br />Leave us your contact details.</p>
-          <form id="form-request-demo" data-remote="true" method="post" action="<%= preview_registration_path %>">
-            <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
-            <div class="form-group">
-              <input class="contact-fields inputWorkMobile" name="preview[name]" type="text" placeholder="Name">
-              <input class="contact-fields inputWorkEmail" name="preview[email]" type="text" placeholder="Work Email"><br />
-              <input class="contact-fields inputWorkMobile" name="preview[phone_number]" type="text" placeholder="Phone Number">
-              <input class="contact-fields inputWorkMobile" name="preview[company]" type="text" placeholder="Company Name">              
-            </div>
-            <button id="btn-submit-request" class="contact-button btn btn-xs btn-success requestDemo" type="submit">Request Demo</button>
-          </form>
+              </fieldset>
+            </form>
+ 
+          </div>
         </div>
       </div>
-    </div><!-- .row -->
+    </div> 
   </div>
 </div>
+<!--/ Modal box-->
 
 
-<footer>
-  <div class="footer-bottom">
-    <div class="container-fluid">
-      <div class="col-sm-9">
-        <ul class="footer-lined-links">
-          <li> <a href="https://fb.com/finly.io" target="_blank">Facebook</a> </li>
-          <li> <a href="https://www.twitter.com/finlyUs" target="_blank">Twitter</a> </li>
-          <li> <a href="https://www.linkedin.com/company/finly.io" target="_blank">LinkedIn</a> </li>
-          <li> <a href="mailto:contact@finly.io">Email</a></li>
-          <li>|</li>
-          <li> <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" target="_blank">Play Store</a></li>
-        </ul>
+<!--Banner-->
+<div class="banner">
+  <div class="bg-color">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-7 col-xs-offset-">
+          <h1>Simplifying Business Expense Management. One Snap at a time.</h1>
+
+          <div class="banner-dynamic">
+            <h4>Be a part of the digital cashless economy with</h4>
+            <h3 id="banner-dynamic-content"><span style="display: none;">Easy Cash Disbursement</span></h3>
+          </div>
+
+          <div class="banner-options">
+            <button data-toggle="modal" data-target="#modal-play-video" class="btn-round btn-border-white" style="border: 1px solid white;padding: 10px 50px;"><img src="/common/images/landing/banner/play-video.png" style="height: 18px;padding-right: 10px;margin-top: -2px;">Play Video</button>
+            <button data-toggle="modal" data-target="#modal-request-demo" class="btn-request-demo btn-round btn-translucent-white" style="border: 1px solid #eee;padding: 10px 30px;margin-left: 22px;"><i class="fa fa-phone"/></i>&nbsp;&nbsp;Request for a demo</button>
+          </div>
+        </div>
+
+        <!-- <div class="col-xs-6 banner-image">
+          <img src="/common/images/landing/banner/main-lg.png" class="img-responsive">
+        </div> -->
+
+
       </div>
-      <div class="col-sm-3">
-        <p class="pull-right" style="color: #eee; font-size: 11px;"> Copyright &#169; 2016 Jouska Tech Pvt. Ltd. </p>
-      </div>
-      
     </div>
   </div>
-  <!--/.footer-bottom-->
+</div>
+<!--/ Banner-->
+
+
+<!--What is Finly-->
+<section id ="what-is-finly" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">What is Finly?</h1>
+        <h2>What is Finly?</h2>
+        <p>Finly is your one stop solution to have complete visibility and control over your business expenses.</p>
+      </div>
+    </div>
+    <div class="section-info">
+      <div class="row">
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/card-swipe-lg.png" class="img-responsive">
+          <h4>Controlled Spending</h4>
+          <p>Distribute Finly’s VISA Expense Cards with predefined spending limits to all your employees.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/mobile-picture-lg.png" class="img-responsive">
+          <h4>Automated Reporting</h4>
+          <p>Spend using Finly Expense card, snap using Finly App and instantly report Expenses.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/computer-accept-lg.png" class="img-responsive">
+          <h4>Real-time Visibility</h4>
+          <p>Finly’s Analytics Dashboard gives you visibility on who spent how much and where in real-time.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/what_is_finly/app-integration-lg.png" class="img-responsive">
+          <h4>Integrate Accounting Tools</h4>
+          <p>Finance team can process your business expense data and synchronise the same with your accounting tool.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!--/ What is Finly -->
+
+
+<!--How Finly Can Help You-->
+<section id ="how-finly-can-help" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">How Finly Can Help You?</h1>
+        <h2>How Finly Can Help You?</h2>
+        <p>Finly helps you track and manage your business expenses from end-to-end.
+        We are here to take away your worries about expense reporting, processing cash advance requests and reimbursements, utility bill payments, and most importantly keeping your accounting tool up-to-date. We have got it all covered for you.</p>
+      </div>
+    </div>
+
+    <div class="feature-image">
+      <img src="/common/images/landing/how_finly_can_help/group-lg.png" class="img-responsive">
+    </div>
+
+    <div class="row">
+      <div class="col-xs-8 col-xs-offset-2">
+        <div class="stakeholders">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#stakeholder-sales" aria-controls="stakeholder-sales" role="tab" data-toggle="tab">Sales</a></li>
+            <li role="presentation"><a href="#stakeholder-admin" aria-controls="stakeholder-admin" role="tab" data-toggle="tab">Admin</a></li>
+            <li role="presentation"><a href="#stakeholder-marketing" aria-controls="stakeholder-marketing" role="tab" data-toggle="tab">Marketing</a></li>
+            <li role="presentation"><a href="#stakeholder-fieldworker" aria-controls="stakeholder-fieldworker" role="tab" data-toggle="tab">Fieldworders</a></li>
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="stakeholder-sales">
+              <img src="/common/images/landing/how_finly_can_help/sales.png">
+              <p>Manage your team’s travel expenses and reimbursements in just a few clicks using Finly. Our VISA expense cards are accepted everywhere - online, POS and any ATM across India.</p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="stakeholder-admin">
+              <img src="/common/images/landing/how_finly_can_help/admin.png">
+              <p>Use Finly to streamline and automate petty cash management, vendor and utility bill payments.  Ensure zero cash-leakage using real-time disbursement, tracking and accounting.</p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="stakeholder-marketing">
+              <img src="/common/images/landing/how_finly_can_help/marketing.png">
+              <p>Get end to end visibility into all your digital marketing purchases in a single screen. Set spending limits using Finly’s policy engine and compare multiple platforms instantly using Finly’s Analytics dashboard.</p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="stakeholder-fieldworker">
+              <img src="/common/images/landing/how_finly_can_help/field-worker.png">
+              <p>Virtually track and approve expenses instantaneously for a huge workforce present on the field.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</section>
+<!--/ How Finly Can Help You-->
+<div class="finly-form-group">
+  <form class="form-request-demo">
+  <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+  <input type="text" name="preview[email]" class="input-round-finly" placeholder="Your email"/>
+  <input type="text" name="preview[phone_number]" class="input-round-finly" placeholder="Your mobile"/>
+  <input type="submit" class="button-round-finly" value="Get a Demo" />
+  </form>
+</div> 
+
+
+
+<!--Features & Benefits-->
+<section id="features-benefits" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">Featues &amp; Benefits</h1>
+        <h2>Features &amp; Benefits</h2>
+        <p>Features You Only Get With Real Time Software.
+        Time to equip your business with a powerful Expense Management System.</p>
+      </div>
+    </div>
+
+    <div class="section-info">
+      <div class="row">
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/calendar-lg.png" class="img-responsive">
+          <h4>Superfast Reporting</h4>
+          <p>Finly’s Expense Card and Mobile Application can help Employees quickly submit their Expenses.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/control-lg.png" class="img-responsive">
+          <h4>Complete Control</h4>
+          <p>Have control before and after spend occurs using our powerful Policy Control Engine.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/realtime-lg.png" class="img-responsive">
+          <h4>Realtime Visibility</h4>
+          <p>Use the power of Instant Notifications and Analytics Dashboard to make accurate data-driven decisions.</p>
+        </div>
+
+        <div class="col-xs-3 text-center">
+          <img src="/common/images/landing/features_benefits/mobile-lg.png" class="img-responsive">
+          <h4>Instant Disbursement</h4>
+          <p>No more long waits for money transfers. Disburse cash to Employees instantly at the click of a button.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row sub-section finly-expense-card">
+      <div class="col-xs-10 col-xs-offset-1">
+        <div class="well">
+          <h3>Finly Expense Cards</h3>
+          <p>You no longer need to rely on sharing Credit Cards or allow your Employees to incur out of pocket expenses. Employees can now spend using our Prepaid Card at ATMs, Online Stores or make In store purchase, of course at the discretion of the Employer.</p>
+
+          <img src="/common/images/landing/features_benefits/finly-card-md.png" class="img-responsive">
+          <ul class="finly-expense-card-features">
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;No bank account required</p></li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Turn on/off cards on the fly</p></li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Set Budget and transaction restrictions</p></li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Preferential usage: set places it can be used in atms, pos, online</p></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!--/ Features & Benefits-->
+
+
+<!--Security Measures-->
+<section id="security-measures" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">How Secure is Finly?</h1>
+        <h2>How Secure is Finly?</h2>
+      </div>
+    </div>
+
+    <div class="row security-features">
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/visa-card-lg.png" class="img-responsive">
+        <h4>VISA Card</h4>
+        <p>Finly’s Expense Cards are powered by VISA and accepted everywhere.</p>
+      </div>
+
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/fraud-monitoring-lg.png" class="img-responsive">
+        <h4>24x7 Fraud Monitoring</h4>
+        <p>Our system works 24/7 to identify and flag any suspicious activity immediately.</p>
+      </div>
+
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/security-lg.png" class="img-responsive">
+        <h4>Bank-Level Security</h4>
+        <p>Sensitive data is stored in PCIDSS level-1 compliant data centre and in 2048-bit SSL encrypted.</p>
+      </div>
+    </div>
+    <div class="row security-features">
+      <div class="col-xs-4 col-xs-offset-2 text-center">
+        <img src="/common/images/landing/security/itzcash-partner-lg.png" class="img-responsive">
+        <h4>ItzCash Partner</h4>
+        <p>Finly Expense Cards are issued by Itzcash - a seamless, safe and trusted payments platform.</p>
+      </div>
+
+      <div class="col-xs-4 text-center">
+        <img src="/common/images/landing/security/reserve-bank-lg.png" class="img-responsive">
+        <h4>RBI Bound</h4>
+        <p>Every transaction on Finly follows the guidelines set by the Reserve Bank of India.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!--/ Security Measures-->
+
+<section id="testimonials" class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h1 class="text-shadow">Testimonials</h1>
+        <h2>Testimonials</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="carousel slide" data-ride="carousel" id="quote-carousel">
+          <!-- Bottom Carousel Indicators -->
+          <ol class="carousel-indicators">
+            <li class="active" data-slide-to="0" data-target="#quote-carousel"></li>
+            <li data-slide-to="1" data-target="#quote-carousel"></li>
+            <li data-slide-to="2" data-target="#quote-carousel"></li>
+          </ol>
+          <!-- Carousel Slides / Quotes -->
+
+
+          <div class="carousel-inner">
+            <!-- Quote 1 -->
+            <div class="item active">
+              <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                  <img src="/common/images/landing/testimonials/agni_group.jpg" class="img-responsive img-circle user-img">
+                  <h5>Agnishwar Jayaprakash</h5>
+                  <div class="designation">Director of Operations, Agni Group of Companies</div>
+
+                  <p>&ldquo;Processing cash advances and reimbursements for my employees was always a hassle before we started using Finly. Now, my Finance manager is able to disburse money as and when needed in seconds.&rdquo;</p>
+                </div>
+              </div>
+            </div>
+            <!-- Quote 2 -->
+
+
+            <div class="item">
+              <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                  <img src="/common/images/landing/testimonials/movie_korner.jpg" class="img-responsive img-circle user-img">
+                  <h5>Tanzeem Ahmed</h5>
+                  <div class="designation">Founder, NTT ECom Pvt. Ltd.</div>
+
+                  <p>&ldquo;Documenting and saving all the receipts in one place was a big issue and we suffered especially during the audits. Finly has helped us solve this problem and the system takes care of my organization’s expense management end to end without any difficulty.&rdquo;</p>
+                </div>
+              </div>
+            </div>
+            <!-- Quote 3 -->
+
+
+            <div class="item">
+              <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                  <img src="/common/images/landing/testimonials/mrhm_pharma.png" class="img-responsive img-circle user-img">
+                  <h5>Mr. KM Shetty</h5>
+                  <div class="designation">Founder &amp; CEO, MRHM Pharma</div>
+
+                  <p>&ldquo;Disbursing money and processing reimbursements for my organization’s sales work force who are distributed across the country was not an easy task at all. We never used to get the receipts in proper shape or in time before. Thanks to Finly, we don’t face those problems anymore&rdquo;</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!--Footer-->
+<footer id="request-for-demo" class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="header-section text-center">
+        <h2>Talk to one of our experts! Schedule a demo.</h2>
+        <!-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-8 col-xs-offset-2">
+        <form class="form-request-demo">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+          <div class="finly-form-group">
+            <input type="text" name="preview[email]" class="input-round-finly" placeholder="Your email"/>
+            <input type="text" name="preview[phone_number]" class="input-round-finly" placeholder="Your mobile"/>
+            <input type="submit" class="button-round-finly" value="Get a Demo" />
+          </div> 
+        </form>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <ul class="quick-links">
+          <li><a href="/about">About</a></li>
+          <li><a href="#how-finly-can-help">Solutions</a></li>
+          <!-- <li>Resources</li>
+          <li>FAQ</li>
+          <li>Blog</li> -->
+        </ul>
+        <hr>
+        <ul class="social-links">
+          <li><a href="http://fb.me/finly.io" target="_blank"><img src="/common/images/landing/social/facebook.png"></a></li>
+          <li><a href="http://twitter.com/finly_io" target="_blank"><img src="/common/images/landing/social/twitter.png"></a></li>
+          <li><a href="https://plus.google.com/u/0/111517948130779105047" target="_blank"><img src="/common/images/landing/social/google.png"></a></li>
+          <li><a href="https://www.linkedin.com/company-beta/13222948/" target="_blank"><img src="/common/images/landing/social/linkedin.png"></a></li>
+        </ul>
+      </div>
+    </div>    
+  </div>
 </footer>
+<!--/ Footer-->
 
 <div id="ohsnap"></div>
 <div id="ohsnap-priority"></div>
+    
 
 <script type="text/javascript">
-  $(document).ready(function(){
+  $(document).ready(function() {
     snapNotify = function(obj){
       // console.log "From snap", obj
       ohSnapX()
@@ -218,12 +533,44 @@
         }
       }
     }
-    $("#btn-submit-request").on('click', function(e){
+
+
+    // Dynamic banner content
+    ar = ["Instant Expense Reporting", "Immediate Approvals", "Quick Reimbursements", "Zero Paperwork", "Zero Auditing Hassles", "Easy Cash Disbursement", "Complete Visibility", "Robust Expense Policies"];
+    var i = 0;
+    timer = setInterval(function(){
+      $("#banner-dynamic-content span").fadeOut()
+      max = ar.length;
+      if(i == max){
+        i = 0;
+      }
+      $("#banner-dynamic-content").html("<span style='display: none;'>" + ar[i] + "</span>");
+      $("#banner-dynamic-content span").fadeIn()
+
+
+      i++;
+    }, 2500);
+    //carousel options
+    $('#quote-carousel').carousel({
+      pause: true, interval: 10000,
+    });
+
+    $("#modal-play-video").on('hidden.bs.modal', function (e) {
+      $("#modal-play-video iframe").attr("src", $("#modal-play-video iframe").attr("src"));
+    });
+
+    // $(".btn-request-demo").on('click', function(e) {
+    //   e.preventDefault();
+    //   // $(window).scrollTop(document.getElementById('request-for-demo').offsetTop - 50);
+    // });
+
+    $(".form-request-demo").on('submit', function(e){
       e.preventDefault();
+      form = this
 
       $.ajax({
-        url: '<%= preview_registration_path %>',
-        data: $("#form-request-demo").serialize(),
+        url: '/welcome/preview',
+        data: $(form).serialize(),
         type: "POST",
         dataType: 'json',
         success: function(res){
@@ -237,182 +584,5 @@
         }
       });
     });
-
-    $(".btn-request-demo").on('click', function(e){
-      e.preventDefault();
-      $(window).scrollTop(document.getElementById('section-schedule-demo').offsetTop - 50);
-    });
   });
 </script>
-
-
-<style type="text/css">
-
-  footer{
-    padding-top: 25px;
-    background: #46568B;
-    background: #061735;
-  }
-
-  footer hr{
-    border-color: #CD925A;
-  }
-  .footer h4{
-    font-size: 13px;
-    color: #eee;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-
-  .footer hr{
-    margin: 3px 0 0 0;
-    border-color: #CDBC5A;
-  }
-
-  .footer ul {
-    font-size: 13px;
-    list-style-type: none;
-    margin-left: 0;
-    padding-left: 0;
-    margin-top: 10px;
-    color: #fff;
-  }
-  .footer ul li a {
-    padding: 0 0 5px 0;
-    display: block;
-    font-size: 13px;
-  }
-  .footer a {
-    color: #ddd;
-  }
-  .footer-bottom{
-    padding-bottom: 20px;
-  }
-
-
-  body{
-    padding-top: 0;
-  }
-
-  .no-margin{
-    margin: 0;
-  }
-  .no-padding{
-    padding: 0;
-  }
-
-  .jumbotron{
-    /*height: calc(100% - 50px);*/
-    /*min-height: calc(100vh);*/
-    background: #423689;
-    /*background: #46568b;*/
-    background:#3F51B5;
-    background: #061735;
-    /*color: #efefef;*/
-    margin-bottom: 0;
-    padding-top: 20px;
-  }
-
-  .jumbotron p{
-    font-size: 15px;
-    font-weight: 300;
-    /*font-weight: 200;*/
-    color: #898989;
-  }
-
-  .jumbotron .feature_image{
-    width: 75%;
-    margin-left: 12.5%;
-  }
-
-  /*.jumbotron h1{
-    font-size:
-  }
-*/
-  .jumbotron h2{
-    font-size: 35px;
-    font-weight: 200;
-    color: #3F51B5;
-    color: #CD925A;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
-    margin: 10px auto 30px auto;
-  }
-  .jumbotron h3{
-    /*font-family: Roboto;*/
-    font-size: 24px;
-    font-weight: 200;
-    color: #CD925A;
-    color: #3F51B5;
-    /*color: rgb(147, 193, 120);*/
-  }
-
-  .landing-feature{
-    margin: 100px auto;
-    /*height: 400px;*/
-  }
-
-
-  .contact-fields{
-    padding: 10px;
-    color: #232332;
-    color: #3F51B5;
-    border-radius: 5px;
-    border: 0.5px solid #ddd;
-    width: 90%;
-    margin-bottom: 15px;
-  }
-
-  .contact-button{
-    padding: 10px 20px;
-  }
-
-  /*Social Icons*/
-  .social-icons{
-    text-decoration: none;
-    filter: grayscale(100%) brightness(150%);
-  }
-  .social-icons:hover{
-    text-decoration: none;
-    filter: grayscale(10%);
-  }
-
-.animation-element {
-  opacity: 0;
-  position: relative;
-}
-
-.btn-ghost-round{
-  padding: 10px 20px;
-  border-radius: 30px;
-  background: transparent;
-  border: 2px solid #EDE763;
-  text-transform: uppercase;
-  color: white;
-}
-
-.btn-ghost-round:hover, .btn-ghost-round:active{
-  color: white;
-  text-decoration: none;
-}
-
-ul.footer-lined-links{
-  list-style-type: none;
-  display: inline-block;
-  padding-left: 0;
-}
-
-
-ul.footer-lined-links li{
-  display: inline-block;
-  padding: 0 10px;
-  color: white;
-}
-
-ul.footer-lined-links li a{
-  color: white;
-
-}
-ul.footer-lined-links li a:hover{
-  text-decoration: none;
-}
-</style>
