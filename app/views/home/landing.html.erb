@@ -18,7 +18,7 @@
       <li><a href="#courses">Resources</a></li>
       <li><a href="#pricing">FAQ</a></li>
       <li><a href="#" data-target="#login" data-toggle="modal">Blog</a></li>
-      <li><a href="#footer" class="navbar-request-demo btn-request-demo"><i class="fa fa-phone"></i>&nbsp;&nbsp;Request for a demo</a></li>
+      <li><a href="#footer" data-toggle="modal" data-target="#modal-request-demo" class="navbar-request-demo"><i class="fa fa-phone"></i>&nbsp;&nbsp;Request for a demo</a></li>
       <li><a href="/users/sign_in" class="btn-round btn-border-blue">Login to Finly</a></li>
     </ul>
     </div>
@@ -55,31 +55,57 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-sm-12">
-            <form>
-              <div class="form-group">
-                <label>You Name</label>
-                <input type="text" name="preview[name]">
-              </div>
+            <form class="form-horizontal form-request-demo">
+              <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+              <fieldset>
 
-              <div class="form-group">
-                <label>Your Email</label>
-                <input type="email" name="preview[email]" />
-              </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="name">Name</label>  
+                  <div class="col-md-4">
+                  <input id="name" name="preview[name]" placeholder="Your Name" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-              <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" name="preview[phone_number]" />
-              </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="email">Email</label>  
+                  <div class="col-md-4">
+                  <input id="email" name="preview[email]" placeholder="Your Work Email" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-              <div class="form-group">
-                <label>Company Name</label>
-                <input type="text" name="preview[company]" />
-              </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
+                  <div class="col-md-4">
+                  <input id="phonenumber" name="preview[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
 
-              <div class="form-group">
-                <input type="submit" value="Request Demo">
-              </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="company_name">Company Name</label>  
+                  <div class="col-md-4">
+                  <input id="company_name" name="preview[company]" placeholder="Your Company" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Button -->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="submit"></label>
+                  <div class="col-md-4">
+                    <button id="submit" name="submit" class="btn btn-primary">Request For Demo</button>
+                  </div>
+                </div>
+
+              </fieldset>
             </form>
+ 
           </div>
         </div>
       </div>
@@ -99,18 +125,18 @@
 
           <div class="banner-dynamic">
             <h4>Be a part of the digital cashless economy with</h4>
-            <h3>Easy cash disbursement</h3>
+            <h3 id="banner-dynamic-content"><span style="display: none;">Easy Cash Disbursement</span></h3>
           </div>
 
           <div class="banner-options">
             <button data-toggle="modal" data-target="#modal-play-video" class="btn-round btn-border-white" style="border: 1px solid white;padding: 10px 50px;"><img src="/common/images/landing/banner/play-video.png" style="height: 18px;padding-right: 10px;margin-top: -2px;">Play Video</button>
-            <button class="btn-request-demo btn-round btn-translucent-white" style="border: 1px solid #eee;padding: 10px 30px;margin-left: 22px;"><i class="fa fa-phone"/></i>&nbsp;&nbsp;Request for a demo</button>
+            <button data-toggle="modal" data-target="#modal-request-demo" class="btn-request-demo btn-round btn-translucent-white" style="border: 1px solid #eee;padding: 10px 30px;margin-left: 22px;"><i class="fa fa-phone"/></i>&nbsp;&nbsp;Request for a demo</button>
           </div>
         </div>
 
-        <div class="col-xs-6 banner-image">
+        <!-- <div class="col-xs-6 banner-image">
           <img src="/common/images/landing/banner/main-lg.png" class="img-responsive">
-        </div>
+        </div> -->
 
 
       </div>
@@ -127,29 +153,33 @@
       <div class="header-section text-center">
         <h1 class="text-shadow">What is Finly?</h1>
         <h2>What is Finly?</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem nesciunt vitae,<br> maiores, magni dolorum aliquam.</p>
+        <p>Finly is your one stop solution to have complete visibility and control over your business expenses.</p>
       </div>
     </div>
     <div class="section-info">
       <div class="row">
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/what_is_finly/card-swipe-lg.png" class="img-responsive">
-          <p>Employees use Finly’s card / Cash to spend for the company.</p>
+          <h4>Controlled Spending</h4>
+          <p>Distribute Finly’s VISA Expense Cards with predefined spending limits to all your employees.</p>
         </div>
 
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/what_is_finly/mobile-picture-lg.png" class="img-responsive">
-          <p>Mobile application to instantly snap a picture of the bill</p>
+          <h4>Automated Reporting</h4>
+          <p>Spend using Finly Expense card, snap using Finly App and instantly report Expenses.</p>
         </div>
 
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/what_is_finly/computer-accept-lg.png" class="img-responsive">
-          <p>Mobile application or web application to approve/reject the report</p>
+          <h4>Real-time Visibility</h4>
+          <p>Finly’s Analytics Dashboard gives you visibility on who spent how much and where in real-time.</p>
         </div>
 
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/what_is_finly/app-integration-lg.png" class="img-responsive">
-          <p>Finance manager syncs this data to Tally/Quickbooks immediately.</p>
+          <h4>Integrate Accounting Tools</h4>
+          <p>Finance team can process your business expense data and synchronise the same with your accounting tool.</p>
         </div>
       </div>
     </div>
@@ -165,9 +195,8 @@
       <div class="header-section text-center">
         <h1 class="text-shadow">How Finly Can Help You?</h1>
         <h2>How Finly Can Help You?</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem nesciunt vitae,<br> maiores, magni dolorum aliquam. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Finly helps you track and manage your business expenses from end-to-end.
+        We are here to take away your worries about expense reporting, processing cash advance requests and reimbursements, utility bill payments, and most importantly keeping your accounting tool up-to-date. We have got it all covered for you.</p>
       </div>
     </div>
 
@@ -190,31 +219,19 @@
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="stakeholder-sales">
               <img src="/common/images/landing/how_finly_can_help/sales.png">
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+              <p>Manage your team’s travel expenses and reimbursements in just a few clicks using Finly. Our VISA expense cards are accepted everywhere - online, POS and any ATM across India.</p>
             </div>
             <div role="tabpanel" class="tab-pane" id="stakeholder-admin">
               <img src="/common/images/landing/how_finly_can_help/admin.png">
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+              <p>Use Finly to streamline and automate petty cash management, vendor and utility bill payments.  Ensure zero cash-leakage using real-time disbursement, tracking and accounting.</p>
             </div>
             <div role="tabpanel" class="tab-pane" id="stakeholder-marketing">
               <img src="/common/images/landing/how_finly_can_help/marketing.png">
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+              <p>Get end to end visibility into all your digital marketing purchases in a single screen. Set spending limits using Finly’s policy engine and compare multiple platforms instantly using Finly’s Analytics dashboard.</p>
             </div>
             <div role="tabpanel" class="tab-pane" id="stakeholder-fieldworker">
               <img src="/common/images/landing/how_finly_can_help/field-worker.png">
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+              <p>Virtually track and approve expenses instantaneously for a huge workforce present on the field.</p>
             </div>
           </div>
         </div>
@@ -225,6 +242,15 @@
   </div>
 </section>
 <!--/ How Finly Can Help You-->
+<div class="finly-form-group">
+  <form class="form-request-demo">
+  <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+  <input type="text" name="preview[email]" class="input-round-finly" placeholder="Your email"/>
+  <input type="text" name="preview[phone_number]" class="input-round-finly" placeholder="Your mobile"/>
+  <input type="submit" class="button-round-finly" value="Get a Demo" />
+  </form>
+</div> 
+
 
 
 <!--Features & Benefits-->
@@ -234,9 +260,8 @@
       <div class="header-section text-center">
         <h1 class="text-shadow">Featues &amp; Benefits</h1>
         <h2>Features &amp; Benefits</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem nesciunt vitae,<br> maiores, magni dolorum aliquam. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Features You Only Get With Real Time Software.
+        Time to equip your business with a powerful Expense Management System.</p>
       </div>
     </div>
 
@@ -245,25 +270,25 @@
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/features_benefits/calendar-lg.png" class="img-responsive">
           <h4>Superfast Reporting</h4>
-          <p>Cash expenses can be reported on the fly using the mobile app. Card expenses are automatically reported.</p>
+          <p>Finly’s Expense Card and Mobile Application can help Employees quickly submit their Expenses.</p>
         </div>
 
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/features_benefits/control-lg.png" class="img-responsive">
           <h4>Complete Control</h4>
-          <p>Our powerful policy engine allows you to have control even before the 5spend happens using the card by allowing you to set budgets and spend.</p>
+          <p>Have control before and after spend occurs using our powerful Policy Control Engine.</p>
         </div>
 
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/features_benefits/realtime-lg.png" class="img-responsive">
           <h4>Realtime Visibility</h4>
-          <p>The Analytics Dashboard gives complete real time visibility into who is spending how much money within your organization.</p>
+          <p>Use the power of Instant Notifications and Analytics Dashboard to make accurate data-driven decisions.</p>
         </div>
 
         <div class="col-xs-3 text-center">
           <img src="/common/images/landing/features_benefits/mobile-lg.png" class="img-responsive">
           <h4>Instant Disbursement</h4>
-          <p>All transfers are real time 365 days 24/7. Empower your employees with Finly Expense cards and make instant transfers at the click of a button.</p>
+          <p>No more long waits for money transfers. Disburse cash to Employees instantly at the click of a button.</p>
         </div>
       </div>
     </div>
@@ -272,16 +297,14 @@
       <div class="col-xs-10 col-xs-offset-1">
         <div class="well">
           <h3>Finly Expense Cards</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p>You no longer need to rely on sharing Credit Cards or allow your Employees to incur out of pocket expenses. Employees can now spend using our Prepaid Card at ATMs, Online Stores or make In store purchase, of course at the discretion of the Employer.</p>
 
           <img src="/common/images/landing/features_benefits/finly-card-md.png" class="img-responsive">
           <ul class="finly-expense-card-features">
-            <li>No bank account required</li>
-            <li>Turn on/off cards on the fly</li>
-            <li>Set Budget and transaction restrictions</li>
-            <li>Preferential usage: set places it can be used in atms, pos, online</li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;No bank account required</p></li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Turn on/off cards on the fly</p></li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Set Budget and transaction restrictions</p></li>
+            <li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Preferential usage: set places it can be used in atms, pos, online</p></li>
           </ul>
         </div>
       </div>
@@ -306,34 +329,32 @@
       <div class="col-xs-4 text-center">
         <img src="/common/images/landing/security/visa-card-lg.png" class="img-responsive">
         <h4>VISA Card</h4>
-        <p>Employees use Finly’s card / Cash to spend for the company..</p>
+        <p>Finly’s Expense Cards are powered by VISA and accepted everywhere.</p>
       </div>
 
       <div class="col-xs-4 text-center">
         <img src="/common/images/landing/security/fraud-monitoring-lg.png" class="img-responsive">
         <h4>24x7 Fraud Monitoring</h4>
-        <p>Employees use Finly’s Card / Cash to spend for the company.</p>
+        <p>Our system works 24/7 to identify and flag any suspicious activity immediately.</p>
       </div>
 
       <div class="col-xs-4 text-center">
         <img src="/common/images/landing/security/security-lg.png" class="img-responsive">
         <h4>Bank-Level Security</h4>
-        <p>Employees use Finly’s card / Cash to spend for the company.</p>
+        <p>Sensitive data is stored in PCIDSS level-1 compliant data centre and in 2048-bit SSL encrypted.</p>
       </div>
     </div>
     <div class="row security-features">
       <div class="col-xs-4 col-xs-offset-2 text-center">
         <img src="/common/images/landing/security/itzcash-partner-lg.png" class="img-responsive">
         <h4>ItzCash Partner</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Finly Expense Cards are issued by Itzcash - a seamless, safe and trusted payments platform.</p>
       </div>
 
       <div class="col-xs-4 text-center">
         <img src="/common/images/landing/security/reserve-bank-lg.png" class="img-responsive">
-        <h4>We Abide by RBI Guidelines</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <h4>RBI Bound</h4>
+        <p>Every transaction on Finly follows the guidelines set by the Reserve Bank of India.</p>
       </div>
     </div>
   </div>
@@ -365,11 +386,11 @@
             <div class="item active">
               <div class="row">
                 <div class="col-sm-6 col-sm-offset-3">
-                  <img src="/common/images/landing/testimonials/user_one.jpg" class="img-responsive img-circle user-img">
-                  <h5>Random User</h5>
-                  <div class="designation">XXX, Company Name</div>
+                  <img src="/common/images/landing/testimonials/agni_group.jpg" class="img-responsive img-circle user-img">
+                  <h5>Agnishwar Jayaprakash</h5>
+                  <div class="designation">Director of Operations, Agni Group of Companies</div>
 
-                  <p>&ldquo;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Etiam porta sem malesuada magna mollis euismod. Nulla vitae elit libero, a pharetra augue. Donec id elit non mi porta gravida at eget metus.&rdquo;</p>
+                  <p>&ldquo;Processing cash advances and reimbursements for my employees was always a hassle before we started using Finly. Now, my Finance manager is able to disburse money as and when needed in seconds.&rdquo;</p>
                 </div>
               </div>
             </div>
@@ -379,11 +400,11 @@
             <div class="item">
               <div class="row">
                 <div class="col-sm-6 col-sm-offset-3">
-                  <img src="/common/images/landing/testimonials/user_two.jpg" class="img-responsive img-circle user-img">
-                  <h5>Random User</h5>
-                  <div class="designation">XXX, Company Name</div>
+                  <img src="/common/images/landing/testimonials/movie_korner.jpg" class="img-responsive img-circle user-img">
+                  <h5>Tanzeem Ahmed</h5>
+                  <div class="designation">Founder, NTT ECom Pvt. Ltd.</div>
 
-                  <p>&ldquo;Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean lacinia bibendum nulla sed consectetur. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.&rdquo;</p>
+                  <p>&ldquo;Documenting and saving all the receipts in one place was a big issue and we suffered especially during the audits. Finly has helped us solve this problem and the system takes care of my organization’s expense management end to end without any difficulty.&rdquo;</p>
                 </div>
               </div>
             </div>
@@ -393,11 +414,11 @@
             <div class="item">
               <div class="row">
                 <div class="col-sm-6 col-sm-offset-3">
-                  <img src="/common/images/landing/testimonials/user_three.jpg" class="img-responsive img-circle user-img">
-                  <h5>Random User</h5>
-                  <div class="designation">XXX, Company Name</div>
+                  <img src="/common/images/landing/testimonials/mrhm_pharma.png" class="img-responsive img-circle user-img">
+                  <h5>Mr. KM Shetty</h5>
+                  <div class="designation">Founder &amp; CEO, MRHM Pharma</div>
 
-                  <p>&ldquo;Aenean lacinia bibendum nulla sed consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Maecenas faucibus mollis interdum. Cras mattis consectetur purus sit amet fermentum.&rdquo;</p>
+                  <p>&ldquo;Disbursing money and processing reimbursements for my organization’s sales work force who are distributed across the country was not an easy task at all. We never used to get the receipts in proper shape or in time before. Thanks to Finly, we don’t face those problems anymore&rdquo;</p>
                 </div>
               </div>
             </div>
@@ -406,7 +427,6 @@
       </div>
     </div>
   </div>
-  
 </section>
 
 
@@ -423,14 +443,14 @@
     </div>
 
     <div class="row">
-      <div class="col-xs-6 col-xs-offset-3">
-        <form>
+      <div class="col-xs-8 col-xs-offset-2">
+        <form class="form-request-demo">
+          <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
           <div class="finly-form-group">
-            <input type="text" name="mobile" class="input-round" placeholder="Contact Number">
-            <input type="email" name="email" class="input-round" placeholder="Your Company Email">
-            <input type="submit" value="Get an invite" class="btn-round">  
-          </div>
-          
+            <input type="text" name="preview[email]" class="input-round-finly" placeholder="Your email"/>
+            <input type="text" name="preview[phone_number]" class="input-round-finly" placeholder="Your mobile"/>
+            <input type="submit" class="button-round-finly" value="Get a Demo" />
+          </div> 
         </form>
       </div>
     </div>
@@ -446,10 +466,10 @@
         </ul>
         <hr>
         <ul class="social-links">
-          <li><a href="http://fb.me/finly.io"><img src="/common/images/landing/social/facebook.png"></a></li>
-          <li><a href="http://twitter.com/finly_io"><img src="/common/images/landing/social/twitter.png"></a></li>
-          <li><a href="http://plus.google.com/finly_io"><img src="/common/images/landing/social/google.png"></a></li>
-          <li><a href="http://linkedin.com/finly_io"><img src="/common/images/landing/social/linkedin.png"></a></li>
+          <li><a href="http://fb.me/finly.io" target="_blank"><img src="/common/images/landing/social/facebook.png"></a></li>
+          <li><a href="http://twitter.com/finly_io" target="_blank"><img src="/common/images/landing/social/twitter.png"></a></li>
+          <li><a href="https://plus.google.com/u/0/111517948130779105047" target="_blank"><img src="/common/images/landing/social/google.png"></a></li>
+          <li><a href="https://www.linkedin.com/company-beta/13222948/" target="_blank"><img src="/common/images/landing/social/linkedin.png"></a></li>
         </ul>
       </div>
     </div>    
@@ -460,18 +480,54 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
+    // Dynamic banner content
+    ar = ["Instant Expense Reporting", "Immediate Approvals", "Quick Reimbursements", "Zero Paperwork", "Zero Auditing Hassles", "Easy Cash Disbursement", "Complete Visibility", "Robust Expense Policies"];
+    var i = 0;
+    timer = setInterval(function(){
+      $("#banner-dynamic-content span").fadeOut()
+      max = ar.length;
+      if(i == max){
+        i = 0;
+      }
+      $("#banner-dynamic-content").html("<span style='display: none;'>" + ar[i] + "</span>");
+      $("#banner-dynamic-content span").fadeIn()
+
+
+      i++;
+    }, 2500);
     //carousel options
     $('#quote-carousel').carousel({
-      pause: true, interval: 100000,
+      pause: true, interval: 10000,
     });
 
     $("#modal-play-video").on('hidden.bs.modal', function (e) {
       $("#modal-play-video iframe").attr("src", $("#modal-play-video iframe").attr("src"));
     });
 
-    $(".btn-request-demo").on('click', function(e) {
+    // $(".btn-request-demo").on('click', function(e) {
+    //   e.preventDefault();
+    //   // $(window).scrollTop(document.getElementById('request-for-demo').offsetTop - 50);
+    // });
+
+    $(".form-request-demo").on('submit', function(e){
       e.preventDefault();
-      $(window).scrollTop(document.getElementById('request-for-demo').offsetTop - 50);
-    })
+      form = this
+
+      $.ajax({
+        url: '/welcome/preview',
+        data: $(form).serialize(),
+        type: "POST",
+        dataType: 'json',
+        success: function(res){
+          // console.log(res);
+          if(res.success === true){
+            ohSnap("Thank you for the request! We will contact you soon", {color: 'green', 'duration': '6000'});
+          } else {
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+          }
+        }
+      });
+    });
   });
 </script>

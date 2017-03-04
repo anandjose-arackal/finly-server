@@ -195,16 +195,40 @@ body {
     color: rgba(0, 0, 0, 0.06);
     user-select: none;
     -moz-user-select: none;
+    -webkit-user-select: none;
+    cursor: default;
+  }
+
+  h2{
+    color: #555;
   }
 }
 
 // Banner
 .banner{
   margin-top: 65px;
-  background: url('/common/images/landing/banner/background-md.png') no-repeat center top;
+  // background: url('/common/images/landing/banner/background-md.png') no-repeat center top;
   background-size: cover;
-  min-height: 450px;
+  min-height: 550px;
   color: #fff;
+
+  // Ple
+  // background-image:url('/common/images/landing/banner/background-md.png'), url(/common/images/landing/banner/background-md.png);
+  // background-position: no-repeat center top, right center no-repeat;
+  // background-size:cover, auto 490px;
+  // background-position-x: left;
+  background: #3D4B9D;
+  background-image: url("https://s24.postimg.org/4iqves2ph/mobile.gif"), url("https://s23.postimg.org/54tkt1f9n/finly_card_md.png"), url("https://s23.postimg.org/tk1su3e6j/monitor.png"), url("https://s24.postimg.org/l7sbaozat/transparent_layer.png"), url('/common/images/landing/banner/background-md.png');
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position-y: 382px, 439px, 177px, top, center;
+  background-position-x: 64%, 55%, 86%, right, center;
+  background-size: 93px, 154px, 400px, 665px, cover;
+
+
+  // width: 970px;
+  // height: 490px;
+  // margin-top: -75px;
+  // margin-left: -30px;
 
   h1{
     margin-top: 100px;
@@ -250,14 +274,6 @@ body {
   // padding-top: 50px;
   padding-bottom: 50px;
 
-  // h1.text-shadow{
-  //   text-transform: uppercase;
-  //   font-size: 66px;
-  //   color: rgba(0, 0, 0, 0.06);
-  //   font-weight: 700;
-  //   -moz-user-select: none;
-  // }
-
   h2{
     text-transform: uppercase;
     margin-bottom: 20px;
@@ -265,6 +281,13 @@ body {
 
   .section-info{
     margin-top: 50px;
+    h4{
+      font-size: 17px;
+      color: #454545;
+    }
+    p{
+      font-size: 15px;
+    }
     img{
       height: 125px;
       margin-left: auto;
@@ -278,7 +301,7 @@ body {
   background: #E6F7FE;
   background-image: radial-gradient(circle at 50% 46%, rgba(52, 189, 240, 0.1), rgba(101, 224, 249, 0.2));
   // padding-top: 50px;
-  padding-bottom: 50px;
+  padding-bottom: 100px;
 
   .header-section{
     margin-bottom: 50px;
@@ -293,6 +316,11 @@ body {
     h2{
       text-transform: uppercase;
       margin-bottom: 20px;
+    }
+    p{
+      width: 75%;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
   
@@ -346,7 +374,44 @@ body {
   }
 }
 
+.input-md{
+  width: 250px;
+}
+.finly-form-group{
+  box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.3);
+  background: white;
+  margin: 10px 10px;
+  border-radius: 50px;
+  width: 610px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  top: -43px;
+
+  .input-round-finly{
+    width: 240px;
+    border-radius: 50px;
+    height: 25px;
+    padding-left: 35px;
+    border: none;
+  }
+
+  .button-round-finly{
+    width: 123px;
+    border: none;
+    background: #454545;
+    color: white;
+    padding: 18px;
+    border-radius: 50px;
+    position: relative;
+    left: 2px;
+  }
+}
+
 #features-benefits{
+  .container{
+    margin-top: -50px;
+  }
   // padding-top: 50px;
   padding-bottom: 50px;
 
@@ -365,6 +430,13 @@ body {
 
   .section-info{
     margin-top: 50px;
+    h4{
+      color: #454545;
+      font-size: 17px;
+    }
+    p{
+      font-size: 15px;
+    }
     img{
       height: 100px;
       margin-left: auto;
@@ -386,13 +458,29 @@ body {
     }
     img{
       display: inline-block;
+      position: relative;
+      margin-top: -100px;
     }
 
     ul.finly-expense-card-features{
       display: inline-block;
+      margin-top: 20px;
+
+      .card-list-check{
+        display: block;
+        position: relative;
+        padding-bottom: 7px;
+      }
+      .card-list-check::before {
+        color: #3BBA6C;
+      }
 
       li{
         margin-bottom: 10px;
+        p{
+          display: inline-block;
+          margin-bottom: 15px;
+        }
 
       }
     }
@@ -422,6 +510,14 @@ body {
 
   .security-features{
     margin-bottom: 20px;
+    h4{
+      color: #454545;
+      font-size: 17px;
+      margin-top: 20px;
+    }
+    p{
+      font-size: 15px;
+    }
     img{
       margin-left: auto;
       margin-right: auto;
@@ -529,26 +625,33 @@ body {
   form{
     margin-top: 50px;
     margin-bottom: 100px;
+    color: #555;
+
+    .finly-form-group{
+      top: 0;
+    }
   }
   
 
-  input[type=submit]{
-    padding: 16px 25px;
-    border: none;
-    background: #373737;
-    color: white;
-    position: relative;
-    left: -46px;
-  }
+  // input[type=submit]{
+  //   padding: 16px 25px;
+  //   border: none;
+  //   background: #373737;
+  //   color: white;
+  //   position: relative;
+  //   left: -46px;
+  //   width: 30%;
+  // }
 
-  .input-round{
-    padding: 15px 25px;
-    width: 60%;
-    border-radius: 50px;
-    border: none;
-    padding-right: 50px;
-    margin-left: 69px;
-  }
+  // .input-round{
+  //   padding: 15px 25px;
+  //   width: 30%;
+  //   border-radius: 50px;
+  //   border: none;
+  //   padding-right: 50px;
+  //   margin-left: 69px;
+  //   color: #555;
+  // }
 
   hr{
     max-width: 600px;
@@ -562,6 +665,13 @@ body {
       list-style: none;
       display: inline-block;
       margin-right: 60px;
+      a{
+        color: white;
+      }
+      a:hover, a:active{
+        color: white;
+        text-decoration: none;
+      }
     }
   }
   ul.social-links{
@@ -578,4 +688,28 @@ body {
     }
   }
 
+}
+
+@media (min-width: 800px) and (max-width: 1100px) {
+  #primary-navbar.navbar li a{
+    font-size:11px !important;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+
+  #primary-navbar.navbar .navbar-brand{
+    font-size: 16px !important;
+  }
+}
+
+@media (min-width: 1450px) {
+  .banner{
+    background: #3D4B9D;
+    background-image: url("https://s24.postimg.org/4iqves2ph/mobile.gif"), url("https://s23.postimg.org/54tkt1f9n/finly_card_md.png"), url("https://s23.postimg.org/tk1su3e6j/monitor.png"), url("https://s24.postimg.org/l7sbaozat/transparent_layer.png"), url("/common/images/landing/banner/background-md.png");
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position-y: 382px, 439px, 177px, top, center;
+    background-position-x: 74%, 68%, 89%, right, center;
+    background-size: 93px, 154px, 400px, 665px, cover;
+  }
 }
