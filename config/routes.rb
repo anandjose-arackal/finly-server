@@ -510,7 +510,7 @@
 #
 
 Rails.application.routes.draw do
-
+  get '/landing', to: 'home#landing'
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
