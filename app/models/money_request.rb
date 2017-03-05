@@ -32,6 +32,7 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -47,6 +48,8 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy
   belongs_to :payment
+
+  has_many :custom_fields, as: :parent
 
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy

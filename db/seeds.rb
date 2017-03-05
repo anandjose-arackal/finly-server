@@ -101,6 +101,8 @@ if MoneyRequestTrackingAction.count == 0
   end
 end
 
+
+
 if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
@@ -190,6 +192,18 @@ end
 if ChannelType.count == 0
   ChannelType::TYPES.each do |k, v|
     ChannelType.create(name: ChannelType::NAMES[v], abbreviation: k.to_s.upcase)
+  end
+end
+
+if FieldParentType.count == 0
+  FieldParentType::TYPES.each do |key, value|
+    FieldParentType.create id: value, name: key
+  end
+end
+
+if FieldType.count == 0
+  FieldType::TYPES.each do |key, value|
+    FieldType.create id: value, name: key
   end
 end
 

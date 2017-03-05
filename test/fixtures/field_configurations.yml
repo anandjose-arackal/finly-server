@@ -1,0 +1,36 @@
+# == Schema Information
+#
+# Table name: field_configurations
+#
+#  id                   :integer          not null, primary key
+#  enabled              :boolean          default(TRUE), not null
+#  field_type_id        :integer          not null
+#  mandatory            :boolean          default(FALSE), not null
+#  company_id           :integer          not null
+#  field_parent_type_id :integer          not null
+#  configurable_id      :integer          not null
+#  configurable_type    :string(255)      not null
+#  default_value        :text(65535)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  enabled: false
+  field_type_id: 
+  mandatory: false
+  company_id: 
+  field_parent_type_id: 
+  configuration_level_id: 
+  default_value: MyText
+
+two:
+  enabled: false
+  field_type_id: 
+  mandatory: false
+  company_id: 
+  field_parent_type_id: 
+  configuration_level_id: 
+  default_value: MyText

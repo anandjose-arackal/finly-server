@@ -33,6 +33,8 @@
 
 
 
+
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -53,6 +55,8 @@ class Report < ActiveRecord::Base
   belongs_to :reimbursement_amount, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
+
+  has_many :custom_fields, as: :parent
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"

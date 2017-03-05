@@ -50,6 +50,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -112,6 +114,8 @@ class User < ActiveRecord::Base
   has_many :notifier_type_configurations
 
   has_many :user_balance_histories
+
+  has_many :field_configurations, as: :configurable
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping

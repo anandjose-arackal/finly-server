@@ -69,6 +69,8 @@ class Amount < ActiveRecord::Base
   alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
   alias_method :wallet_balance_value, :amount_value
 
+  scope :with_id, -> (id) { where id: id }
+
   def greater_than_amount_value
     self.value
   end
