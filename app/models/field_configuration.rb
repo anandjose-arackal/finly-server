@@ -3,6 +3,7 @@
 # Table name: field_configurations
 #
 #  id                   :integer          not null, primary key
+#  field_name           :string(255)      not null
 #  enabled              :boolean          default(TRUE), not null
 #  field_type_id        :integer          not null
 #  mandatory            :boolean          default(FALSE), not null
@@ -13,7 +14,6 @@
 #  default_value        :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  field_name           :string(255)      not null
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -29,7 +29,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true
-  validates :mandatory, presence: true
+  # validates :mandatory, presence: true
   validates :company_id, presence: true
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
@@ -38,6 +38,8 @@ class FieldConfiguration < ActiveRecord::Base
 
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
+
+  scope :with_id, -> (id) { where id: id }
 
   def validate_config
     case field_type_id

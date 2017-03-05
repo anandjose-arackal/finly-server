@@ -1,6 +1,14 @@
 class CustomField::Configuration::ValidateFieldValue < CustomField::Configuration::Base
   attr_accessor :value, :key, :config
 
+  def self.call(params)
+    self.new(params).run
+  end
+
+  def initialize(params)
+    super(nil, params)
+  end
+
   def pre_validate
     if params.blank?
       add_message :error, 'Nothing to validate'
@@ -52,6 +60,19 @@ class CustomField::Configuration::ValidateFieldValue < CustomField::Configuratio
       when :amount
         # Amount validation is Not required as Amount model would be handling the validation
     end
+  end
+
+  def success
+      CustomField::Configuration::ValidateFieldValue::SuccessPresenter.new(params)
+  end
+
+  class CustomField::Configuration::ValidateFieldValue::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :params
+
+    def initialize(params)
+      super(nil, params)
+    end
+
   end
 
 end

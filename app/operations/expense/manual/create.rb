@@ -13,7 +13,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   def pre_validate
     super
     if params.blank?
-      messages[:error] << 'Parameters not present.'
+      messages[:error] << 'Parameters not present'
     end
     if params[:expense].blank?
       messages[:error] << 'You have not provided any details to create an expense'

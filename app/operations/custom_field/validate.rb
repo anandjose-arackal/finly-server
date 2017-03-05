@@ -1,6 +1,14 @@
 class CustomField::Validate < CustomField::Base
   attr_accessor :field
 
+  def self.call(params)
+    self.new(params).run
+  end
+
+  def initialize(params)
+    super(nil, params)
+  end
+
   def pre_validate
     if params.blank?
       add_message :error, 'Configuration not loaded correctly'
@@ -44,6 +52,19 @@ class CustomField::Validate < CustomField::Base
     unless field.parent_type == config.field_parent_type.name
       add_message :error, 'Configuration error. Please try again'
     end
+  end
+
+  def success
+    CustomField::Validate::SuccessPresenter.new(params)
+  end
+
+  class CustomField::Validate::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :params
+
+    def initialize(params)
+      super(nil, params)
+    end
+
   end
 
 end
