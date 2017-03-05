@@ -41,6 +41,9 @@ class CustomField::Validate < CustomField::Base
       add_message :error, result.messages[:error]
       return
     end
+    unless field.parent_type == config.field_parent_type.name
+      add_message :error, 'Configuration error. Please try again'
+    end
   end
 
 end

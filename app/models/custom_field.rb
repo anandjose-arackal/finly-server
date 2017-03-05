@@ -20,7 +20,7 @@ class CustomField < ActiveRecord::Base
   def validate_field
     result = CustomField::Validate.(self)
     unless result.success?
-      result.messages[:errors].each do |error|
+      result.messages[:error].each do |error|
         self.errors.add :error, error
       end
     end

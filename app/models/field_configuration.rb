@@ -46,7 +46,7 @@ class FieldConfiguration < ActiveRecord::Base
     if default_value.present?
       result = CustomField::Configuration::ValidateFieldValue.(value: default_value, config: self)
       unless result.success?
-        result.messages[:errors].each do |error|
+        result.messages[:error].each do |error|
           self.errors.add :error, error
         end
       end
