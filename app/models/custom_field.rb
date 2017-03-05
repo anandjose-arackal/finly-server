@@ -18,9 +18,11 @@ class CustomField < ActiveRecord::Base
   validate :validate_field
 
   def validate_field
-    errors = FieldConfiguration.valid_field?(self)
-    if errors.present?
-      self.errors.add errors
+    result = CustomField::Validate.(self)
+    unless result.success?
+      result.messages[:errors].each do |error|
+        self.errors.add :error, error
+      end
     end
   end
 end

@@ -32,25 +32,24 @@ class FieldConfiguration < ActiveRecord::Base
   validates :company_id, presence: true
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
-  validates :configurable_type, presence: true, :inclusion=> { :in => ['Police', 'Company', 'User'] }
+  validates :configurable_type, presence: true, :inclusion => {:in => ['Police', 'Company', 'User']}
   validate :validate_config
 
   def validate_config
     case field_type_id
-      when FieldType.id_for(:dropdown)
+      when FieldType.id_for(:drop_down)
         if drop_down_items.blank?
-          self.errors.add(:dropdown, 'cannot be empty')
+          self.errors.add(:drop_down, 'cannot be empty')
         end
     end
     if default_value.present?
-      error = FieldType.valid_value?(field_type_id, default_value)
-      if error.present?
-        self.errors.add error
+      result = CustomField::Configuration::ValidateFieldValue.(type_id: field_type_id, value: default_value, field_name: self.field_name)
+      unless result.success?
+        result.messages[:errors].each do |error|
+          self.errors.add :error, error
+        end
       end
     end
   end
 
-  def self.valid_field?(field)
-
-  end
 end
