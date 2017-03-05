@@ -1,13 +1,5 @@
 class CustomField::Configuration::ValidateFieldValue < CustomField::Configuration::Base
-  attr_accessor :type_id, :value, :key, :field_name
-  
-  def self.call(params)
-    self.new(params).run
-  end
-  
-  def initialize(params)
-    super(nil, params)
-  end
+  attr_accessor :value, :key, :config
 
   def pre_validate
     if params.blank?
@@ -17,25 +9,21 @@ class CustomField::Configuration::ValidateFieldValue < CustomField::Configuratio
     if params[:type_id].blank?
       add_message :error, 'Invalid Configuration. Type ID not found'
     end
-    if params[:field_name].blank?
-      add_message :error, 'Invalid Configuration. Field name cannot be empty'
+    if params[:config].blank?
+      add_message :error, 'Invalid Configuration. Configuration not found'
     end
   end
 
   def init
-    self.field_name = params[:field_name]
-    self.type_id = params[:type_id]
     self.value = params[:value]
-    self.key = FieldType.name_for(type_id)
+    self.config = params[:config]
+    self.key = FieldType.name_for(config.field_type_id) if config.present?
   end
 
   def validate
-    if field_name.blank?
-      add_message :error, 'Invalid Configuration. Field name cannot be empty'
+    if self.config.blank?
+      add_message :error, 'Invalid Configuration. Configuration not found'
       return
-    end
-    if type_id.blank?
-      add_message :error, "'Invalid Configuration. #{field_name}'s Type ID not found'"
     end
     if value.blank?
       add_message :error, "#{field_name}'s value cannot be empty"
@@ -57,16 +45,15 @@ class CustomField::Configuration::ValidateFieldValue < CustomField::Configuratio
       when :boolean
         return unless StringUtils.to_bool(value).nil?
         add_message :error, 'Given value is not a boolean'
-      when :dropdown
-        return if Integer (value) and FieldDropDownItem.with_id(value).present? rescue nil
-        add_message :error, 'Selected item not found within the scope of the dropdown'
+      when :drop_down
+        return if Integer (value) and config.drop_down_items.with_id(value).present? rescue nil
+        add_message :error, 'Selected item not found within the scope of the drop-down'
       when :date
         # Validates date format for 12 Apr 2011
         return if Date.strptime(value, "%d %b %Y") rescue nil
         add_message :error, 'Given date is not a valid date format'
       when :amount
-        return if Integer (value) and Amount.with_id(value).present? rescue nil
-        add_message :error, 'Entered amount is invalid format'
+        # Amount validation is Not required as Amount model would be handling the validation
     end
   end
 

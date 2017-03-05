@@ -13,6 +13,7 @@
 #  default_value        :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  field_name           :string(255)      not null
 #
 
 require 'test_helper'

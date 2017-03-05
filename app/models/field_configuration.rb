@@ -13,6 +13,7 @@
 #  default_value        :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  field_name           :string(255)      not null
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -43,7 +44,7 @@ class FieldConfiguration < ActiveRecord::Base
         end
     end
     if default_value.present?
-      result = CustomField::Configuration::ValidateFieldValue.(type_id: field_type_id, value: default_value, field_name: self.field_name)
+      result = CustomField::Configuration::ValidateFieldValue.(value: default_value, config: self)
       unless result.success?
         result.messages[:errors].each do |error|
           self.errors.add :error, error

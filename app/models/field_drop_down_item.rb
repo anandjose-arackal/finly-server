@@ -14,5 +14,5 @@ class FieldDropDownItem < ActiveRecord::Base
 
   validates :name, presence: true
 
-  scope with_id, -> (id){ where id: id }
+  scope :with_id, -> (id){ where id: id }
 end
