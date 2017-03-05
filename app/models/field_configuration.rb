@@ -33,8 +33,11 @@ class FieldConfiguration < ActiveRecord::Base
   validates :company_id, presence: true
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
-  validates :configurable_type, presence: true, :inclusion => {:in => ['Police', 'Company', 'User']}
+  validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company', 'User']}
   validate :validate_config
+
+  accepts_nested_attributes_for :drop_down_items
+  accepts_nested_attributes_for :custom_fields
 
   def validate_config
     case field_type_id
@@ -43,11 +46,16 @@ class FieldConfiguration < ActiveRecord::Base
           self.errors.add(:drop_down, 'cannot be empty')
         end
     end
+    # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense
+    # if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type == 'Policy'
+    #   add_message :error, 'Custom expense field cannot be added at a policy level'
+    #   return
+    # end
     if default_value.present?
       result = CustomField::Configuration::ValidateFieldValue.(value: default_value, config: self)
       unless result.success?
         result.messages[:error].each do |error|
-          self.errors.add :error, error
+          self.errors.add :error, ": #{error}"
         end
       end
     end
