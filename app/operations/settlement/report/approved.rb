@@ -36,35 +36,54 @@ class Settlement::Report::Approved < Report::Base
     balance_sheet = report.user.balance_sheet
     total_cash_amount = report.total_amount(:only_manual_expenses)
     total_card_amount = report.total_amount(:only_card_expenses)
-    currency = Currency.first # todo - temporary until currency is implemented
-    cash_expenses_total = total_cash_amount
-    balance_sheet.add_approved_reports_total cash_expenses_total, currency
+    currency = Currency.first
+    balance_sheet.add_approved_reports_total total_cash_amount, currency
+
+    # adding report's total cash amount
     if report.cash_expenses_total.blank?
-      report_amount = Amount.new(value: cash_expenses_total, currency: Currency.first)
-      unless report_amount.save
-        messages[:error] = report_amount.errors.full_messages
+      cash_amount = Amount.new(value: total_cash_amount, currency: Currency.first)
+      unless cash_amount.save
+        messages[:error] = cash_amount.errors.full_messages
         return
       end
-      report.cash_expenses_total = report_amount
+      unless report.update_attributes(cash_expenses_total: cash_amount)
+        messages[:error] = report.errors.full_messages
+        return
+      end
     else
-      report_amount = report.cash_expenses_total
-      report_amount.value = cash_expenses_total
-      report_amount.currency = currency
-      unless report_amount.save
+      cash_amount = report.cash_expenses_total
+      unless cash_amount.update_attributes(value: total_cash_amount, currency: Currency.first)
         messages[:error] = report_amount.errors.full_messages
         return
       end
     end
 
-    report.accounted = true
-    report.accounted_at = DateUtils.local_date
+    # adding reports total card amount
+    if report.card_expenses_total.blank?
+      card_amount = Amount.new(value: total_card_amount, currency: Currency.first)
+      unless card_amount.save
+        messages[:error] = card_amount.errors.full_messages
+        return
+      end
+      unless report.update_attributes(card_expenses_total: card_amount)
+        messages[:error] = report.errors.full_messages
+        return
+      end
+    else
+      card_amount = report.card_expenses_total
+      unless card_amount.update_attributes(value: total_card_amount, currency: Currency.first)
+        messages[:error] = card_amount.errors.full_messages
+        return
+      end
+    end
+
     unless report.save
       messages[:error] = report.errors.full_messages
     end
   end
 
   def post_process
-    # mailer
+
   end
 
   def success

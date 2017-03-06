@@ -33,6 +33,7 @@ class Settlement::Report::Unapproved < Report::Base
     cash_expenses_total = report.cash_expenses_total.value if report.cash_expenses_total.present?
     report.user.balance_sheet.subtract_approved_reports_total cash_expenses_total, currency
     report.cash_expenses_total.update(value: 0) if report.cash_expenses_total.present?
+    report.card_expenses_total.update(value: 0) if report.card_expenses_total.present?
     unless report.update_attributes(accounted: false)
       messages[:error] = report.errors.full_messages
     end

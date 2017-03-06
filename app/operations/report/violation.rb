@@ -161,7 +161,7 @@ class Report::Violation < Report::Base
     report = expense.report
     total_expenses = 0
     # all user reports with the associated budget
-    user.reports.where(report_status_id: [5, 6, 7, 8]).where(policy_id: rule.policy_id).where.not(id: report.id).each do |budget_report|
+    user.reports.where(report_status_id: [ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]).where(policy_id: rule.policy_id).where.not(id: report.id).each do |budget_report|
       if category
         total_expenses += number_with_precision(budget_report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
       else
