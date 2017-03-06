@@ -3,7 +3,6 @@
 # Table name: field_configurations
 #
 #  id                   :integer          not null, primary key
-#  field_name           :string(255)      not null
 #  enabled              :boolean          default(TRUE), not null
 #  field_type_id        :integer          not null
 #  mandatory            :boolean          default(FALSE), not null
@@ -11,9 +10,11 @@
 #  field_parent_type_id :integer          not null
 #  configurable_id      :integer          not null
 #  configurable_type    :string(255)      not null
-#  default_value        :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  field_name           :string(255)      not null
+#  default_value_id     :integer
+#  default_value_type   :string(255)
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -25,6 +26,8 @@ class FieldConfiguration < ActiveRecord::Base
 
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :custom_fields
+  belongs_to :default_value, polymorphic: true
+
 
   validates :field_name, presence: true
   validates :enabled, presence: true
@@ -34,6 +37,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company', 'User']}
+  validates :default_value_type, :inclusion =>  {:in => ['FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
   validate :validate_config
 
   accepts_nested_attributes_for :drop_down_items

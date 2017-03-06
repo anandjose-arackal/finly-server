@@ -3,6 +3,7 @@ module Constants
   VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}\z/i
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /[MmFf]/i
+  VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
 
   OTP_RESEND_INTERVAL = 60
 

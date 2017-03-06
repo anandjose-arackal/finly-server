@@ -13,9 +13,7 @@ class Amount < ActiveRecord::Base
   include MathUtil
   belongs_to :currency
 
-
   validate :no_negative_amount
-
 
   validates :currency_id, presence: true
 

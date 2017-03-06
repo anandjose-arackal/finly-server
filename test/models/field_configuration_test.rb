@@ -10,10 +10,11 @@
 #  field_parent_type_id :integer          not null
 #  configurable_id      :integer          not null
 #  configurable_type    :string(255)      not null
-#  default_value        :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  field_name           :string(255)      not null
+#  default_value_id     :integer
+#  default_value_type   :string(255)
 #
 
 require 'test_helper'

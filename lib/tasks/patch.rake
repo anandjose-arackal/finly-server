@@ -56,4 +56,19 @@ namespace :patch do
     # manually updated company d_code from company.d_code to company.itz_cash_property.d_code
   end
 
+  desc '07-03-2017: Add field values for custom fields'
+  task add_field_types: :environment do
+    if FieldParentType.count == 0
+      FieldParentType::TYPES.each do |key, value|
+        FieldParentType.create id: value, name: key
+      end
+    end
+
+    if FieldType.count == 0
+      FieldType::TYPES.each do |key, value|
+        FieldType.create id: value, name: key
+      end
+    end
+  end
+
 end

@@ -19,17 +19,9 @@
 #
 
 
-
-
-
-
-
-
-
-include MathUtil
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
+  include MathUtil
 
   belongs_to :amount
   belongs_to :expense_status
