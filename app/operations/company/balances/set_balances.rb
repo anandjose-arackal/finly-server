@@ -28,7 +28,7 @@ class Company::Balances::SetBalances < BaseOperation
   private
 
   def extract_balance_params(company)
-    neft_transfer_total = 0
+    neft_transfer_total = company.company_transactions.where(transaction_mode: "MANUAL FUND CREDIT").where('DATE(transaction_date) = ?', params[:date]).joins(:transaction_amount).sum(:value)
 
     self.company_admin = company.users.only_admins.first
     current_company_balance = Company::VirtualAccount::Balance.(company_admin)
@@ -50,6 +50,9 @@ class Company::Balances::SetBalances < BaseOperation
     wallet_load_from_virtual_account = 0
     wallet_load_from_card = 0
     wallet_load_from_wallet = 0
+
+    card_expenses_total = 0
+    card_atm_withdrawals = 0
 
     company.users.each do |user|
 
@@ -79,6 +82,9 @@ class Company::Balances::SetBalances < BaseOperation
 
       wallet_balance_total += user.wallet.balance_value
 
+      card_expenses_total += user.expenses.only_card_expenses.where(date: params[:date]).joins(:amount).sum(:value)
+      card_atm_withdrawals += user.card_transactions.where('DATE(transaction_timestamp) = ?', params[:date]).where(transaction_mode: 'ATM').joins(:billing_amount).sum(:value)
+
     end
 
     {
@@ -103,7 +109,9 @@ class Company::Balances::SetBalances < BaseOperation
       wallet_withdrawal_to_card_attributes: {value: wallet_withdrawal_to_card, currency: Currency.first},
       wallet_withdrawal_to_virtual_account_attributes: {value: wallet_withdrawal_to_virtual_account, currency: Currency.first},
       wallet_withdrawal_to_wallet_attributes: {value: wallet_withdrawal_to_wallet, currency: Currency.first},
-      wallet_balance_attributes: {value: wallet_balance_total, currency: Currency.first}
+      wallet_balance_attributes: {value: wallet_balance_total, currency: Currency.first},
+      card_expenses_attributes: {value: card_expenses_total, currency: Currency.first},
+      card_atm_withdrawal_attributes: {value: card_atm_withdrawals, currency: Currency.first}
     }
 
   end

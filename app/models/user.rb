@@ -43,7 +43,10 @@
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)
+#  otp_request_type_id    :integer
 #
+
+
 
 
 
@@ -113,6 +116,8 @@ class User < ActiveRecord::Base
 
   has_many :user_balance_histories
 
+  belongs_to :otp_request_type
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
@@ -181,7 +186,7 @@ class User < ActiveRecord::Base
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
-  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
+  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
 
   after_create do
     # self.build_profile.save if self.profile.blank?

@@ -1,6 +1,6 @@
-# operations that invites all the
+# API call to MSG91's servers to send a custom SMS message
 
-class WelcomeMessage::Create < BaseHandler
+class CustomMessage::Create < BaseHandler
 
   attr_accessor :message
 
@@ -11,13 +11,16 @@ class WelcomeMessage::Create < BaseHandler
   end
 
   def env_key
-    'msg91_welcome_message'
+    'msg91_custom_message'
   end
 
   def init
     super()
     self.message = params[:message]
-    self.message = "You have been invited to use Finly. Please contact your manager to activate your account" if message.nil?
+    # the default message is the custom message that is sent while inviting a user via mobile number
+    if message.nil?
+      self.message = "You have been invited to use Finly. Please contact your manager to activate your account"
+    end
   end
 
   def process
@@ -36,14 +39,14 @@ class WelcomeMessage::Create < BaseHandler
   end
 
   def parse
-    # todo - take up once msg91 fixes their end
+
   end
 
   def success
-    WelcomeMessage::Create::SuccessPresenter.new(user, {result: "Success"})
+    CustomMessage::Create::SuccessPresenter.new(user, {result: "Success"})
   end
 
-  class WelcomeMessage::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class CustomMessage::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :result
 

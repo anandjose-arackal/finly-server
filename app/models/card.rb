@@ -41,6 +41,8 @@ class Card < ActiveRecord::Base
   delegate :card_balance_value, to: :card_balance
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
+  validates :user_id, presence: true
+  validates :ending_number, presence: true
 
   after_create do
     user = self.user

@@ -158,7 +158,7 @@ class Analytics::Charts < BaseOperation
             r = Report.approved.all
             exp_ids += expenses.where(report_id: r).pluck(:id)
           when '4'
-            r = Report.reimbursed_and_closed.all
+            r = Report.settled_and_closed.all
             exp_ids += expenses.where(report_id: r).pluck(:id)
           else
             # do nothing

@@ -94,8 +94,8 @@ class Report::Index < Report::Base
       counts[:retracted] = (type_counts[ReportStatus.retracted_id] or 0)
       counts[:rejected] = (type_counts[ReportStatus.rejected_id] or 0)
       counts[:approved] = (type_counts[ReportStatus.approved_id] or 0)
-      counts[:reimbursed] = (type_counts[ReportStatus.reimbursed_id] or 0)
-      counts[:reimbursement_confirmed] = (type_counts[ReportStatus.reimbursement_confirmed_id] or 0)
+      counts[:settled] = (type_counts[ReportStatus.settled_id] or 0)
+      counts[:settlement_confirmed] = (type_counts[ReportStatus.settlement_confirmed_id] or 0)
       counts[:closed] = (type_counts[ReportStatus.closed_id] or 0)
     end
 

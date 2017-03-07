@@ -18,6 +18,7 @@ class Amount < ActiveRecord::Base
 
 
   validates :currency_id, presence: true
+  validates :value, presence: true
 
   before_create do
     if self.value.nil?

@@ -193,6 +193,12 @@ if ChannelType.count == 0
   end
 end
 
+if OtpRequestType.count == 0
+  OtpRequestType::TYPES.each do |k, v|
+    OtpRequestType.create(id: v, name: k)
+  end
+end
+
 ##########################
 
 if Amount.count == 0

@@ -344,7 +344,7 @@
 #                         report_unapprove PATCH      /reports/:report_id/unapprove(.:format)                     reports#unapprove
 #                            report_reject PATCH      /reports/:report_id/reject(.:format)                        reports#reject
 #                    report_reject_expense PATCH      /reports/:report_id/reject_expense(.:format)                reports#reject_expense
-#             report_reimbursement_confirm PATCH      /reports/:report_id/reimbursement_confirm(.:format)         reports#reimbursement_confirm
+#                report_settlement_confirm PATCH      /reports/:report_id/settlement_confirm(.:format)            reports#settlement_confirm
 #                      report_take_control PATCH      /reports/:report_id/take_control(.:format)                  reports#take_control
 #                      report_add_expenses POST       /reports/:report_id/add_expenses(.:format)                  reports#add_expenses
 #                   report_remove_expenses DELETE     /reports/:report_id/remove_expenses(.:format)               reports#remove_expenses
@@ -670,7 +670,7 @@ Rails.application.routes.draw do
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
     patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
-    patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+    patch 'settlement_confirm' => 'reports#settlement_confirm', as: :settlement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses

@@ -16,7 +16,6 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  reimbursement_id             :integer
-#  reimbursement_amount_id      :integer
 #  accounted                    :boolean          default(FALSE), not null
 #  archived                     :boolean          default(FALSE), not null
 #  is_deleted                   :boolean          default(FALSE), not null
@@ -26,9 +25,9 @@
 #  approved_at                  :datetime
 #  cash_in_hand_deduction_id    :integer
 #  submitted_amount_id          :integer
+#  cash_expenses_total_id       :integer
+#  card_expenses_total_id       :integer
 #
-
-
 
 
 
@@ -50,13 +49,16 @@ class Report < ActiveRecord::Base
   has_many :receipts, as: :parent
   # Payment made as reimbursement
   belongs_to :reimbursement, class_name: 'Payment'
-  belongs_to :reimbursement_amount, class_name: 'Amount'
+  belongs_to :cash_expenses_total, class_name: 'Amount'
+  belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
   accepts_nested_attributes_for :submitted_amount
+  accepts_nested_attributes_for :cash_expenses_total
+  accepts_nested_attributes_for :card_expenses_total
 
   validates :user, presence: true
   validate :is_employee
@@ -71,16 +73,17 @@ class Report < ActiveRecord::Base
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
-  scope :with_amount, -> { joins :reimbursement_amount }
-  scope :with_reimbursement_amount, -> {joins :reimbursement_amount}
+  scope :with_amount, -> { joins :cash_expenses_total }
+  scope :with_cash_expenses_total, -> {joins :cash_expenses_total}
+  scope :with_card_expenses_total, -> {joins :card_expenses_total}
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
   scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
-  scope :reimbursed, -> { where report_status_id: ReportStatus.reimbursed_id }
-  scope :reimbursement_confirmed, -> { where report_status_id: ReportStatus.reimbursement_confirmed_id }
+  scope :settled, -> { where report_status_id: ReportStatus.settled_id }
+  scope :settlement_confirmed, -> { where report_status_id: ReportStatus.settlement_confirmed_id }
   scope :processing, -> { where report_status_id: ReportStatus.processing_id }
-  scope :processed, -> { where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
+  scope :processed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
@@ -88,14 +91,14 @@ class Report < ActiveRecord::Base
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
   scope :include_user, -> { includes :user }
   scope :without_payment, -> { where reimbursement_id: nil }
-  scope :pending_reimbursement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
+  scope :pending_settlement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
   # scope for reports being shown in settlements page
-  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id, ReportStatus.reimbursement_confirmed_id]}
+  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
 
-  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.reimbursed_id, ReportStatus.closed_id]}
-  scope :reimbursed_and_closed, -> {where report_status_id: [ReportStatus.reimbursed_id, ReportStatus.reimbursement_confirmed_id, ReportStatus.closed_id]}
+  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id]}
+  scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -159,12 +162,12 @@ class Report < ActiveRecord::Base
     self.status_id == ReportStatus.approved_id
   end
 
-  def reimbursed?
-    self.status_id == ReportStatus.reimbursed_id
+  def settled?
+    self.status_id == ReportStatus.settled_id
   end
 
-  def reimbursement_confirmed?
-    self.status_id == ReportStatus.reimbursement_confirmed_id
+  def settlement_confirmed?
+    self.status_id == ReportStatus.settlement_confirmed_id
   end
 
   def closed?
@@ -175,8 +178,8 @@ class Report < ActiveRecord::Base
     open? or retracted? or rejected?
   end
 
-  def reimbursement_pending?
-    approved? and reimbursement_amount.present? and reimbursement_amount.value > 0
+  def settlement_pending?
+    approved? and cash_expenses_total.present? and cash_expenses_total.value > 0
   end
 
   def can_submit?
@@ -189,7 +192,7 @@ class Report < ActiveRecord::Base
   end
 
   def can_archive?
-    reimbursed? or reimbursement_confirmed? or closed?
+    settled? or settlement_confirmed? or closed?
   end
 
   def can_unapprove?
@@ -246,7 +249,7 @@ class Report < ActiveRecord::Base
   end
 
   def final_approver
-    return nil unless self.approved? or self.reimbursed? or self.reimbursement_confirmed? or self.closed?
+    return nil unless self.approved? or self.settled? or self.settlement_confirmed? or self.closed?
     tracks = self.tracks.with_action(ReportTrackingAction.id_for(:approve))
     if tracks.present?
       return tracks.last.action_user
@@ -282,7 +285,7 @@ class Report < ActiveRecord::Base
     self.expenses.sort_date_desc.first
   end
 
-  def require_reimbursement?
+  def require_settlement?
     report_total = total_amount
     latest_exp = latest_expense
     date = nil

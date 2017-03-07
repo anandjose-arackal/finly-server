@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170301132334) do
+
+ActiveRecord::Schema.define(version: 20170307093314) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -72,16 +73,16 @@ ActiveRecord::Schema.define(version: 20170301132334) do
   add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree
 
   create_table "balance_sheets", force: :cascade do |t|
-    t.integer  "user_id",                  limit: 4
-    t.integer  "cash_in_hand_id",          limit: 4
-    t.integer  "pending_reimbursement_id", limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-    t.integer  "pending_advance_id",       limit: 4
+    t.integer  "user_id",                   limit: 4
+    t.integer  "cash_in_hand_id",           limit: 4
+    t.integer  "approved_reports_total_id", limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "pending_advance_id",        limit: 4
   end
 
+  add_index "balance_sheets", ["approved_reports_total_id"], name: "index_balance_sheets_on_approved_reports_total_id", using: :btree
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
-  add_index "balance_sheets", ["pending_reimbursement_id"], name: "index_balance_sheets_on_pending_reimbursement_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
@@ -211,7 +212,7 @@ ActiveRecord::Schema.define(version: 20170301132334) do
     t.string   "serial_id",             limit: 255
     t.string   "product_code",          limit: 255
     t.datetime "transaction_timestamp"
-    t.boolean  "expensed",                            default: true
+    t.boolean  "expensed",                            default: false
     t.text     "error_message",         limit: 65535
     t.integer  "billing_amount_id",     limit: 4
     t.boolean  "is_deleted",                          default: false
@@ -322,7 +323,6 @@ ActiveRecord::Schema.define(version: 20170301132334) do
   add_index "company_balance_histories", ["company_id"], name: "index_company_balance_histories_on_company_id", using: :btree
   add_index "company_balance_histories", ["company_load_from_card_id"], name: "index_company_balance_histories_on_company_load_from_card_id", using: :btree
   add_index "company_balance_histories", ["company_withdrawal_to_card_id"], name: "index_company_balance_histories_on_company_withdrawal_to_card_id", using: :btree
-  add_index "company_balance_histories", ["finly_money_balance_id"], name: "index_company_balance_histories_on_finly_money_balance_id", using: :btree
   add_index "company_balance_histories", ["neft_transfer_id"], name: "index_company_balance_histories_on_neft_transfer_id", using: :btree
   add_index "company_balance_histories", ["wallet_load_from_virtual_account_id"], name: "index_wal_load_on_company_history", using: :btree
   add_index "company_balance_histories", ["wallet_load_from_wallet_id"], name: "index_company_balance_histories_on_wallet_load_from_wallet_id", using: :btree
@@ -382,6 +382,8 @@ ActiveRecord::Schema.define(version: 20170301132334) do
     t.integer  "balance_amount_id",     limit: 4,   null: false
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.string   "transaction_mode",      limit: 255
+    t.string   "merchant_type_key",     limit: 255
   end
 
   add_index "company_transactions", ["balance_amount_id"], name: "index_company_transactions_on_balance_amount_id", using: :btree
@@ -758,6 +760,12 @@ ActiveRecord::Schema.define(version: 20170301132334) do
   add_index "opro_client_apps", ["app_id", "app_secret"], name: "index_opro_client_apps_on_app_id_and_app_secret", unique: true, using: :btree
   add_index "opro_client_apps", ["app_id"], name: "index_opro_client_apps_on_app_id", unique: true, using: :btree
 
+  create_table "otp_request_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -989,7 +997,6 @@ ActiveRecord::Schema.define(version: 20170301132334) do
     t.datetime "created_at",                                                             null: false
     t.datetime "updated_at",                                                             null: false
     t.integer  "reimbursement_id",             limit: 4
-    t.integer  "reimbursement_amount_id",      limit: 4
     t.boolean  "accounted",                                              default: false, null: false
     t.boolean  "archived",                                               default: false, null: false
     t.boolean  "is_deleted",                                             default: false, null: false
@@ -999,6 +1006,8 @@ ActiveRecord::Schema.define(version: 20170301132334) do
     t.datetime "approved_at"
     t.integer  "cash_in_hand_deduction_id",    limit: 4
     t.integer  "submitted_amount_id",          limit: 4
+    t.integer  "cash_expenses_total_id",       limit: 4
+    t.integer  "card_expenses_total_id",       limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -1199,6 +1208,7 @@ ActiveRecord::Schema.define(version: 20170301132334) do
     t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
     t.boolean  "verified",                           default: false
+    t.integer  "otp_request_type_id",    limit: 4
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

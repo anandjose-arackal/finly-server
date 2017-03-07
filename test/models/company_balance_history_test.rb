@@ -28,6 +28,8 @@
 #  wallet_withdrawal_to_virtual_account_id :integer
 #  wallet_load_from_card_id                :integer
 #  wallet_load_from_virtual_account_id     :integer
+#  date                                    :date
+#  wallet_balance_id                       :integer
 #
 
 require 'test_helper'
