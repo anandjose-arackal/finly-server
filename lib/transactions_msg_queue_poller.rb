@@ -33,7 +33,7 @@ class TransactionsMsgQueuePoller
       merchant_city = name_city[1]
 
       trans_params = {reference_id: data[0],
-                      transaction_timestamp: data[1],
+                      transaction_timestamp: data[1] + " 05:30",
                       transaction_amount_attributes: {value: data[2], currency_id: 1},
                       billing_amount_attributes: {value: data[3], currency_id: 1},
                       auth_transaction_id: data[4],

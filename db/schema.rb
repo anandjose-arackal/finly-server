@@ -11,7 +11,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema.define(version: 20170307093314) do
 
   create_table "active_admin_comments", force: :cascade do |t|
@@ -295,7 +294,6 @@ ActiveRecord::Schema.define(version: 20170307093314) do
     t.integer  "card_withdrawal_to_wallet_id",            limit: 4
     t.integer  "card_balance_id",                         limit: 4
     t.integer  "card_expenses_id",                        limit: 4
-    t.integer  "finly_money_balance_id",                  limit: 4
     t.integer  "wallet_load_from_wallet_id",              limit: 4
     t.datetime "created_at",                                        null: false
     t.datetime "updated_at",                                        null: false
