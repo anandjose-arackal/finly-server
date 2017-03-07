@@ -17,17 +17,77 @@ class CustomField < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
   belongs_to :value, polymorphic: true
 
-  validate :validate_field
+  # validate :validate_field
 
   validates :value_id, presence: true
   validates :value_type, presence: true, :inclusion =>  {:in => ['FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
 
-  def validate_field
-    result = CustomField::Validate.(self)
-    unless result.success?
-      result.messages[:error].each do |error|
-        self.errors.add :error, error
-      end
+  # def validate_field
+  #   result = CustomField::Validate.(self)
+  #   unless result.success?
+  #     result.messages[:error].each do |error|
+  #       self.errors.add :error, error
+  #     end
+  #   end
+  # end
+
+
+
+  def set_value(value)
+    case field_type_id
+      when FieldType.id_for(:text)
+        if value.blank?
+          self.value =  FieldText.new
+        end
+        self.value.value = value
+      when FieldType.id_for(:number)
+        if value.blank?
+          self.value =  FieldNumber.new
+        end
+        self.value.value = value
+      when FieldType.id_for(:decimal)
+        if value.blank?
+          self.value =  FieldType.new
+        end
+        self.value.value = value
+      when FieldType.id_for(:boolean)
+        if value.blank?
+          self.value =  FieldBoolean.new
+        end
+        self.value.value = value
+      when FieldType.id_for(:drop_down)
+        if value.blank?
+          self.value =  FieldDropDownSelection.new
+        end
+        self.value.value_id = value
+      when FieldType.id_for(:date)
+        if value.blank?
+          self.value =  FieldDate.new
+        end
+        self.value.value = value
+      when FieldType.id_for(:datetime)
+        if value.blank?
+          self.value =  FieldDateTime.new
+        end
+        self.value.value = value
+      when FieldType.id_for(:amount)
+        if value.blank?
+          self.value =  FieldAmount.new
+        end
+        if value.present?
+          if self.value.value_id.blank?
+            # value.value is Amount
+            self.value.value = Amount.new
+          end
+          # value.value is Amount, so setting Amounts value becomes value(CustomField.value).value(FieldAmount.value).value(Amount.value)
+          self.value.value.value = value
+          # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
+          self.value.value.currency_id = 1
+        else
+          self.value.value.destroy if self.value.value_id.present?
+        end
     end
+    self.value.save if self.value.present?
   end
+  
 end

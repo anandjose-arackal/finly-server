@@ -14,5 +14,5 @@ class FieldAmount < ActiveRecord::Base
 
   belongs_to :value, class_name: 'Amount'
 
-  validates :value_id, presence: true
+  # validates :value_id, presence: true
 end

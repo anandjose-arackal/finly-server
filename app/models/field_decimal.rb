@@ -15,6 +15,12 @@ class FieldDecimal < ActiveRecord::Base
   validates :value, presence: true
   validate :value_format
 
+  def value_as_decimal
+    Float (value)
+  end
+
+  protected
+
   def value_format
     if value.present?
       decimal = Float (value) rescue nil
