@@ -36,6 +36,21 @@ class UserBalanceHistory < ActiveRecord::Base
   belongs_to :card_expenses, class_name: "Amount"
   belongs_to :card_atm_withdrawal, class_name: "Amount"
 
+  validates :date, presence: true
+  validates :date, uniqueness: {scope: [:user_id]}
+  validates :user, presence: true
+  validates :card_balance, presence: true
+  validates :card_withdrawal, presence: true
+  validates :card_load, presence: true
+  validates :finly_money_balance, presence: true
+  validates :finly_money_load, presence: true
+  validates :finly_money_withdrawal, presence: true
+  validates :cash_on_hand_balance, presence: true
+  validates :cash_on_hand_withdrawal, presence: true
+  validates :cash_on_hand_load, presence: true
+  validates :card_expenses, presence: true
+  validates :card_atm_withdrawal, presence: true
+
   accepts_nested_attributes_for :card_balance, :card_withdrawal, :card_load, :card_atm_withdrawal, :card_expenses, :finly_money_load, :finly_money_balance, :finly_money_withdrawal,
                                 :cash_on_hand_load, :cash_on_hand_withdrawal, :cash_on_hand_balance
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170307093314) do
+ActiveRecord::Schema.define(version: 20170307143635) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -311,6 +311,9 @@ ActiveRecord::Schema.define(version: 20170307093314) do
     t.integer  "wallet_load_from_virtual_account_id",     limit: 4
     t.date     "date"
     t.integer  "wallet_balance_id",                       limit: 4
+    t.integer  "cash_on_hand_load_id",                    limit: 4
+    t.integer  "cash_on_hand_withdrawal_id",              limit: 4
+    t.integer  "cash_on_hand_balance_id",                 limit: 4
   end
 
   add_index "company_balance_histories", ["card_balance_id"], name: "index_company_balance_histories_on_card_balance_id", using: :btree
