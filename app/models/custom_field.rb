@@ -31,61 +31,63 @@ class CustomField < ActiveRecord::Base
   #   end
   # end
 
-
-
   def set_value(value)
+    if value.nil?
+      if value.present?
+        value.destroy
+        self.value = nil
+      end
+      return
+    end
+
     case field_type_id
       when FieldType.id_for(:text)
         if value.blank?
-          self.value =  FieldText.new
+          self.value = FieldText.new
         end
         self.value.value = value
       when FieldType.id_for(:number)
         if value.blank?
-          self.value =  FieldNumber.new
+          self.value = FieldNumber.new
         end
         self.value.value = value
       when FieldType.id_for(:decimal)
         if value.blank?
-          self.value =  FieldType.new
+          self.value = FieldDecimal.new
         end
         self.value.value = value
       when FieldType.id_for(:boolean)
         if value.blank?
-          self.value =  FieldBoolean.new
+          self.value = FieldBoolean.new
         end
         self.value.value = value
       when FieldType.id_for(:drop_down)
         if value.blank?
-          self.value =  FieldDropDownSelection.new
+          self.value = FieldDropDownSelection.new
         end
         self.value.value_id = value
       when FieldType.id_for(:date)
         if value.blank?
-          self.value =  FieldDate.new
+          self.value = FieldDate.new
         end
-        self.value.value = value
+        self.value.value = DateUtils.datetime_in_ist(value)
       when FieldType.id_for(:datetime)
         if value.blank?
-          self.value =  FieldDateTime.new
+          self.value = FieldDateTime.new
         end
-        self.value.value = value
+        self.value.value = DateUtils.datetime_in_ist(value)
       when FieldType.id_for(:amount)
         if value.blank?
-          self.value =  FieldAmount.new
+          self.value = FieldAmount.new
         end
-        if value.present?
-          if self.value.value_id.blank?
-            # value.value is Amount
-            self.value.value = Amount.new
-          end
-          # value.value is Amount, so setting Amounts value becomes value(CustomField.value).value(FieldAmount.value).value(Amount.value)
-          self.value.value.value = value
-          # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
-          self.value.value.currency_id = 1
-        else
-          self.value.value.destroy if self.value.value_id.present?
+        if self.value.value_id.blank?
+          # value.value is Amount
+          self.value.value = Amount.new
         end
+        # value.value is Amount, so setting Amounts value becomes value(CustomField.value).value(FieldAmount.value).value(Amount.value)
+        self.value.value.value = value
+        # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
+        self.value.value.currency_id = 1
     end
     self.value.save if self.value.present?
   end

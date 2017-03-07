@@ -13,14 +13,9 @@ class FieldDate < ActiveRecord::Base
   has_one :field_configuration, as: :default_value
 
   validates :value, presence: true
-  validate :value_format
 
-  def value_format
-    if value.present?
-      date = Date.strptime(value, "%d %b %Y") rescue nil
-      if date.blank?
-        self.errors.add :date, 'format is incorrect'
-      end
-    end
+  def value_as_date
+    value.strftime("%d %b %Y")
   end
+
 end

@@ -43,7 +43,24 @@ class FieldConfigurationTest < ActiveSupport::TestCase
     assert_nil field_configuration.default_value
   end
 
-  test 'setting default value for fields configuration' do
+  test 'setting default value for fields configuration: Text: Success' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:text),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value 'abc'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldText'
+    assert field_configuration.default_value.kind_of?(FieldText)
+    assert_equal field_configuration.default_value.value, 'abc'
+  end
+
+  test 'setting default value for fields configuration: Number: Success' do
     name = 'Test name'
     configurable = Company.first
     param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:number),
@@ -56,9 +73,201 @@ class FieldConfigurationTest < ActiveSupport::TestCase
     assert field_configuration.id.present?
     assert field_configuration.default_value_id.present?
     assert_equal field_configuration.default_value_type, 'FieldNumber'
-    debugger
     assert field_configuration.default_value.kind_of?(FieldNumber)
     assert_equal field_configuration.default_value.value_as_number, 200
+  end
+
+  test 'Setting default value for fields configuration: Decimal: Success' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:decimal),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '200.10'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldDecimal'
+    assert field_configuration.default_value.kind_of?(FieldDecimal)
+    assert_equal field_configuration.default_value.value_as_decimal, 200.10
+  end
+
+  test 'Setting default value for fields configuration: Boolean: Success' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:boolean),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value 'true'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldBoolean'
+    assert field_configuration.default_value.kind_of?(FieldBoolean)
+    assert_equal field_configuration.default_value.value, true
+  end
+
+  test 'Setting default value for fields configuration: Date: Success' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:date),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '12 Jan 2017 +5:30'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldDate'
+    assert field_configuration.default_value.kind_of?(FieldDate)
+    assert_equal field_configuration.default_value.value_as_date, '12 Jan 2017'
+  end
+
+  test 'Setting default value for fields configuration: DateTime: Success' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:datetime),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '08:30 AM, 12 Jan 2017 +5:30'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldDateTime'
+    assert field_configuration.default_value.kind_of?(FieldDateTime)
+    assert_equal field_configuration.default_value.value_as_datetime, '08:30 AM, 12 Jan 2017'
+  end
+
+  test 'Setting default value for fields configuration: Amount: Success' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:amount),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '100'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldAmount'
+    assert field_configuration.default_value.kind_of?(FieldAmount)
+    assert_equal field_configuration.default_value.value_amount.to_f, 100.to_f
+  end
+
+  test 'Updating default value for amount field should update the same existing objects and not create new ones' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:amount),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '100'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert_equal field_configuration.default_value.value_amount.to_f, 100.to_f
+
+    object_id = field_configuration.default_value.value.id
+    field_configuration.set_default_value '200'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert_equal field_configuration.default_value.value_amount.to_f, 200.to_f
+    assert_equal field_configuration.default_value.value.id, object_id
+  end
+
+  test 'Setting default value for fields configuration: Dropdown: Success' do
+    # name = 'Test name'
+    # configurable = Company.first
+    # param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:number),
+    #          field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    # field_configuration = FieldConfiguration.new param
+    # field_configuration.set_default_value '08:30 AM, 12 Jan 2017'
+    # assert field_configuration.valid?
+    # assert field_configuration.save
+    # field_configuration.reload
+    # assert field_configuration.id.present?
+    # assert field_configuration.default_value_id.present?
+    # assert_equal field_configuration.default_value_type, 'FieldDate'
+    # assert field_configuration.default_value.kind_of?(FieldDate)
+    # assert_equal field_configuration.default_value.value, '08:30 AM, 12 Jan 2017'
+  end
+
+  test 'Updating field value should update in the same table' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:text),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value 'abc'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+
+    # Updating value
+    original_field_id = field_configuration.default_value_id
+    field_configuration.set_default_value '12345ad'
+    assert field_configuration.save
+    field_configuration.reload
+    assert_equal field_configuration.default_value_id, original_field_id
+    assert_equal field_configuration.default_value.value, '12345ad'
+  end
+
+  test 'If default value is updated to nil, then the field should be destroyed' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:text),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value 'abc'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+
+    # Updating value to nil
+    original_field = field_configuration.default_value
+    field_configuration.set_default_value nil
+    assert field_configuration.save
+    field_configuration.reload
+    assert_nil field_configuration.default_value_id
+    record_not_found_exception = false
+    begin
+      original_field.reload
+    rescue ActiveRecord::RecordNotFound
+      record_not_found_exception = true
+    end
+    assert record_not_found_exception
+  end
+
+  test 'setting default value for fields configuration: Text: Failure' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:text),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value nil
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.nil?
+  end
+
+  test 'entering invalid format for default value should throw an error' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:number),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '12abd'
+    assert_not field_configuration.valid?
   end
 
 end

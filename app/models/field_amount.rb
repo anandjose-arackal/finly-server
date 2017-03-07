@@ -13,6 +13,12 @@ class FieldAmount < ActiveRecord::Base
   has_one :field_configuration, as: :default_value
 
   belongs_to :value, class_name: 'Amount'
+  
+  accepts_nested_attributes_for :value
 
   # validates :value_id, presence: true
+
+  def value_amount
+    self.value.value
+  end
 end
