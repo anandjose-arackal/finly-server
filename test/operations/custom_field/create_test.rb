@@ -14,7 +14,7 @@ class CreateTest < ActiveSupport::TestCase
     #     drop_down_items_attributes:[:name]
   end
 
-  test 'successful creation of field_configuration company level' do
+  test 'successful creation of field_configuration at a company level' do
     valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: 2, mandatory: false,
                                            default_value: 10, field_parent_type_id: FieldParentType.id_for(:report),
                                            configurable_id: @company.id, configurable_type: 'Company'}}
@@ -30,7 +30,7 @@ class CreateTest < ActiveSupport::TestCase
     assert @company.field_configurations.with_id(result.field_configuration.id).present?
   end
 
-  test 'successful creation of field_configuration policy level' do
+  test 'successful creation of field_configuration at policy level' do
     valid_params = {field_configuration: {field_name: 'Test Title Policy', field_type_id: 4, mandatory: false,
                                           default_value: 'true', field_parent_type_id: FieldParentType.id_for(:expense),
                                           configurable_id: @policy.id, configurable_type: 'Policy'}}
@@ -46,7 +46,7 @@ class CreateTest < ActiveSupport::TestCase
     assert @policy.field_configurations.with_id(result.field_configuration.id).present?
   end
 
-  test 'successful creation of field_configuration user level' do
+  test 'successful creation of field_configuration at user level' do
     valid_params = {field_configuration: {field_name: 'Test Title User', field_type_id: 1,
                                           default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
                                           configurable_id: @user_2.id, configurable_type: 'User'}}
@@ -109,7 +109,7 @@ class CreateTest < ActiveSupport::TestCase
   end
 
   test 'Configurable ID required to create field configuration' do
-    valid_params = {field_configuration: {field_type_id: 1, mandatory: false,
+    valid_params = {field_configuration: {field_name: 'test field', field_type_id: 1, mandatory: false,
                                           default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
                                           configurable_type: 'User'}}
     result = nil
@@ -120,18 +120,7 @@ class CreateTest < ActiveSupport::TestCase
   end
 
   test 'Configurable Type required to create field configuration' do
-    valid_params = {field_configuration: {field_type_id: 1, mandatory: false,
-                                          default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
-                                          configurable_id: @user_2.id}}
-    result = nil
-    assert_no_difference 'FieldConfiguration.count' do
-      result = CustomField::Configuration::Create.(@user, valid_params)
-    end
-    assert result.failure?
-  end
-
-  test 'Configurable Type required to create field configuration' do
-    valid_params = {field_configuration: {field_type_id: 1, mandatory: false,
+    valid_params = {field_configuration: {field_name: 'test field', field_type_id: 1, mandatory: false,
                                           default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
                                           configurable_id: @user_2.id, configurable_type: 'Payment'}}
     result = nil
@@ -140,34 +129,36 @@ class CreateTest < ActiveSupport::TestCase
     end
     assert result.failure?
 
-    valid_params = {field_configuration: {field_type_id: 1, mandatory: false,
+    valid_params = {field_configuration: {field_name: 'test field', field_type_id: 1, mandatory: false,
                                           default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
                                           configurable_id: @user_2.id, configurable_type: 'User'}}
     result = nil
-    assert_no_difference 'FieldConfiguration.count' do
+    assert_difference 'FieldConfiguration.count',1 do
       result = CustomField::Configuration::Create.(@user, valid_params)
     end
-    assert result.failure?
+    assert result.success?
 
-    valid_params = {field_configuration: {field_type_id: 1, mandatory: false,
+    valid_params = {field_configuration: {field_name: 'test field', field_type_id: 1, mandatory: false,
                                           default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
                                           configurable_id: @user_2.id, configurable_type: 'Policy'}}
     result = nil
-    assert_difference 'FieldConfiguration.count', 1 do
+    assert_difference 'FieldConfiguration.count',1 do
       result = CustomField::Configuration::Create.(@user, valid_params)
     end
-    assert result.failure?
+    assert result.success?
 
-    valid_params = {field_configuration: {field_type_id: 1, mandatory: false,
+    valid_params = {field_configuration: {field_name: 'test field', field_type_id: 1, mandatory: false,
                                           default_value: '100', field_parent_type_id: FieldParentType.id_for(:money_request),
                                           configurable_id: @user_2.id, configurable_type: 'Company'}}
     result = nil
-    assert_difference 'FieldConfiguration.count', 1 do
+    assert_difference 'FieldConfiguration.count',1 do
       result = CustomField::Configuration::Create.(@user, valid_params)
     end
-    assert result.failure?
+    assert result.success?
   end
 
-
+  test '' do
+     sssdv
+  end
 
 end
