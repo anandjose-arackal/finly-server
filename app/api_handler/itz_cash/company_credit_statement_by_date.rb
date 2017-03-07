@@ -87,6 +87,8 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
           transaction_type = transaction[4].squish
           transaction_id = transaction[5].squish
           balance = transaction[6].squish.to_d
+          transaction_mode = transaction[7].squish
+          merchant_type_key = transaction[8].squish
           size =  params[:transactions].size
           params[:transactions][size] = {request_id: request_id,
                                         merchant_name: merchant_name,
@@ -94,7 +96,9 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
                                         transaction_amount: transaction_amount,
                                         transaction_type: transaction_type,
                                         transaction_id: transaction_id,
-                                        balance: balance}
+                                        balance: balance,
+                                        transaction_mode: transaction_mode,
+                                        merchant_type_key: merchant_type_key}
         end
       end
     end

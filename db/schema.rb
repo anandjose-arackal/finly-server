@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170304141723) do
+ActiveRecord::Schema.define(version: 20170307093314) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -294,7 +294,6 @@ ActiveRecord::Schema.define(version: 20170304141723) do
     t.integer  "card_withdrawal_to_wallet_id",            limit: 4
     t.integer  "card_balance_id",                         limit: 4
     t.integer  "card_expenses_id",                        limit: 4
-    t.integer  "finly_money_balance_id",                  limit: 4
     t.integer  "wallet_load_from_wallet_id",              limit: 4
     t.datetime "created_at",                                        null: false
     t.datetime "updated_at",                                        null: false
@@ -322,7 +321,6 @@ ActiveRecord::Schema.define(version: 20170304141723) do
   add_index "company_balance_histories", ["company_id"], name: "index_company_balance_histories_on_company_id", using: :btree
   add_index "company_balance_histories", ["company_load_from_card_id"], name: "index_company_balance_histories_on_company_load_from_card_id", using: :btree
   add_index "company_balance_histories", ["company_withdrawal_to_card_id"], name: "index_company_balance_histories_on_company_withdrawal_to_card_id", using: :btree
-  add_index "company_balance_histories", ["finly_money_balance_id"], name: "index_company_balance_histories_on_finly_money_balance_id", using: :btree
   add_index "company_balance_histories", ["neft_transfer_id"], name: "index_company_balance_histories_on_neft_transfer_id", using: :btree
   add_index "company_balance_histories", ["wallet_load_from_virtual_account_id"], name: "index_wal_load_on_company_history", using: :btree
   add_index "company_balance_histories", ["wallet_load_from_wallet_id"], name: "index_company_balance_histories_on_wallet_load_from_wallet_id", using: :btree
@@ -382,6 +380,8 @@ ActiveRecord::Schema.define(version: 20170304141723) do
     t.integer  "balance_amount_id",     limit: 4,   null: false
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.string   "transaction_mode",      limit: 255
+    t.string   "merchant_type_key",     limit: 255
   end
 
   add_index "company_transactions", ["balance_amount_id"], name: "index_company_transactions_on_balance_amount_id", using: :btree

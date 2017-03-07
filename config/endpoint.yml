@@ -52,6 +52,8 @@ itzcash_uat:
     path: "user/servlet/NaradaSetTransactionLimitsServlet"
   itzcash_mcc_group_restriction:
     path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
+  itzcash_company_statement_by_date:
+    path: "user/servlet/CorporateTransactionStatementByDateRangeServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
@@ -75,6 +77,8 @@ production:
     path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
   itzcash_mcc_group_restriction:
     path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
+  itzcash_company_statement_by_date:
+    path: "itzgift/servlet/CorporateTransactionStatementByDateRangeServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"

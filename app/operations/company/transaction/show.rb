@@ -86,7 +86,9 @@ class Company::Transaction::Show < Company::Base
                                           transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
                                           transaction_type: t[:transaction_type],
                                           transaction_id: t[:transaction_id],
-                                          balance_amount_attributes: {value: t[:balance], currency_id: 1}
+                                          balance_amount_attributes: {value: t[:balance], currency_id: 1},
+                                          transaction_mode: t[:transaction_mode],
+                                          merchant_type_key: t[:merchant_type_key]
     end
     self.required_transactions = company.company_transactions.with_date_range(start_date.beginning_of_day, end_date.end_of_day)
   end
