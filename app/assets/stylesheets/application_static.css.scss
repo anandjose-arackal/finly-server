@@ -337,6 +337,7 @@ body {
     margin-bottom: 30px;
     .tab-content{
       .tab-pane{
+        min-height: 140px;
         img{
           display: inline-block;
           width: 30%;
@@ -456,32 +457,33 @@ body {
         color: #555;
       }
     }
-    img{
-      display: inline-block;
-      position: relative;
-      margin-top: -100px;
-    }
 
-    ul.finly-expense-card-features{
-      display: inline-block;
-      margin-top: 20px;
+    .card-features{
+      margin-top: 50px;
 
-      .card-list-check{
-        display: block;
-        position: relative;
-        padding-bottom: 7px;
-      }
-      .card-list-check::before {
-        color: #3BBA6C;
-      }
 
-      li{
-        margin-bottom: 10px;
-        p{
-          display: inline-block;
-          margin-bottom: 15px;
+      ul.finly-expense-card-features{
+        // display: inline-block;
+        // margin-top: 20px;
+        // max-width: 400px;
+
+        // .card-list-check{
+        //   // display: block;
+        //   // position: relative;
+        //   // padding-bottom: 7px;
+        // }
+        // .card-list-check::before {
+        //   color: #3BBA6C;
+        // }
+
+        li{
+          font-family: Lato, sans-serif;
+          // margin-bottom: 10px;
+          p{
+            display: inline-block;
+            // margin-bottom: 15px;
+          }
         }
-
       }
     }
   }
