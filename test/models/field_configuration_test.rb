@@ -145,6 +145,30 @@ class FieldConfigurationTest < ActiveSupport::TestCase
     assert_equal field_configuration.default_value.value_as_datetime, '08:30 AM, 12 Jan 2017'
   end
 
+  test 'Creating drop-down field configuration requires creating dropdown items' do
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:drop_down),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    assert_not field_configuration.valid?
+    assert_not field_configuration.save
+
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:drop_down),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable, drop_down_items_attributes: [{name: 'a'}, {name: 'b'}]}
+    field_configuration = FieldConfiguration.new param
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert_equal field_configuration.drop_down_items.count, 2
+    assert_equal field_configuration.drop_down_items.first.name, 'a'
+    assert_equal field_configuration.drop_down_items.second.name, 'b'
+
+  end
+
   test 'Setting default value for fields configuration: Amount: Success' do
     name = 'Test name'
     configurable = Company.first
@@ -183,21 +207,36 @@ class FieldConfigurationTest < ActiveSupport::TestCase
     assert_equal field_configuration.default_value.value.id, object_id
   end
 
-  test 'Setting default value for fields configuration: Dropdown: Success' do
-    # name = 'Test name'
-    # configurable = Company.first
-    # param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:number),
-    #          field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
-    # field_configuration = FieldConfiguration.new param
-    # field_configuration.set_default_value '08:30 AM, 12 Jan 2017'
-    # assert field_configuration.valid?
-    # assert field_configuration.save
-    # field_configuration.reload
-    # assert field_configuration.id.present?
-    # assert field_configuration.default_value_id.present?
-    # assert_equal field_configuration.default_value_type, 'FieldDate'
-    # assert field_configuration.default_value.kind_of?(FieldDate)
-    # assert_equal field_configuration.default_value.value, '08:30 AM, 12 Jan 2017'
+  test 'If default drop down selection is not present among the field configurations, it should fail' do
+    FieldConfiguration.any_instance.stubs(:drop_down_items => stub(:with_id => stub(:present? => false)))
+
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:drop_down),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '1'
+    assert_not field_configuration.valid?
+    assert_not field_configuration.save
+  end
+
+  test 'Setting default value for fields configuration: Dropdown' do
+    FieldConfiguration.any_instance.stubs(:drop_down_items => stub(:with_id => stub(:present? => true)))
+
+    name = 'Test name'
+    configurable = Company.first
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:drop_down),
+             field_parent_type_id: FieldParentType.id_for(:report), configurable: configurable}
+    field_configuration = FieldConfiguration.new param
+    field_configuration.set_default_value '1'
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+    assert field_configuration.default_value_id.present?
+    assert_equal field_configuration.default_value_type, 'FieldDropDownSelection'
+    assert field_configuration.default_value.kind_of?(FieldDropDownSelection)
+    assert_equal field_configuration.default_value.value_id, 1
   end
 
   test 'Updating field value should update in the same table' do

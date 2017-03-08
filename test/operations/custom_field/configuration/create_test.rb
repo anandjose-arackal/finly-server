@@ -1,5 +1,8 @@
 require 'test_helper'
 
+require 'minitest/unit'
+require 'mocha/mini_test'
+
 class CreateTest < ActiveSupport::TestCase
 
   def setup
@@ -170,6 +173,101 @@ class CreateTest < ActiveSupport::TestCase
     assert result.field_configuration.default_value.present?
     assert result.field_configuration.default_value.kind_of?(FieldDecimal)
     assert_equal result.field_configuration.default_value.value_as_decimal, 10.1001
+  end
+
+  test 'Only company admins and policy admins can create field configurations' do
+    # Trying to create for company
+    @user.stubs(:admin?).returns(false)
+
+    valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                          default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                          configurable_id: @company.id, configurable_type: 'Company'}}
+    result = nil
+    not_authorized_exception = false
+    assert_no_difference 'FieldConfiguration.count' do
+      begin
+        result = CustomField::Configuration::Create.(@user, valid_params)
+      rescue NotAuthorizedException
+        not_authorized_exception = true
+      end
+    end
+    assert not_authorized_exception
+
+
+    # Company admin creating a field configuration
+    @user.stubs(:admin?).returns(true)
+    @user.stubs(:company_admin?).returns(true)
+    Policy::Index.stubs(:call => stub(:policies => stub(:with_id => stub(:present? => true))))
+    valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                          default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                          configurable_id: 1, configurable_type: 'Policy'}}
+    result = nil
+    assert_difference 'FieldConfiguration.count', 1 do
+      result = CustomField::Configuration::Create.(@user, valid_params)
+    end
+    assert result.success?
+    assert result.field_configuration.reload.present?
+    assert result.field_configuration.default_value.present?
+    assert result.field_configuration.default_value.kind_of?(FieldDecimal)
+    assert_equal result.field_configuration.default_value.value_as_decimal, 10.1001
+  end
+
+  test 'Policy admins can create field configurations only for the policy they belong to' do
+    # Trying to create for company
+    @user.stubs(:admin?).returns(true)
+    @user.stubs(:company_admin?).returns(false)
+    @user.stubs(:policy_admin?).returns(true)
+
+    valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                          default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                          configurable_id: @company.id, configurable_type: 'Company'}}
+    result = nil
+    not_authorized_exception = false
+    assert_no_difference 'FieldConfiguration.count' do
+      begin
+      result = CustomField::Configuration::Create.(@user, valid_params)
+      rescue NotAuthorizedException
+        not_authorized_exception = true
+      end
+    end
+    assert not_authorized_exception
+
+    # Trying to create for policy for which the user is not an admin
+    Policy::Index.stubs(:call => stub(:policies => stub(:with_id => stub(:present? => false))))
+    valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                          default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                          configurable_id: 1, configurable_type: 'Policy'}}
+    result = nil
+    not_authorized_exception = false
+    assert_no_difference 'FieldConfiguration.count' do
+      begin
+        result = CustomField::Configuration::Create.(@user, valid_params)
+      rescue NotAuthorizedException
+        not_authorized_exception = true
+      end
+    end
+    assert not_authorized_exception
+
+    Policy::Index.stubs(:call => stub(:policies => stub(:with_id => stub(:present? => true))))
+    valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                          default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                          configurable_id: 1, configurable_type: 'Policy'}}
+    result = nil
+    assert_difference 'FieldConfiguration.count', 1 do
+      result = CustomField::Configuration::Create.(@user, valid_params)
+    end
+    assert result.success?
+    assert result.field_configuration.reload.present?
+    assert result.field_configuration.default_value.present?
+    assert result.field_configuration.default_value.kind_of?(FieldDecimal)
+    assert_equal result.field_configuration.default_value.value_as_decimal, 10.1001
+  end
+
+  private
+  def get_params(modified_config)
+    default_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                            default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                            configurable_id: 1, configurable_type: 'Policy'}}
   end
 
 end

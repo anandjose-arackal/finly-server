@@ -1,11 +1,9 @@
 class CustomField::Configuration::Create < CustomField::Configuration::Base
   attr_accessor :config_params, :type_id, :default_value
 
+  # todo: Policy admins are permitted to create only for their policy and users within the policy
+
   def authorized_user_types
-    # todo: Policy admins are permitted to create only for their policy and users within the policy
-    # if user.present? and user.policy_admin? and not user.company_admin?
-    #
-    # end
     [:admin]
   end
 
@@ -19,11 +17,27 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     end
   end
 
+  def pre_authorize
+    if not user.company_admin? and (params[:field_configuration][:configurable_type].blank? or params[:field_configuration][:configurable_type] != 'Policy')
+      raise_unauthorized_exception
+    end
+  end
+
   def init
     params[:field_configuration][:company_id] = self.user.company_id
     self.config_params = config_strong_params
     self.type_id = config_params[:field_type_id] if config_params.present? and config_params[:field_type_id].present?
     self.default_value = params[:field_configuration][:default_value] if config_params.present? and params[:field_configuration][:default_value].present?
+  end
+
+  def authorize
+    if not user.company_admin? and user.policy_admin?
+      policy_id = params[:field_configuration][:configurable_id]
+      policies_presenter = Policy::Index.(user, view: 'admin')
+      unless policies_presenter.policies.with_id(policy_id).present?
+        raise_unauthorized_exception
+      end
+    end
   end
 
   def validate

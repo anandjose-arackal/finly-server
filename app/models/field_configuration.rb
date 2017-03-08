@@ -104,7 +104,7 @@ class FieldConfiguration < ActiveRecord::Base
         if default_value.blank?
           self.default_value = FieldDropDownSelection.new
         end
-        self.default_value.value_id = value
+        self.default_value.value_id = value if self.drop_down_items.with_id(value).present?
       when FieldType.id_for(:date)
         if default_value.blank?
           self.default_value = FieldDate.new
