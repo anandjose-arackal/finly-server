@@ -34,8 +34,8 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
 
   def process
     self.field_configuration = FieldConfiguration.new config_params
+    self.field_configuration.set_default_value default_value if default_value.present?
     if self.field_configuration.save
-      self.field_configuration.set_default_value default_value if default_value.present?
     else
       add_message :error, field_configuration.errors.full_messages
     end
@@ -47,7 +47,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
                                                 :field_parent_type_id, :configurable, :configurable_id,
                                                 :configurable_type,
                                                 :company_id, amount_attributes: [:value, :currency],
-                                                drop_down_items_attributes:[:name])
+                                                drop_down_items_attributes: [:name])
   end
 
 end

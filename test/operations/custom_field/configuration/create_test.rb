@@ -157,8 +157,19 @@ class CreateTest < ActiveSupport::TestCase
     assert result.success?
   end
 
-  test '' do
-     sssdv
+  test 'When default value is set, a new default value object is created' do
+    valid_params = {field_configuration: {field_name: 'Test Title', field_type_id: FieldType.id_for(:decimal), mandatory: false,
+                                          default_value: '10.1001', field_parent_type_id: FieldParentType.id_for(:report),
+                                          configurable_id: @company.id, configurable_type: 'Company'}}
+    result = nil
+    assert_difference 'FieldConfiguration.count', 1 do
+      result = CustomField::Configuration::Create.(@user, valid_params)
+    end
+    assert result.success?
+    assert result.field_configuration.reload.present?
+    assert result.field_configuration.default_value.present?
+    assert result.field_configuration.default_value.kind_of?(FieldDecimal)
+    assert_equal result.field_configuration.default_value.value_as_decimal, 10.1001
   end
 
 end
