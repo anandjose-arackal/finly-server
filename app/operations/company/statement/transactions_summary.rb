@@ -28,7 +28,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
 
   def process
     result = Company::VirtualAccount::Balance.(user)
-    items[:company_account_closing_balance] = result.balance
+    items[:company_account_closing_balance] = result.balance rescue 0
 
     items[:company_account_details] = {}
     items[:total_account_load_via_NEFT] = 0

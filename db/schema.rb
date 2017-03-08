@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170307143635) do
+ActiveRecord::Schema.define(version: 20170308110850) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1033,7 +1033,7 @@ ActiveRecord::Schema.define(version: 20170307143635) do
   end
 
   create_table "user_balance_histories", force: :cascade do |t|
-    t.datetime "date"
+    t.date     "date"
     t.integer  "user_id",                    limit: 4
     t.integer  "company_id",                 limit: 4
     t.integer  "card_balance_id",            limit: 4

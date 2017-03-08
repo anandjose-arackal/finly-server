@@ -77,8 +77,21 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   end
 
   def post_process
-    add_message :success, 'Added debt to company clearance'
+    add_message :success, 'Deducted cash on hand'
 
     Event::ESettlement::AddDebtClearance.(user, payment: self.payment)
+
+    # recalculating user balance history for the respective day the cash was deducted
+    unless Date.parse(payment_params[:date]) == Date.today
+      balance_history = to_user.user_balance_histories.find_by(date: payment_params[:date].to_date)
+      unless history.blank?
+        cash_on_hand_value = history.cash_on_hand_balance.value
+        cash_on_hand_withdrawal = history.cash_in_hand_withdrawal.value
+        cash_on_hand_value += payment_params[:amount]
+        cash_on_hand_withdrawal += payment_params[:amount]
+        balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: history.cash_on_hand_balance.id},
+                                  cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, id: history.cash_on_hand_withdrawal.id})
+      end
+    end
   end
 end

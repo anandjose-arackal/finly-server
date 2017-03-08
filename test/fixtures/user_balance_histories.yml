@@ -3,7 +3,7 @@
 # Table name: user_balance_histories
 #
 #  id                         :integer          not null, primary key
-#  date                       :datetime
+#  date                       :date
 #  user_id                    :integer
 #  company_id                 :integer
 #  card_balance_id            :integer

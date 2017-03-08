@@ -20,4 +20,10 @@ class DateUtils
     true
   end
 
+  def self.datetime_in_ist(datetime)
+    return nil if datetime.blank?
+    datetime += " +5:30" unless datetime.include?("+5:30")
+    datetime
+  end
+
 end

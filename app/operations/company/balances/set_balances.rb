@@ -106,7 +106,7 @@ class Company::Balances::SetBalances < BaseOperation
 
     {
       company_id: company.id,
-      date: params[:date],
+      date: (params[:date]),
       neft_transfer_attributes: {value: neft_transfer_total, currency_id: Currency.first.id},
       company_balance_attributes: {value: current_company_balance, currency_id: Currency.first.id},
       company_withdrawal_to_card_attributes: {value: company_withdrawal_to_card, currency_id: Currency.first.id},

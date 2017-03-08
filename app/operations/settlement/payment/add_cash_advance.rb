@@ -98,12 +98,22 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def post_process
-    add_message :success, 'Cash advance added'
+    add_message :success, 'Added cash on hand'
 
-    #a adding a custom error message to the logs just for kicks
-    logger = Logger.new(STDOUT)
-    logger.error("Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
     Event::ESettlement::AddCashAdvance.(user, payment: self.payment)
+
+    # recalculating user balance history for the respective day the cash was added
+    unless Date.parse(payment_param[:date]) == Date.today
+      balance_history = to_user.user_balance_histories.find_by(date: payment_param[:date].to_date)
+      unless history.blank?
+        cash_on_hand_value = history.cash_on_hand_balance.value
+        cash_on_hand_load = history.cash_in_hand_load.value
+        cash_on_hand_value += payment_param[:amount]
+        cash_on_hand_load += payment_param[:amount]
+        balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: history.cash_on_hand_balance.id},
+                                  cash_on_hand_load_attributes: {value: cash_on_hand_load, id: history.cash_on_hand_load.id})
+      end
+    end
   end
 
 end

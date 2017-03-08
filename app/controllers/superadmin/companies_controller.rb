@@ -42,7 +42,7 @@ class Superadmin::CompaniesController < ApplicationController
   def update
     @result = Superadmin::Company::Update.(current_user, params)
     if @result.success?
-      flash[:success] = "Compny updated"
+      flash[:success] = "Company updated"
     else
       flash[:error] = @result.messages[:error]
     end
@@ -62,6 +62,7 @@ class Superadmin::CompaniesController < ApplicationController
 
   def superadmin_accounts
     unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
+      flash[:error] = "You are not authorized to perform this action"
       redirect_to root_url
     end
   end

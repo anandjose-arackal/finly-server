@@ -54,6 +54,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -301,18 +302,26 @@ class User < ActiveRecord::Base
   def cash_in_hand(date = nil)
     cash = self.balance_sheet.cash_in_hand
     return cash if date.blank? or date == DateUtils.local_date
-    payments = self.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_cash_to_user.sum(:value)
-    debt_clearance = payments.debt_clearance.sum(:value)
-    settlement = payments.settlement.sum(:value)
-    reports = self.reports.processed.submitted_after(date)
-    report_ids = reports.pluck(:id)
-    expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
-    pending_reimbursement = reports.with_amount.without_payment.sum(:value)
-    value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
-    # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    min_value = [cash.value, value].min
-    Amount.new(value: min_value, currency: cash.currency)
+    history = self.user_balance_histories.find_by(date: date)
+    if history.blank?
+      return 0
+    else
+      cash_on_hand = history.cash_on_hand_balance
+      return cash_on_hand
+    end
+
+    # payments = self.payments.made_after(date).with_amount
+    # payments_to_user = payments.transferred_cash_to_user.sum(:value)
+    # debt_clearance = payments.debt_clearance.sum(:value)
+    # settlement = payments.settlement.sum(:value)
+    # reports = self.reports.processed.submitted_after(date)
+    # report_ids = reports.pluck(:id)
+    # expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
+    # pending_reimbursement = reports.with_amount.without_payment.sum(:value)
+    # value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
+    # # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
+    # min_value = [cash.value, value].min
+    # Amount.new(value: min_value, currency: cash.currency)
   end
 
   alias_method :manager_name, :user_name
