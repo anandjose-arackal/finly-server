@@ -24,6 +24,9 @@
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
 #  is_deleted            :boolean          default(FALSE)
+#  mcc_code              :string(255)
+#  transaction_status    :string(255)
+#  api_reference_id      :string(255)
 #
 
 class CardTransaction < ActiveRecord::Base
