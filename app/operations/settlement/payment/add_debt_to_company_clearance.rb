@@ -84,13 +84,13 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     # recalculating user balance history for the respective day the cash was deducted
     unless Date.parse(payment_params[:date]) == Date.today
       balance_history = to_user.user_balance_histories.find_by(date: payment_params[:date].to_date)
-      unless history.blank?
-        cash_on_hand_value = history.cash_on_hand_balance.value
-        cash_on_hand_withdrawal = history.cash_in_hand_withdrawal.value
+      unless balance_history.blank?
+        cash_on_hand_value = balance_history.cash_on_hand_balance.value
+        cash_on_hand_withdrawal = balance_history.cash_in_hand_withdrawal.value
         cash_on_hand_value += payment_params[:amount]
         cash_on_hand_withdrawal += payment_params[:amount]
-        balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: history.cash_on_hand_balance.id},
-                                  cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, id: history.cash_on_hand_withdrawal.id})
+        balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
+                                  cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, id: balance_history.cash_on_hand_withdrawal.id})
       end
     end
   end
