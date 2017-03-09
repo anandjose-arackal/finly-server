@@ -54,9 +54,9 @@ after 'deploy', 'runner:restart'
 namespace :runner do
   task :restart do
     on roles(:app) do
-      stage = fetch(:stage)
-      case stage
-        when :itzcash_production, 'itzcash_production'
+      env = fetch(:rails_env)
+      case env
+        when :production, 'production'
           `ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/current/msgqueue_restart.sh #{fetch(:rails_env)}'`
       end
       # execute("sh app/shared/msgqueue_restart.sh production")
