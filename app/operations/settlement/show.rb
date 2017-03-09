@@ -51,14 +51,15 @@ class Settlement::Show < Settlement::Base
       self.type = params[:type]
     end
 
-    def reimbursement_amount_for_report(report)
-      return 0 unless report.present?
-      if report.reimbursement_amount.present?
-        report.reimbursement_amount.value
-      else
-        0
-      end
-    end
+    # def reimbursement_amount_for_report(report)
+    #   return 0 unless report.present?
+    #   if report.reimbursement_amount.present?
+    #     report.reimbursement_amount.value
+    #   else
+    #     0
+    #   end
+    # end
+
   end
 
   private

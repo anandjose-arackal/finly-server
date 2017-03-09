@@ -13,8 +13,13 @@ class User::Balances::SetBalances < BaseOperation
 
   def process
     params = retrieve_balances(user)
-    balance_history = user.user_balance_histories.build(params)
-    balance_history.save
+    balance_history = user.user_balance_histories.find_by(date: params[:date])
+    if balance_history.present?
+      balance_history.update(params)
+    else
+      balance_history = user.user_balance_histories.build(params)
+      balance_history.save
+    end
   end
 
   private
@@ -68,5 +73,6 @@ class User::Balances::SetBalances < BaseOperation
      cash_on_hand_load_attributes: {value: cash_on_hand_load, currency: Currency.first},
      cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, currency: Currency.first},
     }
+
   end
 end

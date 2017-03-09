@@ -195,6 +195,12 @@ if ChannelType.count == 0
   end
 end
 
+if OtpRequestType.count == 0
+  OtpRequestType::TYPES.each do |k, v|
+    OtpRequestType.create(id: v, name: k)
+  end
+end
+
 if FieldParentType.count == 0
   FieldParentType::TYPES.each do |key, value|
     FieldParentType.create id: value, name: key
@@ -258,7 +264,7 @@ if User.count == 0
   end
 
   ##############################################################################################################################################
-  ## User's for Venky's iOS testing
+  ## User's for iOS testing
   v = []
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
                    password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
@@ -297,7 +303,7 @@ if User.count == 0
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
-  ########################## Employee for Venky's testing ################################################################################
+  ########################## Employee for iOS testing ################################################################################
   User.create(company: Company.first, first_name: "Finly", last_name: "Employee", email: "kaley@finlytest.io",
               password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
               mothers_maiden_name: Faker::Name.first_name,
@@ -477,7 +483,7 @@ unless Rails.env.production?
         from_date = DateTime.parse("01-01-2017 12:00:00")
         to_date = DateTime.now
         random_amount = random_integer(50, 200) + 0.1234
-        sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
+        sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
 
         data = sample_msg_queue_entry.split(",")
 

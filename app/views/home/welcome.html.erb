@@ -13,7 +13,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
     <ul class="nav navbar-nav navbar-right">
-      <!--<li><a href="/about">About</a></li>-->
+      <li><a href="/about">About</a></li>
       <li><a href="#how-finly-can-help">Solutions</a></li>
       <!-- <li><a href="#courses">Resources</a></li>
       <li><a href="#pricing">FAQ</a></li>
@@ -258,7 +258,7 @@
   <div class="container">
     <div class="row">
       <div class="header-section text-center">
-        <h1 class="text-shadow">Featues &amp; Benefits</h1>
+        <h1 class="text-shadow">Features &amp; Benefits</h1>
         <h2>Features &amp; Benefits</h2>
         <p>Features You Only Get With Real Time Software.
         Time to equip your business with a powerful Expense Management System.</p>
@@ -293,22 +293,33 @@
       </div>
     </div>
 
-    <!--<div class="row sub-section finly-expense-card">-->
-      <!--<div class="col-xs-10 col-xs-offset-1">-->
-        <!--<div class="well">-->
-          <!--<h3>Finly Expense Cards</h3>-->
-          <!--<p>You no longer need to rely on sharing Credit Cards or allow your Employees to incur out of pocket expenses. Employees can now spend using our Prepaid Card at ATMs, Online Stores or make In store purchase, of course at the discretion of the Employer.</p>-->
-
-          <!--<img src="/common/images/landing/features_benefits/finly-card-md.png" class="img-responsive">-->
-          <!--<ul class="finly-expense-card-features">-->
-            <!--<li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;No bank account required</p></li>-->
-            <!--<li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Turn on/off cards on the fly</p></li>-->
-            <!--<li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Set Budget and transaction restrictions</p></li>-->
-            <!--<li class="fa fa-check card-list-check"><p>&nbsp;&nbsp;Preferential usage: set places it can be used in atms, pos, online</p></li>-->
-          <!--</ul>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
+    <div class="row sub-section finly-expense-card">
+      <div class="col-xs-10 col-xs-offset-1">
+        <div class="well">
+          <h3>Finly Expense Cards</h3>
+          <p>You no longer need to rely on sharing Credit Cards or allow your Employees to incur out of pocket expenses. Employees can now spend using our Prepaid Card at ATMs, Online Stores or make In store purchase, of course at the discretion of the Employer.</p>
+          <div class="card-features">
+            <table>
+              <tr>
+                <td>
+                  <img src="/common/images/landing/features_benefits/finly-card-md.png" class="img-responsive">
+                </td>
+                <td>
+                  <h5>India's Most Powerful Prepaid Card</h5>
+                  <ul class="finly-expense-card-features">
+                    <li class="card-list-check"><p>&nbsp;&nbsp;No bank account required</p></li>
+                    <li class="card-list-check"><p>&nbsp;&nbsp;Turn on/off cards on the fly</p></li>
+                    <li class="card-list-check"><p>&nbsp;&nbsp;Set Budget and transaction restrictions</p></li>
+                    <li class="card-list-check"><p>&nbsp;&nbsp;Preferential usage: set places it can be used in atms, pos, online</p></li>
+                  </ul>    
+                </td>
+              </tr>
+            </table>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </section>
@@ -319,7 +330,7 @@
 <section id="security-measures" class="section-padding">
   <div class="container">
     <div class="row">
-      <div class="header-section text-center">
+      <div class="header-section text-center"   >
         <h1 class="text-shadow">How Secure is Finly?</h1>
         <h2>How Secure is Finly?</h2>
       </div>
@@ -458,7 +469,7 @@
     <div class="row">
       <div class="col-xs-12">
         <ul class="quick-links">
-          <!--<li><a href="/about">About</a></li>-->
+          <li><a href="/about">About</a></li>
           <li><a href="#how-finly-can-help">Solutions</a></li>
           <!-- <li>Resources</li>
           <li>FAQ</li>
@@ -576,6 +587,9 @@
         success: function(res){
           // console.log(res);
           if(res.success === true){
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide')
+            }
             ohSnap("Thank you for the request! We will contact you soon", {color: 'green', 'duration': '6000'});
           } else {
             snapNotify(res.messages)

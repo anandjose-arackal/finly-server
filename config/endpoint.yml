@@ -18,7 +18,7 @@ default: &default
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
-  msg91_welcome_message:
+  msg91_custom_message:
     base: "https://control.msg91.com"
     path: "api/sendhttp.php"
 
@@ -52,10 +52,12 @@ itzcash_uat:
     path: "user/servlet/NaradaSetTransactionLimitsServlet"
   itzcash_mcc_group_restriction:
     path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
+  itzcash_company_statement_by_date:
+    path: "user/servlet/CorporateTransactionStatementByDateRangeServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
-  msg91_welcome_message:
+  msg91_custom_message:
     base: "https://control.msg91.com"
     path: "api/sendhttp.php"
 
@@ -75,9 +77,11 @@ production:
     path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
   itzcash_mcc_group_restriction:
     path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
+  itzcash_company_statement_by_date:
+    path: "itzgift/servlet/CorporateTransactionStatementByDateRangeServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
-  msg91_welcome_message:
+  msg91_custom_message:
     base: "https://control.msg91.com"
     path: "api/sendhttp.php"

@@ -120,8 +120,8 @@ class Event::EReport::Approve < Event::EReport::Base
         else
           message = "Congratulations! Your report #{report.name} has been approved"
         end
-        if report.reimbursement_pending?
-          message = "#{message} and is awaiting reimbursement!"
+        if report.settlement_pending?
+          message = "#{message} and is awaiting settlement!"
         else
           message = "#{message} and has been closed"
         end

@@ -28,7 +28,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
 
   def process
     result = Company::VirtualAccount::Balance.(user)
-    items[:company_account_closing_balance] = result.balance
+    items[:company_account_closing_balance] = result.balance rescue 0
 
     items[:company_account_details] = {}
     items[:total_account_load_via_NEFT] = 0
@@ -77,7 +77,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
       items[:total_amount_transferred][:to_finly_money] += to_finly_money_total
     end
 
-    items[:company_account_opening_balance] = items[:company_account_closing_balance] + items[:transfers_to_company_account][:total] - items[:transfers_from_company_account][:total]
+    items[:company_account_opening_balance] = company.company_balance_histories.find_by(date: start_date).company_balance.value rescue 0
   end
 
   def success

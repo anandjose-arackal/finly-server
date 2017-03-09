@@ -12,7 +12,6 @@
 #  card_withdrawal_to_wallet_id            :integer
 #  card_balance_id                         :integer
 #  card_expenses_id                        :integer
-#  finly_money_balance_id                  :integer
 #  wallet_load_from_wallet_id              :integer
 #  created_at                              :datetime         not null
 #  updated_at                              :datetime         not null
@@ -30,6 +29,9 @@
 #  wallet_load_from_virtual_account_id     :integer
 #  date                                    :date
 #  wallet_balance_id                       :integer
+#  cash_on_hand_load_id                    :integer
+#  cash_on_hand_withdrawal_id              :integer
+#  cash_on_hand_balance_id                 :integer
 #
 
 require 'test_helper'

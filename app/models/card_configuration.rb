@@ -16,4 +16,7 @@ class CardConfiguration < ActiveRecord::Base
   belongs_to :card_status
   belongs_to :configured_by_user, class_name: "User"
   belongs_to :prepaid_card, class_name: "Card"
+
+  validates :prepaid_card_id, presence: true
+
 end

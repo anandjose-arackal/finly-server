@@ -73,13 +73,14 @@ class PendingInvitesController < ApplicationController
 
 
   def send_otp
+    # setting the otp request type as 'user activation'
+    params[:type] = OtpRequestType.id_for(:user_activation)
     @result = User::ManagerActivate::SendOtp.(current_user, params)
     if @result.success?
       respond response: :success
     else
       respond response: :failure
     end
-
   end
 
   def activate_employee

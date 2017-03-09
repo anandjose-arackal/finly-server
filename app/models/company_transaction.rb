@@ -13,6 +13,8 @@
 #  balance_amount_id     :integer          not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  transaction_mode      :string(255)
+#  merchant_type_key     :string(255)
 #
 
 class CompanyTransaction < ActiveRecord::Base

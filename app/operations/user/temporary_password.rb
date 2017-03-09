@@ -1,5 +1,6 @@
+##############################################################
 # not being used as this flow has changed
-
+##############################################################
 class User::TemporaryPassword < BaseOperation
 
   attr_accessor :selected_user, :accept_params, :temp_password
@@ -38,8 +39,7 @@ class User::TemporaryPassword < BaseOperation
   def post_process
     message = "Your temporary password is: #{temp_password}. You will be asked to change it upon signing in. Please do not share this information with anyone"
     # sending the one time password as an SMS. Mobile number is to be sent as an array of mobile numbers
-    WelcomeMessage::Create.(user, {mobile_number: [selected_user.mobile_number], message: message})
-
+    CustomMessage::Create.(user, {mobile_number: [selected_user.mobile_number], message: message})
     add_message :success, "You will get a message with instructions"
   end
 

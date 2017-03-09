@@ -9,9 +9,7 @@ class SettlementsController < ApplicationController
     elsif params[:payment_type] == PaymentType.id_for(:deduct_cash_on_hand).to_s
       operation = Settlement::Payment::AddDebtToCompanyClearance.new(current_user, params)
     elsif params[:payment_type] == PaymentType.id_for(:reimbursement).to_s
-      operation = Settlement::Payment::AddReimbursement.new(current_user, params)
-    elsif params[:payment_type] == PaymentType.id_for(:settlement).to_s
-      operation = Settlement::Payment::Settle.new(current_user, params)
+      operation = Settlement::Payment::AddSettlement.new(current_user, params)
     end
     if operation.blank?
       respond_failure 'Error while creating payment. Unknown type'

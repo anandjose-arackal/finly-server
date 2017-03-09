@@ -59,6 +59,7 @@ class Card::Transaction::Create < BaseOperation
               return false
             end
             transaction.card_expense = @result.expense.card_expense
+            transaction.expensed = true
             transaction.save
             return true
           when "ATM"

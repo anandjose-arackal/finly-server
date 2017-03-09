@@ -28,12 +28,12 @@ class Settlement::Report::Unapproved < Report::Base
   end
 
   def process
-    total_amount = report.total_amount
     currency = Currency.first.id
-    pending_reimbursement = 0
-    pending_reimbursement = report.reimbursement_amount.value if report.reimbursement_amount.present?
-    report.user.balance_sheet.subtract_pending_reimbursement pending_reimbursement, currency
-    report.reimbursement_amount.update(value: 0) if report.reimbursement_amount.present?
+    cash_expenses_total = 0
+    cash_expenses_total = report.cash_expenses_total.value if report.cash_expenses_total.present?
+    report.user.balance_sheet.subtract_approved_reports_total cash_expenses_total, currency
+    report.cash_expenses_total.update(value: 0) if report.cash_expenses_total.present?
+    report.card_expenses_total.update(value: 0) if report.card_expenses_total.present?
     unless report.update_attributes(accounted: false)
       messages[:error] = report.errors.full_messages
     end
