@@ -36,7 +36,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :company_id, presence: true
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
-  validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company', 'User']}
+  validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
   validate :validate_config
 
@@ -54,6 +54,9 @@ class FieldConfiguration < ActiveRecord::Base
     end
     if default_value.present? and not default_value.valid?
       self.errors.add :invalid, 'input format for "default value"'
+    end
+    if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type != 'Company'
+      self.errors.add :invalid, 'config. Custom Expense Field can only be configured at an organisation level'
     end
     # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense
     # if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type == 'Policy'

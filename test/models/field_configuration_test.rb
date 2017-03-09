@@ -309,4 +309,22 @@ class FieldConfigurationTest < ActiveSupport::TestCase
     assert_not field_configuration.valid?
   end
 
+  test 'expense configuration can only be added at an organisation level' do
+    name = 'Test name'
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:number),
+             field_parent_type_id: FieldParentType.id_for(:expense), configurable_id: 1, configurable_type: 'Policy'}
+    field_configuration = FieldConfiguration.new param
+    assert_not field_configuration.valid?
+    assert_not field_configuration.save
+
+    name = 'Test name'
+    param = {company: Company.first, field_name: name, enabled: true, field_type_id: FieldType.id_for(:number),
+             field_parent_type_id: FieldParentType.id_for(:expense), configurable_id: 1, configurable_type: 'Company'}
+    field_configuration = FieldConfiguration.new param
+    assert field_configuration.valid?
+    assert field_configuration.save
+    field_configuration.reload
+    assert field_configuration.id.present?
+  end
+
 end
