@@ -25,7 +25,7 @@
 <div class="container-fluid">
   <div class="row">
 
-  <h1 style="text-align: center; font-size: 16px;"><label>Enormous Marble Shoes</label></h1>
+  <h1 style="text-align: center; font-size: 16px;"><label>@report.name</label></h1>
     <div class="col-sm-12">
       <table class="table table-bordered table-condensed">
         <tr>
@@ -62,6 +62,7 @@
       </table>
     </div>
 
+    <% if @result.violations_present %>
     <div class="col-sm-12">
      <h1 style="font-size: 15px; text-align: left;"><label>Report Violations.</label></h1>
       <div class="col-sm-12">
@@ -93,6 +94,7 @@
     	</div>
     	<hr>
     </div>
+    <% end %>
 
     <div class="col-sm-12">
     <h1 style="font-size: 14px;"><label>Expenses</label></h1>

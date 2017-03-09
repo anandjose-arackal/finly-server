@@ -39,12 +39,12 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
       cash_total = 0
       if policy.name.nil?
         name = "None"
-        totals = default_policy_total(policy)
+        totals = default_policy_total
         card_total = totals[0]
         cash_total = totals[1]
       else
         name = policy.name
-        r = Report.where(policy_id: policy.id).processed.where('approved_at >= ? and approved_at <= ?', start_date, end_date)
+        r = Report.with_policy_id(policy.id).processed.with_approved_at_range(start_date.beginning_of_day, end_date.end_of_day)
         r.each do |report|
           card_total += report.total_amount(:only_card_expenses)
         end
@@ -72,9 +72,9 @@ class Company::Statement::PolicyExpenses < Company::Statement::Base
 
   private
 
-  def default_policy_total(policy)
+  def default_policy_total
     user_ids = user.company.users.pluck(:id)
-    r = Report.where(user_id: user_ids).where(policy_id: nil).processed.where('approved_at > ? and approved_at <= ?', start_date, end_date)
+    r = Report.with_user_id(user_ids).with_policy_id(nil).processed.with_approved_at_range(start_date.beginning_of_day, end_date.end_of_day)
     card_total = 0
     cash_total = 0
     r.each do |report|

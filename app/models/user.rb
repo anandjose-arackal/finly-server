@@ -309,19 +309,6 @@ class User < ActiveRecord::Base
       cash_on_hand = history.cash_on_hand_balance
       return cash_on_hand
     end
-
-    # payments = self.payments.made_after(date).with_amount
-    # payments_to_user = payments.transferred_cash_to_user.sum(:value)
-    # debt_clearance = payments.debt_clearance.sum(:value)
-    # settlement = payments.settlement.sum(:value)
-    # reports = self.reports.processed.submitted_after(date)
-    # report_ids = reports.pluck(:id)
-    # expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
-    # pending_reimbursement = reports.with_amount.without_payment.sum(:value)
-    # value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
-    # # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    # min_value = [cash.value, value].min
-    # Amount.new(value: min_value, currency: cash.currency)
   end
 
   alias_method :manager_name, :user_name
@@ -335,7 +322,7 @@ class User < ActiveRecord::Base
     json
   end
 
-  # overriding devise's default methdod so that it compares against both email and phone number to authenticate
+  # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(mobile_number: conditions[:email]) || find_by(email: conditions[:email])
   end

@@ -27,38 +27,27 @@ class User::Balances::SetBalances < BaseOperation
   def retrieve_balances(selected_user)
     card_balance = User::PrepaidCard::Show.(selected_user, {id: selected_user.id, view: 'admin'}).balance rescue 0
 
-    card_withdrawal = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:debit_from_card_to_virtual_account),
-                                                                                                          PaymentType.id_for(:debit_from_card_to_wallet),
-                                                                                                          PaymentType.id_for(:debit_from_card_to_card)]).joins(:amount).sum(:value)
-    card_withdrawal += selected_user.initiating_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:credit_from_card_to_card),
-                                                                                                            PaymentType.id_for(:credit_from_card_to_wallet)]).joins(:amount).sum(:value)
+    card_withdrawal = selected_user.receiving_payments.with_date(params[:date]).debit_from_card.joins(:amount).sum(:value)
+    card_withdrawal += selected_user.initiating_payments.with_date(params[:date]).credit_from_card.joins(:amount).sum(:value)
 
-    card_load = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card),
-                                                                                                    PaymentType.id_for(:credit_from_virtual_account_to_card),
-                                                                                                    PaymentType.id_for(:credit_from_card_to_card)]).joins(:amount).sum(:value)
-    card_load += selected_user.initiating_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_card),
-                                                                                                      PaymentType.id_for(:debit_from_card_to_card)]).joins(:amount).sum(:value)
+    card_load = selected_user.receiving_payments.with_date(params[:date]).credit_to_card.joins(:amount).sum(:value)
+    card_load += selected_user.initiating_payments.with_date(params[:date]).debit_to_card.joins(:amount).sum(:value)
 
-    card_expenses = selected_user.expenses.only_card_expenses.where(date: params[:date]).joins(:amount).sum(:value)
-    card_atm_withdrawal = selected_user.initiating_payments.where(receiving_user_id: selected_user.id).where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:atm_withdrawal)).joins(:amount).sum(:value)
+    card_expenses = selected_user.expenses.only_card_expenses.with_date(params[:date]).joins(:amount).sum(:value)
+    card_atm_withdrawal = selected_user.initiating_payments.received_by_user(selected_user.id).with_date(params[:date]).atm_withdrawals.joins(:amount).sum(:value)
 
     finly_money_balance = selected_user.wallet.balance_value
 
-    finly_money_load = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:credit_from_card_to_wallet),
-                                                                                                           PaymentType.id_for(:credit_from_wallet_to_wallet),
-                                                                                                           PaymentType.id_for(:credit_from_virtual_account_to_wallet)]).joins(:amount).sum(:value)
-    finly_money_load += selected_user.initiating_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:debit_from_card_to_wallet),
-                                                                                                             PaymentType.id_for(:debit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
+    finly_money_load = selected_user.receiving_payments.with_date(params[:date]).credit_to_wallet.joins(:amount).sum(:value)
+    finly_money_load += selected_user.initiating_payments.with_date(params[:date]).debit_to_wallet.joins(:amount).sum(:value)
 
-    finly_money_withdrawal = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:debit_from_wallet_to_wallet),
-                                                                                                                 PaymentType.id_for(:debit_from_wallet_to_card),
-                                                                                                                 PaymentType.id_for(:debit_from_wallet_to_virtual_account)]).joins(:amount).sum(:value)
-    finly_money_withdrawal += selected_user.initiating_payments.where(date: params[:date]).where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card),
-                                                                                                                   PaymentType.id_for(:credit_from_wallet_to_wallet)]).joins(:amount).sum(:value)
+    finly_money_withdrawal = selected_user.receiving_payments.with_date(params[:date]).debit_from_wallet.joins(:amount).sum(:value)
+    finly_money_withdrawal += selected_user.initiating_payments.with_date(params[:date]).credit_from_wallet.joins(:amount).sum(:value)
 
     cash_on_hand_balance = selected_user.cash_in_hand.value
-    cash_on_hand_load = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:add_cash_on_hand)).joins(:amount).sum(:value)
-    cash_on_hand_withdrawal = selected_user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:deduct_cash_on_hand)).joins(:amount).sum(:value)
+    cash_on_hand_load = selected_user.receiving_payments.with_date(params[:date]).cash_on_hand_additions.joins(:amount).sum(:value)
+    cash_on_hand_withdrawal = selected_user.receiving_payments.with_date(params[:date]).cash_on_hand_deductions.joins(:amount).sum(:value)
+
     {company_id: selected_user.company_id,
      date: params[:date],
      card_balance_attributes: {value: card_balance, currency: Currency.first},
