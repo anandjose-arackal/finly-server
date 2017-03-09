@@ -587,6 +587,9 @@
         success: function(res){
           // console.log(res);
           if(res.success === true){
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide')
+            }
             ohSnap("Thank you for the request! We will contact you soon", {color: 'green', 'duration': '6000'});
           } else {
             snapNotify(res.messages)
