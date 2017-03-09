@@ -1,35 +1,83 @@
 <div class="row no-margin">
-  <div class="col-sm-12 no-padding">
-    <h4>Total Reimbursement to be Made: <span class="currency">&#8377;&nbsp;{{summary.actionData.selectedReportsTotal}}</span></h4>
-    <input type="hidden" name="total_reimbursement" value="{{summary.actionData.selectedReportsTotal}}">
-  </div>
-
-  <div class="col-sm-12 no-padding">
+  <div class="col-sm-5">
+    <div class="row no-margin" style="border-bottom: 1px solid #ddd;">
+      <h4>Summary</h4>
+    </div>
     <div class="row no-margin">
-      <div class="col-sm-6 no-padding">
-        <h4>Cash on Hand:<span class="currency">&#8377;&nbsp;{{summary.userData.cash_in_hand}}</span></h4>
+      <div class="col-sm-8 no-padding">
+        <h5>Selected Reports Total:</h5>
       </div>
+      <div class="col-sm-3 no-padding">
+        <h5 class="text-right"><span class="currency">&#8377;&nbsp;{{summary.actionData.selectedReportsCashCardTotal}}</span></h5>
+      </div>
+    </div>
 
-      <div class="col-sm-6">
-        <div class="form-group">
-          <label>Deduct from Cash on Hand</label>
-          <input type="number" value="0" name="from_cash_in_hand" class="form-control reimbursement-calculation cash-in-hand">
-        </div>
+    <div class="row no-margin">
+      <div class="col-sm-8 no-padding">
+        <h5>Selected Reports Cash Expenses:</h5>
+        <input type="hidden" name="total_reimbursement" value="{{summary.actionData.selectedReportsTotal}}">
+      </div>
+      <div class="col-sm-3 no-padding">
+        <h5 class="text-right"><span class="currency">&#8377;&nbsp;{{summary.actionData.selectedReportsTotal}}</span></h5>
+      </div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-8 no-padding">
+        <h5>Selected Reports Card Expenses:</h5>
+      </div>
+      <div class="col-sm-3 no-padding">
+        <h5 class="text-right"><span class="currency greyed-out">&#8377;&nbsp;{{summary.actionData.selectedReportsCardTotal}}</span></h5>
       </div>
     </div>
   </div>
 
-  <div class="col-sm-12 no-padding">
+  <div class="col-sm-7" style="border-left: 1px solid #ddd;">
+    <div class="row no-margin" style="border-bottom: 1px solid #ddd;">
+      <h4>How would you like to Settle?</h4>
+    </div> 
     <div class="row no-margin">
-      <div class="col-sm-6 col-sm-offset-6">
-        <div class="form-group">
-          <label>Settle outside Finly</label>
+      <div class="col-sm-8 no-padding">
+        <h5>Total Amount to be Settled:</h5>
+      </div>
+
+      <div class="col-sm-4">
+        <h5 class="text-right"><span class="currency">&#8377;&nbsp;{{summary.actionData.selectedReportsTotal}}</span></h5>
+      </div>
+    </div>
+
+    <div class="row no-margin">
+      <div class="col-sm-8 no-padding">
+        <h5>{{summary.userData.user_details.name}}'s Cash on Hand:</h5>
+      </div>
+
+      <div class="col-sm-4">
+        <h5 class="text-right"><span class="currency">&#8377;&nbsp;{{summary.userData.cash_in_hand}}</span></h5>
+      </div>
+    </div>
+
+    <div class="row no-margin" style="margin-top: 20px;">
+      <div class="form-group" style="width: 45%;">
+        <label>Deduct from Cash on Hand</label>
+        <div class="input-group">
+          <div class="input-group-addon">&#8377;</div>
+          <input type="number" value="0" name="from_cash_in_hand" class="form-control reimbursement-calculation cash-in-hand">
+        </div>
+      </div>
+      <div class="form-group" style="width: 45%;">
+        <label>Settle outside Finly</label>
+        <div class="input-group">
+          <div class="input-group-addon">&#8377;</div>
           <input type="number" value="{{summary.actionData.selectedReportsTotal}}" name="from_outside_finly" class="form-control reimbursement-calculation outside-finly">
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-sm-12 no-padding text-center">
-    <button class="btn btn-sm btn-primary step-2-action" data-action-type="credit_reimbursement" data-url="{{summary.userData.actions.credit_reimbursement}}">Proceed</button>
+
+
+    <div class="row no-margin">
+      <div class="col-sm-12 no-padding text-center">
+        <button class="btn btn-sm btn-primary step-2-action" data-action-type="credit_reimbursement" data-url="{{summary.userData.actions.credit_reimbursement}}">Proceed</button>
+      </div>
+    </div>
   </div>
 </div>
