@@ -166,6 +166,76 @@
   </div>
 </div>
 
+<!--Modal Demo-->
+<div class="modal fade" id="modal-request-demo" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-center form-title">Request For a Demo</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-horizontal form-request-demo">
+              <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+              <fieldset>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="name">Name</label>  
+                  <div class="col-md-4">
+                  <input id="name" name="preview[name]" placeholder="Your Name" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="email">Email</label>  
+                  <div class="col-md-4">
+                  <input id="email" name="preview[email]" placeholder="Your Work Email" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
+                  <div class="col-md-4">
+                  <input id="phonenumber" name="preview[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="company_name">Company Name</label>  
+                  <div class="col-md-4">
+                  <input id="company_name" name="preview[company]" placeholder="Your Company" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Button -->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="submit"></label>
+                  <div class="col-md-4">
+                    <button id="submit" name="submit" class="btn btn-primary">Request For Demo</button>
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+ 
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+</div>
+<!--/ Modal box-->
+
 
 <style type="text/css">
   body{
@@ -177,6 +247,81 @@
   
 </script>
 
-<style type="text/css">
-  
-</style>
+<script type="text/javascript">
+  $(document).ready(function() {
+    snapNotify = function(obj){
+      // console.log "From snap", obj
+      ohSnapX()
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            ohSnap(message, {
+              color: color,
+              'duration': '9000',
+              'container-id': container
+            });
+          }
+        }
+      }
+    }
+
+    $(".form-request-demo").on('submit', function(e){
+      e.preventDefault();
+      form = this
+
+      $.ajax({
+        url: '/welcome/preview',
+        data: $(form).serialize(),
+        type: "POST",
+        dataType: 'json',
+        success: function(res){
+          // console.log(res);
+          if(res.success === true){
+            ohSnap("Thank you for the request! We will contact you soon.", {color: 'green', 'duration': '6000'});
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide')
+            }
+          } else {
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+          }
+        }
+      });
+    });
+  });
+</script>

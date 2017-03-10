@@ -1,22 +1,25 @@
-<link href='https://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
-<h5>About Us</h5>
-<hr>
-<p>Finly was founded with a simple idea: to allow companies get a better insight into their spend and expenses.
-  Finly has been designed to structure better processes in your company leading to a much more cost efficient and time
-  efficient system.
+<%= render 'shared/header' %>
+<div class="container">
+    
+  <h5>About Us</h5>
+  <hr>
+  <p>Finly was founded with a simple idea: to allow companies get a better insight into their spend and expenses.
+    Finly has been designed to structure better processes in your company leading to a much more cost efficient and time
+    efficient system.
 
-  By replacing traditional tools for reporting expenses with Finly we hope to make the entire experience hassle free
-  leading to improved employee satisfaction.<br>
-  By providing the company with complete visibility into its spend, Finly
-  keeps all company business systems in sync and offers the most dynamic reporting in the market. Our goal is to provide
-  finance teams with tools and data that enable them to have real time insights into their spends to make better strategic decisions and remove all expense management hurdles as your
-  business scales.</p>
+    By replacing traditional tools for reporting expenses with Finly we hope to make the entire experience hassle free
+    leading to improved employee satisfaction.<br>
+    By providing the company with complete visibility into its spend, Finly
+    keeps all company business systems in sync and offers the most dynamic reporting in the market. Our goal is to provide
+    finance teams with tools and data that enable them to have real time insights into their spends to make better strategic decisions and remove all expense management hurdles as your
+    business scales.</p>
 
-<h5>Contact</h5>
-<hr>
-<p>We would be happy to hear from you on <a>contact@finly.io</a> or you can hit us directly at <span > +91-9886321387/
-  +91-9986676713</span></p>
+  <h5>Contact</h5>
+  <hr>
+  <p>We would be happy to hear from you on <a>contact@finly.io</a> or you can hit us directly at <span > +91-9886321387/
+    +91-9986676713</span></p>
 
+</div>
 <!--Modal Demo-->
 <div class="modal fade" id="modal-request-demo" role="dialog">
   <div class="modal-dialog">
@@ -110,13 +113,13 @@
   }*/
 
   h5 {
-    font-weight: 700;
+    font-weight: 300;
     font-size: 26px;
     color: #46568b;
     letter-spacing: -1px;
     margin-left: 20px;
     margin-top: 40px;
-    font-family: 'Bree Serif', serif;
+    font-family: 'Lato', serif;
   }
 
   p {
@@ -201,7 +204,10 @@
         success: function(res){
           // console.log(res);
           if(res.success === true){
-            ohSnap("Thank you for the request! We will contact you soon", {color: 'green', 'duration': '6000'});
+            ohSnap("Thank you for the request! We will contact you soon.", {color: 'green', 'duration': '6000'});
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide')
+            }
           } else {
             snapNotify(res.messages)
             // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
