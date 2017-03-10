@@ -16,7 +16,7 @@ class Report::MarkAsSettled < Report::Base
     self.payment = params[:payment]
     self.cash_in_hand_deduction = params[:from_cash_in_hand]
     self.status = params[:status] || ReportStatus.settled_id
-    self.tracking_status = (params[:status]) ? ReportTrackingAction.id_for(:closed) : ReportTrackingAction.id_for(:reimbursed)
+    self.tracking_status = (params[:status]) ? ReportTrackingAction.id_for(:closed) : ReportTrackingAction.id_for(:settled)
   end
 
   def validate

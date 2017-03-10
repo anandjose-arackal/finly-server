@@ -37,7 +37,8 @@ class Company::Balances::SetBalances < BaseOperation
   private
 
   def extract_balance_params(company)
-    neft_transfer_total = company.company_transactions.where(transaction_mode: "MANUAL FUND CREDIT").where('DATE(transaction_date) = ?', params[:date]).joins(:transaction_amount).sum(:value)
+    neft_balance_op = Company::Transaction::Show.(company, {start_date: Date.today, end_date: Date.today})
+    neft_transfer_total =  neft_balance_op.transactions.manual_fund_credits.with_date(params[:date]).joins(:transaction_amount).sum(:value)
 
     self.company_admin = company.users.only_admins.first
     current_company_balance = Company::VirtualAccount::Balance.(company_admin).balance rescue 0
@@ -69,38 +70,38 @@ class Company::Balances::SetBalances < BaseOperation
 
     company.users.each do |user|
 
-      company_withdrawal_to_card += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_virtual_account_to_card)).joins(:amount).sum(:value)
-      company_withdrawal_to_wallet += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_virtual_account_to_wallet)).joins(:amount).sum(:value)
+      company_withdrawal_to_card += user.receiving_payments.with_date(params[:date]).credit_from_virtual_account_to_card.joins(:amount).sum(:value)
+      company_withdrawal_to_wallet += user.receiving_payments.with_date(params[:date]).credit_from_virtual_account_to_wallet.joins(:amount).sum(:value)
 
-      company_load_from_card += user.initiating_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_card_to_virtual_account)).joins(:amount).sum(:value)
-      company_load_from_wallet += user.initiating_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_wallet_to_virtual_account)).joins(:amount).sum(:value)
+      company_load_from_card += user.initiating_payments.with_date(params[:date]).debit_from_card_to_virtual_account.joins(:amount).sum(:value)
+      company_load_from_wallet += user.initiating_payments.with_date(params[:date]).debit_from_wallet_to_virtual_account.joins(:amount).sum(:value)
 
-      card_withdrawal_to_virtual_account += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_card_to_virtual_account)).joins(:amount).sum(:value)
-      card_withdrawal_to_wallet += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_card_to_wallet)).joins(:amount).sum(:value)
-      card_withdrawal_to_card += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_card_to_card)).joins(:amount).sum(:value)
+      card_withdrawal_to_virtual_account += user.receiving_payments.with_date(params[:date]).debit_from_card_to_virtual_account.joins(:amount).sum(:value)
+      card_withdrawal_to_wallet += user.receiving_payments.with_date(params[:date]).debit_from_card_to_wallet.joins(:amount).sum(:value)
+      card_withdrawal_to_card += user.receiving_payments.with_date(params[:date]).debit_from_card_to_card.joins(:amount).sum(:value)
 
-      card_load_from_wallet += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_wallet_to_card)).joins(:amount).sum(:value)
-      card_load_from_card += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_card_to_card)).joins(:amount).sum(:value)
-      card_load_from_virtual_account += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_virtual_account_to_card)).joins(:amount).sum(:value)
+      card_load_from_wallet += user.receiving_payments.with_date(params[:date]).credit_from_wallet_to_card.joins(:amount).sum(:value)
+      card_load_from_card += user.receiving_payments.with_date(params[:date]).credit_from_card_to_card.joins(:amount).sum(:value)
+      card_load_from_virtual_account += user.receiving_payments.with_date(params[:date]).credit_from_virtual_account_to_card.joins(:amount).sum(:value)
 
       card_balance_total += user.cards.first.card_balance_value rescue 0
 
-      wallet_withdrawal_to_virtual_account += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_wallet_to_virtual_account)).joins(:amount).sum(:value)
-      wallet_withdrawal_to_card += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_wallet_to_card)).joins(:amount).sum(:value)
-      wallet_withdrawal_to_wallet += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:debit_from_wallet_to_wallet)).joins(:amount).sum(:value)
+      wallet_withdrawal_to_virtual_account += user.receiving_payments.with_date(params[:date]).debit_from_wallet_to_virtual_account.joins(:amount).sum(:value)
+      wallet_withdrawal_to_card += user.receiving_payments.with_date(params[:date]).debit_from_wallet_to_card.joins(:amount).sum(:value)
+      wallet_withdrawal_to_wallet += user.receiving_payments.with_date(params[:date]).debit_from_wallet_to_wallet.joins(:amount).sum(:value)
 
-      wallet_load_from_virtual_account += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_virtual_account_to_wallet)).joins(:amount).sum(:value)
-      wallet_load_from_wallet += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_card_to_wallet)).joins(:amount).sum(:value)
-      wallet_load_from_card += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:credit_from_wallet_to_wallet)).joins(:amount).sum(:value)
+      wallet_load_from_virtual_account += user.receiving_payments.with_date(params[:date]).credit_from_virtual_account_to_wallet.joins(:amount).sum(:value)
+      wallet_load_from_wallet += user.receiving_payments.with_date(params[:date]).credit_from_card_to_wallet.joins(:amount).sum(:value)
+      wallet_load_from_card += user.receiving_payments.with_date(params[:date]).credit_from_wallet_to_wallet.joins(:amount).sum(:value)
 
       wallet_balance_total += user.wallet.balance_value
 
-      card_expenses_total += user.expenses.only_card_expenses.where(date: params[:date]).joins(:amount).sum(:value)
-      card_atm_withdrawals += user.card_transactions.where('DATE(transaction_timestamp) = ?', params[:date]).where(transaction_mode: 'ATM').joins(:billing_amount).sum(:value)
+      card_expenses_total += user.expenses.only_card_expenses.with_date(params[:date]).joins(:amount).sum(:value)
+      card_atm_withdrawals += user.card_transactions.on_date(params[:date]).atm_withdrawals.joins(:billing_amount).sum(:value)
 
       cash_on_hand_total += user.cash_in_hand.value rescue 0
-      cash_on_hand_load_total += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:add_cash_on_hand)).joins(:amount).sum(:value)
-      cash_on_hand_withdrawal_total += user.receiving_payments.where(date: params[:date]).where(payment_type_id: PaymentType.id_for(:deduct_cash_on_hand)).joins(:amount).sum(:value)
+      cash_on_hand_load_total += user.receiving_payments.with_date(params[:date]).cash_on_hand_additions.joins(:amount).sum(:value)
+      cash_on_hand_withdrawal_total += user.receiving_payments.with_date(params[:date]).cash_on_hand_deductions.joins(:amount).sum(:value)
 
     end
 

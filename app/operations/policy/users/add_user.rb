@@ -16,7 +16,7 @@ class Policy::Users::AddUser < Policy::Base
   def init
     self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
     ids = params[:user_id].split(',')
-    self.added_users = user.company.users.where(id: ids)
+    self.added_users = user.company.users.with_id(ids)
     self.admin = params[:admin]
   end
 

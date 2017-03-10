@@ -27,7 +27,7 @@ class Report::AssociatedUsers < Report::Base
       # Order is MySQL Specific
       user_ids = user_ids.reverse!
       user_ids.reject! { |id| id.blank? }
-      self.associated_users = User.where(id: user_ids).where(company_id: self.user.company_id).order("field(id,#{user_ids.join(',')})")
+      self.associated_users = User.with_id(user_ids).with_company_id(self.user.company_id).order("field(id,#{user_ids.join(',')})")
     end
   end
 

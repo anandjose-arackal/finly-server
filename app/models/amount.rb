@@ -39,6 +39,7 @@ class Amount < ActiveRecord::Base
   alias_method :billing_amount_value, :amount_value
   alias_method :card_balance_value, :amount_value
   alias_method :submitted_amount_value, :amount_value
+  alias_method :card_amount_value, :amount_value
   alias_method :cash_on_hand_load_value, :amount_value
   alias_method :cash_on_hand_withdrawal_value, :amount_value
   alias_method :cash_on_hand_balance_value, :amount_value

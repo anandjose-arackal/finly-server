@@ -44,7 +44,7 @@ class Report::Base < BaseOperation
 
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
-                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result
+                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present
 
     def init
       self.report = params[:report]
@@ -61,6 +61,7 @@ class Report::Base < BaseOperation
       self.manager = User::Team::Approver.(report.user, report: report, type: :manager)
       self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
+      self.violations_present = has_warning? || has_blocking?
     end
 
     def retrieve_policies
