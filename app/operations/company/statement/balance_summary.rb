@@ -29,7 +29,7 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
 
   def process
     result = Company::VirtualAccount::Balance.(user)
-    items[:current_company_balance] = result.balance
+    items[:current_company_balance] = result.balance rescue 0
 
     # calculating money with employees in various forms
     items[:total_amount_with_employees] = {}

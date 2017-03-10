@@ -27,8 +27,12 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
   end
 
   def process
-    result = Company::VirtualAccount::Balance.(user)
-    items[:company_account_closing_balance] = result.balance rescue 0
+    if end_date.to_date == Date.today
+      result = Company::VirtualAccount::Balance.(user)
+      items[:company_account_closing_balance] = result.balance rescue 0
+    else
+      items[:company_account_closing_balance] = company.company_balance_histories.find_by(date: end_date.to_date).company_balance.value rescue 0
+    end
 
     items[:company_account_details] = {}
     items[:total_account_load_via_NEFT] = 0
@@ -74,22 +78,36 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
       to_finly_money_total = user.receiving_payments.with_date_range(start_date, end_date).credit_from_virtual_account_to_wallet.joins(:amount).sum(:value)
       items[:total_amount_transferred][:to_finly_money] += to_finly_money_total
     end
-
-    items[:company_account_opening_balance] = company.company_balance_histories.find_by(date: start_date).company_balance.value rescue 0
+    
+    items[:company_account_opening_balance] = company.company_balance_histories.find_by(date: start_date.to_date).company_balance.value rescue 0
   end
 
   def success
+    params[:invalid_date] = date_before_limit?
     params[:items] = items
     Company::Statement::TransactionsSummary::SummaryPresenter.new(user, params, messages)
   end
 
   class Company::Statement::TransactionsSummary::SummaryPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :items
+    attr_accessor :items, :invalid_date
 
     def init
       self.items = params[:items]
+      self.invalid_date = params[:invalid_date]
     end
+  end
+
+  private
+
+  def date_before_limit?
+    if start_date.to_date < Date.parse(Constants::BEGINNING_OF_TIME)
+      return true
+    end
+    if end_date.to_date < Date.parse(Constants::BEGINNING_OF_TIME)
+      return true
+    end
+    false
   end
 
 end
