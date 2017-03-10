@@ -74,8 +74,8 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
     company.users.each do |user|
       items[:unreported_expenses][:via_card_total] += user.expenses.unreported.only_card_expenses.with_amount.sum(:value) rescue 0
       items[:unreported_expenses][:via_cash_total] += user.expenses.unreported.only_manual_expenses.with_amount.sum(:value) rescue 0
-      items[:unreported_expenses][:via_card_number] += user.expenses.unreported.only_card_expenses.count 0
-      items[:unreported_expenses][:via_cash_number] += user.expenses.unreported.only_manual_expenses.count 0
+      items[:unreported_expenses][:via_card_number] += user.expenses.unreported.only_card_expenses.count rescue 0
+      items[:unreported_expenses][:via_cash_number] += user.expenses.unreported.only_manual_expenses.count rescue 0
     end
 
   end
