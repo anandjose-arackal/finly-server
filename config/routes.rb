@@ -559,7 +559,7 @@ Rails.application.routes.draw do
         patch 'approve' => 'reports#approve', as: :approve
         patch 'unapprove' => 'reports#unapprove', as: :unapprove
         patch 'reject' => 'reports#reject', as: :reject
-        patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+        patch 'settlement_confirm' => 'reports#settlement_confirm', as: :settlement_confirm
         patch 'take_control' => 'reports#take_control', as: :take_control
         post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
         delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses

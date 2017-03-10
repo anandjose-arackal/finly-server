@@ -143,7 +143,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     end
   end
 
-  def reimbursement_confirm
+  def settlement_confirm
     @result = Report::SettlementConfirm.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
