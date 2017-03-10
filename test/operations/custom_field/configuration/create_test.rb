@@ -7,6 +7,7 @@ class CreateTest < ActiveSupport::TestCase
 
   def setup
     @user = User.first
+    @user.stubs(:company_admin? => true)
     @company = Company.first
     @policy = Policy.first
     @user_2 = User.second
