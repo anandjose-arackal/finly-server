@@ -192,15 +192,18 @@ body {
     letter-spacing: 2px;
     text-transform: uppercase;
     font-size: 66px;
-    color: rgba(0, 0, 0, 0.06);
+    color: rgba(53, 59, 82, 0.05);
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
     cursor: default;
+    letter-spacing: 5px;
   }
 
   h2{
-    color: #555;
+    letter-spacing: 5px;
+    font-weight: 700;
+    color: #353B53;
   }
 }
 
@@ -217,12 +220,12 @@ body {
   // background-position: no-repeat center top, right center no-repeat;
   // background-size:cover, auto 490px;
   // background-position-x: left;
-  background: #3D4B9D;
+  background: #fff;
   background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-position-y: 382px, 439px, 177px, top, center;
+  background-position-y: 382px, 439px, 177px, top, -95px;
   background-position-x: 64%, 55%, 86%, right, center;
-  background-size: 93px, 154px, 400px, 665px, cover;
+  background-size: 93px, 154px, 400px, 735px, cover;
 
 
   // width: 970px;
@@ -235,7 +238,16 @@ body {
     font-family: Lato;
     color: #fefefe;
     font-weight: normal;
-    font-weight: 100;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+  h4{
+    font-size: 19px;
+    font-weight: 100px;
+  }
+  h3 span{
+    font-weight: 700;
+    letter-spacing: 1px;
   }
 
   .banner-image{
@@ -260,7 +272,7 @@ body {
   }
 
   .banner-options{
-    margin-top: 60px;
+    margin-top: 70px;
     button{
       img{
         display: inline-block;
@@ -287,6 +299,7 @@ body {
     }
     p{
       font-size: 15px;
+      color: #464646;
     }
     img{
       height: 125px;
@@ -437,6 +450,7 @@ body {
     }
     p{
       font-size: 15px;
+      color: #464646;
     }
     img{
       height: 100px;
@@ -449,17 +463,19 @@ body {
   .finly-expense-card{
     margin-top: 60px;
     .well{
-      padding: 20px 30px;
+      padding: 20px 45px;
       border-radius: 30px;
       background: white;
 
       h3{
-        color: #555;
+        color: #353b52;
+        letter-spacing: 0.2px;
+        margin-bottom: 20px;
       }
     }
 
     .card-features{
-      margin-top: 50px;
+      margin-top: 35px;
       h5{
         padding-left: 20px;
         font-size: 17px;
@@ -525,6 +541,7 @@ body {
     }
     p{
       font-size: 15px;
+      color: #464646;
     }
     img{
       margin-left: auto;
