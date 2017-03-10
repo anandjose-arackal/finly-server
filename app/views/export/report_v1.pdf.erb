@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%=@report.name%></title>
+  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", media: "all", "data-turbolinks-track" => true %>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
+  <!-- <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css"> -->
+  <style>
+  table{
+    table-layout: fixed;
+  }
+  td{
+    overflow-wrap: break-word;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+  .image_with_text {
+  	border: 1px solid black;
+  	height: 300px;
+  }
+
+  @media print {
+    #pagebreak {
+      page-break-before: always;
+    }
+  }
+
+  @page {
+    size: a4;
+    margin: .9cm;
+  }
+
+  @media print {
+    div.divFooter {
+      position: fixed;
+      bottom: 0;
+      margin: 0px;
+    }
+  }
+
+</style>
+</head>
+<body>
+<div class="container-fluid">
+<div class="container-fluid">
+  <div class="row">
+
+  <h1 style="text-align: center; font-size: 16px;"><label><%= @report.name%></label></h1>
+    <div class="col-sm-12">
+      <table class="table table-bordered table-condensed">
+        <tr>
+          <td width="25%"><label>Policy</label></td>
+          <td width="25%"><%= @report.policy.name rescue "None" %></td>
+
+          <td width="25%"><label>From</label></td>
+          <td width="25%"><%= @report.user.name%></td>
+        </tr>
+
+        <tr>
+          <td width="25%"><label>Memo</label></td>
+          <td width="25%"><%= @report.memo %></td>
+
+          <td width="25%"><label>To manager</label></td>
+          <td width="25%"><%= @result.manager.name rescue "None"%></td>
+        </tr>
+
+        <tr>
+          <td width="25%"><label>Status</label></td>
+          <td width="25%"><%=@report.status_name%></td>
+
+          <td width="25%"><label>To Finance Manager</label></td>
+          <td width="25%"><%=@result.finance_manager.name rescue "None"%></td>
+        </tr>
+
+        <tr>
+          <td width="25%"><label>Date</label></td>
+          <td width="25%"><%=@report.date_as_string%></td>
+
+          <td width="25%"><label>Total Amount:</label></td>
+          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%=@report.total_amount%></td>
+        </tr>
+      </table>
+    </div>
+
+    <% if @result.violations_present %>
+    <div class="col-sm-12">
+     <h1 style="font-size: 15px; text-align: left;"><label>Report Violations.</label></h1>
+      <div class="col-sm-12">
+
+        <% unless @result.warning_array.empty? %>
+           <h5 style="text-align: left; margin: 0px;"><label>Warning Violations</label></h5>
+      		 <ul>
+              <% @result.warning_array.each do |violation| %>
+              <li>
+        		 		<p style="overflow-wrap: break-word;"><%= violation[:message] %></p>
+        		 	</li>
+              <% end %>
+      		 </ul>
+        <% end %>
+
+    	<div style="margin: 10px;"></div>
+
+        <% unless @result.blocking_array.empty? %>
+          <h5 style="text-align: left; margin: 0px;"><label>Blocking Violations</label></h5>
+        	   <ul>
+              <% @result.blocking_array.each do |violation| %>
+                <li>
+          		 		<p style="overflow-wrap: break-word;"><%=violation[:message]%></p>
+          		 	</li>
+              <% end %>
+        		 </ul>
+        <% end %>
+
+    	</div>
+    	<hr>
+    </div>
+    <% end %>
+
+    <div class="col-sm-12">
+    <h1 style="font-size: 14px;"><label>Expenses</label></h1>
+    </div>
+
+    <% @index = 1%>
+    <% @result.expenses_category_sorted.each do |section| %>
+
+      <div class="col-sm-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <td colspan="3"><label width="100%"><%=section[:section_name]%></label></td>
+              <td style="text-align: right;"><label width="100%">Category Total&nbsp;&nbsp;:</label></td>
+              <td><i class="fa fa-inr" aria-hidden="true"></i><%=section[:section_total]%></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background-color: #DCDCDC;" class="table_header">
+              <td width="20%" style="padding-left: 30px;"><label>SI. No.</label></td>
+              <td width="20%"><label>Date</label></td>
+              <td width="20%"><label>Merchant</label></td>
+              <td width="20%"><label>Note</label></td>
+              <td width="20%"><label>Total</label></td>
+            </tr>
+
+            <% section[:expenses].each do |expense| %>
+              <tr>
+                <% if expense.manual_expense? %>
+                  <td width="20%"><i class="fa fa-money"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
+                <% elsif expense.card_expense? %>
+                  <td width="20%"><i class="fa fa-cc-visa"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
+                <% end %>
+                <td width="20%"><%=expense.date%></td>
+                <td width="20%"><%=expense.merchant_name%></td>
+                <td width="20%"><%=expense.note%></td>
+                <td width="20%"><i class="fa fa-inr">&nbsp;</i><%=expense.amount_value%></td>
+              </tr>
+              <% @index += 1 %>
+            <% end %>
+
+          </tbody>
+        </table>
+        <hr>
+      </div>
+
+    <% end %>
+
+
+    <div class="col-sm-12">
+      <table class="table">
+        <tbody>
+        <tr>
+        	<td width="80%" style="text-align: right; font-size: 16px"><label>Report&nbsp;Total&nbsp;:&nbsp;</label></td>
+        	<td width="20%" style="font-size: 16px;"><label><i class="fa fa-rupee"></i>&nbsp;<%=@report.total_amount.to_f%></label></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+  </div>
+
+</div>
+
+
+<% unless @report.comments.empty? %>
+  <h1 style="text-align: left; font-size: 16px; margin-left: 12px" id="pagebreak"><label>Timeline</label></h1>
+  <div class="col-sm-12">
+
+    <% @report.comments.each do |comment| %>
+      <div class="row" style="width: 100%">
+        <div class="col-sm-2">
+          <label><%=comment.user.name if comment.user%></label> |&nbsp;
+          <span style="font-size: 11px; color: #aaa;"><%=comment.created_at%></span>
+        </div>
+
+        <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
+          <%=comment.generate(current_user)%>
+        </div>
+      </div>
+
+    <% end %>
+
+  </div>
+<% end %>
+
+
+<% unless @report.expenses.filter_receipt('present').empty? %>
+  <div class="row" style="width: 100%;" id="pagebreak">
+    <div class="col-sm-12">
+      <h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Receipts</label></h1>
+      <% @report.expenses.filter_receipt('present').each do |expense| %>
+          <div class="img-responsive" style="text-align: center;">
+            <%=wicked_pdf_image_tag(expense.receipts.first.image.url, :style=>"max-width:100%; height:auto;")%>
+            <p class="text-center">Merchant: <%=expense.merchant_name %> | Amount: <%=expense.amount_value%></p>
+          </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+  <div class="divFooter">
+    --------------------------------------------------------------------------------------------------------------------------------------------------------
+    <span style="float: right; margin-right: 10px;">Powered by&nbsp;&nbsp;<img src="/assets/images/logo_black_xs.png" style="height: 25px; width: 70px; float: right;"></span>
+  </div>
+
+</div>
+
+</body>
+</html>

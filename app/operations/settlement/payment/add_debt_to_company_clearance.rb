@@ -86,9 +86,9 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
       balance_history = to_user.user_balance_histories.find_by(date: payment_params[:date].to_date)
       unless balance_history.blank?
         cash_on_hand_value = balance_history.cash_on_hand_balance.value
-        cash_on_hand_withdrawal = balance_history.cash_in_hand_withdrawal.value
-        cash_on_hand_value += payment_params[:amount]
-        cash_on_hand_withdrawal += payment_params[:amount]
+        cash_on_hand_withdrawal = balance_history.cash_on_hand_withdrawal.value
+        cash_on_hand_value -= payment_params[:amount].to_f
+        cash_on_hand_withdrawal += payment_params[:amount].to_f
         balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
                                   cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, id: balance_history.cash_on_hand_withdrawal.id})
       end

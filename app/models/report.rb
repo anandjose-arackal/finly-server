@@ -34,6 +34,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -72,7 +73,9 @@ class Report < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.not id: id }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
+  scope :with_policy_id, ->(policy_id) { where policy_id: policy_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
+  scope :with_user_id, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :cash_expenses_total }
@@ -96,10 +99,12 @@ class Report < ActiveRecord::Base
   scope :pending_settlement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
+  scope :with_approved_at_range, -> (start_time, end_time) {where('approved_at >= ? and approved_at <= ?', start_time, end_time)}
+
   # scope for reports being shown in settlements page
   scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
 
-  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id]}
+  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
   scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }

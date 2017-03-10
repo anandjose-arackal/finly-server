@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170308110850) do
+ActiveRecord::Schema.define(version: 20170309192201) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -215,6 +215,9 @@ ActiveRecord::Schema.define(version: 20170308110850) do
     t.text     "error_message",         limit: 65535
     t.integer  "billing_amount_id",     limit: 4
     t.boolean  "is_deleted",                          default: false
+    t.string   "mcc_code",              limit: 255
+    t.string   "transaction_status",    limit: 255
+    t.string   "api_reference_id",      limit: 255
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
