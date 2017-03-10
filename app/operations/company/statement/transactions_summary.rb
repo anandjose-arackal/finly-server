@@ -78,7 +78,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
       to_finly_money_total = user.receiving_payments.with_date_range(start_date, end_date).credit_from_virtual_account_to_wallet.joins(:amount).sum(:value)
       items[:total_amount_transferred][:to_finly_money] += to_finly_money_total
     end
-    
+
     items[:company_account_opening_balance] = company.company_balance_histories.find_by(date: start_date.to_date).company_balance.value rescue 0
   end
 

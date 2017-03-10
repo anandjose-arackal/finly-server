@@ -25,12 +25,14 @@
       display:block; clear:both; page-break-before:always;
     }
 
-
+  @media print {
     div.divFooter {
       position: fixed;
       bottom: 0;
-      margin: 0px;
+      margin: 20px;
     }
+  }
+
 
   </style>
 </head>
@@ -207,6 +209,10 @@
   </div>
 
   <br>
+
+  <!--<div class="divFooter" style="border-top: 1px dashed #666;width: 90%;">-->
+    <!--<span style="float: right; margin-right: 10px;">Powered by&nbsp;&nbsp; <%=wicked_pdf_image_tag('/common/images/logos/logo_black_xs.png', :style=>"height: 25px; width: 70px; float: right;")%></span>-->
+  <!--</div>-->
 
 
 </div>
