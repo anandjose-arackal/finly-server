@@ -1,5 +1,5 @@
 class CustomField::Configuration::Create < CustomField::Configuration::Base
-  attr_accessor :config_params, :type_id, :default_value
+  attr_accessor :config_params, :default_value
 
   # todo: Policy admins are permitted to create only for their policy and users within the policy
 
@@ -26,7 +26,6 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   def init
     params[:field_configuration][:company_id] = self.user.company_id
     self.config_params = config_strong_params
-    self.type_id = config_params[:field_type_id] if config_params.present? and config_params[:field_type_id].present?
     self.default_value = params[:field_configuration][:default_value] if config_params.present? and params[:field_configuration][:default_value].present?
   end
 
@@ -53,6 +52,10 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     else
       add_message :error, field_configuration.errors.full_messages
     end
+  end
+
+  def post_process
+    add_message :success, 'Field Configuration Created'
   end
 
   protected

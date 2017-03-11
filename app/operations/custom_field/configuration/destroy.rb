@@ -36,4 +36,8 @@ class CustomField::Configuration::Destroy < CustomField::Configuration::Base
     end
   end
 
+  def post_process
+    add_message :success, 'Field removed'
+  end
+
 end
