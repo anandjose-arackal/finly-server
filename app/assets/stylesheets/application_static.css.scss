@@ -224,11 +224,18 @@ body {
   // background-size:cover, auto 490px;
   // background-position-x: left;
   background: #fff;
-  background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
+  // background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
+  // background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  // background-position-y: 383px, 439px, 177px, top, bottom 40px;
+  // background-position-x: 64%, 55%, 86%, right, center;
+  // background-size: 93px, 154px, 400px, 735px, cover;
+  // background-position: 383px 64%, 439px 55%, 177px 86%, top right, bottom 40px center;
+
+  background-image: url("/common/images/landing/banner/mobile.gif"),url("/common/images/landing/banner/finly-card-md.png"),url("/common/images/landing/banner/monitor.png"),url("/common/images/landing/banner/transparent-layer.png"),url("/common/images/landing/banner/background-md.png");
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-position-y: 383px, 439px, 177px, top, bottom 40px;
-  background-position-x: 64%, 55%, 86%, right, center;
-  background-size: 93px, 154px, 400px, 735px, cover;
+  background-position-y: 382px, 439px, 177px, top, center;
+  background-position-x: 74%, 68%, 89%, right, center;
+  background-size: 93px, 154px, 400px, 665px, cover;
 
 
   // width: 970px;
@@ -810,9 +817,14 @@ body {
 @media (min-width: 1450px) {
   .banner{
     background: #fff;
-    background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
+    // background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
+    // background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    // background-position-y: 383px, 439px, 177px, top, bottom 40px;
+    // background-position-x: 74%, 68%, 89%, right, center;
+    // background-size: 93px, 154px, 400px, 665px, cover;
+    background-image: url("/common/images/landing/banner/mobile.gif"),url("/common/images/landing/banner/finly-card-md.png"),url("/common/images/landing/banner/monitor.png"),url("/common/images/landing/banner/transparent-layer.png"),url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position-y: 383px, 439px, 177px, top, bottom 40px;
+    background-position-y: 382px, 439px, 177px, top, center;
     background-position-x: 74%, 68%, 89%, right, center;
     background-size: 93px, 154px, 400px, 665px, cover;
   }
