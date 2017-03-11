@@ -226,7 +226,7 @@ body {
   background: #fff;
   background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-position-y: 382px, 439px, 177px, top, -95px;
+  background-position-y: 383px, 439px, 177px, top, bottom 40px;
   background-position-x: 64%, 55%, 86%, right, center;
   background-size: 93px, 154px, 400px, 735px, cover;
 
@@ -485,7 +485,9 @@ body {
         padding-left: 20px;
         font-size: 17px;
         margin-top: 0;
-        color: #555;
+        color: #353B53;
+        font-weight: 700;
+        letter-spacing: 0.2px;
       }
 
 
@@ -807,10 +809,10 @@ body {
 
 @media (min-width: 1450px) {
   .banner{
-    background: #3D4B9D;
+    background: #fff;
     background-image: url("/common/images/landing/banner/mobile.gif"), url("/common/images/landing/banner/finly-card-md.png"), url("/common/images/landing/banner/monitor.png"), url("/common/images/landing/banner/transparent-layer.png"), url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position-y: 382px, 439px, 177px, top, center;
+    background-position-y: 383px, 439px, 177px, top, bottom 40px;
     background-position-x: 74%, 68%, 89%, right, center;
     background-size: 93px, 154px, 400px, 665px, cover;
   }
