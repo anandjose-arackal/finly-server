@@ -22,6 +22,7 @@
 
 
 
+
 class ReportComment < ActiveRecord::Base
   belongs_to :report
   belongs_to :user
@@ -87,15 +88,15 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:report_update)
         # Report update
         comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
-      when ReportCommentAction.id_for(:report_reimbursed)
+      when ReportCommentAction.id_for(:report_settled)
         # Report reimbursed
         payment_id = payment.id rescue nil
         comment = "#{name} reimbursed the report with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , with a note : #{payment.note}"
         end
-      when ReportCommentAction.id_for(:report_reimbursement_confirmed)
-        # Report reimbursement confirmed
+      when ReportCommentAction.id_for(:report_settlement_confirmed)
+        # Report settlement confirmed
         comment = "#{name} confirmed that the reimbursement is received"
       when ReportCommentAction.id_for(:report_closed)
         # Report closed

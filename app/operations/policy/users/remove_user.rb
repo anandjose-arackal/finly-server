@@ -26,7 +26,7 @@ class Policy::Users::RemoveUser < Policy::Base
   def init
     self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
     ids = params[:user_id].split(',')
-    self.removed_users = user.company.users.where(id: ids)
+    self.removed_users = user.company.users.with_id(ids)
     self.conflicting_users = []
     self.conflicts_present = false
   end

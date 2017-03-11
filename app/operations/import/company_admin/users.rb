@@ -45,7 +45,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
             u.update_attribute(:email, "")
             u.update_attribute(:mobile_only_invite, true)
             # send welcome message to invitee
-            WelcomeMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
+            CustomMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
           end
         end
       end

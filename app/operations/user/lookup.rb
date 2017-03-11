@@ -58,6 +58,4 @@ class User::Lookup < User::Base
     end
   end
 
-  private
-
 end

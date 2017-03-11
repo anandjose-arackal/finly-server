@@ -41,7 +41,7 @@ class Superadmin::Company::Create < Superadmin::Base
   private
 
   def company_params
-    params.require(:company).permit(:name, :d_code)
+    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code])
   end
 
 end

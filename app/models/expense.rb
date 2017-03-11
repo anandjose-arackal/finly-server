@@ -20,10 +20,6 @@
 
 
 
-
-
-
-
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -88,7 +84,9 @@ class Expense < ActiveRecord::Base
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
+  scope :with_report_id, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
+  scope :with_user_id, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) { where expense_type_id: type_id }
 
@@ -164,15 +162,22 @@ class Expense < ActiveRecord::Base
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
+  scope :with_date_range, -> (start_date, end_date) {where('date >= ? AND date <= ?', start_date, end_date)}
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
-  scope :unreported, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
+  scope :unreported_and_rejected, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
+  scope :unreported, -> {where expense_status_id: ExpenseStatus.unreported_id}
+  scope :rejected, -> {where expense_status_id: ExpenseStatus.rejected_id}
+  scope :unsubmitted, -> {where expense_status_id: ExpenseStatus.unsubmitted_id}
   scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id] }
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
   scope :filter_user_id, ->(id) { where user_id: id }
+
+  scope :verified, -> {where expense_status_id: ExpenseStatus.submitted_id}
+  scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
 
   delegate :category_name, to: :category
 

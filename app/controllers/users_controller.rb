@@ -89,6 +89,7 @@ class UsersController < ApplicationController
   # action that sends the user an OTP before verifying them
   # params: mobile_number
   def send_verification_otp
+    params[:type] = OtpRequestType.id_for(:set_or_forgot_password)
     @result = User::Login::SendVerificationOtp.(params)
     respond
   end

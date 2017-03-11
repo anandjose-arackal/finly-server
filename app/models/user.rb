@@ -43,7 +43,13 @@
 #  mobile_only_invite     :boolean          default(FALSE)
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)
+#  otp_request_type_id    :integer
 #
+
+
+
+
+
 
 
 
@@ -110,6 +116,10 @@ class User < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
 
   has_many :notifier_type_configurations
+
+  has_many :user_balance_histories
+
+  belongs_to :otp_request_type
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
@@ -179,7 +189,7 @@ class User < ActiveRecord::Base
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
-  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :pending_reimbursement]) }
+  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
 
   after_create do
     # self.build_profile.save if self.profile.blank?
@@ -291,20 +301,18 @@ class User < ActiveRecord::Base
 
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
+    unless date.kind_of?(Date)
+      date_obj = date.to_date rescue nil
+    end
     cash = self.balance_sheet.cash_in_hand
-    return cash if date.blank? or date == DateUtils.local_date
-    payments = self.payments.made_after(date).with_amount
-    payments_to_user = payments.transferred_cash_to_user.sum(:value)
-    debt_clearance = payments.debt_clearance.sum(:value)
-    settlement = payments.settlement.sum(:value)
-    reports = self.reports.processed.submitted_after(date)
-    report_ids = reports.pluck(:id)
-    expenses = self.expenses.with_amount.with_report(report_ids).sum(:value)
-    pending_reimbursement = reports.with_amount.without_payment.sum(:value)
-    value = cash.value + expenses + debt_clearance + settlement - payments_to_user - pending_reimbursement
-    # For checking if current cash in hand is of lower value or the prev cash in hand is of lower value
-    min_value = [cash.value, value].min
-    Amount.new(value: min_value, currency: cash.currency)
+    return cash if date_obj.blank? or date_obj == DateUtils.local_date
+    history = self.user_balance_histories.find_by(date: date_obj)
+    if history.blank?
+      return 0
+    else
+      cash_on_hand = history.cash_on_hand_balance
+      return cash_on_hand
+    end
   end
 
   alias_method :manager_name, :user_name
@@ -318,7 +326,7 @@ class User < ActiveRecord::Base
     json
   end
 
-  # overriding devise's default methdod so that it compares against both email and phone number to authenticate
+  # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(mobile_number: conditions[:email]) || find_by(email: conditions[:email])
   end

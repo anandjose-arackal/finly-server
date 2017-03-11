@@ -9,9 +9,9 @@
 <div class="col-sm-2">
   {{#switch item.status}}
     {{#case 'Approved'}}<span class="label label-success">{{item.status}}</span>{{/case}}
-    {{#case 'Reimbursed'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+    {{#case 'Settled'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
     {{#case 'Closed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
-    {{#case 'Reimbursement Confirmed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+    {{#case 'Settlement Confirmed'}}<span class="label label-success"><i class="fa fa-check-circle"></i><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
   {{/switch}}
 </div>
 <div class="col-sm-2 text-right">&#8377; {{item.reimbursement_amount}}</div>

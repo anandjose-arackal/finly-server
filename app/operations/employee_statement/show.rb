@@ -4,7 +4,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
 
   def init
     super()
-    self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date)
+    self.transactions = selected_user.card_transactions.with_transaction_timestamp_range(start_date.beginning_of_day, end_date.end_of_day)
     self.items = []
   end
 
@@ -42,7 +42,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
   def retrieve_merchant_name(transaction)
     trans_mode = transaction.transaction_mode.upcase rescue nil
     if transaction.transaction_type == "Debit"
-      if ["ATM", "POS", "ECOM"].include?(trans_mode)
+      if ["POS", "ECOM"].include?(trans_mode)
         return transaction.merchant_name
       else
         return "N/A"
@@ -60,7 +60,7 @@ class EmployeeStatement::Show < EmployeeStatement::Base
     if expense.expense_status_id == ExpenseStatus.unreported_id or expense.expense_status_id == ExpenseStatus.unsubmitted_id
       return "Unverified"
     elsif expense.expense_status_id == ExpenseStatus.submitted_id
-      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or expense.report.reimbursement_confirmed?
+      if expense.report.approved? or expense.report.closed? or expense.report.settled? or expense.report.settlement_confirmed?
         return "Verified"
       else
         return "Unverified"

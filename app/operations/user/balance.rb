@@ -40,7 +40,10 @@ class User::Balance < User::Base
     self.balances={}
 
     # Virtual Account
-    self.balances[:virtual_account] = Company::VirtualAccount::Balance.(user).balance rescue nil if params[:virtual_account] and user.company_admin?
+    if params[:virtual_account] and user.company_admin?
+      op = Company::VirtualAccount::Balance.(user)
+      self.balances[:virtual_account] = op.balance rescue nil
+    end
 
     # Wallet
     self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]

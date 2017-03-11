@@ -16,8 +16,8 @@ class Amount < ActiveRecord::Base
 
   validate :no_negative_amount
 
-
   validates :currency_id, presence: true
+  validates :value, presence: true
 
   before_create do
     if self.value.nil?
@@ -40,6 +40,35 @@ class Amount < ActiveRecord::Base
   alias_method :billing_amount_value, :amount_value
   alias_method :card_balance_value, :amount_value
   alias_method :submitted_amount_value, :amount_value
+  alias_method :card_amount_value, :amount_value
+  alias_method :cash_on_hand_load_value, :amount_value
+  alias_method :cash_on_hand_withdrawal_value, :amount_value
+  alias_method :cash_on_hand_balance_value, :amount_value
+  alias_method :card_load_value, :amount_value
+  alias_method :card_withdrawal_value, :amount_value
+  alias_method :card_expenses_value, :amount_value
+  alias_method :finly_money_load_value, :amount_value
+  alias_method :finly_money_balance_value, :amount_value
+  alias_method :finly_money_withdrawal_value, :amount_value
+
+  alias_method :company_balance_value, :amount_value
+  alias_method :company_load_from_card_value, :amount_value
+  alias_method :company_load_from_wallet, :amount_value
+  alias_method :company_withdrawal_to_card_value, :amount_value
+  alias_method :company_withdrawal_to_wallet_value, :amount_value
+  alias_method :card_withdrawal_to_card_value, :amount_value
+  alias_method :card_withdrawal_to_wallet_value, :amount_value
+  alias_method :card_withdrawal_to_virtual_account_value, :amount_value
+  alias_method :card_load_from_card_value, :amount_value
+  alias_method :card_load_from_wallet_value, :amount_value
+  alias_method :card_load_from_virtual_account_value, :amount_value
+  alias_method :wallet_load_from_card_value, :amount_value
+  alias_method :wallet_load_from_wallet_value, :amount_value
+  alias_method :wallet_load_from_virtual_account_value, :amount_value
+  alias_method :wallet_withdrawal_to_card_value, :amount_value
+  alias_method :wallet_withdrawal_to_wallet_value, :amount_value
+  alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
+  alias_method :wallet_balance_value, :amount_value
 
   def greater_than_amount_value
     self.value

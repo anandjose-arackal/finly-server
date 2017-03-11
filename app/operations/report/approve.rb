@@ -108,7 +108,7 @@ class Report::Approve < Report::Base
       end
       comment.save
 
-      # computing the reimbursement value of tje report
+      # set the reimbursement amount of the report
       unless report.processing?
         Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload

@@ -39,6 +39,16 @@ class Superadmin::CompaniesController < ApplicationController
     @companies = Company.all
   end
 
+  def update
+    @result = Superadmin::Company::Update.(current_user, params)
+    if @result.success?
+      flash[:success] = "Company updated"
+    else
+      flash[:error] = @result.messages[:error]
+    end
+    redirect_to request.referrer
+  end
+
   def import
     import_op = Import::Superadmin::Users.new(current_user, params)
     @result = import_op.run
@@ -52,6 +62,7 @@ class Superadmin::CompaniesController < ApplicationController
 
   def superadmin_accounts
     unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
+      flash[:error] = "You are not authorized to perform this action"
       redirect_to root_url
     end
   end

@@ -29,6 +29,27 @@ module Constants
 
   #########################
 
+  #### Date before which statements won't be accurate
+  BEGINNING_OF_TIME = '10-03-2017'
+  ###################################################
+
+
+  if Rails.env.development?
+    # url = "http://192.168.81.157:3000/#"
+    url = "http://localhost:3000/#"
+  elsif Rails.env.staging?
+    url = "http://staging.finly.io/#"
+  elsif Rails.env.itzcash_uat?
+    url = "http://uat.finly.io/#"
+  elsif Rails.env.local_vm?
+    url = "http://192.168.56.101/#"
+  elsif Rails.env.production?
+    url = "https://www.finly.io/#"
+  else
+    url = ""
+  end
+
+  BASE_URL = url
 
 
   class Constants::ItzCash

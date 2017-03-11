@@ -27,7 +27,7 @@ class Company::VirtualAccount::Balance < BaseOperation
     self.balance = (itzcash_balance - total_wallet_balance)
 
     if response.company.itz_cash_property.easy_account_no.blank? or response.company.itz_cash_property.easy_account_no.blank?
-      company.itz_cash_property.update_attribute(:easy_account_no, response.wallets.first[:account_number])
+      response.company.itz_cash_property.update_attribute(:easy_account_no, response.wallets.first[:account_number])
     end
   end
 

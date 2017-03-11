@@ -13,6 +13,8 @@
 #  balance_amount_id     :integer          not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  transaction_mode      :string(255)
+#  merchant_type_key     :string(255)
 #
 
 class CompanyTransaction < ActiveRecord::Base
@@ -29,10 +31,16 @@ class CompanyTransaction < ActiveRecord::Base
   validates :transaction_id, presence: true
   validates :balance_amount, presence: true
 
+  delegate :transaction_amount_value, to: :transaction_amount
+
   accepts_nested_attributes_for :balance_amount
   accepts_nested_attributes_for :transaction_amount
 
-  scope :with_date_range, ->(start_date, end_date) { where('transaction_date >= ? AND transaction_date <= ?', start_date, end_date) }
+  scope :with_date_range, -> (start_date, end_date) { where('transaction_date >= ? AND transaction_date <= ?', start_date, end_date) }
+  scope :with_date, -> (date) {where('DATE(transaction_date) = ?', date)}
   scope :sort_date, -> (type){ order transaction_date: type}
+
+  scope :manual_fund_credits, -> {where(transaction_mode: "MANUAL FUND CREDIT")}
+
 
 end

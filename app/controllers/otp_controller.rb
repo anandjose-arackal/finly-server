@@ -17,6 +17,7 @@ class OtpController < ApplicationController
   end
 
   def resend
+    params[:type] = OtpRequestType.id_for(:user_verification)
     @result = User::Verification::Otp::Create.(current_user, params)
     if @result.success?
       flash[:success] = @result.messages[:success].first rescue nil

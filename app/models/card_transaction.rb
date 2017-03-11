@@ -20,10 +20,13 @@
 #  serial_id             :string(255)
 #  product_code          :string(255)
 #  transaction_timestamp :datetime
-#  expensed              :boolean          default(TRUE)
+#  expensed              :boolean          default(FALSE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
 #  is_deleted            :boolean          default(FALSE)
+#  mcc_code              :string(255)
+#  transaction_status    :string(255)
+#  api_reference_id      :string(255)
 #
 
 class CardTransaction < ActiveRecord::Base
@@ -31,6 +34,7 @@ class CardTransaction < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :card
+
 
   has_one :card_expense, dependent: :destroy
 
@@ -42,6 +46,10 @@ class CardTransaction < ActiveRecord::Base
 
   delegate :transaction_amount_value, to: :transaction_amount
   delegate :billing_amount_value, to: :billing_amount
+  delegate :card_amount_value, to: :card_amount
+
+  # i.e. a combination of reference ID and transaction type should be unique
+  validates_uniqueness_of :reference_id, scope: [:transaction_type]
 
   accepts_nested_attributes_for :transaction_amount
   accepts_nested_attributes_for :card_amount
@@ -51,6 +59,15 @@ class CardTransaction < ActiveRecord::Base
 
   scope :debits, -> {where transaction_type: 'Debit'}
   scope :credits, -> {where transaction_type: 'Credit'}
+
+  scope :on_date, -> (date) {where('DATE(transaction_timestamp) = ?', date)}
+
+  # scope for timestamp range
+  scope :with_transaction_timestamp_range, -> (start_time, end_time) {where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time)}
+
+  scope :atm_withdrawals, -> {where transaction_mode: "ATM"}
+  scope :pos_expenses, -> {where transaction_mode: "POS"}
+  scope :online_expenses, -> {where('UPPER(transaction_mode) = ?', "ECOM")}
 
   def credit?
     self.transaction_type == 'Credit'

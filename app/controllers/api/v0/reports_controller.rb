@@ -143,8 +143,8 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     end
   end
 
-  def reimbursement_confirm
-    @result = Report::ReimburseConfirm.(current_user, params)
+  def settlement_confirm
+    @result = Report::SettlementConfirm.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'api/v0/reports/show'

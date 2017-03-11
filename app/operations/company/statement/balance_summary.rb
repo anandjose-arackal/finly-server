@@ -29,7 +29,7 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
 
   def process
     result = Company::VirtualAccount::Balance.(user)
-    items[:current_company_balance] = result.balance
+    items[:current_company_balance] = result.balance rescue 0
 
     # calculating money with employees in various forms
     items[:total_amount_with_employees] = {}
@@ -72,10 +72,10 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
     items[:unreported_expenses][:via_cash_total] = 0
 
     company.users.each do |user|
-      items[:unreported_expenses][:via_card_total] += user.expenses.unreported.only_card_expenses.with_amount.sum(:value) rescue 0
-      items[:unreported_expenses][:via_cash_total] += user.expenses.unreported.only_manual_expenses.with_amount.sum(:value) rescue 0
-      items[:unreported_expenses][:via_card_number] += user.expenses.unreported.only_card_expenses.count 0
-      items[:unreported_expenses][:via_cash_number] += user.expenses.unreported.only_manual_expenses.count 0
+      items[:unreported_expenses][:via_card_total] += user.expenses.unreported_and_rejected.only_card_expenses.with_amount.sum(:value) rescue 0
+      items[:unreported_expenses][:via_cash_total] += user.expenses.unreported_and_rejected.only_manual_expenses.with_amount.sum(:value) rescue 0
+      items[:unreported_expenses][:via_card_number] += user.expenses.unreported_and_rejected.only_card_expenses.count rescue 0
+      items[:unreported_expenses][:via_cash_number] += user.expenses.unreported_and_rejected.only_manual_expenses.count rescue 0
     end
 
   end

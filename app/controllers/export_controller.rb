@@ -19,7 +19,7 @@ class ExportController < ApplicationController
       format.pdf {
         @result = Report::Show.(@user, params)
         @report = @result.report
-        render pdf: "report-#{@report.name}", layout: "pdf.html.erb"
+        render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
       }
     end
   end
