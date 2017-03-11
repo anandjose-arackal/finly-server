@@ -39,7 +39,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
 
     items[:company_account_details][:loads] = []
 
-    company.company_transactions.with_date_range(start_date, end_date).each do |transfer|
+    company.company_transactions.manual_fund_credits.with_date_range(start_date, end_date).each do |transfer|
       items[:company_account_details][:loads] << {date: transfer.transaction_date.to_date, amount: transfer.transaction_amount_value}
       items[:total_account_load_via_NEFT] += transfer.transaction_amount_value
     end
