@@ -38,7 +38,7 @@ class Company::Balances::SetBalances < BaseOperation
 
   def extract_balance_params(company)
     neft_balance_op = Company::Transaction::Show.(company, {start_date: Date.today, end_date: Date.today})
-    neft_transfer_total =  neft_balance_op.transactions.manual_fund_credits.with_date(params[:date]).joins(:transaction_amount).sum(:value)
+    neft_transfer_total =  neft_balance_op.transactions.manual_fund_credits.with_date(params[:date]).joins(:transaction_amount).sum(:value) rescue 0
 
     self.company_admin = company.users.only_admins.first
     current_company_balance = Company::VirtualAccount::Balance.(company_admin).balance rescue 0
