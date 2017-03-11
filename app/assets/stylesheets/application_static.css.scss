@@ -205,11 +205,14 @@ body {
     font-weight: 700;
     color: #353B53;
   }
+  p.section-description{
+    color: #666;
+  }
 }
 
 // Banner
 .banner{
-  margin-top: 65px;
+  margin-top: 60px;
   // background: url('/common/images/landing/banner/background-md.png') no-repeat center top;
   background-size: cover;
   min-height: 550px;
@@ -342,7 +345,7 @@ body {
       max-height: 500px;
       margin-left: auto;
       margin-right: auto;
-      margin-bottom: 60px;
+      margin-bottom: 100px;
     }
   }
 
@@ -375,13 +378,15 @@ body {
           background: transparent;
           border: none;
           color: rgba(51, 51, 51, 0.6);
-          border-bottom: 2px solid #cfcfcf;
+          border-bottom: 3px solid rgba(0, 0, 0, 0.13);
+          text-transform: uppercase;
+          font-size: 14px;
         }
       }
       li.active{
         a{
           color: #2ca0c7;
-          border-bottom: 2px solid #2ca0c7;
+          border-bottom: 3px solid #2ca0c7;
         }
       }
     }
@@ -503,6 +508,7 @@ body {
           // margin-bottom: 10px;
           p{
             display: inline-block;
+            color: #666;
             // margin-bottom: 15px;
           }
         }
@@ -725,10 +731,11 @@ body {
 }
 
 
-// For Shared Footer
+// For Shared Footer ONLY FOR ABOUT PAGE
 #shared-footer{
-  padding-bottom: 50px;
-  padding-top: 100px;
+  position: fixed;
+  bottom: 10px;
+  margin-top: 50px;
 
   form{
     margin-top: 50px;
