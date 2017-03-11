@@ -1,4 +1,32 @@
 <% provide(:title, "Finly: Log In") %>
+
+<!--Navigation bar-->
+<nav class="navbar navbar-default navbar-fixed-top" style="background-color: #061735; border: none;">
+  <div class="container">
+    <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="/">
+      <img src="/common/images/logos/logo_xs.png" class="img-responsive" style="height: 28px;">
+    </a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <!-- <li><a href="#courses">Resources</a></li>
+      <li><a href="#pricing">FAQ</a></li>
+      <li><a href="#" data-target="#login" data-toggle="modal">Blog</a></li> -->
+      <li class="active"><a href="#">Login to Finly</a></li>
+    </ul>
+    </div>
+  </div>
+</nav>
+<!--/ Navigation bar-->
+
 <div class="brand-logo" style="width: 300px; margin-left: auto; margin-right: auto; margin-bottom: 20px; margin-top: 50px;">
   <img src="<%= image_url('/common/images/logos/logo_lg.png') %>" style="width: 100%;">
 </div>
@@ -165,7 +193,7 @@
     </div>
   </div>
 
-  <%= render 'shared/footer' %>
+  <%= render 'shared/login_footer' %>
 </div>
 
 <!--Modal Demo-->
@@ -242,6 +270,30 @@
 <style type="text/css">
   body{
     background: #061735 !important;
+  }
+  .navbar-default .navbar-nav > li > a{
+    color: white;
+    border-bottom: 2px solid transparent;
+    background-color: transparent;
+  }
+  .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+    background-color: transparent;
+  }
+
+
+  .navbar-default .navbar-nav > li.active > a:hover, .navbar-default .navbar-nav > li.active > a:focus {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+    background-color: transparent;
+  }
+
+
+  .navbar-default .navbar-nav > li.active > a{
+    color: #fff;
+    border-bottom: 2px solid #fff;
+    background-color: transparent;
   }
 </style>
 
