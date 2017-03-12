@@ -66,6 +66,7 @@ class Report < ActiveRecord::Base
   accepts_nested_attributes_for :submitted_amount
   accepts_nested_attributes_for :cash_expenses_total
   accepts_nested_attributes_for :card_expenses_total
+  accepts_nested_attributes_for :custom_fields
 
   validates :user, presence: true
   validate :is_employee

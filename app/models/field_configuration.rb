@@ -44,6 +44,7 @@ class FieldConfiguration < ActiveRecord::Base
   accepts_nested_attributes_for :custom_fields
 
   scope :with_id, -> (id) { where id: id }
+  scope :with_parent_type, ->(type_id) {where field_parent_type_id: type_id}
 
   def validate_config
     case field_type_id

@@ -15,12 +15,19 @@
 class CustomField < ActiveRecord::Base
   belongs_to :field_configuration
   belongs_to :parent, polymorphic: true
-  belongs_to :value, polymorphic: true
+
+  # If the custom field is destroyed, destroyed its associated value
+  belongs_to :value, polymorphic: true, dependent: :destroy
 
   # validate :validate_field
 
+  validates :field_configuration_id, presence: true
+  validates :parent_id, presence: true
+  validates :parent_type, presence: true, :inclusion => {:in => ['Expense', 'Report', 'MoneyRequest']}
   validates :value_id, presence: true
   validates :value_type, presence: true, :inclusion =>  {:in => ['FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
+
+  scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
 
   # def validate_field
   #   result = CustomField::Validate.(self)
@@ -31,7 +38,7 @@ class CustomField < ActiveRecord::Base
   #   end
   # end
 
-  def set_value(value)
+  def set_value(value, save = true)
     if value.nil?
       if value.present?
         value.destroy
@@ -65,7 +72,9 @@ class CustomField < ActiveRecord::Base
         if value.blank?
           self.value = FieldDropDownSelection.new
         end
-        self.value.value_id = value
+        if self.field_configuration.present? and self.field_configuration.drop_down_items.present? and self.field_configuration.drop_down_items.with_id(value).present?
+          self.value.value_id = value
+        end
       when FieldType.id_for(:date)
         if value.blank?
           self.value = FieldDate.new
@@ -89,7 +98,7 @@ class CustomField < ActiveRecord::Base
         # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
         self.value.value.currency_id = 1
     end
-    self.value.save if self.value.present?
+    self.value.save if self.value.present? and save
   end
   
 end

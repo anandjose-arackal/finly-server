@@ -32,6 +32,7 @@ class Report::Create < Report::Base
                                          controlling_user_role_id: role_id,
                                          policy_id: params[:policy_id],
                                          name: params[:name]
+    CustomField::SetReport.(report, reset_fields: true)
     if report.save
       report.tracks.create action_user: for_user,
                            action_user_role_id: role_id,
