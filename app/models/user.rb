@@ -292,7 +292,7 @@ class User < ActiveRecord::Base
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
     unless date.kind_of?(Date)
-      date_obj = date.to_date
+      date_obj = date.to_date rescue nil
     end
     cash = self.balance_sheet.cash_in_hand
     return cash if date_obj.blank? or date_obj == DateUtils.local_date
