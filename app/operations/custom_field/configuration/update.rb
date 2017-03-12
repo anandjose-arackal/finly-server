@@ -22,12 +22,12 @@ class CustomField::Configuration::Update < CustomField::Configuration::Base
   def init
     id = params[:id]
     self.field_configuration = CustomField::Configuration::Index.(user, params).field_configurations.with_id(id).first rescue nil
-    self.default_value = params[:field_configuration][:default_value] if config_params.present? and params[:field_configuration][:default_value].present?
+    self.default_value = params[:field_configuration][:default_value] if params[:field_configuration].present? and params[:field_configuration][:default_value].present?
     self.update_params = config_strong_params
   end
 
   def validate
-    if self.update_params.blank?
+    if self.update_params.blank? and self.default_value.blank?
       add_message :error, 'Nothing ot update'
     end
   end
@@ -53,10 +53,8 @@ class CustomField::Configuration::Update < CustomField::Configuration::Base
 
   protected
   def config_strong_params
-    params.require(:field_configuration).permit(:field_name, :enabled, :field_type_id, :mandatory,
-                                                :field_parent_type_id, :configurable, :configurable_id,
-                                                :configurable_type,
-                                                :company_id, amount_attributes: [:value, :currency],
+    params.require(:field_configuration).permit(:field_name, :enabled, :mandatory,
+                                                amount_attributes: [:value, :currency],
                                                 drop_down_items_attributes: [:name])
   end
 
