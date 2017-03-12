@@ -40,9 +40,14 @@ class CustomField < ActiveRecord::Base
 
   def set_value(value, save = true)
     if value.nil?
-      if value.present?
-        value.destroy
+      if self.value.present?
+        self.value.destroy
         self.value = nil
+      end
+      # If value has not been set but default value is present, set the value as a deep clone of default value
+      if self.field_configuration.default_value.present?
+        self.value = self.field_configuration.default_value.deep_clone
+        self.value.save if self.value.present? and save
       end
       return
     end
