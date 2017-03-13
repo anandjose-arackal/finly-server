@@ -199,6 +199,19 @@ if OtpRequestType.count == 0
   end
 end
 
+if CardProgram.count == 0
+  CardProgram.create name: 'Expense', create_expense: true, receive_reimbursement: false,
+                     personal_wallet_fund_transfer: true, spend_restrictions: true,
+                     end_date_restrictions: true, manager_credit: true, manager_debit: true,
+                     manager_blockable: true, manager_view_balance: true, manager_view_eligibility: true,
+                     manager_view_transactions: true
+  CardProgram.create name: 'Reimbursement', create_expense: false, receive_reimbursement: true,
+                     personal_wallet_fund_transfer: false, spend_restrictions: false,
+                     end_date_restrictions: true, manager_credit: false, manager_debit: false,
+                     manager_blockable: false, manager_view_balance: false, manager_view_eligibility: true,
+                     manager_view_transactions: false
+end
+
 ##########################
 
 if Amount.count == 0
@@ -206,7 +219,7 @@ if Amount.count == 0
 end
 
 if Company.count == 0
-  c = Company.create(name: 'Finly Test', itz_cash_property_attributes: { d_code: 'D000000360'})
+  c = Company.create(name: 'Finly Test', itz_cash_property_attributes: {d_code: 'D000000360'})
   c.reload
 else
   c = Company.first
@@ -255,14 +268,14 @@ if User.count == 0
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
                    password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.manager_id},{user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{user_role_id: UserRole.manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Finance", email: "finance4@finlytest.io",
                    password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
@@ -298,7 +311,7 @@ if User.count == 0
               team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-############################################################################################################################################
+  ############################################################################################################################################
 
 
   User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
@@ -451,8 +464,11 @@ unless Rails.env.production?
     User.all.each do |user|
       if user.id < 9
         number = "S0001774009#{(user.id - 1)}"
-        user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: Constants::ItzCash::PRODUCT_CODE,
-                          card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
+        user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
+                          product_code: Constants::ItzCash::PRODUCT_CODE,
+                          card_type_id: 1, company_id: user.company.id,
+                          ending_number: random(1000, 9999).to_i, active: true,
+                          card_program_id: CardProgram.first.id)
       end
     end
   end
