@@ -1,0 +1,24 @@
+# == Schema Information
+#
+# Table name: time_expenses
+#
+#  id         :integer          not null, primary key
+#  expense_id :integer
+#  is_deleted :boolean
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  duration: 9.99
+  units: MyString
+  expense_id: 
+  is_deleted: false
+
+two:
+  duration: 9.99
+  units: MyString
+  expense_id: 
+  is_deleted: false
