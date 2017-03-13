@@ -13,4 +13,7 @@
 
 class DistanceExpense < ActiveRecord::Base
   belongs_to :expense
+
+  has_one :distance
+
 end

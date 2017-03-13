@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170313135243) do
+ActiveRecord::Schema.define(version: 20170313160853) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -425,12 +425,11 @@ ActiveRecord::Schema.define(version: 20170313135243) do
   end
 
   create_table "distance_expenses", force: :cascade do |t|
-    t.integer  "expense_id",     limit: 4
-    t.boolean  "is_deleted",               default: false
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
-    t.integer  "distance_id",    limit: 4
-    t.integer  "time_object_id", limit: 4
+    t.integer  "expense_id",  limit: 4
+    t.boolean  "is_deleted",            default: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "distance_id", limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree

@@ -11,4 +11,5 @@
 
 class Distance < ActiveRecord::Base
   belongs_to :physical_unit
+
 end

@@ -11,5 +11,9 @@
 
 class PhysicalUnit < ActiveRecord::Base
 
-  VALUES = {}
+  VALUES = {1 => {name: "Kilometre", symbol: "km"},
+            2 => {name: "Mile", symbol: "mi"},
+            3 => {name: "Hour", symbol: "hr"},
+            4 => {name: "Minute", symbol: "min"},
+            5 => {name: "Second", symbol: "s"}}
 end
