@@ -25,6 +25,9 @@ class Company < ActiveRecord::Base
   has_one :itz_cash_property
   has_many :company_transactions
 
+  has_one :expense_configuration, as: :configurable
+  has_many :per_diems
+
   has_many :company_balance_histories
 
   accepts_nested_attributes_for :configuration

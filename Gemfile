@@ -144,7 +144,7 @@ group :development, :test do
   gem 'capistrano-crono', '0.1.2'
   gem 'capistrano-sidekiq', '0.10.0'
   gem 'hirb', '0.7.3'
-
+  gem 'meta_request'
 end
 
 group :development do

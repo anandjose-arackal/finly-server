@@ -70,6 +70,8 @@ class Amount < ActiveRecord::Base
   alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
   alias_method :wallet_balance_value, :amount_value
 
+  alias_method :rate_value, :amount_value
+
   def greater_than_amount_value
     self.value
   end

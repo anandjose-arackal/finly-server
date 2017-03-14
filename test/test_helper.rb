@@ -7,7 +7,7 @@ require 'sidekiq/testing'
 class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-  fixtures :users
+  # fixtures :users
 
   # load "#{Rails.root}/db/seeds.rb"
 
