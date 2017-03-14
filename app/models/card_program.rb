@@ -23,4 +23,10 @@ class CardProgram < ActiveRecord::Base
 
   has_many :cards
 
+  PROGRAMS = {expense: 1, reimbursement: 2}
+
+  def self.id_for(program)
+    PROGRAMS[program]
+  end
+
 end

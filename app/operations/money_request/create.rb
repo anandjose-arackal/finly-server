@@ -18,7 +18,8 @@ class MoneyRequest::Create < MoneyRequest::Base
     param[:controlling_user] = self.user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
     param[:payment_mode_id] = PaymentMode.id_for(:cash)
-    if user.cards.present?
+    # Money request can only be request through expense cards
+    if user.cards.with_card_program(CardProgram.id_for(:expense)).present?
       param[:payment_mode_id] = PaymentMode.id_for(:card)
     end
     self.money_request = user.money_requests.build param

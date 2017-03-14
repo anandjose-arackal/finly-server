@@ -39,6 +39,7 @@ class Card < ActiveRecord::Base
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
+  scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :with_card_program, ->(id) { where card_program_id: id }
 
   delegate :card_balance_value, to: :card_balance

@@ -55,14 +55,33 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
     if amount.nil? or not (amount.is_a?(BigDecimal) or amount.is_a?(Float))
       add_message :error, 'Error processing request'
     end
+    if params[:from_account] == :card and user.cards.with_card_program(CardProgram.id_for(:expense)).blank?
+      add_message :error, 'User has not been assigned a Finly Expense Card to initiate the transfer'
+      return
+    end
+    if to_user.cards.with_card_program(CardProgram.id_for(:expense)).blank?
+      add_message :error, 'No Finly Expense card found to receive the funds'
+    end
   end
 
   def process
     if amount > 0
       from_account = params[:from_account].to_sym
+      from_account_id = nil
+      if from_account == :card
+        from_account_id = user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
+      end
+
       to_account = :card
+      to_account_id = nil
       to_account = params[:to_account].to_sym if params[:to_account].present?
-      result = User::Wallet::Credit.(user, from_account: from_account, to_account: to_account, to_user: to_user, amount: self.amount, password: params[:password])
+      if to_account == :card
+        to_account_id = to_user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
+      end
+
+      result = User::Wallet::Credit.(user, from_account: from_account, from_account_id: from_account_id,
+          to_account: to_account, to_account_id: to_account_id, to_user: to_user, amount: self.amount, password: params[:password])
+
       if result.failure?
         add_message :error, result.messages[:error]
         return
