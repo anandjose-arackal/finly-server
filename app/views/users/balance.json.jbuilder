@@ -13,7 +13,7 @@ if @result.target_user.present?
       json.balance card_hash[:balance]
       json.eligibility card_hash[:eligibility]
       json.disabled_by do
-        json.name (card.disabled_by_user.name rescue nil)
+        json.name card.disabled_by_user.name rescue nil
         role_name = nil
         role_name = UserRole.name_for(card.disabled_by_role_id) if card.disabled_by_role_id.present?
         json.role role_name
@@ -35,7 +35,7 @@ if @result.user.present?
       json.balance card_hash[:balance]
       json.eligibility card_hash[:eligibility]
       json.disabled_by do
-        json.name (card.disabled_by_user.name rescue nil)
+        json.name card.disabled_by_user.name rescue nil
         role_name = nil
         role_name = UserRole.name_for(card.disabled_by_role_id) if card.disabled_by_role_id.present?
         json.role role_name
