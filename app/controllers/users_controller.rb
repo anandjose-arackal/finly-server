@@ -59,7 +59,6 @@ class UsersController < ApplicationController
     end
   end
 
-
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
     @result = update_password_op.run
