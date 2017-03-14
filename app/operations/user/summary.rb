@@ -30,23 +30,22 @@ class User::Summary < User::Base
 
   def process
     self.summary = {}
-    card = nil
+
+    summary[:card] = []
+    if self.selected_user.cards.present?
+      self.selected_user.cards.each do |card|
+        card_details = ItzCash::AccountDetails.(selected_user, card_id: card.id).card rescue nil
+        item = {}
+        item[:card] = card
+        item[:assigned] = true
+        item[:active] = card_details.active
+        item[:balance] = card_details.balance
+        item[:available_eligibility] = card_details.available_card_eligibility
+        summary[:card] << item
+      end
+    end
 
     balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true, virtual_account: true).balances
-
-    if self.selected_user.cards.present?
-      card = ItzCash::AccountDetails.(selected_user).card rescue nil
-    end
-
-    summary[:card] = {}
-    if self.selected_user.cards.present? and card.present?
-      summary[:card][:assigned] = true
-      summary[:card][:active] = card.active
-      summary[:card][:balance] = card.balance
-      summary[:card][:available_eligibility] = card.available_card_eligibility
-    else
-      summary[:card][:assigned] = false
-    end
 
     summary[:wallet] = {balance: balances[:target_user_wallet]}
 

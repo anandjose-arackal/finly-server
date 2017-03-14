@@ -28,7 +28,7 @@ class User::Balance < User::Base
 
   def validate
     if target_user.blank? and (params[:target_user_id].present? or params[:user_id].present? or params[:id].present? or
-                               params[:target_user].present? or params[:user].present?)
+        params[:target_user].present? or params[:user].present?)
       add_message :error, 'User not found'
     end
   end
@@ -42,17 +42,26 @@ class User::Balance < User::Base
     # Virtual Account
     if params[:virtual_account] and user.company_admin?
       op = Company::VirtualAccount::Balance.(user)
-      self.balances[:virtual_account] = op.balance rescue nil
+      self.balances[:virtual_account] = {balance: op.balance} rescue nil
     end
 
     # Wallet
-    self.balances[:current_user_wallet] = User::Wallet::Balance.(user) if params[:current_user_wallet] or params[:current_user_all]
+    self.balances[:current_user_wallet] = {balance: User::Wallet::Balance.(user)} if params[:current_user_wallet] or params[:current_user_all]
 
     # Card
     if current_user_card_assigned and (params[:current_user_card] or params[:current_user_all])
-      presenter = User::PrepaidCard::Show.(user, user: user)
-      self.balances[:current_user_card] = presenter.balance rescue nil
-      self.balances[:current_user_card_eligibility] = presenter.available_card_eligibility rescue nil
+      self.balances[:current_user_card] = []
+
+      self.user.cards.each do |card|
+        item = {}
+        presenter = User::PrepaidCard::Show.(user, user: user, card_id: card.id)
+        item[:card] = card
+        item[:program] = {id: card.card_program_id, name: card.card_program.name, view_balance: true, view_eligibility: true}
+        item[:balance] = presenter.balance rescue nil
+        item[:eligibility] = presenter.available_card_eligibility rescue nil
+        self.balances[:current_user_card] << item
+      end
+
     end
 
     # Cash In Hand
@@ -75,13 +84,25 @@ class User::Balance < User::Base
       target_user_card_assigned = target_user.cards.present? if target_user.present?
 
       # Wallet
-      self.balances[:target_user_wallet] = User::Wallet::Balance.(user, for_user: target_user) if params[:target_user_wallet] or params[:target_user_all]
+      self.balances[:target_user_wallet] = {balance: User::Wallet::Balance.(user, for_user: target_user)} if params[:target_user_wallet] or params[:target_user_all]
 
       # Card
       if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
-        presenter = User::PrepaidCard::Show.(user, user: target_user)
-        self.balances[:target_user_card] = presenter.balance rescue nil
-        self.balances[:target_user_card_eligibility] = presenter.available_card_eligibility rescue nil
+        self.balances[:target_user_card] = []
+
+        self.target_user.cards.each do |card|
+          item = {}
+          view_balance = user.id == target_user.id ? true : card.card_program.manager_view_balance
+          view_eligibility = user.id == target_user.id ? true : card.card_program.manager_view_eligibility
+          item[:card] = card
+          item[:program] = {id: card.card_program_id, name: card.card_program.name, view_balance: view_balance, view_eligibility: view_eligibility}
+          if view_eligibility or view_balance
+            presenter = User::PrepaidCard::Show.(user, user: target_user, card_id: card.id)
+            item[:balance] = presenter.balance rescue nil if view_balance
+            item[:eligibility] = presenter.available_card_eligibility rescue nil if view_eligibility
+          end
+          self.balances[:target_user_card] << item
+        end
       end
 
       # Cash In Hand
