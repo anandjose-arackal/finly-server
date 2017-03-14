@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
-  protect_from_forgery with: :exception
+  # protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
   before_action :whitelisted_emails
@@ -182,6 +182,7 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_otp
+    # debugger
     if logged_in? && !current_user.otp_verified && !(params[:controller] == 'otp') and not
     params[:controller] == 'sessions' and not params[:controller] == 'pending_invites'
       params[:type] = 'verification'

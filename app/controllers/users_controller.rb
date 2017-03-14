@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
 
+  allow_oauth!
   before_action :authenticate_user!, except: [:lookup, :send_verification_otp, :verify_user_otp, :set_new_password]
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
@@ -63,7 +64,7 @@ class UsersController < ApplicationController
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
     @result = update_password_op.run
     if @result.success?
-      sign_in @result.user, :bypass => true
+      # sign_in @result.user, :bypass => true
       # flash[:success] = @result.messages[:success].first rescue nil
     else
       # flash[:error] = @result.messages[:error].first rescue nil
@@ -102,16 +103,22 @@ class UsersController < ApplicationController
   # also the action that mobile users use to set their password if they've forgotten it
   def set_new_password
     @result = User::Login::SetPassword.(params)
-    if @result.success?
-      # signing in the user so that he can be redirected to expenses screen
-      sign_in @result.user, :bypass => true
-    end
+    # if @result.success?
+    #   # signing in the user so that he can be redirected to expenses screen
+    #   sign_in @result.user, :bypass => true
+    # end
     respond
   end
 
   def lookup
+    cookies.delete :user_name
     @result = User::Lookup.(params)
     respond
+  end
+
+  def menu_data
+    # Helps the front end app to get user specific yaml data from view_wise_data.yml
+    render partial: 'menu_data'
   end
 
   private

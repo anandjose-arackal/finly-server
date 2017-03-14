@@ -1,4 +1,6 @@
 class MoneyRequestController < ApplicationController
+  before_action :authenticate_user!
+  allow_oauth!
 
   def create
     @result = MoneyRequest::Create.(current_user, params)

@@ -1,5 +1,6 @@
 class SettlementsController < ApplicationController
   before_action :authenticate_user!
+  allow_oauth!
 
   def create
     success_message = nil

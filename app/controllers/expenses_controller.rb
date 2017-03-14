@@ -1,6 +1,7 @@
 class ExpensesController < ApplicationController
 
   before_action :authenticate_user!
+  allow_oauth!
 
   def create
     @result = Expense::Manual::Create.(current_user, params)

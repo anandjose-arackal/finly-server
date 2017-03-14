@@ -1,4 +1,5 @@
 class AnalyticsController < ApplicationController
+  allow_oauth!
 
   def show
     # params[:page] = 1
