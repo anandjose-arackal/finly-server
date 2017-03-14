@@ -1,5 +1,5 @@
 class ItzCash::AccountDetails < ItzCash::Base
-  attr_accessor :card
+  attr_accessor :serial_id
 
   def pre_validate
     unless user.present?
@@ -8,6 +8,10 @@ class ItzCash::AccountDetails < ItzCash::Base
     end
     unless user.cards.present?
       add_message :error, 'A card has not been assigned to the user'
+      return
+    end
+    if params.blank? or params[:card_id].blank? or user.cards.with_id(params[:card_id].blank?)
+      add_message :error, 'Card not found'
     end
   end
 
@@ -16,12 +20,12 @@ class ItzCash::AccountDetails < ItzCash::Base
   end
 
   def post_params
-    {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
+    {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE}
   end
 
   def init
     super
-    self.card = user.cards.first
+    self.serial_id = user.cards.with_id(params[:card_id]).first.serial_id
   end
 
   def success

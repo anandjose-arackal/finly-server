@@ -13,22 +13,22 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
     elsif not user.valid_password?(params[:password])
       add_message :error, 'Invalid Password!'
     end
+    if params[:card_id].blank?
+      add_message :error, 'Card not found'
+    end
   end
 
   def validate
     super
     return if has_errors?
-    validate_status
-  end
-
-  def validate_status
-    # unless selected_user.cards.first.active
-    #   add_message :error, 'Card is already blocked'
-    # end
+    if self.card_id.blank?
+      add_message :error, 'Card not found'
+      return
+    end
   end
 
   def process
-    self.block_presenter = ItzCash::Block.(selected_user, params)
+    self.block_presenter = ItzCash::Block.(selected_user, card_id: self.card_id)
     if block_presenter.failure?
       add_message :error, block_presenter.messages[:error]
     end

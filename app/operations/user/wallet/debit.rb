@@ -1,6 +1,6 @@
 # params = {from_account: :virtual_account/wallet,to_account: wallet/card, to_user_id: 1, password: 'password' }
 class User::Wallet::Debit < User::Wallet::Base
-  attr_accessor :target_user, :initiating_user, :from_account, :to_account, :amount, :payment
+  attr_accessor :target_user, :initiating_user, :from_account, :from_account_id, :to_account, :to_account_id, :amount, :payment
 
   def authorized_user_types
     if params.present? and params[:from_account].present? and params[:to_account].present?
@@ -17,6 +17,15 @@ class User::Wallet::Debit < User::Wallet::Base
     super
     if params.blank? or params[:from_account].blank? or params[:to_account].blank? or (params[:from_user].blank? and params[:from_user_id].blank?)
       add_message :error, 'Invalid request'
+      return
+    end
+    if params[:from_account] == :card and params[:from_account_id].blank?
+      add_message :error, 'Card not found'
+      return
+    end
+    if params[:to_account] == :card and params[:to_account_id].blank?
+      add_message :error, 'Card not found'
+      return
     end
   end
 
@@ -98,7 +107,7 @@ class User::Wallet::Debit < User::Wallet::Base
 
         elsif to_account == :card
           target_user.wallet.subtract_funds(self.amount)
-          credit_presenter = ItzCash::Credit.(initiating_user, params)
+          credit_presenter = ItzCash::Credit.(initiating_user, card_id: from_account_id, amount: self.amount)
           if credit_presenter.success?
 
             add_message :success, "Debit successful"
@@ -115,9 +124,9 @@ class User::Wallet::Debit < User::Wallet::Base
       when :card
 
         if to_account == :virtual_account
-          debit_presenter = ItzCash::Debit.(target_user, params)
+          debit_presenter = ItzCash::Debit.(target_user, card_id: target_account_id, amount: self.amount)
           unless debit_presenter.success?
-            add_message :error, "Money debit failed, please try again later"
+            add_message :error, 'Money debit failed, please try again later'
             return
           end
           payment_attributes[:payment_type_id] = PaymentType.id_for(:debit_from_card_to_virtual_account)
@@ -127,9 +136,9 @@ class User::Wallet::Debit < User::Wallet::Base
 
         elsif to_account == :wallet
 
-          debit_presenter = ItzCash::Debit.(target_user, params)
+          debit_presenter = ItzCash::Debit.(target_user, card_id: target_account_id, amount: self.amount)
           unless debit_presenter.success?
-            add_message :error, "Money debit failed, please try again later"
+            add_message :error, 'Money debit failed, please try again later'
             return
           end
           # the money has moved from the card to the virtual account already, now we need to move it from virtual account to wallet
@@ -144,12 +153,11 @@ class User::Wallet::Debit < User::Wallet::Base
         elsif to_account == :card
           # first reduce the amount from the card holder's balance
           # duplicating the params hash first
-          debit_params = params.deep_dup
-          debit_presenter = ItzCash::Debit.(target_user, params)
+          debit_presenter = ItzCash::Debit.(target_user,  card_id: target_account_id, amount: self.amount)
           # if the debit is successful, i.e. if the money has been reduced from the card holder's account
           if debit_presenter.success?
             # now add the money to the target user's card
-            credit_presenter = ItzCash::Credit.(initiating_user, debit_params)
+            credit_presenter = ItzCash::Credit.(initiating_user, card_id: from_account_id, amount: self.amount)
             unless credit_presenter.success?
               # throw error message saying debit is successful but credit was unsuccessful
               add_message :error, "Amount could not be credited, the funds will be transferred to your company balance"

@@ -50,7 +50,7 @@ class Card < ActiveRecord::Base
 
   after_create do
     user = self.user
-    balance_amount = ItzCash::AccountDetails.(user, {}).balance rescue 0
+    balance_amount = ItzCash::AccountDetails.(user, card_id: self.id).balance rescue 0
     unless self.card_balance
       balance = Amount.create!(value: balance_amount, currency_id: Currency.first.id)
       self.update_attributes(card_balance_id: balance.id)

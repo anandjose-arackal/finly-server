@@ -19,7 +19,10 @@ class User::Show < User::Base
         if self.selected_user.blank?
           add_message :error, 'User not found'
         elsif self.selected_user.cards.present?
-          self.card_presenter = ItzCash::AccountDetails.(selected_user) rescue nil
+          self.card_presenter = []
+          self.selected_user.cards.each do |card|
+            self.card_presenter << ItzCash::AccountDetails.(selected_user, card_id: card.id) rescue nil
+          end
         end
       else
         messages[:error] = operation.messages[:error]
@@ -74,7 +77,7 @@ class User::Show < User::Base
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
       if (self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?) or
-        (selected_user.first_name.blank?)
+          (selected_user.first_name.blank?)
         actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
         actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id) unless self.selected_user.mobile_only_invite
       else

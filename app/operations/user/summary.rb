@@ -32,10 +32,11 @@ class User::Summary < User::Base
     self.summary = {}
     card = nil
 
+    balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true, virtual_account: true).balances
+
     if self.selected_user.cards.present?
       card = ItzCash::AccountDetails.(selected_user).card rescue nil
     end
-    balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true, virtual_account: true).balances
 
     summary[:card] = {}
     if self.selected_user.cards.present? and card.present?
