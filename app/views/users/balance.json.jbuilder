@@ -2,14 +2,14 @@ json.merge! @result.balances
 
 if @result.target_user.present?
   json.target_user_card_details do
-    target_user_cards = (@result.balances[:target_user_card] or [])
+    target_user_cards = (@result.cards[:target_user_card] or [])
     json.array! target_user_cards.each do |card_hash|
       card = card_hash[:card]
       json.extract! card, :ending_number, :description, :active, :serial_id
       view_balance = card_hash[:program][:view_balance]
       view_eligibility = card_hash[:program][:view_eligibility]
-      json.view_balance view_balance
-      json.view_eligibility view_eligibility
+      json.show_balance view_balance
+      json.show_eligibility view_eligibility
       json.balance card_hash[:balance]
       json.eligibility card_hash[:eligibility]
       json.disabled_by do
@@ -24,14 +24,14 @@ end
 
 if @result.user.present?
   json.current_user_card_details do
-    current_user_cards = (@result.balances[:current_user_card] or [])
+    current_user_cards = (@result.cards[:current_user_card] or [])
     json.array! current_user_cards.each do |card_hash|
       card = card_hash[:card]
       json.extract! card, :ending_number, :description, :active, :serial_id
       view_balance = card_hash[:program][:view_balance]
       view_eligibility = card_hash[:program][:view_eligibility]
-      json.view_balance view_balance
-      json.view_eligibility view_eligibility
+      json.show_balance view_balance
+      json.show_eligibility view_eligibility
       json.balance card_hash[:balance]
       json.eligibility card_hash[:eligibility]
       json.disabled_by do

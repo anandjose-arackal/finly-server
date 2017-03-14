@@ -1,5 +1,5 @@
 class User::Balance < User::Base
-  attr_accessor :target_user, :balances
+  attr_accessor :target_user, :balances, :cards
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -38,6 +38,7 @@ class User::Balance < User::Base
     current_user_card_assigned = user.cards.present? if user.present?
 
     self.balances={}
+    self.cards = {}
 
     # Virtual Account
     if params[:virtual_account] and user.company_admin?
@@ -50,7 +51,7 @@ class User::Balance < User::Base
 
     # Card
     if current_user_card_assigned and (params[:current_user_card] or params[:current_user_all])
-      self.balances[:current_user_card] = []
+      self.cards[:current_user_card] = []
 
       self.user.cards.each do |card|
         item = {}
@@ -59,7 +60,7 @@ class User::Balance < User::Base
         item[:program] = {id: card.card_program_id, name: card.card_program.name, view_balance: true, view_eligibility: true}
         item[:balance] = presenter.balance rescue nil
         item[:eligibility] = presenter.available_card_eligibility rescue nil
-        self.balances[:current_user_card] << item
+        self.cards[:current_user_card] << item
       end
 
     end
@@ -88,7 +89,7 @@ class User::Balance < User::Base
 
       # Card
       if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
-        self.balances[:target_user_card] = []
+        self.cards[:target_user_card] = []
 
         self.target_user.cards.each do |card|
           item = {}
@@ -101,7 +102,7 @@ class User::Balance < User::Base
             item[:balance] = presenter.balance rescue nil if view_balance
             item[:eligibility] = presenter.available_card_eligibility rescue nil if view_eligibility
           end
-          self.balances[:target_user_card] << item
+          self.cards[:target_user_card] << item
         end
       end
 
@@ -124,15 +125,16 @@ class User::Balance < User::Base
   end
 
   def success
-    User::Balance::SuccessPresenter.new(user, {target_user: target_user, balances: self.balances}, messages)
+    User::Balance::SuccessPresenter.new(user, {target_user: target_user, balances: self.balances, cards: self.cards}, messages)
   end
 
   class User::Balance::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :target_user, :balances
+    attr_accessor :target_user, :balances, :cards
 
     def init
       self.target_user = params[:target_user]
       self.balances = params[:balances]
+      self.cards = params[:cards]
     end
 
   end
