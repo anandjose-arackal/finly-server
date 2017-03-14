@@ -1,6 +1,6 @@
 class ExpenseTypes::PerDiem::Create < ExpenseTypes::Base
 
-  attr_accessor :company, :per_diem
+  attr_accessor :configurable_object, :per_diem
 
   def authorized_user_types
     [:company_admin, :policy_admin]
@@ -34,6 +34,6 @@ class ExpenseTypes::PerDiem::Create < ExpenseTypes::Base
   end
 
   def success
-    Company::Configuration::ExpenseTypes::PerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
+    ExpenseTypes::PerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
   end
 end

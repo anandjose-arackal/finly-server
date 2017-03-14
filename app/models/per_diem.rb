@@ -2,16 +2,17 @@
 #
 # Table name: per_diems
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  rate_id    :integer
-#  company_id :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id                :integer          not null, primary key
+#  name              :string(255)
+#  rate_id           :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  configurable_id   :integer
+#  configurable_type :string(255)
 #
 
 class PerDiem < ActiveRecord::Base
-  belongs_to :company
+  belongs_to :configurer, polymorphic: true
 
   belongs_to :rate, class_name: "Amount"
 

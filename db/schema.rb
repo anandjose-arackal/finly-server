@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170314143011) do
+ActiveRecord::Schema.define(version: 20170314160020) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -842,14 +842,14 @@ ActiveRecord::Schema.define(version: 20170314143011) do
   add_index "per_diem_expenses", ["per_diem_id"], name: "index_per_diem_expenses_on_per_diem_id", using: :btree
 
   create_table "per_diems", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "rate_id",    limit: 4
-    t.integer  "company_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",              limit: 255
+    t.integer  "rate_id",           limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "configurable_id",   limit: 4
+    t.string   "configurable_type", limit: 255
   end
 
-  add_index "per_diems", ["company_id"], name: "index_per_diems_on_company_id", using: :btree
   add_index "per_diems", ["rate_id"], name: "index_per_diems_on_rate_id", using: :btree
 
   create_table "periods", force: :cascade do |t|
@@ -1393,7 +1393,6 @@ ActiveRecord::Schema.define(version: 20170314143011) do
   add_foreign_key "payments", "payment_types"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
-  add_foreign_key "per_diems", "companies"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"

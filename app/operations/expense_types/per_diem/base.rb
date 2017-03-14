@@ -1,10 +1,10 @@
-class Company::Configuration::ExpenseTypes::PerDiem::Base < Company::Configuration::ExpenseTypes::Base
+class ExpenseTypes::PerDiem::Base < ExpenseTypes::Base
 
   def per_diem_params
     params.require(:per_diem).permit(:name, rate_attributes: [:value, :currency_id])
   end
 
-  class Company::Configuration::ExpenseTypes::PerDiem::Base::PerDiemPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ExpenseTypes::PerDiem::Base::PerDiemPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :per_diem
 
