@@ -6,12 +6,9 @@ if @result.target_user.present?
     json.array! target_user_cards.each do |card_hash|
       card = card_hash[:card]
       json.extract! card, :ending_number, :description, :active, :serial_id
-      view_balance = card_hash[:program][:view_balance]
-      view_eligibility = card_hash[:program][:view_eligibility]
-      json.show_balance view_balance
-      json.show_eligibility view_eligibility
       json.balance card_hash[:balance]
       json.eligibility card_hash[:eligibility]
+      json.program card_hash[:program]
       json.disabled_by do
         json.name card.disabled_by_user.name rescue nil
         role_name = nil
@@ -28,12 +25,9 @@ if @result.user.present?
     json.array! current_user_cards.each do |card_hash|
       card = card_hash[:card]
       json.extract! card, :ending_number, :description, :active, :serial_id
-      view_balance = card_hash[:program][:view_balance]
-      view_eligibility = card_hash[:program][:view_eligibility]
-      json.show_balance view_balance
-      json.show_eligibility view_eligibility
       json.balance card_hash[:balance]
       json.eligibility card_hash[:eligibility]
+      json.program card_hash[:program]
       json.disabled_by do
         json.name card.disabled_by_user.name rescue nil
         role_name = nil
