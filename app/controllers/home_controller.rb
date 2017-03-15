@@ -15,6 +15,9 @@ class HomeController < ApplicationController
 
   end
 
+  def resources
+  end
+
   def welcome
     if logged_in?
       redirect_to root_path
@@ -41,7 +44,7 @@ class HomeController < ApplicationController
       else
         "static"
       end
-    when "about"
+    when "about", "resources"
       "static"
     when "landing"
       'landing'
