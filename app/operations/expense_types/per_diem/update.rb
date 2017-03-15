@@ -1,4 +1,4 @@
-class ExpenseTypes::PerDiem::Update < ExpenseTypes::Base
+class ExpenseTypes::PerDiem::Update < ExpenseTypes::PerDiem::Base
 
   attr_accessor :company, :per_diem
 
@@ -13,14 +13,11 @@ class ExpenseTypes::PerDiem::Update < ExpenseTypes::Base
   end
 
   def init
-    # self.company = user.company
-    # self.per_diem = 
+
   end
 
   def authorize
-    unless company
-      raise_unauthorized_exception
-    end
+    super()
   end
 
   def process

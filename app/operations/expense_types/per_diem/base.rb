@@ -1,7 +1,13 @@
 class ExpenseTypes::PerDiem::Base < ExpenseTypes::Base
 
+  attr_accessor :configurable_object
+
   def per_diem_params
     params.require(:per_diem).permit(:name, rate_attributes: [:value, :currency_id])
+  end
+
+  def authorize
+    super()
   end
 
   class ExpenseTypes::PerDiem::Base::PerDiemPresenter < BaseOperation::BasePresenter::SuccessPresenter

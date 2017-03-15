@@ -1,4 +1,6 @@
-class ExpenseTypes::PerDiem::Create < ExpenseTypes::Base
+# configurable object can be either policy or company - will be decided based on the params passed
+
+class ExpenseTypes::PerDiem::Create < ExpenseTypes::PerDiem::Base
 
   attr_accessor :configurable_object, :per_diem
 
@@ -13,17 +15,27 @@ class ExpenseTypes::PerDiem::Create < ExpenseTypes::Base
   end
 
   def init
-    self.company = user.company
-  end
-
-  def authorize
-    unless company
-      raise_unauthorized_exception
+    case params[:per_diem_level]
+      when 'company'
+        self.configurable_object = user.company
+      when 'policy'
+        company = user.company
+        self.configurable_object = company.policies.find_from_id(params[:level_id])
+      else
+        # do nothing
     end
   end
 
+  def validate
+
+  end
+
+  def authorize
+    super()
+  end
+
   def process
-    self.per_diem = company.per_diems.build(per_diem_params)
+    self.per_diem = configurable_object.per_diems.build(per_diem_params)
     unless per_diem.save
       messages[:error] = per_diem.errors.full_messages
     end

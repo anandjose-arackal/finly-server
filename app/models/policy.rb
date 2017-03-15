@@ -16,6 +16,8 @@
 
 
 
+
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -31,7 +33,11 @@ class Policy < ActiveRecord::Base
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
 
-  has_one :expense_configuration, as: :configurable
+  has_one :distance_expense_config, as: :parent
+  has_one :time_expense_config, as: :parent
+  has_one :per_diem_expense_config, as: :parent
+
+  has_many :per_diems, as: :configurable
 
   scope :default, -> { where default: true }
   scope :non_default, -> { where default: false }

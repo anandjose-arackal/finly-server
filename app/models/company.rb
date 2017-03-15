@@ -25,8 +25,12 @@ class Company < ActiveRecord::Base
   has_one :itz_cash_property
   has_many :company_transactions
 
-  has_one :expense_configuration, as: :configurable
-  has_many :per_diems
+
+  has_one :distance_expense_config, as: :parent
+  has_one :time_expense_config, as: :parent
+  has_one :per_diem_expense_config, as: :parent
+
+  has_many :per_diems, as: :configurable
 
   has_many :company_balance_histories
 

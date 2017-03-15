@@ -12,12 +12,12 @@
 #
 
 class PerDiem < ActiveRecord::Base
-  belongs_to :configurer, polymorphic: true
+  belongs_to :configurable, polymorphic: true
 
   belongs_to :rate, class_name: "Amount"
 
   validates :rate, presence: true
-  validates :company_id, presence: true
+  validates :configurable, presence: true
   validates :name, presence: true
 
   accepts_nested_attributes_for :rate

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170314160020) do
+ActiveRecord::Schema.define(version: 20170315115142) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -424,6 +424,16 @@ ActiveRecord::Schema.define(version: 20170314160020) do
     t.string   "symbol",       limit: 255
   end
 
+  create_table "distance_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_km",                     precision: 10
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
   create_table "distance_expenses", force: :cascade do |t|
     t.integer  "expense_id",  limit: 4
     t.boolean  "is_deleted",            default: false
@@ -829,6 +839,14 @@ ActiveRecord::Schema.define(version: 20170314160020) do
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
+  create_table "per_diem_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",   limit: 4
+    t.string   "parent_type", limit: 255
+    t.boolean  "enabled"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
   create_table "per_diem_expenses", force: :cascade do |t|
     t.integer  "per_diem_id", limit: 4
     t.integer  "expense_id",  limit: 4
@@ -1094,6 +1112,16 @@ ActiveRecord::Schema.define(version: 20170314160020) do
     t.string   "code",       limit: 255, null: false
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "time_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_hour",                   precision: 10
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
   end
 
   create_table "time_expenses", force: :cascade do |t|
