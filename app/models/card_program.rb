@@ -23,6 +23,8 @@ class CardProgram < ActiveRecord::Base
 
   has_many :cards
 
+  scope :with_manager_credit, -> { where manager_credit: true }
+
   PROGRAMS = {expense: 1, reimbursement: 2}
 
   def self.id_for(program)

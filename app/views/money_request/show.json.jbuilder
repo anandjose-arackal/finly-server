@@ -75,9 +75,4 @@ json.request_items @result.items do |item|
   end
 end
 
-json.actions do
-  # json.dummy 'dummy'
-  @result.actions.each do |key, value|
-    json.set! key, (value[:url] or value[:value])
-  end
-end
+json.actions @result.actions
