@@ -73,6 +73,19 @@ class User::Show < User::Base
 
     end
 
+    def load_wallet
+      credit_actions = {from: [], to: []}
+      credit_actions[:from][]
+
+      debit_actions={}
+
+      {id: self.selected_user.wallet.id, name: 'Finly Money', balance: self.selected_user.wallet.balance_value, actions: {credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}}
+    end
+
+    def load_cards
+
+    end
+
     def load_actions
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
