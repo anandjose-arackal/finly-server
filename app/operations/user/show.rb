@@ -73,11 +73,53 @@ class User::Show < User::Base
 
     end
 
-    def load_wallet
+    def load_actions2
       credit_actions = {from: [], to: []}
-      credit_actions[:from][]
+      debit_actions={from:[], to:[]}
 
-      debit_actions={}
+      from_user_creditable_cards = user.cards.creditable_cards
+      to_user_creditable_cards = selected_user.cards.creditable_cards
+      from_user_name = 'Your'
+      personal_transfer = self.user == self.selected_user
+      to_user_name = personal_transfer ? 'Your' : self.selected_user.name
+
+      # From Actions
+      # Virtual Account
+      if user.company_admin?
+        action = {type: :virtual_account, id: user.company.id, name: 'Company Credits'}
+        actions[:credit_actions][:from] << action
+        actions[:debit_actions][:to] << action
+      end
+
+      # Wallet
+      action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money"}
+      actions[:credit_actions][:from] << action
+      actions[:debit_actions][:to] << action
+
+      # Cards
+      if from_user_creditable_cards.present?
+        from_user_creditable_cards.each do |card|
+          action = {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card"}
+          actions[:credit_actions][:from] << action
+          actions[:debit_actions][:to] << action
+        end
+      end
+
+      # To Actions
+      # Wallet
+      action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money"}
+      actions[:credit_actions][:to] << action
+      actions[:debit_actions][:from] << action
+
+      # Cards
+      if to_user_creditable_cards.present?
+        to_user_creditable_cards.each do |card|
+          action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card"}
+          actions[:credit_actions][:to] << action
+          actions[:debit_actions][:from] << action
+        end
+      end
+
 
       {id: self.selected_user.wallet.id, name: 'Finly Money', balance: self.selected_user.wallet.balance_value, actions: {credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}}
     end
