@@ -92,6 +92,11 @@ class Company < ActiveRecord::Base
     end
 
     self.build_account.save if self.account.blank?
+
+    # building the difference expense configurations
+    self.build_distance_expense_config(enabled: false).save
+    self.build_time_expense_config(enabled: false).save
+    self.build_per_diem_expense_config(enabled: false).save
   end
 
 end

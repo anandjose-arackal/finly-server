@@ -20,4 +20,6 @@ class TimeExpense < ActiveRecord::Base
 
   validates :time_object, presence: true
 
+  accepts_nested_attributes_for :time_object
+
 end

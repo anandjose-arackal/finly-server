@@ -56,6 +56,8 @@ class Policy < ActiveRecord::Base
 
   has_paper_trail
 
+  after_create :initialize_expense_configs
+
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
     User.where(id: admin_mapping_ids)
@@ -80,7 +82,10 @@ class Policy < ActiveRecord::Base
     count
   end
 
+
+
   private
+
   def valid_name
     errors.add(:name, 'cannot be blank') if name.blank? and not default
     if company_id.present? and name.present?
@@ -93,6 +98,13 @@ class Policy < ActiveRecord::Base
       default_policy = Policy.company(company_id).default
       errors.add(:company, 'cannot have more than one default policy') if default_policy.present? and default_policy != self
     end
+  end
+
+  def initialize_expense_configs
+    # building the difference expense configurations
+    self.build_distance_expense_config(enabled: false).save
+    self.build_time_expense_config(enabled: false).save
+    self.build_per_diem_expense_config(enabled: false).save
   end
 
 end

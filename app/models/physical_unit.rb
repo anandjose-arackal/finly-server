@@ -16,4 +16,26 @@ class PhysicalUnit < ActiveRecord::Base
             3 => {name: "Hour", symbol: "hr"},
             4 => {name: "Minute", symbol: "min"},
             5 => {name: "Second", symbol: "s"}}
+
+  def self.kilometre_id
+    1
+  end
+
+  def self.mile_id
+    2
+  end
+
+  def self.hour_id
+    3
+  end
+
+  def self.minute_id
+    4
+  end
+
+  def self.second_id
+    5
+  end
+
+
 end

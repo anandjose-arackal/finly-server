@@ -1,6 +1,6 @@
 # configurable object can be either policy or company - will be decided based on the params passed
 
-class ExpenseTypes::PerDiem::Create < ExpenseTypes::PerDiem::Base
+class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::PerDiem::Base
 
   attr_accessor :configurable_object, :per_diem
 

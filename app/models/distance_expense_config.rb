@@ -16,4 +16,17 @@ class DistanceExpenseConfig < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
 
   belongs_to :default_category, class_name: "Category"
+
+  validate :rate_exists_for_enabled
+  validates :parent, presence: true
+
+  private
+
+  def rate_exists_for_enabled
+    if self.enabled
+      if self.rate_per_km.blank?
+        errors.add(:rate, "cannot be empty")
+      end
+    end
+  end
 end

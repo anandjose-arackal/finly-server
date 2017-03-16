@@ -17,5 +17,10 @@ class DistanceExpense < ActiveRecord::Base
   belongs_to :expense
 
   has_one :distance
+
+  validates :expense, presence: true
+  validates :distance, presence: true
+
+  accepts_nested_attributes_for :distance
   
 end

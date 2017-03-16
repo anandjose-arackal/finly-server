@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170315115142) do
+ActiveRecord::Schema.define(version: 20170316061123) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -462,18 +462,6 @@ ActiveRecord::Schema.define(version: 20170315115142) do
   end
 
   add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
-
-  create_table "expense_configurations", force: :cascade do |t|
-    t.boolean  "manual_enabled"
-    t.boolean  "card_enabled"
-    t.boolean  "distance_enabled"
-    t.boolean  "time_enabled"
-    t.boolean  "per_diem_enabled"
-    t.integer  "configurable_id",   limit: 4,   null: false
-    t.string   "configurable_type", limit: 255, null: false
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-  end
 
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255

@@ -1,0 +1,60 @@
+# operation that enables / disables as well as updates the respective rates for a time and time expense
+# parameters:
+# type = '2', for time expense
+# parent_type: 'policy' or 'company' based on the type
+# parent_id: id of the policy to which this configuration belongs
+# time_expense_config: {
+#                rate_per_km: rate per km of the time expense
+#                default_category_id: id of the default category that the expense will be added to
+#                enabled: 0 or 1 depending on whether it's being enabled or disabled
+#            }
+
+class ExpenseTypes::ExTime::Update < ExpenseTypes::Base
+
+  attr_accessor :time_config
+
+  def authorized_user_types
+    [:company_admin, :policy_admin]
+  end
+
+  def pre_validate
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters"
+    end
+  end
+
+  def init
+    case params[:parent_type]
+      when 'company'
+        self.time_config = user.company.time_expense_config
+      when 'policy'
+        policies = Policy::Index.(user, {view: 'policy_admin'}).policies rescue []
+        self.time_config = policies.find_from_id(params[:parent_id]).time_expense_config rescue nil
+      else
+        self.time_config = nil
+    end
+  end
+
+  def authorize
+    unless time_config
+      raise_unauthorized_exception
+    end
+  end
+
+  def validate
+
+  end
+
+  def process
+    unless time_config.update(time_expense_config_params)
+      messages[:error] = time_config.errors.full_messages
+    end
+  end
+
+  private
+
+  def time_expense_config_params
+    params.require(:time_expense_config).permit(:rate_per_km, :default_category_id, :enabled)
+  end
+
+end
