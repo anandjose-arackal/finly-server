@@ -34,7 +34,7 @@ class Report::Expenses::Add < Report::Base
     if self.report.blank? and id.present?
       reports_presenter = Report::Index.(self.user, self.params)
       unless reports_presenter.success?
-        self.messages = index_operation.errors
+        self.messages = reports_presenter.errors
         return false
       end
       self.report = reports_presenter.reports.with_id(id).first rescue nil
