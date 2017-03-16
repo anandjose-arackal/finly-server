@@ -463,14 +463,8 @@
 #                                          PATCH      /receipts/:id(.:format)                                     receipts#update
 #                                          PUT        /receipts/:id(.:format)                                     receipts#update
 #                                          DELETE     /receipts/:id(.:format)                                     receipts#destroy
-#        expense_types_configuration_index GET        /expense_types_configuration(.:format)                      expense_types_configuration#index
-#                                          POST       /expense_types_configuration(.:format)                      expense_types_configuration#create
-#          new_expense_types_configuration GET        /expense_types_configuration/new(.:format)                  expense_types_configuration#new
-#         edit_expense_types_configuration GET        /expense_types_configuration/:id/edit(.:format)             expense_types_configuration#edit
-#              expense_types_configuration GET        /expense_types_configuration/:id(.:format)                  expense_types_configuration#show
-#                                          PATCH      /expense_types_configuration/:id(.:format)                  expense_types_configuration#update
-#                                          PUT        /expense_types_configuration/:id(.:format)                  expense_types_configuration#update
-#                                          DELETE     /expense_types_configuration/:id(.:format)                  expense_types_configuration#destroy
+#          expense_type_configuration_show GET        /expense_type_configurations(.:format)                      expense_types_configuration#show
+#        expense_type_configuration_update PATCH      /expense_type_configurations(.:format)                      expense_types_configuration#update
 #                                per_diems GET        /per_diems(.:format)                                        per_diems#index
 #                                          POST       /per_diems(.:format)                                        per_diems#create
 #                             new_per_diem GET        /per_diems/new(.:format)                                    per_diems#new
@@ -766,8 +760,9 @@ Rails.application.routes.draw do
 
   end
 
-  resources :expense_types_configuration
-
+  get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
+  patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
+  
   resources :per_diems
 
   namespace :superadmin do
