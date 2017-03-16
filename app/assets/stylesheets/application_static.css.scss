@@ -225,6 +225,9 @@ body {
 .form-request-demo-mobile{
   display: none;
 }
+.shown-mobile{
+  display: none;
+}
 
 // Banner
 .banner{
@@ -773,9 +776,11 @@ body {
 
 // For Shared Footer ONLY FOR ABOUT PAGE
 #shared-footer{
-  position: fixed;
-  bottom: 10px;
-  margin-top: 50px;
+  position: absolute;
+  bottom: 0;
+  height: 60px;
+  width: 100%;
+  // margin-top: 50px;
 
   form{
     margin-top: 50px;
@@ -1096,9 +1101,9 @@ body {
   .banner{
     background-image: url("/common/images/landing/banner/product-background.png"), url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat;
-    background-position-y: 100px, center;
-    background-position-x: 200%, center;
-    background-size: 900px, cover;
+    background-position-y: 165px, center;
+    background-position-x: 150%, center;
+    background-size: 770px, cover;
   }
   
 }
@@ -1108,9 +1113,9 @@ body {
   .banner{
     background-image: url("/common/images/landing/banner/product-background.png"), url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat;
-    background-position-y: 100px, center;
+    background-position-y: 165px, center;
     background-position-x: 126%, center;
-    background-size: 900px, cover;
+    background-size: 770px, cover;
   }
   
 }
@@ -1119,9 +1124,9 @@ body {
   .banner{
     background-image: url("/common/images/landing/banner/product-background.png"), url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat;
-    background-position-y: 100px, center;
+    background-position-y: 165px, center;
     background-position-x: 120%, center;
-    background-size: 900px, cover;
+    background-size: 770px, cover;
   }
     
 }
@@ -1130,9 +1135,9 @@ body {
   .banner{
     background-image: url("/common/images/landing/banner/product-background.png"), url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat;
-    background-position-y: 100px, center;
+    background-position-y: 165px, center;
     background-position-x: 100%, center;
-    background-size: 900px, cover;
+    background-size: 770px, cover;
   }
     
 }
@@ -1141,9 +1146,9 @@ body {
   .banner{
     background-image: url("/common/images/landing/banner/product-background.png"), url("/common/images/landing/banner/background-md.png");
     background-repeat: no-repeat, no-repeat;
-    background-position-y: 100px, center;
+    background-position-y: 165px, center;
     background-position-x: 90%, center;
-    background-size: 900px, cover;
+    background-size: 770px, cover;
   }
   
 }
@@ -1162,6 +1167,24 @@ body {
 
 
 
+// /* Sticky footer styles
+// -------------------------------------------------- */
+// html {
+//   position: relative;
+//   min-height: 100%;
+// }
+// body {
+//   /* Margin bottom by footer height */
+//   margin-bottom: 60px;
+// }
+// .footer {
+//   position: absolute;
+//   bottom: 0;
+//   width: 100%;
+//   /* Set the fixed height of the footer here */
+//   height: 60px;
+//   background-color: #f5f5f5;
+// }
 
 
 

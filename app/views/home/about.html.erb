@@ -15,6 +15,7 @@
     <ul class="nav navbar-nav navbar-right">
       <li><a href="/">Home</a></li>
       <li><a href="/#how-finly-can-help">Solutions</a></li>
+      <!-- <li><a href="/resources">Resources</a></li> -->
       <!-- <li><a href="#courses">Resources</a></li>
       <li><a href="#pricing">FAQ</a></li>
       <li><a href="#" data-target="#login" data-toggle="modal">Blog</a></li> -->
@@ -25,34 +26,38 @@
   </div>
 </nav>
 <!--/ Navigation bar-->
-<div class="container">
-    
-  <h5>About Us</h5>
-  <hr>
-  <p>Finly was founded with a simple idea: to allow companies get a better insight into their spend and expenses.
-    Finly has been designed to structure better processes in your company leading to a much more cost efficient and time
-    efficient system.
-    By replacing traditional tools for reporting expenses with Finly we hope to make the entire experience hassle free
-    leading to improved employee satisfaction.
-  </p>
-  <br>
-  <p>
-    By providing the company with complete visibility into its spend, Finly
-    keeps all company business systems in sync and offers the most dynamic reporting in the market. Our goal is to provide
-    finance teams with tools and data that enable them to have real time insights into their spends to make better strategic decisions and remove all expense management hurdles as your
-    business scales.
-  </p>
-  <br>
-  <br>
+<div class="container" style="padding-bottom: 20px;">
+  <div class="row">
+    <div class="col-sm-12">
+        <h5>About Us</h5>
+        <hr>
+        <p>Finly was founded with a simple idea: to allow companies get a better insight into their spend and expenses.
+          Finly has been designed to structure better processes in your company leading to a much more cost efficient and time
+          efficient system.
+          By replacing traditional tools for reporting expenses with Finly we hope to make the entire experience hassle free
+          leading to improved employee satisfaction.
+        </p>
+        <br>
+        <p>
+          By providing the company with complete visibility into its spend, Finly
+          keeps all company business systems in sync and offers the most dynamic reporting in the market. Our goal is to provide
+          finance teams with tools and data that enable them to have real time insights into their spends to make better strategic decisions and remove all expense management hurdles as your
+          business scales.
+        </p>
+        <br>
+        <br>
 
-  <h5>Contact</h5>
-  <hr>
-  <p>We would be happy to hear from you on <a>contact@finly.io</a> or you can hit us directly at <span > +91-9886321387
-    </span></p>
-
-  <%= render 'shared/footer_grey' %>
-
+        <h5>Contact</h5>
+        <hr>
+        <p>
+          We would be happy to hear from you on <a>contact@finly.io</a> or you can hit us directly at <span > +91-9886321387
+          </span>
+        </p>    
+    </div>
+  </div> 
 </div>
+
+<%= render 'shared/footer_grey' %>
 <!--Modal Demo-->
 <div class="modal fade" id="modal-request-demo" role="dialog">
   <div class="modal-dialog">
@@ -124,6 +129,14 @@
 <!--/ Modal box-->
 
 <style>
+  html {
+    position: relative;
+    min-height: 100%;
+  }
+  body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+  }
 
   body{
     background-color: #fff;

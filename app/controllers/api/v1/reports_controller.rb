@@ -26,7 +26,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   end
 
   def update
-    action = (params[:action] or :update)
+    action = (params[:action_type] or :update)
     @result = nil
     case action.to_sym
       when :submit

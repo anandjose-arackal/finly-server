@@ -29,14 +29,15 @@ class Report::Expenses::Add < Report::Base
   def init
     self.report= params[:report]
     self.auto_submit = params[:auto_submit]
-    return if self.report.blank? and params[:report_id].blank?
-    if self.report.blank? and params[:report_id].present?
+    id = (params[:report_id] or params[:id])
+    return if self.report.blank? and id.blank?
+    if self.report.blank? and id.present?
       reports_presenter = Report::Index.(self.user, self.params)
       unless reports_presenter.success?
-        self.messages = index_operation.errors
+        self.messages = reports_presenter.errors
         return false
       end
-      self.report = reports_presenter.reports.with_id(params[:report_id]).first rescue nil
+      self.report = reports_presenter.reports.with_id(id).first rescue nil
     end
     self.expenses = params[:expenses]
     if params[:expenses].blank? and user.present?
@@ -44,7 +45,7 @@ class Report::Expenses::Add < Report::Base
       # Split if IDS are sent as one comma delimited string
       ids= ids.split(',')
       self.expenses = user.expenses.with_id(ids)
-    end
+      end
   end
 
   def authorize

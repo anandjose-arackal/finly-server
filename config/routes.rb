@@ -771,6 +771,7 @@ Rails.application.routes.draw do
   get 'welcome' => 'home#welcome'
 
   get 'about', to: 'home#about'
+  get 'resources', to: 'home#resources'
 
 
   #Filters/Autocomplete
