@@ -92,7 +92,10 @@ end
 json.actions @result.actions
 
 json.cards do
-  json.array! @result.cards.each do |card|
+  json.array! @result.cards.each do |card_details|
+    card = card_details[:card]
+    actions = card_details[:actions]
+
     json.extract! card, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility
     json.disabled_by do
       json.name card.disabled_by_user.name rescue nil
@@ -137,6 +140,8 @@ json.cards do
         end
       end
     end
+
+    json.actions actions
 
   end
 end

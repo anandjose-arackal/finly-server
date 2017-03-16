@@ -62,7 +62,35 @@ class User::Show < User::Base
       self.cards = []
       if params[:card_presenter].present?
         params[:card_presenter].each do |card_presenter|
-          self.cards << card_presenter.card
+          actions = {}
+          # Card Actions
+          card = card_presenter.card
+          if manager_view? or finance_view? or admin_view?
+            next unless card.card_program.manager_blockable
+            card_params = {}
+            card_params[:view] = params[:view]
+            card_params[:user_id] = selected_user.id
+            card_params[:card_id] = card_presenter.card.id
+            card_params[:action_type] = nil
+            if card.active
+              card_params[:status_type] = User::PrepaidCard::Base::STATUS[:block]
+              actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            else
+              card_params[:status_type] = User::PrepaidCard::Base::STATUS[:unblock]
+              actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            end
+          else
+            if card.active
+              card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
+              actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            else
+              if card.disabled_by_role_id == UserRole.id_for(:employee)
+                card_params = {status_type: User::PrepaidCard::Base::STATUS[:unblock], user_id: selected_user.id}
+                actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+              end
+            end
+          end
+          self.cards << {card: card, actions: actions}
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config
@@ -98,37 +126,8 @@ class User::Show < User::Base
         end
       end
 
-      card_assigned = self.selected_user.cards.present?
-
       actions[:transfer_options] = load_transfer_options
 
-      if card_assigned
-        # Card Actions
-        card = self.selected_user.cards.first
-        if manager_view? or finance_view? or admin_view?
-          card_params = {}
-          card_params[:view] = params[:view]
-          card_params[:user_id] = selected_user.id
-          card_params[:action_type] = nil
-          if card.active
-            card_params[:status_type] = User::PrepaidCard::Base::STATUS[:block]
-            actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-          else
-            card_params[:status_type] = User::PrepaidCard::Base::STATUS[:unblock]
-            actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-          end
-        else
-          if card.active
-            card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
-            actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-          else
-            if card.disabled_by_role_id == UserRole.id_for(:employee)
-              card_params = {status_type: User::PrepaidCard::Base::STATUS[:unblock], user_id: selected_user.id}
-              actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-            end
-          end
-        end
-      end
       actions
     end
 
@@ -158,9 +157,20 @@ class User::Show < User::Base
       # Cards
       if from_user_creditable_cards.present?
         from_user_creditable_cards.each do |card|
+
+          next if (not personal_transfer and not card.card_program.manager_credit) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
+
           action = {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card"}
-          credit_actions[:from] << action
-          debit_actions[:to] << action
+          card_program = card.card_program
+          if personal_transfer
+            next unless card_program.personal_wallet_fund_transfer
+            credit_actions[:from] << action
+            debit_actions[:to] << action
+          else
+            next unless card_program.non_personal_fund_transfer
+            credit_actions[:from] << action
+            debit_actions[:to] << action
+          end
         end
       end
 
@@ -173,13 +183,27 @@ class User::Show < User::Base
       # Cards
       if to_user_creditable_cards.present?
         to_user_creditable_cards.each do |card|
+
           action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card"}
-          credit_actions[:to] << action
-          debit_actions[:from] << action
+          card_program = card.card_program
+          # Verify is user is allowed to credit / debit from the card based on the card program
+          if personal_transfer
+            next unless card_program.personal_wallet_fund_transfer
+            credit_actions[:to] << action
+            debit_actions[:from] << action
+          else
+            if card_program.manager_credit
+              credit_actions[:to] << action
+            end
+            if card_program.manager_debit
+              debit_actions[:from] << action
+            end
+          end
+
         end
       end
 
-      {credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
+      {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(to_user_id: selected_user.id, view: params[:view])}, credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
     end
 
   end
