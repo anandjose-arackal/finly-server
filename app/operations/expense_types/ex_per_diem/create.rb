@@ -1,6 +1,6 @@
 # configurable object can be either policy or company - will be decided based on the params passed
 
-class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::PerDiem::Base
+class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::ExPerDiem::Base
 
   attr_accessor :configurable_object, :per_diem
 
@@ -46,6 +46,6 @@ class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::PerDiem::Base
   end
 
   def success
-    ExpenseTypes::PerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
+    ExpenseTypes::ExPerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
   end
 end

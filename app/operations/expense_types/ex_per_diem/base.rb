@@ -8,7 +8,7 @@ class ExpenseTypes::ExPerDiem::Base < ExpenseTypes::Base
     super()
   end
 
-  class ExpenseTypes::PerDiem::Base::PerDiemPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ExpenseTypes::ExPerDiem::Base::PerDiemPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :per_diem
 

@@ -1,4 +1,4 @@
-class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::PerDiem::Base
+class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
 
   attr_accessor :per_diem_config
 
@@ -38,6 +38,10 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::PerDiem::Base
     unless per_diem_config.destroy
       messages[:error] = per_diem_config.errors.full_messages
     end
+  end
+
+  def success
+    true
   end
 
 

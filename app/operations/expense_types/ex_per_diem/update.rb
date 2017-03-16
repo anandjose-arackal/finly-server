@@ -4,12 +4,10 @@
 # parent_type: 'policy' or 'company' based on the type
 # parent_id: id of the policy to which this configuration belongs
 # per_diem_expense_config: {
-#                rate_per_km: rate per km of the per_diem expense
-#                default_category_id: id of the default category that the expense will be added to
 #                enabled: 0 or 1 depending on whether it's being enabled or disabled
 #            }
 
-class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::PerDiem::Base
+class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::ExPerDiem::Base
 
   attr_accessor :per_diem_config
 
@@ -49,6 +47,10 @@ class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::PerDiem::Base
     unless per_diem_config.update(per_diem_expense_config_params)
       messages[:error] = per_diem_config.errors.full_messages
     end
+  end
+
+  def success
+    ExpenseTypes::ExPerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
   end
 
   private
