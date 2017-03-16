@@ -1,6 +1,6 @@
 class User::CardRestrictions::Destroy < User::Base
 
-  attr_accessor :selected_user, :card_limit
+  attr_accessor :card_limit
 
   def authorized_user_types
     [:company_admin]
@@ -8,19 +8,32 @@ class User::CardRestrictions::Destroy < User::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      add_message :error, "Invalid input, please try again"
+      add_message :error, 'Invalid input, please try again'
+      return
+    end
+    if params[:id].blank? and params[:user_id].blank?
+      add_message :error, 'User not found'
+      return
+    end
+    if params[:card_id].blank?
+      add_message :error, 'Card not found'
+    end
+    if params[:limit_id].blank?
+      add_message :error, 'Restriction not found'
     end
   end
 
   def init
-    self.card_limit = CardLimit.find_by(id: params[:limit_id])
-    self.selected_user = user.company.users.find_by(id: params[:id])
+    selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
+    return if selected_user.blank?
+    selected_card = selected_user.cards.with_id(card_id: params[:card_id])
+    return if selected_card.blank?
+    self.card_limit = selected_card.card_restriction.card_limits.with_id(params[:limit_id]).first rescue nil
   end
 
   def validate
     unless card_limit
-      add_message :error, "Invalid parameters. Please try again"
-      return
+      add_message :error, 'Restriction not found'
     end
   end
 
@@ -31,7 +44,7 @@ class User::CardRestrictions::Destroy < User::Base
   end
 
   def post_process
-    add_message :success, "Limit destroyed"
+    add_message :success, 'Updated successfully'
   end
 
 

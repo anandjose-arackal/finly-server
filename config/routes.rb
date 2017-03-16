@@ -726,7 +726,6 @@ Rails.application.routes.draw do
   post 'superadmin_import', to: 'superadmin/companies#import', as: :superadmin_import
   # get 'sample_import_file', to: 'users#sample_file', as: :sample_import_file
 
-
   get 'pending_invites/initiate_activation', to: 'pending_invites#initiate_activation', as: :initiate_activation
   get 'pending_invites/activate_employee' => 'pending_invites#activate_employee', as: :activate_employee
   get 'pending_invites/send_otp', to: 'pending_invites#send_otp', as: :send_otp
