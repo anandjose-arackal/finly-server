@@ -76,22 +76,26 @@ class MoneyRequest::Base < BaseOperation
     end
 
     def load_actions
+      from_user_has_card = user.cards.present?
+      to_user_has_card = money_request.user.cards.present?
       actions = {}
       if admin_view?
         if self.money_request.can_take_control? and not self.money_request.controlling_user?(user)
           actions[:take_control] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)
           if self.money_request.payment_mode_card?
+
             if user.company_admin?
               actions[:credit_wallet_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
                                                                                                                           from_account: :virtual_account,
                                                                                                                           to_account: :wallet,
                                                                                                                           view: params[:view])}
-              actions[:credit_card_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                                        from_account: :virtual_account,
-                                                                                                                        to_account: :card,
-                                                                                                                        view: params[:view])}
-
+              if to_user_has_card
+                actions[:credit_card_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                          from_account: :virtual_account,
+                                                                                                                          to_account: :card,
+                                                                                                                          view: params[:view])}
+              end
             end
 
             unless self.money_request.user == user
@@ -99,24 +103,29 @@ class MoneyRequest::Base < BaseOperation
                                                                                                                  from_account: :wallet,
                                                                                                                  to_account: :wallet,
                                                                                                                  view: params[:view])}
+
+
+              if from_user_has_card and to_user_has_card
+                actions[:credit_card_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :card,
+                                                                                                                to_account: :card,
+                                                                                                                view: params[:view])}
+              end
             end
 
-            actions[:credit_card_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                                      from_account: :card,
-                                                                                                                      to_account: :card,
-                                                                                                                      view: params[:view])}
+            if from_user_has_card
+              actions[:credit_wallet_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :card,
+                                                                                                                to_account: :wallet,
+                                                                                                                view: params[:view])}
+            end
 
-            actions[:credit_wallet_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                                      from_account: :card,
-                                                                                                                      to_account: :wallet,
-                                                                                                                      view: params[:view])}
-                                                                                                                                  
-
-            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                              from_account: :wallet,
-                                                                                                              to_account: :card,
-                                                                                                              view: params[:view])}
-
+            if to_user_has_card
+              actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :wallet,
+                                                                                                                to_account: :card,
+                                                                                                                view: params[:view])}
+            end
             actions[:approve_and_forward_to] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id,
                                                                                                              type: :approve_and_forward_to,
                                                                                                              view: params[:view])}
@@ -133,36 +142,43 @@ class MoneyRequest::Base < BaseOperation
                                                                                                                           from_account: :virtual_account,
                                                                                                                           to_account: :wallet,
                                                                                                                           view: params[:view])}
-              actions[:credit_card_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                                        from_account: :virtual_account,
-                                                                                                                        to_account: :card,
-                                                                                                                        view: params[:view])}
+              if to_user_has_card
+                actions[:credit_card_from_virtual_account]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                          from_account: :virtual_account,
+                                                                                                                          to_account: :card,
+                                                                                                                          view: params[:view])}
+              end
             end
-            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                              from_account: :wallet,
-                                                                                                              to_account: :card,
-                                                                                                              view: params[:view])}
+            if to_user_has_card
+              actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :wallet,
+                                                                                                                to_account: :card,
+                                                                                                                view: params[:view])}
+            end
             actions[:credit_wallet_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                              from_account: :wallet,
-                                                                                                              to_account: :wallet,
-                                                                                                              view: params[:view])}
+                                                                                                                from_account: :wallet,
+                                                                                                                to_account: :wallet,
+                                                                                                                view: params[:view])}
 
-            actions[:credit_card_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                            from_account: :card,
-                                                                                                            to_account: :card,
-                                                                                                            view: params[:view])}
+            if from_user_has_card
+              if to_user_has_card
+                actions[:credit_card_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :card,
+                                                                                                                to_account: :card,
+                                                                                                                view: params[:view])}
+              end
+              actions[:credit_wallet_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :card,
+                                                                                                                to_account: :wallet,
+                                                                                                                view: params[:view])}
+            end
 
-            actions[:credit_wallet_from_card] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                              from_account: :card,
-                                                                                                              to_account: :wallet,
-                                                                                                              view: params[:view])}
-
-
-            actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
-                                                                                                              from_account: :wallet,
-                                                                                                              to_account: :card,
-                                                                                                              view: params[:view])}
-
+            if to_user_has_card
+              actions[:credit_card_from_wallet] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
+                                                                                                                from_account: :wallet,
+                                                                                                                to_account: :card,
+                                                                                                                view: params[:view])}
+            end
             unless self.money_request.user == user
               actions[:credit_wallet_from_wallet]= {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, type: :credit,
                                                                                                                  from_account: :wallet,

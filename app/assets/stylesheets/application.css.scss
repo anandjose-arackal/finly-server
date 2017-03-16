@@ -176,12 +176,21 @@
   min-height: 550px;
 }
 
-
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
 
 
 #login-footer{
-  position: fixed;
-  bottom: 10px;
+  position: absolute;
+  bottom: 0;
+  height: 60px;
+  width: 100%;
 
   ul.social-links{
     padding-left: 0;
