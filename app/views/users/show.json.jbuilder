@@ -79,6 +79,7 @@ json.mapping @result.mapping.each do |mapping|
     end
   end
 end
+
 [:team_managers, :team_finance_managers].each do |key|
   managers = @managers.send(key)
   next if managers.blank?
@@ -89,11 +90,9 @@ end
   end
 end
 json.actions @result.actions
-json.card do
-  card = @result.card
-  assigned = card.present?
-  json.assigned assigned
-  if assigned
+
+json.cards do
+  json.array! @result.cards.each do |card|
     json.extract! card, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility
     json.disabled_by do
       json.name card.disabled_by_user.name rescue nil
@@ -101,13 +100,57 @@ json.card do
       role_name = UserRole.name_for(card.disabled_by_role_id) if card.disabled_by_role_id.present?
       json.role role_name
     end
+
+    if card.card_program.spend_restrictions
+      json.restrictions do
+
+        card_restriction = card.card_restriction
+        card_limits = card_restriction.card_limits
+
+        json.channel_atm card_restriction.channel_atm
+        json.channel_ecom_pos card_restriction.channel_ecom_pos
+        json.mcc_group_id card_restriction.mcc_group_id
+        json.mcc_restriction_type card_restriction.mcc_restriction_type
+        json.mcc_group_name card_restriction.mcc_group_name rescue nil
+
+        json.limits do
+          json.atm_limits do
+            json.array! card_limits.ecom_pos_limits.each do |limit|
+              json.id limit.id
+              json.period_id limit.period_id
+              json.period_name limit.period_name rescue nil
+              json.budget limit.budget
+              json.transactions limit.transactions
+              json.enabled limit.allowed
+            end
+          end
+          json.ecom_pos_limits do
+            json.array! card_limits.atm_limits.each do |limit|
+              json.id limit.id
+              json.period_id limit.period_id
+              json.period_name limit.period_name rescue nil
+              json.budget limit.budget
+              json.transactions limit.transactions
+              json.enabled limit.allowed
+            end
+          end
+        end
+      end
+    end
+
   end
-  json.card_limit @result.card_limit
+end
+
+json.mcc_groups do
+  json.array! @result.mcc_groups.each do |mcc_group|
+    json.extract! mcc_group, :id, :name
+  end
 end
 
 json.wallet do
   json.balance @result.wallet.balance_value
 end
+
 json.auto_submit_config do
   json.extract! @result.auto_submit_config, :enabled, :limit_to_card_expenses, :default_memo
   json.period do
@@ -135,42 +178,5 @@ end
 json.periods do
   json.array! @result.periods do |period|
     json.extract! period, :id, :name
-  end
-end
-
-if @result.card_restriction
-  json.restrictions do
-    json.channel_atm @result.card_restriction.channel_atm
-    json.channel_ecom_pos @result.card_restriction.channel_ecom_pos
-    json.mcc_group_id @result.card_restriction.mcc_group_id
-    json.mcc_restriction_type @result.card_restriction.mcc_restriction_type
-    json.mcc_group_name @result.card_restriction.mcc_group_name rescue nil
-    json.mcc_groups do
-      json.array! @result.mcc_groups.each do |mcc_group|
-        json.extract! mcc_group, :id, :name
-      end
-    end
-    json.limits do
-      json.atm_limits do
-        json.array! @result.card_limits.ecom_pos_limits.each do |limit|
-          json.id limit.id
-          json.period_id limit.period_id
-          json.period_name limit.period_name rescue nil
-          json.budget limit.budget
-          json.transactions limit.transactions
-          json.enabled limit.allowed
-        end
-      end
-      json.ecom_pos_limits do
-        json.array! @result.card_limits.atm_limits.each do |limit|
-          json.id limit.id
-          json.period_id limit.period_id
-          json.period_name limit.period_name rescue nil
-          json.budget limit.budget
-          json.transactions limit.transactions
-          json.enabled limit.allowed
-        end
-      end
-    end
   end
 end

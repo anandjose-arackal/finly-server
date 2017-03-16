@@ -21,7 +21,10 @@ class User::Show < User::Base
         elsif self.selected_user.cards.present?
           self.card_presenter = []
           self.selected_user.cards.each do |card|
-            self.card_presenter << ItzCash::AccountDetails.(selected_user, card_id: card.id) rescue nil
+            response = (ItzCash::AccountDetails.(selected_user, card_id: card.id) rescue nil)
+            if response.present? and response.success?
+              self.card_presenter << response
+            end
           end
         end
       else
@@ -41,7 +44,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :mcc_groups, :card_limit, :card_periods, :card_limits, :card_restriction
+                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards
 
     def init
       self.selected_user = params[:selected_user]
@@ -56,15 +59,16 @@ class User::Show < User::Base
       self.actions = load_actions
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
-      self.card = params[:card_presenter].card rescue nil
+      self.cards = []
+      if params[:card_presenter].present?
+        params[:card_presenter].each do |card_presenter|
+          self.cards << card_presenter.card
+        end
+      end
       self.auto_submit_config = self.selected_user.auto_submit_config
       self.periods = Period.all
       self.card_periods = Period.limit(3)
       self.mcc_groups = MccGroup.all
-      self.card_limit = params[:card_presenter].available_card_eligibility rescue nil
-      selected_card = selected_user.cards.first rescue nil
-      self.card_restriction = selected_card.card_restriction rescue nil
-      self.card_limits = card_restriction.card_limits rescue nil
     end
 
     private
@@ -73,56 +77,6 @@ class User::Show < User::Base
 
     end
 
-    def load_actions2
-      credit_actions = {from: [], to: []}
-      debit_actions={from:[], to:[]}
-
-      from_user_creditable_cards = user.cards.creditable_cards
-      to_user_creditable_cards = selected_user.cards.creditable_cards
-      from_user_name = 'Your'
-      personal_transfer = self.user == self.selected_user
-      to_user_name = personal_transfer ? 'Your' : self.selected_user.name
-
-      # From Actions
-      # Virtual Account
-      if user.company_admin?
-        action = {type: :virtual_account, id: user.company.id, name: 'Company Credits'}
-        actions[:credit_actions][:from] << action
-        actions[:debit_actions][:to] << action
-      end
-
-      # Wallet
-      action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money"}
-      actions[:credit_actions][:from] << action
-      actions[:debit_actions][:to] << action
-
-      # Cards
-      if from_user_creditable_cards.present?
-        from_user_creditable_cards.each do |card|
-          action = {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card"}
-          actions[:credit_actions][:from] << action
-          actions[:debit_actions][:to] << action
-        end
-      end
-
-      # To Actions
-      # Wallet
-      action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money"}
-      actions[:credit_actions][:to] << action
-      actions[:debit_actions][:from] << action
-
-      # Cards
-      if to_user_creditable_cards.present?
-        to_user_creditable_cards.each do |card|
-          action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card"}
-          actions[:credit_actions][:to] << action
-          actions[:debit_actions][:from] << action
-        end
-      end
-
-
-      {id: self.selected_user.wallet.id, name: 'Finly Money', balance: self.selected_user.wallet.balance_value, actions: {credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}}
-    end
 
     def load_cards
 
@@ -146,90 +100,9 @@ class User::Show < User::Base
 
       card_assigned = self.selected_user.cards.present?
 
-      credit_params = {}
-      credit_params[:view] = params[:view]
-      credit_params[:action_type] = User::Wallet::Base::ACTIONS[:credit]
-      credit_params[:to_user_id] = selected_user.id
-
-      debit_params = {}
-      debit_params[:view] = params[:view]
-      debit_params[:action_type] = User::Wallet::Base::ACTIONS[:debit]
-      debit_params[:from_user_id] = selected_user.id
-
-      # Wallet Actions
-      if manager_view? or finance_view? or admin_view?
-        if self.user.company_admin?
-          # Virtual Account -> Wallet
-          credit_params[:from_account] = :virtual_account
-          credit_params[:to_account] = :wallet
-          actions[:credit_wallet_from_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-          if card_assigned
-            # Virtual Account -> Selected User's Card
-            credit_params[:from_account] = :virtual_account
-            credit_params[:to_account] = :card
-            actions[:credit_card_from_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-            # Selected User's card -> Virtual Account
-            debit_params[:from_account] = :card
-            debit_params[:to_account] = :virtual_account
-            actions[:debit_card_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-          end
-
-          # Wallet -> Virtual Account
-          debit_params[:from_account] = :wallet
-          debit_params[:to_account] = :virtual_account
-          actions[:debit_wallet_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-        end
-        if selected_user != user
-          # User's Wallet -> Selected User's Wallet
-          credit_params[:from_account] = :wallet
-          credit_params[:to_account] = :wallet
-          actions[:credit_wallet_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-          # Selected User's Wallet -> User's Wallet
-          debit_params[:from_account] = :wallet
-          debit_params[:to_account] = :wallet
-          actions[:debit_wallet_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-
-          if card_assigned
-            # User's Card -> Selected User's Card
-            credit_params[:from_account] = :card
-            credit_params[:to_account] = :card
-            actions[:credit_card_from_card] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-            # Selected User's Card -> User's Card
-            debit_params[:from_account] = :card
-            debit_params[:to_account] = :card
-            actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-          end
-        end
-      end
+      actions[:transfer_options] = load_transfer_options
 
       if card_assigned
-        # Credit actions
-        # User's Wallet -> Selected User's Card
-        credit_params[:from_account] = :wallet
-        credit_params[:to_account] = :card
-        actions[:credit_card_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-        # User's Card -> Selected User's Wallet
-        credit_params[:from_account] = :card
-        credit_params[:to_account] = :wallet
-        actions[:credit_wallet_from_card] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-        # Debit actions
-        # Selected User's Wallet -> User's Card
-        debit_params[:from_account] = :wallet
-        debit_params[:to_account] = :card
-        actions[:debit_wallet_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-
-        # Selected User's Card -> User's Wallet
-        debit_params[:from_account] = :card
-        debit_params[:to_account] = :wallet
-        actions[:debit_card_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-
-
         # Card Actions
         card = self.selected_user.cards.first
         if manager_view? or finance_view? or admin_view?
@@ -257,6 +130,56 @@ class User::Show < User::Base
         end
       end
       actions
+    end
+
+    def load_transfer_options
+      credit_actions = {from: [], to: []}
+      debit_actions={from: [], to: []}
+
+      from_user_creditable_cards = user.cards.creditable_cards
+      to_user_creditable_cards = selected_user.cards.creditable_cards
+      from_user_name = 'Your'
+      personal_transfer = self.user == self.selected_user
+      to_user_name = personal_transfer ? 'Your' : self.selected_user.name
+
+      # From Actions
+      # Virtual Account
+      if user.company_admin?
+        action = {type: :virtual_account, id: user.company.id, name: 'Company Credits'}
+        credit_actions[:from] << action
+        debit_actions[:to] << action
+      end
+
+      # Wallet
+      action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money"}
+      credit_actions[:from] << action
+      debit_actions[:to] << action
+
+      # Cards
+      if from_user_creditable_cards.present?
+        from_user_creditable_cards.each do |card|
+          action = {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card"}
+          credit_actions[:from] << action
+          debit_actions[:to] << action
+        end
+      end
+
+      # To Actions
+      # Wallet
+      action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money"}
+      credit_actions[:to] << action
+      debit_actions[:from] << action
+
+      # Cards
+      if to_user_creditable_cards.present?
+        to_user_creditable_cards.each do |card|
+          action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card"}
+          credit_actions[:to] << action
+          debit_actions[:from] << action
+        end
+      end
+
+      {credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
     end
 
   end
