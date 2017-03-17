@@ -1,3 +1,5 @@
+json.merge @result.balances
+
 json.pending_reimbursement @result.balances[:target_user_approved_reports]
 json.pending_reports_total @result.balances[:target_user_pending_reports_total]
 json.pending_money_request @result.balances[:target_user_pending_money_request]

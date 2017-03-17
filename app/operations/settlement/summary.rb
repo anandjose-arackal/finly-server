@@ -52,7 +52,23 @@ class Settlement::Summary < Settlement::Base
   end
 
   def load_balances
-    self.balances = User::Balance.(user, target_user: selected_user, target_user_all: true).balances
+    result = User::Balance.(user, target_user: selected_user, target_user_all: true).balances
+    self.balances = {}
+    result[:target_user].each do |item|
+      next if item[:type].blank?
+      case item[:type]
+        when :wallet
+          self.balances[:wallet] = {balance: item[:balance]}
+        when :card
+          self.balances[:card] << {id: item[:id], name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility], eligibility: item[:eligibility]}
+        when :cash_on_hand
+          self.balances[:cash_on_hand] = {balance: item[:balance]}
+        when :pending_money_requests
+          self.balance[:pending_money_requests] = {balance: item[:balance], count: item[:count]}
+        when :pending_reports
+          self.balance[:pending_reports] = {balance: item[:balance], count: item[:count]}
+      end
+    end
   end
 
   def load_actions
