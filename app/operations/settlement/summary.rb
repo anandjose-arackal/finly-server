@@ -60,7 +60,8 @@ class Settlement::Summary < Settlement::Base
         when :wallet
           self.balances[:wallet] = {balance: item[:balance]}
         when :card
-          self.balances[:card] << {id: item[:id], name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility], eligibility: item[:eligibility]}
+          self.balances[:card] << {id: item[:id], name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
+                                   eligibility: item[:eligibility], creditable: item[:creditable], debitable: item[:debitable]}
         when :cash_on_hand
           self.balances[:cash_on_hand] = {balance: item[:balance]}
         when :pending_money_requests

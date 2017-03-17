@@ -84,9 +84,9 @@ class User::Balance < User::Base
       if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
         self.target_user.cards.each do |card|
           return unless personal or card.card_program.manager_view_balance or card.card_program.manager_view_eligibility
-          presenter = User::PrepaidCard::Show.(user, user: target_user, card_id: card.id)
-          show_balance = card.card_program.manager_view_balance
-          show_eligibility = card.card_program.manager_view_eligibility
+          presenter = User::PrepaidCard::Show.(user, user: target_user, card_id: card.id, view: params[:view])
+          show_balance = (personal or card.card_program.manager_view_balance)
+          show_eligibility = (personal or card.card_program.manager_view_eligibility)
           balance = nil
           eligibility = nil
           if show_balance
@@ -95,7 +95,11 @@ class User::Balance < User::Base
           if show_eligibility
             eligibility = presenter.available_card_eligibility
           end
-          self.balances[:target_user] << {type: :card, id: card.id, name: card.card_program.name, show_balance: show_balance, balance: balance, show_eligibility: show_eligibility, eligibility: eligibility}
+          creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
+          debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
+          self.balances[:target_user] << {type: :card, id: card.id, name: card.card_program.name, show_balance: show_balance,
+                                          balance: balance, show_eligibility: show_eligibility, eligibility: eligibility,
+                                          creditable: creditable, debitable: debitable}
         end
       end
 
