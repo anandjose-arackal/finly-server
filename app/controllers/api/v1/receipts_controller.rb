@@ -18,12 +18,12 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
 
   def destroy
     @result = Receipt::Destroy.(current_user, params)
-    respond view: false
+    respond response: @result.success?
   end
 
   def update
     @result = Receipt::Update.(current_user, params)
-    respond view: false
+    respond response: @result.success?
   end
 
 end
