@@ -8,7 +8,7 @@ class Api::V1::ReceiptsController < Api::V1::BaseApiController
   def create
     RequestFormatter.parse_receipt(current_user, params)
     @result = Receipt::Create.(current_user, params)
-    respond view: false
+    respond response: (@result.success? ? :success : :failure)
   end
 
   def index
