@@ -100,7 +100,7 @@ class User::Balance < User::Base
           # creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
           # debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
           self.balances[:target_user][:card][card.id] = {type: :card, id: card.id, name: card.card_program.name, show_balance: show_balance,
-                                          balance: balance, show_eligibility: show_eligibility, eligibility: eligibility}
+                                                         balance: balance, show_eligibility: show_eligibility, eligibility: eligibility}
         end
       end
 
