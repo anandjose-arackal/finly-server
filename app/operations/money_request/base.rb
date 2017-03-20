@@ -71,8 +71,8 @@ class MoneyRequest::Base < BaseOperation
                  credit: true,
                  debit: false,
                  credit_actions: {
-                     initiating_account: [],
-                     receiving_account: []}}
+                     initiating_accounts: [],
+                     receiving_accounts: []}}
 
       # Load base actions
       if admin_view? or finance_view? or manager_view?
