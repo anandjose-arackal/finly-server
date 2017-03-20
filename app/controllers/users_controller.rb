@@ -85,6 +85,11 @@ class UsersController < ApplicationController
     respond
   end
 
+  def summary
+    @result = User::Summary.(current_user, params)
+    respond
+  end
+
   # action that sends the user an OTP before verifying them
   # params: mobile_number
   def send_verification_otp

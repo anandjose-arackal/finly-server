@@ -711,6 +711,7 @@ Rails.application.routes.draw do
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
+    get 'summary', to: 'users#summary', as: :user_summary
     post 'user_details', to: 'users#user_details', as: :details
     patch 'update_user_team', to: 'users#update_team', as: :update_team
     patch 'update_role', to: 'users#update_user_role', as: :update_role
