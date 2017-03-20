@@ -1,5 +1,5 @@
 class Event::EWallet::Base < Event::SetNotifier
-  attr_accessor :payment, :from_account, :to_account, :from_account_s, :to_account_s
+  attr_accessor :payment, :initiating_account, :receiving_account, :initiating_account_s, :receiving_account_s
 
   def pre_validate
     unless user.present?
@@ -79,48 +79,25 @@ class Event::EWallet::Base < Event::SetNotifier
   private
 
   def load_payment_types
-    case payment.payment_type_id
-      when PaymentType.id_for(:credit_from_virtual_account_to_wallet)
-        self.from_account = :virtual_account
-        self.to_account = :wallet
-      when PaymentType.id_for(:credit_from_virtual_account_to_card)
-        self.from_account = :virtual_account
-        self.to_account = :card
-      when PaymentType.id_for(:credit_from_wallet_to_wallet)
-        self.from_account = :wallet
-        self.to_account = :wallet
-      when PaymentType.id_for(:credit_from_wallet_to_card)
-        self.from_account = :wallet
-        self.to_account = :card
-      when PaymentType.id_for(:debit_from_wallet_to_wallet)
-        self.from_account = :wallet
-        self.to_account = :wallet
-      when PaymentType.id_for(:debit_from_wallet_to_virtual_account)
-        self.from_account = :wallet
-        self.to_account = :virtual_account
-      when PaymentType.id_for(:debit_from_card_to_virtual_account)
-        self.from_account = :card
-        self.to_account = :virtual_account
-      when PaymentType.id_for(:debit_from_card_to_wallet)
-        self.from_account = :card
-        self.to_account = :wallet
-      when PaymentType.id_for(:debit_from_card_to_card)
-        self.from_account = :card
-        self.to_account = :card
+    self.initiating_account = payment.initiating_account_type
+    self.receiving_account = payment.receiving_account_type
+
+    case payment.initiating_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+        self.initiating_account_s = 'Company Credits'
+      when Payment::AccountType::WALLET
+        self.initiating_account_s = 'Finly Money'
+      when Payment::AccountType::CARD
+        self.initiating_account_s = "Finly #{payment.initiating_account.card_program.name} Card"
     end
-    self.from_account_s = from_account.to_s
-    self.to_account_s = to_account.to_s
-    if from_account_s == 'wallet'
-      self.from_account_s = 'Finly Account'
-    end
-    if from_account_s == 'virtual_account'
-      self.from_account_s = 'Company Credits'
-    end
-    if to_account_s == 'wallet'
-      self.to_account_s = 'Finly Account'
-    end
-    if to_account_s == 'virtual_account'
-      self.to_account_s = 'Company Credits'
+
+    case payment.receiving_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+        self.receiving_account_s = 'Company Credits'
+      when Payment::AccountType::WALLET
+        self.receiving_account_s = 'Finly Money'
+      when Payment::AccountType::CARD
+        self.receiving_account_s = "Finly #{payment.receiving_account.card_program.name} Card"
     end
   end
 

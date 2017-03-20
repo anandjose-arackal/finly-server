@@ -27,6 +27,9 @@ class Company < ActiveRecord::Base
 
   has_many :company_balance_histories
 
+  has_many :initiating_payments, as: :initiating_account
+  has_many :receiving_payments, as: :receiving_account
+
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
 

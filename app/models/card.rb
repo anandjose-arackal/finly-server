@@ -28,6 +28,8 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   belongs_to :card_program
   has_many :transactions, class_name: 'CardTransaction'
+  has_many :initiating_payments, as: :initiating_account
+  has_many :receiving_payments, as: :receiving_account
 
   has_one :card_restriction, dependent: :destroy
 

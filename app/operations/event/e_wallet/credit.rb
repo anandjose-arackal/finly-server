@@ -37,34 +37,31 @@ class Event::EWallet::Credit < Event::EWallet::Base
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: nil,
-                                             amount_attributes: {value: payment.amount_value,
-                                                                 currency_id: 1
-                                                                }
-                                            )
+                                             amount_attributes: {value: payment.amount_value, currency_id: 1})
     notification.save
   end
 
   def mailer_subject(user)
     if user.id == self.payment.initiating_user_id
-      from_s = "your #{from_account_s}"
+      from_s = "your #{initiating_account_s}"
       if to_account == :virtual_account
         from_s = 'Company Credits'
       end
-      "You have credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{to_account_s} from #{from_s}"
+      "You have credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{receiving_account_s} from #{from_s}"
     elsif user.id == self.payment.receiving_user_id
-      "You have received a credit of ₹#{self.payment.amount.value} in your #{to_account_s}"
+      "You have received a credit of ₹#{self.payment.amount.value} in your #{receiving_account_s}"
     end
   end
 
   def mailer_body(user)
     if user.id == self.payment.initiating_user_id
-      from_s = "your #{from_account_s}"
+      from_s = "your #{initiating_account_s}"
       if to_account == :virtual_account
         from_s = 'Company Credits'
       end
-      "You have successfully credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{to_account_s} from #{from_s}"
+      "You have successfully credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{receiving_account_s} from #{from_s}"
     elsif user.id == self.payment.receiving_user_id
-      "You have received a credit of ₹#{self.payment.amount.value} from #{payment.initiating_user.name} in your #{to_account_s}"
+      "You have received a credit of ₹#{self.payment.amount.value} from #{payment.initiating_user.name} in your #{receiving_account_s}"
     end
   end
 

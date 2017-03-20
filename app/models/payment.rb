@@ -36,6 +36,9 @@ class Payment < ActiveRecord::Base
   has_many :money_requests
   has_many :money_request_tracks
 
+  belongs_to :initiating_account, polymorphic: true
+  belongs_to :receiving_account, polymorphic: true
+
   accepts_nested_attributes_for :amount
   delegate :amount_value, to: :amount
 
@@ -96,18 +99,22 @@ class Payment < ActiveRecord::Base
   scope :credit_from_virtual_account_to_card, -> { where payment_type_id: PaymentType.id_for(:credit), initiating_account_type: Payment::AccountType::VIRTUAL_ACCOUNT, receiving_account_type: Payment::AccountType::CARD }
   scope :credit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:credit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::WALLET }
   scope :credit_from_wallet_to_wallet, -> { where payment_type_id: PaymentType.id_for(:credit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::WALLET }
-  scope :credit_from_wallet_to_card, -> { where payment_type_id: PaymentType.id_for(:credit_from_wallet_to_card) }
-  scope :credit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:credit_from_card_to_card) }
-  scope :debit_from_wallet_to_card, -> { where payment_type_id: PaymentType.id_for(:debit_from_wallet_to_card) }
-  scope :debit_from_wallet_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit_from_wallet_to_wallet) }
-  scope :debit_from_wallet_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit_from_wallet_to_virtual_account) }
-  scope :debit_from_card_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit_from_card_to_virtual_account) }
-  scope :debit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit_from_card_to_wallet) }
-  scope :debit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:debit_from_card_to_card) }
+  scope :credit_from_wallet_to_card, -> { where payment_type_id: PaymentType.id_for(:credit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::CARD }
+  scope :credit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:credit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::CARD }
+  scope :debit_from_wallet_to_card, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::WALLET }
+  scope :debit_from_wallet_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::WALLET }
+  scope :debit_from_wallet_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::VIRTUAL_ACCOUNT, receiving_account_type: Payment::AccountType::WALLET }
+  scope :debit_from_card_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::VIRTUAL_ACCOUNT, receiving_account_type: Payment::AccountType::CARD }
+  scope :debit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::CARD }
+  scope :debit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::CARD }
 
+  scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
+                                      PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
+  scope :personal_transfer_to_card, -> { personal.transfer_to_card }
+  scope :non_personal_transfer_to_card, -> { non_personal.transfer_to_card }
 
-  scope :personal_transfer_to_card, -> { personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
-  scope :non_personal_transfer_to_card, -> { non_personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
+  # { personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
+  # scope :non_personal_transfer_to_card, -> { non_personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
 
   scope :cash_additions_to_employee, -> { where(payment_type_id: [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:reimbursement)]) }
   scope :cash_deductions_from_employee, -> { where(payment_type_id: [PaymentType.id_for(:deduct_cash_on_hand)]) }
