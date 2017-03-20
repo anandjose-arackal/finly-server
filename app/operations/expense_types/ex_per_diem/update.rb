@@ -1,15 +1,18 @@
-# operation that enables / disables as well as updates the respective rates for a per_diem and time expense
+# configurable object can be either policy or company - will be decided based on the params passed
 # parameters:
-# type '3' for per diem
-# parent_type: 'policy' or 'company' based on the type
-# parent_id: id of the policy to which this configuration belongs
-# per_diem_expense_config: {
-#                enabled: 0 or 1 depending on whether it's being enabled or disabled
-#            }
+# {   per_diem: {name: "Something",
+#                    rate_attributes: {value: "500",
+#                                     currency_id: 1}
+#
+#               },
+#     id: '2',
+#     level_id: '1',
+#     per_diem_level: 'policy'
+# }
 
 class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::ExPerDiem::Base
 
-  attr_accessor :per_diem_config
+  attr_accessor :configurable_object, :per_diem
 
   def authorized_user_types
     [:company_admin, :policy_admin]
@@ -22,20 +25,15 @@ class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::ExPerDiem::Base
   end
 
   def init
-    case params[:parent_type]
+    case params[:per_diem_level]
       when 'company'
-        self.per_diem_config = user.company.per_diem_expense_config
+        self.per_diem = user.company.per_diems.find_from_id(params[:id])
       when 'policy'
-        policies = Policy::Index.(user, {view: 'policy_admin'}).policies rescue []
-        self.per_diem_config = policies.find_from_id(params[:parent_id]).per_diem_expense_config rescue nil
+        company = user.company
+        policy = company.policies.find_from_id(params[:level_id])
+        self.per_diem = policy.per_diems.find_from_id(params[:id])
       else
-        self.per_diem_config = nil
-    end
-  end
-
-  def authorize
-    unless per_diem_config
-      raise_unauthorized_exception
+        # do nothing
     end
   end
 
@@ -43,21 +41,22 @@ class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::ExPerDiem::Base
 
   end
 
+  def authorize
+    super()
+  end
+
   def process
-    unless per_diem_config.update(per_diem_expense_config_params)
-      messages[:error] = per_diem_config.errors.full_messages
+    unless per_diem.update(per_diem_params)
+      messages[:error] = per_diem.errors.full_messages
     end
+  end
+
+  def post_process
+    add_message :success, "Per Diem updated"
   end
 
   def success
     ExpenseTypes::ExPerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
   end
 
-  private
-
-  def per_diem_expense_config_params
-    params.require(:per_diem_expense_config).permit(:enabled)
-  end
-
 end
-

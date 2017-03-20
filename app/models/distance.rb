@@ -12,7 +12,6 @@
 class Distance < ActiveRecord::Base
   belongs_to :physical_unit
 
-
   validates :value, presence: true
   validates :physical_unit_id, presence: true
 
@@ -23,5 +22,9 @@ class Distance < ActiveRecord::Base
   before_validation {
     self.physical_unit_id = PhysicalUnit.kilometre_id if self.physical_unit_id.nil?
   }
+
+  def distance_value
+    self.value
+  end
 
 end

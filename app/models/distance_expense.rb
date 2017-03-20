@@ -16,11 +16,11 @@ class DistanceExpense < ActiveRecord::Base
 
   belongs_to :expense
 
-  has_one :distance
+  belongs_to :distance
 
-  validates :expense, presence: true
   validates :distance, presence: true
 
   accepts_nested_attributes_for :distance
-  
+
+  delegate :distance_value, to: :distance
 end

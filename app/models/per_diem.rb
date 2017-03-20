@@ -23,4 +23,6 @@ class PerDiem < ActiveRecord::Base
   accepts_nested_attributes_for :rate
 
   delegate :rate_value, to: :rate
+
+  scope :find_from_id, -> (id) {find_by(id: id)}
 end

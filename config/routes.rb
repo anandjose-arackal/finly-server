@@ -506,6 +506,7 @@
 #                                     root GET        /                                                           home#index
 #                                  welcome GET        /welcome(.:format)                                          home#welcome
 #                                    about GET        /about(.:format)                                            home#about
+#                                resources GET        /resources(.:format)                                        home#resources
 #                    autocomplete_merchant GET        /autocomplete/merchant(.:format)                            autocomplete#merchant
 #                        autocomplete_user GET        /autocomplete/user(.:format)                                autocomplete#user
 #                      external_url_report GET        /external/reports/:id(.:format)                             external_url#report

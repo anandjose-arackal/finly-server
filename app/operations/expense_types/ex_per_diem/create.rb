@@ -1,4 +1,13 @@
 # configurable object can be either policy or company - will be decided based on the params passed
+# parameters:
+# {   per_diem: {name: "Something",
+#                    rate_attributes: {value: "500",
+#                                     currency_id: 1}
+#
+#               },
+#     level_id: '1',
+#     per_diem_level: 'company'
+# }
 
 class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::ExPerDiem::Base
 

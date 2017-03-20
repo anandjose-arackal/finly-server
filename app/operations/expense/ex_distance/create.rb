@@ -53,6 +53,12 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       return false
     end
 
+    # checking if distance expense has been enabled for the user at the company or policy level
+    unless user.distance_expense_enabled?
+      add_message :error, "Distance expense creation is not enabled"
+      return false
+    end
+
     # checking if the report is editable for personal view
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])

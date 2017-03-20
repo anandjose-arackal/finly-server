@@ -49,6 +49,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -342,6 +343,20 @@ class User < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def distance_expense_enabled?
+    if self.company.distance_expense_enabled?
+      return true
+    end
+    policies = self.policies
+    policies.each do |policy|
+      if policy.distance_expense_enabled?
+        return true
+      end
+    end
+    # if none of the above conditions are satisfied
+    false
   end
 
   private

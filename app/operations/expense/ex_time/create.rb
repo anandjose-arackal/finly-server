@@ -9,7 +9,7 @@
 #            expense_type_id: 4
 #            expense_status_id: 4
 #          }
-# type: '3' for distance expense
+# type: '4' for time expense
 # }
 
 class Expense::ExTime::Create < Expense::ExTime::Base

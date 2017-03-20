@@ -16,9 +16,10 @@ class TimeExpense < ActiveRecord::Base
 
   belongs_to :expense
 
-  has_one :time_object
+  belongs_to :time_object
 
   validates :time_object, presence: true
+  validates :expense, presence: true
 
   accepts_nested_attributes_for :time_object
 

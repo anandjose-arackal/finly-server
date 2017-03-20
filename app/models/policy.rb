@@ -19,6 +19,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -83,7 +84,17 @@ class Policy < ActiveRecord::Base
     count
   end
 
+  def distance_expense_enabled?
+    self.distance_expense_config.enabled
+  end
 
+  def time_expense_enabled?
+    self.time_expense_config.enabled
+  end
+
+  def per_diem_expense_enabled?
+    self.per_diem_expense_config.enabled
+  end
 
   private
 

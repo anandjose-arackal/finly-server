@@ -20,6 +20,7 @@
 
 
 
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -40,13 +41,15 @@ class Expense < ActiveRecord::Base
   has_one :card_expense, dependent: :destroy
   has_one :distance_expense, dependent: :destroy
   has_one :time_expense, dependent: :destroy
-
+  has_one :per_diem_expense, dependent: :destroy
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :manual_expense
   accepts_nested_attributes_for :card_expense
   accepts_nested_attributes_for :receipts
-
+  accepts_nested_attributes_for :distance_expense
+  accepts_nested_attributes_for :time_expense
+  accepts_nested_attributes_for :per_diem_expense
 
   # delegating to associated classes the dependent attribute calls
   delegate :amount_value, :currency, to: :amount
@@ -275,6 +278,14 @@ class Expense < ActiveRecord::Base
         if self.card_expense.nil?
           errors.add(:expense, "needs to have an associated card expense")
         end
+      when ExpenseType.distance_expense_id
+        if self.distance_expense.blank?
+          errors.add(:expense, "needs to have an associated distance expense")
+        end
+      when ExpenseType.time_expense_id
+        if self.time_expense.blank?
+          errors.add(:expense, "needs to have an associated time expense")
+        end
       else
         errors.add(:expense, "type is invalid")
     end
@@ -291,16 +302,26 @@ class Expense < ActiveRecord::Base
         if self.card_expense.blank?
           errors.add(:card, 'expense details not found')
         end
+      when ExpenseType.distance_expense_id
+        if self.distance_expense.blank?
+          errors.add(:distance, "expense cannot be blank")
+        end
+      when ExpenseType.time_expense_id
+        if self.time_expense.blank?
+          errors.add(:time, "expense cannot be blank")
+        end
       else
         errors.add(:expense, 'type not allowed')
     end
   end
 
   def valid_amount_value
-    if self.amount.blank? or self.amount.value.blank?
-      errors.add(:amount, "can't be blank")
-    elsif self.amount.value <= 0
-      errors.add(:amount, "can't be less than or equal to 0")
+    if self.manual_expense? || self.card_expense?
+      if self.amount.blank? or self.amount.value.blank?
+        errors.add(:amount, "can't be blank")
+      elsif self.amount.value <= 0
+        errors.add(:amount, "can't be less than or equal to 0")
+      end
     end
   end
 

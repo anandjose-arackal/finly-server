@@ -80,6 +80,19 @@ class Company < ActiveRecord::Base
     itz_cash_property.easy_account_no
   end
 
+  def distance_expense_enabled?
+    self.distance_expense_config.enabled
+  end
+
+  def time_expense_enabled?
+    self.time_expense_config.enabled
+  end
+
+  def per_diem_expense_enabled?
+    self.per_diem_expense_config.enabled
+  end
+
+
   private
 
   def init_config_present
