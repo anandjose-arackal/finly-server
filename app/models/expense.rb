@@ -260,8 +260,6 @@ class Expense < ActiveRecord::Base
 
   private
 
-
-
   # cannot add an expense with future date
   def no_future_date
     if date.present? and date > DateUtils.local_date

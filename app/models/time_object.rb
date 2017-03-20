@@ -18,4 +18,9 @@ class TimeObject < ActiveRecord::Base
   before_validation {
     self.physical_unit_id = PhysicalUnit.hour_id if self.physical_unit_id.nil?
   }
+
+  def time_object_value
+    self.value
+  end
+
 end

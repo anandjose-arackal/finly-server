@@ -11,15 +11,13 @@ class Expense::ExTime::Base < Expense::Base
       end
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
-    p = params.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :expense_status_id,
+    p = params.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :expense_status_id, :report_id,
                                         :receipt_id, :receipt, time_expense_attributes: [:id, time_object_attributes: [:value, :id]])
     # Hack as image upload from API is failing in strong params
     receipts = [receipts] unless receipts.is_a?(Array)
     p[:receipts_attributes] = receipts if receipts.present? and p.present?
     p.permit!
 
-    # params.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :expense_status_id,
-    #                                 :receipt_id, :receipt, receipts_attributes: [:image, :user_id, :id], distance_expense_attributes: [:id, distance_attributes: [:value, :id]])
   end
   
 end

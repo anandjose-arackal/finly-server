@@ -14,4 +14,7 @@
 class PerDiemExpense < ActiveRecord::Base
   belongs_to :expense
   belongs_to :per_diem
+
+  validates :per_diem, presence: true
+
 end

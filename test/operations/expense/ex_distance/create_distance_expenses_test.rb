@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CreateDistanceExpenseTest < ActiveSupport::TestCase
+class CreateDistanceExpensesTest < ActiveSupport::TestCase
 
   def setup
     @company = Company.first

@@ -1,6 +1,6 @@
 # operation to create a distance expense
 # parameters :
-# expense: { distance_expense_attributes: { distance_attributes: { value:  of the distance
+# expense: { distance_expense_attributes: { distance_attributes: { value:  of the distance in km
 #                                                                }
 #                                         }
 #            note: "Sample note"
@@ -30,9 +30,9 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       messages[:error] << 'You have not provided any details to create an expense'
       return
     end
-    distance_value = params[:expense][:distance_expense_attributes][:distance_attributes][:distance].to_d rescue nil
+    distance_value = params[:expense][:distance_expense_attributes][:distance_attributes][:value].to_d rescue nil
     if distance_value.present? and distance_value <= 0
-      messages[:error] << 'Amount cannot be less than or equal to 0'
+      messages[:error] << 'Distance cannot be less than or equal to 0'
     end
   end
 

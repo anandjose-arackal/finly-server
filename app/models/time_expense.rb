@@ -19,8 +19,8 @@ class TimeExpense < ActiveRecord::Base
   belongs_to :time_object
 
   validates :time_object, presence: true
-  validates :expense, presence: true
 
   accepts_nested_attributes_for :time_object
 
+  delegate :time_object_value, to: :time_object
 end
