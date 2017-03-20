@@ -36,7 +36,7 @@ class User::Balance < User::Base
   def process
     current_user_card_assigned = user.cards.present?
 
-    self.balances = {current_user: [], target_user: []}
+    self.balances = {current_user: {}, target_user: {}}
 
     # id, name, balance
 
@@ -47,21 +47,22 @@ class User::Balance < User::Base
     end
 
     # Wallet
-    self.balances[:current_user] << {type: :wallet, name: 'Finly Money', id: user.wallet.id, balance: User::Wallet::Balance.(user)} if params[:current_user_wallet] or params[:current_user_all]
+    self.balances[:current_user][:wallet] = {type: :wallet, name: 'Finly Money', id: user.wallet.id, balance: User::Wallet::Balance.(user)} if params[:current_user_wallet] or params[:current_user_all]
 
     # Card
     if current_user_card_assigned and (params[:current_user_card] or params[:current_user_all])
+      self.balances[:current_user][:card] = {}
       self.user.cards.each do |card|
         presenter = User::PrepaidCard::Show.(user, user: user, card_id: card.id)
-        self.balances[:current_user] << {type: :card, id: card.id, name: card.card_program.name, balance: presenter.balance, eligibility: presenter.available_card_eligibility}
+        self.balances[:current_user][:card][card.id] = {type: :card, id: card.id, name: card.card_program.name, balance: presenter.balance, eligibility: presenter.available_card_eligibility}
       end
     end
 
     # Cash In Hand
-    self.balances[:current_user] << {type: :cash_on_hand, id: user.id, name: 'Cash On Hand', balance: (user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:current_user_cash_in_hand] or params[:current_user_all]
+    self.balances[:current_user][:cash_on_hand] = {type: :cash_on_hand, id: user.id, name: 'Cash On Hand', balance: (user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Cash Advance
-    self.balances[:current_user] << {type: :pending_money_requests, id: user.id, name: 'Approved Money Requests', balance: user.balance_sheet.pending_advance.amount_value, count: user.money_requests.approved.count} if params[:current_user_pending_money_request] or params[:current_user_all]
+    self.balances[:current_user][:pending_money_requests] << {type: :pending_money_requests, id: user.id, name: 'Approved Money Requests', balance: user.balance_sheet.pending_advance.amount_value, count: user.money_requests.approved.count} if params[:current_user_pending_money_request] or params[:current_user_all]
 
     # pending approved reports
     if params[:current_user_pending_reports] or params[:current_user_all]
@@ -70,7 +71,7 @@ class User::Balance < User::Base
         total += report.total_amount(:only_manual_expenses)
       end
 
-      self.balances[:current_user] << {type: :pending_reports, id: user.id, name: 'Approved Reports', balance: total, count: user.reports.approved.count}
+      self.balances[:current_user][:pending_reports] = {type: :pending_reports, id: user.id, name: 'Approved Reports', balance: total, count: user.reports.approved.count}
     end
 
     if target_user.present?
@@ -78,10 +79,11 @@ class User::Balance < User::Base
       target_user_card_assigned = target_user.cards.present?
 
       # Wallet
-      self.balances[:target_user] << {type: :wallet, name: 'Finly Money', id: target_user.wallet.id, balance: User::Wallet::Balance.(user, for_user: target_user, view: params[:view])} if params[:target_user_wallet] or params[:target_user_all]
+      self.balances[:target_user][:wallet] = {type: :wallet, name: 'Finly Money', id: target_user.wallet.id, balance: User::Wallet::Balance.(user, for_user: target_user, view: params[:view])} if params[:target_user_wallet] or params[:target_user_all]
 
       # Card
       if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
+        self.balances[:target_user][:card] = {}
         self.target_user.cards.each do |card|
           return unless personal or card.card_program.manager_view_balance or card.card_program.manager_view_eligibility
           presenter = User::PrepaidCard::Show.(user, user: target_user, card_id: card.id, view: params[:view])
@@ -97,16 +99,16 @@ class User::Balance < User::Base
           end
           # creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
           # debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
-          self.balances[:target_user] << {type: :card, id: card.id, name: card.card_program.name, show_balance: show_balance,
+          self.balances[:target_user][:card][card.id] = {type: :card, id: card.id, name: card.card_program.name, show_balance: show_balance,
                                           balance: balance, show_eligibility: show_eligibility, eligibility: eligibility}
         end
       end
 
       # Cash In Hand
-      self.balances[:target_user] << {type: :cash_on_hand, id: target_user.id, name: 'Cash On Hand', balance: (target_user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:target_user_cash_in_hand] or params[:target_user_all]
+      self.balances[:target_user][:cash_on_hand] = {type: :cash_on_hand, id: target_user.id, name: 'Cash On Hand', balance: (target_user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:target_user_cash_in_hand] or params[:target_user_all]
 
       # Pending Cash Advance
-      self.balances[:target_user] << {type: :pending_money_requests, id: target_user.id, name: 'Approved Money Requests', balance: target_user.balance_sheet.pending_advance.amount_value, count: target_user.money_requests.approved.count} if params[:target_user_pending_money_request] or params[:target_user_all]
+      self.balances[:target_user][:pending_money_requests] = {type: :pending_money_requests, id: target_user.id, name: 'Approved Money Requests', balance: target_user.balance_sheet.pending_advance.amount_value, count: target_user.money_requests.approved.count} if params[:target_user_pending_money_request] or params[:target_user_all]
 
       # pending approved reports
       if params[:target_user_pending_reports] or params[:target_user_all]
@@ -115,7 +117,7 @@ class User::Balance < User::Base
           total += report.total_amount(:only_manual_expenses)
         end
 
-        self.balances[:target_user] << {type: :pending_reports, id: target_user.id, name: 'Approved Reports', balance: total, count: target_user.reports.approved.count}
+        self.balances[:target_user][:pending_reports] = {type: :pending_reports, id: target_user.id, name: 'Approved Reports', balance: total, count: target_user.reports.approved.count}
       end
     end
 

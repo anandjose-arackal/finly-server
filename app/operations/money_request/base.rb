@@ -71,8 +71,8 @@ class MoneyRequest::Base < BaseOperation
                  credit: true,
                  debit: false,
                  credit_actions: {
-                     from: [],
-                     to: []}}
+                     initiating_account: [],
+                     receiving_account: []}}
 
       # Load base actions
       if admin_view? or finance_view? or manager_view?
@@ -108,30 +108,35 @@ class MoneyRequest::Base < BaseOperation
         from_user_name = 'Your'
         personal_transfer = self.user == self.money_request.user
         to_user_name = personal_transfer ? 'Your' : self.money_request.user.name
-        from_actions = actions[:credit_actions][:from]
-        to_actions = actions[:credit_actions][:to]
+        initiating_actions = actions[:credit_actions][:initiating_account]
+        receiving_actions = actions[:credit_actions][:receiving_account]
+
+        balances = User::Balance.(user, target_user: money_request.user, target_user_card: true,
+            target_user_wallet: true, current_user_card: true, current_user_wallet: true,
+            virtual_account: true, view: params[:view]).balances
 
         # From Actions
         # Virtual Account
         if user.company_admin?
-          from_actions << {type: :virtual_account, id: user.company.id, name: 'Company Credits'}
+          initiating_actions << {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balances[:virtual_account][:balance]}
         end
         # Wallet
-        from_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money"}
+        initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money", balance: balances[:current_user][:wallet][:balance]}
         # Cards
         if from_user_creditable_cards.present?
           from_user_creditable_cards.each do |card|
-            from_actions << {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card"}
+            initiating_actions << {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card", balance: balances[:current_user][:card][card.id][:balance], eligibility: balances[:current_user][:card][card.id][:balance]}
           end
         end
 
         # To Actions
         # Wallet
-        to_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name}'s Finly Money"}
+        receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balances[:target_user][:wallet][:balance]}
+
         # Cards
         if to_user_creditable_cards.present?
           to_user_creditable_cards.each do |card|
-            actions[:credit_actions][:to] << {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card"}
+            receiving_actions << {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card", balance: balances[:target_user][:card][card.id][:balance], eligibility: balances[:target_user][:card][card.id][:balance]}
           end
         end
       end
