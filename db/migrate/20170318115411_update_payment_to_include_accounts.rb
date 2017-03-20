@@ -99,7 +99,7 @@ class UpdatePaymentToIncludeAccounts < ActiveRecord::Migration
               receiving_account_id = payment.receiving_user.cards.first.id
               receiving_account_type = 'Card'
           end
-          payment.update_attributes(initiating_account_id: initiating_account_id, initiating_account_type: initiating_account_type, receiving_account_id: receiving_account_id, receiving_account_type: receiving_account_type)
+          payment.update_attributes(payment_type_id: type_id,initiating_account_id: initiating_account_id, initiating_account_type: initiating_account_type, receiving_account_id: receiving_account_id, receiving_account_type: receiving_account_type)
         end
 
       end
