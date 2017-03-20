@@ -28,11 +28,12 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
       when 'company'
         self.time_config = user.company.time_expense_config
       when 'policy'
-        policies = Policy::Index.(user, {view: 'policy_admin'}).policies rescue []
+        policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
         self.time_config = policies.find_from_id(params[:parent_id]).time_expense_config rescue nil
       else
         self.time_config = nil
     end
+    self.update_params = time_expense_config_params
   end
 
   def authorize
@@ -45,8 +46,14 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
 
   end
 
+  def pre_process
+    if update_params[:enabled] == '0'
+      update_params[:rate_per_hour] = nil
+    end
+  end
+
   def process
-    unless time_config.update(time_expense_config_params)
+    unless time_config.update(update_params)
       messages[:error] = time_config.errors.full_messages
     end
   end
@@ -54,7 +61,7 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
   private
 
   def time_expense_config_params
-    params.require(:time_expense_config).permit(:rate_per_km, :default_category_id, :enabled)
+    params.require(:time_expense_config).permit(:rate_per_hour, :default_category_id, :enabled)
   end
 
 end

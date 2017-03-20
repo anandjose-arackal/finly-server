@@ -7,7 +7,7 @@
 #                enabled: 0 or 1 depending on whether it's being enabled or disabled
 #            }
 
-class ExpenseTypes::ExPerDiemConfig::Update < ExpenseTypes::ExPerDiem::Base
+class ExpenseTypes::ExPerDiemConfig::Update < ExpenseTypes::Base
 
   attr_accessor :per_diem_config
 
@@ -26,11 +26,12 @@ class ExpenseTypes::ExPerDiemConfig::Update < ExpenseTypes::ExPerDiem::Base
       when 'company'
         self.per_diem_config = user.company.per_diem_expense_config
       when 'policy'
-        policies = Policy::Index.(user, {view: 'policy_admin'}).policies rescue []
+        policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
         self.per_diem_config = policies.find_from_id(params[:parent_id]).per_diem_expense_config rescue nil
       else
         self.per_diem_config = nil
     end
+    self.update_params = per_diem_expense_config_params
   end
 
   def authorize
@@ -44,13 +45,9 @@ class ExpenseTypes::ExPerDiemConfig::Update < ExpenseTypes::ExPerDiem::Base
   end
 
   def process
-    unless per_diem_config.update(per_diem_expense_config_params)
+    unless per_diem_config.update(update_params)
       messages[:error] = per_diem_config.errors.full_messages
     end
-  end
-
-  def success
-    ExpenseTypes::ExPerDiem::Base::PerDiemPresenter.new(user, {per_diem: per_diem}, messages)
   end
 
   private

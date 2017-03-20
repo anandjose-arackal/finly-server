@@ -28,11 +28,12 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
       when 'company'
         self.distance_config = user.company.distance_expense_config
       when 'policy'
-        policies = Policy::Index.(user, {view: 'policy_admin'}).policies rescue []
+        policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
         self.distance_config = policies.find_from_id(params[:parent_id]).distance_expense_config rescue nil
       else
         self.distance_config = nil
     end
+    self.update_params = distance_expense_config_params
   end
 
   def authorize
@@ -45,8 +46,14 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
 
   end
 
+  def pre_process
+    if update_params[:enabled] == '0'
+      update_params[:rate_per_km] = nil
+    end
+  end
+
   def process
-    unless distance_config.update(distance_expense_config_params)
+    unless distance_config.update(update_params)
       messages[:error] = distance_config.errors.full_messages
     end
   end

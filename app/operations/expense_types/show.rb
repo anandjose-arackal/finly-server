@@ -46,7 +46,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
       when 'company'
         self.parent = company
       when 'policy'
-        policies = Policy::Index.(user, {view: 'policy_admin'}).policies rescue []
+        policies = Policy::Index.(user, view: 'admin').policies rescue []
         self.parent = policies.find_from_id(params[:parent_id]) rescue nil
       else
         self.parent = nil
@@ -72,7 +72,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
                               default_category_id: parent.distance_expense_config.default_category_id
                               }
     end
-    if parent.time_expense_config
+    if parent.time_expense_config.enabled
       self.time_config = {enabled: true,
                           rate_per_hour: parent.time_expense_config.rate_per_hour,
                           default_category_id: parent.time_expense_config.default_category_id
@@ -88,7 +88,8 @@ class ExpenseTypes::Show < ExpenseTypes::Base
       self.per_diem_config[:per_diems] = []
       parent.per_diems.each do |per_diem|
         self.per_diem_config[:per_diems] << {name: per_diem.name,
-                                             rate: per_diem.rate_value
+                                             rate: per_diem.rate_value,
+                                             id: per_diem.id
                                             }
       end
     else

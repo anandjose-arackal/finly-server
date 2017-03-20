@@ -415,6 +415,7 @@
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
 #           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
+#             user_available_expense_types GET        /users/:user_id/available_expense_types(.:format)           users#available_expense_types
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -731,6 +732,7 @@ Rails.application.routes.draw do
     get 'balance', to: 'users#balance', as: :balance
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
+  get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import
   # get 'mass_import', to: 'users#mass_import', as: :mass_import

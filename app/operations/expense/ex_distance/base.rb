@@ -8,7 +8,7 @@ class Expense::ExDistance::Base < Expense::Base
       if params[:expense][:receipts_attributes].is_a?(Array) and params[:expense][:receipts_attributes][0].present? and params[:expense][:receipts_attributes][0].kind_of?(Hash)
         params[:expense][:receipts_attributes][0][:user_id] = user.id
       elsif params[:expense][:receipts_attributes].kind_of?(Hash)
-        params[:expense][:receipts_attributes][:user_id] = user.idz
+        params[:expense][:receipts_attributes][:user_id] = user.id
       end
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
