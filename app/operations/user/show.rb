@@ -132,8 +132,8 @@ class User::Show < User::Base
     end
 
     def load_transfer_options
-      credit_actions = {from: [], to: []}
-      debit_actions={from: [], to: []}
+      credit_actions = {initiating_accounts: [], receiving_accounts: []}
+      debit_actions={receiving_accounts: [], initiating_accounts: []}
 
       from_user_creditable_cards = user.cards.creditable_cards
       to_user_creditable_cards = selected_user.cards.creditable_cards
@@ -145,14 +145,14 @@ class User::Show < User::Base
       # Virtual Account
       if user.company_admin?
         action = {type: :virtual_account, id: user.company.id, name: 'Company Credits'}
-        credit_actions[:from] << action
-        debit_actions[:to] << action
+        credit_actions[:initiating_accounts] << action
+        debit_actions[:initiating_accounts] << action
       end
 
       # Wallet
       action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money"}
-      credit_actions[:from] << action
-      debit_actions[:to] << action
+      credit_actions[:initiating_accounts] << action
+      debit_actions[:initiating_accounts] << action
 
       # Cards
       if from_user_creditable_cards.present?
@@ -164,12 +164,12 @@ class User::Show < User::Base
           card_program = card.card_program
           if personal_transfer
             next unless card_program.personal_wallet_fund_transfer
-            credit_actions[:from] << action
-            debit_actions[:to] << action
+            credit_actions[:initiating_accounts] << action
+            debit_actions[:initiating_accounts] << action
           else
             next unless card_program.non_personal_fund_transfer
-            credit_actions[:from] << action
-            debit_actions[:to] << action
+            credit_actions[:initiating_accounts] << action
+            debit_actions[:initiating_accounts] << action
           end
         end
       end
@@ -177,8 +177,8 @@ class User::Show < User::Base
       # To Actions
       # Wallet
       action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money"}
-      credit_actions[:to] << action
-      debit_actions[:from] << action
+      credit_actions[:receiving_accounts] << action
+      debit_actions[:receiving_accounts] << action
 
       # Cards
       if to_user_creditable_cards.present?
@@ -189,14 +189,14 @@ class User::Show < User::Base
           # Verify is user is allowed to credit / debit from the card based on the card program
           if personal_transfer
             next unless card_program.personal_wallet_fund_transfer
-            credit_actions[:to] << action
-            debit_actions[:from] << action
+            credit_actions[:receiving_accounts] << action
+            debit_actions[:receiving_accounts] << action
           else
             if card_program.manager_credit
-              credit_actions[:to] << action
+              credit_actions[:receiving_accounts] << action
             end
             if card_program.manager_debit
-              debit_actions[:from] << action
+              debit_actions[:receiving_accounts] << action
             end
           end
 

@@ -108,8 +108,8 @@ class MoneyRequest::Base < BaseOperation
         from_user_name = 'Your'
         personal_transfer = self.user == self.money_request.user
         to_user_name = personal_transfer ? 'Your' : self.money_request.user.name
-        initiating_actions = actions[:credit_actions][:initiating_account]
-        receiving_actions = actions[:credit_actions][:receiving_account]
+        initiating_actions = actions[:credit_actions][:initiating_accounts]
+        receiving_actions = actions[:credit_actions][:receiving_accounts]
 
         balances = User::Balance.(user, target_user: money_request.user, target_user_card: true,
             target_user_wallet: true, current_user_card: true, current_user_wallet: true,
