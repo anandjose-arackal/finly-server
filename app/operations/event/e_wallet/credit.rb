@@ -14,18 +14,18 @@ class Event::EWallet::Credit < Event::EWallet::Base
 
   def send_push_notification(user)
     return unless user.id == payment.receiving_user_id
-    message = "You have received a credit of ₹#{payment.amount.value} in your #{to_account_s}"
+    message = "You have received a credit of ₹#{payment.amount.value} in your #{receiving_account_s}"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
   def set_notification(user)
-    case to_account
+    case receiving_account
       when :wallet
-        object = "Wallet"
+        object = 'Wallet'
       when :card
-        object = "Card"
+        object = 'Card'
       else
-        object = "Wallet"
+        object = 'Wallet'
     end
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:wallet),
                                              action_type_id: NotificationActionType.id_for(:notify_credit),
@@ -44,7 +44,7 @@ class Event::EWallet::Credit < Event::EWallet::Base
   def mailer_subject(user)
     if user.id == self.payment.initiating_user_id
       from_s = "your #{initiating_account_s}"
-      if to_account == :virtual_account
+      if receiving_account == :virtual_account
         from_s = 'Company Credits'
       end
       "You have credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{receiving_account_s} from #{from_s}"
@@ -56,7 +56,7 @@ class Event::EWallet::Credit < Event::EWallet::Base
   def mailer_body(user)
     if user.id == self.payment.initiating_user_id
       from_s = "your #{initiating_account_s}"
-      if to_account == :virtual_account
+      if receiving_account == :virtual_account
         from_s = 'Company Credits'
       end
       "You have successfully credited ₹#{self.payment.amount.value} to #{payment.receiving_user.name}'s #{receiving_account_s} from #{from_s}"

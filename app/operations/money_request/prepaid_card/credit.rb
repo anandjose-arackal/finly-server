@@ -14,14 +14,14 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
     unless user.valid_password?(params[:password])
       add_message :error, 'Invalid password!'
     end
-    if params[:from_account].blank?
+    if params[:initiating_account].blank?
       add_message :error, 'From Account not defined'
       return
     end
-    unless params[:from_account].to_sym == :wallet || params[:from_account].to_sym == :virtual_account || params[:from_account].to_sym == :card
+    unless params[:initiating_account].to_sym == :wallet || params[:initiating_account].to_sym == :virtual_account || params[:initiating_account].to_sym == :card
       add_message :error, 'Invalid account type'
     end
-    if params[:to_account].present? and not params[:to_account].to_sym == :card and not params[:to_account].to_sym == :wallet
+    if params[:receiving_account].present? and not params[:receiving_account].to_sym == :card and not params[:receiving_account].to_sym == :wallet
       add_message :error, 'Invalid transfer to account type'
     end
   end
@@ -55,7 +55,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
     if amount.nil? or not (amount.is_a?(BigDecimal) or amount.is_a?(Float))
       add_message :error, 'Error processing request'
     end
-    if params[:from_account] == :card and user.cards.with_card_program(CardProgram.id_for(:expense)).blank?
+    if params[:initiating_account] == :card and user.cards.with_card_program(CardProgram.id_for(:expense)).blank?
       add_message :error, 'User has not been assigned a Finly Expense Card to initiate the transfer'
       return
     end
@@ -66,21 +66,21 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
 
   def process
     if amount > 0
-      from_account = params[:from_account].to_sym
-      from_account_id = nil
-      if from_account == :card
-        from_account_id = user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
+      initiating_account = params[:initiating_account].to_sym
+      initiating_account_id = nil
+      if initiating_account == :card
+        initiating_account_id = user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
       end
 
-      to_account = :card
-      to_account_id = nil
-      to_account = params[:to_account].to_sym if params[:to_account].present?
-      if to_account == :card
-        to_account_id = to_user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
+      receiving_account = :card
+      receiving_account_id = nil
+      receiving_account = params[:receiving_account].to_sym if params[:receiving_account].present?
+      if receiving_account == :card
+        receiving_account_id = to_user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
       end
 
-      result = User::Wallet::Credit.(user, from_account: from_account, from_account_id: from_account_id,
-          to_account: to_account, to_account_id: to_account_id, to_user: to_user, amount: self.amount, password: params[:password])
+      result = User::Wallet::Credit.(user, initiating_account: initiating_account, initiating_account_id: initiating_account_id,
+          receiving_account: receiving_account, receiving_account_id: receiving_account_id, to_user: to_user, amount: self.amount, password: params[:password])
 
       if result.failure?
         add_message :error, result.messages[:error]
@@ -107,7 +107,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       track_attributes[:payment] = result.payment
       money_request.tracks.create track_attributes
 
-      action_id = "credited_from_#{from_account}_to_#{to_account}"
+      action_id = "credited_from_#{initiating_account}_to_#{receiving_account}"
       money_request.comments.create money_request_id: money_request.id,
                                     user: user, comment_action_id: MoneyRequestCommentAction.id_for(action_id.to_sym), payment: result.payment
     end

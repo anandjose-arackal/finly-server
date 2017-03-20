@@ -14,7 +14,7 @@ class Event::EWallet::Debit < Event::EWallet::Base
 
   def send_push_notification(user)
     return unless user.id == payment.receiving_user_id
-    message = "An amount of ₹#{self.payment.amount.value} has been debited from your #{from_account_s}"
+    message = "An amount of ₹#{self.payment.amount.value} has been debited from your #{receiving_account_s}"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 
@@ -23,23 +23,20 @@ class Event::EWallet::Debit < Event::EWallet::Base
                                              action_type_id: NotificationActionType.id_for(:notify_debit),
                                              action_user_id: payment.initiating_user_id,
                                              object_id: payment.id,
-                                             object_type: "Wallet",
+                                             object_type: 'Wallet',
                                              path_object_id: payment.id,
-                                             path_object_type: "Wallet",
+                                             path_object_type: 'Wallet',
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: nil,
-                                             amount_attributes: {value: payment.amount_value,
-                                                                 currency_id: 1
-                                                                }
-                                            )
+                                             amount_attributes: {value: payment.amount_value, currency_id: 1})
     notification.save
   end
 
   def mailer_subject(user)
     if user.id == self.payment.initiating_user_id
       to_s = "your #{initiating_account_s}"
-      if to_account == :virtual_account
+      if initiating_account == :virtual_account
         to_s = 'Company Credits'
       end
       "You have debited ₹#{self.payment.amount.value} from #{payment.receiving_user.name}'s #{receiving_account_s} to #{to_s}"
@@ -51,7 +48,7 @@ class Event::EWallet::Debit < Event::EWallet::Base
   def mailer_body(user)
     if user.id == self.payment.initiating_user_id
       to_s = "your #{initiating_account_s}"
-      if to_account == :virtual_account
+      if initiating_account == :virtual_account
         to_s = 'Company Credits'
       end
       "You have successfully debited ₹#{self.payment.amount.value} from #{payment.receiving_user.name}'s #{receiving_account_s} to #{to_s}"

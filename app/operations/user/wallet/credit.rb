@@ -1,4 +1,4 @@
-# params = {from_account: :virtual_account/wallet,receiving_account_type: wallet/card, receiving_user_id: 1, password: 'password' }
+# params = {initiating_account_id: :virtual_account/wallet,receiving_account_type: wallet/card, receiving_user_id: 1, password: 'password' }
 class User::Wallet::Credit < User::Wallet::Base
 
   def validate_sufficient_funds
@@ -96,7 +96,7 @@ class User::Wallet::Credit < User::Wallet::Base
         if receiving_account_type == :card
           # first reduce the amount from the card holder's balance
           # duplicating the params hash first
-          debit_presenter = ItzCash::Debit.(initiating_user, card_id: from_account_id, amount: self.amount)
+          debit_presenter = ItzCash::Debit.(initiating_user, card_id: initiating_account_id, amount: self.amount)
           # if the debit is successful, i.e. if the money has been reduced from the card holder's account
           if debit_presenter.success?
             # now add the money to the receiving user's card
@@ -115,7 +115,7 @@ class User::Wallet::Credit < User::Wallet::Base
             return
           end
         elsif receiving_account_type == :wallet
-          debit_presenter = ItzCash::Debit.(initiating_user, card_id: from_account_id, amount: self.amount)
+          debit_presenter = ItzCash::Debit.(initiating_user, card_id: initiating_account_id, amount: self.amount)
           if debit_presenter.success?
             # i.e. the money was successfully deducted
             # deducting money from the company balance
