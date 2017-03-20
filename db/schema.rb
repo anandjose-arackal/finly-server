@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170316191656) do
+ActiveRecord::Schema.define(version: 20170318115411) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -802,14 +802,18 @@ ActiveRecord::Schema.define(version: 20170316191656) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",          limit: 4,     null: false
-    t.date     "date",                             null: false
-    t.integer  "payment_type_id",    limit: 4,     null: false
-    t.integer  "initiating_user_id", limit: 4,     null: false
-    t.integer  "receiving_user_id",  limit: 4,     null: false
-    t.text     "note",               limit: 65535
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.integer  "amount_id",               limit: 4,     null: false
+    t.date     "date",                                  null: false
+    t.integer  "payment_type_id",         limit: 4,     null: false
+    t.integer  "initiating_user_id",      limit: 4,     null: false
+    t.integer  "receiving_user_id",       limit: 4,     null: false
+    t.text     "note",                    limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "initiating_account_id",   limit: 4
+    t.string   "initiating_account_type", limit: 255
+    t.integer  "receiving_account_id",    limit: 4
+    t.string   "receiving_account_type",  limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

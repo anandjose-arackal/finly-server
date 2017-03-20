@@ -17,6 +17,7 @@
 #  manager_view_transactions     :boolean
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
+#  non_personal_fund_transfer    :boolean
 #
 
 require 'test_helper'
