@@ -18,8 +18,7 @@ class User::Wallet::Base < BaseOperation
 
   def pre_validate
     super
-    if params.blank? or params[:initiating_account_type].blank? or params[:receiving_account_type].blank? or
-        (params[:receiving_user].blank? and params[:receiving_user_id].blank?)
+    if params.blank? or params[:initiating_account_type].blank? or params[:receiving_account_type].blank? or (params[:receiving_user].blank? and params[:receiving_user_id].blank?)
       add_message :error, 'Invalid request'
       return
     end
