@@ -32,7 +32,8 @@ class User::Summary < User::Base
     self.summary = {}
 
     balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
-        target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true, target_user_cash_in_hand: true, view: params[:view]).balances
+        target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
+        target_user_cash_in_hand: true, view: params[:view]).balances
 
     summary[:cards] = []
     if self.selected_user.cards.present?

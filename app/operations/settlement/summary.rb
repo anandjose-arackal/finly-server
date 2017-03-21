@@ -63,7 +63,7 @@ class Settlement::Summary < Settlement::Base
         card = Card.with_id(id).first
         creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
         debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
-        self.balances[:cards] << {id: item[:id], program_name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
+        self.balances[:cards] << {id: item[:id], name: "#{item[:name]} Card", show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
                                  eligibility: item[:eligibility], creditable: creditable, debitable: debitable, enabled: card.active}
       end
     end
