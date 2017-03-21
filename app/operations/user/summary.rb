@@ -53,7 +53,7 @@ class User::Summary < User::Base
 
     summary[:virtual_account] = balances[:virtual_account] if selected_user.company_admin?
 
-    summary[:cash_on_hand] = {name: 'Cash on Hand', balance: balances[:target_user][:cash_on_hand]}
+    summary[:cash_on_hand] = {name: 'Cash on Hand', balance: balances[:target_user][:cash_on_hand][:balance]}
 
     summary[:actions] = load_actions balances
 
