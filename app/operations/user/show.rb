@@ -60,13 +60,23 @@ class User::Show < User::Base
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
       self.cards = []
+      personal = (selected_user == user)
       if params[:card_presenter].present?
         params[:card_presenter].each do |card_presenter|
           actions = {}
           # Card Actions
           card = card_presenter.card
-          if manager_view? or finance_view? or admin_view?
-            next unless card.card_program.manager_blockable
+          show_balance = personal ? true : card.card_program.manager_view_balance
+          show_eligibility = personal ? true : card.card_program.manager_view_eligibility
+          configurable_restrictions = card.card_program.spend_restrictions
+          balance = show_balance ? card_presenter.balance : nil
+          eligibility = show_eligibility ? card_presenter.available_card_eligibility : nil
+          disabled_by = card.disabled_by_role
+          active = card.active
+          name = "#{card.card_program.name} Card"
+          ending_number = card.ending_number
+
+          if not personal and card.card_program.manager_blockable
             card_params = {}
             card_params[:view] = params[:view]
             card_params[:user_id] = selected_user.id
@@ -90,7 +100,12 @@ class User::Show < User::Base
               end
             end
           end
-          self.cards << {card: card, actions: actions}
+          self.cards << {card: {show_balance: show_balance, show_eligibility: show_eligibility,
+                                ending_number: ending_number,
+                                configurable_restrictions: configurable_restrictions, balance: balance,
+                                eligibility: eligibility, disabled_by: disabled_by,
+                                active: active, name: name},
+                         actions: actions}
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config

@@ -96,15 +96,9 @@ json.cards do
     card = card_details[:card]
     actions = card_details[:actions]
 
-    json.extract! card, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility
-    json.disabled_by do
-      json.name card.disabled_by_user.name rescue nil
-      role_name = nil
-      role_name = UserRole.name_for(card.disabled_by_role_id) if card.disabled_by_role_id.present?
-      json.role role_name
-    end
+    json.card card
 
-    if card.card_program.spend_restrictions
+    if card[:configurable_restrictions]
       json.restrictions do
 
         card_restriction = card.card_restriction

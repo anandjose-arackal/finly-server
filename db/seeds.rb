@@ -204,12 +204,12 @@ if CardProgram.count == 0
                      personal_wallet_fund_transfer: true, spend_restrictions: true,
                      end_date_restrictions: true, manager_credit: true, manager_debit: true,
                      manager_blockable: true, manager_view_balance: true, manager_view_eligibility: true,
-                     manager_view_transactions: true
+                     manager_view_transactions: true, non_personal_fund_transfer: true
   CardProgram.create name: 'Reimbursement', create_expense: false, receive_reimbursement: true,
                      personal_wallet_fund_transfer: false, spend_restrictions: false,
                      end_date_restrictions: true, manager_credit: false, manager_debit: false,
                      manager_blockable: false, manager_view_balance: false, manager_view_eligibility: true,
-                     manager_view_transactions: false
+                     manager_view_transactions: false, non_personal_fund_transfer: false
 end
 
 ##########################
