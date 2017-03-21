@@ -185,7 +185,7 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <form class="form-horizontal form-download-resources" action="/download_resources.json" method="post">
+            <form class="form-horizontal form-download-resources" >
                <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
               <input type="hidden" class="input-file-index" name="file_index">
               <fieldset>
@@ -227,7 +227,9 @@
 
               </fieldset>
             </form>
- 
+            <form action="/download_resource" method="get" class="actually-download-resource">
+              <input type="hidden" name="file_index" class="input-file-index" />
+            </form>
           </div>
         </div>
       </div>
@@ -430,52 +432,35 @@
       });
     });
 
-//    $(".form-download-resources").on('submit', function(e){
-//      e.preventDefault();
-//      form = this
-//
-//      $.ajax({
-//        url: '/download_resources',
-//        data: $(form).serialize(),
-//        type: "POST",
-//        dataType: 'json',
-//        success: function(res){
-//          // console.log(res);
-//          if(res.success === true){
-//            ohSnap("Thank you. Resource file will start downloading in a bit.", {color: 'green', 'duration': '6000'});
-//            if (typeof window.chrome !== 'undefined') {
-//                // Chrome version
-//                var link = document.createElement('a');
-//                link.href = window.URL.createObjectURL(res);
-//                link.download = "PdfName-" + new Date().getTime() + ".pdf";
-//                link.click();
-//            } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
-//                // IE version
-//                var blob = new Blob([res], { type: 'application/pdf' });
-//                window.navigator.msSaveBlob(blob, filename);
-//            } else {
-//                // Firefox version
-//                var file = new File([res], filename, { type: 'application/force-download' });
-//                window.open(URL.createObjectURL(file));
-//            }
-////            win =  window.open(res.file_src, '_blank');
-////            win.focus();
-//            // window.location = res.file_src
-//
-//
-//
-//            if($(form).closest('.modal').length >= 0){
-//              $(form).closest('.modal').modal('hide');
-//            }
-//            // $("#resource-downloader").attr('href', res.file_src);
-//            // $("#resource-downloader").click();
-//          } else {
-//            snapNotify(res.messages)
-//            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
-//          }
-//        }
-//      });
-//    });
+    $(".form-download-resources").on('submit', function(e){
+      e.preventDefault();
+      form = this;
+      modal = $(form).closest('.modal')
+
+      $.ajax({
+        url: '/resources_details',
+        data: $(form).serialize(),
+        type: "POST",
+        dataType: 'json',
+        success: function(res){
+          // console.log(res);
+          if(res.success === true){
+            ohSnap("Thank you. Resource file will start downloading in a bit.", {color: 'green', 'duration': '6000'});
+            $(modal).find('form.actually-download-resource').submit();
+
+
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide');
+            }
+            // $("#resource-downloader").attr('href', res.file_src);
+            // $("#resource-downloader").click();
+          } else {
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+          }
+        }
+      });
+    });
 
   });
 </script>

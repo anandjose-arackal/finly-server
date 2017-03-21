@@ -10,19 +10,21 @@ class RegistrationsController < ApplicationController
     end
   end
 
-  def download_resources
+  def resource_requests
     @result = ResourceRequests::Create.(nil, params)
-    if @result.success?
-      respond_to do |format|
-        format.json {send_file @result.file_url, :type=>"application/pdf"}
-      end
-    else
-      respond_to do |format|
-        format.json {
-          render js: "ohSnap('Something')"
-        }
-      end
+    respond
+  end
+
+  def resources_download
+    case params[:file_index]
+      when '1'
+        file_url = "#{Rails.root}/public/common/files/Say_No_to_Spreadsheets.pdf"
+      when '2'
+        file_url = "#{Rails.root}/public/common/files/Expense_Management_Checklist.pdf"
+      else
+        file_url = "#{Rails.root}/public/common/files/Say_No_to_Spreadsheets.pdf"
     end
+    send_file file_url, :type=>"application/pdf"
   end
 
   private
