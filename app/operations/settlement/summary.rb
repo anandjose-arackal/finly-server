@@ -55,26 +55,42 @@ class Settlement::Summary < Settlement::Base
     personal = user == selected_user
     result = User::Balance.(user, target_user: selected_user, target_user_all: true).balances
     self.balances = {}
-    result[:target_user].each do |item|
-      next if item[:type].blank?
-      case item[:type]
-        when :wallet
-          self.balances[:wallet] = {balance: item[:balance]}
-        when :card
-          self.balances[:card] = [] if self.balances[:card].blank?
-          card = Card.with_id(item[:id]).first
-          creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
-          debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
-          self.balances[:card] << {id: item[:id], program_name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
-                                   eligibility: item[:eligibility], creditable: creditable, debitable: debitable, enabled: card.active}
-        when :cash_on_hand
-          self.balances[:cash_on_hand] = {balance: item[:balance]}
-        when :pending_money_requests
-          self.balances[:pending_money_requests] = {balance: item[:balance], count: item[:count]}
-        when :pending_reports
-          self.balances[:pending_reports] = {balance: item[:balance], count: item[:count]}
+
+    self.balances[:wallet] = {balance: result[:target_user][:wallet][:balance], name: 'Finly Money'}
+    if result[:target_user][:card].present?
+      self.balances[:cards] = []
+      result[:target_user][:card].each do |id, item|
+        card = Card.with_id(id).first
+        creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
+        debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
+        self.balances[:cards] << {id: item[:id], program_name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
+                                 eligibility: item[:eligibility], creditable: creditable, debitable: debitable, enabled: card.active}
       end
     end
+    self.balances[:cash_on_hand] = {balance: result[:target_user][:cash_on_hand][:balance], name: 'Cash on Hand'}
+    self.balances[:pending_money_requests] = {balance: result[:target_user][:pending_money_requests][:balance], count: result[:target_user][:pending_money_requests][:count]}
+    self.balances[:pending_reports] = {balance: result[:target_user][:pending_reports][:balance], count: result[:target_user][:pending_reports][:count]}
+
+    # result[:target_user].each do |item|
+    #   next if item[:type].blank?
+    #   case item[:type]
+    #     when :wallet
+    #       self.balances[:wallet] = {balance: item[:balance]}
+    #     when :card
+    #       self.balances[:card] = [] if self.balances[:card].blank?
+    #       card = Card.with_id(item[:id]).first
+    #       creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
+    #       debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
+    #       self.balances[:card] << {id: item[:id], program_name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
+    #                                eligibility: item[:eligibility], creditable: creditable, debitable: debitable, enabled: card.active}
+    #     when :cash_on_hand
+    #       self.balances[:cash_on_hand] = {balance: item[:balance]}
+    #     when :pending_money_requests
+    #       self.balances[:pending_money_requests] = {balance: item[:balance], count: item[:count]}
+    #     when :pending_reports
+    #       self.balances[:pending_reports] = {balance: item[:balance], count: item[:count]}
+    #   end
+    # end
   end
 
   def load_transfer_options
@@ -86,7 +102,7 @@ class Settlement::Summary < Settlement::Base
     from_user_name = 'Your'
     personal_transfer = self.user == self.selected_user
     to_user_name = personal_transfer ? 'Your' : self.selected_user.name
-Ø
+
     # From Actions
     # Virtual Account
     if user.company_admin?
