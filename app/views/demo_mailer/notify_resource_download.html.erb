@@ -1,14 +1,13 @@
 <% content_for :body do %>
-    <h3><%= "#{@resource_request.company}" %> has requested for a demo of our product. The details are as follows: </h3>
+    <h3><%= "#{@resource_request.name}" %> has downloaded the resource <%=@resource_request.resource_file_name%> from our website. The details are as follows: </h3>
 
-    <h4>Requester Name: <%= @preview_registration.name %></h4>
+    <h4>Downloader Name: <%= @resource_request.name %></h4>
     <br/>
-    <h4>Requester Email: <%= @preview_registration.email %></h4>
+    <h4>Downloader Email: <%= @resource_request.email %></h4>
     <br/>
-    <h4>Requester Mobile Number: <%= @preview_registration.phone_number %></h4>
+    <h4>Downloader Mobile Number: <%= @resource_request.mobile_number %></h4>
     <br/>
-    <h4>Company: <%= @preview_registration.company %></h4>
-    <br/>
+
 <% end %>
 
 <%= render 'application_mailer/template' %>

@@ -11,17 +11,16 @@ class RegistrationsController < ApplicationController
   end
 
   def download_resources
-    if params[:file_index].to_i == 1 
-      file = '/common/files/Say_No_to_Spreadsheets.pdf'
-    elsif params[:file_index].to_i == 2
-      file = '/common/files/Expense_Management_Checklist.pdf'
-    end
-
-    resource_request = ResourceRequest.new(resource_request_params)
-    if resource_request.save!
-      @result = {success: true, file_src: file}
+    @result = ResourceRequests::Create.(nil, params)
+    if @result.success?
       respond_to do |format|
-        format.json{ render json: @result.as_json}
+        format.json {send_file @result.file_url, :type=>"application/pdf"}
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render js: "ohSnap('Something')"
+        }
       end
     end
   end
