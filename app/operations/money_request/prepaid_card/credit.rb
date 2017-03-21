@@ -80,7 +80,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       end
 
       result = User::Wallet::Credit.(user, initiating_account_type: initiating_account_type, initiating_account_id: initiating_account_id,
-          receiving_account_type: receiving_account_type, receiving_account_id: receiving_account_id, to_user: to_user, amount: self.amount, password: params[:password])
+          receiving_account_type: receiving_account_type, receiving_account_id: receiving_account_id, receiving_user: to_user, amount: self.amount, password: params[:password])
 
       if result.failure?
         add_message :error, result.messages[:error]
