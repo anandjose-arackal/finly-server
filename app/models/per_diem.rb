@@ -24,5 +24,6 @@ class PerDiem < ActiveRecord::Base
 
   delegate :rate_value, to: :rate
 
-  scope :find_from_id, -> (id) {find_by(id: id)}
+  scope :with_id, -> (id) {where id: id}
+  scope :find_from_id, -> (id) {where(id: id).first}
 end

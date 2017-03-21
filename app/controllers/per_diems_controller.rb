@@ -31,6 +31,10 @@ class PerDiemsController < ApplicationController
 
   def destroy
     @result = ExpenseTypes::ExPerDiem::Destroy.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success, message: @result.messages
+    else
+      respond response: :failure, message: @result.messages
+    end
   end
 end

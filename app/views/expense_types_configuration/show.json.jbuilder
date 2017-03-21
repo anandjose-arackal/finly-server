@@ -16,6 +16,7 @@ json.per_diem_config do
     json.array! @result.per_diem_config[:per_diems].each do |per_diem|
       json.name per_diem[:name]
       json.rate per_diem[:rate]
+      json.id per_diem[:id]
     end
   end
 end

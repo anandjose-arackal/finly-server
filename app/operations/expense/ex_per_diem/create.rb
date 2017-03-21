@@ -19,6 +19,11 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     if quantity_value.present? and quantity_value <= 0
       messages[:error] << 'Quantity cannot be less than or equal to 0'
     end
+    per_diem_id = params[:expense][:per_diem_expense_attributes][:per_diem_id].to_d rescue nil
+    per_diem = PerDiem.find_from_id(per_diem_id)
+    if per_diem.blank?
+      add_message :error, "You have to select an associated per diem"
+    end
   end
 
   def init

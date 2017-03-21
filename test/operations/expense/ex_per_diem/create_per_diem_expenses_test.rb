@@ -8,7 +8,7 @@ class CreatePerDiemExpensesTest < ActiveSupport::TestCase
     @finance_manager = User.second
     @manager = User.third
     @receipt_image = File.open("#{Rails.root}/app/assets/images/1363397.png")
-    @valid_expense_params = { expense: {time_expense_attributes: {time_object_attributes: {value: '100'}},
+    @valid_expense_params = { expense: {per_diem_expense_attributes: {time_object_attributes: {value: '100'}},
                                         note: "Sample note",
                                         category_id: '3',
                                         date: "18-03-2017",

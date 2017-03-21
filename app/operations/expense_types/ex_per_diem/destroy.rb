@@ -24,10 +24,10 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
     id = params[:id] || params[:per_diem_id]
     case params[:parent_type]
       when 'company'
-        self.per_diem = company.per_diems.find_from_id(id) rescue nil
+        self.per_diem = user.company.per_diems.with_id(id) rescue nil
       when 'policy'
-        policy = company.policies.find_from_id(params[:parent_id])
-        self.per_diem = policy.per_diems.find_from_id(id)
+        policy = user.company.policies.with_id(params[:parent_id])
+        self.per_diem = policy.per_diems.with_id(id) rescue nil
       else
         self.per_diem = nil
     end
@@ -49,8 +49,8 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
     end
   end
 
-  def success
-    true
+  def post_process
+    add_message :success, "Per Diem destroyed"
   end
 
 
