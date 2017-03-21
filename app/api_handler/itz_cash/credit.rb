@@ -14,7 +14,7 @@ class ItzCash::Credit < ItzCash::Base
       add_message :error, 'Amount cannot be blank'
       return
     end
-    if params[:card_id].blank? or user.cards.with_id(params[:card_id].blank?)
+    if params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
       add_message :error, 'Card not found'
       return
     end
