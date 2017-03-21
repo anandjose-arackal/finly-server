@@ -26,7 +26,6 @@ class CardsController < ApplicationController
         # Value = 2
         @result = User::Wallet::Debit.(current_user, params)
     end
-    debugger
   end
 
   # params = { disable_note: 'why am i disabling this card', action_type: 1, password: 'password' }
