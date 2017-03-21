@@ -64,23 +64,29 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     if parent.distance_expense_config.enabled
       self.distance_config = {enabled: true,
                               rate_per_km: parent.distance_expense_config.rate_per_km,
-                              default_category_id: parent.distance_expense_config.default_category_id
+                              default_category_id: parent.distance_expense_config.default_category_id,
+                              default_category_name: parent.distance_expense_config.default_category_name
+
                              }
     else
       self.distance_config = {enabled: false,
                               rate_per_km: parent.distance_expense_config.rate_per_km,
-                              default_category_id: parent.distance_expense_config.default_category_id
+                              default_category_id: parent.distance_expense_config.default_category_id,
+                              default_category_name: parent.distance_expense_config.default_category_name
                               }
     end
     if parent.time_expense_config.enabled
       self.time_config = {enabled: true,
                           rate_per_hour: parent.time_expense_config.rate_per_hour,
-                          default_category_id: parent.time_expense_config.default_category_id
+                          default_category_id: parent.time_expense_config.default_category_id,
+                          default_category_name: parent.distance_expense_config.default_category_name
                           }
     else
       self.time_config = {enabled: false,
                           rate_per_hour: parent.time_expense_config.rate_per_hour,
-                          default_category_id: parent.time_expense_config.default_category_id
+                          default_category_id: parent.time_expense_config.default_category_id,
+                          default_category_name: parent.distance_expense_config.default_category_name
+
                           }
     end
     if parent.per_diem_expense_config.enabled
@@ -97,7 +103,8 @@ class ExpenseTypes::Show < ExpenseTypes::Base
       self.per_diem_config[:per_diems] = []
       parent.per_diems.each do |per_diem|
         self.per_diem_config[:per_diems] << {name: per_diem.name,
-                                             rate: per_diem.rate_value
+                                             rate: per_diem.rate_value,
+                                             id: per_diem.id
         }
       end
     end

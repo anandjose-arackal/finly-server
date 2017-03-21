@@ -41,11 +41,15 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.time_config = {enabled: user.time_expense_enabled?}
     self.per_diem_config = {enabled: user.per_diem_expense_enabled?}
     if per_diem_config
-      per_diem_config[:per_diems] = []
-      user.per_diems_list.each do |per_diem|
-        per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
-                                        id: per_diem.id
-                                        }
+      if user.per_diems_list.empty?
+        self.per_diem_config = {enabled: false}
+      else
+        per_diem_config[:per_diems] = []
+        user.per_diems_list.each do |per_diem|
+          per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
+                                          id: per_diem.id
+          }
+        end
       end
     end
   end

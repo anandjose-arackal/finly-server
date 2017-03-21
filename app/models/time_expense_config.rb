@@ -20,6 +20,14 @@ class TimeExpenseConfig < ActiveRecord::Base
   validate :rate_exists_for_enabled
   validates :parent, presence: true
 
+  def default_category_name
+    if self.default_category_id
+      return Category.find(default_category_id).name
+    else
+      ""
+    end
+  end
+
   private
 
   def rate_exists_for_enabled

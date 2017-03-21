@@ -5,13 +5,13 @@
 #                                     currency_id: 1}
 #
 #               },
-#     level_id: '1',
-#     per_diem_level: 'company'
+#     parent_id: '1',
+#     parent_type: 'company'
 # }
 
 class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::ExPerDiem::Base
 
-  attr_accessor :configurable_object, :per_diem
+  attr_accessor :parent_object, :per_diem
 
   def authorized_user_types
     [:company_admin, :policy_admin]
@@ -24,12 +24,12 @@ class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::ExPerDiem::Base
   end
 
   def init
-    case params[:per_diem_level]
+    case params[:parent_type]
       when 'company'
-        self.configurable_object = user.company
+        self.parent_object = user.company
       when 'policy'
         company = user.company
-        self.configurable_object = company.policies.find_from_id(params[:level_id])
+        self.parent_object = company.policies.find_from_id(params[:parent_id])
       else
         # do nothing
     end
@@ -44,7 +44,7 @@ class ExpenseTypes::ExPerDiem::Create < ExpenseTypes::ExPerDiem::Base
   end
 
   def process
-    self.per_diem = configurable_object.per_diems.build(per_diem_params)
+    self.per_diem = parent_object.per_diems.build(per_diem_params)
     unless per_diem.save
       messages[:error] = per_diem.errors.full_messages
     end

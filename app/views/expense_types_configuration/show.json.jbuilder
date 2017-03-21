@@ -2,11 +2,13 @@ json.distance_config do
   json.enabled @result.distance_config[:enabled]
   json.rate_per_km @result.distance_config[:rate_per_km]
   json.default_category_id @result.distance_config[:default_category_id]
+  json.default_category_name @result.distance_config[:default_category_name]
 end
 json.time_config do
   json.enabled @result.time_config[:enabled]
   json.rate_per_hour @result.time_config[:rate_per_hour]
   json.default_category_id @result.time_config[:default_category_id]
+  json.default_category_name @result.distance_config[:default_category_name]
 end
 json.per_diem_config do
   json.enabled @result.per_diem_config[:enabled]

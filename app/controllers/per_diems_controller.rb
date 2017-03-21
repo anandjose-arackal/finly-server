@@ -1,17 +1,28 @@
 class PerDiemsController < ApplicationController
 
+  before_action :authenticate_user!
+  allow_oauth!
+
   def show
 
   end
 
   def create
-    @result = ExpenseTypes::ExPerDiem::Create.(user, params)
-    respond
+    @result = ExpenseTypes::ExPerDiem::Create.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages
+    else
+      respond response: :failure, message: @result.messages
+    end
   end
 
   def update
-    @result = ExpenseTypes::ExPerDiem::Update.(user, params)
-    respond
+    @result = ExpenseTypes::ExPerDiem::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages
+    else
+      respond response: :failure, message: @result.messages
+    end
   end
 
   def index
@@ -19,7 +30,7 @@ class PerDiemsController < ApplicationController
   end
 
   def destroy
-    @result = ExpenseTypes::ExPerDiem::Destroy.(user, params)
+    @result = ExpenseTypes::ExPerDiem::Destroy.(current_user, params)
     respond
   end
 end

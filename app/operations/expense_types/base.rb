@@ -15,7 +15,7 @@ class ExpenseTypes::Base < BaseOperation
       end
     end
     if parent_object.is_a?(Policy)
-      unless user.policy_admin?(configurable_object)
+      unless user.policy_admin?(parent_object) || user.company_admin?
         raise_unauthorized_exception
       end
     end
