@@ -34,7 +34,7 @@ class User::Summary < User::Base
     balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
         target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true, view: params[:view]).balances
 
-    summary[:card] = []
+    summary[:cards] = []
     if self.selected_user.cards.present?
       self.selected_user.cards.each do |card|
         item = {}
@@ -45,13 +45,13 @@ class User::Summary < User::Base
         end
         item[:balance] = balances[:target_user][:card][card.id][:balance] rescue nil
         item[:available_eligibility] = balances[:target_user][:card][card.id][:eligibility] rescue nil
-        summary[:card] << item
+        summary[:cards] << item
       end
     end
 
-    summary[:wallet] = {balance: balances[:target_user][:wallet][:balance]}
+    summary[:wallet] = {id: selected_user.wallet.id, balance: balances[:target_user][:wallet][:balance], name: 'Finly Money'}
 
-    summary[:company_credits] = balances[:virtual_account] if selected_user.company_admin?
+    summary[:virtual_account] = balances[:virtual_account] if selected_user.company_admin?
 
     summary[:actions] = load_actions balances
 
