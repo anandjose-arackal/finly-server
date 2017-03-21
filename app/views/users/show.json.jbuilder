@@ -101,7 +101,7 @@ json.cards do
     if card[:configurable_restrictions]
       json.restrictions do
 
-        card_restriction = card.card_restriction
+        card_restriction = card_details[:card_restriction]
         card_limits = card_restriction.card_limits
 
         json.channel_atm card_restriction.channel_atm
