@@ -32,7 +32,7 @@ class User::Summary < User::Base
     self.summary = {}
 
     balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
-        target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true, view: params[:view]).balances
+        target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true, target_user_cash_in_hand: true, view: params[:view]).balances
 
     summary[:cards] = []
     if self.selected_user.cards.present?
@@ -52,6 +52,8 @@ class User::Summary < User::Base
     summary[:wallet] = {id: selected_user.wallet.id, balance: balances[:target_user][:wallet][:balance], name: 'Finly Money'}
 
     summary[:virtual_account] = balances[:virtual_account] if selected_user.company_admin?
+
+    summary[:cash_on_hand] = {name: 'Cash on Hand', balance: balances[:target_user][:cash_on_hand]}
 
     summary[:actions] = load_actions balances
 
