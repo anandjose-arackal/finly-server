@@ -17,7 +17,7 @@ class CardsController < ApplicationController
   # params = {action_type: 1, amount: 100, password: 'password', from_account: :virtual_account/:wallet/:card,
   # :to_account: :virtual_account/:wallet/:card }
   def update_balance
-    action_type = params[:type] rescue nil
+    action_type = params[:type] || params[:action_type] rescue nil
     case action_type
       when 'credit', :credit
         # Value = 1
@@ -26,6 +26,7 @@ class CardsController < ApplicationController
         # Value = 2
         @result = User::Wallet::Debit.(current_user, params)
     end
+    respond
   end
 
   # params = { disable_note: 'why am i disabling this card', action_type: 1, password: 'password' }
