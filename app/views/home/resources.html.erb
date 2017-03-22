@@ -29,16 +29,12 @@
 <div class="container" style="padding-bottom: 20px;">
   <div class="row">
     <div class="col-sm-12">
-      <h2>Resources</h2>
-      <div>
-
-        <!-- Nav tabs -->
+      <h2 style="margin-bottom: 20px;">Resources</h2>
+      <!-- <div>
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="active"><a href="#guides" aria-controls="guides" role="tab" data-toggle="tab">Guides</a></li>
           <li role="presentation"><a href="#videos" aria-controls="videos" role="tab" data-toggle="tab">Videos</a></li>
         </ul>
-
-        <!-- Tab panes -->
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="guides">
             <div class="row">
@@ -78,9 +74,26 @@
             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </div>
-          
         </div>
+      </div> -->
+      <p>
+        A collection of Resources co-authored by Team Finly. Check out these resources and download them for free.
+      </p>
+    </div>
 
+    <!-- <h3>Download Resources</h3> -->
+    <div class="row" style="padding: 0 15px; margin-top: 20px;">
+      <div class="col-sm-4 resource">
+        <img src="/common/resources/say-no-to-spreadsheets.jpg" class="">
+        <div class="download">
+          <button class="btn btn-primary btn-download" data-file-index="1" data-toggle="modal" data-target="#modal-download-resources">Download</button>
+        </div>
+      </div>
+      <div class="col-sm-4 resource">
+        <img src="/common/resources/expense-management.jpg" class="">
+        <div class="download">
+          <button class="btn btn-primary btn-download" data-file-index="2" data-toggle="modal" data-target="#modal-download-resources">Download</button>
+        </div>
       </div>
     </div>
   </div> 
@@ -124,7 +137,7 @@
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
                   <div class="col-md-4">
-                  <input id="phonenumber" name="preview[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                  <input id="phonenumber" name="preview[mobile_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
                     
                   </div>
                 </div>
@@ -157,9 +170,83 @@
 </div>
 <!--/ Modal box-->
 
-<style>
+<div class="modal fade" id="modal-download-resources" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-center form-title">Download Resources</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <img class="modal-resource-preview img-responsive" src="">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-horizontal form-download-resources" >
+               <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+              <input type="hidden" class="input-file-index" name="file_index">
+              <fieldset>
 
-  body{
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="name">Name</label>  
+                  <div class="col-md-4">
+                  <input id="name" name="request[name]" placeholder="Your Name" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="email">Email</label>  
+                  <div class="col-md-4">
+                  <input id="email" name="request[email]" placeholder="Your Work Email" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
+                  <div class="col-md-4">
+                  <input id="phonenumber" name="request[mobile_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Button -->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="submit"></label>
+                  <div class="col-md-4">
+                    <button id="submit" name="submit" class="btn btn-primary">Download</button>
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+            <form action="/download_resource" method="get" class="actually-download-resource">
+              <input type="hidden" name="file_index" class="input-file-index" />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+</div>
+
+<a id="resource-downloader" href="#" target="_blank" style="display:none;">Resource</a>
+
+<style>
+  html {
+    position: relative;
+    min-height: 100%;
+  }
+  body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
     background-color: #fff;
     /*padding: 90px 11.5% 60px  11.5%;*/
     padding-top: 75px;
@@ -206,7 +293,7 @@
     font-size: 16px;
     font-weight: 300;
     color: #404040;
-    margin-left: 20px;
+    margin-left: 0;
     text-align: justify;
 
   }
@@ -217,6 +304,46 @@
 
   hr {
     border-top: 1px solid #d8d8d8;
+  }
+
+  .download{
+    position: absolute;
+    display: none;
+  }
+  .resource{
+    min-width: 300px;
+    /*margin-bottom: 15px;*/
+    margin-top: 20px;
+    margin-right: 15px;
+  }
+  .resource img{
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+  }
+
+  .resource:hover .download{
+    display: block;
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+    top: 0;
+    width: 300px;
+    height: 100%;
+  }
+
+  .download .btn-download{
+    width: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 90%;
+  }
+
+  #modal-download-resources img.modal-resource-preview{
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
   }
 </style>
 <script type="text/javascript">
@@ -272,9 +399,18 @@
       }
     }
 
+    $(".btn-download").on('click', function(e){
+      var file_index = $(this).attr('data-file-index');
+      img_src = $(this).closest('.resource').find('img').attr('src');
+      console.log(file_index, img_src);
+
+      $("#modal-download-resources").find('input.input-file-index').val(file_index);
+      $("#modal-download-resources").find('.modal-resource-preview').attr('src', img_src);
+    })
+
     $(".form-request-demo").on('submit', function(e){
       e.preventDefault();
-      form = this
+      form = this;
 
       $.ajax({
         url: '/welcome/preview',
@@ -295,5 +431,36 @@
         }
       });
     });
+
+    $(".form-download-resources").on('submit', function(e){
+      e.preventDefault();
+      form = this;
+      modal = $(form).closest('.modal')
+
+      $.ajax({
+        url: '/resources_details',
+        data: $(form).serialize(),
+        type: "POST",
+        dataType: 'json',
+        success: function(res){
+          // console.log(res);
+          if(res.success === true){
+            ohSnap("Thank you. Resource file will start downloading in a bit.", {color: 'green', 'duration': '6000'});
+            $(modal).find('form.actually-download-resource').submit();
+
+
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide');
+            }
+            // $("#resource-downloader").attr('href', res.file_src);
+            // $("#resource-downloader").click();
+          } else {
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+          }
+        }
+      });
+    });
+
   });
 </script>

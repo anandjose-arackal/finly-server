@@ -555,6 +555,8 @@ Rails.application.routes.draw do
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+  post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
+  get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
   devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
     # get 'login', to: 'sessions#new', as: :login

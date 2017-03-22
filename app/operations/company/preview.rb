@@ -33,6 +33,4 @@ class Company::Preview < BaseOperation
   def preview_params
     params.require(:preview).permit(:name, :phone_number, :email, :company)
   end
-
-
 end

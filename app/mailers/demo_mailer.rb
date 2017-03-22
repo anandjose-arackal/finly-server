@@ -9,4 +9,9 @@ class DemoMailer < ApplicationMailer
     @preview_registration = preview_registration
     mail to: recipient, subject: 'New demo request'
   end
+
+  def notify_resource_download(resource_request, recipient)
+    @resource_request = resource_request
+    mail to: recipient, subject: "New Resource Download"
+  end
 end
