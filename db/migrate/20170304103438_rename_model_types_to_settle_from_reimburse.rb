@@ -1,12 +1,19 @@
 class RenameModelTypesToSettleFromReimburse < ActiveRecord::Migration
   def up
-    ReportStatus.find(6).update(name: "Settled")
-    ReportStatus.find(7).update(name: "Settlement Confirmed")
+    if ReportStatus.count > 0
+      ReportStatus.find(6).update(name: "Settled")
+      ReportStatus.find(7).update(name: "Settlement Confirmed")
+    end
 
-    ReportCommentAction.find(11).update(name: "report_settled")
-    ReportCommentAction.find(12).update(name: "report_settlement_confirmed")
+    if ReportCommentAction.count > 0
+      ReportCommentAction.find(11).update(name: "report_settled")
+      ReportCommentAction.find(12).update(name: "report_settlement_confirmed")
+    end
 
-    NotifierType.find(9).update(name: "report_settled")
+    if NotifierType.count > 0
+      NotifierType.find(9).update(name: "report_settled")
+    end
+
   end
 
   def down
