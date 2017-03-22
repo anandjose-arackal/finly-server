@@ -634,8 +634,8 @@ class FinlyF.Views.SettlementsIndex extends Backbone.View
       # when 'withdraw-funds-finlymoney'
       when 'process-reports'
         $(modal).find('.modal-title').text("Settle Reports")
-        $(modal).find(".settlement-step-1 .panel-heading .step-title .title").text("Select Reports to be Reimbursed")
-        $(modal).find(".settlement-step-2 .panel-heading .step-title .title").text("Choose Reimbursement Options")
+        $(modal).find(".settlement-step-1 .panel-heading .step-title .title").text("Select Reports to be Settled")
+        $(modal).find(".settlement-step-2 .panel-heading .step-title .title").text("Choose Settlement Options")
         #Append base structure
         $(modal).find('.settlement-step-1 .panel-body').html(@tInitReports({summary: @selectedUserSummary}))
 

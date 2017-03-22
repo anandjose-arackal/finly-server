@@ -1,0 +1,13 @@
+<% content_for :body do %>
+    <h3><%= "#{@resource_request.name}" %> has downloaded the resource <%=@resource_request.resource_file_name%> from our website. The details are as follows: </h3>
+
+    <h4>Downloader Name: <%= @resource_request.name %></h4>
+    <br/>
+    <h4>Downloader Email: <%= @resource_request.email %></h4>
+    <br/>
+    <h4>Downloader Mobile Number: <%= @resource_request.mobile_number %></h4>
+    <br/>
+
+<% end %>
+
+<%= render 'application_mailer/template' %>

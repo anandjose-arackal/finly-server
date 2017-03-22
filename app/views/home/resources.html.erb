@@ -137,7 +137,7 @@
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
                   <div class="col-md-4">
-                  <input id="phonenumber" name="preview[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                  <input id="phonenumber" name="preview[mobile_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
                     
                   </div>
                 </div>
@@ -185,8 +185,8 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <form class="form-horizontal form-download-resources">
-              <!-- <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden"> -->
+            <form class="form-horizontal form-download-resources" >
+               <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
               <input type="hidden" class="input-file-index" name="file_index">
               <fieldset>
 
@@ -212,7 +212,7 @@
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
                   <div class="col-md-4">
-                  <input id="phonenumber" name="request[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                  <input id="phonenumber" name="request[mobile_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
                     
                   </div>
                 </div>
@@ -227,7 +227,9 @@
 
               </fieldset>
             </form>
- 
+            <form action="/download_resource" method="get" class="actually-download-resource">
+              <input type="hidden" name="file_index" class="input-file-index" />
+            </form>
           </div>
         </div>
       </div>
@@ -432,10 +434,11 @@
 
     $(".form-download-resources").on('submit', function(e){
       e.preventDefault();
-      form = this
+      form = this;
+      modal = $(form).closest('.modal')
 
       $.ajax({
-        url: '/download_resources',
+        url: '/resources_details',
         data: $(form).serialize(),
         type: "POST",
         dataType: 'json',
@@ -443,10 +446,7 @@
           // console.log(res);
           if(res.success === true){
             ohSnap("Thank you. Resource file will start downloading in a bit.", {color: 'green', 'duration': '6000'});
-            win =  window.open(res.file_src, '_blank');
-            win.focus();
-            // window.location = res.file_src
-
+            $(modal).find('form.actually-download-resource').submit();
 
 
             if($(form).closest('.modal').length >= 0){

@@ -10,20 +10,21 @@ class RegistrationsController < ApplicationController
     end
   end
 
-  def download_resources
-    if params[:file_index].to_i == 1 
-      file = '/common/files/Say_No_to_Spreadsheets.pdf'
-    elsif params[:file_index].to_i == 2
-      file = '/common/files/Expense_Management_Checklist.pdf'
-    end
+  def resource_requests
+    @result = ResourceRequests::Create.(nil, params)
+    respond
+  end
 
-    resource_request = ResourceRequest.new(resource_request_params)
-    if resource_request.save!
-      @result = {success: true, file_src: file}
-      respond_to do |format|
-        format.json{ render json: @result.as_json}
-      end
+  def resources_download
+    case params[:file_index]
+      when '1'
+        file_url = "#{Rails.root}/public/common/files/Say_No_to_Spreadsheets.pdf"
+      when '2'
+        file_url = "#{Rails.root}/public/common/files/Expense_Management_Checklist.pdf"
+      else
+        file_url = "#{Rails.root}/public/common/files/Say_No_to_Spreadsheets.pdf"
     end
+    send_file file_url, :type=>"application/pdf"
   end
 
   private
