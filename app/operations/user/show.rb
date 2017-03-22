@@ -75,6 +75,7 @@ class User::Show < User::Base
           active = card.active
           name = "#{card.card_program.name} Card"
           ending_number = card.ending_number
+          id = card.id
 
           if not personal and card.card_program.manager_blockable
             card_params = {}
@@ -104,7 +105,7 @@ class User::Show < User::Base
                                 ending_number: ending_number,
                                 configurable_restrictions: configurable_restrictions, balance: balance,
                                 eligibility: eligibility, disabled_by: disabled_by,
-                                active: active, name: name},
+                                active: active, name: name, id: id},
                          actions: actions, card_restriction: card.card_restriction}
         end
       end
