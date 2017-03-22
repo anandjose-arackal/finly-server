@@ -31,6 +31,8 @@ class Card < ActiveRecord::Base
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 
+  accepts_nested_attributes_for :card_program
+
   has_one :card_restriction, dependent: :destroy
 
   has_many :card_balance_history, dependent: :destroy

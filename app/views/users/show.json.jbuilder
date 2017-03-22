@@ -96,7 +96,7 @@ json.cards do
     card = card_details[:card]
     actions = card_details[:actions]
 
-    json.extract! card, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility
+    json.extract! card, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility, :id
     json.disabled_by do
       json.name card.disabled_by_user.name rescue nil
       role_name = nil
