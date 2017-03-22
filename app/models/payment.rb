@@ -72,8 +72,8 @@ class Payment < ActiveRecord::Base
                                       PaymentType.id_for(:atm_withdrawal), [PaymentType.id_for(:credit), PaymentType.id_for(:debit)], [Payment::AccountType::WALLET, Payment::AccountType::CARD],
                                       [Payment::AccountType::WALLET, Payment::AccountType::CARD]) }
   scope :non_settlement, -> { where.not('initiating_user_id = receiving_user_id AND payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)',
-                                        [PaymentType.id_for(:credit), PaymentType.id_for(:debit), [Payment::AccountType::WALLET, Payment::AccountType::CARD],
-                                         [Payment::AccountType::WALLET, Payment::AccountType::CARD]]).where.not(payment_type_id: [PaymentType.id_for(:atm_withdrawal)]) }
+                                        [PaymentType.id_for(:credit), PaymentType.id_for(:debit)], [Payment::AccountType::WALLET, Payment::AccountType::CARD],
+                                         [Payment::AccountType::WALLET, Payment::AccountType::CARD]).where.not(payment_type_id: [PaymentType.id_for(:atm_withdrawal)]) }
 
   # scope :personal, -> { where "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:debit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }
   # scope :non_personal, -> { where.not "initiating_user_id = receiving_user_id AND (payment_type_id = #{PaymentType.id_for(:credit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:debit_from_wallet_to_card)} OR payment_type_id = #{PaymentType.id_for(:atm_withdrawal)})" }

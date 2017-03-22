@@ -36,7 +36,7 @@ class User::Wallet::Debit < User::Wallet::Base
     payment_attributes[:payment_type_id] = PaymentType.id_for(:credit)
     payment_attributes[:initiating_account] = initiating_account
     payment_attributes[:receiving_account] = receiving_account
-    self.payment = Payment.build payment_attributes
+    self.payment = Payment.new payment_attributes
 
     unless self.payment.valid?
       add_message :error, self.payment.errors.full_messages

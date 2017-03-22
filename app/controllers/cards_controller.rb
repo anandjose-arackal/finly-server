@@ -17,12 +17,12 @@ class CardsController < ApplicationController
   # params = {action_type: 1, amount: 100, password: 'password', from_account: :virtual_account/:wallet/:card,
   # :to_account: :virtual_account/:wallet/:card }
   def update_balance
-    action_type = params[:action_type].to_i rescue nil
+    action_type = params[:type] rescue nil
     case action_type
-      when User::Wallet::Base::ACTIONS[:credit]
+      when 'credit', :credit
         # Value = 1
         @result = User::Wallet::Credit.(current_user, params)
-      when User::Wallet::Base::ACTIONS[:debit]
+      when 'debit', :debit
         # Value = 2
         @result = User::Wallet::Debit.(current_user, params)
     end

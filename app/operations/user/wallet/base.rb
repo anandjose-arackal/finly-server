@@ -18,8 +18,7 @@ class User::Wallet::Base < BaseOperation
 
   def pre_validate
     super
-    if params.blank? or params[:initiating_account_type].blank? or params[:receiving_account_type].blank? or
-        (params[:receiving_user].blank? and params[:receiving_user_id].blank?)
+    if params.blank? or params[:initiating_account_type].blank? or params[:receiving_account_type].blank? or (params[:receiving_user].blank? and params[:receiving_user_id].blank?)
       add_message :error, 'Invalid request'
       return
     end
@@ -68,11 +67,11 @@ class User::Wallet::Base < BaseOperation
 
     if initiating_user.present?
       case self.initiating_account_type
-        when Payment::AccountType::VIRTUAL_ACCOUNT
+        when :virtual_account
           self.initiating_account = initiating_user.company
-        when Payment::AccountType::WALLET
+        when :wallet
           self.initiating_account = initiating_user.wallet
-        when Payment::AccountType::Card
+        when :card
           if initiating_account_id.present?
             self.initiating_account = initiating_user.cards.with_id(initiating_account_id).first rescue nil
           end
@@ -83,11 +82,11 @@ class User::Wallet::Base < BaseOperation
     self.receiving_account_id = params[:receiving_account_id]
     if receiving_user.present?
       case self.receiving_account_type
-        when Payment::AccountType::VIRTUAL_ACCOUNT
+        when :virtual_account
           self.receiving_account = receiving_user.company
-        when Payment::AccountType::WALLET
+        when :wallet
           self.receiving_account = receiving_user.wallet
-        when Payment::AccountType::Card
+        when :card
           if receiving_account_id.present?
             self.receiving_account = receiving_user.cards.with_id(receiving_account_id).first rescue nil
           end

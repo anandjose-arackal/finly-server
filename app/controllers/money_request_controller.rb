@@ -20,11 +20,11 @@ class MoneyRequestController < ApplicationController
   # params[:type] = types given below
   def update
     # fail
-    if params[:type].blank?
+    if params[:action_type].blank?
       respond_failure 'Invalid update type'
       return
     end
-    case params[:type].to_sym
+    case params[:action_type].to_sym
       when :update
         @result = MoneyRequest::Update.(current_user, params)
       when :submit
