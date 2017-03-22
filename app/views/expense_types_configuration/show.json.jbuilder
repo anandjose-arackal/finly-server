@@ -8,7 +8,7 @@ json.time_config do
   json.enabled @result.time_config[:enabled]
   json.rate_per_hour @result.time_config[:rate_per_hour]
   json.default_category_id @result.time_config[:default_category_id]
-  json.default_category_name @result.distance_config[:default_category_name]
+  json.default_category_name @result.time_config[:default_category_name]
 end
 json.per_diem_config do
   json.enabled @result.per_diem_config[:enabled]
