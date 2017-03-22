@@ -46,11 +46,11 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
 
   end
 
-  def pre_process
-    if update_params[:enabled] == '0'
-      update_params[:rate_per_hour] = nil
-    end
-  end
+  # def pre_process
+  #   if update_params[:enabled] == '0'
+  #     update_params[:rate_per_hour] = nil
+  #   end
+  # end
 
   def process
     unless time_config.update(update_params)
