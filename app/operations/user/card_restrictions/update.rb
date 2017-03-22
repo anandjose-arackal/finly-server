@@ -20,7 +20,7 @@ class User::CardRestrictions::Update < User::Base
     if params[:card_id].blank?
       add_message :error, 'Card not found'
     end
-    if params[:user_id].blank? and params[:id].blank?
+    if params[:user_id].blank? && params[:id].blank?
       add_message :error, 'User not found'
     end
   end
@@ -29,7 +29,7 @@ class User::CardRestrictions::Update < User::Base
     # self.selected_user = user.company.users.find_by(id: params[:id])
     self.selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
     return if selected_user.blank?
-    self.selected_card = selected_user.cards.with_id(card_id: params[:card_id])
+    self.selected_card = selected_user.cards.with_id(params[:card_id]).first
     return if selected_card.blank?
     self.card_restriction = selected_card.card_restriction
     self.card_limits = self.card_restriction.card_limits

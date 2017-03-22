@@ -19,14 +19,14 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
   end
 
   def validate
-    super
+    super   
     return if has_errors?
-    if self.card_id.blank?
+    if self.card_id.blank?  
       add_message :error, 'Card not found'
       return
     end
   end
-
+  
   def process
     self.block_presenter = ItzCash::Block.(selected_user, card_id: self.card_id)
     if block_presenter.failure?
