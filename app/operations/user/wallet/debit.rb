@@ -1,6 +1,6 @@
 # params = {receiving_account: :virtual_account/wallet,initiating_account: wallet/card, initiating_user_id: 1, password: 'password' }
 class User::Wallet::Debit < User::Wallet::Base
-  
+
   def validate_sufficient_funds
     if receiving_account_type == :wallet and receiving_account.balance_value < self.amount
       add_message :error, 'Insufficient funds to initiate the transfer'
@@ -68,6 +68,7 @@ class User::Wallet::Debit < User::Wallet::Base
           end
 
         elsif initiating_account == :card
+<<<<<<< HEAD
           receiving_user.wallet.subtract_funds(self.amount)
           credit_presenter = ItzCash::Credit.(initiating_user, card_id: receiving_account_id, amount: self.amount)
           if credit_presenter.success?
@@ -78,8 +79,22 @@ class User::Wallet::Debit < User::Wallet::Base
             # restore funds to receiving_user's wallet
             receiving_user.wallet.add_funds(self.amount)
             add_message :error, credit_presenter.messages[:error]
-          end
+=======
+          if receiving_user.wallet.subtract_funds(self.amount)
+            credit_presenter = ItzCash::Credit.(initiating_user, card_id: receiving_account_id, amount: self.amount)
+            if credit_presenter.success?
 
+              add_message :success, 'Debit successful'
+              self.payment.save
+            else
+              # restore funds to receiving_user's wallet
+              receiving_user.wallet.add_funds(self.amount)
+              add_message :error, credit_presenter.messages[:error]
+            end
+          else
+            add_message :error, receiving_user.wallet.errors.full_messages
+>>>>>>> b0588031f038ccea847177e72976addc23a15300
+          end
         end
 
       when :card
