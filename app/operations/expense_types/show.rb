@@ -79,13 +79,13 @@ class ExpenseTypes::Show < ExpenseTypes::Base
       self.time_config = {enabled: true,
                           rate_per_hour: parent.time_expense_config.rate_per_hour,
                           default_category_id: parent.time_expense_config.default_category_id,
-                          default_category_name: parent.distance_expense_config.default_category_name
+                          default_category_name: parent.time_expense_config.default_category_name
                           }
     else
       self.time_config = {enabled: false,
                           rate_per_hour: parent.time_expense_config.rate_per_hour,
                           default_category_id: parent.time_expense_config.default_category_id,
-                          default_category_name: parent.distance_expense_config.default_category_name
+                          default_category_name: parent.time_expense_config.default_category_name
 
                           }
     end

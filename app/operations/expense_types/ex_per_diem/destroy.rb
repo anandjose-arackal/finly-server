@@ -24,10 +24,10 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
     id = params[:id] || params[:per_diem_id]
     case params[:parent_type]
       when 'company'
-        self.per_diem = user.company.per_diems.with_id(id) rescue nil
+        self.per_diem = user.company.per_diems.with_id(id).first rescue nil
       when 'policy'
-        policy = user.company.policies.with_id(params[:parent_id])
-        self.per_diem = policy.per_diems.with_id(id) rescue nil
+        policy = user.company.policies.find_by(id: params[:parent_id])
+        self.per_diem = policy.per_diems.with_id(id).first rescue nil
       else
         self.per_diem = nil
     end
