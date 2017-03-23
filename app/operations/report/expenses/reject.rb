@@ -58,11 +58,19 @@ class Report::Expenses::Reject < Report::Base
       expenses.each do |expense|
         comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_reject), expense_id: expense.id, content: params[:memo]
         comment.save
+
+        # also set the amount for these expense as nil if they're distance/Time/Per Diem
+        unless expense.manual_expense? || expense.card_expense?
+          amount = expense.amount
+          expense.update(amount: nil)
+          amount.destroy
+        end
+
         # triggering the reject event
         Event::EReport::EExpense::Reject.(user, {report: report, rejected_expense: expenses.first})
       end
+
     end
     messages[:success] << 'Expenses rejected!'
-
   end
 end

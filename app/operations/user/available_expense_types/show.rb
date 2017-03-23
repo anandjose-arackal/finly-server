@@ -43,12 +43,14 @@ class User::AvailableExpenseTypes::Show < User::Base
     if per_diem_config
       if user.per_diems_list.empty?
         self.per_diem_config = {enabled: false}
+        self.per_diem_config[:per_diems] = []
       else
         per_diem_config[:per_diems] = []
         user.per_diems_list.each do |per_diem|
           per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
-                                          id: per_diem.id
-          }
+                                          id: per_diem.id,
+                                          rate: per_diem.rate_value
+                                         }
         end
       end
     end

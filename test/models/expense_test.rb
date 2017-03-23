@@ -25,4 +25,8 @@ class ExpenseTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
+
+  def setup
+    # creating a bunch of different types of expenses to check the validations
+  end
 end

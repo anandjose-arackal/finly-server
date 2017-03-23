@@ -28,6 +28,14 @@ class TimeExpenseConfig < ActiveRecord::Base
     end
   end
 
+  def rate
+    if self.enabled
+      return self.rate_per_hour
+    else
+      return nil
+    end
+  end
+
   private
 
   def rate_exists_for_enabled

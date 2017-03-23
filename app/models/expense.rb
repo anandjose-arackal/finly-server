@@ -53,7 +53,7 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :per_diem_expense
 
   # delegating to associated classes the dependent attribute calls
-  delegate :amount_value, :currency, to: :amount
+  # delegate :amount_value, :currency, to: :amount
   delegate :surcharge_value, to: :card_expense
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
@@ -164,8 +164,11 @@ class Expense < ActiveRecord::Base
   scope :manual, -> { joins(:manual_expense) }
   scope :card, -> { joins(:card_expense) }
 
-  scope :only_card_expenses, -> { where(expense_type_id: 2) }
-  scope :only_manual_expenses, -> { where(expense_type_id: 1) }
+  scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
+  scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
+  scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
+  scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
+  scope :only_per_diem_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
@@ -188,6 +191,41 @@ class Expense < ActiveRecord::Base
 
   delegate :category_name, to: :category
 
+
+  def amount_value(policy = nil)
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.amount.value
+      when ExpenseType.id_for(:card)
+        return self.amount.value
+      when ExpenseType.id_for(:distance)
+        if policy.blank?
+          rate = self.user.company.distance_expense_config.rate rescue nil
+          amount = rate.blank? ? "- -" : (self.distance_expense.distance.value * rate)
+          return amount
+        else
+          rate = policy.distance_expense_config.rate rescue nil
+          amount = rate.blank? ? "- -" : (self.distance_expense.distance.value * rate)
+          return amount
+        end
+      when ExpenseType.id_for(:time)
+        if policy.blank?
+          rate = self.user.company.time_expense_config.rate rescue nil
+          amount = rate.blank? ? "- -" : (self.time_expense.time_object.value * rate)
+          return amount
+        else
+          rate = policy.time_expense_config.rate rescue nil
+          amount = rate.blank? ? "- -" : (self.time_expense.time_object.value * rate)
+          return amount
+        end
+      when ExpenseType.id_for(:per_diem)
+        rate = self.per_diem_expense.per_diem.rate_value rescue nil
+        amount = rate.blank? ? "- -" : (self.per_diem_expense.quantity * rate)
+        return amount
+      else
+        return 0
+    end
+  end
 
   def merchant_name
     case self.expense_type_id

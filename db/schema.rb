@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170316061123) do
+ActiveRecord::Schema.define(version: 20170321073209) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -424,6 +424,35 @@ ActiveRecord::Schema.define(version: 20170316061123) do
     t.string   "symbol",       limit: 255
   end
 
+  create_table "distance_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_km",                     precision: 10
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
+  create_table "distance_expenses", force: :cascade do |t|
+    t.integer  "expense_id",  limit: 4
+    t.boolean  "is_deleted",            default: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "distance_id", limit: 4
+  end
+
+  add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
+
+  create_table "distances", force: :cascade do |t|
+    t.decimal  "value",                      precision: 10
+    t.integer  "physical_unit_id", limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
+
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
@@ -798,8 +827,46 @@ ActiveRecord::Schema.define(version: 20170316061123) do
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
+  create_table "per_diem_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",   limit: 4
+    t.string   "parent_type", limit: 255
+    t.boolean  "enabled"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "per_diem_expenses", force: :cascade do |t|
+    t.integer  "per_diem_id", limit: 4
+    t.integer  "expense_id",  limit: 4
+    t.integer  "quantity",    limit: 4
+    t.boolean  "is_deleted"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree
+  add_index "per_diem_expenses", ["per_diem_id"], name: "index_per_diem_expenses_on_per_diem_id", using: :btree
+
+  create_table "per_diems", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "rate_id",           limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "configurable_id",   limit: 4
+    t.string   "configurable_type", limit: 255
+  end
+
+  add_index "per_diems", ["rate_id"], name: "index_per_diems_on_rate_id", using: :btree
+
   create_table "periods", force: :cascade do |t|
     t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "physical_units", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "symbol",     limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
@@ -1022,6 +1089,13 @@ ActiveRecord::Schema.define(version: 20170316061123) do
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
+  create_table "resource_requests", force: :cascade do |t|
+    t.string "name",               limit: 255
+    t.string "email",              limit: 255
+    t.string "mobile_number",      limit: 255
+    t.string "resource_file_name", limit: 255
+  end
+
   create_table "rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -1034,6 +1108,35 @@ ActiveRecord::Schema.define(version: 20170316061123) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "time_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_hour",                   precision: 10
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
+  create_table "time_expenses", force: :cascade do |t|
+    t.integer  "expense_id",     limit: 4
+    t.boolean  "is_deleted"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "time_object_id", limit: 4
+  end
+
+  add_index "time_expenses", ["expense_id"], name: "index_time_expenses_on_expense_id", using: :btree
+
+  create_table "time_objects", force: :cascade do |t|
+    t.decimal  "value",                      precision: 10
+    t.integer  "physical_unit_id", limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
 
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
@@ -1272,6 +1375,8 @@ ActiveRecord::Schema.define(version: 20170316061123) do
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_tags", "companies"
+  add_foreign_key "distance_expenses", "expenses"
+  add_foreign_key "distances", "physical_units"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -1309,6 +1414,8 @@ ActiveRecord::Schema.define(version: 20170316061123) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "per_diem_expenses", "expenses"
+  add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
@@ -1326,6 +1433,8 @@ ActiveRecord::Schema.define(version: 20170316061123) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "time_expenses", "expenses"
+  add_foreign_key "time_objects", "physical_units"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_manager_mappings", "policies"

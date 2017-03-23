@@ -28,6 +28,14 @@ class DistanceExpenseConfig < ActiveRecord::Base
     end
   end
 
+  def rate
+    if self.enabled
+      return self.rate_per_km
+    else
+      return nil
+    end
+  end
+
   private
 
   def rate_exists_for_enabled
