@@ -49,7 +49,8 @@ class User::Summary < User::Base
 
     summary[:wallet] = {balance: balances[:target_user_wallet]}
 
-    summary[:company_credits] = {balance: balances[:virtual_account]} if selected_user.company_admin?
+    # summary[:company_credits] = {balance: balances[:virtual_account]} if selected_user.company_admin?
+    summary[:company_credits] = balances[:virtual_account] if selected_user.company_admin?
 
     summary[:cash_on_hand] = {balance: balances[:target_user_cash_in_hand]}
 
