@@ -42,7 +42,9 @@ class User::Summary < User::Base
         item[:card_program] = {name: card.card_program.name, id: card.card_program.id}
         item[:active] = card.active
         unless card.active
-          item[:card][:disabler] = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name}, user: {id: card.disabled_by_user_id, name: card.disabled_by_user.name}}
+          disabled_by_role_name = card.disabled_by_role.name rescue nil
+          disabled_by_user_name = card.disabled_by_user.name rescue nil
+          item[:disabler] = {role: {id: card.disabled_by_role_id, name: disabled_by_role_name}, user: {id: card.disabled_by_user_id, name: disabled_by_user_name}}
         end
         item[:balance] = balances[:target_user][:card][card.id][:balance] rescue nil
         item[:available_eligibility] = balances[:target_user][:card][card.id][:eligibility] rescue nil

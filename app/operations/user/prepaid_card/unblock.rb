@@ -28,10 +28,10 @@ class User::PrepaidCard::Unblock < User::PrepaidCard::Block
 
   def post_process
     return unless success?
-    selected_user.cards.first.update_attributes({active: true,
-                                                 disabled_by_role_id: nil,
-                                                 disabled_by_user: nil,
-                                                 disable_note: nil})
+    card.update_attributes({active: true,
+                            disabled_by_role_id: nil,
+                            disabled_by_user: nil,
+                            disable_note: nil})
     if self.block_presenter.present? and self.block_presenter.success?
       add_message :success, 'Successfully unblocked the card'
     end
