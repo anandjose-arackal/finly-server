@@ -167,6 +167,24 @@ ActiveRecord::Schema.define(version: 20170321073209) do
   add_index "card_limits", ["card_restriction_id"], name: "index_card_limits_on_card_restriction_id", using: :btree
   add_index "card_limits", ["period_id"], name: "index_card_limits_on_period_id", using: :btree
 
+  create_table "card_programs", force: :cascade do |t|
+    t.string   "name",                          limit: 255
+    t.boolean  "create_expense"
+    t.boolean  "receive_reimbursement"
+    t.boolean  "personal_wallet_fund_transfer"
+    t.boolean  "spend_restrictions"
+    t.boolean  "end_date_restrictions"
+    t.boolean  "manager_credit"
+    t.boolean  "manager_debit"
+    t.boolean  "manager_blockable"
+    t.boolean  "manager_view_balance"
+    t.boolean  "manager_view_eligibility"
+    t.boolean  "manager_view_transactions"
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
+  end
+
   create_table "card_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -245,6 +263,7 @@ ActiveRecord::Schema.define(version: 20170321073209) do
     t.text     "disable_note",        limit: 65535
     t.string   "product_code",        limit: 255,   null: false
     t.integer  "card_balance_id",     limit: 4
+    t.integer  "card_program_id",     limit: 4,     null: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -783,14 +802,18 @@ ActiveRecord::Schema.define(version: 20170321073209) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",          limit: 4,     null: false
-    t.date     "date",                             null: false
-    t.integer  "payment_type_id",    limit: 4,     null: false
-    t.integer  "initiating_user_id", limit: 4,     null: false
-    t.integer  "receiving_user_id",  limit: 4,     null: false
-    t.text     "note",               limit: 65535
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.integer  "amount_id",               limit: 4,     null: false
+    t.date     "date",                                  null: false
+    t.integer  "payment_type_id",         limit: 4,     null: false
+    t.integer  "initiating_user_id",      limit: 4,     null: false
+    t.integer  "receiving_user_id",       limit: 4,     null: false
+    t.text     "note",                    limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "initiating_account_id",   limit: 4
+    t.string   "initiating_account_type", limit: 255
+    t.integer  "receiving_account_id",    limit: 4
+    t.string   "receiving_account_type",  limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
