@@ -35,7 +35,7 @@ class User::Summary < User::Base
     if self.selected_user.cards.present?
       card = ItzCash::AccountDetails.(selected_user).card rescue nil
     end
-    balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true, virtual_account: true).balances
+    balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true, target_user_cash_in_hand: true, virtual_account: true).balances
 
     summary[:card] = {}
     if self.selected_user.cards.present? and card.present?
@@ -49,7 +49,9 @@ class User::Summary < User::Base
 
     summary[:wallet] = {balance: balances[:target_user_wallet]}
 
-    summary[:company_credits] = balances[:virtual_account] if selected_user.company_admin?
+    summary[:company_credits] = {balance: balances[:virtual_account]} if selected_user.company_admin?
+
+    summary[:cash_on_hand] = {balance: balances[:target_user_cash_in_hand]}
 
     summary[:personal] = {}
     summary[:personal][:unreported_expenses] = selected_user.expenses.unreported.count
