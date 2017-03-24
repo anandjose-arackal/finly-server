@@ -55,7 +55,7 @@ class Settlement::Summary < Settlement::Base
     result = User::Balance.(user, target_user: selected_user, current_user_all: true, target_user_all: true, virtual_account: true).balances
 
     self.balances = {}
-    self.balances[:wallet] = {balance: result[:target_user][:wallet][:balance], name: 'Finly Money'}
+    self.balances[:wallet] = {balance: result[:target_user][:wallet][:balance], name: 'Finly Money', id: selected_user.wallet.id}
     if result[:target_user][:card].present?
       self.balances[:cards] = []
       result[:target_user][:card].each do |id, item|
