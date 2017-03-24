@@ -104,10 +104,10 @@ class Report::Expenses::Add < Report::Base
       else
         amount = expense.amount
         if amount.nil?
-          amount_params = {value: expense.amount_value(report.policy), currency_id: Currency.first.id}
+          amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
           amount = Amount.create(amount_params)
         else
-          amount.update(value: expense.amount_value(report.policy))
+          amount.update(value: expense.calculate_amount_value(report.policy))
         end
         expense.update_attributes(amount_id: amount.id)
       end

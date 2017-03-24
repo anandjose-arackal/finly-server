@@ -53,6 +53,7 @@ class Report::Update < Report::Base
 
   def post_process
     save_comments
+    calculate_amounts # this method recalculates the amoutns for the various Distance/Time/Per Diem expenses
     messages[:success] << "Report updated."
   end
 
@@ -80,6 +81,14 @@ class Report::Update < Report::Base
       end
     end
     report.comments.create query if query.present?
+  end
+
+  def calculate_amounts
+    report.expenses.each do |expense|
+      if expense.distance_expense? || expense.time_expense? || expense.per_diem_expense?
+        expense.amount.update(value: expense.calculate_amount_value(report.policy))
+      end
+    end
   end
 
 end

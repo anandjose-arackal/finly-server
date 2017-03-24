@@ -192,7 +192,27 @@ class Expense < ActiveRecord::Base
   delegate :category_name, to: :category
 
 
-  def amount_value(policy = nil)
+  # this method is to purely show the amount values for the carious expenses
+  def amount_value
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.amount.value
+      when ExpenseType.id_for(:card)
+        return self.amount.value
+      when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
+        if self.amount.blank?
+          return "- -"
+        else
+          return self.amount.value
+        end
+      else
+        return "- -"
+    end
+  end
+
+
+  # this method is to calculate the amount values for the various time/distance/per diem expenses
+  def calculate_amount_value(policy)
     case self.expense_type_id
       when ExpenseType.id_for(:manual)
         return self.amount.value
@@ -201,26 +221,26 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:distance)
         if policy.blank?
           rate = self.user.company.distance_expense_config.rate rescue nil
-          amount = rate.blank? ? "- -" : (self.distance_expense.distance.value * rate)
+          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
           return amount
         else
           rate = policy.distance_expense_config.rate rescue nil
-          amount = rate.blank? ? "- -" : (self.distance_expense.distance.value * rate)
+          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
           return amount
         end
       when ExpenseType.id_for(:time)
         if policy.blank?
           rate = self.user.company.time_expense_config.rate rescue nil
-          amount = rate.blank? ? "- -" : (self.time_expense.time_object.value * rate)
+          amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
           return amount
         else
           rate = policy.time_expense_config.rate rescue nil
-          amount = rate.blank? ? "- -" : (self.time_expense.time_object.value * rate)
+          amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
           return amount
         end
       when ExpenseType.id_for(:per_diem)
         rate = self.per_diem_expense.per_diem.rate_value rescue nil
-        amount = rate.blank? ? "- -" : (self.per_diem_expense.quantity * rate)
+        amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
         return amount
       else
         return 0
