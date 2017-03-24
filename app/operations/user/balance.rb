@@ -62,7 +62,7 @@ class User::Balance < User::Base
     self.balances[:current_user][:cash_on_hand] = {type: :cash_on_hand, id: user.id, name: 'Cash On Hand', balance: (user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Cash Advance
-    self.balances[:current_user][:pending_money_requests] << {type: :pending_money_requests, id: user.id, name: 'Approved Money Requests', balance: user.balance_sheet.pending_advance.amount_value, count: user.money_requests.approved.count} if params[:current_user_pending_money_request] or params[:current_user_all]
+    self.balances[:current_user][:pending_money_requests] = {type: :pending_money_requests, id: user.id, name: 'Approved Money Requests', balance: user.balance_sheet.pending_advance.amount_value, count: user.money_requests.approved.count} if params[:current_user_pending_money_request] or params[:current_user_all]
 
     # pending approved reports
     if params[:current_user_pending_reports] or params[:current_user_all]

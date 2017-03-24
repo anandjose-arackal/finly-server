@@ -105,7 +105,8 @@ class User::Summary < User::Base
     end
 
     # Wallet
-    action = {type: :wallet, id: user.wallet.id, name: "#{initiating_user_name}'s Finly Money", balance: balances[:current_user][:wallet][:balance]}
+    balance = balances[:current_user][:wallet][:balance] rescue nil
+    action = {type: :wallet, id: user.wallet.id, name: "#{initiating_user_name}'s Finly Money", balance: balance}
     credit_actions[:initiating_accounts] << action
     debit_actions[:initiating_accounts] << action
 
@@ -113,10 +114,12 @@ class User::Summary < User::Base
     if initiating_user_creditable_cards.present?
       initiating_user_creditable_cards.each do |card|
         next if (not personal_transfer and not card.card_program.manager_credit) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
+
+        balance = balances[:current_user][:card][card.id][:balance] rescue nil
+        eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
         action = {type: :card, id: card.id, name: "#{initiating_user_name}'s #{card.card_program.name} Card",
-                  balance: balances[:current_user][:card][card.id][:balance],
-                  eligibility: balances[:current_user][:card][card.id][:balance],
-                  show_balance: true, show_eligbility: true}
+                  balance: balance, eligibility: eligibility,
+                  show_balance: true, show_eligbility: true, active: card.active}
         card_program = card.card_program
         if personal_transfer
           next unless card_program.personal_wallet_fund_transfer
@@ -132,7 +135,8 @@ class User::Summary < User::Base
 
     # To Actions
     # Wallet
-    action = {type: :wallet, id: selected_user.wallet.id, name: "#{receiving_user_name}'s Finly Money", balance: balances[:target_user][:wallet][:balance]}
+    balance = balances[:target_user][:wallet][:balance] rescue nil
+    action = {type: :wallet, id: selected_user.wallet.id, name: "#{receiving_user_name}'s Finly Money", balance: balance}
     credit_actions[:receiving_accounts] << action
     debit_actions[:receiving_accounts] << action
 
@@ -141,10 +145,13 @@ class User::Summary < User::Base
       receiving_user_creditable_cards.each do |card|
         show_balance = (personal_transfer or card.card_program.manager_view_balance)
         show_eligibility = (personal_transfer or card.card_program.manager_view_eligibility)
+        balance = balances[:target_user][:card][card.id][:balance] rescue nil
+        eligibility = balances[:target_user][:card][card.id][:balance] rescue nil
+
         action = {type: :card, id: card.id, name: "#{receiving_user_name}'s #{card.card_program.name} Card",
-                  balance: balances[:target_user][:card][card.id][:balance],
-                  eligibility: balances[:target_user][:card][card.id][:balance],
-                  show_balance: show_balance, show_eligibility: show_eligibility}
+                  balance: balance, eligibility: eligibility, show_balance: show_balance,
+                  show_eligibility: show_eligibility, active: card.active}
+
         card_program = card.card_program
         # Verify is user is allowed to credit / debit from the card based on the card program
         if personal_transfer
