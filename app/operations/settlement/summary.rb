@@ -107,14 +107,14 @@ class Settlement::Summary < Settlement::Base
     # Virtual Account
     if user.company_admin?
       balance = balances[:virtual_account][:balance] rescue nil
-      action = {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance}
+      action = {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance, active: true}
       credit_actions[:initiating_accounts] << action
       debit_actions[:initiating_accounts] << action
     end
 
     # Wallet
     balance = balances[:current_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money", balance: balance}
+    action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money", balance: balance, active: true}
     credit_actions[:initiating_accounts] << action
     debit_actions[:initiating_accounts] << action
 
@@ -153,7 +153,7 @@ class Settlement::Summary < Settlement::Base
     # To Actions
     # Wallet
     balance = balances[:target_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance}
+    action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance, active: true}
     credit_actions[:receiving_accounts] << action
     debit_actions[:receiving_accounts] << action
 
@@ -166,7 +166,9 @@ class Settlement::Summary < Settlement::Base
         eligibility = balances[:target_user][:card][card.id][:balance] rescue nil
         disabler = nil
         unless card.active
-          disabler = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name}, user: {id: card.disabled_by_user_id, name: card.disabled_by_user.name}}
+          disabler = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name},
+                      user: {id: card.disabled_by_user_id,
+                             name: card.disabled_by_user.name}}
         end
 
         action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card",

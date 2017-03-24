@@ -71,11 +71,12 @@ class User::Show < User::Base
           configurable_restrictions = card.card_program.spend_restrictions
           balance = show_balance ? card_presenter.balance : nil
           eligibility = show_eligibility ? card_presenter.available_card_eligibility : nil
-          disabled_by = card.disabled_by_role
+          disabled_by = card.disabled_by_role.name rescue nil
           active = card.active
           name = "#{card.card_program.name} Card"
           ending_number = card.ending_number
           id = card.id
+          
 
           if not personal and card.card_program.manager_blockable
             card_params = {}

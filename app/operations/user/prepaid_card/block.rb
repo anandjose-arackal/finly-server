@@ -1,5 +1,5 @@
 class User::PrepaidCard::Block < User::PrepaidCard::Base
-  attr_accessor :block_presenter
+  attr_accessor :block_presenter, :card
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -18,12 +18,20 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
     end
   end
 
+  def init
+    super()
+    self.card = selected_user.cards.with_id(card_id).first rescue nil
+  end
+
   def validate
     super   
     return if has_errors?
     if self.card_id.blank?  
       add_message :error, 'Card not found'
       return
+    end
+    if self.card.blank?
+      add_message :error, "Card not found"
     end
   end
   
@@ -42,8 +50,8 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
                      disabled_by_role_id: role,
                      disabled_by_user_id: user.id,
                      disable_note: params[:disable_note]}
-    selected_user.cards.first.update_attributes(update_params)
     if self.block_presenter.present? and self.block_presenter.success?
+      card.update_attributes(update_params)
       add_message :success, 'Successfully blocked the card!'
     end
   end
