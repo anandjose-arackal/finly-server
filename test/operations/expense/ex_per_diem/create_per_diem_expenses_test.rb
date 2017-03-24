@@ -17,7 +17,7 @@ class CreatePerDiemExpensesTest < ActiveSupport::TestCase
                                         date: "18-03-2017",
                                         expense_status_id: '1'
     },
-                              type: '3'
+                              type: '5'
     }
     @valid_expense_params_with_receipt = { expense: {per_diem_expense_attributes: {per_diem_id: @per_diem.id,
                                                                                quantity: "2"
@@ -28,7 +28,7 @@ class CreatePerDiemExpensesTest < ActiveSupport::TestCase
                                                      expense_status_id: '1',
                                                      receipts_attributes: {image: @receipt_image}
                                                     },
-                                           type: '3'
+                                           type: '5'
                                          }
     @receipt = @admin.receipts.create({image: @receipt_image})
     @report = @admin.reports.open.first
@@ -36,7 +36,7 @@ class CreatePerDiemExpensesTest < ActiveSupport::TestCase
 
   test "users can create per diem expenses without receipt" do
     @admin.stubs(:per_diem_expense_enabled?).returns(true)
-    operation = Expense::ExDistance::Create.new(@admin, @valid_expense_params)
+    operation = Expense::ExPerDiem::Create.new(@admin, @valid_expense_params)
     assert_difference 'Expense.count', 1 do
       @result = operation.run
     end

@@ -4,7 +4,6 @@ class ExpensesController < ApplicationController
   allow_oauth!
 
   def create
-    params[:type] = '1'
     case params[:type]
       when '1'
         @result = Expense::Manual::Create.(current_user, params)

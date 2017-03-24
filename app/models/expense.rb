@@ -343,6 +343,10 @@ class Expense < ActiveRecord::Base
         if self.time_expense.blank?
           errors.add(:expense, "needs to have an associated time expense")
         end
+      when ExpenseType.per_diem_expense_id
+        if self.per_diem_expense.blank?
+          errors.add(:expense, "needs to have an associated per diem expense")
+        end
       else
         errors.add(:expense, "type is invalid")
     end
