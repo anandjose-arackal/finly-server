@@ -18,6 +18,8 @@
 #
 
 class FieldConfiguration < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :field_type
   belongs_to :company
   belongs_to :field_parent_type
