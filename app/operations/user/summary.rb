@@ -101,14 +101,15 @@ class User::Summary < User::Base
     # Virtual Account
     if user.company_admin?
       balance = balances[:virtual_account][:balance] rescue nil
-      action = {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance}
+      action = {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance, active: true}
       credit_actions[:initiating_accounts] << action
       debit_actions[:initiating_accounts] << action
     end
 
     # Wallet
     balance = balances[:current_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: user.wallet.id, name: "#{initiating_user_name}'s Finly Money", balance: balance}
+    action = {type: :wallet, id: user.wallet.id, name: "#{initiating_user_name}'s Finly Money",
+              balance: balance, active: true}
     credit_actions[:initiating_accounts] << action
     debit_actions[:initiating_accounts] << action
 
@@ -138,7 +139,8 @@ class User::Summary < User::Base
     # To Actions
     # Wallet
     balance = balances[:target_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: selected_user.wallet.id, name: "#{receiving_user_name}'s Finly Money", balance: balance}
+    action = {type: :wallet, id: selected_user.wallet.id, name: "#{receiving_user_name}'s Finly Money",
+              balance: balance, active: true}
     credit_actions[:receiving_accounts] << action
     debit_actions[:receiving_accounts] << action
 

@@ -119,33 +119,37 @@ class MoneyRequest::Base < BaseOperation
         # Virtual Account
         if user.company_admin?
           balance = balances[:virtual_account][:balance] rescue nil
-          initiating_actions << {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance}
+          initiating_actions << {type: :virtual_account, id: user.company.id, name: 'Company Credits',
+                                 balance: balance, active: true}
         end
 
         # Wallet
         balance = balances[:current_user][:wallet][:balance] rescue nil
-        initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money", balance: balance}
+        initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money",
+                               balance: balance, active: true}
 
         # Cards
         if from_user_creditable_cards.present?
           from_user_creditable_cards.each do |card|
             balance = balances[:current_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:current_user][:card][card.id][:eligibility] rescue nil
-            initiating_actions << {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card", balance: balance, eligibility: eligibility}
+            initiating_actions << {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card",
+                                   balance: balance, eligibility: eligibility, active: card.active}
           end
         end
 
         # To Actions
         # Wallet
         balance = balances[:target_user][:wallet][:balance] rescue nil
-        receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance}
+        receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance, active: true}
 
         # Cards
         if to_user_creditable_cards.present?
           to_user_creditable_cards.each do |card|
             balance = balances[:target_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
-            receiving_actions << {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card", balance: balance, eligibility: eligibility}
+            receiving_actions << {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card",
+                                  balance: balance, eligibility: eligibility, active: card.active}
           end
         end
       end
