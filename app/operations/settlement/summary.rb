@@ -52,9 +52,9 @@ class Settlement::Summary < Settlement::Base
 
   def load_balances
     personal = user == selected_user
-    result = User::Balance.(user, target_user: selected_user, current_user_all: true, target_user_all: true).balances
-    self.balances = {}
+    result = User::Balance.(user, target_user: selected_user, current_user_all: true, target_user_all: true, virtual_account: true).balances
 
+    self.balances = {}
     self.balances[:wallet] = {balance: result[:target_user][:wallet][:balance], name: 'Finly Money'}
     if result[:target_user][:card].present?
       self.balances[:cards] = []
