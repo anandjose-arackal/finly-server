@@ -53,6 +53,10 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
+      if self.updated_expense_params[:distance_expense_attributes].present? and self.updated_expense_params[:distance_expense_attributes][:distance_attributes].present? and
+          expense.distance_expense.present?
+        self.updated_expense_params[:distance_expense_attributes][:id] = expense.distance_expense.id
+      end
       if self.updated_expense_params[:distance_expense_attributes][:distance_attributes].present? and self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:value].present? and
           expense.distance_expense.distance_id.present?
         self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:id] = expense.distance_expense.distance.id
@@ -112,13 +116,12 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
 
   private
 
-  # def define_editable_attributes
-  #   self.editable_attrs = {note: expense.note,
-  #                          date: expense.date,
-  #                          merchant_name: expense.merchant_name,
-  #                          amount_value: expense.amount_value,
-  #                          category_name: expense.category_name,
-  #                          receipt: expense.receipts.count}
-  # end
+  def define_editable_attributes
+    self.editable_attrs = {note: expense.note,
+                           date: expense.date,
+                           distance_value: expense.distance_value,
+                           category_name: expense.category_name,
+                           receipt: expense.receipts.count}
+  end
 
 end

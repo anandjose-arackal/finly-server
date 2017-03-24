@@ -25,7 +25,8 @@ class CreateDistanceExpensesTest < ActiveSupport::TestCase
                                                     },
                                            type: '3'
                                          }
-
+    @receipt = @admin.receipts.create({image: @receipt_image})
+    @report = @admin.reports.open.first
   end
 
   test "users can create distance expenses without receipt" do

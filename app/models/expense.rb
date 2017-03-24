@@ -252,7 +252,6 @@ class Expense < ActiveRecord::Base
       when 1
         return self.manual_expense.merchant
       when 2
-        # todo - temporary
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
       else
@@ -272,6 +271,38 @@ class Expense < ActiveRecord::Base
   def report_name
     if report_id
       self.report.name
+    end
+  end
+
+  def distance_value
+    if self.distance_expense?
+      return self.distance_expense.distance_value
+    else
+      return nil
+    end
+  end
+
+  def time_value
+    if self.time_expense?
+      return self.time_expense.time_object_value
+    else
+      return nil
+    end
+  end
+
+  def per_diem_quantity_value
+    if self.per_diem_expense?
+      return self.per_diem_expense.quantity
+    else
+      return nil
+    end
+  end
+
+  def per_diem_rate_value
+    if self.per_diem_expense?
+      return self.per_diem_expense.per_diem.rate_value
+    else
+      return nil
     end
   end
 
@@ -370,6 +401,10 @@ class Expense < ActiveRecord::Base
       when ExpenseType.time_expense_id
         if self.time_expense.blank?
           errors.add(:time, "expense cannot be blank")
+        end
+      when ExpenseType.per_diem_expense_id
+        if self.per_diem_expense.blank?
+          errors.add(:per_diem, "expense cannot be blank")
         end
       else
         errors.add(:expense, 'type not allowed')
