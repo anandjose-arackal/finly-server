@@ -66,9 +66,14 @@ class Settlement::Summary < Settlement::Base
                                   eligibility: item[:eligibility], creditable: creditable, debitable: debitable, enabled: card.active}
       end
     end
-    self.balances[:cash_on_hand] = {balance: result[:target_user][:cash_on_hand][:balance], name: 'Cash on Hand'}
-    self.balances[:pending_money_requests] = {balance: result[:target_user][:pending_money_requests][:balance], count: result[:target_user][:pending_money_requests][:count]}
-    self.balances[:pending_reports] = {balance: result[:target_user][:pending_reports][:balance], count: result[:target_user][:pending_reports][:count]}
+
+    self.balances[:cash_on_hand] = {balance: result[:target_user][:cash_on_hand][:balance], name: 'Cash on Hand',
+                                    meta: {credit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))},
+                                           debit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:debt_clearance))}}}
+    self.balances[:pending_money_requests] = {balance: result[:target_user][:pending_money_requests][:balance], count: result[:target_user][:pending_money_requests][:count],
+                                              meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))}}
+    self.balances[:pending_reports] = {balance: result[:target_user][:pending_reports][:balance], count: result[:target_user][:pending_reports][:count],
+                                       meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}}
 
     load_transfer_options(result)
     # result[:target_user].each do |item|
@@ -193,21 +198,8 @@ class Settlement::Summary < Settlement::Base
       end
     end
 
-    self.actions = {card_actions: {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
-                                   credit: credit_actions.present?,
-                                   debit: debit_actions.present?,
-                                   credit_actions: credit_actions,
-                                   debit_actions: debit_actions},
-                    finly_money_actions: {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
-                                          credit: credit_actions.present?,
-                                          debit: debit_actions.present?,
-                                          credit_actions: credit_actions,
-                                          debit_actions: debit_actions},
-                    process_reports: {meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}},
-                    process_money_requests: {meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))}},
-                    cash_on_hand: {credit: {meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))}},
-                                   debit: {meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:debt_clearance))}}}}
-
+    self.actions = {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
+                    credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
   end
 
 end
