@@ -168,9 +168,9 @@ class Settlement::Summary < Settlement::Base
         show_balance = (personal_transfer or card.card_program.manager_view_balance)
         show_eligibility = (personal_transfer or card.card_program.manager_view_eligibility)
         balance = balances[:target_user][:card][card.id][:balance] rescue nil
-        eligibility = balances[:target_user][:card][card.id][:balance] rescue nil
+        eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
         disabler = nil
-        unless card.active
+        if not card.active and card.disabled_by_role_id.present? and card.disabled_by_user_id.present?
           disabler = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name},
                       user: {id: card.disabled_by_user_id,
                              name: card.disabled_by_user.name}}
