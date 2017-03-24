@@ -1,5 +1,5 @@
 class User::Show < User::Base
-  attr_accessor :selected_user, :card_presenter
+  attr_accessor :selected_user, :balances
 
   def pre_validate
     unless user.present?
@@ -19,13 +19,9 @@ class User::Show < User::Base
         if self.selected_user.blank?
           add_message :error, 'User not found'
         elsif self.selected_user.cards.present?
-          self.card_presenter = []
-          self.selected_user.cards.each do |card|
-            response = (ItzCash::AccountDetails.(selected_user, card_id: card.id) rescue nil)
-            if response.present? and response.success?
-              self.card_presenter << response
-            end
-          end
+          self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
+              target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
+              target_user_cash_in_hand: true, view: params[:view]).balances
         end
       else
         messages[:error] = operation.messages[:error]
@@ -35,7 +31,7 @@ class User::Show < User::Base
 
   def success
     params[:selected_user] = selected_user
-    params[:card_presenter] = card_presenter
+    params[:balances] = balances
     User::Show::Presenter.new(user, params, messages)
   end
 
@@ -44,7 +40,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards
+                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances
 
     def init
       self.selected_user = params[:selected_user]
@@ -53,36 +49,35 @@ class User::Show < User::Base
       self.team_mapping = self.selected_user.team_mapping
       self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
+      self.balances = params[:balances]
       self.policies.each do |policy|
         self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
       end
-      self.actions = load_actions
+      self.actions = load_actions(self.balances)
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
       self.cards = []
       personal = (selected_user == user)
-      if params[:card_presenter].present?
-        params[:card_presenter].each do |card_presenter|
+      if balances.present?
+        selected_user.cards.each do |card|
           actions = {}
           # Card Actions
-          card = card_presenter.card
           show_balance = personal ? true : card.card_program.manager_view_balance
           show_eligibility = personal ? true : card.card_program.manager_view_eligibility
           configurable_restrictions = card.card_program.spend_restrictions
-          balance = show_balance ? card_presenter.balance : nil
-          eligibility = show_eligibility ? card_presenter.available_card_eligibility : nil
+          balance = show_balance ? balances[:target_user][:card][card.id][:balance] : nil
+          eligibility = show_eligibility ? balances[:target_user][:card][card.id][:eligibility] : nil
           disabled_by = card.disabled_by_role.name rescue nil
           active = card.active
           name = "#{card.card_program.name} Card"
           ending_number = card.ending_number
           id = card.id
-          
 
           if not personal and card.card_program.manager_blockable
             card_params = {}
             card_params[:view] = params[:view]
             card_params[:user_id] = selected_user.id
-            card_params[:card_id] = card_presenter.card.id
+            card_params[:card_id] = id
             card_params[:action_type] = nil
             if card.active
               card_params[:status_type] = User::PrepaidCard::Base::STATUS[:block]
@@ -127,7 +122,7 @@ class User::Show < User::Base
 
     end
 
-    def load_actions
+    def load_actions(balances)
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
       if (self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?) or
@@ -143,12 +138,12 @@ class User::Show < User::Base
         end
       end
 
-      actions[:transfer_options] = load_transfer_options
+      actions[:transfer_options] = load_transfer_options(balances)
 
       actions
     end
 
-    def load_transfer_options
+    def load_transfer_options(balances)
       credit_actions = {initiating_accounts: [], receiving_accounts: []}
       debit_actions={receiving_accounts: [], initiating_accounts: []}
 
