@@ -254,6 +254,8 @@ class Expense < ActiveRecord::Base
       when 2
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
+      when 5
+        return self.per_diem_expense.per_diem_name
       else
         # do nothing
     end
@@ -301,6 +303,14 @@ class Expense < ActiveRecord::Base
   def per_diem_rate_value
     if self.per_diem_expense?
       return self.per_diem_expense.per_diem.rate_value
+    else
+      return nil
+    end
+  end
+
+  def per_diem_name
+    if self.per_diem_expense?
+      return self.per_diem_expense.per_diem_name
     else
       return nil
     end

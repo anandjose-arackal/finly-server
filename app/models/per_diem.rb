@@ -26,4 +26,8 @@ class PerDiem < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :find_from_id, -> (id) {where(id: id).first}
+
+  def per_diem_name
+    self.name
+  end
 end
