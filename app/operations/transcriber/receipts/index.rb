@@ -1,8 +1,8 @@
-class Trabscriber::Receipt::Index < BaseOperation
+class Transcriber::Receipts::Index < BaseOperation
 
-  attr_accessor :receipts
+  attr_accessor :receipts, :company
 
-  class Transcriber::Expense::Index::TrascriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :receipts, :categories, :company
 
@@ -32,7 +32,7 @@ class Trabscriber::Receipt::Index < BaseOperation
 
   def process
     company.users.each do |user|
-      self.receipts << user.receipts.without_parent
+      self.receipts += user.receipts
     end
   end
 
@@ -40,6 +40,6 @@ class Trabscriber::Receipt::Index < BaseOperation
     params[:receipts] = receipts
     params[:company] = company
     params[:categories] = company.categories.active
-    Transcriber::Expense::Index::TrascriberPresenter.new(user, params, messages)
+    Transcriber::Receipts::Index::TranscriberPresenter.new(user, params, messages)
   end
 end

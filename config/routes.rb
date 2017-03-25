@@ -1,9 +1,12 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
-#  transcriber_transcribed_expenses_create POST       /transcriber/transcribed_expenses/create(.:format)          transcriber/transcriber/expenses#create
-#  transcriber_transcribed_expenses_update PATCH      /transcriber/transcribed_expenses/update(.:format)          transcriber/transcriber/expenses#update
-#    transcriber_transcribed_expenses_show GET        /transcriber/transcribed_expenses/:id/show(.:format)        transcriber/transcriber/expenses#show
+#              transcriber_companies_index GET        /transcriber/companies/index(.:format)                      transcriber/companies#index
+#  transcriber_transcribed_expenses_create POST       /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
+#  transcriber_transcribed_expenses_update PATCH      /transcriber/expenses/update(.:format)                      transcriber/receipts#update_expense
+#     transcriber_transcribed_receipt_show GET        /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
+#       transcriber_untranscribed_receipts GET        /transcriber/companies/:id(.:format)                        transcriber/companies#show
+#                    transcriber_companies GET        /transcriber/companies(.:format)                            transcriber/companies#index
 #                                menu_data GET        /menu_data(.:format)                                        users#menu_data
 #                   new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
@@ -530,11 +533,17 @@
 Rails.application.routes.draw do
 
   namespace :transcriber do
-    post 'transcribed_expenses/create', to: 'transcriber/expenses#create', as: :transcribed_expenses_create
-    patch 'transcribed_expenses/update', to: 'transcriber/expenses#update', as: :transcribed_expenses_update
-    get 'transcribed_expenses/:id/show', to: 'transcriber/expenses#show', as: :transcribed_expenses_show
-    get '/:id/receipts_untranscribed', to: 'transcriber/expenses#receipts', as: :untranscribed_receipts
+  get 'companies/index'
   end
+
+  namespace :transcriber do
+    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
+    patch 'expenses/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
+    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
+    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
+    get 'companies', to: 'companies#index', as: :companies
+  end
+
 
 
   get 'menu_data', to: "users#menu_data"

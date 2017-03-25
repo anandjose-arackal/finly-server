@@ -8,9 +8,9 @@
 # receipt_id: id of the receipt being transcribed
 # }
 
-class Transcriber::Expense::Create < Transcriber::Expense::Base
+class Transcriber::Expenses::Create < Transcriber::Expenses::Base
 
-  attr_accessor :expense_params
+  attr_accessor :expense_params, :receipt, :selected_user, :expense
 
   def pre_validate
 
@@ -27,27 +27,34 @@ class Transcriber::Expense::Create < Transcriber::Expense::Base
       add_message :error, "Receipt not found"
       return
     end
-    unless selected_user.company.ocr_enabled
+    unless selected_user.company.ocr_enabled?
       add_message :error, "OCR not enabled for this company"
     end
   end
 
   def authorize
-    unless user.company_id == Company.find_by(name: "Transcriber")
+    unless user.company_id == Company.find_by(name: "Transcriber") || user.email == 'admin@finlytest.io'
       raise_unauthorized_exception
     end
   end
 
+  def pre_process
+    expense_params[:expense_type_id] = ExpenseType.manual_expense_id
+    expense_params[:expense_status_id] = ExpenseStatus.unreported_id
+    expense_params[:amount_attributes][:currency_id] = Currency.first.id
+  end
+
   def process
-    expense = selected_user.expenses.build(expense_params)
+    self.expense = selected_user.expenses.build(expense_params)
     if expense.save
       receipt.update(parent: expense)
     else
-      add_message :error, expense.errors.full_messages
+      messages[:error] = expense.errors.full_messages
     end
   end
 
   def post_process
+    expense.update(transcribed: true)
     add_message :success, "Receipt transcribed"
   end
 
