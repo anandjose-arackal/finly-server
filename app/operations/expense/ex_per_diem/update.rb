@@ -70,8 +70,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     end
     # checking whether the new per_diem is accessible to the user
     if updated_expense_params[:per_diem_expense_attributes][:per_diem_id].present?
-
-      unless user.per_diems_list.pluck(:id).include?()
+      
     end
   end
 
