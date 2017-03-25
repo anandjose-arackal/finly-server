@@ -54,6 +54,8 @@ class Settlement::Summary < Settlement::Base
     personal = user == selected_user
     result = User::Balance.(user, target_user: selected_user, current_user_all: true, target_user_all: true, virtual_account: true).balances
 
+    load_transfer_options(result)
+
     self.balances = {}
     self.balances[:wallet] = {balance: result[:target_user][:wallet][:balance], name: 'Finly Money', id: selected_user.wallet.id}
     if result[:target_user][:card].present?
@@ -81,10 +83,15 @@ class Settlement::Summary < Settlement::Base
                                            debit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:debt_clearance))}}}
     self.balances[:pending_money_requests] = {balance: result[:target_user][:pending_money_requests][:balance], count: result[:target_user][:pending_money_requests][:count],
                                               meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))}}
-    self.balances[:pending_reports] = {balance: result[:target_user][:pending_reports][:balance], count: result[:target_user][:pending_reports][:count],
+
+
+    reimbursement = load_reimbursement(personal, result)
+
+    self.balances[:pending_reports] = {balance: result[:target_user][:pending_reports][:balance],
+                                       count: result[:target_user][:pending_reports][:count],
+                                       reimbursement: reimbursement,
                                        meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}}
 
-    load_transfer_options(result)
     # result[:target_user].each do |item|
     #   next if item[:type].blank?
     #   case item[:type]
@@ -107,12 +114,28 @@ class Settlement::Summary < Settlement::Base
     # end
   end
 
+  def load_reimbursement(personal, balances)
+    to_user_reimbursable_card = selected_user.cards.reimbursable_cards.first rescue nil
+    reimbursement = {associated_reimbursement_card: to_user_reimbursable_card.present?,
+                     card: {},
+                     initiating_accounts: []}
+
+    if to_user_reimbursable_card
+      name = personal ? 'Your Reimbursement card' : "#{selected_user.name}'s Reimbursement Card"
+      eligibility = balances[:target_user][:card][to_user_reimbursable_card.id][:eligibility]
+      reimbursement[:card] = {id: to_user_reimbursable_card.id, name: name, eligibility: eligibility}
+    end
+    reimbursement[:initiating_accounts] = self.actions[:credit_actions][:initiating_accounts]
+    reimbursement
+  end
+
   def load_transfer_options(balances)
     credit_actions = {initiating_accounts: [], receiving_accounts: []}
     debit_actions={initiating_accounts: [], receiving_accounts: []}
 
     from_user_creditable_cards = user.cards.creditable_cards
     to_user_creditable_cards = selected_user.cards.creditable_cards
+
     from_user_name = 'Your'
     personal_transfer = self.user == self.selected_user
     to_user_name = personal_transfer ? 'Your' : self.selected_user.name

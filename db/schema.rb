@@ -1154,6 +1154,13 @@ ActiveRecord::Schema.define(version: 20170324105448) do
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
+  create_table "resource_requests", force: :cascade do |t|
+    t.string "name",               limit: 255
+    t.string "email",              limit: 255
+    t.string "mobile_number",      limit: 255
+    t.string "resource_file_name", limit: 255
+  end
+
   create_table "rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
