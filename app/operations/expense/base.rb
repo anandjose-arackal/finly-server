@@ -28,6 +28,7 @@ class Expense::Base < BaseOperation
       self.view = params[:view]
       self.violation = retrieve_violation
       self.editable = retrieve_editable
+      self.per_diems = user.per_diems_list
     end
 
     def retrieve_violation

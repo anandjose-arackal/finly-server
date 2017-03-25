@@ -13,6 +13,8 @@ json.receipts @result.expense.receipts do |receipt|
   end
 end
 
+json.per_diems @result.per_diems
+
 json.violations @result.violation
 
 json.editable @result.editable
