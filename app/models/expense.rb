@@ -257,7 +257,7 @@ class Expense < ActiveRecord::Base
       when 5
         return self.per_diem_expense.per_diem_name
       else
-        # do nothing
+        return "- -"
     end
   end
 
