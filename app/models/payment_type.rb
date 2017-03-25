@@ -13,7 +13,7 @@ class PaymentType < ActiveRecord::Base
   has_many :payments
 
   TYPES = {add_cash_on_hand: 1, deduct_cash_on_hand: 2, reimbursement: 3, settlement: 4,
-           atm_withdrawal: 11, credit: 18, debit: 19}
+           atm_withdrawal: 11, credit: 18, debit: 19, reimbursement_outside_finly: 20}
 
   # TYPES = {advance: 1, debt_clearance: 2, reimbursement: 3, settlement: 4,
   #          credit_from_virtual_account_to_wallet: 5,

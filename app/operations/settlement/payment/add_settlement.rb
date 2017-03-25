@@ -3,16 +3,16 @@
 # report_ids: ids of the reports that are to be reimbursed.
 # to_user_id or id: user whose reports are being settled
 # payment:
-  # amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
-  # currency_id: currency of the reimbursement
-  # note: optional note to accompany payment
-  # date: date of the payment
+# amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
+# currency_id: currency of the reimbursement
+# note: optional note to accompany payment
+# date: date of the payment
 
 class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   include MathUtil
-  attr_accessor :reports, :role, :report_total, :cash_deduction, :report_names
-
-  attr_accessor :reimbursement_amount, :cash_in_hand_deduction_amount
+  attr_accessor :reports, :role, :report_total, :cash_deduction, :report_names, :reimbursement_card, :reimbursement_card_id,
+                :reimbursement_amount, :cash_in_hand_deduction_amount, :outside_settlement_amount,
+                :initiating_account, :initiating_account_type, :initiating_account_id
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -20,14 +20,17 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
   def pre_validate
     super()
-    if params[:payment][:from_cash_in_hand].to_f <0 or params[:payment][:from_outside_finly].to_f < 0
-      add_message :error, "Reimbursement amount or cash in hand deduction cannot be negative"
+    from_cash_in_hand = params[:payment][:from_cash_in_hand].to_f rescue 0
+    from_outside_finly = params[:payment][:from_outside_finly].to_f rescue 0
+    from_reimbursement_card = params[:payment][:from_reimburesement_card][:amount] rescue 0
+    if from_cash_in_hand < 0 or from_outside_finly < 0 or from_reimbursement_card < 0
+      add_message :error, 'Reimbursement amount or cash in hand deduction cannot be negative'
       return
     end
-    if params[:payment][:from_cash_in_hand].to_f == 0 and params[:payment][:from_outside_finly].to_f == 0
-      add_message :error, 'Reimbursement amount and cash in hand deduction cannot both be equal to 0'
-      return
-    end
+    # if params[:payment][:from_cash_in_hand].to_f == 0 and params[:payment][:from_outside_finly].to_f == 0
+    #   add_message :error, 'Reimbursement amount and cash in hand deduction cannot both be equal to 0'
+    #   return
+    # end
     if params[:report_ids].blank?
       add_message :error, 'No reports to reimburse'
     end
@@ -41,8 +44,20 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     reports.each do |report|
       self.report_names << report.name
     end
-    self.reimbursement_amount = payment_params[:from_outside_finly].to_f
-    self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f
+    return if to_user.blank?
+
+    self.outside_settlement_amount = payment_params[:from_outside_finly].to_f rescue nil
+
+    self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f rescue nil
+
+    self.reimbursement_card_id = payment_params[:from_reimburesement_card][:id] rescue nil
+    if reimbursement_card_id.present?
+      self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
+    end
+
+    if self.reimbursement_card.present?
+      self.reimbursement_amount = payment_params[:from_reimburesement_card][:amount].to_f rescue nil
+    end
   end
 
   def authorize
@@ -61,6 +76,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     unless team.include?(to_user)
       raise_unauthorized_exception
     end
+
   end
 
   def validate
@@ -77,71 +93,182 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       return
     end
 
-    payment_date = Date.parse(payment_params[:date])
+    # payment_date = Date.parse(payment_params[:date])
     # validating that the money deducted from cash in hand is actually less than the cash in hand on date of settlement
-    cash_in_hand = to_user.cash_in_hand(payment_date).value rescue 0
+    cash_in_hand = to_user.cash_in_hand.value rescue 0
 
-    if precision_value(cash_in_hand_deduction_amount) > precision_value(cash_in_hand)
+    if cash_in_hand_deduction_amount.present? and precision_value(cash_in_hand_deduction_amount) > precision_value(cash_in_hand)
       add_message :error, "You cannot deduct more cash than the employee has on #{payment_params[:date].to_s}"
     end
 
-    # checking if cash in hand deduction + settlement amount matches up with report total
-    self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
-    unless report_total == precision_value(reimbursement_amount + cash_in_hand_deduction_amount).to_f
-      add_message :error, 'Reimbursement total does not match report totals'
+    validate_reimbursement_card
+    # # Removed the check to ensure cash in hand deduction + settlement amount matches up as we would also be considering Reimbursements
+    # # checking if cash in hand deduction + settlement amount matches up with report total
+    # self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
+    # unless report_total == precision_value(reimbursement_amount + cash_in_hand_deduction_amount).to_f
+    #   add_message :error, 'Reimbursement total does not match report totals'
+    # end
+    return if has_errors?
+    cia_deduction_amount = cash_in_hand_deduction_amount.present? ? cash_in_hand_deduction_amount : 0
+    outside_amount = outside_settlement_amount.present? ? outside_settlement_amount : 0
+    r_amount = reimbursement_amount.present? ? reimbursement_amount : 0
+    if cia_deduction_amount + outside_amount + r_amount > report_total
+      add_message :error, 'Settlement amount exceeds report total'
+    end
+  end
+
+  def validate_reimbursement_card
+    if self.reimbursement_card_id.present? and self.reimbursement_card.blank?
+      add_message :error, 'Card not found to process reimbursement'
+      return
+    end
+
+    return if self.reimbursement_card.blank?
+    unless self.reimbursement_card.card_program.receive_reimbursement
+      add_message :error, 'Selected card is not a Reimbursement Card'
+      return
+    end
+
+    if self.reimbursement_amount.blank?
+      add_message :error, 'Reimbursement Amount cannot be blank'
+      return
+    end
+
+    if self.reimbursement_amount < 0
+      add_message :error, 'Reimbursement amount has to be greater than 0'
+      return
+    end
+
+    if outside_settlement_amount.present?
+      add_message :error, 'Invalid Entry. You can either settle outside Finly or process the reimbursement through Finly Reimbursement Card but not both'
+      return
     end
   end
 
   def process
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
-                                          payment_type_id: PaymentType.id_for(:reimbursement),
-                                          date: payment_params[:date], note: payment_params[:note],
-                                  amount_attributes: {value: reimbursement_amount, currency_id: payment_params[:currency_id]})
-    # deducting cash in hand given in the params
-    self.cash_deduction = to_user.payments.build(initiating_user: user, receiving_user: to_user,
-                                                 payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
-                                                 date: payment_params[:date], note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
-                                                 amount_attributes: {value: cash_in_hand_deduction_amount, currency_id: payment_params[:currency_id]})
     balance_sheet = to_user.balance_sheet
-    if reimbursement_amount == 0
-      if cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
-        # subtract the respective amount from the user's cash in hand
-        to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
-        # mark the reports as reimbursed
-        reports.each do |report|
-          Report::MarkAsSettled.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role})
-        end
+
+    if self.cash_in_hand_deduction_amount.present?
+      # deducting cash in hand given in the params
+      self.cash_deduction = to_user.payments.build(initiating_user: user, receiving_user: to_user,
+                                                   payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
+                                                   date: payment_params[:date], note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
+                                                   amount_attributes: {value: cash_in_hand_deduction_amount, currency_id: payment_params[:currency_id]})
+      unless cash_deduction.valid?
+        add_message :error, cash_deduction.errors.full_messages
         return
-      else
-        add_message :error, cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
-      end
-    elsif cash_in_hand_deduction_amount == 0
-      if payment.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
-        # mark the reports as reimbursed
-        reports.each do |report|
-          Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
-        end
-      else
-        add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
-      end
-    else
-      if payment.save and cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
-        # subtract the respective amount from the user's cash in hand
-        to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
-        # mark all the reports as reimbursed
-        reports.each do |report|
-          Report::MarkAsSettled.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
-        end
-      else
-        add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
       end
     end
+
+    if reimbursement_amount.present?
+      self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
+                                            payment_type_id: PaymentType.id_for(:reimbursement),
+                                            date: Date.today, note: payment_params[:note],
+                                            initiating_account: self.initiating_account,
+                                            receiving_account: self.reimbursement_card,
+                                            amount_attributes: {value: reimbursement_amount,
+                                                                currency_id: payment_params[:currency_id]})
+      unless self.payment.valid?
+        add_message :error, self.payment.errors.full_messages
+        return
+      end
+
+      case initiating_account_type
+        when :virtual_account
+          # Do nothing
+        when :wallet
+          # Subtract the reimbursement amount from wallet
+          wallet = user.wallet
+          unless wallet.subtract_funds(self.amount)
+            add_message :error, wallet.errors.full_messages
+            return
+          end
+        when :card
+          # Debit the reimbursement amount from card
+          debit_result = ItzCash::Debit.(user, card_id: initiating_account_id, amount: self.amount)
+          unless debit_result.success?
+            add_message :error, debit_result.messages[:error]
+            return
+          end
+      end
+
+      result = ItzCash::Credit.(to_user, card_id: reimbursement_card.id, amount: self.amount)
+      unless result.success?
+        add_message :error, result.messages[:error]
+        return
+      end
+
+      self.payment.save
+
+    elsif outside_settlement_amount.present?
+      self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
+                                            payment_type_id: PaymentType.id_for(:reimbursement_outside_finly),
+                                            date: payment_params[:date], note: payment_params[:note],
+                                            amount_attributes: {value: outside_settlement_amount, currency_id: payment_params[:currency_id]})
+      if self.payment.save
+        balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+      else
+        add_message :error, self.payment.errors.full_messages
+      end
+    end
+
+    if self.cash_in_hand_deduction_amount.present?
+      # deducting cash in hand given in the params
+      bs = to_user.balance_sheet
+      if bs.subtract_cash_in_hand(cash_in_hand_deduction_amount)
+        self.cash_deduction.save
+      else
+        add_message :error, bs.errors.full_messages
+        return
+      end
+    end
+
+    reports.each do |report|
+      Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
+    end
+
+
+      # if outside_settlement_amount == 0
+      #   if cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+      #     # subtract the respective amount from the user's cash in hand
+      #     to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
+      #     # mark the reports as reimbursed
+      #     reports.each do |report|
+      #       Report::MarkAsSettled.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role})
+      #     end
+      #     return
+      #   else
+      #     add_message :error, cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
+      #   end
+      # elsif cash_in_hand_deduction_amount == 0
+      #   if payment.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+      #     # mark the reports as reimbursed
+      #     reports.each do |report|
+      #       Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
+      #     end
+      #   else
+      #     add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
+      #   end
+      # else
+      #   if payment.save and cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+      #     # subtract the respective amount from the user's cash in hand
+      #     to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
+      #     # mark all the reports as reimbursed
+      #     reports.each do |report|
+      #       Report::MarkAsSettled.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
+      #     end
+      #   else
+      #     add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
+      #   end
+      # end
   end
 
   def post_process
     add_message :success, 'Reports settled'
 
-    event = Event::ESettlement::AddSettlement.new(user, payment: self.payment, cash_in_hand_deduction: cash_deduction, from_cash_in_hand: cash_deduction)
+    event = Event::ESettlement::AddSettlement.new(user, payment: self.payment, cash_in_hand_deduction: cash_deduction,
+                                                  from_cash_in_hand: cash_deduction,
+                                                  reimbursement: {card: reimbursement_card, amount: reimbursement_amount})
     event.run
   end
 end
