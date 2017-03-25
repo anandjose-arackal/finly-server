@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style type="text/css">
+    .spacing {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    #editbutton {
+      width: 100px;
+      margin: auto;
+    }
+    #submitbutton {
+      width: 100px;
+      float: right;
+    }
+    body {
+      background-color: #dedede;
+    }
+  </style>
+  <script type="text/javascript">
+      function submitfunction(){
+          console.log("submit function is called");
+
+          // the following will hide all the form input fields
+          document.getElementById("expense_amount").style.display = "none";
+          document.getElementById("expense_merchant").style.display = "none";
+          document.getElementById("expense_date").style.display = "none";
+          document.getElementById("expense_category").style.display = "none";
+          document.getElementById("expense_note").style.display = "none";
+
+          // the following will change the css to display all the data
+          document.getElementById("amount_value").style.display = "block";
+          document.getElementById("merchant_value").style.display = "block";
+          document.getElementById("date_value").style.display = "block";
+          document.getElementById("note_value").style.display = "block";
+          document.getElementById("category_value").style.display = "block";
+
+          // the following will extract input value entered by user and show
+          document.getElementById("amount_value").innerHTML = document.getElementById("expense_amount").value;
+          document.getElementById("merchant_value").innerHTML = document.getElementById("expense_merchant").value;
+          document.getElementById("date_value").innerHTML = document.getElementById("expense_date").value;
+          document.getElementById("note_value").innerHTML = document.getElementById("expense_note").value;
+          var e = document.getElementById("expense_category");
+          var category_value = e.options[e.selectedIndex].text;
+          document.getElementById("category_value").innerHTML = category_value;
+
+          // the following will hide the submit button and display the edit button
+          document.getElementById("submitbutton").style.display = "none";
+          document.getElementById("editbutton").style.display = "block";
+      }
+
+
+      function editfunciton(){
+          console.log("edit function is called");
+
+          // the following code is changing the style of the form elements to allow user to edit
+          document.getElementById("expense_amount").style.display = "block";
+          document.getElementById("expense_merchant").style.display = "block";
+          document.getElementById("expense_date").style.display = 'block';
+          document.getElementById("expense_note").style.display = "block";
+          document.getElementById("expense_category").style.display = "block";
+
+          // the following is displaying the submit button and hiding the edit button
+          document.getElementById("submitbutton").style.display = "block";
+          document.getElementById("editbutton").style.display = "none";
+
+          // the following will hide all the data that are displayed once the submit button is clicked
+          document.getElementById("amount_value").style.display = "none";
+          document.getElementById("merchant_value").style.display = "none";
+          document.getElementById("date_value").style.display = "none";
+          document.getElementById("note_value").style.display = "none";
+          document.getElementById("category_value").style.display = "none";
+
+      }
+  </script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6">
+      <img src="http://placehold.it/500x500/663399" class="img-responsive">
+    </div>
+    <div class="col-sm-6">
+
+      <div class="form-group">
+        <div class="spacing">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Amount:</strong></h5>
+            </div>
+            <div class="col-sm-6">
+              <p id="amount_value"></p>
+            </div>
+          </div>
+          <input type="number" name="" class="form-control" id="expense_amount">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="spacing">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Merchant:</strong></h5>
+            </div>
+            <div class="col-sm-6">
+              <p id="merchant_value"></p>
+            </div>
+          </div>
+          <input type="text" name="" class="form-control" id="expense_merchant">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="spacing">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Date:</strong></h5>
+            </div>
+            <div class="col-sm-6">
+              <p id="date_value"></p>
+            </div>
+          </div>
+          <input type="date" name="" class="form-control" id="expense_date">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="spacing">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Note:</strong></h5>
+            </div>
+            <div class="col-sm-6">
+              <p id="note_value"></p>
+            </div>
+          </div>
+          <textarea class="form-control" id="expense_note"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <input type="text" name="" hidden="hidden">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="spacing">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Category:</strong></h5>
+            </div>
+            <div class="col-sm-6">
+              <p id="category_value"></p>
+            </div>
+          </div>
+          <select class="form-control" id="expense_category">
+              <option value="">None</option>
+            <% @result.categories.each do |category| %>
+              <option value="<% category.id%>"><%=category.name%></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="spacing">
+          <div class="row">
+            <div class="col-sm-12">
+              <button class="btn btn-primary" onclick="submitfunction()" id="submitbutton">Submit</button>
+              <button class="btn btn-success" onclick="editfunciton()" id="editbutton" style="display: none;">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

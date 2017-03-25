@@ -1,6 +1,9 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
+#  transcriber_transcribed_expenses_create POST       /transcriber/transcribed_expenses/create(.:format)          transcriber/transcriber/expenses#create
+#  transcriber_transcribed_expenses_update PATCH      /transcriber/transcribed_expenses/update(.:format)          transcriber/transcriber/expenses#update
+#    transcriber_transcribed_expenses_show GET        /transcriber/transcribed_expenses/:id/show(.:format)        transcriber/transcriber/expenses#show
 #                                menu_data GET        /menu_data(.:format)                                        users#menu_data
 #                   new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
@@ -110,6 +113,8 @@
 #                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
 #                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
 #                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
+#                        resources_details POST       /resources_details(.:format)                                registrations#resource_requests
+#                       resources_download GET        /download_resource(.:format)                                registrations#resources_download
 #                         new_user_session GET        /users/sign_in(.:format)                                    sessions#new
 #                             user_session POST       /users/sign_in(.:format)                                    sessions#create
 #                     destroy_user_session DELETE     /users/sign_out(.:format)                                   sessions#destroy
@@ -415,7 +420,6 @@
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
 #           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
-#             user_available_expense_types GET        /users/:user_id/available_expense_types(.:format)           users#available_expense_types
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -424,6 +428,7 @@
 #                                          PATCH      /users/:id(.:format)                                        users#update
 #                                          PUT        /users/:id(.:format)                                        users#update
 #                                          DELETE     /users/:id(.:format)                                        users#destroy
+#                  available_expense_types GET        /available_expense_types(.:format)                          users#available_expense_types
 #                              user_import POST       /import(.:format)                                           users#import
 #                        superadmin_import POST       /superadmin_import(.:format)                                superadmin/companies#import
 #                      initiate_activation GET        /pending_invites/initiate_activation(.:format)              pending_invites#initiate_activation
@@ -523,6 +528,15 @@
 #
 
 Rails.application.routes.draw do
+
+  namespace :transcriber do
+    post 'transcribed_expenses/create', to: 'transcriber/expenses#create', as: :transcribed_expenses_create
+    patch 'transcribed_expenses/update', to: 'transcriber/expenses#update', as: :transcribed_expenses_update
+    get 'transcribed_expenses/:id/show', to: 'transcriber/expenses#show', as: :transcribed_expenses_show
+    get '/:id/receipts_untranscribed', to: 'transcriber/expenses#receipts', as: :untranscribed_receipts
+  end
+
+
   get 'menu_data', to: "users#menu_data"
 
 

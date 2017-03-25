@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170325085735) do
+ActiveRecord::Schema.define(version: 20170325152946) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -344,6 +344,7 @@ ActiveRecord::Schema.define(version: 20170325085735) do
     t.datetime "logo_updated_at"
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
+    t.boolean  "ocr_enabled"
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -1138,6 +1139,23 @@ ActiveRecord::Schema.define(version: 20170325085735) do
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
 
+  create_table "transcribed_expenses", force: :cascade do |t|
+    t.integer  "amount_id",  limit: 4
+    t.date     "date"
+    t.text     "merchant",   limit: 65535
+    t.text     "note",       limit: 65535
+    t.integer  "receipt_id", limit: 4
+    t.integer  "expense_id", limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "transcribed_expenses", ["amount_id"], name: "index_transcribed_expenses_on_amount_id", using: :btree
+  add_index "transcribed_expenses", ["expense_id"], name: "index_transcribed_expenses_on_expense_id", using: :btree
+  add_index "transcribed_expenses", ["receipt_id"], name: "index_transcribed_expenses_on_receipt_id", using: :btree
+  add_index "transcribed_expenses", ["user_id"], name: "index_transcribed_expenses_on_user_id", using: :btree
+
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
     t.integer  "user_id",                    limit: 4
@@ -1435,6 +1453,10 @@ ActiveRecord::Schema.define(version: 20170325085735) do
   add_foreign_key "reports", "users"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
+  add_foreign_key "transcribed_expenses", "amounts"
+  add_foreign_key "transcribed_expenses", "expenses"
+  add_foreign_key "transcribed_expenses", "receipts"
+  add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_manager_mappings", "policies"
