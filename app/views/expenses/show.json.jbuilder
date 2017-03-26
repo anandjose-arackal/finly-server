@@ -13,7 +13,11 @@ json.receipts @result.expense.receipts do |receipt|
   end
 end
 
-json.per_diems @result.per_diems
+json.per_diems @result.per_diems do |per_diem|
+  json.id per_diem.id
+  json.name "#{per_diem.configurable.name} - #{per_diem.name}"
+  json.per_diems @result.per_diems
+end
 
 json.violations @result.violation
 
