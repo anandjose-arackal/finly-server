@@ -71,7 +71,8 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     # checking whether the new per_diem is accessible to the user
     if updated_expense_params[:per_diem_expense_attributes][:per_diem_id].present?
       per_diem_id = updated_expense_params[:per_diem_expense_attributes][:per_diem_id].to_i
-      unless user.per_diems_list.pluck(:id).include?(per_diem_id)
+      per_diem = PerDiem.find_by(per_diem_id)
+      unless per_diem && user.per_diems_list.include?(per_diem)
         add_message :error, "You do not have access to this Per Diem"
         return
       end
