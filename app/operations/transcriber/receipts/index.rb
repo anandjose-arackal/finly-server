@@ -6,8 +6,12 @@ class Transcriber::Receipts::Index < BaseOperation
 
     attr_accessor :receipts, :categories, :company
 
+    # scopes for filters
+    has_scope :filter_parent
+
     def init
       self.receipts = params[:receipts]
+      self.receipts = apply_scopes(receipts, params)
       self.company = params[:company]
       self.categories = params[:categories]
     end
@@ -32,7 +36,7 @@ class Transcriber::Receipts::Index < BaseOperation
 
   def process
     company.users.each do |user|
-      self.receipts += user.receipts
+      self.receipts += user.receipts.untranscribed
     end
   end
 

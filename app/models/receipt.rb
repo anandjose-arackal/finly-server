@@ -15,7 +15,10 @@
 #  parent_type        :string(255)
 #  note               :text(65535)
 #  receipt_email_id   :integer
+#  transcribed        :boolean          default(FALSE)
 #
+
+
 
 
 
@@ -50,6 +53,20 @@ class Receipt < ActiveRecord::Base
       where(receipts[type_val].gteq(date_from).and(receipts[type_val].lteq(date_to)))
     end
   end
+
+  scope :filter_parent, -> (type){
+    # 1 - parent present, 2 - parent absent
+    case type
+      when '1', 1
+        where(parent: nil)
+      when '2', 2
+        where(parent_type: 'Expense')
+      else
+
+    end
+  }
+
+  scope :untranscribed, -> { where(to_be_transcribed: true) }
 
   def receipt_file_name
     self.image_file_name

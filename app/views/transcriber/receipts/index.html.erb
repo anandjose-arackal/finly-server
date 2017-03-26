@@ -23,6 +23,11 @@
     }
   </style>
   <script type="text/javascript">
+
+
+      //$('.datepicker').datepicker({ dateFormat: 'dd-mm-yy' });
+
+
       function submitfunction(){
           console.log("submit function is called");
 
@@ -77,17 +82,31 @@
           document.getElementById("category_value").style.display = "none";
 
       }
+
+
   </script>
 </head>
 <body>
 <div class="container-fluid">
+  <%	 @counter = 1 %>
   <%	@result.receipts.each do |receipt|  %>
+      <h3> <%= @counter %>. <%= receipt.user.name %> - <%	receipt.note %></h3>
+      <%	 @counter += 1 %>
+      <% expense = receipt.parent %>
       <div class="row">
         <div class="col-sm-6">
           <img src="<%= receipt.image.url %>" class="img-responsive">
         </div>
         <div class="col-sm-6">
-        <form action="<%= transcriber_transcribed_expenses_create_path%>" method="post" id="transcribe-expense-form">
+
+        <% if expense %>
+          <form action="<%= transcriber_transcribed_expenses_update_path(expense.id)%>" method="post" id="transcribe-expense-form">
+              <input hidden="hidden" name="_method" value="patch">
+        <% else %>
+          <form action="<%= transcriber_transcribed_expenses_create_path%>" method="post" id="transcribe-expense-form">
+        <% end %>
+
+
           <input name="receipt_id" value="<%=receipt.id%>" hidden="true">
           <div class="form-group">
             <div class="spacing">
@@ -99,7 +118,7 @@
                   <p id="amount_value"></p>
                 </div>
               </div>
-              <input type="number" name="expense[amount_attributes][value]" class="form-control" id="expense[amount_attributes][value]">
+              <input type="number" name="expense[amount_attributes][value]" value="<%= expense.amount_value if expense%>" class="form-control" id="expense[amount_attributes][value]">
             </div>
           </div>
 
@@ -113,7 +132,7 @@
                   <p id="merchant_value"></p>
                 </div>
               </div>
-              <input type="text" name="expense[manual_expense_attributes][merchant]" class="form-control" id="expense[manual_expense_attributes][merchant]">
+              <input type="text" name="expense[manual_expense_attributes][merchant]" value="<%= expense.merchant_name if expense%>" class="form-control" id="expense[manual_expense_attributes][merchant]">
             </div>
           </div>
 
@@ -127,7 +146,7 @@
                   <p id="date_value"></p>
                 </div>
               </div>
-              <input type="date" name="expense[date]" class="form-control" id="expense[date]">
+              <input type="date" name="expense[date]" value="<%= expense.date if expense%>" class="form-control datepicker" id="expense[date]">
             </div>
           </div>
 
@@ -141,7 +160,7 @@
                   <p id="note_value"></p>
                 </div>
               </div>
-              <textarea class="form-control" id="expense[note]" name="expense[note]"></textarea>
+              <textarea class="form-control" id="expense[note]" name="expense[note]" ><%= expense.note if expense%></textarea>
             </div>
           </div>
 
@@ -164,7 +183,11 @@
               <select class="form-control" id="expense[category_id]" name="expense[category_id]">
                 <option value="">None</option>
                 <% @result.categories.each do |category| %>
-                    <option value="<%= category.id %>"><%=category.name%></option>
+                    <option value="<%= category.id %>"
+                    <% if expense && expense.category_id == category.id %>
+                    selected="selected"
+                    <% end %>
+                    ><%=category.name%></option>
                 <% end %>
               </select>
             </div>
@@ -174,12 +197,17 @@
             <div class="spacing">
               <div class="row">
                 <div class="col-sm-12">
-                  <button class="btn btn-primary" id="submitbutton">Submit</button>
+                  <% if expense %>
+                      <button class="btn btn-primary" id="submitbutton">Update</button>
+                  <% else %>
+                      <button class="btn btn-primary" id="submitbutton">Submit</button>
+                  <% end %>
                   <button class="btn btn-success" onclick="editfunciton()" id="editbutton" style="display: none;">Edit</button>
                 </div>
               </div>
             </div>
           </div>
+        </form>
         </form>
         </div>
       </div>

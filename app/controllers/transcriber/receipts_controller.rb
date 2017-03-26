@@ -15,6 +15,13 @@ class Transcriber::ReceiptsController < ApplicationController
   end
 
   def update_expense
+    @result = Transcriber::Expenses::Update.(current_user, params)
+    if @result.success?
+      flash[:success] = "Expense Updated"
+    else
+      flash[:error] = @result.messages[:error]
+    end
+    redirect_to request.referrer
   end
 
   def show

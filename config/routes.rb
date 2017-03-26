@@ -3,7 +3,7 @@
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
 #              transcriber_companies_index GET        /transcriber/companies/index(.:format)                      transcriber/companies#index
 #  transcriber_transcribed_expenses_create POST       /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
-#  transcriber_transcribed_expenses_update PATCH      /transcriber/expenses/update(.:format)                      transcriber/receipts#update_expense
+#  transcriber_transcribed_expenses_update PATCH      /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
 #     transcriber_transcribed_receipt_show GET        /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
 #       transcriber_untranscribed_receipts GET        /transcriber/companies/:id(.:format)                        transcriber/companies#show
 #                    transcriber_companies GET        /transcriber/companies(.:format)                            transcriber/companies#index
@@ -532,13 +532,10 @@
 
 Rails.application.routes.draw do
 
-  namespace :transcriber do
-  get 'companies/index'
-  end
 
   namespace :transcriber do
     post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
-    patch 'expenses/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
+    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
     get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
     get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
     get 'companies', to: 'companies#index', as: :companies
