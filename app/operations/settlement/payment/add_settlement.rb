@@ -311,20 +311,5 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
                                                   reimbursement: {card: reimbursement_card, amount: reimbursement_amount})
     event.run
   end
-
-  def success
-    Settlement::Base::SuccessPresenter.new(user, params)
-  end
-
-  class Settlement::Payment::AddSettlement::SuccessPresenter < Settlement::Base::SuccessPresenter
-    attr_accessor :reports, :role, :report_total, :cash_deduction, :reimbursement_card
-                  :reimbursement_amount, :cash_in_hand_deduction_amount, :outside_settlement_amount,
-                  :initiating_account
-
-    def init
-      self.reports = params[:reports]
-      self.role = params[:role]
-      self.report_total = params[:report_total]
-    end
-  end
+  
 end
