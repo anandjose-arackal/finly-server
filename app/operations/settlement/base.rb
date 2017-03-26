@@ -2,7 +2,7 @@ class Settlement::Base < BaseOperation
 
   attr_accessor :to_user
 
-  class Settlement::Base::BasePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Settlement::Base::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
   end
 
@@ -22,7 +22,7 @@ class Settlement::Base < BaseOperation
       add_message :error, 'Date cannot be blank'
       return false
     end
-    unless DateUtils.validate_date_format?(date)
+    if date.is_a?(String) and DateUtils.validate_date_format?(date)
       add_message :error, 'Invalid date format'
       return false
     end

@@ -34,11 +34,20 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     if params[:report_ids].blank?
       add_message :error, 'No reports to reimburse'
     end
+
+    if params[:payment].present? and params[:payment][:from_reimbursement_card]
+      initiating_account_id = params[:payment][:initiating_account_id].to_sym rescue nil
+      initiating_account_type = params[:payment][:initiating_account_type].to_sym rescue nil
+      if initiating_account_type.blank? or (initiating_account_type == :card and initiating_account_id.blank?)
+        add_message :error, 'Account not found to initiate the transfer'
+        return
+      end
+    end
   end
 
   def init
     id = (params[:id] or params[:to_user_id])
-    self.to_user = user.company.users.find_by(id: id)
+    self.to_user = user.company.users.with_id(id).first rescue nil
     self.reports = to_user.reports.with_id(params[:report_ids]) if to_user
     self.report_names = []
     reports.each do |report|
@@ -50,13 +59,29 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
     self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f rescue nil
 
-    self.reimbursement_card_id = payment_params[:from_reimburesement_card][:id] rescue nil
+    self.reimbursement_card_id = payment_params[:from_reimbursement_card][:id] rescue nil
     if reimbursement_card_id.present?
       self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
     end
 
     if self.reimbursement_card.present?
-      self.reimbursement_amount = payment_params[:from_reimburesement_card][:amount].to_f rescue nil
+      self.reimbursement_amount = payment_params[:from_reimbursement_card][:amount].to_f rescue nil
+
+      self.initiating_account_type = payment_params[:initiating_account_type]
+
+      case self.initiating_account_type.to_sym
+        when :virtual_account
+          self.initiating_account_id = user.company_id
+          self.initiating_account = user.company
+        when :wallet
+          self.initiating_account_id = user.wallet.id
+          self.initiating_account = user.wallet
+        when :card
+          self.initiating_account_id = payment_params[:initiating_account_id].to_i rescue nil
+          if self.initiating_account_id.present?
+            self.initiating_account = user.cards.with_id(self.initiating_account_id).first rescue nil
+          end
+      end
     end
   end
 
@@ -73,7 +98,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       self.role = UserRole.finance_manager_id
     end
     team = User::Team::Index.(user, params)
-    unless team.include?(to_user)
+    unless team.success? and team.include?(to_user)
       raise_unauthorized_exception
     end
 
@@ -102,6 +127,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
 
     validate_reimbursement_card
+    validate_initiating_account
     # # Removed the check to ensure cash in hand deduction + settlement amount matches up as we would also be considering Reimbursements
     # # checking if cash in hand deduction + settlement amount matches up with report total
     # self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
@@ -109,11 +135,24 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     #   add_message :error, 'Reimbursement total does not match report totals'
     # end
     return if has_errors?
+    self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
     cia_deduction_amount = cash_in_hand_deduction_amount.present? ? cash_in_hand_deduction_amount : 0
     outside_amount = outside_settlement_amount.present? ? outside_settlement_amount : 0
     r_amount = reimbursement_amount.present? ? reimbursement_amount : 0
     if cia_deduction_amount + outside_amount + r_amount > report_total
       add_message :error, 'Settlement amount exceeds report total'
+    end
+  end
+
+  def validate_initiating_account
+    return unless self.reimbursement_amount.present?
+    if self.initiating_account.blank?
+      add_message :error, 'Account not found to initiate the fund transfer'
+      return
+    end
+    if self.initiating_account_type == :card and not self.initiating_account.non_personal_fund_transfer
+      add_message :error, 'Cannot use the selected card for processing reimbursements'
+      return
     end
   end
 
@@ -152,8 +191,10 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       # deducting cash in hand given in the params
       self.cash_deduction = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                                    payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
-                                                   date: payment_params[:date], note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
-                                                   amount_attributes: {value: cash_in_hand_deduction_amount, currency_id: payment_params[:currency_id]})
+                                                   date: payment_params[:date],
+                                                   note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
+                                                   amount_attributes: {value: cash_in_hand_deduction_amount,
+                                                                       currency_id: payment_params[:currency_id]})
       unless cash_deduction.valid?
         add_message :error, cash_deduction.errors.full_messages
         return
@@ -227,40 +268,39 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
     end
 
-
-      # if outside_settlement_amount == 0
-      #   if cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
-      #     # subtract the respective amount from the user's cash in hand
-      #     to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
-      #     # mark the reports as reimbursed
-      #     reports.each do |report|
-      #       Report::MarkAsSettled.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role})
-      #     end
-      #     return
-      #   else
-      #     add_message :error, cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
-      #   end
-      # elsif cash_in_hand_deduction_amount == 0
-      #   if payment.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
-      #     # mark the reports as reimbursed
-      #     reports.each do |report|
-      #       Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
-      #     end
-      #   else
-      #     add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
-      #   end
-      # else
-      #   if payment.save and cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
-      #     # subtract the respective amount from the user's cash in hand
-      #     to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
-      #     # mark all the reports as reimbursed
-      #     reports.each do |report|
-      #       Report::MarkAsSettled.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
-      #     end
-      #   else
-      #     add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
-      #   end
-      # end
+    # if outside_settlement_amount == 0
+    #   if cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+    #     # subtract the respective amount from the user's cash in hand
+    #     to_user.balance_sheet.subtract_cash_in_hand(cash_in_hand_deduction_amount)
+    #     # mark the reports as reimbursed
+    #     reports.each do |report|
+    #       Report::MarkAsSettled.(user, {from_cash_in_hand: cash_deduction, report: report, role_id: role})
+    #     end
+    #     return
+    #   else
+    #     add_message :error, cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
+    #   end
+    # elsif cash_in_hand_deduction_amount == 0
+    #   if payment.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+    #     # mark the reports as reimbursed
+    #     reports.each do |report|
+    #       Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
+    #     end
+    #   else
+    #     add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
+    #   end
+    # else
+    #   if payment.save and cash_deduction.save and balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
+    #     # subtract the respective amount from the user's cash in hand
+    #     to_user.balance_sheet.subtract_cash_in_hand(payment_params[:from_cash_in_hand].to_f)
+    #     # mark all the reports as reimbursed
+    #     reports.each do |report|
+    #       Report::MarkAsSettled.(user, {payment: payment, from_cash_in_hand: cash_deduction, report: report, role_id: role})
+    #     end
+    #   else
+    #     add_message :error, payment.errors.full_messages + cash_deduction.errors.full_messages + balance_sheet.errors.full_messages
+    #   end
+    # end
   end
 
   def post_process
@@ -270,5 +310,21 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
                                                   from_cash_in_hand: cash_deduction,
                                                   reimbursement: {card: reimbursement_card, amount: reimbursement_amount})
     event.run
+  end
+
+  def success
+    Settlement::Base::SuccessPresenter.new(user, params)
+  end
+
+  class Settlement::Payment::AddSettlement::SuccessPresenter < Settlement::Base::SuccessPresenter
+    attr_accessor :reports, :role, :report_total, :cash_deduction, :reimbursement_card
+                  :reimbursement_amount, :cash_in_hand_deduction_amount, :outside_settlement_amount,
+                  :initiating_account
+
+    def init
+      self.reports = params[:reports]
+      self.role = params[:role]
+      self.report_total = params[:report_total]
+    end
   end
 end
