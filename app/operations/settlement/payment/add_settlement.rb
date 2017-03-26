@@ -55,17 +55,27 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
     return if to_user.blank?
 
-    self.outside_settlement_amount = payment_params[:from_outside_finly].to_f rescue nil
+    if payment_params[:from_outside_finly].present?
+      self.outside_settlement_amount = payment_params[:from_outside_finly].to_f rescue nil
+    end
 
-    self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f rescue nil
+    if payment_params[:from_cash_in_hand].present?
+      self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f rescue nil
+    end
 
-    self.reimbursement_card_id = payment_params[:from_reimbursement_card][:id] rescue nil
+    if payment_params[:from_reimbursement_card].present? and payment_params[:from_reimbursement_card][:id].present?
+      self.reimbursement_card_id = payment_params[:from_reimbursement_card][:id] rescue nil
+    end
+
     if reimbursement_card_id.present?
+      # reimbursement_card_id = 3
       self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
     end
 
     if self.reimbursement_card.present?
-      self.reimbursement_amount = payment_params[:from_reimbursement_card][:amount].to_f rescue nil
+      if payment_params[:from_reimbursement_card][:amount].present?
+        self.reimbursement_amount = payment_params[:from_reimbursement_card][:amount].to_f rescue nil
+      end
 
       self.initiating_account_type = payment_params[:initiating_account_type]
 
@@ -98,7 +108,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       self.role = UserRole.finance_manager_id
     end
     team = User::Team::Index.(user, params)
-    unless team.success? and team.include?(to_user)
+    unless team.present? and team.include?(to_user)
       raise_unauthorized_exception
     end
 
@@ -220,20 +230,20 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         when :wallet
           # Subtract the reimbursement amount from wallet
           wallet = user.wallet
-          unless wallet.subtract_funds(self.amount)
+          unless wallet.subtract_funds(self.reimbursement_amount)
             add_message :error, wallet.errors.full_messages
             return
           end
         when :card
           # Debit the reimbursement amount from card
-          debit_result = ItzCash::Debit.(user, card_id: initiating_account_id, amount: self.amount)
+          debit_result = ItzCash::Debit.(user, card_id: initiating_account_id, amount: self.reimbursement_amount)
           unless debit_result.success?
             add_message :error, debit_result.messages[:error]
             return
           end
       end
 
-      result = ItzCash::Credit.(to_user, card_id: reimbursement_card.id, amount: self.amount)
+      result = ItzCash::Credit.(to_user, card_id: reimbursement_card.id, amount: self.reimbursement_amount)
       unless result.success?
         add_message :error, result.messages[:error]
         return

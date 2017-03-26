@@ -18,7 +18,8 @@ class Settlement::Payment::Base < Settlement::Base
 
   def payment_params
     params.require(:payment).permit(:from_cash_in_hand, :from_outside_finly, :amount, :date, :note,
-                                    :currency_id, :total, :initiating_account_id, :initiating_account_type, from_reimbursement_card: [:id, :name])
+                                    :currency_id, :total, :initiating_account_id, :initiating_account_type,
+                                    from_reimbursement_card: [:id, :amount])
   end
 
   def success
