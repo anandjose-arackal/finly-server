@@ -311,5 +311,5 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
                                                   reimbursement: {card: reimbursement_card, amount: reimbursement_amount})
     event.run
   end
-  
+
 end
