@@ -8,16 +8,11 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
 
   def init
     self.expense_params = manual_expense_params
-    self.receipt = Receipt.find_by(id: params[:receipt_id])
-    self.selected_user = receipt.user if receipt
     self.expense = Expense.find_by(params[:id])
+    self.selected_user = expense.user if expense
   end
 
   def validate
-    unless receipt
-      add_message :error, "Receipt not found"
-      return
-    end
     unless selected_user.company.ocr_enabled?
       add_message :error, "OCR not enabled for this company"
       return
@@ -33,9 +28,13 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
     end
   end
 
+  def pre_process
+    expense_params[:amount_attributes][:currency_id] = Currency.first.id
+  end
+
   def process
-    if expense.save
-      receipt.update(parent: expense, transcribed: true)
+    if expense.update(expense_params)
+      # nothing to do
     else
       messages[:error] = expense.errors.full_messages
     end
