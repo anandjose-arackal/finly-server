@@ -67,6 +67,8 @@ class Receipt < ActiveRecord::Base
     end
   }
 
+  scope :filter_user, -> (user_id) {where user_id: user_id}
+
   scope :untranscribed, -> { where(to_be_transcribed: true) }
 
   def receipt_file_name

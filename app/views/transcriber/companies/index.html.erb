@@ -3,7 +3,7 @@
     <div class="col-md-6 col-md-offset-3" style="min-height: 20px">
 
       <% @companies.each do |company| %>
-          <%= link_to company.name, transcriber_untranscribed_receipts_path(company) %>
+          <%= link_to company.name, transcriber_untranscribed_receipts_path(company, params: {filter_parent: 1}) %>
 
           <hr class="listDivider">
 

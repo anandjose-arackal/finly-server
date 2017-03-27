@@ -4,16 +4,18 @@ class Transcriber::Receipts::Index < BaseOperation
 
   class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receipts, :categories, :company
+    attr_accessor :receipts, :categories, :company, :users
 
     # scopes for filters
     has_scope :filter_parent
+    has_scope :filter_user
 
     def init
       self.receipts = params[:receipts]
       self.receipts = apply_scopes(receipts, params)
       self.company = params[:company]
       self.categories = params[:categories]
+      self.users = company.users
     end
 
   end

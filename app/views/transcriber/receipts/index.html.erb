@@ -107,8 +107,23 @@
           <% end %>
           >With parent</option>
       </select>
+      <br/>
 
+      <h4>User: </h4>
+      <select class="form-control" id="user-filter" name="filter_user">
+        <option value="">None</option>
+        <% @result.users.each do |user| %>
+          <option value="<%=user.id%>"
+          <% if params[:filter_user] && params[:filter_user].to_i == user.id %>
+          selected="selected"
+          <% end %>
+          ><%=user.name%></option>
+        <% end %>
+      </select>
+
+      <br/>
       <button class="btn btn-primary" id="submitbutton">Apply</button>
+
     </form>
   </div>
 </div>
