@@ -201,12 +201,12 @@ class Expense < ActiveRecord::Base
         return self.amount.value
       when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
         if self.amount.blank?
-          return "- -"
+          return nil
         else
           return self.amount.value
         end
       else
-        return "- -"
+        return nil
     end
   end
 
