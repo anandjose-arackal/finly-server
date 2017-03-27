@@ -553,6 +553,7 @@ Rails.application.routes.draw do
   # get 'policies' => 'policies#index'
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
+  get '/api/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite_for_front_end
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
