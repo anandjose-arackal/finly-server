@@ -1,8 +1,12 @@
 json.distance_config do
   json.enabled @result.distance_config[:enabled]
+  json.rate @result.distance_config[:rate]
+  json.default_category_id @result.distance_config[:default_category_id]
 end
 json.time_config do
   json.enabled @result.time_config[:enabled]
+  json.rate @result.time_config[:rate]
+  json.default_category_id @result.time_config[:default_category_id]
 end
 json.per_diem_config do
   json.enabled @result.per_diem_config[:enabled]

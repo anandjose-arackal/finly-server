@@ -310,7 +310,7 @@ class Expense < ActiveRecord::Base
 
   def per_diem_name
     if self.per_diem_expense?
-      return self.per_diem_expense.per_diem_name
+      return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
     else
       return nil
     end
