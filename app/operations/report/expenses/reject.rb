@@ -63,7 +63,7 @@ class Report::Expenses::Reject < Report::Base
         unless expense.manual_expense? || expense.card_expense?
           amount = expense.amount
           expense.update(amount: nil)
-          amount.destroy
+          amount.destroy if amount
         end
 
         # triggering the reject event
