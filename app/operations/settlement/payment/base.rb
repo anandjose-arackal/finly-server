@@ -1,7 +1,7 @@
 class Settlement::Payment::Base < Settlement::Base
   attr_accessor :payment
 
-  class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter
+  class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter
     attr_accessor :payment
 
     def init

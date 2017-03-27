@@ -262,6 +262,8 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       end
     end
 
+    debugger
+
     if self.cash_in_hand_deduction_amount.present?
       # deducting cash in hand given in the params
       bs = to_user.balance_sheet
