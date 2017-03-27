@@ -35,9 +35,11 @@ class Transcriber::Receipts::Index < BaseOperation
   end
 
   def process
+    user_ids = []
     company.users.each do |user|
-      self.receipts += user.receipts.untranscribed
+      user_ids << user.id
     end
+    self.receipts = Receipt.untranscribed.with_user_id(user_ids)
   end
 
   def success

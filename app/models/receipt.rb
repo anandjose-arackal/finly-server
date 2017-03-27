@@ -40,6 +40,7 @@ class Receipt < ActiveRecord::Base
       content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
   }
 
+  scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_id, ->(id) { where id: id }
   scope :without_parent, -> { where(parent_id: nil) }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
@@ -55,7 +56,7 @@ class Receipt < ActiveRecord::Base
   end
 
   scope :filter_parent, -> (type){
-    # 1 - parent present, 2 - parent absent
+    # 1 - parent absent, 2 - parent present
     case type
       when '1', 1
         where(parent: nil)

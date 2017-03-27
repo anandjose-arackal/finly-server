@@ -87,6 +87,32 @@
   </script>
 </head>
 <body>
+
+<div class="container-fluid">
+  <div class="col-md-5">
+    <h3>Filter by: </h3>
+
+    <form action="<%=transcriber_untranscribed_receipts_path(@result.company.id)%>" method="get">
+
+      <h4>Parent: </h4>
+      <select class="form-control" id="parent-presence" name="filter_parent">
+          <option value="1"
+          <% if params[:filter_parent] == '1' %>
+          selected="selected"
+          <% end %>
+          >Without parent</option>
+          <option value="2"
+          <% if params[:filter_parent] == '2' %>
+          selected="selected"
+          <% end %>
+          >With parent</option>
+      </select>
+
+      <button class="btn btn-primary" id="submitbutton">Apply</button>
+    </form>
+  </div>
+</div>
+
 <div class="container-fluid">
   <%	 @counter = 1 %>
   <%	@result.receipts.each do |receipt|  %>
