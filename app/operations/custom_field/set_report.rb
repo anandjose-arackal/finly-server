@@ -56,9 +56,9 @@ class CustomField::SetReport < CustomField::Base
     if self.reset
       report.custom_fields.destroy_all
 
-      self.field_configurations.with_id(create_ids).each do |config|
-        report.custom_fields.build(field_configuration: config)
-      end
+      # self.field_configurations.with_id(create_ids).each do |config|
+      #   report.custom_fields.build(field_configuration: config)
+      # end
     end
 
     return if report.custom_fields.blank?

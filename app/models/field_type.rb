@@ -7,7 +7,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-require 'Date'
+
 class FieldType < ActiveRecord::Base
 
   TYPES = {text: 1, number: 2, decimal: 3, boolean: 4, drop_down: 5, date: 6, datetime: 7, amount: 8}

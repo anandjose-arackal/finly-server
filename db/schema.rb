@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170309192201) do
+ActiveRecord::Schema.define(version: 20170324105448) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -551,6 +551,7 @@ ActiveRecord::Schema.define(version: 20170309192201) do
     t.string   "field_name",           limit: 255,                 null: false
     t.integer  "default_value_id",     limit: 4
     t.string   "default_value_type",   limit: 255
+    t.boolean  "is_deleted",                       default: false, null: false
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
