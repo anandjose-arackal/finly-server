@@ -78,7 +78,7 @@ class Report::Expenses::Remove < Report::Base
         unless expense.manual_expense? || expense.card_expense?
           amount = expense.amount
           expense.update(amount: nil)
-          amount.destroy
+          amount.destroy if amount
         end
       end
       messages[:success] << "Expenses removed."
