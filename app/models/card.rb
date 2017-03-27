@@ -31,13 +31,15 @@ class Card < ActiveRecord::Base
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 
-  accepts_nested_attributes_for :card_program
 
   has_one :card_restriction, dependent: :destroy
 
   has_many :card_balance_history, dependent: :destroy
 
   belongs_to :card_balance, class_name: 'Amount'
+  belongs_to :card_eligibility, class_name: 'Amount'
+
+  accepts_nested_attributes_for :card_program, :card_balance, :card_eligibility
 
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
@@ -57,10 +59,16 @@ class Card < ActiveRecord::Base
 
   after_create do
     user = self.user
-    balance_amount = ItzCash::AccountDetails.(user, card_id: self.id).balance rescue 0
+    result = ItzCash::AccountDetails.(user, card_id: self.id)
+    balance_amount = result.balance rescue 0
+    eligibility_amount = result.available_card_eligibility rescue 0
     unless self.card_balance
       balance = Amount.create!(value: balance_amount, currency_id: Currency.first.id)
       self.update_attributes(card_balance_id: balance.id)
+    end
+    unless self.card_eligibility
+      balance = Amount.create!(value: eligibility_amount, currency_id: Currency.first.id)
+      self.update_attributes(card_eligibility_id: balance.id)
     end
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
 
@@ -74,7 +82,15 @@ class Card < ActiveRecord::Base
   end
 
 
-  attr_accessor :balance, :available_card_eligibility
+  # attr_accessor :balance, :available_card_eligibility
+
+  def balance
+    self.card_balance.value
+  end
+
+  def available_card_eligibility
+    self.card_eligibility.value
+  end
 
   def serial_id
     self.proxy

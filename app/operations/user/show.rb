@@ -73,7 +73,7 @@ class User::Show < User::Base
           ending_number = card.ending_number
           id = card.id
 
-          if not personal and card.card_program.manager_blockable
+          if not personal_view? and card.card_program.manager_blockable
             card_params = {}
             card_params[:view] = params[:view]
             card_params[:user_id] = selected_user.id
@@ -91,7 +91,7 @@ class User::Show < User::Base
               card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
               actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
             else
-              if card.disabled_by_role_id == UserRole.id_for(:employee)
+              if card.disabled_by_role_id == UserRole.id_for(:employee) or user.company_admin?
                 card_params = {status_type: User::PrepaidCard::Base::STATUS[:unblock], user_id: selected_user.id}
                 actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
               end

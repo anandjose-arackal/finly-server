@@ -77,12 +77,14 @@ class ItzCash::AccountDetails < ItzCash::Base
   protected
   def update_card
     if params[:suspended_status] == 'Y'
+      # attributes_to_update[:active] = false if card.active
       card.update_attribute(:active, false) if card.active
     elsif params[:suspended_status] == 'N'
+      # attributes_to_update[:active] = true if card.active
       card.update_attribute(:active, true) unless card.active
     end
-    card.balance = parsed_response[2].to_d
-    card.available_card_eligibility = parsed_response[9].to_d
+    card.card_balance.update_attributes(value: parsed_response[2].to_d)
+    card.card_eligibility.update_attributes(value: parsed_response[9].to_d)
   end
 
 end

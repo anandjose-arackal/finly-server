@@ -68,7 +68,6 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
 
     if reimbursement_card_id.present?
-      # reimbursement_card_id = 3
       self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
     end
 
