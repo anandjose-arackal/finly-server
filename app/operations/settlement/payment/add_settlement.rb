@@ -12,7 +12,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   include MathUtil
   attr_accessor :reports, :role, :report_total, :cash_deduction, :report_names, :reimbursement_card, :reimbursement_card_id,
                 :reimbursement_amount, :cash_in_hand_deduction_amount, :outside_settlement_amount,
-                :initiating_account, :initiating_account_type, :initiating_account_id
+                :initiating_account, :initiating_account_type, :initiating_account_id, :reimbursement_type_id
+
+  REIMBURSEMENT_TYPE = {:none => 1, :outside_finly => 2, :reimbursement_card => 3}
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -23,19 +25,25 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     from_cash_in_hand = params[:payment][:from_cash_in_hand].to_f rescue 0
     from_outside_finly = params[:payment][:from_outside_finly].to_f rescue 0
     from_reimbursement_card = params[:payment][:from_reimburesement_card][:amount] rescue 0
-    if from_cash_in_hand < 0 or from_outside_finly < 0 or from_reimbursement_card < 0
-      add_message :error, 'Reimbursement amount or cash in hand deduction cannot be negative'
+    if from_cash_in_hand < 0
+      add_message :error, 'Deduct Cash in Hand amount cannot be less than 0'
       return
     end
-    # if params[:payment][:from_cash_in_hand].to_f == 0 and params[:payment][:from_outside_finly].to_f == 0
-    #   add_message :error, 'Reimbursement amount and cash in hand deduction cannot both be equal to 0'
-    #   return
-    # end
+    if from_outside_finly < 0 or from_reimbursement_card < 0
+      add_message :error, 'Reimbursement amount cannot cannot be less than 0'
+      return
+    end
+
     if params[:report_ids].blank?
       add_message :error, 'No reports to reimburse'
     end
 
-    if params[:payment].present? and params[:payment][:from_reimbursement_card]
+    if params[:payment].blank? or params[:payment][:reimbursement_type_id].blank?
+      add_message :error, 'Reimbursement Type not found'
+      return
+    end
+
+    if params[:payment][:reimbursement_type_id] == REIMBURSEMENT_TYPE[:reimbursement_card]
       initiating_account_id = params[:payment][:initiating_account_id].to_sym rescue nil
       initiating_account_type = params[:payment][:initiating_account_type].to_sym rescue nil
       if initiating_account_type.blank? or (initiating_account_type == :card and initiating_account_id.blank?)
@@ -55,43 +63,43 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
     return if to_user.blank?
 
-    if payment_params[:from_outside_finly].present?
-      self.outside_settlement_amount = payment_params[:from_outside_finly].to_f rescue nil
-    end
+    self.reimbursement_type_id = params[:reimbursement_type_id]
 
     if payment_params[:from_cash_in_hand].present?
       self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f rescue nil
     end
 
-    if payment_params[:from_reimbursement_card].present? and payment_params[:from_reimbursement_card][:id].present?
-      self.reimbursement_card_id = payment_params[:from_reimbursement_card][:id] rescue nil
-    end
+    case self.reimbursement_type_id
+      when REIMBURSEMENT_TYPE[:outside_finly]
+        if payment_params[:from_outside_finly].present?
+          self.outside_settlement_amount = payment_params[:from_outside_finly].to_f rescue nil
+        end
+      when REIMBURSEMENT_TYPE[:reimbursement_card]
+        return unless payment_params[:from_reimbursement_card].present? and payment_params[:from_reimbursement_card][:id].present?
+        self.reimbursement_card_id = payment_params[:from_reimbursement_card][:id] rescue nil
+        self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
 
-    if reimbursement_card_id.present?
-      self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
-    end
+        if self.reimbursement_card.present?
+          self.reimbursement_amount = payment_params[:from_reimbursement_card][:amount].to_f rescue 0
 
-    if self.reimbursement_card.present?
-      if payment_params[:from_reimbursement_card][:amount].present?
-        self.reimbursement_amount = payment_params[:from_reimbursement_card][:amount].to_f rescue nil
-      end
+          self.initiating_account_type = payment_params[:initiating_account_type]
 
-      self.initiating_account_type = payment_params[:initiating_account_type]
-
-      case self.initiating_account_type.to_sym
-        when :virtual_account
-          self.initiating_account_id = user.company_id
-          self.initiating_account = user.company
-        when :wallet
-          self.initiating_account_id = user.wallet.id
-          self.initiating_account = user.wallet
-        when :card
-          self.initiating_account_id = payment_params[:initiating_account_id].to_i rescue nil
-          if self.initiating_account_id.present?
-            self.initiating_account = user.cards.with_id(self.initiating_account_id).first rescue nil
+          case self.initiating_account_type.to_sym
+            when :virtual_account
+              self.initiating_account_id = user.company_id
+              self.initiating_account = user.company
+            when :wallet
+              self.initiating_account_id = user.wallet.id
+              self.initiating_account = user.wallet
+            when :card
+              self.initiating_account_id = payment_params[:initiating_account_id].to_i rescue nil
+              if self.initiating_account_id.present?
+                self.initiating_account = user.cards.with_id(self.initiating_account_id).first rescue nil
+              end
           end
-      end
+        end
     end
+
   end
 
   def authorize
@@ -114,9 +122,6 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   end
 
   def validate
-    unless validate_date payment_params[:date]
-      return false
-    end
 
     if params[:password].blank?
       add_message :error, 'You need to provide your password to initiate this transfer'
@@ -127,16 +132,26 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       return
     end
 
-    # payment_date = Date.parse(payment_params[:date])
     # validating that the money deducted from cash in hand is actually less than the cash in hand on date of settlement
     cash_in_hand = to_user.cash_in_hand.value rescue 0
 
     if cash_in_hand_deduction_amount.present? and precision_value(cash_in_hand_deduction_amount) > precision_value(cash_in_hand)
-      add_message :error, "You cannot deduct more cash than the employee has on #{payment_params[:date].to_s}"
+      add_message :error, "Deduct Cash on Hand amount is greater than the cash on hand with #{to_user.name}"
     end
 
-    validate_reimbursement_card
-    validate_initiating_account
+    unless self.reimbursement_type_id.present?
+      add_message :error, 'Reimbursement Type not found'
+      return
+    end
+
+    case self.reimbursement_type_id
+      when REIMBURSEMENT_TYPE[:outside_finly]
+
+      when REIMBURSEMENT_TYPE[:reimbursement_card]
+        validate_reimbursement_card
+        validate_initiating_account
+    end
+
     # # Removed the check to ensure cash in hand deduction + settlement amount matches up as we would also be considering Reimbursements
     # # checking if cash in hand deduction + settlement amount matches up with report total
     # self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
@@ -144,13 +159,21 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     #   add_message :error, 'Reimbursement total does not match report totals'
     # end
     return if has_errors?
+
     self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
+
     cia_deduction_amount = cash_in_hand_deduction_amount.present? ? cash_in_hand_deduction_amount : 0
     outside_amount = outside_settlement_amount.present? ? outside_settlement_amount : 0
     r_amount = reimbursement_amount.present? ? reimbursement_amount : 0
-    if cia_deduction_amount + outside_amount + r_amount > report_total
+
+    total = cia_deduction_amount
+    total += outside_amount if reimbursement_type_id == REIMBURSEMENT_TYPE[:outside_finly]
+    total += r_amount if reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_card]
+
+    if precision_value(total) > precision_value(report_total)
       add_message :error, 'Settlement amount exceeds report total'
     end
+
   end
 
   def validate_initiating_account
@@ -210,7 +233,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       end
     end
 
-    if reimbursement_amount.present?
+    if self.reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_card] and reimbursement_amount.present?
       self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                             payment_type_id: PaymentType.id_for(:reimbursement),
                                             date: Date.today, note: payment_params[:note],
@@ -250,7 +273,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
       self.payment.save
 
-    elsif outside_settlement_amount.present?
+    elsif self.reimbursement_type_id == REIMBURSEMENT_TYPE[:outside_finly] and outside_settlement_amount.present?
       self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                             payment_type_id: PaymentType.id_for(:reimbursement_outside_finly),
                                             date: payment_params[:date], note: payment_params[:note],
@@ -261,8 +284,6 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         add_message :error, self.payment.errors.full_messages
       end
     end
-
-    debugger
 
     if self.cash_in_hand_deduction_amount.present?
       # deducting cash in hand given in the params
