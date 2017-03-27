@@ -86,11 +86,11 @@
 
                   <div class="card text-center">
                     <div class="status">
-                      {{#if item.card.active}}
+                      {{!-- {{#if item.card.active}}
                         <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71; cursor: default;"></i>&nbsp;&nbsp;<span>Active</span></label>
                       {{else}}
                         <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c; cursor: default;"></i>&nbsp;&nbsp;<span>Inactive</span></label>
-                      {{/if}}
+                      {{/if}} --}}
                     </div>
                     <div class="card-type">Expense Card</div>
                     <div class="card-number">
@@ -200,52 +200,52 @@
 
                   <div class="col-sm-12">
                     <form class="form-restrictions">
-                      <div class="row no-margin" style="margin-bottom: 10px;">
-                        <div class="col-sm-4">
-                          <label>Applied Category Restriction:</label>
-                        </div>
+                      <!--<div class="row no-margin" style="margin-bottom: 10px;">-->
+                        <!--<div class="col-sm-4">-->
+                          <!--<label>Applied Category Restriction:</label>-->
+                        <!--</div>-->
 
-                        <div class="col-sm-3">
-                            <label for="" class="item-attr-preview">
-                                {{#switch item.restrictions.mcc_restriction_type}}
-                                  {{#case 'A'}} Allowed {{/case}}
-                                  {{#case 'R'}} Disallowed {{/case}}
-                                  {{#case 'NA'}}{{/case}}
-                                {{/switch}}
-                            </label>
-                            <label for="" class="item-attr-edit">
-                                <input type="radio" value="A"
-                                       {{#if_eq item.restrictions.mcc_restriction_type "A" }}
-                                           checked="checked"
-                                       {{/if_eq}}
-                                       name="restrictions[mcc_restriction_type]" />&nbsp;Allow
-                            </label>
-                            <label for="" class="item-attr-edit">
-                                <input type="radio" value="R"
-                                        {{#if_eq item.restrictions.mcc_restriction_type "R" }}
-                                           checked="checked"
-                                        {{/if_eq}}
-                                       name="restrictions[mcc_restriction_type]" />&nbsp;Disallow
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                          <div class="col-sm-6">
-                            <label class="item-attr-preview">
-                              {{#if item.restrictions.mcc_group_name}}
-                                {{item.restrictions.mcc_group_name}}
-                              {{else}}
-                                No restriction
-                              {{/if}}
-                            </label>
-                            <select class="form-control item-attr-edit" name="restrictions[mcc_group_id]" style="width: 200px;" data-default-value="{{item.restrictions.mcc_group_id}}">
-                              <option value="">None</option>
-                              {{#each item.restrictions.mcc_groups}}
-                                <option value="{{this.id}}">{{this.name}}</option>
-                              {{/each}}
-                            </select>
-                          </div>
-                        </div>
-                      </div>
+                        <!--<div class="col-sm-3">-->
+                            <!--<label for="" class="item-attr-preview">-->
+                                <!--{{#switch item.restrictions.mcc_restriction_type}}-->
+                                  <!--{{#case 'A'}} Allowed {{/case}}-->
+                                  <!--{{#case 'R'}} Disallowed {{/case}}-->
+                                  <!--{{#case 'NA'}}{{/case}}-->
+                                <!--{{/switch}}-->
+                            <!--</label>-->
+                            <!--<label for="" class="item-attr-edit">-->
+                                <!--<input type="radio" value="A"-->
+                                       <!--{{#if_eq item.restrictions.mcc_restriction_type "A" }}-->
+                                           <!--checked="checked"-->
+                                       <!--{{/if_eq}}-->
+                                       <!--name="restrictions[mcc_restriction_type]" />&nbsp;Allow-->
+                            <!--</label>-->
+                            <!--<label for="" class="item-attr-edit">-->
+                                <!--<input type="radio" value="R"-->
+                                        <!--{{#if_eq item.restrictions.mcc_restriction_type "R" }}-->
+                                           <!--checked="checked"-->
+                                        <!--{{/if_eq}}-->
+                                       <!--name="restrictions[mcc_restriction_type]" />&nbsp;Disallow-->
+                            <!--</label>-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-4">-->
+                          <!--<div class="col-sm-6">-->
+                            <!--<label class="item-attr-preview">-->
+                              <!--{{#if item.restrictions.mcc_group_name}}-->
+                                <!--{{item.restrictions.mcc_group_name}}-->
+                              <!--{{else}}-->
+                                <!--No restriction-->
+                              <!--{{/if}}-->
+                            <!--</label>-->
+                            <!--<select class="form-control item-attr-edit" name="restrictions[mcc_group_id]" style="width: 200px;" data-default-value="{{item.restrictions.mcc_group_id}}">-->
+                              <!--<option value="">None</option>-->
+                              <!--{{#each item.restrictions.mcc_groups}}-->
+                                <!--<option value="{{this.id}}">{{this.name}}</option>-->
+                              <!--{{/each}}-->
+                            <!--</select>-->
+                          <!--</div>-->
+                        <!--</div>-->
+                      <!--</div>-->
                       
                       <div class="row no-margin" style="margin-bottom: 10px;">
                         <div class="col-sm-12">
@@ -314,13 +314,13 @@
                                 {{else}}
                                   <i class="fa fa-ban" style="color: #E74C3C;"></i>
                                 {{/if}}
-                                &nbsp;<span>E-Commerce/POS</span>
+                                &nbsp;<span>Online/POS</span>
                               </label>
                               <label class="item-attr-edit finly-switch">
                                 <input class="input-card-channel-type" type="checkbox" {{#if item.restrictions.channel_ecom_pos}}checked="checked"{{/if}} name="restrictions[channel_ecom_pos]" value="1" />
                                 <div class="finly-slider round"></div>
                               </label> 
-                              <h4 class="item-attr-edit" style="position: relative;top: -7px;">&nbsp;&nbsp;&nbsp;E-Commerce/POS</h4>
+                              <h4 class="item-attr-edit" style="position: relative;top: -7px;">&nbsp;&nbsp;&nbsp;Online/POS</h4>
                             </div> 
 
                             <div class="col-sm-8" style="margin-top: 10px;">
@@ -1202,7 +1202,7 @@
   .card {
     width: 400px;
     position: absolute;
-    background: url(/common/images/card.png);
+    background: url(/common/images/card2.png);
     color: white;
     padding: 20px;
     height: 252px;

@@ -45,11 +45,11 @@
               <div class="col-sm-6" style="min-width: 400px;min-height: 250px;">
                 <div class="card text-center" style="display: inline-block;">
                   <div class="status">
-                    <% if card.active %>
-                      <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label>
-                    <% else %>
-                      <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Blocked</span></label>
-                    <% end %>
+                    <%# if card.active %>
+                      <!-- <label class="control-label"><i class="fa fa-check-circle" style="color: #2ecc71;"></i>&nbsp;&nbsp;<span>Active</span></label> -->
+                    <%# else %>
+                      <!-- <label class="control-label"><i class="fa fa-minus-circle" style="color: #e74c3c;"></i>&nbsp;&nbsp;<span>Blocked</span></label> -->
+                    <%# end %>
                   </div>
                   <div class="card-type">Expense Card</div>
                   <div class="card-number">
@@ -244,7 +244,7 @@
 .card {
     width: 400px;
     position: absolute;
-    background: url(/common/images/card.png);
+    background: url(/common/images/card2.png);
     color: white;
     padding: 20px;
     height: 252px;
