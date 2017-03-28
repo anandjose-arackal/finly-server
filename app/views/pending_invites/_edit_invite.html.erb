@@ -1,0 +1,218 @@
+
+
+<div class="container-fluid">
+
+  <form id="newUserRegistration" action="/api<%= pending_invite_accept_path(pending_invite_id: @pending_user.id) %>" method="post" data-remote='true'>
+
+    <input name="_method" type="hidden" value="patch">
+    <input name="authenticity_token" value="<%= form_authenticity_token%>" type="hidden">
+    <input name="user[invitation_token]" type="hidden" value="<%=params[:invitation_token]%>">
+    <input name="type" type="hidden" value="accept">
+
+    <div class="row">
+      <div class="col-sm-4 col-sm-offset-4" style="padding-left: 50px; padding-right: 50px;">
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Company Name:</strong></h5>
+            </div>
+          </div>
+          <input type="text" placeholder="Finly Test" class="form-control" name="user[company_name]" value="<%= @pending_user.company_name %>" disabled>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <h5><strong>Email:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[email]" value="<%= @pending_user.email %>" disabled>
+        </div>
+
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <h5><strong>Password:</strong></h5>
+            </div>
+            <div class="col-sm-10">
+              <h5 style="color: #ababab; text-align: right;">minimum 8 characters.</h5>
+            </div>
+          </div>
+          <input type="password" class="form-control user-password" name="user[password]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-5">
+              <h5><strong>Confirm Password:</strong></h5>
+            </div>
+            <div class="col-sm-7 text-right">
+              <h5 style="color: #ababab;">Make sure it was entered correctly.</h5>
+            </div>
+          </div>
+          <input type="password" class="form-control" name="user[password_confirmation]">
+        </div>
+
+
+        <!-- <div>
+          <div class="row">
+            <div class="col-sm-5">
+              <h5><strong>Confirm Password:</strong></h5>
+            </div>
+            <div class="col-sm-7 text-right">
+              <h5 style="color: #ababab;">Make sure it was entered correctly.</h5>
+            </div>
+          </div>
+          <input type="Password" name="" class="form-control">
+        </div>
+        <button class="btn btn-default" style="color: dodgerblue; margin-top: 10px; border-color: dodgerblue;">Set up password</button>
+      </div> -->
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <h5><strong>Mobile:</strong></h5>
+            </div>
+            <div class="col-sm-10">
+              <h5 style="color: #ababab; text-align: right;">Enter your 10 digit mobile number</h5>
+            </div>
+          </div>
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-phone"> +91</i></span>
+            <input type="number" class="form-control" name="user[mobile_number]" placeholder="">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>First Name:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[first_name]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Last Name:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[last_name]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Mother's Maiden Name:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[mothers_maiden_name]" value="">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Date of Birth:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="datepicker form-control" name="user[profile_attributes][date_of_birth]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Gender:</strong></h5>
+            </div>
+          </div>
+          <div>
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="radio" name="user[profile_attributes][gender]">&nbsp;<inline style="font-size: 17px;">Male</inline>
+              </div>
+              <div class="col-sm-6">
+                <input type="radio" name="user[profile_attributes][gender]">&nbsp;<inline style="font-size: 17px;">Female</inline>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Address Line 1:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[profile_attributes][address_1]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Address Line 2:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[profile_attributes][address_2]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>City:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[profile_attributes][city]">
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>State:</strong></h5>
+            </div>
+          </div>
+          <select class="form-control" name="user[profile_attributes][state_id]">
+            <% @states.each do |state| %>
+              <option value="<%=state.id%>"><%=state.name%></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <h5><strong>Pin Code:</strong></h5>
+            </div>
+          </div>
+          <input type="text" class="form-control" name="user[profile_attributes][pin_code]">
+        </div>
+
+        <div class="row text-center" style="margin-bottom: 20px;">
+          <div class="col-sm-12">
+            <button class="btn btn-success" id="submitButton" style="width: 100px;">Submit</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</div>
+
+<style type="text/css">
+  body {
+    background-color: #dedede;
+  }
+  .primary-navbar {
+    height: 50px;
+    box-shadow: 0 0px 2px 1px rgba(0, 0, 0, 0.46);
+    padding: 5px;
+  }
+  .secondary-navbar {
+    height: 40px;
+    box-shadow: 0 0 2px -1px rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    font-size: 20px;
+  }
+</style>
+
+</body>
