@@ -15,6 +15,7 @@
 #  field_name           :string(255)      not null
 #  default_value_id     :integer
 #  default_value_type   :string(255)
+#  is_deleted           :boolean          default(FALSE), not null
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -29,7 +30,6 @@ class FieldConfiguration < ActiveRecord::Base
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
-
 
   validates :field_name, presence: true
   validates :enabled, presence: true
@@ -58,7 +58,7 @@ class FieldConfiguration < ActiveRecord::Base
     if default_value.present? and not default_value.valid?
       self.errors.add :invalid, 'input format for "default value"'
     end
-    if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type != 'Company'
+    if FieldParentType.expense_ids.include?(self.field_parent_type_id) and configurable_type != 'Company'
       self.errors.add :invalid, 'config. Custom Expense Field can only be configured at an organisation level'
     end
     # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense

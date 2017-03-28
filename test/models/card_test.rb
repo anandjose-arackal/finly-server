@@ -18,6 +18,7 @@
 #  product_code        :string(255)      not null
 #  card_balance_id     :integer
 #  card_program_id     :integer          not null
+#  card_eligibility_id :integer
 #
 
 

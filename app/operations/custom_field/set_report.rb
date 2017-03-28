@@ -21,6 +21,7 @@ class CustomField::SetReport < CustomField::Base
 
   def init
 
+    # field_values = { "1": "abc", "2":"asdk"}
     self.field_values = {}
     if params.present? and params[:report].present? and params[:report][:custom_fields].present?
       self.field_values = params[:report][:custom_fields]
@@ -55,10 +56,21 @@ class CustomField::SetReport < CustomField::Base
     # If reset has been set, destroy all custom fields and create new ones
     if self.reset
       report.custom_fields.destroy_all
+    end
 
-      # self.field_configurations.with_id(create_ids).each do |config|
-      #   report.custom_fields.build(field_configuration: config)
-      # end
+    required_ids = self.field_configurations.pluck(:id)
+    existing_ids = self.report.custom_fields.pluck(:field_configuration_id)
+    create_ids = required_ids - existing_ids
+
+    if create_ids.present?
+      self.field_configurations.with_id(create_ids).each do |config|
+        # If value has not been set but default value is present, set the value as a deep clone of default value
+        default_value = nil
+        if config.default_value.present?
+          default_value =config.default_value.deep_clone
+        end
+        report.custom_fields.build(field_configuration: config, value: default_value).save
+      end
     end
 
     return if report.custom_fields.blank?
@@ -68,12 +80,14 @@ class CustomField::SetReport < CustomField::Base
       field.set_value(self.field_values[field.field_configuration_id], false)
     end
 
-    # If report is saved by the class calling this operation, we do not have to save it here as it would be getting saved there automatically
+    # If report is saved by the class calling this operation, we do not have to save it here as it
+    # would be getting saved there automatically
     if params.present? and params[:save]
       unless self.report.save
         add_message :error, self.report.errors.full_messages
       end
     end
+
   end
 
 end

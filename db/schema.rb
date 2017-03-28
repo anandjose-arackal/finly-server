@@ -264,7 +264,7 @@ ActiveRecord::Schema.define(version: 20170327091529) do
     t.string   "product_code",        limit: 255,   null: false
     t.integer  "card_balance_id",     limit: 4
     t.integer  "card_program_id",     limit: 4,     null: false
-    t.integer  "card_eligibility_id", limit: 4,     null: false
+    t.integer  "card_eligibility_id", limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -450,8 +450,8 @@ ActiveRecord::Schema.define(version: 20170327091529) do
     t.string   "parent_type",            limit: 255, null: false
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
-    t.integer  "value_id",               limit: 4,   null: false
-    t.string   "value_type",             limit: 255, null: false
+    t.integer  "value_id",               limit: 4
+    t.string   "value_type",             limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree

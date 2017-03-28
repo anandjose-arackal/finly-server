@@ -15,6 +15,7 @@
 #  field_name           :string(255)      not null
 #  default_value_id     :integer
 #  default_value_type   :string(255)
+#  is_deleted           :boolean          default(FALSE), not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

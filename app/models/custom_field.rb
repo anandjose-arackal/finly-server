@@ -23,31 +23,17 @@ class CustomField < ActiveRecord::Base
 
   validates :field_configuration_id, presence: true
   validates :parent_id, presence: true
-  validates :parent_type, presence: true, :inclusion => {:in => ['Expense', 'Report', 'MoneyRequest']}
-  validates :value_id, presence: true
-  validates :value_type, presence: true, :inclusion =>  {:in => ['FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
+  validates :parent_type, presence: true, :inclusion => {:in => ['ManualExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest']}
+  validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
 
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
-
-  # def validate_field
-  #   result = CustomField::Validate.(self)
-  #   unless result.success?
-  #     result.messages[:error].each do |error|
-  #       self.errors.add :error, error
-  #     end
-  #   end
-  # end
 
   def set_value(value, save = true)
     if value.nil?
       if self.value.present?
         self.value.destroy
         self.value = nil
-      end
-      # If value has not been set but default value is present, set the value as a deep clone of default value
-      if self.field_configuration.default_value.present?
-        self.value = self.field_configuration.default_value.deep_clone
-        self.value.save if self.value.present? and save
+        self.save if save
       end
       return
     end
@@ -105,5 +91,5 @@ class CustomField < ActiveRecord::Base
     end
     self.value.save if self.value.present? and save
   end
-  
+
 end

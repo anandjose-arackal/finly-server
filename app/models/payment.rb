@@ -18,6 +18,7 @@
 #
 
 
+
 class Payment < ActiveRecord::Base
 
   class AccountType

@@ -3,7 +3,7 @@
 # Table name: field_dates
 #
 #  id         :integer          not null, primary key
-#  value      :datetime         not null
+#  value      :date             not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

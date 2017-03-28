@@ -18,4 +18,9 @@ class FieldParentType < ActiveRecord::Base
     TYPES[sym]
   end
 
+  def self.expense_ids
+    [FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),
+     FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:perdiem_expense)]
+  end
+
 end

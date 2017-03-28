@@ -18,6 +18,7 @@
 #  product_code        :string(255)      not null
 #  card_balance_id     :integer
 #  card_program_id     :integer          not null
+#  card_eligibility_id :integer
 #
 
 class Card < ActiveRecord::Base
@@ -39,7 +40,9 @@ class Card < ActiveRecord::Base
   belongs_to :card_balance, class_name: 'Amount'
   belongs_to :card_eligibility, class_name: 'Amount'
 
-  accepts_nested_attributes_for :card_program, :card_balance, :card_eligibility
+  accepts_nested_attributes_for :card_program
+  accepts_nested_attributes_for :card_balance
+  accepts_nested_attributes_for :card_eligibility
 
   scope :with_id, ->(id) { where id: id }
   scope :with_user, ->(user_id) { where user_id: user_id }
@@ -59,17 +62,10 @@ class Card < ActiveRecord::Base
 
   after_create do
     user = self.user
+
     result = ItzCash::AccountDetails.(user, card_id: self.id)
     balance_amount = result.balance rescue 0
-    eligibility_amount = result.available_card_eligibility rescue 0
-    unless self.card_balance
-      balance = Amount.create!(value: balance_amount, currency_id: Currency.first.id)
-      self.update_attributes(card_balance_id: balance.id)
-    end
-    unless self.card_eligibility
-      balance = Amount.create!(value: eligibility_amount, currency_id: Currency.first.id)
-      self.update_attributes(card_eligibility_id: balance.id)
-    end
+
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
 
     # building card restriction
@@ -80,6 +76,31 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
+
+  # after_create do
+  #   user = self.user
+  #   result = ItzCash::AccountDetails.(user, card_id: self.id)
+  #   balance_amount = result.balance rescue 0
+  #   eligibility_amount = result.available_card_eligibility rescue 0
+  #   unless self.card_balance
+  #     balance = Amount.create!(value: balance_amount, currency_id: Currency.first.id)
+  #     self.update_attributes(card_balance_id: balance.id)
+  #   end
+  #   unless self.card_eligibility
+  #     balance = Amount.create!(value: eligibility_amount, currency_id: Currency.first.id)
+  #     self.update_attributes(card_eligibility_id: balance.id)
+  #   end
+  #
+  #   self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
+  #
+  #   # building card restriction
+  #   self.build_card_restriction(channel_atm: true, channel_ecom_pos: true, card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
+  #                                                                                                   {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
+  #                                                                                                   {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
+  #                                                                                                   {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
+  #                                                                                                   {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
+  #                                                                                                   {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
+  # end
 
 
   # attr_accessor :balance, :available_card_eligibility
