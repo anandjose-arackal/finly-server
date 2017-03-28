@@ -66,6 +66,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     if expense.report_id and personal_view?
       unless expense.report.editable?
         messages[:error] << 'Expense cannot be edited at this stage'
+        return
       end
     end
     # checking whether the new per_diem is accessible to the user
@@ -75,6 +76,11 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       unless per_diem && user.per_diems_list.include?(per_diem)
         add_message :error, "You do not have access to this Per Diem"
         return
+      end
+    end
+    if receipt
+      unless receipt.user_id == user.id
+        add_message :error, "You do not own this receipt"
       end
     end
   end
@@ -96,9 +102,8 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
   end
 
   def post_process
-    # todo - come back to this later
     # add comment in report if expense is added within report
-    # Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     add_message :success, 'Expense updated'
   end
@@ -108,8 +113,10 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
   def define_editable_attributes
     self.editable_attrs = {note: expense.note,
                            date: expense.date,
-                           per_diem_value: expense.per_diem_quantity_value,
+                           per_diem_quantity_value: expense.per_diem_quantity_value,
+                           per_diem_name: expense.per_diem_name,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count}
+                           receipt: expense.receipts.count
+                          }
   end
 end

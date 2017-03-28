@@ -47,6 +47,39 @@ class ReportComment < ActiveRecord::Base
     elsif self.user.present?
       name = self.user.name
     end
+
+    type = "" # i.e. will form 'an expense...'
+    merchant = ""
+    if self.expense
+      case expense.expense_type_id
+        when ExpenseType.manual_expense_id
+          type = "cash"
+        when ExpenseType.card_expense_id
+          type = "card"
+        when ExpenseType.distance_expense_id
+          type = "distance" # i.e. will form 'a distance...'
+        when ExpenseType.time_expense_id
+          type = "time" # i.e. will form  ' a time...'
+        when ExpenseType.per_diem_expense_id
+          type = "per diem" # i.e. will form ' a per diem...'
+        else
+          type = ""
+      end
+
+      case expense.expense_type_id
+        when ExpenseType.distance_expense_id
+          merchant = "of #{expense.distance_value} kms"
+        when ExpenseType.time_expense_id
+          merchant = "of #{expense.time_value} hrs"
+        when ExpenseType.manual_expense_id, ExpenseType.card_expense_id, ExpenseType.per_diem_expense_id
+          merchant = "at : #{expense.merchant_name}"
+        else
+          merchant = "-unavailable-"
+      end
+
+    end
+
+
     case report_comment_action_id
       when ReportCommentAction.id_for(:report_comment)
         # Report comment
@@ -106,31 +139,31 @@ class ReportComment < ActiveRecord::Base
         comment = "#{name} attached a receipt to the report"
       when ReportCommentAction.id_for(:report_detach_receipt)
         # Report detach receipt
-        comment = "#{name} detacted a receipt from the report"
+        comment = "#{name} detached a receipt from the report"
       when ReportCommentAction.id_for(:expense_add)
         # Expense add
-        comment = "#{name} added an expense at : #{expense.merchant_name} to the report"
+        comment = "#{name} added a #{type} expense #{merchant} to the report"
       when ReportCommentAction.id_for(:expense_remove)
         # Expense remove
-        comment = "#{name} removed the expense at : #{expense.merchant_name} to the report"
+        comment = "#{name} removed the #{type} expense #{merchant} to the report"
       when ReportCommentAction.id_for(:expense_reject)
         # Expense reject
-        comment = "#{name} rejected the expense at : #{expense.merchant_name}"
+        comment = "#{name} rejected the #{type} expense #{merchant}"
         if expense.note.present?
           comment += " with a note : #{content}"
         end
       when ReportCommentAction.id_for(:expense_update)
         # Expense update
-        comment = "#{name} updated the expense at : #{expense.merchant_name}. #{updated_field} from #{updated_from} to #{updated_to}"
+        comment = "#{name} updated the #{type} expense #{merchant}. #{updated_field} from #{updated_from} to #{updated_to}"
       when ReportCommentAction.id_for(:expense_attach_receipt)
         # adding a receipt to an expense
-        comment = "#{name} attached a receipt to the expense at : #{expense.merchant_name}"
+        comment = "#{name} attached a receipt to the #{type} expense #{merchant}"
       when ReportCommentAction.id_for(:expense_detach_receipt)
         # adding a receipt to an expense
-        comment = "#{name} detached a receipt from the expense at : #{expense.merchant_name}"
+        comment = "#{name} detached a receipt from the #{type} expense #{merchant}"
       when ReportCommentAction.id_for(:expense_update_receipt)
         # adding a receipt to an expense
-        comment = "#{name} updated a receipt on the expense at : #{expense.merchant_name}"
+        comment = "#{name} updated a receipt on the #{type} expense #{merchant}"
       when ReportCommentAction.id_for(:cash_in_hand_deduction_against_reimbursement)
         # deducing cash in hand for reimbursement
         payment_id = payment.id rescue nil
