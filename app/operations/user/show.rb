@@ -86,7 +86,7 @@ class User::Show < User::Base
               card_params[:status_type] = User::PrepaidCard::Base::STATUS[:unblock]
               actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
             end
-          else
+          elsif personal
             if card.active
               card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
               actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
