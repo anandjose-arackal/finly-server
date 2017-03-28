@@ -17,7 +17,6 @@ class SettlementsController < ApplicationController
       return
     end
     @result = operation.run
-    debugger
     respond(response: :success, message: success_message)
   end
 

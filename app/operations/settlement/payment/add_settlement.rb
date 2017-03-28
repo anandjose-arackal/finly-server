@@ -63,10 +63,16 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
     return if to_user.blank?
 
-    self.reimbursement_type_id = params[:reimbursement_type_id]
+    self.reimbursement_type_id = params[:payment][:reimbursement_type_id].to_i
 
     if payment_params[:from_cash_in_hand].present?
       self.cash_in_hand_deduction_amount = payment_params[:from_cash_in_hand].to_f rescue nil
+    end
+
+    if user.admin? and admin_view?
+      self.role = UserRole.admin_id
+    elsif user.finance_manager? and finance_view?
+      self.role = UserRole.finance_manager_id
     end
 
     case self.reimbursement_type_id
@@ -106,14 +112,10 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     unless to_user
       raise_unauthorized_exception
     end
-    if reports.blank?
+    if reports.blank? or self.role.blank?
       raise_unauthorized_exception
     end
-    if user.admin? and admin_view?
-      self.role = UserRole.admin_id
-    else
-      self.role = UserRole.finance_manager_id
-    end
+
     team = User::Team::Index.(user, params)
     unless team.present? and team.include?(to_user)
       raise_unauthorized_exception
@@ -223,8 +225,8 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       # deducting cash in hand given in the params
       self.cash_deduction = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                                    payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
-                                                   date: payment_params[:date],
-                                                   note: "Reimbursement deduction for reports: #{report_names.to_sentence}",
+                                                   date: Date.today,
+                                                   note: payment_params[:note],
                                                    amount_attributes: {value: cash_in_hand_deduction_amount,
                                                                        currency_id: payment_params[:currency_id]})
       unless cash_deduction.valid?
@@ -276,7 +278,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     elsif self.reimbursement_type_id == REIMBURSEMENT_TYPE[:outside_finly] and outside_settlement_amount.present?
       self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                             payment_type_id: PaymentType.id_for(:reimbursement_outside_finly),
-                                            date: payment_params[:date], note: payment_params[:note],
+                                            date: Date.today, note: payment_params[:note],
                                             amount_attributes: {value: outside_settlement_amount, currency_id: payment_params[:currency_id]})
       if self.payment.save
         balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
@@ -285,7 +287,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       end
     end
 
-    if self.cash_in_hand_deduction_amount.present?
+    if self.cash_in_hand_deduction_amount.present? and cash_in_hand_deduction_amount > 0
       # deducting cash in hand given in the params
       bs = to_user.balance_sheet
       if bs.subtract_cash_in_hand(cash_in_hand_deduction_amount)
@@ -297,7 +299,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
 
     reports.each do |report|
-      Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role})
+      Report::MarkAsSettled.(user, {payments: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
     end
 
     # if outside_settlement_amount == 0

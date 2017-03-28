@@ -5,7 +5,7 @@
 # role_id: role id of the person accessing this action
 
 class Report::MarkAsSettled < Report::Base
-  attr_accessor :payment, :status, :cash_in_hand_deduction, :tracking_status
+  attr_accessor :payment, :status, :cash_in_hand_deduction, :tracking_status, :role_id
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -16,16 +16,20 @@ class Report::MarkAsSettled < Report::Base
     self.payment = params[:payment]
     self.cash_in_hand_deduction = params[:from_cash_in_hand]
     self.status = params[:status] || ReportStatus.settled_id
+    self.role_id = params[:role_id]
     self.tracking_status = (params[:status]) ? ReportTrackingAction.id_for(:closed) : ReportTrackingAction.id_for(:settled)
   end
 
   def validate
     unless report.settlement_pending?
-      messages[:error] << 'Report cannot be reimbursed at this stage'
+      messages[:error] << 'Report cannot be settled at this stage'
     end
-    unless payment.present? or cash_in_hand_deduction.present?
-      messages[:error] << 'Payment not found'
+    if self.role_id.blank?
+      add_message :error, 'Error in configuration. Role not defined'
     end
+    # unless payment.present? or cash_in_hand_deduction.present?
+    #   messages[:error] << 'Payment not found'
+    # end
   end
 
   def process
@@ -36,8 +40,9 @@ class Report::MarkAsSettled < Report::Base
                                 report_status_id: status,
                                 reimbursement: payment,
                                 cash_in_hand_deduction: cash_in_hand_deduction
-      # todo test this logic
-      role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
+
+      role_id = self.role_id
+      # role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
       report.tracks.create action_user: user,
                            action_user_role_id: role_id,
                            report_tracking_action_id: tracking_status,

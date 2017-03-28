@@ -23,6 +23,6 @@ class Settlement::Payment::Base < Settlement::Base
   end
 
   def success
-    Settlement::Payment::Base::Presenter.new(user, self.payment, messages)
+    Settlement::Payment::Base::Presenter.new(user, {payment: self.payment}, messages)
   end
 end
