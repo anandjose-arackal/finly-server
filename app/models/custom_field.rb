@@ -19,6 +19,8 @@ class CustomField < ActiveRecord::Base
   # If the custom field is destroyed, destroyed its associated value
   belongs_to :value, polymorphic: true, dependent: :destroy
 
+  accepts_nested_attributes_for :value
+
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
@@ -37,6 +39,8 @@ class CustomField < ActiveRecord::Base
       end
       return
     end
+
+    field_type_id = field_configuration.field_type_id
 
     case field_type_id
       when FieldType.id_for(:text)

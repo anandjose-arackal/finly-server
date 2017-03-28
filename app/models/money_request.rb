@@ -111,6 +111,8 @@ class MoneyRequest < ActiveRecord::Base
     where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)]
   }
 
+  accepts_nested_attributes_for :custom_fields
+
   accepts_nested_attributes_for :items
   delegate :status_name, to: :status
   delegate :payment_mode_name, to: :payment_mode

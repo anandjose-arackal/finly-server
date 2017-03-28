@@ -16,6 +16,7 @@ class TimeExpense < ActiveRecord::Base
 
   belongs_to :expense
   has_many :custom_fields, as: :parent
+  accepts_nested_attributes_for :custom_fields
 
   belongs_to :time_object
 

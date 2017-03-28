@@ -49,7 +49,7 @@ class Report::Create < Report::Base
         Report::Expenses::Add.(user, {for_user: for_user, report: report, expenses: expenses, expense_ids: expense_ids})
       end
 
-      CustomField::SetReport.(report, reset_fields: true, save: true)
+      CustomField::SetFields.(report, FieldParentType.id_for(:report), reset_fields: true, save: true)
 
     else
       add_message :error, report.errors.full_messages

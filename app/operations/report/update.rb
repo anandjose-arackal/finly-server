@@ -46,7 +46,9 @@ class Report::Update < Report::Base
   def process
     return unless update_param.present?
     if report.update_attributes(update_param)
-      CustomField::SetReport.(report, custom_fields: params[:custom_fields])
+      if params[:report].present? and params[:report][:custom_fields].present?
+        CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:report][:custom_fields])
+      end
     else
       messages[:error] = report.errors.full_messages
       false
