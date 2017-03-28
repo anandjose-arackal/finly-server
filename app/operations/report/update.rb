@@ -45,7 +45,9 @@ class Report::Update < Report::Base
 
   def process
     return unless update_param.present?
-    unless report.update_attributes(update_param)
+    if report.update_attributes(update_param)
+      CustomField::SetReport.(report, custom_fields: params[:custom_fields])
+    else
       messages[:error] = report.errors.full_messages
       false
     end
@@ -54,7 +56,7 @@ class Report::Update < Report::Base
   def post_process
     save_comments
     calculate_amounts # this method recalculates the amoutns for the various Distance/Time/Per Diem expenses
-    messages[:success] << "Report updated."
+    messages[:success] << 'Report updated'
   end
 
   protected

@@ -15,6 +15,7 @@ class DistanceExpense < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :expense
+  has_many :custom_fields, as: :parent
 
   belongs_to :distance
 

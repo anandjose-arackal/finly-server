@@ -41,8 +41,6 @@ class Expense < ActiveRecord::Base
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
 
-  has_many :custom_fields, as: :parent
-
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :manual_expense
   accepts_nested_attributes_for :card_expense

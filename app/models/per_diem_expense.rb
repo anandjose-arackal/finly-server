@@ -14,6 +14,7 @@
 class PerDiemExpense < ActiveRecord::Base
   belongs_to :expense
   belongs_to :per_diem
+  has_many :custom_fields, as: :parent
 
   validates :per_diem, presence: true
 

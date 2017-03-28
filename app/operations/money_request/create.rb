@@ -30,6 +30,7 @@ class MoneyRequest::Create < MoneyRequest::Base
                                        modified_user_role_id: param[:controlling_user_role_id],
                                        money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
                                        status_id: MoneyRequestStatus.id_for(:open)
+      CustomField::SetMoneyRequest.(money_request, reset_fields: true, save: true)
     else
       self.messages = money_request.errors.full_messages
     end
