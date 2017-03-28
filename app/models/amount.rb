@@ -13,7 +13,6 @@ class Amount < ActiveRecord::Base
   include MathUtil
   belongs_to :currency
 
-
   validate :no_negative_amount
 
   validates :currency_id, presence: true
@@ -71,6 +70,8 @@ class Amount < ActiveRecord::Base
   alias_method :wallet_balance_value, :amount_value
 
   alias_method :rate_value, :amount_value
+
+  scope :with_id, -> (id) { where id: id }
 
   def greater_than_amount_value
     self.value

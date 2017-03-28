@@ -101,6 +101,8 @@ if MoneyRequestTrackingAction.count == 0
   end
 end
 
+
+
 if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
@@ -196,6 +198,18 @@ end
 if OtpRequestType.count == 0
   OtpRequestType::TYPES.each do |k, v|
     OtpRequestType.create(id: v, name: k)
+  end
+end
+
+if FieldParentType.count == 0
+  FieldParentType::TYPES.each do |key, value|
+    FieldParentType.create id: value, name: key
+  end
+end
+
+if FieldType.count == 0
+  FieldType::TYPES.each do |key, value|
+    FieldType.create id: value, name: key
   end
 end
 

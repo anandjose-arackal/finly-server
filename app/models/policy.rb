@@ -13,6 +13,8 @@
 #
 
 
+
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -44,6 +46,8 @@ class Policy < ActiveRecord::Base
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
+
+  has_many :field_configurations, as: :configurable
 
   validates :company_id, presence: true
   validate :valid_name

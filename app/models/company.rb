@@ -34,6 +34,8 @@ class Company < ActiveRecord::Base
 
   has_many :company_balance_histories
 
+  has_many :field_configurations, as: :configurable
+
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 

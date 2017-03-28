@@ -444,6 +444,49 @@ ActiveRecord::Schema.define(version: 20170327091529) do
     t.string   "symbol",       limit: 255
   end
 
+  create_table "custom_fields", force: :cascade do |t|
+    t.integer  "field_configuration_id", limit: 4,   null: false
+    t.integer  "parent_id",              limit: 4,   null: false
+    t.string   "parent_type",            limit: 255, null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "value_id",               limit: 4,   null: false
+    t.string   "value_type",             limit: 255, null: false
+  end
+
+  add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
+  add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
+  add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
+
+  create_table "distance_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_km",                     precision: 10
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
+  create_table "distance_expenses", force: :cascade do |t|
+    t.integer  "expense_id",  limit: 4
+    t.boolean  "is_deleted",            default: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "distance_id", limit: 4
+  end
+
+  add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
+
+  create_table "distances", force: :cascade do |t|
+    t.decimal  "value",                      precision: 10
+    t.integer  "physical_unit_id", limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
+
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
@@ -529,6 +572,101 @@ ActiveRecord::Schema.define(version: 20170327091529) do
 
   add_index "export_preferences", ["company_id"], name: "index_export_preferences_on_company_id", using: :btree
   add_index "export_preferences", ["export_field_id"], name: "index_export_preferences_on_export_field_id", using: :btree
+
+  create_table "field_amounts", force: :cascade do |t|
+    t.integer  "value_id",   limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "field_amounts", ["value_id"], name: "index_field_amounts_on_value_id", using: :btree
+
+  create_table "field_booleans", force: :cascade do |t|
+    t.boolean  "value",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "field_configurations", force: :cascade do |t|
+    t.boolean  "enabled",                          default: true,  null: false
+    t.integer  "field_type_id",        limit: 4,                   null: false
+    t.boolean  "mandatory",                        default: false, null: false
+    t.integer  "company_id",           limit: 4,                   null: false
+    t.integer  "field_parent_type_id", limit: 4,                   null: false
+    t.integer  "configurable_id",      limit: 4,                   null: false
+    t.string   "configurable_type",    limit: 255,                 null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.string   "field_name",           limit: 255,                 null: false
+    t.integer  "default_value_id",     limit: 4
+    t.string   "default_value_type",   limit: 255
+    t.boolean  "is_deleted",                       default: false, null: false
+  end
+
+  add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
+  add_index "field_configurations", ["configurable_id"], name: "index_field_configurations_on_configurable_id", using: :btree
+  add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
+  add_index "field_configurations", ["field_parent_type_id"], name: "index_field_configurations_on_field_parent_type_id", using: :btree
+  add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
+
+  create_table "field_date_times", force: :cascade do |t|
+    t.datetime "value",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "field_dates", force: :cascade do |t|
+    t.date     "value",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "field_decimals", force: :cascade do |t|
+    t.text     "value",      limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "field_drop_down_items", force: :cascade do |t|
+    t.string   "name",                   limit: 255, null: false
+    t.integer  "field_configuration_id", limit: 4,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
+
+  create_table "field_drop_down_selections", force: :cascade do |t|
+    t.integer  "value_id",   limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "field_drop_down_selections", ["value_id"], name: "index_field_drop_down_selections_on_value_id", using: :btree
+
+  create_table "field_numbers", force: :cascade do |t|
+    t.text     "value",      limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "field_parent_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "field_texts", force: :cascade do |t|
+    t.text     "value",      limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "field_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "itz_cash_properties", force: :cascade do |t|
     t.string   "d_code",          limit: 255
@@ -822,8 +960,46 @@ ActiveRecord::Schema.define(version: 20170327091529) do
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
+  create_table "per_diem_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",   limit: 4
+    t.string   "parent_type", limit: 255
+    t.boolean  "enabled"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "per_diem_expenses", force: :cascade do |t|
+    t.integer  "per_diem_id", limit: 4
+    t.integer  "expense_id",  limit: 4
+    t.integer  "quantity",    limit: 4
+    t.boolean  "is_deleted"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree
+  add_index "per_diem_expenses", ["per_diem_id"], name: "index_per_diem_expenses_on_per_diem_id", using: :btree
+
+  create_table "per_diems", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "rate_id",           limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "configurable_id",   limit: 4
+    t.string   "configurable_type", limit: 255
+  end
+
+  add_index "per_diems", ["rate_id"], name: "index_per_diems_on_rate_id", using: :btree
+
   create_table "periods", force: :cascade do |t|
     t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "physical_units", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "symbol",     limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
@@ -1066,6 +1242,35 @@ ActiveRecord::Schema.define(version: 20170327091529) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "time_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_hour",                   precision: 10
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
+  create_table "time_expenses", force: :cascade do |t|
+    t.integer  "expense_id",     limit: 4
+    t.boolean  "is_deleted"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "time_object_id", limit: 4
+  end
+
+  add_index "time_expenses", ["expense_id"], name: "index_time_expenses_on_expense_id", using: :btree
+
+  create_table "time_objects", force: :cascade do |t|
+    t.decimal  "value",                      precision: 10
+    t.integer  "physical_unit_id", limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
+
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
     t.integer  "user_id",                    limit: 4
@@ -1303,6 +1508,9 @@ ActiveRecord::Schema.define(version: 20170327091529) do
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_tags", "companies"
+  add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "distance_expenses", "expenses"
+  add_foreign_key "distances", "physical_units"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -1315,6 +1523,10 @@ ActiveRecord::Schema.define(version: 20170327091529) do
   add_foreign_key "expenses", "users"
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
+  add_foreign_key "field_configurations", "companies"
+  add_foreign_key "field_configurations", "field_parent_types"
+  add_foreign_key "field_configurations", "field_types"
+  add_foreign_key "field_drop_down_items", "field_configurations"
   add_foreign_key "itz_cash_properties", "companies"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
@@ -1340,6 +1552,8 @@ ActiveRecord::Schema.define(version: 20170327091529) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "per_diem_expenses", "expenses"
+  add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
@@ -1357,6 +1571,8 @@ ActiveRecord::Schema.define(version: 20170327091529) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "time_expenses", "expenses"
+  add_foreign_key "time_objects", "physical_units"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_manager_mappings", "policies"

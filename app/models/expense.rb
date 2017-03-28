@@ -19,13 +19,9 @@
 #
 
 
-
-
-
-include MathUtil
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
+  include MathUtil
 
   belongs_to :amount
   belongs_to :expense_status
@@ -43,6 +39,8 @@ class Expense < ActiveRecord::Base
   has_one :distance_expense, dependent: :destroy
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
+
+  has_many :custom_fields, as: :parent
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :manual_expense
