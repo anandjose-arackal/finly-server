@@ -1,8 +1,8 @@
 class Transcriber::CompaniesController < ApplicationController
 
   before_action :authenticate_user!
-  before_action :transcriber_accounts
   allow_oauth!
+  before_action :transcriber_accounts
 
   def index
     @companies = Company.ocr_enabled

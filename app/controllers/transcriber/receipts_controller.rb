@@ -2,7 +2,7 @@ class Transcriber::ReceiptsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :transcriber_accounts
-  # allow_oauth!
+  allow_oauth!
 
   def create_expense
     @result = Transcriber::Expenses::Create.(current_user, params)
