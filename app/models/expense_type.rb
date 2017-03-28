@@ -17,6 +17,11 @@ class ExpenseType < ActiveRecord::Base
 
   VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5}
 
+
+  def self.id_for(type)
+    VALUES[type]
+  end
+
   # delegated from expense model
   def expense_type_name
     self.name

@@ -1,6 +1,7 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
+#                                menu_data GET        /menu_data(.:format)                                        users#menu_data
 #                   new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
 #               destroy_admin_user_session DELETE|GET /admin/logout(.:format)                                     active_admin/devise/sessions#destroy
@@ -154,7 +155,7 @@
 #                    api_v0_report_approve PATCH      /api/v0/reports/:report_id/approve(.:format)                api/v0/reports#approve
 #                  api_v0_report_unapprove PATCH      /api/v0/reports/:report_id/unapprove(.:format)              api/v0/reports#unapprove
 #                     api_v0_report_reject PATCH      /api/v0/reports/:report_id/reject(.:format)                 api/v0/reports#reject
-#      api_v0_report_reimbursement_confirm PATCH      /api/v0/reports/:report_id/reimbursement_confirm(.:format)  api/v0/reports#reimbursement_confirm
+#         api_v0_report_settlement_confirm PATCH      /api/v0/reports/:report_id/settlement_confirm(.:format)     api/v0/reports#settlement_confirm
 #               api_v0_report_take_control PATCH      /api/v0/reports/:report_id/take_control(.:format)           api/v0/reports#take_control
 #               api_v0_report_add_expenses POST       /api/v0/reports/:report_id/add_expenses(.:format)           api/v0/reports#add_expenses
 #            api_v0_report_remove_expenses DELETE     /api/v0/reports/:report_id/remove_expenses(.:format)        api/v0/reports#remove_expenses
@@ -414,6 +415,7 @@
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
 #           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
+#             user_available_expense_types GET        /users/:user_id/available_expense_types(.:format)           users#available_expense_types
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -462,6 +464,16 @@
 #                                          PATCH      /receipts/:id(.:format)                                     receipts#update
 #                                          PUT        /receipts/:id(.:format)                                     receipts#update
 #                                          DELETE     /receipts/:id(.:format)                                     receipts#destroy
+#          expense_type_configuration_show GET        /expense_type_configurations(.:format)                      expense_types_configuration#show
+#        expense_type_configuration_update PATCH      /expense_type_configurations(.:format)                      expense_types_configuration#update
+#                                per_diems GET        /per_diems(.:format)                                        per_diems#index
+#                                          POST       /per_diems(.:format)                                        per_diems#create
+#                             new_per_diem GET        /per_diems/new(.:format)                                    per_diems#new
+#                            edit_per_diem GET        /per_diems/:id/edit(.:format)                               per_diems#edit
+#                                 per_diem GET        /per_diems/:id(.:format)                                    per_diems#show
+#                                          PATCH      /per_diems/:id(.:format)                                    per_diems#update
+#                                          PUT        /per_diems/:id(.:format)                                    per_diems#update
+#                                          DELETE     /per_diems/:id(.:format)                                    per_diems#destroy
 #             superadmin_company_new_admin POST       /superadmin/companies/:company_id/add_admin(.:format)       superadmin/companies#add_admin
 #                 superadmin_company_users GET        /superadmin/companies/:company_id/users(.:format)           superadmin/users#index
 #                                          POST       /superadmin/companies/:company_id/users(.:format)           superadmin/users#create
@@ -495,6 +507,7 @@
 #                                     root GET        /                                                           home#index
 #                                  welcome GET        /welcome(.:format)                                          home#welcome
 #                                    about GET        /about(.:format)                                            home#about
+#                                resources GET        /resources(.:format)                                        home#resources
 #                    autocomplete_merchant GET        /autocomplete/merchant(.:format)                            autocomplete#merchant
 #                        autocomplete_user GET        /autocomplete/user(.:format)                                autocomplete#user
 #                      external_url_report GET        /external/reports/:id(.:format)                             external_url#report
@@ -540,6 +553,7 @@ Rails.application.routes.draw do
   # get 'policies' => 'policies#index'
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
+  get '/api/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite_for_front_end
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
@@ -722,6 +736,7 @@ Rails.application.routes.draw do
     get 'balance', to: 'users#balance', as: :balance
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
+  get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import
   # get 'mass_import', to: 'users#mass_import', as: :mass_import
@@ -750,6 +765,11 @@ Rails.application.routes.draw do
   resources :receipts do
 
   end
+
+  get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
+  patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
+  
+  resources :per_diems
 
   namespace :superadmin do
     resources :companies do

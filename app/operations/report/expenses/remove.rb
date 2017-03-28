@@ -73,6 +73,14 @@ class Report::Expenses::Remove < Report::Base
           comment.save
         end
       end
+      expenses.each do |expense|
+        # also set the amount for these expense as nil if they're distance/Time/Per Diem
+        unless expense.manual_expense? || expense.card_expense?
+          amount = expense.amount
+          expense.update(amount: nil)
+          amount.destroy if amount
+        end
+      end
       messages[:success] << "Expenses removed."
     end
   end

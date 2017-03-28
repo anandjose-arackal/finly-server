@@ -1,0 +1,25 @@
+# == Schema Information
+#
+# Table name: distance_expenses
+#
+#  id          :integer          not null, primary key
+#  expense_id  :integer
+#  is_deleted  :boolean          default(FALSE)
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  distance_id :integer
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  expense_id: 
+  distance: 9.99
+  unit: MyString
+  is_deleted: false
+
+two:
+  expense_id: 
+  distance: 9.99
+  unit: MyString
+  is_deleted: false

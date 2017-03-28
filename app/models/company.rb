@@ -25,6 +25,13 @@ class Company < ActiveRecord::Base
   has_one :itz_cash_property
   has_many :company_transactions
 
+
+  has_one :distance_expense_config, as: :parent
+  has_one :time_expense_config, as: :parent
+  has_one :per_diem_expense_config, as: :parent
+
+  has_many :per_diems, as: :configurable
+
   has_many :company_balance_histories
 
   has_many :initiating_payments, as: :initiating_account
@@ -76,6 +83,19 @@ class Company < ActiveRecord::Base
     itz_cash_property.easy_account_no
   end
 
+  def distance_expense_enabled?
+    self.distance_expense_config.enabled
+  end
+
+  def time_expense_enabled?
+    self.time_expense_config.enabled
+  end
+
+  def per_diem_expense_enabled?
+    self.per_diem_expense_config.enabled
+  end
+
+
   private
 
   def init_config_present
@@ -88,6 +108,11 @@ class Company < ActiveRecord::Base
     end
 
     self.build_account.save if self.account.blank?
+
+    # building the difference expense configurations
+    self.build_distance_expense_config(enabled: false).save
+    self.build_time_expense_config(enabled: false).save
+    self.build_per_diem_expense_config(enabled: false).save
   end
 
 end

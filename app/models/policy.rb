@@ -13,7 +13,6 @@
 #
 
 
-
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -29,12 +28,19 @@ class Policy < ActiveRecord::Base
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
 
+  has_one :distance_expense_config, as: :parent
+  has_one :time_expense_config, as: :parent
+  has_one :per_diem_expense_config, as: :parent
+
+  has_many :per_diems, as: :configurable
+
   scope :default, -> { where default: true }
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
   scope :with_id, -> (id) { where id: id }
   scope :not_deleted, -> {where is_deleted: false}
+  scope :find_from_id, -> (id) {find_by(id: id)}
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
@@ -44,6 +50,8 @@ class Policy < ActiveRecord::Base
   validate :one_default_per_company
 
   has_paper_trail
+
+  after_create :initialize_expense_configs
 
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
@@ -69,7 +77,20 @@ class Policy < ActiveRecord::Base
     count
   end
 
+  def distance_expense_enabled?
+    self.distance_expense_config.enabled
+  end
+
+  def time_expense_enabled?
+    self.time_expense_config.enabled
+  end
+
+  def per_diem_expense_enabled?
+    self.per_diem_expense_config.enabled
+  end
+
   private
+
   def valid_name
     errors.add(:name, 'cannot be blank') if name.blank? and not default
     if company_id.present? and name.present?
@@ -82,6 +103,13 @@ class Policy < ActiveRecord::Base
       default_policy = Policy.company(company_id).default
       errors.add(:company, 'cannot have more than one default policy') if default_policy.present? and default_policy != self
     end
+  end
+
+  def initialize_expense_configs
+    # building the difference expense configurations
+    self.build_distance_expense_config(enabled: false).save
+    self.build_time_expense_config(enabled: false).save
+    self.build_per_diem_expense_config(enabled: false).save
   end
 
 end

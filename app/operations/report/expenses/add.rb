@@ -70,10 +70,13 @@ class Report::Expenses::Add < Report::Base
     unless report.open? or report.retracted? or report.rejected?
       add_message :error, 'Cannot add expenses to report unless report is in open or retracted state'
     end
+    # if the expense is a distance, time or per diem expense, it must be enabled at the respective report policy or organization level
+
   end
 
   def process
     expenses.each do |expense|
+      calculate_amounts # method that calculates the amount for all distance, time and Per Diem expenses
       unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
         messages[:error] = expense.errors.full_messages
       end
@@ -89,6 +92,25 @@ class Report::Expenses::Add < Report::Base
         end
       end
       add_message :success, 'Expenses added'
+    end
+  end
+
+  private
+
+  def calculate_amounts
+    expenses.each do |expense|
+      if expense.card_expense? || expense.manual_expense?
+        next
+      else
+        amount = expense.amount
+        if amount.nil?
+          amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
+          amount = Amount.create(amount_params)
+        else
+          amount.update(value: expense.calculate_amount_value(report.policy))
+        end
+        expense.update_attributes(amount_id: amount.id)
+      end
     end
   end
 end

@@ -199,6 +199,12 @@ if OtpRequestType.count == 0
   end
 end
 
+if PhysicalUnit.count == 0
+  PhysicalUnit::VALUES.each do |k, v|
+    PhysicalUnit.create(id: k, name: v[:name], symbol: v[:symbol])
+  end
+end
+
 if CardProgram.count == 0
   CardProgram.create name: 'Expense', create_expense: true, receive_reimbursement: false,
                      personal_wallet_fund_transfer: true, spend_restrictions: true,

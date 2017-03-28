@@ -51,12 +51,6 @@
 
 
 
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -350,6 +344,58 @@ class User < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def distance_expense_enabled?
+    if self.company.distance_expense_enabled?
+      return true
+    end
+    policies = self.policies
+    policies.each do |policy|
+      if policy.distance_expense_enabled?
+        return true
+      end
+    end
+    # if none of the above conditions are satisfied
+    false
+  end
+
+  def time_expense_enabled?
+    if self.company.time_expense_enabled?
+      return true
+    end
+    policies = self.policies
+    policies.each do |policy|
+      if policy.time_expense_enabled?
+        return true
+      end
+    end
+    # if none of the above conditions are satisfied
+    false
+  end
+
+  # returns the list of per diems that the user has access to
+  def per_diems_list
+    per_diems = self.company.per_diems
+    policies = self.policies
+    policies.each do |policy|
+      per_diems += policy.per_diems
+    end
+    per_diems
+  end
+
+  def per_diem_expense_enabled?
+    if self.company.per_diem_expense_enabled?
+      return true
+    end
+    policies = self.policies
+    policies.each do |policy|
+      if policy.per_diem_expense_enabled?
+        return true
+      end
+    end
+    # if none of the above conditions are satisfied
+    false
   end
 
   private

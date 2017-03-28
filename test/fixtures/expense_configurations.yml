@@ -1,0 +1,33 @@
+# == Schema Information
+#
+# Table name: expense_configurations
+#
+#  id                :integer          not null, primary key
+#  manual_enabled    :boolean
+#  card_enabled      :boolean
+#  distance_enabled  :boolean
+#  time_enabled      :boolean
+#  per_diem_enabled  :boolean
+#  configurable_id   :integer          not null
+#  configurable_type :string(255)      not null
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  manual_enabled: false
+  card_enabled: false
+  distance_enabled: false
+  time_enabled: false
+  per_diem_enabled: false
+  configurable_id: 
+
+two:
+  manual_enabled: false
+  card_enabled: false
+  distance_enabled: false
+  time_enabled: false
+  per_diem_enabled: false
+  configurable_id: 

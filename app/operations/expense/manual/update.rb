@@ -5,7 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
-  attr_accessor :old_amount, :editable_attrs, :receipt, :old_receipt
+  attr_accessor :editable_attrs, :receipt, :old_receipt
 
   def pre_validate
     if params.blank? or user.blank?

@@ -20,6 +20,8 @@
 
 
 
+
+
 include MathUtil
 
 class Expense < ActiveRecord::Base
@@ -38,15 +40,20 @@ class Expense < ActiveRecord::Base
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
+  has_one :distance_expense, dependent: :destroy
+  has_one :time_expense, dependent: :destroy
+  has_one :per_diem_expense, dependent: :destroy
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :manual_expense
   accepts_nested_attributes_for :card_expense
   accepts_nested_attributes_for :receipts
-
+  accepts_nested_attributes_for :distance_expense
+  accepts_nested_attributes_for :time_expense
+  accepts_nested_attributes_for :per_diem_expense
 
   # delegating to associated classes the dependent attribute calls
-  delegate :amount_value, :currency, to: :amount
+  # delegate :amount_value, :currency, to: :amount
   delegate :surcharge_value, to: :card_expense
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
@@ -157,8 +164,11 @@ class Expense < ActiveRecord::Base
   scope :manual, -> { joins(:manual_expense) }
   scope :card, -> { joins(:card_expense) }
 
-  scope :only_card_expenses, -> { where(expense_type_id: 2) }
-  scope :only_manual_expenses, -> { where(expense_type_id: 1) }
+  scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
+  scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
+  scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
+  scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
+  scope :only_per_diem_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
@@ -182,16 +192,72 @@ class Expense < ActiveRecord::Base
   delegate :category_name, to: :category
 
 
+  # this method is to purely show the amount values for the carious expenses
+  def amount_value
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.amount.value
+      when ExpenseType.id_for(:card)
+        return self.amount.value
+      when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
+        if self.amount.blank?
+          return nil
+        else
+          return self.amount.value
+        end
+      else
+        return nil
+    end
+  end
+
+
+  # this method is to calculate the amount values for the various time/distance/per diem expenses
+  def calculate_amount_value(policy)
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.amount.value
+      when ExpenseType.id_for(:card)
+        return self.amount.value
+      when ExpenseType.id_for(:distance)
+        if policy.blank?
+          rate = self.user.company.distance_expense_config.rate rescue nil
+          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
+          return amount
+        else
+          rate = policy.distance_expense_config.rate rescue nil
+          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
+          return amount
+        end
+      when ExpenseType.id_for(:time)
+        if policy.blank?
+          rate = self.user.company.time_expense_config.rate rescue nil
+          amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
+          return amount
+        else
+          rate = policy.time_expense_config.rate rescue nil
+          amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
+          return amount
+        end
+      when ExpenseType.id_for(:per_diem)
+        rate = self.per_diem_expense.per_diem.rate_value rescue nil
+        amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
+        return amount
+      else
+        return 0
+    end
+  end
+
   def merchant_name
     case self.expense_type_id
       when 1
         return self.manual_expense.merchant
       when 2
-        # todo - temporary
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
+      when 5
+        return self.per_diem_expense.per_diem_name
       else
-        # do nothing
+        return "- -"
     end
   end
 
@@ -207,6 +273,46 @@ class Expense < ActiveRecord::Base
   def report_name
     if report_id
       self.report.name
+    end
+  end
+
+  def distance_value
+    if self.distance_expense?
+      return self.distance_expense.distance_value
+    else
+      return nil
+    end
+  end
+
+  def time_value
+    if self.time_expense?
+      return self.time_expense.time_object_value
+    else
+      return nil
+    end
+  end
+
+  def per_diem_quantity_value
+    if self.per_diem_expense?
+      return self.per_diem_expense.quantity
+    else
+      return nil
+    end
+  end
+
+  def per_diem_rate_value
+    if self.per_diem_expense?
+      return self.per_diem_expense.per_diem.rate_value
+    else
+      return nil
+    end
+  end
+
+  def per_diem_name
+    if self.per_diem_expense?
+      return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
+    else
+      return nil
     end
   end
 
@@ -253,8 +359,6 @@ class Expense < ActiveRecord::Base
 
   private
 
-
-
   # cannot add an expense with future date
   def no_future_date
     if date.present? and date > DateUtils.local_date
@@ -272,6 +376,18 @@ class Expense < ActiveRecord::Base
         if self.card_expense.nil?
           errors.add(:expense, "needs to have an associated card expense")
         end
+      when ExpenseType.distance_expense_id
+        if self.distance_expense.blank?
+          errors.add(:expense, "needs to have an associated distance expense")
+        end
+      when ExpenseType.time_expense_id
+        if self.time_expense.blank?
+          errors.add(:expense, "needs to have an associated time expense")
+        end
+      when ExpenseType.per_diem_expense_id
+        if self.per_diem_expense.blank?
+          errors.add(:expense, "needs to have an associated per diem expense")
+        end
       else
         errors.add(:expense, "type is invalid")
     end
@@ -288,16 +404,30 @@ class Expense < ActiveRecord::Base
         if self.card_expense.blank?
           errors.add(:card, 'expense details not found')
         end
+      when ExpenseType.distance_expense_id
+        if self.distance_expense.blank?
+          errors.add(:distance, "expense cannot be blank")
+        end
+      when ExpenseType.time_expense_id
+        if self.time_expense.blank?
+          errors.add(:time, "expense cannot be blank")
+        end
+      when ExpenseType.per_diem_expense_id
+        if self.per_diem_expense.blank?
+          errors.add(:per_diem, "expense cannot be blank")
+        end
       else
         errors.add(:expense, 'type not allowed')
     end
   end
 
   def valid_amount_value
-    if self.amount.blank? or self.amount.value.blank?
-      errors.add(:amount, "can't be blank")
-    elsif self.amount.value <= 0
-      errors.add(:amount, "can't be less than or equal to 0")
+    if self.manual_expense? || self.card_expense?
+      if self.amount.blank? or self.amount.value.blank?
+        errors.add(:amount, "can't be blank")
+      elsif self.amount.value <= 0
+        errors.add(:amount, "can't be less than or equal to 0")
+      end
     end
   end
 

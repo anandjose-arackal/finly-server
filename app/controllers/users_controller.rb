@@ -107,10 +107,6 @@ class UsersController < ApplicationController
   # also the action that mobile users use to set their password if they've forgotten it
   def set_new_password
     @result = User::Login::SetPassword.(params)
-    # if @result.success?
-    #   # signing in the user so that he can be redirected to expenses screen
-    #   sign_in @result.user, :bypass => true
-    # end
     respond
   end
 
@@ -123,6 +119,11 @@ class UsersController < ApplicationController
   def menu_data
     # Helps the front end app to get user specific yaml data from view_wise_data.yml
     render partial: 'menu_data'
+  end
+
+  def available_expense_types
+    @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    respond
   end
 
   private
