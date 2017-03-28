@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170327091529) do
+ActiveRecord::Schema.define(version: 20170328181254) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -446,8 +446,8 @@ ActiveRecord::Schema.define(version: 20170327091529) do
 
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
-    t.integer  "parent_id",              limit: 4,   null: false
-    t.string   "parent_type",            limit: 255, null: false
+    t.integer  "parent_id",              limit: 4
+    t.string   "parent_type",            limit: 255
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
     t.integer  "value_id",               limit: 4

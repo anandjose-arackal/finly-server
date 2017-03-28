@@ -77,8 +77,9 @@ class CustomField::SetReport < CustomField::Base
 
     report.custom_fields.each do |field|
       # Set values for fields but do not save. We can save everything in one go
-      field.set_value(self.field_values[field.field_configuration_id], false)
+      field.set_value(self.field_values[field.field_configuration_id], false) if self.field_values.has_key?(field.field_configuration_id)
     end
+
 
     # If report is saved by the class calling this operation, we do not have to save it here as it
     # would be getting saved there automatically

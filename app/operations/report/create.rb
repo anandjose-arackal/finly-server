@@ -32,7 +32,6 @@ class Report::Create < Report::Base
                                          controlling_user_role_id: role_id,
                                          policy_id: params[:policy_id],
                                          name: params[:name]
-    CustomField::SetReport.(report, reset_fields: true)
     if report.save
       report.tracks.create action_user: for_user,
                            action_user_role_id: role_id,
@@ -42,12 +41,16 @@ class Report::Create < Report::Base
                            report_status_id: ReportStatus.open_id
       expenses = params[:expenses]
       expense_ids = nil
+
       if params[:expense_ids] and expenses.blank?
         expense_ids = params[:expense_ids].split(',')
       end
       if expense_ids.present? or expenses.present?
         Report::Expenses::Add.(user, {for_user: for_user, report: report, expenses: expenses, expense_ids: expense_ids})
       end
+
+      CustomField::SetReport.(report, reset_fields: true, save: true)
+
     else
       add_message :error, report.errors.full_messages
     end

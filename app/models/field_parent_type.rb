@@ -10,9 +10,12 @@
 
 class FieldParentType < ActiveRecord::Base
 
-  TYPES = { expense: 1,
-             report: 2,
-             money_request: 3 }
+  TYPES = {report: 1,
+           money_request: 2,
+           manual_expense: 3,
+           time_expense: 4,
+           distance_expense: 5,
+           per_diem_expense: 6}
 
   def self.id_for(sym)
     TYPES[sym]
@@ -20,7 +23,7 @@ class FieldParentType < ActiveRecord::Base
 
   def self.expense_ids
     [FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),
-     FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:perdiem_expense)]
+     FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense)]
   end
 
 end

@@ -4,12 +4,12 @@
 #
 #  id                     :integer          not null, primary key
 #  field_configuration_id :integer          not null
-#  parent_id              :integer          not null
-#  parent_type            :string(255)      not null
+#  parent_id              :integer
+#  parent_type            :integer
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  value_id               :integer          not null
-#  value_type             :string(255)      not null
+#  value_id               :integer
+#  value_type             :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
