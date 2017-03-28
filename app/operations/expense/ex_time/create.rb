@@ -89,6 +89,19 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         messages[:error] = comment.errors.full_messages
       end
     end
+    # if the expense is part of a report, calculate the associated amount
+    if expense_params[:report_id].present?
+      report = user.reports.find_by(id: expense_params[:report_id])
+      amount = expense.amount
+      if amount.nil?
+        amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
+        amount = Amount.create(amount_params)
+      else
+        amount.update(value: expense.calculate_amount_value(report.policy))
+      end
+      expense.update_attributes(amount_id: amount.id)
+    end
+
     messages[:success] << 'Expense created'
   end
 end
