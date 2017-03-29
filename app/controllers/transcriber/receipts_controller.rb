@@ -7,21 +7,51 @@ class Transcriber::ReceiptsController < ApplicationController
   def create_expense
     @result = Transcriber::Expenses::Create.(current_user, params)
     if @result.success?
-      flash[:success] = "Receipt transcribed"
+      respond_to do |format|
+        format.html {
+          flash[:success] = "Receipt transcribed"
+          redirect_to request.referrer
+        }
+        format.json {
+          respond response: :success, message: @result.messages[:success]
+        }
+      end
     else
-      flash[:error] = @result.messages[:error]
+      respond_to do |format|
+        format.html {
+          flash[:error] = @result.messages[:error]
+          redirect_to request.referrer
+        }
+        format.json {
+          respond response: :failure, message: @result.messages[:error]
+        }
+      end
     end
-    redirect_to request.referrer
   end
 
   def update_expense
     @result = Transcriber::Expenses::Update.(current_user, params)
     if @result.success?
-      flash[:success] = "Expense Updated"
+      respond_to do |format|
+        format.html {
+          flash[:success] = "Receipt transcribed"
+          redirect_to request.referrer
+        }
+        format.json {
+          respond response: :success, message: @result.messages[:success]
+        }
+      end
     else
-      flash[:error] = @result.messages[:error]
+      respond_to do |format|
+        format.html {
+          flash[:error] = @result.messages[:error]
+          redirect_to request.referrer
+        }
+        format.json {
+          respond response: :failure, message: @result.messages[:error]
+        }
+      end
     end
-    redirect_to request.referrer
   end
 
   def show
