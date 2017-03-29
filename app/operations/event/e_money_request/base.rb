@@ -24,11 +24,11 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
   end
 
   def send_mailer(user)
-    subject = self.mailer_subject(user)
-    body = self.mailer_body(user)
-    button_name = self.mailer_button_name(user)
+    return if user.nil?
+    set_presenter_params
+    debugger
     return unless subject.present? and body.present?
-    MoneyRequestMailer.delay.send_mail(Event::EMoneyRequest::Base::MailerPresenter.new(user, money_request, subject, body, button_name))
+    MoneyRequestMailer.delay.send_mail(Event::EMoneyRequest::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -46,15 +46,26 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
     end
   end
 
-  class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :money_request, :user, :body_val, :subject_val, :button_val
+  def set_presenter_params
+    params[:subject] = self.mailer_subject(user)
+    params[:body] = self.mailer_body(user)
+    params[:button_name] = self.mailer_button_name(user)
+    params[:event_id] = event_id
+    params[:action_name] = action_name
+  end
 
-    def initialize(user, money_request, subject, body, button_name)
-      self.money_request = money_request
+  class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
+    attr_accessor :money_request, :user, :body_val, :subject_val, :button_val, :event_id,
+                  :action_name
+
+    def initialize(user, params)
+      self.money_request = params[:money_request]
       self.user = user
-      self.body_val = body
-      self.subject_val = subject
-      self.button_val = button_name
+      self.body_val = params[:body]
+      self.subject_val = params[:subject]
+      self.button_val = params[:button_name]
+      self.event_id = params[:event_id]
+      self.action_name = params[:action_name]
     end
 
     def validate

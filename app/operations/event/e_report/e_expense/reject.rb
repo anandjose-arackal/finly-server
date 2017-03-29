@@ -17,6 +17,10 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
     NotifierType.id_for(:report_expense_reject)
   end
 
+  def action_name
+    "Report Expense Rejected"
+  end
+
   def affected_users
     Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
   end

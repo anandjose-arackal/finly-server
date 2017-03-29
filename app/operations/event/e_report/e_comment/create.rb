@@ -25,6 +25,10 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     affected_users
   end
 
+  def action_name
+    "New Report Comment"
+  end
+
   def send_push_notification(user)
     content = comment.content
     comment_user = comment.user

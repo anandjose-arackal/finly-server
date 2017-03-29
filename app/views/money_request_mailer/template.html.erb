@@ -1379,7 +1379,7 @@
 
     <body>
     <!-- <style> -->
-    <table class="body" data-made-with-foundation="">
+    <table class="body" style="height: auto;">
       <tr>
         <td class="float-center" align="center" valign="top">
           <center data-parsed="">
@@ -1390,7 +1390,7 @@
                   <table class="spacer">
                     <tbody>
                     <tr>
-                      <td height="50px" style="font-size:16px;line-height:16px; background-color: #2980b9;"><span style="color: white; margin-left: 25px;">Finly</span></td>
+                      <td height="50px" style="font-size:16px;line-height:16px; background-color: #2980b9;vertical-align: middle;height: 80px;"><span style="color: white; margin-left: 25px;"><%=@data.action_name%></span></td>
                     </tr>
                     </tbody>
                   </table><br>
@@ -1404,6 +1404,7 @@
                             <th>
                               <!--<p style="font-size: 20px;"><span style="color: #2980b9;">Abhinash1354@gmail.com</span> has shared 'New Money Request' with you.</p>-->
                               <!--<p style="font-size: 14px;"><span style="color: #2980b9;">Abhinash1354@gmail.com</span> has approved expenses submitted by <span style="color: #2980b9;">Abhinash1354@gmail.com</span> for <span style="font-weight: bold;">$440</span>. They have shared them with you for your further approval or reimbursement.</p>-->
+                              <p style="font-size: 14px;"><%=@data.body_val.html_safe%></p>
                               <center data-parsed=""><br>
                                 <table class="button success float-center">
                                   <tr>
@@ -1417,7 +1418,7 @@
                                   </tr>
                                 </table>
                               </center>
-                              <p style="font-weight: bold; text-align: right; font-size: 18px;">Money Request Total&nbsp;&nbsp;:&nbsp;&nbsp;$2000</p>
+                              <p style="font-weight: bold; text-align: right; font-size: 18px;">Money Request Total&nbsp;&nbsp;:&nbsp;&nbsp;&#8377;<%=@data.money_request.total_amount%></p>
                             </th>
                             <th class="expander"></th>
                           </tr>
@@ -1427,7 +1428,10 @@
                     </tbody>
                   </table>
                   <!-- repeat this part of the code -->
-                  <%= render 'categories_split' %>
+                  <% if @data.event_id == NotifierType.id_for(:money_request_comment) %>
+                  <% else %>
+                    <%= render 'categories_split' %>
+                  <% end %>
                   <br>
                   <br>
                 </td>

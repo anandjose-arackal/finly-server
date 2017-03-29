@@ -4,6 +4,10 @@ class Event::EReport::Retract < Event::EReport::Base
     NotifierType.id_for(:report_retract)
   end
 
+  def action_name
+    "Report Retracted"
+  end
+
   def affected_users
     users = Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
     users.reject { |r| r == self.user}

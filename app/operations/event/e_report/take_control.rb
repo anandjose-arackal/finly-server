@@ -4,6 +4,10 @@ class Event::EReport::TakeControl < Event::EReport::Base
     NotifierType.id_for(:report_take_control)
   end
 
+  def action_name
+    "Report Taken Control of"
+  end
+
   def affected_users
     # [self.report.controlling_user, self.report.controlling_for_user]
     [self.report.controlling_user, self.report.controlling_for_user]

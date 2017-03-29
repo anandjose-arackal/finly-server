@@ -11,41 +11,12 @@
         <% @data.money_request.items.each do |item| %>
           <tr>
             <th style="font-weight: bold; opacity: 0.9;"><%=item.category_name%></th>
-            <th><%= item.amount_value%></th>
+            <th>&#8377;<%= item.amount_value%></th>
           </tr>
         <% end %>
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Travel</th>-->
-          <!--<th>30</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Entertainment</th>-->
-          <!--<th>30</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Marketing and Advertising</th>-->
-          <!--<th>30</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Meals</th>-->
-          <!--<th>0</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Office Expenses</th>-->
-          <!--<th>0</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Other</th>-->
-          <!--<th>0</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th style="font-weight: bold; opacity: 0.9;">Personal</th>-->
-          <!--<th>0</th>-->
-        <!--</tr>-->
         </thead>
       </table>
     </th>
   </tr>
-  <!-- <th class="expander"></th> -->
   </tbody>
 </table>

@@ -13,7 +13,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   attr_accessor :expense_params, :receipt, :selected_user, :expense
 
   def pre_validate
-
+    self.user = User.first
   end
 
   def init

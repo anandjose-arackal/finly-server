@@ -4,6 +4,10 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_unapprove)
   end
 
+  def action_name
+    "Money Request Unapproved"
+  end
+
   def affected_users
     [self.money_request.controlling_user, self.money_request.tracks.last.modified_user]
   end

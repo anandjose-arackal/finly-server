@@ -33,6 +33,10 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_approve)
   end
 
+  def action_name
+    "Money Request Approved"
+  end
+
   def affected_users
     if approved
       if auto_approve

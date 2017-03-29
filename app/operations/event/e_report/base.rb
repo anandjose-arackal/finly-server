@@ -52,10 +52,12 @@ class Event::EReport::Base < Event::SetNotifier
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)
     params[:event_id] = event_id
+    params[:action_name] = action_name
   end
 
   class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :report, :user, :body_val, :subject_val, :button_val, :categories, :expenses, :rejected_expenses, :event_id
+    attr_accessor :report, :user, :body_val, :subject_val, :button_val, :categories, :expenses, :rejected_expenses, :event_id,
+                  :action_name
 
     def initialize(user, params)
       self.report = params[:report]
@@ -67,6 +69,7 @@ class Event::EReport::Base < Event::SetNotifier
       self.expenses = report.expenses
       self.rejected_expenses = params[:rejected_expenses]
       self.event_id = params[:event_id]
+      self.action_name = params[:action_name]
     end
 
     def expenses_category_sorted

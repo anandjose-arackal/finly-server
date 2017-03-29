@@ -4,6 +4,10 @@ class Event::EMoneyRequest::Submit < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_submit)
   end
 
+  def action_name
+    "Money Request Submitted"
+  end
+
   def affected_users
     [self.money_request.user, self.money_request.controlling_user]
   end
