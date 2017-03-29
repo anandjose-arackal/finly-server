@@ -96,12 +96,13 @@ class CustomField < ActiveRecord::Base
     self.value.save if self.value.present? and save
   end
 
-  def as_json
+  def as_json(options = {})
     options = []
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
     end
-    {name: field_configuration.name,
+    {id: field_configuration.id,
+     label: field_configuration.field_name,
      field_type: {id: field_configuration.field_type.id,
                   name: field_configuration.field_type.name},
      mandatory: field_configuration.mandatory,

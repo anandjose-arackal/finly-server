@@ -76,3 +76,7 @@ json.request_items @result.items do |item|
 end
 
 json.actions @result.actions
+
+json.custom_fields do
+  json.array! @result.report.custom_fields
+end

@@ -83,7 +83,6 @@ json.receipts @result.expenses do |expense|
   end
 end
 
-
 json.actions do
   json.dummy 'dummy'
   @result.actions.each do |key, value|
@@ -98,4 +97,6 @@ json.violations do
   json.warning_messages @result.warning_array
 end
 
-# json.custom_fields report.custom_fields
+json.custom_fields do
+  json.array! @result.report.custom_fields
+end
