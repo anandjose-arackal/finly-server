@@ -98,4 +98,4 @@ json.violations do
   json.warning_messages @result.warning_array
 end
 
-json.custom_fields report.custom_fields
+# json.custom_fields report.custom_fields
