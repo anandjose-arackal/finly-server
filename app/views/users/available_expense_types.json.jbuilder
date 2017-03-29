@@ -18,3 +18,4 @@ json.per_diem_config do
     end
   end
 end
+json.custom_fields_config @result.custom_fields_config

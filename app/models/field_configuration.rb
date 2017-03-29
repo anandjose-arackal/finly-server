@@ -140,4 +140,18 @@ class FieldConfiguration < ActiveRecord::Base
     self.default_value.save if self.default_value.present?
   end
 
+  def as_json(options = {})
+    options = []
+    if field_type_id == FieldType.id_for(:drop_down)
+      options = drop_down_items
+    end
+    {id: id,
+     label: field_name,
+     field_type: {id: field_type.id,
+                  name: field_type.name},
+     mandatory: mandatory,
+     value: self.default_value,
+     options: options}
+  end
+
 end

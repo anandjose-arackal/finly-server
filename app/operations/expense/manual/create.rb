@@ -55,11 +55,21 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def process
     self.expense = user.expenses.build(expense_params)
-    custom_fields = params[:expense][:custom_fields]
-    custom_fields[:reset_fields] = true
-    custom_fields[:save] = false
-    CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
-
+    if self.expense.valid?
+      custom_fields = (params[:custom_fields] or {})
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      valid = CustomField::Validate.(self.expense.manual_expense)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return
+      end
+    end
     if self.expense.save
       # Attach an existing receipt to the expense
       if self.receipt.present?
@@ -67,7 +77,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         self.receipt.save
       end
     else
-      messages[:error] = self.expense.errors.full_messages
+      add_message :error, self.expense.errors.full_messages
     end
   end
 
@@ -75,12 +85,12 @@ class Expense::Manual::Create < Expense::Manual::Base
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
-        report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
+                                                   report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
       unless comment.save
-        messages[:error] = comment.errors.full_messages
+        add_message :error, comment.errors.full_messages
       end
     end
-    messages[:success] << 'Expense created'
+    add_message :success, 'Expense created'
   end
 
   # def success
