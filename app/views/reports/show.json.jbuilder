@@ -97,3 +97,5 @@ json.violations do
   json.blocking_messages @result.blocking_array
   json.warning_messages @result.warning_array
 end
+
+json.custom_fields report.custom_fields

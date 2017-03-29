@@ -15,10 +15,6 @@ class CustomField::SetFields < CustomField::Base
   end
 
   def pre_validate
-    if self.identifier.blank?
-      add_message :error, 'Error loading configuration'
-      return
-    end
     if item.blank?
       add_message :error, 'Item not found'
     end
@@ -73,7 +69,7 @@ class CustomField::SetFields < CustomField::Base
       create_ids = required_ids - existing_ids
 
       if create_ids.present?
-        self.field_configurations.with_id(create_ids).each do |config|
+        self.field_configurations.enabled.with_id(create_ids).each do |config|
           # If value has not been set but default value is present, set the value as a deep clone of default value
           default_value = nil
           if config.default_value.present?

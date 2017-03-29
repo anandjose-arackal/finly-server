@@ -21,4 +21,5 @@ class FieldAmount < ActiveRecord::Base
   def value_amount
     self.value.value
   end
+
 end

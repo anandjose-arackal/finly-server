@@ -45,6 +45,7 @@ class Report::Create < Report::Base
       if params[:expense_ids] and expenses.blank?
         expense_ids = params[:expense_ids].split(',')
       end
+
       if expense_ids.present? or expenses.present?
         Report::Expenses::Add.(user, {for_user: for_user, report: report, expenses: expenses, expense_ids: expense_ids})
       end

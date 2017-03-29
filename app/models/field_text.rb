@@ -13,4 +13,8 @@ class FieldText < ActiveRecord::Base
   has_one :field_configuration, as: :default_value
 
   validates :value, presence: true
+
+  def as_json
+    {value: self.value}
+  end
 end
