@@ -116,6 +116,12 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
+    # if the expense has an associated amount, update the amount
+    if expense.amount.present? && expense.report.present?
+      amount = expense.amount
+      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+    end
+
     add_message :success, 'Expense updated'
   end
 

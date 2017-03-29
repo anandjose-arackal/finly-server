@@ -311,7 +311,7 @@ class Expense < ActiveRecord::Base
 
 
   def time_rate_value
-    if self.distance_expense?
+    if self.time_expense?
       if self.report_id.present?
         report = self.report
         if report.policy
