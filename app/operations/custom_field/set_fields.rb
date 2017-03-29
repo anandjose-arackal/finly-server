@@ -5,7 +5,7 @@ class CustomField::SetFields < CustomField::Base
   attr_accessor :item, :field_configurations, :field_values, :reset, :save, :parent_type_id
 
   def self.call(item, parent_type_id, params= {})
-    super(item, params)
+    self.new(item, parent_type_id, params).run
   end
 
   def initialize(item, parent_type_id, params= {})
@@ -79,6 +79,7 @@ class CustomField::SetFields < CustomField::Base
         end
       end
     end
+    debugger
     return if item.custom_fields.blank?
 
     item.custom_fields.each do |field|
