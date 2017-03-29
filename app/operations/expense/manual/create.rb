@@ -59,7 +59,7 @@ class Expense::Manual::Create < Expense::Manual::Base
       custom_fields = (params[:custom_fields] or {})
       custom_fields[:reset_fields] = true
       custom_fields[:save] = false
-      CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+      set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
       unless set_fields.success?
         add_message :error, set_fields.messages[:error]
         return
