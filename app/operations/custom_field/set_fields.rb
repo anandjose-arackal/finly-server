@@ -97,7 +97,7 @@ class CustomField::SetFields < CustomField::Base
         value = self.field_values[field.field_configuration_id.to_s]
       end
       # Set values for fields but do not save. We can save everything in one go
-      field.set_value(value, false) if value.present?
+      field.set_value(value, false) unless value.nil?
     end
 
     # If item is saved by the class calling this operation, we do not have to save it here as it
