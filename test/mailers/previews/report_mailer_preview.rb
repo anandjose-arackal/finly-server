@@ -3,13 +3,15 @@ Dir["#{Rails.root}/app/operations/event/*.rb"].each {|file| require file }
 # Preview all emails at http://localhost:3000/rails/mailers/report_mailer
 class ReportMailerPreview < ActionMailer::Preview
 
+
+
   # http://localhost:3000/rails/mailers/report_mailer/submit
   def submit
     event = Event::EReport::Submit.new(User.second, {report: Report.first})
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_submit)}))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/approve
@@ -18,7 +20,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_approve)}))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/retract
@@ -27,7 +29,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_retract)}))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/comment
@@ -36,16 +38,17 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_reject)}))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/comment
   def comment
-    event = Event::EReport::EComment.new(User.first, {report: Report.first})
+    comment = Report.first.comments.build(report_comment_action_id: ReportCommentAction.id_for(:report_comment), user_id: User.first.id, content: "Something stupid").save
+    event = Event::EReport::EComment::Create.new(User.first, {report: Report.first})
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_comment)}))
   end
 
   # http://localhost:3000/rails/mailers/report_mailer/take_control
@@ -54,7 +57,16 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, event.report, subject, body, 'View Report'))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_take_control)}))
+  end
+
+  # http://localhost:3000/rails/mailers/report_mailer/reject_expense
+  def reject_expense
+    event = Event::EReport::EExpense::Reject.new(User.first, {report: Report.first, rejected_expense: Report.first.expenses.first})
+    event.init
+    subject = event.mailer_subject(event.user)
+    body = event.mailer_body(event.user)
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', rejected_expenses: [Report.first.expenses.first], event_id: NotifierType.id_for(:report_expense_reject)}))
   end
 
 

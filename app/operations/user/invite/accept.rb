@@ -143,8 +143,7 @@ class User::Invite::Accept < User::Invite::Base
   def post_process
     # send welcome mail
 
-    # Send OTP Verification
-    User::Verification::Otp::Create.(invited_user, params)
+
   end
 
   def success
