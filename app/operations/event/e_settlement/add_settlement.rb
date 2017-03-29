@@ -10,6 +10,10 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
 
   end
 
+  def action_name
+    "New Settlment Process"
+  end
+
   def init
     super()
     self.cash_in_hand_deduction = params[:cash_in_hand_deduction]

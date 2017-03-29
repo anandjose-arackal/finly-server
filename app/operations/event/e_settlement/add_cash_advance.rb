@@ -8,6 +8,10 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
 
   end
 
+  def action_name
+    "Cash Advance Added to Cash on Hand"
+  end
+
   def set_notification(user)
     notification = user.notifications.create( notification_type_id: NotificationType.id_for(:payment),
                                               action_type_id: NotificationActionType.id_for(:notify_cash_load),
@@ -25,11 +29,11 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
   end
 
   def mailer_subject(user)
-    "You have received a cash advance of ₹#{payment.amount.value}"
+    "Money Added to Cash on Hand"
   end
 
   def mailer_body(user)
-    "This is to notify you that a cash advance of ₹#{payment.amount.value} has been recorded by #{payment.initiating_user.name}"
+    "This is to notify you an amount of ₹#{payment.amount.value} has been added to your Cash on Hand by #{payment.initiating_user.name}"
   end
 
 end

@@ -4,6 +4,10 @@ class Event::EWallet::Debit < Event::EWallet::Base
     NotifierType.id_for(:wallet_debit)
   end
 
+  def action_name
+    "Debit Processed"
+  end
+
   def affected_users
     [self.payment.initiating_user, self.payment.receiving_user]
   end
