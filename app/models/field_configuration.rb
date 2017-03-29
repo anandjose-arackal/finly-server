@@ -79,10 +79,11 @@ class FieldConfiguration < ActiveRecord::Base
   end
 
   def set_default_value(value)
-    if value.nil?
+    if value.blank?
       if default_value.present?
         default_value.destroy
         self.default_value = nil
+        self.save
       end
       return
     end

@@ -31,7 +31,7 @@ class CustomField < ActiveRecord::Base
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
 
   def set_value(value, save = true)
-    if value.nil?
+    if value.blank?
       if self.value.present?
         self.value.destroy
         self.value = nil

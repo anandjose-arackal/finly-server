@@ -79,7 +79,7 @@ class CustomField::SetFields < CustomField::Base
         end
       end
     end
-    debugger
+
     return if item.custom_fields.blank?
 
     item.custom_fields.each do |field|

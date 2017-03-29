@@ -38,7 +38,7 @@ class Report::Submit < Report::Base
     # checking if policy is added if enforce policy is enabled
     if user.enforce_policy_enabled?
       if report.policy.nil?
-        add_message :error, "You have to select a policy for the report before submission"
+        add_message :error, 'You have to select a policy for the report before submission'
         return false
       end
     end
@@ -52,6 +52,11 @@ class Report::Submit < Report::Base
     end
     if violations_present
       add_message :error, 'Reports with blocking violations cannot be submitted'
+    end
+
+    custom_field_validations = CustomField::Validate.(report)
+    unless custom_field_validations.success?
+      add_message :error, custom_field_validations.messages[:error]
     end
   end
 

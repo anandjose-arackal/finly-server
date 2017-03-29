@@ -102,7 +102,6 @@ if MoneyRequestTrackingAction.count == 0
 end
 
 
-
 if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
@@ -506,7 +505,7 @@ unless Rails.env.production?
   #   end
   # end
 
-# creating some junk transactions and card expenses for testing
+  # creating some junk transactions and card expenses for testing
   if CardTransaction.count == 0
     User.all.each do |user|
       next unless user.cards.present?
@@ -555,6 +554,38 @@ end
 User.all.each do |user|
   user.otp_confirm
   user.update verified: true
+end
+
+if FieldConfiguration.count == 0
+  # Report custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Employee ID',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:report)})
+  # Report mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: true,
+                                                                        field_parent_type_id: FieldParentType.id_for(:report)})
+
+  # Money Request custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Location',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:money_request)})
+  # Money Request mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Project Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: true,
+                                                                        field_parent_type_id: FieldParentType.id_for(:money_request)})
 end
 
 if AdminUser.count == 0
