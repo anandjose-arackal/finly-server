@@ -49,8 +49,8 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def process
     if money_request.update_attributes(self.update_param)
-      if params[:money_request].present? and params[:money_request][:custom_fields].present?
-        CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), custom_fields: params[:money_request][:custom_fields])
+      if params[:custom_fields].present?
+        CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), custom_fields: params[:custom_fields], save: true)
       end
     else
       messages[:error] = money_request.errors.full_messages

@@ -55,9 +55,10 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def process
     self.expense = user.expenses.build(expense_params)
-    # custom_fields = params[:expense][:custom_fields]
-    # custom_fields
-    # CustomField::SetFields.(self.expense, reset_fields: true, save: false)
+    custom_fields = params[:expense][:custom_fields]
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = false
+    CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
 
     if self.expense.save
       # Attach an existing receipt to the expense

@@ -44,44 +44,44 @@ class CustomField < ActiveRecord::Base
 
     case field_type_id
       when FieldType.id_for(:text)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldText.new
         end
         self.value.value = value
       when FieldType.id_for(:number)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldNumber.new
         end
         self.value.value = value
       when FieldType.id_for(:decimal)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldDecimal.new
         end
         self.value.value = value
       when FieldType.id_for(:boolean)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldBoolean.new
         end
         self.value.value = value
       when FieldType.id_for(:drop_down)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldDropDownSelection.new
         end
         if self.field_configuration.present? and self.field_configuration.drop_down_items.present? and self.field_configuration.drop_down_items.with_id(value).present?
           self.value.value_id = value
         end
       when FieldType.id_for(:date)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldDate.new
         end
         self.value.value = DateUtils.datetime_in_ist(value)
       when FieldType.id_for(:datetime)
-        if value.blank?
+        if self.value.blank?
           self.value = FieldDateTime.new
         end
         self.value.value = DateUtils.datetime_in_ist(value)
       when FieldType.id_for(:amount)
-        if value.blank?
+        if self. value.blank?
           self.value = FieldAmount.new
         end
         if self.value.value_id.blank?
