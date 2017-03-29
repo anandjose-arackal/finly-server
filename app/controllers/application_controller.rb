@@ -182,7 +182,6 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_otp
-    # debugger
     if logged_in? && !current_user.otp_verified && !(params[:controller] == 'otp') and not
     params[:controller] == 'sessions' and not params[:controller] == 'pending_invites'
       params[:type] = 'verification'

@@ -42,7 +42,14 @@ class CustomField::SetFields < CustomField::Base
         policy = item.policy
         self.field_configurations = policy.field_configurations
       else
-        self.field_configurations = item.user.company.field_configurations
+        if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id)
+          # For reports and money requests
+          self.field_configurations = item.user.company.field_configurations
+        elsif FieldParentType.expense_ids.include?(parent_type_id)
+          # For expenses
+          self.field_configurations = item.expense.user.company.field_configurations
+        end
+
       end
 
       # Retrieve configurations which are set only for items
