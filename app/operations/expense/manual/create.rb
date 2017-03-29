@@ -55,12 +55,15 @@ class Expense::Manual::Create < Expense::Manual::Base
   def process
     self.expense = user.expenses.build(expense_params)
 
+    # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
 
     if self.expense.save
-      # Attach an existing receipt to the expense
+      # Set custom fields
       set_custom_fields true
+
+      # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
         self.receipt.save

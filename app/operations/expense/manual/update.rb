@@ -78,6 +78,7 @@ class Expense::Manual::Update < Expense::Manual::Base
   end
 
   def process
+    # Set custom fields
     custom_fields = {custom_fields: params[:custom_fields]}
     custom_fields[:save] = false
     set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)

@@ -45,7 +45,7 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
 
     # checking if per_diem expense has been enabled for the user at the company or policy level
     unless user.per_diem_expense_enabled?
-      add_message :error, "Per Diem expense creation is not enabled"
+      add_message :error, 'Per Diem expense creation is not enabled'
       return false
     end
 
@@ -53,14 +53,21 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])
       unless report.editable?
-        messages[:error] << "Expense cannot be added to the report in this state"
+        messages[:error] << 'Expense cannot be added to the report in this state'
       end
     end
   end
 
   def process
     self.expense = user.expenses.build(expense_params)
+
+    # Create custom fields only for validations. Fields will be saved later
+    validate_custom_fields
+    return if has_errors?
+
     if self.expense.save
+      # Set custom fields
+      set_custom_fields true
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
@@ -94,6 +101,31 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     end
 
     messages[:success] << 'Expense created'
+  end
+
+  protected
+  def validate_custom_fields
+    if self.expense.valid?
+      set_fields = set_custom_fields false
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      valid = CustomField::Validate.(self.expense.per_diem_expense)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return
+      end
+      self.expense.per_diem_expense.custom_fields.destroy_all
+    end
+  end
+
+  def set_custom_fields(save)
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.expense.per_diem_expense, FieldParentType.id_for(:per_diem_expense), custom_fields)
   end
 
 end

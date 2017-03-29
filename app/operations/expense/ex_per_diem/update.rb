@@ -68,6 +68,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
         messages[:error] << 'Expense cannot be edited at this stage'
       end
     end
+
     # checking whether the new per_diem is accessible to the user
     if updated_expense_params[:per_diem_expense_attributes][:per_diem_id].present?
       per_diem_id = updated_expense_params[:per_diem_expense_attributes][:per_diem_id].to_i
@@ -80,6 +81,20 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
   end
 
   def process
+    # Set custom fields
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:save] = false
+    set_fields = CustomField::SetFields.(self.expense.per_diem_expense, FieldParentType.id_for(:per_diem_expense), custom_fields)
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.expense.per_diem_expense)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+
     if expense.update(updated_expense_params)
       if receipt
         receipt.parent = expense

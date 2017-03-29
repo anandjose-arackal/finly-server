@@ -74,6 +74,21 @@ class Expense::ExTime::Update < Expense::ExTime::Base
   end
 
   def process
+
+    # Set custom fields
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:save] = false
+    set_fields = CustomField::SetFields.(self.expense.time_expense, FieldParentType.id_for(:time_expense), custom_fields)
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.expense.time_expense)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+
     if expense.update(updated_expense_params)
       if receipt
         receipt.parent = expense
