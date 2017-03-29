@@ -69,7 +69,7 @@ class CustomField::SetFields < CustomField::Base
 
     # If reset has been set, destroy all custom fields and create new ones
     if self.reset
-      item.custom_fields.destroy_all
+      item.custom_fields.destroy_all if item.custom_fields.present?
 
       required_ids = self.field_configurations.pluck(:id)
       existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
