@@ -52,26 +52,15 @@ class Expense::Manual::Create < Expense::Manual::Base
     end
   end
 
-
   def process
     self.expense = user.expenses.build(expense_params)
-    if self.expense.valid?
-      custom_fields = (params[:custom_fields] or {})
-      custom_fields[:reset_fields] = true
-      custom_fields[:save] = false
-      set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
-      unless set_fields.success?
-        add_message :error, set_fields.messages[:error]
-        return
-      end
-      valid = CustomField::Validate.(self.expense.manual_expense)
-      unless valid.success?
-        add_message :error, valid.messages[:error]
-        return
-      end
-    end
+
+    validate_custom_fields
+    return if has_errors?
+
     if self.expense.save
       # Attach an existing receipt to the expense
+      set_custom_fields true
       if self.receipt.present?
         self.receipt.parent = expense
         self.receipt.save
@@ -91,6 +80,31 @@ class Expense::Manual::Create < Expense::Manual::Base
       end
     end
     add_message :success, 'Expense created'
+  end
+
+  protected
+  def validate_custom_fields
+    if self.expense.valid?
+      set_fields = set_custom_fields false
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      valid = CustomField::Validate.(self.expense.manual_expense)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return
+      end
+      self.expense.manual_expense.custom_fields.destroy_all
+    end
+  end
+
+  def set_custom_fields(save)
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
   end
 
   # def success

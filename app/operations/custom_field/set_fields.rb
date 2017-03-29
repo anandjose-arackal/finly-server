@@ -18,6 +18,13 @@ class CustomField::SetFields < CustomField::Base
     if item.blank?
       add_message :error, 'Item not found'
     end
+    if parent_type_id.blank?
+      add_message :error, 'Invalid Configuration'
+      return
+    end
+    if FieldParentType.expense_ids.include?(parent_type_id) and item.expense.blank? and (params.blank? or params[:user].blank?)
+      add_message :error, 'User not found'
+    end
   end
 
   def init
@@ -47,7 +54,11 @@ class CustomField::SetFields < CustomField::Base
           self.field_configurations = item.user.company.field_configurations
         elsif FieldParentType.expense_ids.include?(parent_type_id)
           # For expenses
-          self.field_configurations = item.expense.user.company.field_configurations
+          user = item.expense.user rescue nil
+          if user.blank?
+            user = params[:user]
+          end
+          self.field_configurations = user.company.field_configurations
         end
 
       end
