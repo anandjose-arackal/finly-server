@@ -49,7 +49,7 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :policy
   belongs_to :payment
 
-  has_many :custom_fields, as: :parent
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
@@ -107,9 +107,7 @@ class MoneyRequest < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
-  scope :settlement_viewable, -> {
-    where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)]
-  }
+  scope :settlement_viewable, -> { where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)] }
 
   accepts_nested_attributes_for :custom_fields
 

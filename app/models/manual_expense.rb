@@ -15,7 +15,7 @@ class ManualExpense < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :expense # foreign key expense_id
-  has_many :custom_fields, as: :parent
+  has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 
   validates :merchant, presence: true

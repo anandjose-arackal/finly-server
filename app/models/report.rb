@@ -60,10 +60,10 @@ class Report < ActiveRecord::Base
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
 
-  has_many :custom_fields, as: :parent
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   # submission amount for determining the approving manager and finance manager
-  belongs_to :submitted_amount, class_name: "Amount"
+  belongs_to :submitted_amount, class_name: 'Amount'
   accepts_nested_attributes_for :submitted_amount
   accepts_nested_attributes_for :cash_expenses_total
   accepts_nested_attributes_for :card_expenses_total
