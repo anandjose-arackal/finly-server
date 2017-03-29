@@ -13,15 +13,15 @@ class Expense::Manual::Create < Expense::Manual::Base
   def pre_validate
     super
     if params.blank?
-      messages[:error] << 'Parameters not present'
+      add_message :error, 'Parameters not present'
     end
     if params[:expense].blank?
-      messages[:error] << 'You have not provided any details to create an expense'
+      add_message :error, 'You have not provided any details to create an expense'
       return
     end
     amount_value = params[:expense][:amount_attributes][:value].to_d rescue nil
     if amount_value.present? and amount_value <= 0
-      messages[:error] << 'Amount cannot be less than or equal to 0'
+      add_message :error, 'Amount cannot be less than or equal to 0'
     end
   end
 
@@ -39,7 +39,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   def validate
     # can't think of anything for now
     if expense_params[:receipt_id].present? and receipt.blank?
-      messages[:error] << 'Receipt not found'
+      add_message :error, 'Receipt not found'
       return false
     end
 
@@ -47,7 +47,7 @@ class Expense::Manual::Create < Expense::Manual::Base
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])
       unless report.editable?
-        messages[:error] << "Expense cannot be added to the report in this state"
+        add_message :error, 'Expense cannot be added to the report in this state'
       end
     end
   end
@@ -55,6 +55,10 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def process
     self.expense = user.expenses.build(expense_params)
+    # custom_fields = params[:expense][:custom_fields]
+    # custom_fields
+    # CustomField::SetFields.(self.expense, reset_fields: true, save: false)
+
     if self.expense.save
       # Attach an existing receipt to the expense
       if self.receipt.present?

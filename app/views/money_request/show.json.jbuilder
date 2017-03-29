@@ -78,5 +78,5 @@ end
 json.actions @result.actions
 
 json.custom_fields do
-  json.array! @result.report.custom_fields
+  json.array! @result.money_request.custom_fields
 end
