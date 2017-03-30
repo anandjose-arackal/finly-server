@@ -7,6 +7,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def create
     param = RequestFormatter.api_expense(current_user, params)
+
     @result = Expense::Manual::Create.(current_user, param)
     @result.config[:mobile_api] = true
     if @result.success?
@@ -35,6 +36,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def update
     param = RequestFormatter.api_expense(current_user, params)
+    debugger
     case params[:type]
       when '1', 1
         @result = Expense::Manual::Update.(current_user, param)
