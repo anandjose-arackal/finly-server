@@ -254,7 +254,7 @@ class Expense < ActiveRecord::Base
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
       when 5
-        return self.per_diem_expense.per_diem_name
+        return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
       else
         return "- -"
     end

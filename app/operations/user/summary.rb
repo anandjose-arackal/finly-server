@@ -39,6 +39,7 @@ class User::Summary < User::Base
     if self.selected_user.cards.present?
       self.selected_user.cards.each do |card|
         item = {}
+        item[:id] = card.id
         item[:card_program] = {name: card.card_program.name, id: card.card_program.id}
         item[:active] = card.active
         unless card.active
