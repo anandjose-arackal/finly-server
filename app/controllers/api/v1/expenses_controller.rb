@@ -36,7 +36,6 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def update
     param = RequestFormatter.api_expense(current_user, params)
-    debugger
     case params[:type]
       when '1', 1
         @result = Expense::Manual::Update.(current_user, param)
