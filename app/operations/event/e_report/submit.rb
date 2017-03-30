@@ -4,6 +4,10 @@ class Event::EReport::Submit < Event::EReport::Base
     NotifierType.id_for(:report_submit)
   end
 
+  def action_name
+    "Report Submitted"
+  end
+
   def affected_users
     [self.report.user, self.report.controlling_user]
   end

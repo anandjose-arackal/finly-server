@@ -1,0 +1,2 @@
+module Transcriber::ExpensesHelper
+end

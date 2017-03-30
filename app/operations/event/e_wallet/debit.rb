@@ -4,6 +4,10 @@ class Event::EWallet::Debit < Event::EWallet::Base
     NotifierType.id_for(:wallet_debit)
   end
 
+  def action_name
+    "Debit Processed"
+  end
+
   def affected_users
     [self.payment.initiating_user, self.payment.receiving_user]
   end
@@ -55,6 +59,11 @@ class Event::EWallet::Debit < Event::EWallet::Base
     elsif user.id == self.payment.receiving_user_id
       "An amount of ₹#{self.payment.amount.value} has been debited from your #{receiving_account_s} by #{payment.initiating_user.name}"
     end
+  end
+
+  def set_presenter_params
+    super
+    params[:payment_note] = payment.note
   end
 
 end

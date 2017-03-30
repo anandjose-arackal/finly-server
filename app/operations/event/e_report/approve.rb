@@ -14,6 +14,10 @@ class Event::EReport::Approve < Event::EReport::Base
     end
   end
 
+  def action_name
+    "Report Approved"
+  end
+
   def init
     super
     self.approving_user = self.report.tracks.last.action_user

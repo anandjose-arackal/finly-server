@@ -86,6 +86,12 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     if expense.report_id and personal_view?
       unless expense.report.editable?
         messages[:error] << 'Expense cannot be edited at this stage'
+        return
+      end
+    end
+    if receipt
+      unless receipt.user_id == user.id
+        add_message :error, "You do not own this receipt"
       end
     end
   end
@@ -121,9 +127,14 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
   end
 
   def post_process
-    # todo - come back to this later
     # add comment in report if expense is added within report
-    # Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+
+    # if the expense has an associated amount, update the amount
+    if expense.amount.present? && expense.report.present?
+      amount = expense.amount
+      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+    end
 
     add_message :success, 'Expense updated'
   end
@@ -135,7 +146,8 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
                            date: expense.date,
                            distance_value: expense.distance_value,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count}
+                           receipt: expense.receipts.count
+                          }
   end
 
 end

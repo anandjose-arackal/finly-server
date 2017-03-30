@@ -17,6 +17,10 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_reject)
   end
 
+  def action_name
+    "Money Request Rejected"
+  end
+
   def affected_users
     MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.user)
   end

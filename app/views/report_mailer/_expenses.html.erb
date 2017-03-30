@@ -1,0 +1,104 @@
+<% @data.expenses_category_sorted.each do |section| %>
+  <table class="row">
+    <thead>
+    <tr>
+      <th class="small-12 large-12 columns first last" style="font-weight: bold;"><%=section[:section_name]%></th>
+      <th class="small-12 large-12 columns first last" style="text-align: right; font-weight: bold;">Category Total&nbsp;&nbsp;:&nbsp;&nbsp;<%=section[:section_total]%></th>
+    </tr>
+    <tr>
+      <th class="small-12 large-12 columns first last" colspan="2">
+        <table class="row custom_expense_table_class ">
+          <thead>
+          <tr style="background-color: #DCDCDC;">
+            <th>DATE</th>
+            <th>MERCHANT</th>
+            <th>CATEGORY</th>
+            <th>AMOUNT</th>
+          </tr>
+          <% section[:expenses].each do |expense| %>
+            <tr>
+              <th><%=expense.date %></th>
+              <th><%=expense.merchant_name %></th>
+              <th><%=expense.category_name %></th>
+              <th>&#8377;<%=expense.amount_value %></th>
+            </tr>
+          <% end %>
+          </thead>
+        </table>
+      </th>
+    </tr>
+    </thead>
+  </table><br>
+<% end %>
+<!--&lt;!&ndash; repetition ends here &ndash;&gt;-->
+<!--&lt;!&ndash; repeat this part of the code &ndash;&gt;-->
+<!--<table class="row">-->
+  <!--<thead>-->
+  <!--<tr>-->
+    <!--<th class="small-12 large-12 columns first last" style="font-weight: bold;">Travel</th>-->
+    <!--<th class="small-12 large-12 columns first last" style="text-align: right; font-weight: bold;">Category Total&nbsp;&nbsp;:&nbsp;&nbsp;$500</th>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<th class="small-12 large-12 columns first last" colspan="2">-->
+      <!--<table class="row custom_expense_table_class ">-->
+        <!--<thead>-->
+        <!--<tr style="background-color: #DCDCDC;">-->
+          <!--<th>DATE</th>-->
+          <!--<th>MERCHANT</th>-->
+          <!--<th>CATEGORY</th>-->
+          <!--<th>AMOUNT</th>-->
+        <!--</tr>-->
+        <!--<tr>-->
+          <!--<th>Aug21</th>-->
+          <!--<th>Uber</th>-->
+          <!--<th>Travel</th>-->
+          <!--<th>$440.00</th>-->
+        <!--</tr>-->
+        <!--<tr>-->
+          <!--<th>Jan15</th>-->
+          <!--<th>Ola </th>-->
+          <!--<th>Travel</th>-->
+          <!--<th>$440.00</th>-->
+        <!--</tr>-->
+        <!--</thead>-->
+      <!--</table>-->
+    <!--</th>-->
+  <!--</tr>-->
+  <!--</thead>-->
+<!--</table><br>-->
+<!--&lt;!&ndash; repetition ends here &ndash;&gt;-->
+<!--&lt;!&ndash; repeat this part of the code &ndash;&gt;-->
+<!--<table class="row">-->
+  <!--<thead>-->
+  <!--<tr>-->
+    <!--<th class="small-12 large-12 columns first last" style="font-weight: bold;">Food</th>-->
+    <!--<th class="small-12 large-12 columns first last" style="text-align: right; font-weight: bold;">Category Total&nbsp;&nbsp;:&nbsp;&nbsp;$300</th>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<th class="small-12 large-12 columns first last" colspan="2">-->
+      <!--<table class="row custom_expense_table_class ">-->
+        <!--<thead>-->
+        <!--<tr style="background-color: #DCDCDC;">-->
+          <!--<th>DATE</th>-->
+          <!--<th>MERCHANT</th>-->
+          <!--<th>CATEGORY</th>-->
+          <!--<th>AMOUNT</th>-->
+        <!--</tr>-->
+        <!--<tr>-->
+          <!--<th>Aug21</th>-->
+          <!--<th>KFC</th>-->
+          <!--<th>Food</th>-->
+          <!--<th>$440.00</th>-->
+        <!--</tr>-->
+        <!--<tr>-->
+          <!--<th>Aug21</th>-->
+          <!--<th>KFC</th>-->
+          <!--<th>Food</th>-->
+          <!--<th>$440.00</th>-->
+        <!--</tr>-->
+        <!--</thead>-->
+      <!--</table>-->
+    <!--</th>-->
+  <!--</tr>-->
+  <!--</thead>-->
+<!--</table><br>-->

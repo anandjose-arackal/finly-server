@@ -17,6 +17,10 @@ class Event::EReport::Reject < Event::EReport::Base
     NotifierType.id_for(:report_reject)
   end
 
+  def action_name
+    "Report Rejected"
+  end
+
   def affected_users
     Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
   end

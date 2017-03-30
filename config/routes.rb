@@ -1,6 +1,12 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
+#              transcriber_companies_index GET        /transcriber/companies/index(.:format)                      transcriber/companies#index
+#  transcriber_transcribed_expenses_create POST       /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
+#  transcriber_transcribed_expenses_update PATCH      /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
+#     transcriber_transcribed_receipt_show GET        /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
+#       transcriber_untranscribed_receipts GET        /transcriber/companies/:id(.:format)                        transcriber/companies#show
+#                    transcriber_companies GET        /transcriber/companies(.:format)                            transcriber/companies#index
 #                                menu_data GET        /menu_data(.:format)                                        users#menu_data
 #                   new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
@@ -110,6 +116,8 @@
 #                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
 #                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
 #                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
+#                        resources_details POST       /resources_details(.:format)                                registrations#resource_requests
+#                       resources_download GET        /download_resource(.:format)                                registrations#resources_download
 #                         new_user_session GET        /users/sign_in(.:format)                                    sessions#new
 #                             user_session POST       /users/sign_in(.:format)                                    sessions#create
 #                     destroy_user_session DELETE     /users/sign_out(.:format)                                   sessions#destroy
@@ -415,7 +423,6 @@
 #                     user_update_password POST       /users/:user_id/update_password(.:format)                   users#update_password
 #                             user_balance GET        /users/:user_id/balance(.:format)                           users#balance
 #           user_verify_reset_password_otp GET        /users/:user_id/verify_reset_otp(.:format)                  users#verify_reset_password_otp
-#             user_available_expense_types GET        /users/:user_id/available_expense_types(.:format)           users#available_expense_types
 #                                          GET        /users(.:format)                                            users#index
 #                                          POST       /users(.:format)                                            users#create
 #                                 new_user GET        /users/new(.:format)                                        users#new
@@ -424,6 +431,7 @@
 #                                          PATCH      /users/:id(.:format)                                        users#update
 #                                          PUT        /users/:id(.:format)                                        users#update
 #                                          DELETE     /users/:id(.:format)                                        users#destroy
+#                  available_expense_types GET        /available_expense_types(.:format)                          users#available_expense_types
 #                              user_import POST       /import(.:format)                                           users#import
 #                        superadmin_import POST       /superadmin_import(.:format)                                superadmin/companies#import
 #                      initiate_activation GET        /pending_invites/initiate_activation(.:format)              pending_invites#initiate_activation
@@ -523,6 +531,18 @@
 #
 
 Rails.application.routes.draw do
+
+
+  namespace :transcriber do
+    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
+    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
+    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
+    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
+    get 'companies', to: 'companies#index', as: :companies
+  end
+
+
+
   get 'menu_data', to: "users#menu_data"
 
 
@@ -553,7 +573,6 @@ Rails.application.routes.draw do
   # get 'policies' => 'policies#index'
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
-  get '/api/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite_for_front_end
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details

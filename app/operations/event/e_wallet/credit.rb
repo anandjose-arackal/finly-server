@@ -4,6 +4,10 @@ class Event::EWallet::Credit < Event::EWallet::Base
     NotifierType.id_for(:wallet_credit)
   end
 
+  def action_name
+    "Credit Processed"
+  end
+
   def affected_users
     [self.payment.initiating_user, self.payment.receiving_user]
   end
@@ -63,6 +67,11 @@ class Event::EWallet::Credit < Event::EWallet::Base
     elsif user.id == self.payment.receiving_user_id
       "You have received a credit of ₹#{self.payment.amount.value} from #{payment.initiating_user.name} in your #{receiving_account_s}"
     end
+  end
+
+  def set_presenter_params
+    super
+    params[:payment_note] = payment.note
   end
 
 end

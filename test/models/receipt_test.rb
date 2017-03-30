@@ -15,6 +15,7 @@
 #  parent_type        :string(255)
 #  note               :text(65535)
 #  receipt_email_id   :integer
+#  transcribed        :boolean          default(FALSE)
 #
 
 

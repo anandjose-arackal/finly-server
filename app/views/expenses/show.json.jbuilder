@@ -1,5 +1,6 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id,
-              :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value
+                               :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
+                               :distance_rate_value, :time_rate_value
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
@@ -16,14 +17,14 @@ end
 json.per_diems @result.per_diems do |per_diem|
   json.id per_diem.id
   json.name "#{per_diem.configurable.name} - #{per_diem.name}"
-  json.per_diems @result.per_diems
+  json.rate_value per_diem.rate_value
 end
 
 json.violations @result.violation
 
 json.editable @result.editable
 
-json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.manual_expense? && @result.expense.report_id.nil?)
+json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.deletable_expense? && @result.expense.report_id.nil?)
 
 json.custom_fields do
   expense = @result.expense
