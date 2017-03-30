@@ -3,7 +3,11 @@ json.manager_name @result.manager.present? ? @result.manager.name : ''
 json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
 json.actions do
   @result.actions.each do |key, value|
-    json.set! key, value
+    v = value
+    unless value == true or value == false
+      v = value.present?
+    end
+    json.set! key, v
   end
 end
 json.categories @result.items.each do |item|
