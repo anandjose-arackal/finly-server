@@ -22,4 +22,6 @@ class PerDiemExpense < ActiveRecord::Base
   validates :per_diem, presence: true
 
   delegate :per_diem_name, to: :per_diem
+
+  scope :with_per_diem_id, -> (per_diem_id) {where per_diem_id: per_diem_id}
 end

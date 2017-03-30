@@ -48,6 +48,11 @@ class User::Summary < User::Base
         end
         item[:balance] = balances[:target_user][:card][card.id][:balance] rescue nil
         item[:available_eligibility] = balances[:target_user][:card][card.id][:eligibility] rescue nil
+        item[:ending_number] = card.ending_number
+        item[:actions] = {}
+        item[:actions][:unblockable] = card.unblockable? # determining of the user can unblock the card at this stage
+        item[:actions][:meta] = {}
+        item[:actions][:meta][:base_url] = Rails.application.routes.url_helpers.update_card_status_path
         summary[:cards] << item
       end
     end
@@ -60,6 +65,8 @@ class User::Summary < User::Base
 
     summary[:actions] = load_actions balances
 
+    summary[:current_user_name] = user.name
+    
     summary[:personal] = {}
     summary[:personal][:unreported_expenses] = selected_user.expenses.unreported.count
     summary[:personal][:unsubmitted_reports] = selected_user.reports.open.count

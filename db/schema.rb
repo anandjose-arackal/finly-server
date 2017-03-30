@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170325085735) do
+ActiveRecord::Schema.define(version: 20170328175313) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -457,7 +457,7 @@ ActiveRecord::Schema.define(version: 20170325085735) do
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
-  add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
+  add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", length: {"parent_type"=>191}, using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
     t.integer  "parent_id",           limit: 4
@@ -607,7 +607,7 @@ ActiveRecord::Schema.define(version: 20170325085735) do
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
   add_index "field_configurations", ["configurable_id"], name: "index_field_configurations_on_configurable_id", using: :btree
-  add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
+  add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", length: {"configurable_type"=>191}, using: :btree
   add_index "field_configurations", ["field_parent_type_id"], name: "index_field_configurations_on_field_parent_type_id", using: :btree
   add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
 
