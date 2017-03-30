@@ -51,3 +51,6 @@ json.payment_modes do
     json.name item.name
   end
 end
+json.custom_fields do
+  json.array! @result.money_request.custom_fields
+end

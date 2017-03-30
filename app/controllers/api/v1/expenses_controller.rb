@@ -59,4 +59,9 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     end
   end
 
+  def available_expense_types
+    @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    respond
+  end
+
 end

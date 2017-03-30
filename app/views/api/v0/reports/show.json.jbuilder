@@ -34,3 +34,6 @@ json.comments @result.comments do |comment|
 end
 json.policies @result.policies, :id, :name
 json.violations @result.violations
+json.custom_fields do
+  json.array! @result.report.custom_fields
+end

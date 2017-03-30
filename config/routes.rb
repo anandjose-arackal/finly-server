@@ -620,6 +620,7 @@ Rails.application.routes.draw do
         post 'gcm/unregister', to: 'gcm#delete'
       end
       get 'balances', to: 'users#balance'
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
   end
 
