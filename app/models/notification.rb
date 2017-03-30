@@ -217,13 +217,16 @@ class Notification < ActiveRecord::Base
         end
       when "Money Request"
         if action_type_id == NotificationActionType.id_for(:notify_credit_advance_request)
-          object = " for an money request"
+          object = " for a money request"
           mr = MoneyRequest.unscoped.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         else
           object = " money request"
           mr = MoneyRequest.unscoped.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
+        end
+        if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
+          object_name += " has been auto approved"
         end
         if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
           object_name += " and is awaiting your further approval"
