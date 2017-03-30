@@ -276,6 +276,13 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def deletable_expense?
+    unless self.expense_type_id == ExpenseType.card_expense_id
+      return true
+    end
+    false
+  end
+
   def distance_value
     if self.distance_expense?
       return self.distance_expense.distance_value

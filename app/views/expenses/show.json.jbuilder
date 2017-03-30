@@ -24,4 +24,4 @@ json.violations @result.violation
 
 json.editable @result.editable
 
-json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.manual_expense? && @result.expense.report_id.nil?)
+json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.deletable_expense? && @result.expense.report_id.nil?)
