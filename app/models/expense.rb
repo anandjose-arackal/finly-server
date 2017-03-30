@@ -194,15 +194,13 @@ class Expense < ActiveRecord::Base
   # this method is to purely show the amount values for the carious expenses
   def amount_value
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        return self.amount.value
-      when ExpenseType.id_for(:card)
-        return self.amount.value
+      when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
+        return precision_value self.amount.value
       when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
         if self.amount.blank?
           return nil
         else
-          return self.amount.value
+          return precision_value self.amount.value
         end
       else
         return nil

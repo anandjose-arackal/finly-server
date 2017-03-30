@@ -41,7 +41,7 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
 
   def validate
     # check if this per diem is associated with any expenses in the system
-    if PerDiemExpense.with_per_diem_id(per_diem.id)
+    if PerDiemExpense.with_per_diem_id(per_diem.id).present?
       add_message :error, "The following per diem is associated with expenses. Please edit those expenses first"
       return
     end
