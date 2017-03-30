@@ -152,22 +152,22 @@ if ExpenseStatus.count ==0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
+  ExpenseRuleType.create!(name: "Require Receipt")
+  ExpenseRuleType.create!(name: "Require Note")
+  ExpenseRuleType.create!(name: "Disallow Expense")
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
+  RuleType.create!(name: "Warning")
+  RuleType.create!(name: "Blocking")
 end
 
 if Period.count == 0
-  b = Period.create!(name: "Day")
-  b = Period.create!(name: "Week")
-  b = Period.create!(name: "Month")
-  b = Period.create!(name: "Quarter")
-  b = Period.create!(name: "Year")
+  Period.create!(name: "Day")
+  Period.create!(name: "Week")
+  Period.create!(name: "Month")
+  Period.create!(name: "Quarter")
+  Period.create!(name: "Year")
 end
 
 if PaymentType.count == 0

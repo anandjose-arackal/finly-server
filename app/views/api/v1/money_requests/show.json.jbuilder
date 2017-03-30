@@ -3,7 +3,7 @@ json.manager_name @result.manager.present? ? @result.manager.name : ''
 json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
 json.actions do
   @result.actions.each do |key, value|
-    json.set! key, (value[:url].present? or value[:value].present?)
+    json.set! key, value
   end
 end
 json.categories @result.items.each do |item|
