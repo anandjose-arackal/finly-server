@@ -12,12 +12,13 @@ class Receipt::Index < Receipt::Base
 
   class Receipt::Index::ReceiptsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     include HasScope
-    attr_accessor :receipts
+    attr_accessor :receipts, :categories
 
     has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       self.receipts = apply_scopes(params[:receipts]).paginate(page: params[:page], per_page: 30) rescue nil
+      self.categories = user.company.categories.active
     end
   end
 
