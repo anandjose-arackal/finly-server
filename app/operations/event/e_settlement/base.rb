@@ -13,6 +13,10 @@ class Event::ESettlement::Base < Event::SetNotifier
     end
   end
 
+  def action_name
+
+  end
+
   def init
     self.payment = params[:payment]
   end

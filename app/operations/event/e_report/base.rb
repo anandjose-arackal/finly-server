@@ -15,6 +15,10 @@ class Event::EReport::Base < Event::SetNotifier
     end
   end
 
+  def action_name
+
+  end
+
   def init
     self.report = params[:report]
   end
