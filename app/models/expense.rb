@@ -278,6 +278,13 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def deletable_expense?
+    unless self.expense_type_id == ExpenseType.card_expense_id
+      return true
+    end
+    false
+  end
+
   def distance_value
     if self.distance_expense?
       return self.distance_expense.distance_value
@@ -286,9 +293,44 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def distance_rate_value
+    if self.distance_expense?
+      if self.report_id.present?
+        report = self.report
+        if report.policy
+          return report.policy.distance_expense_config.rate_per_km
+        else
+          return report.user.company.distance_expense_config.rate_per_km
+        end
+      else
+        return nil
+      end
+    else
+      return nil
+    end
+  end
+
   def time_value
     if self.time_expense?
       return self.time_expense.time_object_value
+    else
+      return nil
+    end
+  end
+
+
+  def time_rate_value
+    if self.time_expense?
+      if self.report_id.present?
+        report = self.report
+        if report.policy
+          return report.policy.time_expense_config.rate_per_hour
+        else
+          return report.user.company.time_expense_config.rate_per_hour
+        end
+      else
+        return nil
+      end
     else
       return nil
     end
