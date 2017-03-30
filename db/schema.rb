@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170328175313) do
+ActiveRecord::Schema.define(version: 20170325085735) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -364,6 +364,7 @@ ActiveRecord::Schema.define(version: 20170328175313) do
     t.datetime "logo_updated_at"
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
+    t.boolean  "ocr_enabled"
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -547,6 +548,7 @@ ActiveRecord::Schema.define(version: 20170328175313) do
     t.integer  "report_id",            limit: 4
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
+    t.boolean  "transcribed",                        default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1102,8 +1104,8 @@ ActiveRecord::Schema.define(version: 20170328175313) do
   create_table "receipts", force: :cascade do |t|
     t.integer  "expense_id",         limit: 4
     t.integer  "user_id",            limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
     t.string   "image_file_name",    limit: 255
     t.string   "image_content_type", limit: 255
     t.integer  "image_file_size",    limit: 4
@@ -1112,6 +1114,7 @@ ActiveRecord::Schema.define(version: 20170328175313) do
     t.string   "parent_type",        limit: 255
     t.text     "note",               limit: 65535
     t.integer  "receipt_email_id",   limit: 4
+    t.boolean  "to_be_transcribed",                default: false
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
@@ -1270,6 +1273,23 @@ ActiveRecord::Schema.define(version: 20170328175313) do
   end
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
+
+  create_table "transcribed_expenses", force: :cascade do |t|
+    t.integer  "amount_id",  limit: 4
+    t.date     "date"
+    t.text     "merchant",   limit: 65535
+    t.text     "note",       limit: 65535
+    t.integer  "receipt_id", limit: 4
+    t.integer  "expense_id", limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "transcribed_expenses", ["amount_id"], name: "index_transcribed_expenses_on_amount_id", using: :btree
+  add_index "transcribed_expenses", ["expense_id"], name: "index_transcribed_expenses_on_expense_id", using: :btree
+  add_index "transcribed_expenses", ["receipt_id"], name: "index_transcribed_expenses_on_receipt_id", using: :btree
+  add_index "transcribed_expenses", ["user_id"], name: "index_transcribed_expenses_on_user_id", using: :btree
 
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
@@ -1573,6 +1593,10 @@ ActiveRecord::Schema.define(version: 20170328175313) do
   add_foreign_key "reports", "users"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
+  add_foreign_key "transcribed_expenses", "amounts"
+  add_foreign_key "transcribed_expenses", "expenses"
+  add_foreign_key "transcribed_expenses", "receipts"
+  add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_manager_mappings", "policies"

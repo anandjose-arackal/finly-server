@@ -4,6 +4,10 @@ class Event::EReport::Unapprove < Event::EReport::Base
     NotifierType.id_for(:report_unapprove)
   end
 
+  def action_name
+    "Report Unapproved"
+  end
+
   def affected_users
     [self.report.controlling_user, self.report.tracks.last.modified_user]
   end

@@ -8,6 +8,10 @@ class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
 
   end
 
+  def action_name
+    "Cash Deducted from Cash on Hand"
+  end
+
   def set_notification(user)
     notification = user.notifications.create( notification_type_id: NotificationType.id_for(:payment),
                                               action_type_id: NotificationActionType.id_for(:notify_cash_withdrawal),
@@ -25,11 +29,11 @@ class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
   end
 
   def mailer_subject(user)
-    "Your payment of ₹#{payment.amount.value} back to the company has been recorded"
+    "Money Deducted from Cash on Hand"
   end
 
   def mailer_body(user)
-    "This is to notify you that your payment of ₹#{payment.amount.value} back to the company has been recorded by #{payment.initiating_user.name}"
+    "This is to notify you that an amount of ₹#{payment.amount.value} has been deducted from your Cash on Hand by #{payment.initiating_user.name}"
   end
 
 end

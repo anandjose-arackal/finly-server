@@ -4,6 +4,10 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_take_control)
   end
 
+  def action_name
+    "Money Request Taken Control of"
+  end
+
   def affected_users
     [self.money_request.controlling_for_user]
   end

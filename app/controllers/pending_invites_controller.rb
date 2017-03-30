@@ -5,11 +5,7 @@ class PendingInvitesController < ApplicationController
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
     @states = State.all
-    # i.e. if user has already signed in, redirect to login page
-    # unless @pending_user and @pending_user.invitation_token
-    #   redirect_to new_user_session_path
-    # end
-    render partial: 'edit'
+    render partial: 'edit_invite'
   end
 
   def create
@@ -54,12 +50,7 @@ class PendingInvitesController < ApplicationController
     # fail
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?
-      # sign_in @result.accepted_user, :bypass => true
-
-      respond_to do |format|
-        format.js { render js: "window.location = '#{new_user_session_path}';"}
-        # format.js { render js: "window.location = '#{root_url}';"}
-      end
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end

@@ -46,6 +46,8 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
+  scope :ocr_enabled, -> {joins(:configuration).select(' companies.*').where('ocr_enabled IS true')}
+
   def default_policy
     self.policies.default
   end
@@ -95,6 +97,10 @@ class Company < ActiveRecord::Base
 
   def per_diem_expense_enabled?
     self.per_diem_expense_config.enabled
+  end
+
+  def ocr_enabled?
+    self.configuration.ocr_enabled
   end
 
 

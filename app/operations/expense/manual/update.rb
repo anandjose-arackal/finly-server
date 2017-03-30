@@ -111,6 +111,16 @@ class Expense::Manual::Update < Expense::Manual::Base
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     add_message :success, 'Expense updated'
+
+    # marking the expense as non-transcribed after the first edit
+    if expense.transcribed
+      expense.update(transcribed: false)
+      if expense.receipts.present?
+        expense.receipts.each do |receipt|
+          receipt.update(to_be_transcribed: false)
+        end
+      end
+    end
   end
 
   private

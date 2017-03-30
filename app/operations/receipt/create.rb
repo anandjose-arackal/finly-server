@@ -21,6 +21,11 @@ class Receipt::Create < Receipt::Base
 
   def post_process
     messages[:success] << 'Receipt added'
+
+    # if the company has receipt transcription enabled, it will be marked on the receipt
+    if user.company.configuration.ocr_enabled
+      receipt.update(to_be_transcribed: true)
+    end
   end
 
   def success

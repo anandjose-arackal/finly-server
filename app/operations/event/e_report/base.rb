@@ -1,5 +1,5 @@
 class Event::EReport::Base < Event::SetNotifier
-  attr_accessor :report
+  attr_accessor :report, :rejected_expenses
 
   def pre_validate
     unless user.present?
@@ -15,6 +15,10 @@ class Event::EReport::Base < Event::SetNotifier
     end
   end
 
+  def action_name
+
+  end
+
   def init
     self.report = params[:report]
   end
@@ -27,11 +31,9 @@ class Event::EReport::Base < Event::SetNotifier
 
   def send_mailer(user)
   	return if user.blank?
-    subject = self.mailer_subject(user)
-    body = self.mailer_body(user)
-    button_name = self.mailer_button_name(user)
-    return unless subject.present? and body.present?
-    ReportMailer.delay.send_mail(Event::EReport::Base::MailerPresenter.new(user, report, subject, body, button_name))
+    set_presenter_params
+    return unless params[:subject].present? and params[:body].present?
+    ReportMailer.delay.send_mail(Event::EReport::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -49,15 +51,43 @@ class Event::EReport::Base < Event::SetNotifier
     end
   end
 
-  class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :report, :user, :body_val, :subject_val, :button_val
+  def set_presenter_params
+    params[:subject] = self.mailer_subject(user)
+    params[:body] = self.mailer_body(user)
+    params[:button_name] = self.mailer_button_name(user)
+    params[:event_id] = event_id
+    params[:action_name] = action_name
+  end
 
-    def initialize(user, report, subject, body, button_name)
-      self.report = report
+  class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
+    attr_accessor :report, :user, :body_val, :subject_val, :button_val, :categories, :expenses, :rejected_expenses, :event_id,
+                  :action_name, :comment_body
+
+    def initialize(user, params)
+      self.report = params[:report]
+      self.categories = user.company.categories.active
       self.user = user
-      self.body_val = body
-      self.subject_val = subject
-      self.button_val = button_name
+      self.body_val = params[:body]
+      self.subject_val = params[:subject]
+      self.button_val = params[:button_name]
+      self.expenses = report.expenses
+      self.rejected_expenses = params[:rejected_expenses]
+      self.event_id = params[:event_id]
+      self.action_name = params[:action_name]
+      self.comment_body = params[:comment_body]
+    end
+
+    def expenses_category_sorted
+      categorized_expenses = []
+      self.categories.each do |category|
+        item_expenses = self.expenses.with_category(category.id)
+        if item_expenses.present?
+          item_name = category.name
+          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      categorized_expenses
     end
 
     def validate
