@@ -12,6 +12,8 @@
 #
 
 class PerDiemExpense < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :expense
   belongs_to :per_diem
   has_many :custom_fields, as: :parent, dependent: :destroy

@@ -31,7 +31,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
-      if updated_expense_params[:receipts_attributes] == [""]
+      if updated_expense_params[:receipts_attributes] == ['']
         receipt = expense.receipts.first
         if receipt
           receipt.parent = nil
@@ -91,7 +91,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       add_message :error, valid.messages[:error]
       return
     end
-
     if expense.update(updated_expense_params)
       if receipt
         receipt.parent = expense

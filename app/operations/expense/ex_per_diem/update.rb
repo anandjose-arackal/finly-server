@@ -5,16 +5,16 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "Parameters or user not found"
+      add_message :error, 'Parameters or user not found'
       return false
     end
     if params[:expense_id].nil? and params[:id].blank?
-      messages[:error] << "Expense ID missing!"
+      add_message :error, 'Expense ID missing'
       return false
     end
     per_diem_value = params[:expense][:per_diem_expense_attributes][:quantity].to_d rescue nil
     if per_diem_value.present? and per_diem_value <= 0
-      messages[:error] << 'Per diem quantity cannot be less than or equal to 0'
+      add_message :error, 'Per diem quantity cannot be less than or equal to 0'
     end
   end
 
@@ -37,8 +37,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
-      if self.updated_expense_params[:per_diem_expense_attributes].present? and self.updated_expense_params[:per_diem_expense_attributes][:time_object_attributes].present? and
-          expense.per_diem_expense.present?
+      if self.updated_expense_params[:per_diem_expense_attributes].present? and expense.per_diem_expense.present?
         self.updated_expense_params[:per_diem_expense_attributes][:id] = expense.per_diem_expense.id
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
@@ -65,7 +64,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
   def validate
     if expense.report_id and personal_view?
       unless expense.report.editable?
-        messages[:error] << 'Expense cannot be edited at this stage'
+        add_message :error, 'Expense cannot be edited at this stage'
       end
     end
 
@@ -74,7 +73,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       per_diem_id = updated_expense_params[:per_diem_expense_attributes][:per_diem_id].to_i
       per_diem = PerDiem.find_by(per_diem_id)
       unless per_diem && user.per_diems_list.include?(per_diem)
-        add_message :error, "You do not have access to this Per Diem"
+        add_message :error, 'You do not have access to this Per Diem'
         return
       end
     end
