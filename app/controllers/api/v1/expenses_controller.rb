@@ -36,9 +36,9 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   def update
     param = RequestFormatter.api_expense(current_user, params)
     case params[:type]
-      when '1'
+      when '1', 1
         @result = Expense::Manual::Update.(current_user, param)
-      when '2'
+      when '2', 2
         @result = Expense::ExCard::Update.(current_user, param)
       else
         respond render: :failure
@@ -48,9 +48,9 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     if @result.success?
       if @result.expense.reload.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
-        respond render: 'api/v0/reports/show'
+        respond render: 'api/v1/reports/show'
       else
-        respond render: 'api/v0/expenses/show'
+        respond render: 'api/v1/expenses/show'
       end
     else
       respond
