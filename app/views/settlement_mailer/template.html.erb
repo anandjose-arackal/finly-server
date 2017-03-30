@@ -1387,7 +1387,7 @@
 
     <body>
     <!-- <style> -->
-    <table class="body" data-made-with-foundation="">
+    <table class="body" style="height: auto">
       <tr>
         <td class="float-center" align="center" valign="top">
           <center data-parsed="">
@@ -1419,22 +1419,24 @@
                     </tr>
                     </tbody>
                   </table>
-                  <table class="row">
-                    <thead>
-                    <tr>
-                      <th class="small-12 large-12 columns first last">
-                        <table class="row custom_expense_table_class ">
-                          <thead>
-                          <tr>
-                            <th style="color: #778899;">MESSAGE:</th>
-                          </tr>
-                          <th style="overflow-wrap: break-word; border-left: 2px solid #778899;"><%= @data.payment_note %></th>
-                          </thead>
-                        </table>
-                      </th>
-                    </tr>
-                    </thead>
-                  </table>
+                  <% if @data.payment_note.present? %>
+                    <table class="row">
+                      <thead>
+                      <tr>
+                        <th class="small-12 large-12 columns first last">
+                          <table class="row custom_expense_table_class ">
+                            <thead>
+                            <tr>
+                              <th style="color: #778899;">MESSAGE:</th>
+                            </tr>
+                            <th style="overflow-wrap: break-word; border-left: 2px solid #778899;"><%= @data.payment_note %></th>
+                            </thead>
+                          </table>
+                        </th>
+                      </tr>
+                      </thead>
+                    </table>
+                  <% end %>
                   <br>
                 </td>
               </tr>

@@ -61,13 +61,17 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def mailer_body(user)
-    content = comment.content
     comment_user = comment.user
-    "#{comment_user.name} has comment on the report '#{self.report.name}'<br/><br/>'#{content}'"
+    "#{comment_user.name} has comment on the report '#{self.report.name}'"
   end
 
   def mailer_button_name(user)
     'View Report'
+  end
+
+  def set_presenter_params
+    super
+    params[:comment_body] = comment.content
   end
 
 end

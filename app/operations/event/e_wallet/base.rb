@@ -26,11 +26,10 @@ class Event::EWallet::Base < Event::SetNotifier
   end
 
   def send_mailer(user)
-    subject = self.mailer_subject(user)
-    body = self.mailer_body(user)
-    button_name = self.mailer_button_name(user)
-    return unless subject.present? and body.present?
-    PaymentMailer.delay.send_mail(Event::EWallet::Base::MailerPresenter.new(user, payment, subject, body, button_name))
+    return if user.blank?
+    set_presenter_params
+    return unless params[:subject].present? and params[:body].present?
+    PaymentMailer.delay.send_mail(Event::EWallet::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -43,15 +42,21 @@ class Event::EWallet::Base < Event::SetNotifier
     'View'
   end
 
+  def set_presenter_params
+    params[:subject] = self.mailer_subject(user)
+    params[:body] = self.mailer_body(user)
+    params[:button_name] = self.mailer_button_name(user)
+  end
+
   class Event::EWallet::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :payment, :user, :body_val, :subject_val, :button_val
 
-    def initialize(user, payment, subject, body, button_name)
-      self.payment = payment
+    def initialize(user, params)
+      self.payment = params[:payment]
       self.user = user
-      self.body_val = body
-      self.subject_val = subject
-      self.button_val = button_name
+      self.body_val = params[:body]
+      self.subject_val = params[:subject]
+      self.button_val = params[:button_name]
     end
 
     def validate

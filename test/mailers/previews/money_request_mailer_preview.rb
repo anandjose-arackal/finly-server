@@ -48,7 +48,7 @@ class MoneyRequestMailerPreview < ActionMailer::Preview
     event.init
     body = event.mailer_body(User.first)
     subject = event.mailer_subject(User.first)
-    MoneyRequestMailer.send_mail(Event::EMoneyRequest::Base::MailerPresenter.new(event.user, {money_request: MoneyRequest.first, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:money_request_comment), action_name: "New Money Request Comment"}))
+    MoneyRequestMailer.send_mail(Event::EMoneyRequest::Base::MailerPresenter.new(event.user, {money_request: MoneyRequest.first, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:money_request_comment), action_name: "New Money Request Comment", comment_body: "Are you kidding me? What're you trying to do, buy America?"}))
 
   end
 

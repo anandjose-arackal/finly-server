@@ -58,23 +58,32 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
 
   def mailer_body(user)
     body = ""
-    unless payment.nil?
-      body += "<br>This is to notify you that a reimbursement of ₹#{payment.amount.value} has been processed for the reports:<br>"
-      i = 1
-      self.payment.reimbursed_reports.each do |report|
-        body += "<br>#{i}. #{report.name}"
-        i += 1
+    body += "<br>This is to notify you that"
+    if payment.present?
+      body += " a reimbursement amount of ₹<b>#{payment.amount_value}</b>"
+      if cash_in_hand_deduction.present?
+        body += " as well as"
       end
     end
-    unless cash_in_hand_deduction.nil?
-      body += "<br>This is to notify you that your cash on hand has been deducted against reimbursement for the following reports:<br>"
-      i =
-      self.cash_in_hand_deduction.cash_in_hand_settled_reports.each do |report|
-        body += "<br>#{i}. #{report.name}"
-        i += 1
-      end
+    if cash_in_hand_deduction.present?
+      body += " a cash on hand deduction of ₹<b>#{cash_in_hand_deduction.amount_value}</b>"
+    end
+    body += " has been processed against settlement of the following reports: <br>"
+
+    reports = payment.reimbursed_reports rescue nil
+    if reports.nil?
+      reports = cash_in_hand_deduction.cash_in_hand_settled_reports rescue []
+    end
+    i = 0
+    reports.each do |report|
+      body += "<br>#{i}. #{report.name}"
+      i += 1
     end
     body
+  end
+
+  def set_presenter_params
+    super
   end
 
 end

@@ -48,7 +48,7 @@ class ReportMailerPreview < ActionMailer::Preview
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_comment), action_name: "New Report Comment"}))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_comment), action_name: "New Report Comment", comment_body: "What the fuck happened in Vegas?"}))
   end
 
   # http://localhost:3001/rails/mailers/report_mailer/take_control

@@ -58,13 +58,17 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
   end
 
   def mailer_body(user)
-    content = comment.content
     comment_user = comment.user
-    "#{comment_user.name} has comment on the Money Request '#{self.money_request.name}'<br/><br/>'#{content}'"
+    "#{comment_user.name} has commented on the Money Request '#{self.money_request.name}'"
   end
 
   def mailer_button_name(user)
     'View Money Request'
+  end
+
+  def set_presenter_params
+    super
+    params[:comment_body] = comment.content
   end
 
 end

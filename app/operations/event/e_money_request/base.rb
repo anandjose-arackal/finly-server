@@ -56,7 +56,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
 
   class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :money_request, :user, :body_val, :subject_val, :button_val, :event_id,
-                  :action_name
+                  :action_name, :comment_body
 
     def initialize(user, params)
       self.money_request = params[:money_request]
@@ -66,6 +66,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
       self.button_val = params[:button_name]
       self.event_id = params[:event_id]
       self.action_name = params[:action_name]
+      self.comment_body = params[:comment_body]
     end
 
     def validate
