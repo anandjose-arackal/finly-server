@@ -77,39 +77,20 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
-  # after_create do
-  #   user = self.user
-  #   result = ItzCash::AccountDetails.(user, card_id: self.id)
-  #   balance_amount = result.balance rescue 0
-  #   eligibility_amount = result.available_card_eligibility rescue 0
-  #   unless self.card_balance
-  #     balance = Amount.create!(value: balance_amount, currency_id: Currency.first.id)
-  #     self.update_attributes(card_balance_id: balance.id)
-  #   end
-  #   unless self.card_eligibility
-  #     balance = Amount.create!(value: eligibility_amount, currency_id: Currency.first.id)
-  #     self.update_attributes(card_eligibility_id: balance.id)
-  #   end
-  #
-  #   self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
-  #
-  #   # building card restriction
-  #   self.build_card_restriction(channel_atm: true, channel_ecom_pos: true, card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
-  #                                                                                                   {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
-  #                                                                                                   {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
-  #                                                                                                   {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
-  #                                                                                                   {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
-  #                                                                                                   {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
-  # end
-
 
   # attr_accessor :balance, :available_card_eligibility
 
   def balance
+    if card_balance.blank?
+      ItzCash::AccountDetails.(user, card_id: self.id)
+    end
     self.card_balance.value
   end
 
   def available_card_eligibility
+    if card_eligibility.blank?
+      ItzCash::AccountDetails.(user, card_id: self.id)
+    end
     self.card_eligibility.value
   end
 

@@ -39,6 +39,8 @@ class User::Summary < User::Base
     if self.selected_user.cards.present?
       self.selected_user.cards.each do |card|
         item = {}
+        item[:id] = card.id
+        item[:name] = "#{card.card_program.name} Card"
         item[:card_program] = {name: card.card_program.name, id: card.card_program.id}
         item[:active] = card.active
         unless card.active
@@ -48,6 +50,14 @@ class User::Summary < User::Base
         end
         item[:balance] = balances[:target_user][:card][card.id][:balance] rescue nil
         item[:available_eligibility] = balances[:target_user][:card][card.id][:eligibility] rescue nil
+        personal = (selected_user == user)
+        if personal
+          item[:credit] = card.card_program.personal_wallet_fund_transfer
+          item[:debit] = card.card_program.personal_wallet_fund_transfer
+        else
+          item[:credit] = card.card_program.manager_credit
+          item[:debit] = card.card_program.manager_debit
+        end
         summary[:cards] << item
       end
     end
@@ -80,10 +90,6 @@ class User::Summary < User::Base
 
   def success
     User::Summary::Presenter.new(self.user, summary, messages)
-  end
-
-  class User::Summary::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-
   end
 
   protected
@@ -174,6 +180,26 @@ class User::Summary < User::Base
       end
     end
 
-    {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])}, credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
+    {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
+     credit: true,
+     debit: true,
+     credit_actions: credit_actions, debit_actions: debit_actions}
   end
+
+  class User::Summary::Presenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    def mobile_params
+      param = self.params.deep_dup
+      param.delete(:cards)
+      param[:card] = {assigned: false}
+      cards = self.params[:cards]
+      if cards.present?
+        param[:card] = cards.first
+        param[:card][:assigned] = true
+      end
+      param
+    end
+
+  end
+
 end

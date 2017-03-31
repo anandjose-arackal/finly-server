@@ -58,10 +58,8 @@ class User::Wallet::Debit < User::Wallet::Base
           end
 
         elsif initiating_account == :virtual_account
-
           if receiving_user.wallet.subtract_funds(self.amount)
             user.company.account.funds_debited_from_wallet(self.amount)
-
             self.payment.save
           else
             add_message :error, initiating_user.wallet.errors.full_messages

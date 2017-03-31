@@ -6,10 +6,10 @@ class Expense::Destroy < Expense::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << 'Parameters or user not present'
+      add_message :error, 'Parameters or user not present'
     end
     if params[:expense_id].nil? and params[:id].nil?
-      messages[:error] << 'Expense ID missing!'
+      add_message :error, 'Expense ID missing!'
     end
   end
 
@@ -19,24 +19,24 @@ class Expense::Destroy < Expense::Base
 
   def authorize
     unless expense
-      messages[:error] << 'Cannot find expense to delete'
+      add_message :error, 'Cannot find expense to delete'
       raise_unauthorized_exception
     end
 
     unless expense.user_id == user.id
-      messages[:error] << 'You do not own this expense'
+      add_message :error, 'You do not own this expense'
       raise_unauthorized_exception
     end
   end
 
   def validate
     if expense.expense_type_id == ExpenseType.card_expense_id
-      messages[:error] << "Card expenses cannot be deleted."
+      add_message :error, 'Card expenses cannot be deleted'
     end
 
     if expense.report.present?
       unless report.editable?
-        add_message :error, "Report is not editable at this stage"
+        add_message :error, 'Report is not editable at this stage'
       end
     end
   end
