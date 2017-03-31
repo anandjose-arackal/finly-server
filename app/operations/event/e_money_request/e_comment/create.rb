@@ -66,8 +66,8 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
     'View Money Request'
   end
 
-  def set_presenter_params
-    super
+  def set_presenter_params(user)
+    super(user)
     params[:comment_body] = comment.content
   end
 

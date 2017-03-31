@@ -64,8 +64,8 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
     
   end
 
-  def set_presenter_params
-    super
+  def set_presenter_params(user)
+    super(user)
     params[:rejected_expenses] = [rejected_expense]
   end
 end

@@ -240,7 +240,7 @@ class Report::Violation < Report::Base
   # method that checks for whether a Distance/Time/Per Diem expense is enabled for the particular report policy
   # (or company if no policy is selected) and adds a blocking violation if it's not
   def check_compatible_expenses(expense)
-    message = "expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
+    message = "Expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
     case expense.expense_type_id
       when ExpenseType.id_for(:distance)
         if report.policy.nil?
@@ -268,13 +268,28 @@ class Report::Violation < Report::Base
         end
       when ExpenseType.id_for(:per_diem)
         if report.policy.nil?
-          unless user.company.per_diem_expense_config.enabled
+          if user.company.per_diem_expense_config.enabled
+            if user.company.per_diems.include?(expense.per_diem_expense.per_diem)
+              return
+            else
+              message = "Expenses are beyond the scope of this policy"
+              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
+            end
+          else
             self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
             return
           end
         else
-          unless report.policy.per_diem_expense_config.enabled
+          if report.policy.per_diem_expense_config.enabled
+            if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
+              return
+            else
+              message = "Expenses are beyond the scope of this policy"
+              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
+            end
+          else
             self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+            return
           end
         end
       else

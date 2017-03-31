@@ -65,9 +65,9 @@ class ReportComment < ActiveRecord::Base
 
       case expense.expense_type_id
         when ExpenseType.distance_expense_id
-          merchant = "of #{expense.distance_value} kms"
+          merchant = "of ₹#{expense.amount_value}"
         when ExpenseType.time_expense_id
-          merchant = "of #{expense.time_value} hrs"
+          merchant = "of ₹#{expense.amount_value}"
         when ExpenseType.manual_expense_id, ExpenseType.card_expense_id, ExpenseType.per_diem_expense_id
           merchant = "at : #{expense.merchant_name}"
         else
@@ -155,7 +155,7 @@ class ReportComment < ActiveRecord::Base
         end
       when ReportCommentAction.id_for(:expense_update)
         # Expense update
-        comment = "#{name} updated the #{type} expense #{merchant}. #{updated_field} from #{updated_from} to #{updated_to}"
+        comment = "#{name} updated the #{type} expense #{merchant} : #{updated_field} from #{updated_from} to #{updated_to}"
       when ReportCommentAction.id_for(:expense_attach_receipt)
         # adding a receipt to an expense
         comment = "#{name} attached a receipt to the #{type} expense #{merchant}"

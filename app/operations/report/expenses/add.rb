@@ -70,7 +70,7 @@ class Report::Expenses::Add < Report::Base
     unless report.open? or report.retracted? or report.rejected?
       add_message :error, 'Cannot add expenses to report unless report is in open or retracted state'
     end
-    # if the expense is a distance, time or per diem expense, it must be enabled at the respective report policy or organization level
+
 
   end
 

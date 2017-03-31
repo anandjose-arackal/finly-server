@@ -58,10 +58,10 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
     response = CustomMessage::Create.(selected_user, {mobile_number: [selected_user.mobile_number], message: message})
     if response.success?
       # have to save it without validation because update_attributes considers validations
-      selected_user.assign_attributes(otp_count: (selected_user.otp_count+1))
+      selected_user.assign_attributes(otp_count: (selected_user.otp_count+1), otp_sent_at: DateTime.now)
       # update the new otp and otp_sent_at only if a new otp has actually been sent
       if otp != selected_user.otp
-        selected_user.assign_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id)
+        selected_user.assign_attributes(otp: otp, otp_request_type_id: otp_request_type_id)
       end
       selected_user.save(validate: false)
     else

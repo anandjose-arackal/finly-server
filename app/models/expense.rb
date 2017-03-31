@@ -237,9 +237,24 @@ class Expense < ActiveRecord::Base
           return amount
         end
       when ExpenseType.id_for(:per_diem)
-        rate = self.per_diem_expense.per_diem.rate_value rescue nil
-        amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
-        return amount
+        per_diem = self.per_diem_expense.per_diem
+        if policy.blank?
+          if user.company.per_diems.include?(per_diem)
+            rate = self.per_diem_expense.per_diem.rate_value rescue nil
+            amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
+            return amount
+          else
+            return 0
+          end
+        else
+          if policy.per_diems.include?(per_diem)
+            rate = self.per_diem_expense.per_diem.rate_value rescue nil
+            amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
+            return amount
+          else
+            return 0
+          end
+        end
       else
         return 0
     end
