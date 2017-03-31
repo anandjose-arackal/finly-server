@@ -139,6 +139,10 @@ class MoneyRequest < ActiveRecord::Base
     status_id == MoneyRequestStatus.id_for(:credited)
   end
 
+  def editable?
+    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted)
+  end
+
   def can_submit?
     open? or retracted? or rejected?
   end

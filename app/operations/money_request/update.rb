@@ -36,6 +36,14 @@ class MoneyRequest::Update < MoneyRequest::Base
     end
   end
 
+  def validate
+    super
+    unless money_request.editable?
+      add_message :error, "Money Request cannot be edited at this stage"
+      return
+    end
+  end
+
   def authorize
     if self.money_request.blank?
       messages[:error] << 'You cannot update this request'

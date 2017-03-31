@@ -68,14 +68,14 @@ class MoneyRequest::Base < BaseOperation
 
     def load_actions
       actions = {meta: {base_url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])},
-                 credit: true,
-                 debit: false,
                  credit_actions: {
                      initiating_accounts: [],
                      receiving_accounts: []}}
 
       # Load base actions
       if admin_view? or finance_view? or manager_view?
+        actions[:credit] = true
+        actions[:debit] = true
         if admin_view? and self.money_request.can_take_control? and not self.money_request.controlling_user?(user)
           actions[:take_control] = true
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)

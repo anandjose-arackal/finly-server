@@ -152,22 +152,22 @@ if ExpenseStatus.count ==0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
+  ExpenseRuleType.create!(name: "Require Receipt")
+  ExpenseRuleType.create!(name: "Require Note")
+  ExpenseRuleType.create!(name: "Disallow Expense")
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
+  RuleType.create!(name: "Warning")
+  RuleType.create!(name: "Blocking")
 end
 
 if Period.count == 0
-  b = Period.create!(name: "Day")
-  b = Period.create!(name: "Week")
-  b = Period.create!(name: "Month")
-  b = Period.create!(name: "Quarter")
-  b = Period.create!(name: "Year")
+  Period.create!(name: "Day")
+  Period.create!(name: "Week")
+  Period.create!(name: "Month")
+  Period.create!(name: "Quarter")
+  Period.create!(name: "Year")
 end
 
 if PaymentType.count == 0
@@ -556,96 +556,96 @@ User.all.each do |user|
   user.update verified: true
 end
 
-if FieldConfiguration.count == 0
-  # Report custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Employee ID',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: false,
-                                                                        field_parent_type_id: FieldParentType.id_for(:report)})
-  # Report mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Client Name',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: true,
-                                                                        field_parent_type_id: FieldParentType.id_for(:report)})
-
-  # Money Request custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Client Location',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: false,
-                                                                        field_parent_type_id: FieldParentType.id_for(:money_request)})
-  # Money Request mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Project Name',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: true,
-                                                                        field_parent_type_id: FieldParentType.id_for(:money_request)})
-
-  # Manual Expense custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Location',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: false,
-                                                                        field_parent_type_id: FieldParentType.id_for(:manual_expense)})
-  # Manual Expense mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Duration of Meeting',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: true,
-                                                                        field_parent_type_id: FieldParentType.id_for(:manual_expense)})
-
-  # Distance Expense custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Reason',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: false,
-                                                                        field_parent_type_id: FieldParentType.id_for(:distance_expense)})
-  # Distance Expense mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Client Name',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: true,
-                                                                        field_parent_type_id: FieldParentType.id_for(:distance_expense)})
-
-  # Time Expense custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Reason',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: false,
-                                                                        field_parent_type_id: FieldParentType.id_for(:time_expense)})
-  # Time Expense mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Client Name',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: true,
-                                                                        field_parent_type_id: FieldParentType.id_for(:time_expense)})
-  # Per Diem Expense custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Reason',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: false,
-                                                                        field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
-  # Per Diem Expense mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
-                                                                        configurable_id: 1, company_id: 1,
-                                                                        field_name: 'Client Name',
-                                                                        field_type_id: FieldType.id_for(:text),
-                                                                        mandatory: true,
-                                                                        field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
-end
+# if FieldConfiguration.count == 0
+#   # Report custom fields
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Employee ID',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: false,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
+#   # Report mandatory custom field
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Client Name',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: true,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
+#
+#   # Money Request custom fields
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Client Location',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: false,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
+#   # Money Request mandatory custom field
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Project Name',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: true,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
+#
+#   # Manual Expense custom fields
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Location',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: false,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:manual_expense)})
+#   # Manual Expense mandatory custom field
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Duration of Meeting',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: true,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:manual_expense)})
+#
+#   # Distance Expense custom fields
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Reason',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: false,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:distance_expense)})
+#   # Distance Expense mandatory custom field
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Client Name',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: true,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:distance_expense)})
+#
+#   # Time Expense custom fields
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Reason',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: false,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:time_expense)})
+#   # Time Expense mandatory custom field
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Client Name',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: true,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:time_expense)})
+#   # Per Diem Expense custom fields
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Reason',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: false,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
+#   # Per Diem Expense mandatory custom field
+#   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+#                                                                         configurable_id: 1, company_id: 1,
+#                                                                         field_name: 'Client Name',
+#                                                                         field_type_id: FieldType.id_for(:text),
+#                                                                         mandatory: true,
+#                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
+# end
 
 if AdminUser.count == 0
   # creating admin panel users who can access admin panel

@@ -7,6 +7,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def create
     param = RequestFormatter.api_expense(current_user, params)
+
     @result = Expense::Manual::Create.(current_user, param)
     @result.config[:mobile_api] = true
     if @result.success?
@@ -35,10 +36,18 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def update
     param = RequestFormatter.api_expense(current_user, params)
-    @result = Expense::Manual::Update.(current_user, param)
+    case params[:type]
+      when '1', 1
+        @result = Expense::Manual::Update.(current_user, param)
+      when '2', 2
+        @result = Expense::ExCard::Update.(current_user, param)
+      else
+        respond render: :failure
+        return
+    end
     @result.config[:mobile_api] = true
     if @result.success?
-      if @result.expense.report_id.present?
+      if @result.expense.reload.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'api/v1/reports/show'
       else
@@ -50,7 +59,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   end
 
   def destroy
-    @result = Expense::Manual::Destroy.(current_user, params)
+    @result = Expense::Destroy.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'api/v0/shared/success'
