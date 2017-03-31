@@ -18,8 +18,11 @@
         <% end %>
 
         <div style="text-align: center;">
-          <button style="height: 33px; width: 100px; background-color: #3adb76; color: white; border: none; font-size: 16px;" href="<%=external_url_report_url(id: @data.report.id)%>">View Report</button>
+          <a href="<%=external_url_report_url(id: @data.report.id)%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+              border-radius: 2px;
+              text-decoration: none;">View Report</a>
         </div>
+        <br>
         <!-- <h3>Report Total:<span>&#8377;</span></h3> -->
         <% unless @data.event_id == NotifierType.id_for(:report_comment) %>
         <div style="text-align: right; padding-right: 3%;">

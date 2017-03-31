@@ -31,7 +31,7 @@ class Event::EReport::Base < Event::SetNotifier
 
   def send_mailer(user)
   	return if user.blank?
-    set_presenter_params
+    set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
     ReportMailer.delay.send_mail(Event::EReport::Base::MailerPresenter.new(user, params))
   end
@@ -51,7 +51,7 @@ class Event::EReport::Base < Event::SetNotifier
     end
   end
 
-  def set_presenter_params
+  def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)
@@ -61,7 +61,7 @@ class Event::EReport::Base < Event::SetNotifier
 
   class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :report, :user, :body_val, :subject_val, :button_val, :categories, :expenses, :rejected_expenses, :event_id,
-                  :action_name, :comment_body
+                  :action_name, :comment_body, :expenses_sorted
 
     def initialize(user, params)
       self.report = params[:report]
@@ -75,6 +75,7 @@ class Event::EReport::Base < Event::SetNotifier
       self.event_id = params[:event_id]
       self.action_name = params[:action_name]
       self.comment_body = params[:comment_body]
+      self.expenses_sorted = expenses_category_sorted
     end
 
     def expenses_category_sorted
