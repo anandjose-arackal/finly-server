@@ -1,29 +1,22 @@
 <% @data.rejected_expenses.each do |expense| %>
-    <table class="row">
-      <thead>
+    <table style="width: 94%; margin: auto;">
       <tr>
-        <th class="small-12 large-12 columns first last" style="font-weight: bold;"><%=expense.category_name%></th>
+        <td style="width: 50%; font-size: 20px; font-weight: bold; font-family: Helvetica, Arial, sans-serif;" colspan="2"><%=expense.category_name%></td>
+      </tr>
+    </table><br>
+
+    <table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tr style="background-color: #dcdcdc;">
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">DATE</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">MERCHANT</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">CATEGORY</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
       </tr>
       <tr>
-        <th class="small-12 large-12 columns first last" colspan="2">
-          <table class="row custom_expense_table_class ">
-            <thead>
-            <tr style="background-color: #DCDCDC;">
-              <th>DATE</th>
-              <th>MERCHANT</th>
-              <th>CATEGORY</th>
-              <th>AMOUNT</th>
-            </tr>
-                <tr>
-                  <th><%=expense.date %></th>
-                  <th><%=expense.merchant_name %></th>
-                  <th><%=expense.category_name %></th>
-                  <th>&#8377;<%=expense.amount_value %></th>
-                </tr>
-            </thead>
-          </table>
-        </th>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.date%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.merchant_name %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.category_name%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=expense.amount_value%></td>
       </tr>
-      </thead>
     </table><br>
 <% end %>
