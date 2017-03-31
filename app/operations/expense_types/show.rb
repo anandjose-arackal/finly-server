@@ -92,7 +92,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     if parent.per_diem_expense_config.enabled
       self.per_diem_config = {enabled: true}
       self.per_diem_config[:per_diems] = []
-      parent.per_diems.each do |per_diem|
+      parent.per_diems.active.each do |per_diem|
         self.per_diem_config[:per_diems] << {name: per_diem.name,
                                              rate: per_diem.rate_value,
                                              id: per_diem.id
@@ -101,7 +101,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     else
       self.per_diem_config = {enabled: false}
       self.per_diem_config[:per_diems] = []
-      parent.per_diems.each do |per_diem|
+      parent.per_diems.active.each do |per_diem|
         self.per_diem_config[:per_diems] << {name: per_diem.name,
                                              rate: per_diem.rate_value,
                                              id: per_diem.id

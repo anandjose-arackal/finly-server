@@ -9,6 +9,7 @@
 #  updated_at        :datetime         not null
 #  configurable_id   :integer
 #  configurable_type :string(255)
+#  is_deleted        :boolean          default(FALSE)
 #
 
 require 'test_helper'

@@ -46,12 +46,6 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
 
   end
 
-  # def pre_process
-  #   # if update_params[:enabled] == '0'
-  #   #   update_params[:rate_per_km] = nil
-  #   # end
-  # end
-
   def process
     unless distance_config.update(update_params)
       messages[:error] = distance_config.errors.full_messages

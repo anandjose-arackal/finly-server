@@ -5,11 +5,11 @@
 #  id                     :integer          not null, primary key
 #  field_configuration_id :integer          not null
 #  parent_id              :integer
-#  parent_type            :integer
+#  parent_type            :string(255)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  value_id               :integer
-#  value_type             :integer
+#  value_type             :string(255)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

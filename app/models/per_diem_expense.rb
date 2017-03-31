@@ -16,6 +16,7 @@ class PerDiemExpense < ActiveRecord::Base
 
   belongs_to :expense
   belongs_to :per_diem
+
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 

@@ -57,12 +57,12 @@ class User::AvailableExpenseTypes::Show < User::Base
         }
         self.per_diem_config = {enabled: policy.per_diem_expense_enabled?}
         if per_diem_config
-          if policy.per_diems.empty?
+          if policy.per_diems.active.empty?
             self.per_diem_config = {enabled: false}
             self.per_diem_config[:per_diems] = []
           else
             per_diem_config[:per_diems] = []
-            policy.per_diems.each do |per_diem|
+            policy.per_diems.active.each do |per_diem|
               per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
                                               id: per_diem.id,
                                               rate: per_diem.rate_value
@@ -81,12 +81,12 @@ class User::AvailableExpenseTypes::Show < User::Base
         }
         self.per_diem_config = {enabled: company.per_diem_expense_enabled?}
         if per_diem_config
-          if company.per_diems.empty?
+          if company.per_diems.active.empty?
             self.per_diem_config = {enabled: false}
             self.per_diem_config[:per_diems] = []
           else
             per_diem_config[:per_diems] = []
-            company.per_diems.each do |per_diem|
+            company.per_diems.active.each do |per_diem|
               per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
                                               id: per_diem.id,
                                               rate: per_diem.rate_value
