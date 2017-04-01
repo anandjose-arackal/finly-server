@@ -2,13 +2,10 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
 
   attr_accessor :expense_params, :receipt, :selected_user, :expense
 
-  def pre_validate
-
-  end
 
   def init
     self.expense_params = manual_expense_params
-    self.expense = Expense.find_by(params[:id])
+    self.expense = Expense.find_by(id: params[:id])
     self.selected_user = expense.user if expense
   end
 
@@ -23,7 +20,7 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
   end
 
   def authorize
-    unless user.company_id == Company.find_by(name: "Transcriber") || user.email == 'admin@finlytest.io'
+    unless user.company_id == Company.find_by(name: "Transcriber").id
       raise_unauthorized_exception
     end
   end
@@ -34,7 +31,6 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
 
   def process
     if expense.update(expense_params)
-      # nothing to do
     else
       messages[:error] = expense.errors.full_messages
     end
