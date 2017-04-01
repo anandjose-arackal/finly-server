@@ -48,6 +48,4 @@ class PasswordsController < Devise::PasswordsController
       respond_with resource
     end
   end
-
-
 end
