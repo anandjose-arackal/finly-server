@@ -84,10 +84,12 @@ class ItzCash::AccountDetails < ItzCash::Base
       card.update_attribute(:active, true) unless card.active
     end
     if card.card_balance.blank?
-      card.card_balance = Amount.create(value: 0, currency_id: Currency.first.id)
+      id = Amount.create(value: 0, currency_id: Currency.first.id).id
+      card.update_attributes(card_balance_id: id)
     end
     if card.card_eligibility.blank?
-      card.card_eligibility = Amount.create(value: 0, currency_id: Currency.first.id)
+      id = Amount.create(value: 0, currency_id: Currency.first.id).id
+      card.update_attributes(card_eligibility_id: id)
     end
     card.card_balance.update_attributes(value: parsed_response[2].to_d)
     card.card_eligibility.update_attributes(value: parsed_response[9].to_d)

@@ -97,10 +97,13 @@ class User::Show < User::Base
               end
             end
           end
-          self.cards << {card: {show_balance: show_balance, show_eligibility: show_eligibility,
+          self.cards << {card: {show_balance: show_balance,
+                                show_eligibility: show_eligibility,
                                 ending_number: ending_number,
-                                configurable_restrictions: configurable_restrictions, balance: balance,
-                                eligibility: eligibility, disabled_by: disabled_by,
+                                configurable_restrictions: configurable_restrictions,
+                                balance: balance,
+                                eligibility: eligibility,
+                                disabled_by: disabled_by,
                                 active: active, name: name, id: id},
                          actions: actions, card_restriction: card.card_restriction}
         end
@@ -147,7 +150,7 @@ class User::Show < User::Base
       credit_actions = {initiating_accounts: [], receiving_accounts: []}
       debit_actions={receiving_accounts: [], initiating_accounts: []}
 
-      from_user_creditable_cards = user.cards.creditable_cards
+      from_user_transferable_cards = user.cards.with_non_personal_fund_transfer
       to_user_creditable_cards = selected_user.cards.creditable_cards
       from_user_name = 'Your'
       personal_transfer = self.user == self.selected_user
@@ -169,10 +172,9 @@ class User::Show < User::Base
       debit_actions[:initiating_accounts] << action
 
       # Cards
-      if from_user_creditable_cards.present?
-        from_user_creditable_cards.each do |card|
-
-          next if (not personal_transfer and not card.card_program.manager_credit) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
+      if from_user_transferable_cards.present?
+        from_user_transferable_cards.each do |card|
+          next if (not personal_transfer and not card.card_program.non_personal_fund_transfer) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
 
           balance = balances[:current_user][:card][card.id][:balance] rescue nil
           eligibility = balances[:current_user][:card][card.id][:balance] rescue nil

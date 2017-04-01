@@ -17,6 +17,7 @@ class CustomField::SetFields < CustomField::Base
   def pre_validate
     if item.blank?
       add_message :error, 'Item not found'
+      return
     end
     if parent_type_id.blank?
       add_message :error, 'Invalid Configuration'
