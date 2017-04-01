@@ -113,7 +113,7 @@
                 <label class="control-label">Remark:</label>
               </div> 
               <div class="col-xs-8">
-                <textarea name="remark"></textarea>
+                <textarea name="remark" class="form-control"></textarea>
               </div>  
             </div>
           </div>
@@ -218,7 +218,7 @@
       amount = $("form#form-submit-request input.amount").val()
 
       $.ajax({
-        url: '/companies/<%= current_company.id %>/add_balance',
+        url: '/api/companies/<%= current_company.id %>/add_balance',
         type: "POST",
         data: formData,
         dataType: "json",
@@ -274,7 +274,7 @@
   }
 
   .success-notice{
-    color: white;
+    color: #353B53;
   }
 #ohsnap-priority{
   position: fixed;

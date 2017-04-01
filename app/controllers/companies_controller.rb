@@ -11,11 +11,11 @@ class CompaniesController < ApplicationController
     else
       @company_balance = 0
     end
+    render partial: 'notify'
   end
 
   def add_balance
     @result = Company::AddBalance.(current_user, params)
     respond
   end
-
 end
