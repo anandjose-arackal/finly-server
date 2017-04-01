@@ -151,7 +151,7 @@ class ApplicationController < ActionController::Base
   def respond_failure(message=nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
-    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {errors: messages})
+    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
     respond_to do |format|
       format.json { render 'layouts/application' }
     end
