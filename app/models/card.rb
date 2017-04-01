@@ -81,10 +81,15 @@ class Card < ActiveRecord::Base
   # attr_accessor :balance, :available_card_eligibility
 
   def unblockable?
-    if self.disabled_by_user_id == self.user_id && !card.active
-      return true
+    if self.active
+      true
+    else
+      if self.disabled_by_user_id && self.disabled_by_user_id == self.user_id
+        return true
+      else
+        return false
+      end
     end
-    false
   end
 
   def balance
