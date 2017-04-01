@@ -58,7 +58,7 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
   end
 
   def destroy
-    @result = Expense::Manual::Destroy.(current_user, params)
+    @result = Expense::Destroy.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'api/v0/shared/success'
