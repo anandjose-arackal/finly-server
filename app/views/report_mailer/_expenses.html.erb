@@ -1,104 +1,25 @@
-<% @data.expenses_category_sorted.each do |section| %>
-  <table class="row">
-    <thead>
-    <tr>
-      <th class="small-12 large-12 columns first last" style="font-weight: bold;"><%=section[:section_name]%></th>
-      <th class="small-12 large-12 columns first last" style="text-align: right; font-weight: bold;">Category Total&nbsp;&nbsp;:&nbsp;&nbsp;<%=section[:section_total]%></th>
-    </tr>
-    <tr>
-      <th class="small-12 large-12 columns first last" colspan="2">
-        <table class="row custom_expense_table_class ">
-          <thead>
-          <tr style="background-color: #DCDCDC;">
-            <th>DATE</th>
-            <th>MERCHANT</th>
-            <th>CATEGORY</th>
-            <th>AMOUNT</th>
-          </tr>
-          <% section[:expenses].each do |expense| %>
-            <tr>
-              <th><%=expense.date %></th>
-              <th><%=expense.merchant_name %></th>
-              <th><%=expense.category_name %></th>
-              <th>&#8377;<%=expense.amount_value %></th>
-            </tr>
-          <% end %>
-          </thead>
-        </table>
-      </th>
-    </tr>
-    </thead>
-  </table><br>
+<% @data.expenses_sorted.each do |section| %>
+    <table style="width: 94%; margin: auto;">
+      <tr>
+        <td style="width: 50%; font-size: 20px; font-weight: bold; text-align: left; font-family: Helvetica, Arial, sans-serif;" colspan="2";><%=section[:section_name]%></td>
+        <td style="width: 50%; font-size: 20px; font-weight: bold; text-align: right; font-family: Helvetica, Arial, sans-serif;" colspan="2">Category Total&nbsp;:&nbsp;&#8377;<%=section[:section_total]%></td>
+      </tr>
+    </table><br>
+
+    <table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tr style="background-color: #dcdcdc;">
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">DATE</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">MERCHANT</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">CATEGORY</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
+      </tr>
+      <% section[:expenses].each do |expense| %>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.date%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.merchant_name %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.category_name%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=expense.amount_value%></td>
+      </tr>
+      <% end %>
+    </table><br>
 <% end %>
-<!--&lt;!&ndash; repetition ends here &ndash;&gt;-->
-<!--&lt;!&ndash; repeat this part of the code &ndash;&gt;-->
-<!--<table class="row">-->
-  <!--<thead>-->
-  <!--<tr>-->
-    <!--<th class="small-12 large-12 columns first last" style="font-weight: bold;">Travel</th>-->
-    <!--<th class="small-12 large-12 columns first last" style="text-align: right; font-weight: bold;">Category Total&nbsp;&nbsp;:&nbsp;&nbsp;$500</th>-->
-  <!--</tr>-->
-  <!--<tr>-->
-    <!--<th class="small-12 large-12 columns first last" colspan="2">-->
-      <!--<table class="row custom_expense_table_class ">-->
-        <!--<thead>-->
-        <!--<tr style="background-color: #DCDCDC;">-->
-          <!--<th>DATE</th>-->
-          <!--<th>MERCHANT</th>-->
-          <!--<th>CATEGORY</th>-->
-          <!--<th>AMOUNT</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th>Aug21</th>-->
-          <!--<th>Uber</th>-->
-          <!--<th>Travel</th>-->
-          <!--<th>$440.00</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th>Jan15</th>-->
-          <!--<th>Ola </th>-->
-          <!--<th>Travel</th>-->
-          <!--<th>$440.00</th>-->
-        <!--</tr>-->
-        <!--</thead>-->
-      <!--</table>-->
-    <!--</th>-->
-  <!--</tr>-->
-  <!--</thead>-->
-<!--</table><br>-->
-<!--&lt;!&ndash; repetition ends here &ndash;&gt;-->
-<!--&lt;!&ndash; repeat this part of the code &ndash;&gt;-->
-<!--<table class="row">-->
-  <!--<thead>-->
-  <!--<tr>-->
-    <!--<th class="small-12 large-12 columns first last" style="font-weight: bold;">Food</th>-->
-    <!--<th class="small-12 large-12 columns first last" style="text-align: right; font-weight: bold;">Category Total&nbsp;&nbsp;:&nbsp;&nbsp;$300</th>-->
-  <!--</tr>-->
-  <!--<tr>-->
-    <!--<th class="small-12 large-12 columns first last" colspan="2">-->
-      <!--<table class="row custom_expense_table_class ">-->
-        <!--<thead>-->
-        <!--<tr style="background-color: #DCDCDC;">-->
-          <!--<th>DATE</th>-->
-          <!--<th>MERCHANT</th>-->
-          <!--<th>CATEGORY</th>-->
-          <!--<th>AMOUNT</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th>Aug21</th>-->
-          <!--<th>KFC</th>-->
-          <!--<th>Food</th>-->
-          <!--<th>$440.00</th>-->
-        <!--</tr>-->
-        <!--<tr>-->
-          <!--<th>Aug21</th>-->
-          <!--<th>KFC</th>-->
-          <!--<th>Food</th>-->
-          <!--<th>$440.00</th>-->
-        <!--</tr>-->
-        <!--</thead>-->
-      <!--</table>-->
-    <!--</th>-->
-  <!--</tr>-->
-  <!--</thead>-->
-<!--</table><br>-->

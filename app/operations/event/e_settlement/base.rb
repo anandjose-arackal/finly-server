@@ -27,8 +27,8 @@ class Event::ESettlement::Base < Event::SetNotifier
 
   def send_mailer(user)
     return if user.nil?
-    set_presenter_params
-    return unless subject.present? and body.present?
+    set_presenter_params(user)
+    return unless params[:subject].present? and params[:body].present?
     SettlementMailer.delay.send_mail Event::ESettlement::Base::MailerPresenter.new(user, params)
   end
 
@@ -42,7 +42,7 @@ class Event::ESettlement::Base < Event::SetNotifier
     'View Payment'
   end
 
-  def set_settlement_params
+  def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)

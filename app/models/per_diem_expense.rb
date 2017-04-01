@@ -16,10 +16,13 @@ class PerDiemExpense < ActiveRecord::Base
 
   belongs_to :expense
   belongs_to :per_diem
+
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 
   validates :per_diem, presence: true
 
   delegate :per_diem_name, to: :per_diem
+
+  scope :with_per_diem_id, -> (per_diem_id) {where per_diem_id: per_diem_id}
 end

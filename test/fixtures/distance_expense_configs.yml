@@ -5,7 +5,7 @@
 #  id                  :integer          not null, primary key
 #  parent_id           :integer
 #  parent_type         :string(255)
-#  rate_per_km         :decimal(10, )
+#  rate_per_km         :decimal(10, 4)
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  enabled             :boolean

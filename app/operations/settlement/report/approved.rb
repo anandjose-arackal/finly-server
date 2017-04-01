@@ -34,7 +34,8 @@ class Settlement::Report::Approved < Report::Base
 
   def process
     balance_sheet = report.user.balance_sheet
-    total_cash_amount = report.total_amount(:only_manual_expenses)
+    total_cash_amount = report.total_amount(:only_manual_expenses) + report.total_amount(:only_distance_expenses) + report.total_amount(:only_time_expenses) + report.total_amount(:only_per_diem_expenses)
+
     total_card_amount = report.total_amount(:only_card_expenses)
     currency = Currency.first
     balance_sheet.add_approved_reports_total total_cash_amount, currency

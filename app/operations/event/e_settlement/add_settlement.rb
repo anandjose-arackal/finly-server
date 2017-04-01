@@ -82,7 +82,7 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
     body
   end
 
-  def set_presenter_params
+  def set_presenter_params(user)
     super
   end
 

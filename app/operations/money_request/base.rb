@@ -103,7 +103,7 @@ class MoneyRequest::Base < BaseOperation
       # Load credit actions
       if actions[:approve_and_credit]
 
-        from_user_creditable_cards = user.cards.creditable_cards
+        from_user_transferable_cards =  user.cards.with_non_personal_fund_transfer
         to_user_creditable_cards = money_request.user.cards.creditable_cards
         from_user_name = 'Your'
         personal_transfer = self.user == self.money_request.user
@@ -129,8 +129,8 @@ class MoneyRequest::Base < BaseOperation
                                balance: balance, active: true}
 
         # Cards
-        if from_user_creditable_cards.present?
-          from_user_creditable_cards.each do |card|
+        if from_user_transferable_cards.present?
+          from_user_transferable_cards.each do |card|
             balance = balances[:current_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:current_user][:card][card.id][:eligibility] rescue nil
             initiating_actions << {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card",

@@ -1,6 +1,7 @@
 class CompaniesController < ApplicationController
 
   before_action :authenticate_user!
+  allow_oauth!
 
   def notify
     # todo

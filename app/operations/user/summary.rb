@@ -58,6 +58,11 @@ class User::Summary < User::Base
           item[:credit] = card.card_program.manager_credit
           item[:debit] = card.card_program.manager_debit
         end
+        item[:ending_number] = card.ending_number
+        item[:actions] = {}
+        item[:actions][:unblockable] = card.unblockable? # determining of the user can unblock the card at this stage
+        item[:actions][:meta] = {}
+        item[:actions][:meta][:base_url] = Rails.application.routes.url_helpers.update_card_status_path
         summary[:cards] << item
       end
     end
@@ -69,6 +74,8 @@ class User::Summary < User::Base
     summary[:cash_on_hand] = {name: 'Cash on Hand', balance: balances[:target_user][:cash_on_hand][:balance]}
 
     summary[:actions] = load_actions balances
+
+    summary[:current_user_name] = user.name
 
     summary[:personal] = {}
     summary[:personal][:unreported_expenses] = selected_user.expenses.unreported.count

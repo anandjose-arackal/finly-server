@@ -1,22 +1,41 @@
-<table class="row">
-  <tbody>
-  <tr>
-    <th class="small-12 large-12 columns first last" colspan="2">
-      <table class="row custom_moneyrequest_bottom_table_class ">
-        <thead>
-        <tr style="background-color: #DCDCDC;">
-          <th style="font-weight: bold;">Categories:</th>
-          <th style="font-weight: bold;">Total</th>
-        </tr>
-        <% @data.money_request.items.each do |item| %>
-          <tr>
-            <th style="font-weight: bold; opacity: 0.9;"><%=item.category_name%></th>
-            <th>&#8377;<%= item.amount_value%></th>
-          </tr>
-        <% end %>
-        </thead>
-      </table>
-    </th>
+<table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+  <tr style="background-color: #dcdcdc;">
+    <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif; width: 70%;">DATE</td>
+    <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif; width: 30%;">MERCHANT</td>
   </tr>
-  </tbody>
-</table>
+  <% @data.money_request.items.each do |item| %>
+    <tr>
+      <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%"><%= item.category_name%></td>
+      <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%"><%=item.amount_value%></td>
+    </tr>
+  <% end %>
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Travel</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">30</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Entertainment</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">30</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Marketing and Advertising</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">30</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Meals</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">0</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Office Expenses</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">0</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Personal</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">0</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%">Other</td>-->
+    <!--<td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%">0</td>-->
+  <!--</tr>-->
+
+</table><br>

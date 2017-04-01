@@ -43,7 +43,7 @@ class User::Login::SendVerificationOtp < BaseOperation
   def pre_process
     # generating the random 6 digit OTP for a particular user and storing it in the message
     # if the last OTP was sent less than 15 minutes ago, send the same OTP back
-    if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago
+    if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago && selected_user.otp
       self.otp = selected_user.otp
       self.message = "#{otp} is your verification code."
       # else send the a new OTP after generating it

@@ -9,7 +9,7 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def affected_users
-    [self.report.user, self.report.controlling_user]
+    [self.report.user, self.report.reload.controlling_user]
   end
 
   def notification_affected_users

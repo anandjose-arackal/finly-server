@@ -69,8 +69,8 @@ class Event::EWallet::Credit < Event::EWallet::Base
     end
   end
 
-  def set_presenter_params
-    super
+  def set_presenter_params(user)
+    super(user)
     params[:payment_note] = payment.note
   end
 

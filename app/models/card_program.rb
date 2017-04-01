@@ -26,6 +26,7 @@ class CardProgram < ActiveRecord::Base
 
   scope :with_manager_credit, -> { where manager_credit: true }
   scope :with_reimbursement, -> { where receive_reimbursement: true }
+  scope :with_non_personal_fund_transfer, -> { where non_personal_fund_transfer: true }
 
   PROGRAMS = {expense: 1, reimbursement: 2}
 

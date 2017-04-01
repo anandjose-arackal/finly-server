@@ -79,14 +79,14 @@ json.receipts @result.expenses do |expense|
     # json.file_type expense.receipts.first.file_format
     json.date expense.date.strftime('%d %b %Y')
     json.merchant_name expense.merchant_name
-    json.amount_value precision_value(expense.amount_value)
+    json.amount_value expense.amount_value
   end
 end
 
 json.actions do
   json.dummy 'dummy'
   @result.actions.each do |key, value|
-    json.set! key, value
+    json.set! key, (value[:url] or value[:value])
   end
 end
 

@@ -51,6 +51,7 @@ class Card < ActiveRecord::Base
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :with_card_program, ->(id) { where card_program_id: id }
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
+  scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
 
   delegate :card_balance_value, to: :card_balance
@@ -79,6 +80,13 @@ class Card < ActiveRecord::Base
 
 
   # attr_accessor :balance, :available_card_eligibility
+
+  def unblockable?
+    if self.disabled_by_user_id == self.user_id && !card.active
+      return true
+    end
+    false
+  end
 
   def balance
     if card_balance.blank?

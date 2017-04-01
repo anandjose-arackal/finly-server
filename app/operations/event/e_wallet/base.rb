@@ -31,7 +31,7 @@ class Event::EWallet::Base < Event::SetNotifier
 
   def send_mailer(user)
     return if user.blank?
-    set_presenter_params
+    set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
     PaymentMailer.delay.send_mail(Event::EWallet::Base::MailerPresenter.new(user, params))
   end
@@ -46,10 +46,11 @@ class Event::EWallet::Base < Event::SetNotifier
     'View'
   end
 
-  def set_presenter_params
+  def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)
+    params[:payment_note] = payment.note
   end
 
   class Event::EWallet::Base::MailerPresenter < Event::SetNotifier::MailerPresenter

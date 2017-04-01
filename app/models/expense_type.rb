@@ -12,6 +12,7 @@
 
 
 
+
 class ExpenseType < ActiveRecord::Base
 
   validates :name, presence: true
@@ -48,7 +49,4 @@ class ExpenseType < ActiveRecord::Base
     5
   end
 
-  def self.id_for(item)
-    VALUES[item]
-  end
 end

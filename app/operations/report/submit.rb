@@ -65,13 +65,6 @@ class Report::Submit < Report::Base
       raise_unauthorized_exception
       return false
     end
-    # # if submitting a report for someone else, ensure he has the right to
-    # if params[:controlling_for_user_id]
-    #   unless report.controlling_for_user_id == user.id
-    #     raise_unauthorized_exception
-    #     return false
-    #   end
-    # else
 
     # Only report owners can submit report
     unless report.user_id == user.id

@@ -44,7 +44,7 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
   end
 
   def process
-    unless per_diem.destroy
+    unless per_diem.update(is_deleted: true)
       messages[:error] = per_diem.errors.full_messages
     end
   end

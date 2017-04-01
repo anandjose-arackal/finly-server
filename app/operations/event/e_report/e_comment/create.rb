@@ -69,8 +69,8 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     'View Report'
   end
 
-  def set_presenter_params
-    super
+  def set_presenter_params(user)
+    super(user)
     params[:comment_body] = comment.content
   end
 

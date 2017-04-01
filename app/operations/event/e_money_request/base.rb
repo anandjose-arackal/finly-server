@@ -29,9 +29,9 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
 
   def send_mailer(user)
     return if user.nil?
-    set_presenter_params
+    set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    MoneyRequestMailer.send_mail(Event::EMoneyRequest::Base::MailerPresenter.new(user, params)).deliver
+    MoneyRequestMailer.delay.send_mail(Event::EMoneyRequest::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -49,7 +49,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
     end
   end
 
-  def set_presenter_params
+  def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)

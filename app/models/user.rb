@@ -52,6 +52,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -377,10 +378,10 @@ class User < ActiveRecord::Base
 
   # returns the list of per diems that the user has access to
   def per_diems_list
-    per_diems = self.company.per_diems
+    per_diems = self.company.per_diems.active
     policies = self.policies
     policies.each do |policy|
-      per_diems += policy.per_diems
+      per_diems += policy.per_diems.active
     end
     per_diems
   end
