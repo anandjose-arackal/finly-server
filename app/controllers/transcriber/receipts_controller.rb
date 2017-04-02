@@ -58,16 +58,12 @@ class Transcriber::ReceiptsController < ApplicationController
   def show
   end
 
-  # def receipts
-  #   @result = Transcriber::Receipt::Index.(current_user, params)
-  #   respond
-  # end
 
   private
 
   # todo - remove admin after testing
   def transcriber_accounts
-    unless current_user.company_id == Company.find_by(name: "Transcriber") || current_user.email == 'admin@finlytest.io'
+    unless current_user.company_id == Company.find_by(name: "Transcriber").id
       flash[:error] = "You are not authorized to perform this action"
       redirect_to root_url
     end

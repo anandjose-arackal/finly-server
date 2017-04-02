@@ -12,7 +12,7 @@ admin:
     cog:
       - Organization Account: '#organization_account/params={"view":"admin"}'
       - Company Statements: '#company_statements/params={"view": "admin"}'
-      - Notify NEFT Transfer: '/companies/notify'
+      - Notify NEFT Transfer: '/transfers/register'
       # - Policies: '/policies'
       - My Account: '#settings'
       # - Expense Policies: '/policies?view=admin'

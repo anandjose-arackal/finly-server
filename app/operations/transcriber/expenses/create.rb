@@ -12,9 +12,6 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
 
   attr_accessor :expense_params, :receipt, :selected_user, :expense
 
-  def pre_validate
-    self.user = User.first
-  end
 
   def init
     self.expense_params = manual_expense_params
@@ -33,7 +30,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   end
 
   def authorize
-    unless user.company_id == Company.find_by(name: "Transcriber") || user.email == 'admin@finlytest.io'
+    unless user.company_id == Company.find_by(name: "Transcriber").id
       raise_unauthorized_exception
     end
   end

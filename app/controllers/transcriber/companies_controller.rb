@@ -1,7 +1,7 @@
 class Transcriber::CompaniesController < ApplicationController
 
   before_action :authenticate_user!
-  allow_oauth!
+  # allow_oauth!
   before_action :transcriber_accounts
 
   def index
@@ -22,7 +22,7 @@ class Transcriber::CompaniesController < ApplicationController
 
   # todo - remove admin after testing
   def transcriber_accounts
-    unless current_user.company_id == Company.find_by(name: "Transcriber") || current_user.email == 'admin@finlytest.io'
+    unless current_user.company_id == Company.find_by(name: "Transcriber").id
       flash[:error] = "You are not authorized to perform this action"
       redirect_to root_url
     end
