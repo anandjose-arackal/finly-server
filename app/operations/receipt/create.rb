@@ -15,12 +15,12 @@ class Receipt::Create < Receipt::Base
   def process
     self.receipt = user.receipts.build(create_params)
     unless receipt.save
-      messages[:error] = receipt.errors.full_messages
+      add_message :error, receipt.errors.full_messages
     end
   end
 
   def post_process
-    messages[:success] << 'Receipt added'
+    add_message :success, 'Receipt added'
 
     # if the company has receipt transcription enabled, it will be marked on the receipt
     if user.company.configuration.ocr_enabled
