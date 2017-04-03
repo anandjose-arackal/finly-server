@@ -31,11 +31,11 @@ class Expense::Destroy < Expense::Base
 
   def validate
     if expense.expense_type_id == ExpenseType.card_expense_id
-      messages[:error] << "Card expenses cannot be deleted."
+      add_message :error, "Card expenses cannot be deleted."
     end
 
     if expense.report.present?
-      unless report.editable?
+      unless expense.report.editable?
         add_message :error, "Report is not editable at this stage"
       end
     end
