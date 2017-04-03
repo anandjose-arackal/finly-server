@@ -32,7 +32,6 @@ class Card < ActiveRecord::Base
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 
-
   has_one :card_restriction, dependent: :destroy
 
   has_many :card_balance_history, dependent: :destroy
@@ -78,10 +77,7 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
-
   # attr_accessor :balance, :available_card_eligibility
-
-
   def unblockable?
     if self.active
       false
