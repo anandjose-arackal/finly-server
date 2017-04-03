@@ -65,11 +65,11 @@ class Report::Base < BaseOperation
     end
 
     def retrieve_policies
-      if report.user.enforce_policy_enabled?
-        return report.user.policies.non_default
-      else
-        return report.user.policies
+      policies = []
+      unless report.user.enforce_policy_enabled?
+        policies << {id: 0, name: 'None'}
       end
+      policies + report.user.policies.non_default
     end
 
     def status_name(report)

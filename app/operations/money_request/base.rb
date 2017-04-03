@@ -54,11 +54,11 @@ class MoneyRequest::Base < BaseOperation
     end
 
     def retrieve_policies
-      if money_request.user.enforce_policy_enabled?
-        return money_request.user.policies.non_default
-      else
-        return money_request.user.policies
+      policies = []
+      unless money_request.user.enforce_policy_enabled?
+        policies << {id: 0, name: 'None'}
       end
+      policies + money_request.user.policies.non_default
     end
 
     def load_card

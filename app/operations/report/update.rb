@@ -20,6 +20,10 @@ class Report::Update < Report::Base
     if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
       self.update_param[:policy_id] = nil
     end
+    if update_param.has_key?(:policy_id) and (update_param[:policy_id].blank? or update_param[:policy_id] == 0) and report.user.enforce_policy_enabled?
+      policy_id = report.user.policies.non_default.first.id rescue nil
+      update_param[:policy_id] = policy_id
+    end
   end
 
   def authorize
@@ -44,7 +48,7 @@ class Report::Update < Report::Base
   end
 
   def process
-    return unless update_param.present?
+    # return unless update_param.present?
     if report.update_attributes(update_param)
       if params[:custom_fields].present?
         CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:custom_fields], save: true)

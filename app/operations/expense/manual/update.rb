@@ -92,7 +92,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       return
     end
     if expense.update(updated_expense_params)
-      expense.reload
       if receipt
         receipt.parent = expense
         if receipt.save

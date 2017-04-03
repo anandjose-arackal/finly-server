@@ -34,6 +34,10 @@ class MoneyRequest::Update < MoneyRequest::Base
         end
       end
     end
+    if update_param.has_key?(:policy_id) and (update_param[:policy_id].blank? or update_param[:policy_id] == 0) and money_request.user.enforce_policy_enabled?
+      policy_id = money_request.user.policies.non_default.first.id rescue nil
+      update_param[:policy_id] = policy_id
+    end
   end
 
   def validate
