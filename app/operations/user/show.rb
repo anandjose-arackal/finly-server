@@ -154,7 +154,7 @@ class User::Show < User::Base
       to_user_creditable_cards = selected_user.cards.creditable_cards
       from_user_name = 'Your'
       personal_transfer = self.user == self.selected_user
-      to_user_name = personal_transfer ? 'Your' : self.selected_user.name
+      to_user_name = personal_transfer ? 'Your' : "#{self.selected_user.name}'s "
 
       # From Actions
       # Virtual Account
@@ -167,7 +167,7 @@ class User::Show < User::Base
 
       # WalletWallet
       balance = balances[:current_user][:wallet][:balance] rescue nil
-      action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money", balance: balance, active: true}
+      action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money", balance: balance, active: true}
       credit_actions[:initiating_accounts] << action
       debit_actions[:initiating_accounts] << action
 
@@ -178,7 +178,7 @@ class User::Show < User::Base
 
           balance = balances[:current_user][:card][card.id][:balance] rescue nil
           eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
-          action = {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card",
+          action = {type: :card, id: card.id, name: "#{from_user_name} #{card.card_program.name} Card",
                     balance: balance, eligibility: eligibility,
                     show_balance: true, show_eligbility: true, active: card.active}
 
@@ -198,7 +198,7 @@ class User::Show < User::Base
       # To Actions
       # Wallet
       balance = balances[:target_user][:wallet][:balance] rescue nil
-      action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance, active: true}
+      action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
       credit_actions[:receiving_accounts] << action
       debit_actions[:receiving_accounts] << action
 
@@ -210,7 +210,7 @@ class User::Show < User::Base
           balance = balances[:target_user][:card][card.id][:balance] rescue nil
           eligibility = balances[:target_user][:card][card.id][:balance] rescue nil
 
-          action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card",
+          action = {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
                     balance: balance, eligibility: eligibility, show_balance: show_balance,
                     show_eligibility: show_eligibility, active: card.active}
 

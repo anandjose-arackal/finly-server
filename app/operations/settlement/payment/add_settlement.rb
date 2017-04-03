@@ -188,6 +188,13 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       add_message :error, 'Cannot use the selected card for processing reimbursements'
       return
     end
+    
+    if initiating_account_type == :wallet || initiating_account_type == 'wallet'
+      unless user.wallet.balance_value > reimbursement_amount
+        add_message :error, "Not enough funds in your wallet to initiate transfer"
+        return
+      end
+    end
   end
 
   def validate_reimbursement_card

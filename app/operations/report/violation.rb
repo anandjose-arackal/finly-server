@@ -272,8 +272,8 @@ class Report::Violation < Report::Base
             if user.company.per_diems.include?(expense.per_diem_expense.per_diem)
               return
             else
-              message = "Expenses are beyond the scope of this policy"
-              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
+              message = "of some expenses do not belong to the selected policy"
+              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
             end
           else
             self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
@@ -284,7 +284,7 @@ class Report::Violation < Report::Base
             if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
               return
             else
-              message = "Expenses are beyond the scope of this policy"
+              message = "of some expenses do not belong to the selected policy"
               self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
             end
           else

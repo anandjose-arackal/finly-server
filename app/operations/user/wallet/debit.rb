@@ -33,7 +33,7 @@ class User::Wallet::Debit < User::Wallet::Base
     payment_attributes[:date] = DateUtils.local_date
     payment_attributes[:note] = params[:note]
     payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
-    payment_attributes[:payment_type_id] = PaymentType.id_for(:credit)
+    payment_attributes[:payment_type_id] = PaymentType.id_for(:debit)
     payment_attributes[:initiating_account] = initiating_account
     payment_attributes[:receiving_account] = receiving_account
     self.payment = Payment.new payment_attributes
@@ -43,10 +43,10 @@ class User::Wallet::Debit < User::Wallet::Base
       return
     end
 
-    case receiving_account
+    case receiving_account_type
       when :wallet
 
-        if initiating_account == :wallet
+        if initiating_account_type == :wallet
 
           if receiving_user.wallet.subtract_funds(self.amount)
             initiating_user.wallet.add_funds(self.amount)
@@ -57,7 +57,7 @@ class User::Wallet::Debit < User::Wallet::Base
             add_message :error, receiving_user.wallet.errors.full_messages
           end
 
-        elsif initiating_account == :virtual_account
+        elsif initiating_account_type == :virtual_account
           if receiving_user.wallet.subtract_funds(self.amount)
             user.company.account.funds_debited_from_wallet(self.amount)
             self.payment.save
@@ -65,10 +65,10 @@ class User::Wallet::Debit < User::Wallet::Base
             add_message :error, initiating_user.wallet.errors.full_messages
           end
 
-        elsif initiating_account == :card
+        elsif initiating_account_type == :card
 
           if receiving_user.wallet.subtract_funds(self.amount)
-            credit_presenter = ItzCash::Credit.(initiating_user, card_id: receiving_account_id, amount: self.amount)
+            credit_presenter = ItzCash::Credit.(initiating_user, card_id: initiating_account_id, amount: self.amount)
             if credit_presenter.success?
 
               add_message :success, 'Debit successful'
@@ -85,8 +85,8 @@ class User::Wallet::Debit < User::Wallet::Base
 
       when :card
 
-        if initiating_account == :virtual_account
-          debit_presenter = ItzCash::Debit.(receiving_user, card_id: target_account_id, amount: self.amount)
+        if initiating_account_type == :virtual_account
+          debit_presenter = ItzCash::Debit.(receiving_user, card_id: receiving_account_id, amount: self.amount)
           unless debit_presenter.success?
             add_message :error, 'Money debit failed, please try again later'
             return
@@ -94,9 +94,9 @@ class User::Wallet::Debit < User::Wallet::Base
           self.payment.save
           add_message :success, 'Debit successful'
 
-        elsif initiating_account == :wallet
+        elsif initiating_account_type == :wallet
 
-          debit_presenter = ItzCash::Debit.(receiving_user, card_id: target_account_id, amount: self.amount)
+          debit_presenter = ItzCash::Debit.(receiving_user, card_id: receiving_account_id, amount: self.amount)
           unless debit_presenter.success?
             add_message :error, 'Money debit failed, please try again later'
             return
@@ -109,14 +109,14 @@ class User::Wallet::Debit < User::Wallet::Base
           self.payment.save
           add_message :success, 'Debit successful'
 
-        elsif initiating_account == :card
+        elsif initiating_account_type == :card
           # first reduce the amount from the card holder's balance
           # duplicating the params hash first
-          debit_presenter = ItzCash::Debit.(receiving_user, card_id: target_account_id, amount: self.amount)
+          debit_presenter = ItzCash::Debit.(receiving_user, card_id: receiving_account_id, amount: self.amount)
           # if the debit is successful, i.e. if the money has been reduced from the card holder's account
           if debit_presenter.success?
             # now add the money to the target user's card
-            credit_presenter = ItzCash::Credit.(initiating_user, card_id: receiving_account_id, amount: self.amount)
+            credit_presenter = ItzCash::Credit.(initiating_user, card_id: initiating_account_id, amount: self.amount)
             unless credit_presenter.success?
               # throw error message saying debit is successful but credit was unsuccessful
               add_message :error, 'Amount could not be credited, the funds will be transferred to your company balance'

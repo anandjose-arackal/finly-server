@@ -92,33 +92,14 @@ class Settlement::Summary < Settlement::Base
                                        reimbursement: reimbursement,
                                        meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}}
 
-    # result[:target_user].each do |item|
-    #   next if item[:type].blank?
-    #   case item[:type]
-    #     when :wallet
-    #       self.balances[:wallet] = {balance: item[:balance]}
-    #     when :card
-    #       self.balances[:card] = [] if self.balances[:card].blank?
-    #       card = Card.with_id(item[:id]).first
-    #       creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
-    #       debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
-    #       self.balances[:card] << {id: item[:id], program_name: item[:name], show_balance: item[:show_balance], balance: item[:balance], show_eligibility: item[:show_eligibility],
-    #                                eligibility: item[:eligibility], creditable: creditable, debitable: debitable, enabled: card.active}
-    #     when :cash_on_hand
-    #       self.balances[:cash_on_hand] = {balance: item[:balance]}
-    #     when :pending_money_requests
-    #       self.balances[:pending_money_requests] = {balance: item[:balance], count: item[:count]}
-    #     when :pending_reports
-    #       self.balances[:pending_reports] = {balance: item[:balance], count: item[:count]}
-    #   end
-    # end
   end
 
   def load_reimbursement(personal, balances)
     to_user_reimbursable_card = selected_user.cards.reimbursable_cards.first rescue nil
-    reimbursement = {associated_reimbursement_card: to_user_reimbursable_card.present?,
+    reimbursement = {associated_reimbursement_card: (to_user_reimbursable_card.present? && to_user_reimbursable_card.active),
                      card: {},
-                     initiating_accounts: []}
+                     initiating_accounts: []
+                    }
 
     if to_user_reimbursable_card
       name = personal ? 'Your Reimbursement card' : "#{selected_user.name}'s Reimbursement Card"
@@ -138,7 +119,7 @@ class Settlement::Summary < Settlement::Base
 
     from_user_name = 'Your'
     personal_transfer = self.user == self.selected_user
-    to_user_name = personal_transfer ? 'Your' : self.selected_user.name
+    to_user_name = personal_transfer ? 'Your' : "#{self.selected_user.name}'s "
 
     # From Actions
     # Virtual Account
@@ -151,7 +132,7 @@ class Settlement::Summary < Settlement::Base
 
     # Wallet
     balance = balances[:current_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money", balance: balance, active: true}
+    action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money", balance: balance, active: true}
     credit_actions[:initiating_accounts] << action
     debit_actions[:initiating_accounts] << action
 
@@ -159,7 +140,7 @@ class Settlement::Summary < Settlement::Base
     if from_user_transferable_cards.present?
       from_user_transferable_cards.each do |card|
 
-        next if (not personal_transfer and not card.card_program.manager_credit) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
+        next if (not personal_transfer and not card.card_program.non_personal_fund_transfer) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
 
         balance = balances[:current_user][:card][card.id][:balance] rescue nil
         eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
@@ -169,7 +150,7 @@ class Settlement::Summary < Settlement::Base
         end
 
         action = {type: :card, id: card.id,
-                  name: "#{from_user_name}'s #{card.card_program.name} Card",
+                  name: "#{from_user_name} #{card.card_program.name} Card",
                   balance: balance, eligibility: eligibility, show_balance: true,
                   show_eligibility: true, active: card.active, disabler: disabler}
 
@@ -190,7 +171,7 @@ class Settlement::Summary < Settlement::Base
     # To Actions
     # Wallet
     balance = balances[:target_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance, active: true}
+    action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
     credit_actions[:receiving_accounts] << action
     debit_actions[:receiving_accounts] << action
 
@@ -208,7 +189,7 @@ class Settlement::Summary < Settlement::Base
                              name: card.disabled_by_user.name}}
         end
 
-        action = {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card",
+        action = {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
                   balance: balance, eligibility: eligibility, show_balance: show_balance,
                   show_eligibility: show_eligibility, active: card.active, disabler: disabler}
 

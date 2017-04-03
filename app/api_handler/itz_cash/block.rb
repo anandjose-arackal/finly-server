@@ -1,5 +1,7 @@
 class ItzCash::Block < ItzCash::Base
 
+  attr_accessor :card
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
@@ -20,7 +22,8 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def post_params
-    serial_id = user.cards.with_id(params[:card_id]).first.proxy
+    self.card = user.cards.with_id(params[:card_id]).first
+    serial_id = card.proxy
     request_type = self.request_type
     itz_module = Constants::ItzCash::MODULE
     remarks = (params[:remarks] or 'nil') rescue 'nil'
@@ -32,12 +35,9 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def post_process
-    user.cards.first.update_attribute(:active, false)
+    card.update_attribute(:active, false)
   end
 
-  # def success_response_code
-  #   [0, -100]
-  # end
 
   def success
     # ResponseCode,SerialID,Description
