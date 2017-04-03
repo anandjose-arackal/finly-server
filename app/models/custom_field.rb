@@ -101,13 +101,14 @@ class CustomField < ActiveRecord::Base
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
     end
-    {id: field_configuration.id,
+    json =  {id: field_configuration.id,
      label: field_configuration.field_name,
      field_type: {id: field_configuration.field_type.id,
                   name: field_configuration.field_type.name},
      mandatory: field_configuration.mandatory,
-     value: self.value,
      options: options}
+    json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+    json
   end
 
 end

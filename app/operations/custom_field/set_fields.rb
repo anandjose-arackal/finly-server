@@ -102,14 +102,15 @@ class CustomField::SetFields < CustomField::Base
     return if item.custom_fields.blank?
 
     item.custom_fields.each do |field|
-      value = nil
       if self.field_values.has_key?(field.field_configuration_id)
         value = self.field_values[field.field_configuration_id]
+        field.set_value(value, false)
       elsif self.field_values.has_key?(field.field_configuration_id.to_s)
         value = self.field_values[field.field_configuration_id.to_s]
+        field.set_value(value, false)
       end
       # Set values for fields but do not save. We can save everything in one go
-      field.set_value(value, false) unless value.nil?
+      # field.set_value(value, false) unless value.nil?
     end
 
     # If item is saved by the class calling this operation, we do not have to save it here as it

@@ -51,14 +51,30 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
+after 'deploy', 'runner:restart'
+
+# Restart runner
+namespace :runner do
+  task :restart do
+    on roles(:app) do
+      env = fetch(:rails_env)
+      case env
+        when :staging, 'production'
+          `ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/current/msgqueue_restart.sh #{fetch(:rails_env)}'`
+      end
+      # execute("sh app/shared/msgqueue_restart.sh production")
+    end
+  end
+end
+
 #
-# # Example: cap staging rake:invoke task=rebuild_table_abc
+# Example: cap staging rake:invoke task=rebuild_table_abc
 # namespace :rake do
 #   desc 'Run a task on a remote server'
 #   # run like: cap staging rake:invoke task=a_certain_task
 #   task :invoke do
-#     run("cd #{deploy_to}/current; /usr/bin/env rake #{ENV['task']} RAILS_ENV=#{rails_env}")
-#   end
+#     # run("cd #{deploy_to}/current; /usr/bin/env rake #{ENV['task']} RAILS_ENV=#{rails_env}")
+#    end
 # end
 
 # after 'deploy', 'deploy:card_restrictions_association_fix'
