@@ -9,6 +9,7 @@ class Api::V0::Configuration::CategoryController < Api::V0::BaseApiController
 
   def index
     @result = Company::Configuration::Category::Index.(current_user, params)
+    @result.config[:mobile_api] = true
     respond
   end
 

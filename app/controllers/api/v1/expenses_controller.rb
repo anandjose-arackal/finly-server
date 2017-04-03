@@ -70,6 +70,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
 
   def available_expense_types
     @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    @result.config[:mobile_api] = true
     respond
   end
 
