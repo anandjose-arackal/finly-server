@@ -1,15 +1,7 @@
 json.partial! 'money_request', money_request: @result.money_request
 json.manager_name @result.manager.present? ? @result.manager.name : ''
 json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
-json.actions do
-  @result.actions.each do |key, value|
-    v = value
-    unless value == true or value == false
-      v = value.present?
-    end
-    json.set! key, v
-  end
-end
+json.actions @result.actions
 json.categories @result.items.each do |item|
   json.category do
     json.id item.category.id

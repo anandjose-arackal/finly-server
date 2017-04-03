@@ -32,7 +32,6 @@ class Card < ActiveRecord::Base
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 
-
   has_one :card_restriction, dependent: :destroy
 
   has_many :card_balance_history, dependent: :destroy
@@ -51,6 +50,7 @@ class Card < ActiveRecord::Base
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :with_card_program, ->(id) { where card_program_id: id }
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
+  scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
 
   delegate :card_balance_value, to: :card_balance
@@ -77,10 +77,7 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
-
   # attr_accessor :balance, :available_card_eligibility
-
-
   def unblockable?
     if self.active
       false
@@ -97,10 +94,16 @@ class Card < ActiveRecord::Base
   end
 
   def balance
+    if card_balance.blank?
+      ItzCash::AccountDetails.(user, card_id: self.id)
+    end
     self.card_balance.value
   end
 
   def available_card_eligibility
+    if card_eligibility.blank?
+      ItzCash::AccountDetails.(user, card_id: self.id)
+    end
     self.card_eligibility.value
   end
 

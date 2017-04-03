@@ -133,7 +133,7 @@ class Settlement::Summary < Settlement::Base
     credit_actions = {initiating_accounts: [], receiving_accounts: []}
     debit_actions={initiating_accounts: [], receiving_accounts: []}
 
-    from_user_creditable_cards = user.cards.creditable_cards
+    from_user_transferable_cards =  user.cards.with_non_personal_fund_transfer
     to_user_creditable_cards = selected_user.cards.creditable_cards
 
     from_user_name = 'Your'
@@ -156,8 +156,8 @@ class Settlement::Summary < Settlement::Base
     debit_actions[:initiating_accounts] << action
 
     # Cards
-    if from_user_creditable_cards.present?
-      from_user_creditable_cards.each do |card|
+    if from_user_transferable_cards.present?
+      from_user_transferable_cards.each do |card|
 
         next if (not personal_transfer and not card.card_program.manager_credit) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
 

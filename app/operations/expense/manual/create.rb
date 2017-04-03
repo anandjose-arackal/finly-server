@@ -103,7 +103,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def set_custom_fields(save)
-    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields = {custom_fields: (params[:custom_fields] or params[:expense][:custom_fields])}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
