@@ -126,6 +126,50 @@ class Payment < ActiveRecord::Base
   validates :initiating_user_id, presence: true
   validates :receiving_user_id, presence: true
 
+  def initiating_account_type_name
+    name = ""
+    unless self.initiating_account_type == 'Company'
+      name += "#{self.initiating_user.name}'s"
+    end
+
+    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand)
+      return nil
+    end
+
+    case self.initiating_account_type
+      when 'UserWallet'
+        name += " Finly Money"
+      when 'Company'
+        name += " Company Credits"
+      when 'Card'
+        name += " Card"
+    end
+    name
+  end
+
+  def receiving_account_type_name
+    name = ""
+
+    unless self.receiving_account_type == 'Company'
+      name += "#{self.receiving_user.name}'s"
+    end
+
+    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand)
+      name += " Cash on Hand"
+      return name
+    end
+
+    case self.receiving_account_type
+      when 'UserWallet'
+        name += " Finly Money"
+      when 'Company'
+        name += " Company Credits"
+      when 'Card'
+        name += " Card"
+    end
+    name
+  end
+
   def advance?
     self.payment_type_id == PaymentType.id_for(:add_cash_on_hand)
   end

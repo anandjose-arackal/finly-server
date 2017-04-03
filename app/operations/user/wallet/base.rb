@@ -49,7 +49,7 @@ class User::Wallet::Base < BaseOperation
       add_message :error, 'Invalid Password!'
     end
 
-    self.amount= params[:amount].to_d rescue nil
+    self.amount = params[:amount].to_d rescue nil
 
     self.initiating_user = user
     self.receiving_user = params[:receiving_user]
@@ -109,6 +109,22 @@ class User::Wallet::Base < BaseOperation
     if initiating_account.blank? or receiving_account.blank?
       add_message :error, 'Error in request. Cannot initiate this transfer'
     end
+
+    # checking of the card being transferred from can be used for debiting / crediting funds
+    if initiating_account_type == :card
+      unless initiating_account.card_program.non_personal_fund_transfer
+        add_message :error, "This card cannot be used for debiting funds"
+        return
+      end
+    end
+
+    if receiving_account_type == :card
+      unless receiving_account.card_program.non_personal_fund_transfer
+        add_message :error, "This card cannot be used for crediting funds manually"
+        return
+      end
+    end
+
     return if has_errors?
     validate_sufficient_funds
   end

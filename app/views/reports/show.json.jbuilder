@@ -3,8 +3,10 @@ json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status_name(@result.report)
 json.status_name @result.status_name(@result.report)
-json.manager_name @result.manager.name rescue ''
-json.finance_manager_name @result.finance_manager.name rescue ''
+manager = (@result.manager.name rescue '')
+json.manager_name manager
+finance_manager = (@result.finance_manager.name rescue '')
+json.finance_manager_name finance_manager
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
