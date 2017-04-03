@@ -5,7 +5,11 @@ class PendingInvitesController < ApplicationController
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
     @states = State.all
-    render partial: 'edit_invite'
+    if @pending_user
+      render partial: 'edit_invite'
+    else
+      render partial: 'edit_invite_not_found'
+    end
   end
 
   def create

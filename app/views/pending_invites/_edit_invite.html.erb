@@ -1,3 +1,12 @@
+<nav class="navbar navbar-default navbar-fixed-top" style="box-shadow: 0 0 2px -1px rgba(0, 0, 0, 0.5); margin-top: 50px; height: 45px;">
+  <div class="container no-padding">
+    <ul class="nav navbar-nav">
+      <li><p style="font-size: 18px;margin-top: 10px;" class="navbar-text">Your email has been verified</p></li>
+    </ul>
+  </div>
+</nav>
+
+
 <form id="newUserRegistration" action="/api<%= pending_invite_accept_path(pending_invite_id: @pending_user.id) %>">
 
   <input name="_method" type="hidden" value="patch">
