@@ -145,8 +145,10 @@ class Settlement::Summary < Settlement::Base
         balance = balances[:current_user][:card][card.id][:balance] rescue nil
         eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
         disabler = nil
+        disabler_name = card.disabled_by_user.name rescue nil
+        disabled_by_role = card.disabled_by_role_id == UserRole.id_for(:employee) ? "" : (card.disabled_by_role.name rescue nil)
         unless card.active
-          disabler = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name}, user: {id: card.disabled_by_user_id, name: card.disabled_by_user.name}}
+          disabler = {role: {id: card.disabled_by_role_id, name: disabled_by_role}, user: {id: card.disabled_by_user_id, name: disabler_name}}
         end
 
         action = {type: :card, id: card.id,
@@ -184,9 +186,11 @@ class Settlement::Summary < Settlement::Base
         eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
         disabler = nil
         if not card.active and card.disabled_by_role_id.present? and card.disabled_by_user_id.present?
-          disabler = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name},
+          disabler_name = card.disabled_by_user.name rescue nil
+          disabled_by_role = card.disabled_by_role_id == UserRole.id_for(:employee) ? "" : (card.disabled_by_role.name rescue nil)
+          disabler = {role: {id: card.disabled_by_role_id, name: disabled_by_role},
                       user: {id: card.disabled_by_user_id,
-                             name: card.disabled_by_user.name}}
+                             name: disabler_name}}
         end
 
         action = {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
