@@ -35,8 +35,8 @@ class Expense::Destroy < Expense::Base
     end
 
     if expense.report.present?
-      unless report.editable?
-        add_message :error, 'Report is not editable at this stage'
+      unless expense.report.editable?
+        add_message :error, "Report is not editable at this stage"
       end
     end
   end

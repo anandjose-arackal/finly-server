@@ -1,4 +1,1 @@
-json.success true
-json.data @result.categories do |category|
-  json.extract! category, :id, :name, :active
-end
+json.merge! json.array! @result.categories, :id, :name, :active
