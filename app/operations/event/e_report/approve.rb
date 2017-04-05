@@ -140,7 +140,7 @@ class Event::EReport::Approve < Event::EReport::Base
     if user.id == report.user_id
       return UserRole.id_for(:employee)
     elsif user.id == report.controlling_user_id
-      return report.controlling_user_id
+      return report.controlling_user_role_id
     elsif user.id == self.report.tracks.last.action_user_id
       return self.report.tracks.last.action_user_role_id
     end

@@ -137,7 +137,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     if user.id == money_request.user_id
       return UserRole.id_for(:employee)
     elsif user.id == money_request.controlling_user_id
-      return money_request.controlling_user_id
+      return money_request.controlling_user_role_id
     elsif user.id == self.money_request.tracks.last.action_user_id
       return self.money_request.tracks.last.action_user_role_id
     end

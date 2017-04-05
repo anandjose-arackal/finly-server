@@ -68,7 +68,7 @@ class Event::ESettlement::Base < Event::SetNotifier
       self.action_name = params[:action_name]
       self.payment_note = params[:payment_note]
       self.role_id = params[:role_id]
-      self.view_url = generate_url(role_id)
+      self.view_url = generate_url(role_id).html_safe
     end
 
     def generate_url(role_id)
@@ -86,7 +86,7 @@ class Event::ESettlement::Base < Event::SetNotifier
       suffix = "/params={\"view\":" + view + "}"
       path = "settlements/"
       if view == "\"personal\"" || view.nil?
-        path += "#{user.id}/"
+        path += "#{user.id}"
       end
       url = Constants::BASE_URL + path + suffix
     end

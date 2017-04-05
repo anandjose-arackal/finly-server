@@ -76,24 +76,25 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
       self.action_name = params[:action_name]
       self.comment_body = params[:comment_body]
       self.role_id = params[:role_id]
-      self.view_url = generate_url(role_id)
+      self.view_url = generate_url(role_id).html_safe
     end
 
     def generate_url(role_id)
       view = ""
       case role_id
         when 3
-          view = "\"manager\""
+          view = 'manager'
         when 2
-          view = "\"finance_manager\""
+          view = 'finance_manager'
         when 1
-          view = "\"admin\""
+          view = 'admin'
         else
-          view = "\"personal\""
+          view = 'personal'
       end
-      suffix = "/params={\"view\":" + view + ",\"preview\":true}"
-      path = "requests/#{money_request.id}"
+      suffix = '/params={"view":"' + view + '","preview":true}'
+      path = 'requests/' + money_request.id.to_s
       url = Constants::BASE_URL + path + suffix
+      return url
     end
 
     def validate

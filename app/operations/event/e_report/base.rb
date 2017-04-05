@@ -82,8 +82,7 @@ class Event::EReport::Base < Event::SetNotifier
       self.comment_body = params[:comment_body]
       self.expenses_sorted = expenses_category_sorted
       self.role_id = params[:role_id]
-
-      self.view_url = generate_url(role_id)
+      self.view_url = generate_url(role_id).html_safe
     end
 
     def expenses_category_sorted

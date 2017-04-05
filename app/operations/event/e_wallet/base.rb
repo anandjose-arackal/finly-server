@@ -68,7 +68,7 @@ class Event::EWallet::Base < Event::SetNotifier
       self.subject_val = params[:subject]
       self.button_val = params[:button_name]
       self.role_id = params[:role_id]
-      self.view_url = generate_url(role_id)
+      self.view_url = generate_url(role_id).html_safe
     end
 
     def generate_url(role_id)
