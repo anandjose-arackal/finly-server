@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170405124018) do
+ActiveRecord::Schema.define(version: 20170405125844) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1354,8 +1354,8 @@ ActiveRecord::Schema.define(version: 20170405124018) do
     t.datetime "avatar_updated_at"
     t.boolean  "kyc_verified"
     t.string   "gcm_sender_id",       limit: 255
-    t.integer  "employee_id",         limit: 4
-    t.integer  "payroll_id",          limit: 4
+    t.string   "employee_id",         limit: 255
+    t.string   "payroll_id",          limit: 255
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false

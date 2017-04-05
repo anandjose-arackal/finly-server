@@ -61,24 +61,24 @@ class MoneyRequestComment < ActiveRecord::Base
     end
     case comment_action_id
       when MoneyRequestCommentAction.id_for(:retract)
-        comment = "#{name} retracted the advance request"
+        comment = "#{name} retracted the Money Request"
       when MoneyRequestCommentAction.id_for(:submit)
-        comment = "#{name} submitted the advance request"
+        comment = "#{name} submitted the Money Request"
       when MoneyRequestCommentAction.id_for(:approve)
-        comment = "#{name} approved the advance request"
+        comment = "#{name} approved the Money Request"
       when MoneyRequestCommentAction.id_for(:approve_and_forward)
-        comment = "#{name} approved and forwarded the advance request to #{rejected_to.name}"
+        comment = "#{name} approved and forwarded the Money Request to #{rejected_to.name}"
       when MoneyRequestCommentAction.id_for(:auto_approve)
         comment = 'Request auto-approved as no manager is assigned to the user'
       when MoneyRequestCommentAction.id_for(:reject)
-        comment = "#{name} rejected the advance request"
+        comment = "#{name} rejected the Money Request"
         if self.content.present?
           comment += " with a note: '#{self.content}'"
         end
       when MoneyRequestCommentAction.id_for(:unapprove)
-        comment = "#{name} unapproved the advance request"
+        comment = "#{name} unapproved the Money Request"
       when MoneyRequestCommentAction.id_for(:take_control)
-        comment = "#{name} took control of the advance request from #{}"
+        comment = "#{name} took control of the Money Request"
         if self.content.present?
           comment += " with a note: '#{self.content}'"
         end
@@ -100,7 +100,7 @@ class MoneyRequestComment < ActiveRecord::Base
         end
       when MoneyRequestCommentAction.id_for(:credited)
         payment_id = payment.id rescue nil
-        comment = "#{name} credited the advance request with Payment ID : #{payment_id}"
+        comment = "#{name} credited the Money Request with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , with a note : #{payment.note}"
         end
