@@ -132,17 +132,26 @@
               <tr style="background-color: #DCDCDC;" class="table_header">
                 <td width="20%" style="padding-left: 30px;"><label>SI. No.</label></td>
                 <td width="20%"><label>Date</label></td>
-                <td width="20%"><label>Merchant</label></td>
+                <td width="20%"><label>Merchant/Per Diem Name</label></td>
                 <td width="20%"><label>Note</label></td>
                 <td width="20%"><label>Total</label></td>
               </tr>
 
               <% section[:expenses].each do |expense| %>
                   <tr>
-                    <% if expense.manual_expense? %>
+                    <% case expense.expense_type_id %>
+                    <% when ExpenseType.id_for(:manual) %>
                         <td width="20%"><i class="fa fa-money"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
-                    <% elsif expense.card_expense? %>
+                    <% when ExpenseType.id_for(:card) %>
                         <td width="20%"><i class="fa fa-cc-visa"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
+                    <% when ExpenseType.id_for(:distance) %>
+                        <td width="20%"><i class="fa fa-location-arrow"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
+                    <% when ExpenseType.id_for(:time) %>
+                        <td width="20%"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
+                    <% when ExpenseType.id_for(:per_diem) %>
+                        <td width="20%"><i class="fa fa-briefcase"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=@index%></td>
+                    <% else %>
+                        <!-- do nothing -->
                     <% end %>
                     <td width="20%"><%=expense.date%></td>
                     <td width="20%"><%=expense.merchant_name%></td>

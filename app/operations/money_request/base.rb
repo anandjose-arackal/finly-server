@@ -125,7 +125,7 @@ class MoneyRequest::Base < BaseOperation
 
         # Wallet
         balance = balances[:current_user][:wallet][:balance] rescue nil
-        initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name}'s Finly Money",
+        initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money",
                                balance: balance, active: true}
 
         # Cards
