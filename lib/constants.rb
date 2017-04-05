@@ -41,7 +41,7 @@ module Constants
 
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
-    url = "http://localhost:3000/#"
+    url = "http://localhost/#"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
   elsif Rails.env.itzcash_uat?
@@ -60,7 +60,8 @@ module Constants
   class Constants::ItzCash
 
 
-    RESTRICTION_CONSTANT = 100000000
+    RESTRICTION_BUDGET_CONSTANT = 1000000
+    RESTRICTION_TRANS_CONSTANT = 1000
 
     MSG_QUEUE_USERNAME = "finly"
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"

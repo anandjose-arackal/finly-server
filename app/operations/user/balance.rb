@@ -54,7 +54,9 @@ class User::Balance < User::Base
       self.balances[:current_user][:card] = {}
       self.user.cards.each do |card|
         presenter = User::PrepaidCard::Show.(user, user: user, card_id: card.id)
-        self.balances[:current_user][:card][card.id] = {type: :card, id: card.id, name: card.card_program.name, balance: presenter.balance, eligibility: presenter.available_card_eligibility}
+        balance = presenter.balance rescue 0
+        eligibility = presenter.available_card_eligibility rescue 0
+        self.balances[:current_user][:card][card.id] = {type: :card, id: card.id, name: card.card_program.name, balance: balance, eligibility: eligibility}
       end
     end
 
@@ -92,10 +94,10 @@ class User::Balance < User::Base
           balance = nil
           eligibility = nil
           if show_balance
-            balance = presenter.balance
+            balance = presenter.balance rescue 0
           end
           if show_eligibility
-            eligibility = presenter.available_card_eligibility
+            eligibility = presenter.available_card_eligibility rescue 0
           end
           # creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
           # debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
