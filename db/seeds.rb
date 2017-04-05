@@ -48,8 +48,8 @@ end
 
 if ReportStatus.count == 0
   ReportStatus.create(id: 1, name: 'Open', order: 1)
-  ReportStatus.create(id: 2, name: 'Processing', order: 2)
-  ReportStatus.create(id: 3, name: 'Retracted', order: 3)
+  ReportStatus.create(id: 2, name: 'Processing', order: 3)
+  ReportStatus.create(id: 3, name: 'Retracted', order: 2)
   ReportStatus.create(id: 4, name: 'Rejected', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
   ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
@@ -106,7 +106,8 @@ if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
     name[0] = name[0].capitalize
-    MoneyRequestStatus.create id: value, name: name
+    order = MoneyRequestStatus.order_for_id(key)
+    MoneyRequestStatus.create id: value, name: name, order: order
   end
 end
 
