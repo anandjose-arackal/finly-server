@@ -355,16 +355,17 @@ ActiveRecord::Schema.define(version: 20170405125844) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
-    t.integer  "company_id",        limit: 4,                   null: false
-    t.integer  "contact_id",        limit: 4
-    t.boolean  "verified",                      default: false
-    t.string   "logo_file_name",    limit: 255
-    t.string   "logo_content_type", limit: 255
-    t.integer  "logo_file_size",    limit: 4
+    t.integer  "company_id",          limit: 4,                   null: false
+    t.integer  "contact_id",          limit: 4
+    t.boolean  "verified",                        default: false
+    t.string   "logo_file_name",      limit: 255
+    t.string   "logo_content_type",   limit: 255
+    t.integer  "logo_file_size",      limit: 4
     t.datetime "logo_updated_at"
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
     t.boolean  "ocr_enabled"
+    t.boolean  "other_expense_types",             default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
