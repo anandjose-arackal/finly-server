@@ -23,6 +23,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -169,6 +170,10 @@ class Expense < ActiveRecord::Base
   scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
   scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
   scope :only_per_diem_expenses, -> { where(expense_type_id: ExpenseType.id_for(:per_diem)) }
+  scope :only_reimbursable_expenses, -> {where(expense_type_id: [ExpenseType.id_for(:manual),
+                                                                 ExpenseType.id_for(:distance),
+                                                                 ExpenseType.id_for(:time),
+                                                                 ExpenseType.id_for(:per_diem)])}
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }

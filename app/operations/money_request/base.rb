@@ -107,7 +107,7 @@ class MoneyRequest::Base < BaseOperation
         to_user_creditable_cards = money_request.user.cards.creditable_cards
         from_user_name = 'Your'
         personal_transfer = self.user == self.money_request.user
-        to_user_name = personal_transfer ? 'Your' : self.money_request.user.name
+        to_user_name = personal_transfer ? 'Your' : "#{self.money_request.user.name}'s"
         initiating_actions = actions[:credit_actions][:initiating_accounts]
         receiving_actions = actions[:credit_actions][:receiving_accounts]
 
@@ -133,7 +133,7 @@ class MoneyRequest::Base < BaseOperation
           from_user_transferable_cards.each do |card|
             balance = balances[:current_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:current_user][:card][card.id][:eligibility] rescue nil
-            initiating_actions << {type: :card, id: card.id, name: "#{from_user_name}'s #{card.card_program.name} Card",
+            initiating_actions << {type: :card, id: card.id, name: "#{from_user_name} #{card.card_program.name} Card",
                                    balance: balance, eligibility: eligibility, active: card.active}
           end
         end
@@ -141,14 +141,14 @@ class MoneyRequest::Base < BaseOperation
         # To Actions
         # Wallet
         balance = balances[:target_user][:wallet][:balance] rescue nil
-        receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name}'s Finly Money", balance: balance, active: true}
+        receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
 
         # Cards
         if to_user_creditable_cards.present?
           to_user_creditable_cards.each do |card|
             balance = balances[:target_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
-            receiving_actions << {type: :card, id: card.id, name: "#{to_user_name}'s #{card.card_program.name} Card",
+            receiving_actions << {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
                                   balance: balance, eligibility: eligibility, active: card.active}
           end
         end

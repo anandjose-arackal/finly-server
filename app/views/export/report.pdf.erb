@@ -181,27 +181,29 @@
       </div>
     </div>
 
+  <% if @include_comments %>
 
-  <% unless @report.comments.empty? %>
-      <h1 class="page-break" style="text-align: left; font-size: 16px; margin-left: 12px" ><label>Timeline</label></h1>
-      <div class="col-sm-12">
-        <% @report.comments.each do |comment| %>
-            <div class="row" style="width: 100%">
-              <div class="col-sm-2">
-                <label><%=comment.user.name if comment.user%></label> |&nbsp;
-                <span style="font-size: 11px; color: #aaa;"><%=comment.created_at%></span>
+    <% unless @report.comments.empty?%>
+        <h1 class="page-break" style="text-align: left; font-size: 16px; margin-left: 12px" ><label>Timeline</label></h1>
+        <div class="col-sm-12">
+          <% @report.comments.each do |comment| %>
+              <div class="row" style="width: 100%">
+                <div class="col-sm-2">
+                  <label><%=comment.user.name if comment.user%></label> |&nbsp;
+                  <span style="font-size: 11px; color: #aaa;"><%=comment.created_at%></span>
+                </div>
+
+                <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
+                  <%=comment.generate(@current_user)%>
+                </div>
               </div>
 
-              <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
-                <%=comment.generate(current_user)%>
-              </div>
-            </div>
+          <% end %>
 
-        <% end %>
+        </div>
+    <% end %>
 
-      </div>
   <% end %>
-
 
   <div class="row page-break" style="width: 100%;">
   <% unless @report.expenses.filter_receipt('present').empty? %>

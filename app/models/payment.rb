@@ -19,6 +19,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class AccountType
@@ -132,7 +133,7 @@ class Payment < ActiveRecord::Base
       name += "#{self.initiating_user.name}'s"
     end
 
-    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand)
+    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand) || PaymentType.id_for(:reimbursement) || PaymentType.id_for(:settlement)
       return nil
     end
 
@@ -154,7 +155,7 @@ class Payment < ActiveRecord::Base
       name += "#{self.receiving_user.name}'s"
     end
 
-    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand)
+    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand) || PaymentType.id_for(:reimbursement) || PaymentType.id_for(:settlement)
       name += " Cash on Hand"
       return name
     end

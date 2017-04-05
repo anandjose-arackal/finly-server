@@ -63,4 +63,9 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     end
   end
 
+  def money_request_view_role(user)
+    roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    roles.first
+  end
+
 end

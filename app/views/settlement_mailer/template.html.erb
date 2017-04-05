@@ -3,27 +3,29 @@
       <title>New Payment</title>
     </head>
     <body style="background-color: #f3f3f3; margin: 0px;">
-    <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
-      <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.action_name%></p>
-    </div>
-    <div style="margin: auto; height: 300px; width: 100%; background-color: white;">
-      <!--<p style="font-size: 18px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">'sreeram.nr</span> Expenses to 2016-06-02' rejected</p>-->
-      <p style="font-size: 17px; margin-left: 3%; text-align: left"><%=@data.body_val.html_safe%>></p>
-
-      <!-- <div style="height: 50px; width: 560px; background-color: #dcdcdc; margin: auto; display: table;"><p style="display: table-cell; vertical-align: middle; color: #778899;">MESSAGE</p></div> -->
-
-      <h4 style="color: #778899; margin-left: 3%; opacity: 0.5;text-align: left">NOTE:</h4>
-
-      <div style="height: 50px; width: 96.5%; margin: auto; display: table; border-left: 2px solid #dcdcdc;">
-        <p style="display: table-cell; vertical-align: middle; padding-left: 3%;text-align: left"><%=@data.payment_note%></p>
-      </div><br>
-
-      <div style="text-align: center;">
-        <a href="<%=external_url_payment_url(id: @data.money_request.id)%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
-            border-radius: 2px;
-            text-decoration: none;">View Payment</a>
+      <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+        <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.action_name%></p>
       </div>
-    </div>
+      <div style="margin: auto; height: 300px; width: 100%; background-color: white;">
+        <!--<p style="font-size: 18px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">'sreeram.nr</span> Expenses to 2016-06-02' rejected</p>-->
+        <p style="font-size: 17px; margin-left: 3%; text-align: left"><%=@data.body_val.html_safe%></p>
+
+        <!-- <div style="height: 50px; width: 560px; background-color: #dcdcdc; margin: auto; display: table;"><p style="display: table-cell; vertical-align: middle; color: #778899;">MESSAGE</p></div> -->
+
+        <% if @data.payment_note.present? %>
+          <h4 style="color: #778899; margin-left: 3%; opacity: 0.5;text-align: left">NOTE:</h4>
+
+          <div style="height: 50px; width: 96.5%; margin: auto; display: table; border-left: 2px solid #dcdcdc;">
+            <p style="display: table-cell; vertical-align: middle; padding-left: 3%;text-align: left"><%=@data.payment_note%></p>
+          </div><br>
+        <% end %>
+
+        <div style="text-align: center;">
+          <a href="<%=@data.view_url%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+              border-radius: 2px;
+              text-decoration: none;">View Payment</a>
+        </div>
+      </div>
     </body>
 
 <% end %>
