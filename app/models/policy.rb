@@ -112,10 +112,12 @@ class Policy < ActiveRecord::Base
   end
 
   def initialize_expense_configs
-    # building the difference expense configurations
+    # building the different expense configurations
     self.build_distance_expense_config(enabled: false).save
     self.build_time_expense_config(enabled: false).save
     self.build_per_diem_expense_config(enabled: false).save
+
+    # todo - change this to mirror the company configuration at this current time
   end
 
 end

@@ -86,7 +86,7 @@ class Event::EWallet::Base < Event::SetNotifier
       suffix = "/params={\"view\":" + view + "}"
       path = "settlements/"
       if view == "\"personal\"" || view.nil?
-        path += "#{user.id}/"
+        path += "#{user.id}"
       end
       url = Constants::BASE_URL + path + suffix
     end
