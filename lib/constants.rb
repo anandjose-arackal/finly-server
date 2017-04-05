@@ -41,7 +41,7 @@ module Constants
 
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
-    url = "http://localhost:3000/#"
+    url = "http://localhost/#"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
   elsif Rails.env.itzcash_uat?

@@ -46,15 +46,20 @@ class Event::EWallet::Base < Event::SetNotifier
     'View'
   end
 
+  def payment_view_role(user)
+    return UserRole.id_for(:employee)
+  end
+
   def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)
     params[:payment_note] = payment.note
+    params[:role_id] = payment_view_role(user)
   end
 
   class Event::EWallet::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :payment, :user, :body_val, :subject_val, :button_val
+    attr_accessor :payment, :user, :body_val, :subject_val, :button_val, :role_id, :view_url
 
     def initialize(user, params)
       self.payment = params[:payment]
@@ -62,6 +67,28 @@ class Event::EWallet::Base < Event::SetNotifier
       self.body_val = params[:body]
       self.subject_val = params[:subject]
       self.button_val = params[:button_name]
+      self.role_id = params[:role_id]
+      self.view_url = generate_url(role_id)
+    end
+
+    def generate_url(role_id)
+      view = ""
+      case role_id
+        when 3
+          view = "\"manager\""
+        when 2
+          view = "\"finance_manager\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"personal\""
+      end
+      suffix = "/params={\"view\":" + view + "}"
+      path = "settlements/"
+      if view == "\"personal\"" || view.nil?
+        path += "#{user.id}/"
+      end
+      url = Constants::BASE_URL + path + suffix
     end
 
     def validate

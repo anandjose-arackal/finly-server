@@ -49,17 +49,22 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
     end
   end
 
+  def money_request_view_role(user)
+
+  end
+
   def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)
     params[:event_id] = event_id
     params[:action_name] = action_name
+    params[:role_id] = money_request_view_role(user)
   end
 
   class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :money_request, :user, :body_val, :subject_val, :button_val, :event_id,
-                  :action_name, :comment_body
+                  :action_name, :comment_body, :role_id, :view_url
 
     def initialize(user, params)
       self.money_request = params[:money_request]
@@ -70,6 +75,25 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
       self.event_id = params[:event_id]
       self.action_name = params[:action_name]
       self.comment_body = params[:comment_body]
+      self.role_id = params[:role_id]
+      self.view_url = generate_url(role_id)
+    end
+
+    def generate_url(role_id)
+      view = ""
+      case role_id
+        when 3
+          view = "\"manager\""
+        when 2
+          view = "\"finance_manager\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"personal\""
+      end
+      suffix = "/params={\"view\":" + view + ",\"preview\":true}"
+      path = "requests/#{money_request.id}"
+      url = Constants::BASE_URL + path + suffix
     end
 
     def validate
