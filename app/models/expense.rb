@@ -247,7 +247,7 @@ class Expense < ActiveRecord::Base
         end
       when ExpenseType.id_for(:per_diem)
         per_diem = self.per_diem_expense.per_diem
-        if policy.blank?
+        if policy.blank? || policy.is_a?(Company)
           if user.company.per_diems.include?(per_diem)
             rate = self.per_diem_expense.per_diem.rate_value rescue nil
             amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)

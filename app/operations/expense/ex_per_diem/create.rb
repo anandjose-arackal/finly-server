@@ -1,6 +1,6 @@
 class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
 
-  attr_accessor :expense_params, :receipt
+  attr_accessor :expense_params, :receipt, :per_diem
 
   def authorized_user_types
     [:employee]
@@ -20,7 +20,7 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       messages[:error] << 'Quantity cannot be less than or equal to 0'
     end
     per_diem_id = params[:expense][:per_diem_expense_attributes][:per_diem_id].to_d rescue nil
-    per_diem = PerDiem.find_from_id(per_diem_id)
+    self.per_diem = PerDiem.find_from_id(per_diem_id)
     if per_diem.blank?
       add_message :error, "You have to select an associated per diem"
     end
@@ -79,6 +79,16 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
   end
 
   def post_process
+
+    # calculate amount of the expense
+    amount = expense.amount
+    if amount.blank?
+      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)
+      expense.update(amount: amount)
+    else
+      amount.update(value: expense.calculate_amount_value(per_diem.configurable))
+    end
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
@@ -86,18 +96,6 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       unless comment.save
         messages[:error] = comment.errors.full_messages
       end
-    end
-    # if the expense is part of a report, calculate the associated amount
-    if expense_params[:report_id].present?
-      report = user.reports.find_by(id: expense_params[:report_id])
-      amount = expense.amount
-      if amount.nil?
-        amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
-        amount = Amount.create(amount_params)
-      else
-        amount.update(value: expense.calculate_amount_value(report.policy))
-      end
-      expense.update_attributes(amount_id: amount.id)
     end
 
     messages[:success] << 'Expense created'
