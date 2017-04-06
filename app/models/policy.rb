@@ -2,20 +2,16 @@
 #
 # Table name: policies
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  company_id :integer
-#  owner_id   :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  default    :boolean          default(FALSE), not null
-#  is_deleted :boolean          default(FALSE), not null
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  company_id  :integer
+#  owner_id    :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  default     :boolean          default(FALSE), not null
+#  is_deleted  :boolean          default(FALSE), not null
+#  description :text(65535)
 #
-
-
-
-
-
 
 
 class Policy < ActiveRecord::Base
@@ -44,8 +40,8 @@ class Policy < ActiveRecord::Base
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
   scope :with_id, -> (id) { where id: id }
-  scope :not_deleted, -> {where is_deleted: false}
-  scope :find_from_id, -> (id) {find_by(id: id)}
+  scope :not_deleted, -> { where is_deleted: false }
+  scope :find_from_id, -> (id) { find_by(id: id) }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
@@ -78,10 +74,7 @@ class Policy < ActiveRecord::Base
   end
 
   def rules_count
-    count = 0
-    count += self.expense_rules.count
-    count += self.budget_rules.count
-    count
+    (self.expense_rules.count + self.budget_rules.count)
   end
 
   def distance_expense_enabled?
