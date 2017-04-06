@@ -106,7 +106,7 @@ if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
     name[0] = name[0].capitalize
-    order = MoneyRequestStatus.order_for_id(key)
+    order = MoneyRequestStatus.order_for_id(value)
     MoneyRequestStatus.create id: value, name: name, order: order
   end
 end
@@ -230,10 +230,6 @@ if CardProgram.count == 0
                      end_date_restrictions: true, manager_credit: false, manager_debit: false,
                      manager_blockable: false, manager_view_balance: false, manager_view_eligibility: true,
                      manager_view_transactions: false, non_personal_fund_transfer: false
-end
-
-if MobileAppVersion.count == 0
-  MobileAppVersion.create name: 'Android'
 end
 
 ##########################
