@@ -2,7 +2,7 @@ class Import::Base < BaseOperation
 
 
   def create_response_csv
-    file_name = "public/common/files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
     CSV.open(file_name, "wb") do |csv|
       self.header << "Result"
       csv << header
@@ -13,7 +13,7 @@ class Import::Base < BaseOperation
         csv << row
       end
     end
-    return file_name
+    return file_name.gsub("public", "")
   end
 
   def generate_response_csv

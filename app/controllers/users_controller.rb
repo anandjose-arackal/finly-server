@@ -78,18 +78,18 @@ class UsersController < ApplicationController
     if @result.success?
       @response = {
           success: true,
+          file_url: @result.file_url,
           messages: {
               error: [],
               failure: [],
               success: [],
               message: [],
               notice: []
-          },
-          file_link: @result.file_url
+          }
       }
       respond_to do |format|
         format.json {
-          render @response.as_json
+          render json: @response.as_json
         }
       end
     else
