@@ -10,6 +10,7 @@
 Gemfile.lock
 /config/database.yml
 /.byebug_history
+dump.rdb
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -20,6 +21,7 @@ Gemfile.lock
 # all local executables
 /bin
 
+.idea/*
 /.idea/*
 .vagrant/
 #Vagrantfile
