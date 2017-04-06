@@ -1,0 +1,11 @@
+
+<table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+  <tr style="background-color: #dcdcdc;">
+    <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">DATE</td>
+    <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
+  </tr>
+  <tr>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=@data.transaction.transaction_timestamp.to_date%></td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=@data.transaction.billing_amount_value%></td>
+  </tr>
+</table><br>

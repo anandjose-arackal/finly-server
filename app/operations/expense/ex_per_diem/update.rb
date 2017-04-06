@@ -1,7 +1,7 @@
 class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
 
   attr_accessor :updated_expense_params
-  attr_accessor :editable_attrs, :receipt, :old_receipt
+  attr_accessor :editable_attrs, :receipt, :old_receipt, :per_diem
 
   def pre_validate
     if params.blank? or user.blank?
@@ -72,7 +72,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     # checking whether the new per_diem is accessible to the user
     if updated_expense_params[:per_diem_expense_attributes][:per_diem_id].present?
       per_diem_id = updated_expense_params[:per_diem_expense_attributes][:per_diem_id].to_i
-      per_diem = PerDiem.find_by(id: per_diem_id)
+      self.per_diem = PerDiem.find_by(id: per_diem_id)
       unless per_diem && user.per_diems_list.include?(per_diem)
         add_message :error, 'You do not have access to this Per Diem'
         return
@@ -120,9 +120,12 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     # if the expense has an associated amount, update the amount
-    if expense.amount.present? && expense.report.present?
+    if expense.amount.present?
       amount = expense.amount
       amount.update(value: expense.calculate_amount_value(expense.report.policy))
+    else
+      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)
+      expense.update(amount: amount)
     end
 
     add_message :success, 'Expense updated'

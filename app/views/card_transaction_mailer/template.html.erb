@@ -1,13 +1,24 @@
 <% content_for :body do %>
-    <p style="line-height:160%;margin:0 0 20px 0">
-      <%= raw(@data.body) %>
-    </p>
-
-    <div class="primary block center" style="background-color: white; text-align: center;">
-      <p style="line-height:160%;margin:0 0 20px 0">
-        <a href="<%= external_url_transaction_url(id: @data.transaction.id) %>" style="background-color:#3F51B5;border:none;color:white;display:inline-block;font-size:14px;font-weight:700;letter-spacing:1px;padding:13px 25px;text-decoration:none;text-transform:uppercase" target="_blank"><%= @data.button_name %></a>
-      </p>
+    <head>
+      <title>New Card Transaction</title>
+    </head>
+    <body style="background-color: #f3f3f3; margin: 0px;height: auto;">
+    <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+      <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.action_name%></p>
     </div>
+    <div style="margin: auto; height: 300px; width: 100%; background-color: white;">
+
+      <!--<p style="font-size: 18px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">'sreeram.nr</span> Expenses to 2016-06-02' rejected</p>-->
+      <p style="font-size: 17px; margin-left: 3%; text-align: left"><%=@data.body_val.html_safe%></p>
+      <br><br>
+      <% if @data.transaction.atm_withdrawal? %>
+      <%= render 'atm_withdrawal' %>
+      <% elsif @data.transaction.expense? %>
+      <%= render 'card_expense' %>
+      <% end %>
+
+    </div>
+    </body>
 <% end %>
 
 <%= render 'application_mailer/template' %>
