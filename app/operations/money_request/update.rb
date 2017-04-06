@@ -92,9 +92,9 @@ class MoneyRequest::Update < MoneyRequest::Base
           updated_field: 'policy', updated_from: money_request.policy_id_was,
           updated_to: money_request.policy_id
       when :items_attributes
-        value.each do |updating_mapping|
-          # todo test it out and add comments
-        end
+        # value.each do |updating_mapping|
+        #   # todo test it out and add comments
+        # end
       else
       end
     end

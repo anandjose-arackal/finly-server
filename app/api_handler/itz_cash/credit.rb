@@ -91,7 +91,7 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def success_response_code
-    [0, 2, 300, 301]
+    [0, 2, 300, 301, 302]
   end
 
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter

@@ -51,7 +51,8 @@ json.expense_sections categorized_expense do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id
+    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id,
+                           :distance_value, :distance_rate_value, :time_value, :time_rate_value
     if expense.note
       if expense.note.length < 29
         json.note expense.note

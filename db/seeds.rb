@@ -48,8 +48,8 @@ end
 
 if ReportStatus.count == 0
   ReportStatus.create(id: 1, name: 'Open', order: 1)
-  ReportStatus.create(id: 2, name: 'Processing', order: 2)
-  ReportStatus.create(id: 3, name: 'Retracted', order: 3)
+  ReportStatus.create(id: 2, name: 'Processing', order: 3)
+  ReportStatus.create(id: 3, name: 'Retracted', order: 2)
   ReportStatus.create(id: 4, name: 'Rejected', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
   ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
@@ -106,7 +106,8 @@ if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
     name[0] = name[0].capitalize
-    MoneyRequestStatus.create id: value, name: name
+    order = MoneyRequestStatus.order_for_id(value)
+    MoneyRequestStatus.create id: value, name: name, order: order
   end
 end
 
@@ -229,10 +230,6 @@ if CardProgram.count == 0
                      end_date_restrictions: true, manager_credit: false, manager_debit: false,
                      manager_blockable: false, manager_view_balance: false, manager_view_eligibility: true,
                      manager_view_transactions: false, non_personal_fund_transfer: false
-end
-
-if MobileAppVersion.count == 0
-  MobileAppVersion.create name: 'Android'
 end
 
 ##########################

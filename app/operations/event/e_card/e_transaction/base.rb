@@ -23,11 +23,10 @@ class Event::ECard::ETransaction::Base < Event::SetNotifier
   end
 
   def send_mailer(user)
-    subject = self.mailer_subject(user)
-    body = self.mailer_body(user)
-    button_name = self.mailer_button_name(user)
-    return unless subject.present? and body.present?
-    CardTransactionMailer.delay.send_mail(Event::ECard::ETransaction::Base::MailerPresenter.new(user, transaction, subject, body, button_name))
+    return if user.blank?
+    set_presenter_params(user)
+    return unless params[:subject].present? and params[:body].present?
+    CardTransactionMailer.delay.send_mail(Event::ECard::ETransaction::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -37,18 +36,26 @@ class Event::ECard::ETransaction::Base < Event::SetNotifier
   end
 
   def mailer_button_name(user)
-      'View'
+    'View'
+  end
+
+  def set_presenter_params(user)
+    params[:subject] = self.mailer_subject(user)
+    params[:body] = self.mailer_body(user)
+    params[:button_name] = self.mailer_button_name(user)
+    params[:action_name] = action_name
   end
 
   class Event::ECard::ETransaction::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :transaction, :user, :body_val, :subject_val, :button_val
+    attr_accessor :transaction, :user, :body_val, :subject_val, :button_val, :action_name
 
-    def initialize(user, transaction, subject, body, button_name)
-      self.transaction = transaction
+    def initialize(user, params)
+      self.transaction = params[:transaction]
       self.user = user
-      self.body_val = body
-      self.subject_val = subject
-      self.button_val = button_name
+      self.body_val = params[:body]
+      self.subject_val = params[:subject]
+      self.button_val = params[:button_name]
+      self.action_name = params[:action_name]
     end
 
     def validate

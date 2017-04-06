@@ -23,6 +23,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -131,6 +132,7 @@ class Expense < ActiveRecord::Base
   scope :filter_merchant, -> (merchant_name) {
     expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
+    expense_ids += PerDiemExpense.joins(:per_diem).where('per_diems.name LIKE ?', "%#{merchant_name}%").pluck(:expense_id)
 
     where(id: expense_ids)
   }
@@ -143,6 +145,7 @@ class Expense < ActiveRecord::Base
   scope :filter_search, -> (value) do
     expense_ids = ManualExpense.where('merchant like ?', "%#{value}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{value}%").pluck(:expense_id)
+    expense_ids += PerDiemExpense.joins(:per_diem).where('per_diems.name LIKE ?', "%#{query}%").pluck(:expense_id)
 
     where('id IN (?) OR note like ?', expense_ids, "%#{value}%")
     # joins(:card_expense).joins(:manual_expense).joins(:amount).select('expenses.*').where('editable_merchant like ? or merchant like ? OR note like ?', "%#{value}%", "%#{value}%", "%#{value}%")
@@ -189,6 +192,8 @@ class Expense < ActiveRecord::Base
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
   scope :filter_user_id, ->(id) { where user_id: id }
+
+
 
   scope :verified, -> {where expense_status_id: ExpenseStatus.submitted_id}
   scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
@@ -242,7 +247,7 @@ class Expense < ActiveRecord::Base
         end
       when ExpenseType.id_for(:per_diem)
         per_diem = self.per_diem_expense.per_diem
-        if policy.blank?
+        if policy.blank? || policy.is_a?(Company)
           if user.company.per_diems.include?(per_diem)
             rate = self.per_diem_expense.per_diem.rate_value rescue nil
             amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
@@ -291,7 +296,17 @@ class Expense < ActiveRecord::Base
       when 5
         return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
       else
-        return "- -"
+        if self.report.nil?
+          return "- -"
+        else
+          parent = report.policy
+          parent = self.user.company if parent.nil?
+          if self.distance_expense?
+            return "#{self.distance_expense.distance_value} KM @ ₹#{parent.distance_expense_config.rate_per_km} per KM"
+          elsif self.time_expense?
+            return "#{self.time_expense.time_object_value} Hours @ ₹#{parent.time_expense_config.rate_per_hour} per Hour"
+          end
+        end
     end
   end
 

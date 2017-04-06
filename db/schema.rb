@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170331092150) do
+ActiveRecord::Schema.define(version: 20170405125844) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -355,16 +355,17 @@ ActiveRecord::Schema.define(version: 20170331092150) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
-    t.integer  "company_id",        limit: 4,                   null: false
-    t.integer  "contact_id",        limit: 4
-    t.boolean  "verified",                      default: false
-    t.string   "logo_file_name",    limit: 255
-    t.string   "logo_content_type", limit: 255
-    t.integer  "logo_file_size",    limit: 4
+    t.integer  "company_id",          limit: 4,                   null: false
+    t.integer  "contact_id",          limit: 4
+    t.boolean  "verified",                        default: false
+    t.string   "logo_file_name",      limit: 255
+    t.string   "logo_content_type",   limit: 255
+    t.integer  "logo_file_size",      limit: 4
     t.datetime "logo_updated_at"
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
     t.boolean  "ocr_enabled"
+    t.boolean  "other_expense_types",             default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -480,10 +481,10 @@ ActiveRecord::Schema.define(version: 20170331092150) do
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
 
   create_table "distances", force: :cascade do |t|
-    t.decimal  "value",                      precision: 10
+    t.decimal  "value",                      precision: 10, scale: 4
     t.integer  "physical_unit_id", limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
   end
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
@@ -754,8 +755,9 @@ ActiveRecord::Schema.define(version: 20170331092150) do
 
   create_table "money_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "order",      limit: 4,   default: 1, null: false
   end
 
   create_table "money_request_tracking_actions", force: :cascade do |t|
@@ -1267,10 +1269,10 @@ ActiveRecord::Schema.define(version: 20170331092150) do
   add_index "time_expenses", ["expense_id"], name: "index_time_expenses_on_expense_id", using: :btree
 
   create_table "time_objects", force: :cascade do |t|
-    t.decimal  "value",                      precision: 10
+    t.decimal  "value",                      precision: 10, scale: 4
     t.integer  "physical_unit_id", limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
   end
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
@@ -1353,8 +1355,8 @@ ActiveRecord::Schema.define(version: 20170331092150) do
     t.datetime "avatar_updated_at"
     t.boolean  "kyc_verified"
     t.string   "gcm_sender_id",       limit: 255
-    t.integer  "employee_id",         limit: 4
-    t.integer  "payroll_id",          limit: 4
+    t.string   "employee_id",         limit: 255
+    t.string   "payroll_id",          limit: 255
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false

@@ -20,8 +20,14 @@ class ReportStatus < ActiveRecord::Base
   scope :rejected, -> { find_by(id: ReportStatus.rejected_id) }
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
+  scope :with_name, -> (name) { find_by(name: name)}
 
   STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, settled: 6, settlement_confirmed: 7, closed: 8}
+
+  def self.personal_sort_order
+    [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:processing), ReportStatus.id_for(:rejected),
+     ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]
+  end
 
   def self.id_for(status)
     STATES[status]

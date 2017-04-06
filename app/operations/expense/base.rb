@@ -28,7 +28,22 @@ class Expense::Base < BaseOperation
       self.view = params[:view]
       self.violation = retrieve_violation
       self.editable = retrieve_editable
-      self.per_diems = user.per_diems_list
+      self.per_diems = retrieve_per_diems(expense)
+    end
+
+    def retrieve_per_diems(expense)
+      if expense.report.nil?
+        return user.per_diems_list
+      else
+        if expense.report.policy.present?
+          policy = expense.report.policy
+          per_diems = policy.per_diems
+        else
+          company = user.company
+          per_diems = company.per_diems
+        end
+        return per_diems
+      end
     end
 
     def retrieve_violation

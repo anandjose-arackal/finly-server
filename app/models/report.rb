@@ -30,15 +30,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -55,6 +46,7 @@ class Report < ActiveRecord::Base
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
   # Payment made as reimbursement
+  belongs_to :report_status
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :cash_expenses_total, class_name: 'Amount'
   belongs_to :card_expenses_total, class_name: 'Amount'
@@ -86,8 +78,8 @@ class Report < ActiveRecord::Base
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
   scope :with_amount, -> { joins :cash_expenses_total }
-  scope :with_cash_expenses_total, -> {joins :cash_expenses_total}
-  scope :with_card_expenses_total, -> {joins :card_expenses_total}
+  scope :with_cash_expenses_total, -> { joins :cash_expenses_total }
+  scope :with_card_expenses_total, -> { joins :card_expenses_total }
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
@@ -103,16 +95,16 @@ class Report < ActiveRecord::Base
   scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
   scope :include_user, -> { includes :user }
   scope :without_payment, -> { where reimbursement_id: nil }
-  scope :pending_settlement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
-  scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
+  scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
+  scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
 
-  scope :with_approved_at_range, -> (start_time, end_time) {where('approved_at >= ? and approved_at <= ?', start_time, end_time)}
+  scope :with_approved_at_range, -> (start_time, end_time) { where('approved_at >= ? and approved_at <= ?', start_time, end_time) }
 
   # scope for reports being shown in settlements page
-  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
+  scope :settlement_viewable, -> { where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id] }
 
-  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
-  scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
+  scope :processed, -> { where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id] }
+  scope :settled_and_closed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id] }
 
   scope :filter_status, ->(status_id) { where report_status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -137,6 +129,8 @@ class Report < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
+  scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
@@ -146,7 +140,6 @@ class Report < ActiveRecord::Base
   before_destroy :clear_expenses
 
   attr_accessor :cache_users
-
 
   def self.get_default_name(user)
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"

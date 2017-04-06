@@ -18,8 +18,6 @@
 #
 
 
-
-
 class ReportComment < ActiveRecord::Base
   belongs_to :report
   belongs_to :user
@@ -155,7 +153,13 @@ class ReportComment < ActiveRecord::Base
         end
       when ReportCommentAction.id_for(:expense_update)
         # Expense update
-        comment = "#{name} updated the #{type} expense #{merchant} : #{updated_field} from #{updated_from} to #{updated_to}"
+        if updated_from.blank? and updated_to.present?
+          comment = "#{name} updated the #{type} expense #{merchant} : Added a '#{updated_field}' as '#{updated_to}'"
+        elsif updated_to.blank? and updated_from.present?
+          comment = "#{name} updated the #{type} expense #{merchant} : Cleared the '#{updated_field}' from '#{updated_from}'"
+        else
+          comment = "#{name} updated the #{type} expense #{merchant} : Set the #{updated_field} from '#{updated_from}' to '#{updated_to}'"
+        end
       when ReportCommentAction.id_for(:expense_attach_receipt)
         # adding a receipt to an expense
         comment = "#{name} attached a receipt to the #{type} expense #{merchant}"
