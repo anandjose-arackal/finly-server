@@ -5,7 +5,7 @@
 #  id          :integer          not null, primary key
 #  per_diem_id :integer
 #  expense_id  :integer
-#  quantity    :integer
+#  quantity    :decimal(10, 4)
 #  is_deleted  :boolean
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
@@ -20,9 +20,9 @@ class PerDiemExpense < ActiveRecord::Base
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 
-  scope :per_diem_like, -> (query, expense_ids) {
-    joins(:per_diem).where(expense_id: expense_ids).where('per_diems.name LIKE ?', "%#{query}%").pluck(:name)
-  }
+  scope :per_diem_like, -> (query, expense_ids) do
+    joins(:per_diem).where(:expense_id => expense_ids).where('per_diems.name LIKE ?', "%#{query}%").pluck(:name)
+  end
 
   validates :per_diem, presence: true
   validate :valid_quantity

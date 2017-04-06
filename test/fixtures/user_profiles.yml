@@ -10,8 +10,8 @@
 #  avatar_updated_at   :datetime
 #  kyc_verified        :boolean
 #  gcm_sender_id       :string(255)
-#  employee_id         :integer
-#  payroll_id          :integer
+#  employee_id         :string(255)
+#  payroll_id          :string(255)
 #  default_currency_id :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
