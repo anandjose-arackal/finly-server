@@ -232,6 +232,8 @@ if CardProgram.count == 0
                      manager_view_transactions: false, non_personal_fund_transfer: false
 end
 
+
+
 ##########################
 
 if Amount.count == 0

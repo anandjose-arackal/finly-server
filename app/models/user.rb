@@ -118,6 +118,8 @@ class User < ActiveRecord::Base
 
   belongs_to :otp_request_type
 
+  has_many :feedbacks
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile

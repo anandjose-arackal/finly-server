@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170405125844) do
+ActiveRecord::Schema.define(version: 20170406150228) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -575,6 +575,24 @@ ActiveRecord::Schema.define(version: 20170405125844) do
 
   add_index "export_preferences", ["company_id"], name: "index_export_preferences_on_company_id", using: :btree
   add_index "export_preferences", ["export_field_id"], name: "index_export_preferences_on_export_field_id", using: :btree
+
+  create_table "feedback_types", force: :cascade do |t|
+    t.string   "name",        limit: 255,   null: false
+    t.text     "description", limit: 65535, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer  "feedback_type_id", limit: 4,     null: false
+    t.text     "content",          limit: 65535, null: false
+    t.integer  "user_id",          limit: 4,     null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "feedbacks", ["feedback_type_id"], name: "index_feedbacks_on_feedback_type_id", using: :btree
+  add_index "feedbacks", ["user_id"], name: "index_feedbacks_on_user_id", using: :btree
 
   create_table "field_amounts", force: :cascade do |t|
     t.integer  "value_id",   limit: 4, null: false
@@ -1546,6 +1564,8 @@ ActiveRecord::Schema.define(version: 20170405125844) do
   add_foreign_key "expenses", "users"
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
+  add_foreign_key "feedbacks", "feedback_types"
+  add_foreign_key "feedbacks", "users"
   add_foreign_key "field_configurations", "companies"
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
