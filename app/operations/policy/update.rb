@@ -19,6 +19,16 @@ class Policy::Update < Policy::Base
     self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
   end
 
+  def validate
+    unless self.policy
+      add_message :error, 'Policy not found'
+      return
+    end
+    if user.policy_admin?(self.policy)
+      add_message :error, 'You do not have the required permission to update this policy'
+    end
+  end
+
   def process
     self.policy.update(description: description)
   end

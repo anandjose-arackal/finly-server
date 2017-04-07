@@ -80,6 +80,10 @@ class PoliciesController < ApplicationController
     respond
   end
 
+  def show_description
+    @result = Policy::Show.(current_user, params)
+  end
+
   def policy_member_settings
     # @result = Policy::InvitableUsers.(current_user, params)
     # selected_user = User.find(params[:user_id])

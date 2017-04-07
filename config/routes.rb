@@ -643,7 +643,6 @@ Rails.application.routes.draw do
     end
   end
 
-
   get 'policies/expense_rules' => 'policies#expense_rules'
   get 'policies/budget_rules' => 'policies#budget_rules'
   get 'policies/policy_members' => 'policies#policy_members'
@@ -661,6 +660,7 @@ Rails.application.routes.draw do
     delete 'remove_mapping/:mapping_id' => 'policies#destrot_mapping', as: :destroy_mapping
     post 'add_rule', to: 'rules#create', as: :add_rule
     delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
+    get 'description', to: 'policies#show_description'
   end
 
   resources :categories
