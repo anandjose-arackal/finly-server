@@ -25,6 +25,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -130,13 +131,13 @@ class Expense < ActiveRecord::Base
   end
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
 
-  scope :filter_merchant, -> (merchant_name) {
+  scope :filter_merchant, -> (merchant_name) do
     expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
     expense_ids += PerDiemExpense.joins(:per_diem).where('per_diems.name LIKE ?', "%#{merchant_name}%").pluck(:expense_id)
 
     where(id: expense_ids)
-  }
+  end
 
   # scope :filter_merchant, -> (merchant_name) {
   #   joins(:manual_expense, :card_expense).select('expenses.*').where('lower(merchant) like ? OR lower(editable_merchant) like ?', "%#{merchant_name}%", "%#{merchant_name}%")
@@ -248,7 +249,7 @@ class Expense < ActiveRecord::Base
         end
       when ExpenseType.id_for(:per_diem)
         per_diem = self.per_diem_expense.per_diem
-        if policy.blank?
+        if policy.blank? || policy.is_a?(Company)
           if user.company.per_diems.include?(per_diem)
             rate = self.per_diem_expense.per_diem.rate_value rescue nil
             amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)

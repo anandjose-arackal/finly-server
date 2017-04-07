@@ -21,6 +21,8 @@ class RegistrationsController < ApplicationController
         file_url = "#{Rails.root}/public/common/files/Say_No_to_Spreadsheets.pdf"
       when '2'
         file_url = "#{Rails.root}/public/common/files/Expense_Management_Checklist.pdf"
+      when '3'
+        file_url = "#{Rails.root}/public/common/files/What_CFOs_Need_to_Know.pdf"
       else
         file_url = "#{Rails.root}/public/common/files/Say_No_to_Spreadsheets.pdf"
     end

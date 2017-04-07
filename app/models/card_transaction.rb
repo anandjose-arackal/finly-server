@@ -68,6 +68,7 @@ class CardTransaction < ActiveRecord::Base
   scope :atm_withdrawals, -> {where transaction_mode: "ATM"}
   scope :pos_expenses, -> {where transaction_mode: "POS"}
   scope :online_expenses, -> {where('UPPER(transaction_mode) = ?', "ECOM")}
+  scope :expensed_transactions, -> {where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"])}
 
   def credit?
     self.transaction_type == 'Credit'

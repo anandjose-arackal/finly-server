@@ -27,6 +27,8 @@ class ResourceRequests::Create < BaseOperation
         resource_params[:resource_file_name] = 'Say_No_to_Spreadsheets'
       when '2'
         resource_params[:resource_file_name] = 'Expense_Management_Checklist'
+      when '3'
+        resource_params[:resource_file_name] = 'What_CFOs_Need_to_Know'
       else
         # do nothing
     end

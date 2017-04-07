@@ -8,6 +8,10 @@ class Event::ECard::ETransaction::Create < Event::ECard::ETransaction::Base
     [self.transaction.user]
   end
 
+  def action_name
+    "New Card Transaction"
+  end
+
   def send_push_notification(user)
     return unless transaction.atm_withdrawal? or transaction.expense?
     param = {}
@@ -41,9 +45,9 @@ class Event::ECard::ETransaction::Create < Event::ECard::ETransaction::Base
   def mailer_body(user)
     return unless transaction.atm_withdrawal? or transaction.expense?
     if transaction.expense?
-      return "This is to inform you that you have used your Finly Expense Card at #{self.transaction.card_expense.expense.merchant_name} for an amount of ₹#{self.transaction.billing_amount.value}"
+      return "This is to inform you that you have used your Finly Expense Card at #{self.transaction.card_expense.expense.merchant_name} for an amount of ₹#{precision_value self.transaction.billing_amount.value}"
     elsif transaction.atm_withdrawal?
-      return "This is to inform you that an amount of ₹#{self.transaction.billing_amount.value} has been withdrawn through the ATM using Finly Expense Cards"
+      return "This is to inform you that an amount of ₹#{precision_value self.transaction.billing_amount.value} has been withdrawn through the ATM using Finly Expense Cards"
     end
     nil
   end
