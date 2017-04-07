@@ -11,7 +11,7 @@ class FinlyAdmin::CompaniesController < ApplicationController
   def show
     # @result = Company::Show.(current_user, params)
     # @states = State::VALUES
-
+    @company = Company.find_by(params[:id])
     @result = {
         balance: "35168161",
         name: "Jouska",
@@ -26,6 +26,7 @@ class FinlyAdmin::CompaniesController < ApplicationController
         render json: @result.as_json
       }
     end
+
   end
 
   def create
