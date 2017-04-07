@@ -9,42 +9,13 @@ class FinlyAdmin::CompaniesController < ApplicationController
   end
 
   def show
-    # @result = Company::Show.(current_user, params)
-    # @states = State::VALUES
-    @company = Company.find_by(params[:id])
-    @result = {
-        balance: "35168161",
-        name: "Jouska",
-        d_code: "51461",
-        logo: {
-            url: "public/common/images/campus-layer-2.png",
-            update_path: "some shit"
-        }
-    }
-    respond_to do |format|
-      format.json {
-        render json: @result.as_json
-      }
-    end
-
+    @company = AdminOperations::Company::Show.(current_user, params)
   end
 
   def create
     @result = AdminOperations::Company::Create.(current_user, params)
     respond
   end
-
-  # def add_admin
-  #   @result = Company::AddAdmin.(current_user, params)
-  #   # temporary rendering for html testing.
-  #   if @result.success?
-  #     flash[:success] = 'Admin Added'
-  #     redirect_to superadmin_companies_path
-  #   else
-  #     flash[:error] = @result.messages[:error]
-  #     redirect_to request.referrer
-  #   end
-  # end
 
   def index
     @companies = Company.all

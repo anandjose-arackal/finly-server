@@ -29,9 +29,5 @@ class AdminOperations::Company::Create < AdminOperations::Company::Base
     add_message :success, "Company created!"
   end
 
-  def success
-
-  end
-
 
 end
