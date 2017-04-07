@@ -6,7 +6,7 @@ class FinlyAdmin::UsersController < ApplicationController
   end
 
   def create
-    @result = Superadmin::User::Create.(current_user, params)
+    @result = AdminOperations::User::Create.(current_user, params)
     respond_to do |format|
       format.json {}
     end

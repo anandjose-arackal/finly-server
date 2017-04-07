@@ -46,7 +46,7 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
-  scope :ocr_enabled, -> {joins(:configuration).select(' companies.*').where('ocr_enabled IS true')}
+  scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
 
   def default_policy
     self.policies.default
