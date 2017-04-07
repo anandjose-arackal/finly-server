@@ -24,7 +24,7 @@ class Policy::Update < Policy::Base
       add_message :error, 'Policy not found'
       return
     end
-    if user.policy_admin?(self.policy)
+    unless user.policy_admin?(self.policy) or user.company_admin?
       add_message :error, 'You do not have the required permission to update this policy'
     end
   end
