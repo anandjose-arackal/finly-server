@@ -6,7 +6,9 @@ json.array! @result.items do |item|
     if item.final_approver
       json.final_approver item.final_approver.name
     end
-    json.reimbursement_amount item.reimbursement_amount.value
+    json.reimbursement_amount item.cash_expenses_total.value rescue 0
+    json.card_expenses_total item.card_expenses_total.value rescue 0
+    json.cash_expenses_total item.cash_expenses_total.value rescue 0
     json.status item.status_name
     json.total_amount item.total_amount
   elsif item.is_a?(Payment)
@@ -32,7 +34,8 @@ json.array! @result.items do |item|
     json.extract! item, :note, :date
     json.type 'payment'
     json.payment_amount item.amount.value
-    json.receiving_user item.receiving_user.name
+    json.receiving_account item.receiving_account_type_name
+    json.initiating_account item.initiating_account_type_name
     json.initiating_user item.initiating_user.name
     json.payment_type payment_type_s
     json.total_amount item.total_amount

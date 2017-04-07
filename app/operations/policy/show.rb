@@ -21,6 +21,13 @@ class Policy::Show < Policy::Base
       policy.company.categories.active
     end
 
+    def editable
+      if user.policy_admin?(self.policy)
+        return true
+      end
+      false
+    end
+
   end
 
   def authorized_user_types

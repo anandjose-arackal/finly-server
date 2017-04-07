@@ -110,10 +110,10 @@ class FinlyF.Views.RequestsIndex extends Backbone.View
 
     if @dump.length == 0
       item = {
-        name: 'advance request'
-        capitalized_name: 'Advance Request'
-        pluralized: 'advance requests'
-        capitalized_pluralized: 'Advance Requests'
+        name: 'money request'
+        capitalized_name: 'Money Request'
+        pluralized: 'money requests'
+        capitalized_pluralized: 'Money Requests'
       }
       $(@el).find("#items").html(FinlyF.Global.templates.templateNoResultsFound(item: item))
     _.each(_this.collection.models, _this.appendItems, _this)

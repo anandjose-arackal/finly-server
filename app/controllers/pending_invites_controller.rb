@@ -1,12 +1,14 @@
 class PendingInvitesController < ApplicationController
   before_action :authenticate_user!, except: [:edit, :accept]
+  allow_oauth!
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
     @states = State.all
-    # i.e. if user has already signed in, redirect to login page
-    unless @pending_user and @pending_user.invitation_token
-      redirect_to new_user_session_path
+    if @pending_user
+      render partial: 'edit_invite'
+    else
+      render partial: 'edit_invite_not_found'
     end
   end
 
@@ -52,12 +54,7 @@ class PendingInvitesController < ApplicationController
     # fail
     @result = User::Invite::Accept.(params)
     if @result.present? and @result.success?
-      sign_in @result.accepted_user, :bypass => true
-
-      respond_to do |format|
-        format.js { render js: "window.location = '#{root_url}';"}
-        # format.js { render js: "window.location = '#{root_url}';"}
-      end
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end
@@ -73,16 +70,14 @@ class PendingInvitesController < ApplicationController
 
 
   def send_otp
+    # setting the otp request type as 'user activation'
+    params[:type] = OtpRequestType.id_for(:user_activation)
     @result = User::ManagerActivate::SendOtp.(current_user, params)
     if @result.success?
       respond response: :success
     else
       respond response: :failure
     end
-
-    # respond_to do |format|
-    #   format.json {render json: {success: true}}
-    # end
   end
 
   def activate_employee

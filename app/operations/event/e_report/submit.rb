@@ -4,8 +4,12 @@ class Event::EReport::Submit < Event::EReport::Base
     NotifierType.id_for(:report_submit)
   end
 
+  def action_name
+    "Report Submitted"
+  end
+
   def affected_users
-    [self.report.user, self.report.controlling_user]
+    [self.report.user, self.report.reload.controlling_user]
   end
 
   def notification_affected_users
@@ -50,4 +54,8 @@ class Event::EReport::Submit < Event::EReport::Base
     end
   end
 
+  def report_view_role(user)
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    roles.first
+  end
 end

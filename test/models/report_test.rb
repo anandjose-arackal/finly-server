@@ -16,7 +16,6 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  reimbursement_id             :integer
-#  reimbursement_amount_id      :integer
 #  accounted                    :boolean          default(FALSE), not null
 #  archived                     :boolean          default(FALSE), not null
 #  is_deleted                   :boolean          default(FALSE), not null
@@ -26,6 +25,8 @@
 #  approved_at                  :datetime
 #  cash_in_hand_deduction_id    :integer
 #  submitted_amount_id          :integer
+#  cash_expenses_total_id       :integer
+#  card_expenses_total_id       :integer
 #
 
 

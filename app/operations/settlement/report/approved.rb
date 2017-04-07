@@ -34,44 +34,57 @@ class Settlement::Report::Approved < Report::Base
 
   def process
     balance_sheet = report.user.balance_sheet
-    total_non_card_amount = report.total_amount(:only_manual_expenses)
-    currency = Currency.first # todo - temporary until currency is implemented
-    latest_date = nil
-    latest_date = report.latest_expense.date if report.latest_expense.present?
-    cash_in_hand = balance_sheet.cash_in_hand latest_date
-    pending_reimbursement = 0
-    new_cash_in_hand_value = cash_in_hand.value - total_non_card_amount
-    if new_cash_in_hand_value < 0
-      pending_reimbursement = total_non_card_amount - cash_in_hand.value
-      new_cash_in_hand_value = 0
-    end
-    report.user.balance_sheet.subtract_cash_in_hand (total_non_card_amount - pending_reimbursement), currency
-    report.user.balance_sheet.add_pending_reimbursement pending_reimbursement, currency
-    if report.reimbursement_amount.blank?
-      report_amount = Amount.new(value: pending_reimbursement, currency: Currency.first)
-      unless report_amount.save
-        messages[:error] = report_amount.errors.full_messages
+    total_cash_amount = report.total_amount(:only_manual_expenses) + report.total_amount(:only_distance_expenses) + report.total_amount(:only_time_expenses) + report.total_amount(:only_per_diem_expenses)
+
+    total_card_amount = report.total_amount(:only_card_expenses)
+    currency = Currency.first
+    balance_sheet.add_approved_reports_total total_cash_amount, currency
+
+    # adding report's total cash amount
+    if report.cash_expenses_total.blank?
+      cash_amount = Amount.new(value: total_cash_amount, currency: Currency.first)
+      unless cash_amount.save
+        messages[:error] = cash_amount.errors.full_messages
         return
       end
-      report.reimbursement_amount = report_amount
+      unless report.update_attributes(cash_expenses_total: cash_amount)
+        messages[:error] = report.errors.full_messages
+        return
+      end
     else
-      report_amount = report.reimbursement_amount
-      report_amount.value = pending_reimbursement
-      report_amount.currency = currency
-      unless report_amount.save
+      cash_amount = report.cash_expenses_total
+      unless cash_amount.update_attributes(value: total_cash_amount, currency: Currency.first)
         messages[:error] = report_amount.errors.full_messages
         return
       end
     end
-    report.accounted = true
-    report.accounted_at = DateUtils.local_date
+
+    # adding reports total card amount
+    if report.card_expenses_total.blank?
+      card_amount = Amount.new(value: total_card_amount, currency: Currency.first)
+      unless card_amount.save
+        messages[:error] = card_amount.errors.full_messages
+        return
+      end
+      unless report.update_attributes(card_expenses_total: card_amount)
+        messages[:error] = report.errors.full_messages
+        return
+      end
+    else
+      card_amount = report.card_expenses_total
+      unless card_amount.update_attributes(value: total_card_amount, currency: Currency.first)
+        messages[:error] = card_amount.errors.full_messages
+        return
+      end
+    end
+
     unless report.save
       messages[:error] = report.errors.full_messages
     end
   end
 
   def post_process
-    # mailer
+
   end
 
   def success

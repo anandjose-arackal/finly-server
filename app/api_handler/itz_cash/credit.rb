@@ -14,6 +14,10 @@ class ItzCash::Credit < ItzCash::Base
       add_message :error, 'Amount cannot be blank'
       return
     end
+    if params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
+      add_message :error, 'Card not found'
+      return
+    end
     if user.company.d_code.blank?
       add_message :error, 'Company has not been configured to initiate the transfer'
     end
@@ -24,7 +28,7 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_params
-    card = user.cards.first
+    card = user.cards.with_id(params[:card_id]).first
     serial_id = card.serial_id
     {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: user.company.d_code,
      merchanttypekey: merchant_type_key,
@@ -87,7 +91,7 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def success_response_code
-    [0, 2, 300, 301]
+    [0, 2, 300, 301, 302]
   end
 
   class ItzCash::Credit::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter

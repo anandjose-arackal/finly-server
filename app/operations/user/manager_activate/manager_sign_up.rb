@@ -132,7 +132,7 @@ class User::ManagerActivate::ManagerSignUp < User::ManagerActivate::Base
     # send welcome message
     message = "Your account has been successfully activated. Please go to www.finly.io to login"
     # sending the welcome message as an SMS. Mobile number is to be sent as an array of mobile numbers
-    WelcomeMessage::Create.(user, {mobile_number: [invited_user.mobile_number], message: message})
+    CustomMessage::Create.(user, {mobile_number: [invited_user.mobile_number], message: message})
 
     messages[:success] << "User successfully activated!"
   end

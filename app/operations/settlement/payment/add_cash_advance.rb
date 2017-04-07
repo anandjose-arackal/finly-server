@@ -98,9 +98,22 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def post_process
-    add_message :success, 'Cash advance added'
+    add_message :success, 'Added cash on hand'
 
     Event::ESettlement::AddCashAdvance.(user, payment: self.payment)
+
+    # recalculating user balance history for the respective day the cash was added
+    unless Date.parse(payment_param[:date]) == Date.today
+      balance_history = to_user.user_balance_histories.find_by(date: payment_param[:date].to_date)
+      unless balance_history.blank?
+        cash_on_hand_value = balance_history.cash_on_hand_balance.value
+        cash_on_hand_load = balance_history.cash_on_hand_load.value
+        cash_on_hand_value += payment_param[:amount].to_f
+        cash_on_hand_load += payment_param[:amount].to_f
+        balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
+                                  cash_on_hand_load_attributes: {value: cash_on_hand_load, id: balance_history.cash_on_hand_load.id})
+      end
+    end
   end
 
 end

@@ -1,6 +1,7 @@
 class ReportsController < ApplicationController
   include MathUtil
   before_action :authenticate_user!
+  allow_oauth!
 
   def create
     @result = Report::Create.(current_user, params)
@@ -83,8 +84,8 @@ class ReportsController < ApplicationController
     # render_flash_message
   end
 
-  def reimbursement_confirm
-    @result = Report::ReimburseConfirm.(current_user, params)
+  def settlement_confirm
+    @result = Report::SettlementConfirm.(current_user, params)
     respond render: :show
   end
 

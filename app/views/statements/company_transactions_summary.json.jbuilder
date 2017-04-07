@@ -37,3 +37,4 @@ json.total_amount_transferred_to_company_account do
   json.from_finly_cards item[:total_amount_transferred][:from_finly_cards]
   json.from_finly_money item[:total_amount_transferred][:from_finly_money]
 end
+json.invalid_date @result.invalid_date

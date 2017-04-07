@@ -1,6 +1,13 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
+#              transcriber_companies_index GET        /transcriber/companies/index(.:format)                      transcriber/companies#index
+#  transcriber_transcribed_expenses_create POST       /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
+#  transcriber_transcribed_expenses_update PATCH      /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
+#     transcriber_transcribed_receipt_show GET        /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
+#       transcriber_untranscribed_receipts GET        /transcriber/companies/:id(.:format)                        transcriber/companies#show
+#                    transcriber_companies GET        /transcriber/companies(.:format)                            transcriber/companies#index
+#                                menu_data GET        /menu_data(.:format)                                        users#menu_data
 #                   new_admin_user_session GET        /admin/login(.:format)                                      active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                      active_admin/devise/sessions#create
 #               destroy_admin_user_session DELETE|GET /admin/logout(.:format)                                     active_admin/devise/sessions#destroy
@@ -109,6 +116,8 @@
 #                                          DELETE     /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
 #                            accept_invite GET        /users/invitation/accept(.:format)                          pending_invites#edit
 #                     preview_registration POST       /welcome/preview(.:format)                                  registrations#preview
+#                        resources_details POST       /resources_details(.:format)                                registrations#resource_requests
+#                       resources_download GET        /download_resource(.:format)                                registrations#resources_download
 #                         new_user_session GET        /users/sign_in(.:format)                                    sessions#new
 #                             user_session POST       /users/sign_in(.:format)                                    sessions#create
 #                     destroy_user_session DELETE     /users/sign_out(.:format)                                   sessions#destroy
@@ -154,7 +163,7 @@
 #                    api_v0_report_approve PATCH      /api/v0/reports/:report_id/approve(.:format)                api/v0/reports#approve
 #                  api_v0_report_unapprove PATCH      /api/v0/reports/:report_id/unapprove(.:format)              api/v0/reports#unapprove
 #                     api_v0_report_reject PATCH      /api/v0/reports/:report_id/reject(.:format)                 api/v0/reports#reject
-#      api_v0_report_reimbursement_confirm PATCH      /api/v0/reports/:report_id/reimbursement_confirm(.:format)  api/v0/reports#reimbursement_confirm
+#         api_v0_report_settlement_confirm PATCH      /api/v0/reports/:report_id/settlement_confirm(.:format)     api/v0/reports#settlement_confirm
 #               api_v0_report_take_control PATCH      /api/v0/reports/:report_id/take_control(.:format)           api/v0/reports#take_control
 #               api_v0_report_add_expenses POST       /api/v0/reports/:report_id/add_expenses(.:format)           api/v0/reports#add_expenses
 #            api_v0_report_remove_expenses DELETE     /api/v0/reports/:report_id/remove_expenses(.:format)        api/v0/reports#remove_expenses
@@ -344,7 +353,7 @@
 #                         report_unapprove PATCH      /reports/:report_id/unapprove(.:format)                     reports#unapprove
 #                            report_reject PATCH      /reports/:report_id/reject(.:format)                        reports#reject
 #                    report_reject_expense PATCH      /reports/:report_id/reject_expense(.:format)                reports#reject_expense
-#             report_reimbursement_confirm PATCH      /reports/:report_id/reimbursement_confirm(.:format)         reports#reimbursement_confirm
+#                report_settlement_confirm PATCH      /reports/:report_id/settlement_confirm(.:format)            reports#settlement_confirm
 #                      report_take_control PATCH      /reports/:report_id/take_control(.:format)                  reports#take_control
 #                      report_add_expenses POST       /reports/:report_id/add_expenses(.:format)                  reports#add_expenses
 #                   report_remove_expenses DELETE     /reports/:report_id/remove_expenses(.:format)               reports#remove_expenses
@@ -422,6 +431,7 @@
 #                                          PATCH      /users/:id(.:format)                                        users#update
 #                                          PUT        /users/:id(.:format)                                        users#update
 #                                          DELETE     /users/:id(.:format)                                        users#destroy
+#                  available_expense_types GET        /available_expense_types(.:format)                          users#available_expense_types
 #                              user_import POST       /import(.:format)                                           users#import
 #                        superadmin_import POST       /superadmin_import(.:format)                                superadmin/companies#import
 #                      initiate_activation GET        /pending_invites/initiate_activation(.:format)              pending_invites#initiate_activation
@@ -462,6 +472,16 @@
 #                                          PATCH      /receipts/:id(.:format)                                     receipts#update
 #                                          PUT        /receipts/:id(.:format)                                     receipts#update
 #                                          DELETE     /receipts/:id(.:format)                                     receipts#destroy
+#          expense_type_configuration_show GET        /expense_type_configurations(.:format)                      expense_types_configuration#show
+#        expense_type_configuration_update PATCH      /expense_type_configurations(.:format)                      expense_types_configuration#update
+#                                per_diems GET        /per_diems(.:format)                                        per_diems#index
+#                                          POST       /per_diems(.:format)                                        per_diems#create
+#                             new_per_diem GET        /per_diems/new(.:format)                                    per_diems#new
+#                            edit_per_diem GET        /per_diems/:id/edit(.:format)                               per_diems#edit
+#                                 per_diem GET        /per_diems/:id(.:format)                                    per_diems#show
+#                                          PATCH      /per_diems/:id(.:format)                                    per_diems#update
+#                                          PUT        /per_diems/:id(.:format)                                    per_diems#update
+#                                          DELETE     /per_diems/:id(.:format)                                    per_diems#destroy
 #             superadmin_company_new_admin POST       /superadmin/companies/:company_id/add_admin(.:format)       superadmin/companies#add_admin
 #                 superadmin_company_users GET        /superadmin/companies/:company_id/users(.:format)           superadmin/users#index
 #                                          POST       /superadmin/companies/:company_id/users(.:format)           superadmin/users#create
@@ -495,11 +515,13 @@
 #                                     root GET        /                                                           home#index
 #                                  welcome GET        /welcome(.:format)                                          home#welcome
 #                                    about GET        /about(.:format)                                            home#about
+#                                resources GET        /resources(.:format)                                        home#resources
 #                    autocomplete_merchant GET        /autocomplete/merchant(.:format)                            autocomplete#merchant
 #                        autocomplete_user GET        /autocomplete/user(.:format)                                autocomplete#user
 #                      external_url_report GET        /external/reports/:id(.:format)                             external_url#report
 #               external_url_money_request GET        /external/requests/:id(.:format)                            external_url#money_request
 #                  external_url_settlement GET        /external/settlements/:id(.:format)                         external_url#payment
+#                 external_url_transaction GET        /external/transaction/:id(.:format)                         external_url#transaction
 #                                analytics GET        /analytics(.:format)                                        analytics#show
 #                                          GET        /companies/notify(.:format)                                 companies#notify
 #                            notifications GET        /notifications(.:format)                                    notifications#index
@@ -509,6 +531,19 @@
 #
 
 Rails.application.routes.draw do
+
+
+  namespace :transcriber do
+    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
+    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
+    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
+    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
+    get 'companies', to: 'companies#index', as: :companies
+  end
+
+
+
+  get 'menu_data', to: "users#menu_data"
 
 
   devise_for :admin_users, ActiveAdmin::Devise.config
@@ -540,6 +575,8 @@ Rails.application.routes.draw do
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+  post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
+  get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
   devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
     # get 'login', to: 'sessions#new', as: :login
@@ -558,7 +595,7 @@ Rails.application.routes.draw do
         patch 'approve' => 'reports#approve', as: :approve
         patch 'unapprove' => 'reports#unapprove', as: :unapprove
         patch 'reject' => 'reports#reject', as: :reject
-        patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+        patch 'settlement_confirm' => 'reports#settlement_confirm', as: :settlement_confirm
         patch 'take_control' => 'reports#take_control', as: :take_control
         post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
         delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
@@ -602,9 +639,9 @@ Rails.application.routes.draw do
         post 'gcm/unregister', to: 'gcm#delete'
       end
       get 'balances', to: 'users#balance'
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
   end
-
 
   get 'policies/expense_rules' => 'policies#expense_rules'
   get 'policies/budget_rules' => 'policies#budget_rules'
@@ -613,6 +650,7 @@ Rails.application.routes.draw do
   get 'policies/policy_member_settings/' => 'policies#policy_member_settings'
 
   get 'policies/details' => 'policies#details'
+  get 'policies/personal' => 'policies#show_personal'
   resources :policies, except: [:new, :edit]
   resources :policies do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users
@@ -622,6 +660,7 @@ Rails.application.routes.draw do
     delete 'remove_mapping/:mapping_id' => 'policies#destrot_mapping', as: :destroy_mapping
     post 'add_rule', to: 'rules#create', as: :add_rule
     delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
+    get 'description', to: 'policies#show_description'
   end
 
   resources :categories
@@ -669,7 +708,7 @@ Rails.application.routes.draw do
     patch 'unapprove' => 'reports#unapprove', as: :unapprove
     patch 'reject' => 'reports#reject', as: :reject
     patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
-    patch 'reimbursement_confirm' => 'reports#reimbursement_confirm', as: :reimbursement_confirm
+    patch 'settlement_confirm' => 'reports#settlement_confirm', as: :settlement_confirm
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
@@ -709,6 +748,7 @@ Rails.application.routes.draw do
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
+    get 'summary', to: 'users#summary', as: :user_summary
     post 'user_details', to: 'users#user_details', as: :details
     patch 'update_user_team', to: 'users#update_team', as: :update_team
     patch 'update_role', to: 'users#update_user_role', as: :update_role
@@ -717,13 +757,13 @@ Rails.application.routes.draw do
     get 'balance', to: 'users#balance', as: :balance
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
+  get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import
   # get 'mass_import', to: 'users#mass_import', as: :mass_import
   post 'import', to: 'users#import', as: :user_import
   post 'superadmin_import', to: 'superadmin/companies#import', as: :superadmin_import
   # get 'sample_import_file', to: 'users#sample_file', as: :sample_import_file
-
 
   get 'pending_invites/initiate_activation', to: 'pending_invites#initiate_activation', as: :initiate_activation
   get 'pending_invites/activate_employee' => 'pending_invites#activate_employee', as: :activate_employee
@@ -747,6 +787,11 @@ Rails.application.routes.draw do
 
   end
 
+  get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
+  patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
+  
+  resources :per_diems
+
   namespace :superadmin do
     resources :companies do
       post 'add_admin', to: 'companies#add_admin', as: :new_admin
@@ -769,6 +814,7 @@ Rails.application.routes.draw do
   get 'welcome' => 'home#welcome'
 
   get 'about', to: 'home#about'
+  get 'resources', to: 'home#resources'
 
 
   #Filters/Autocomplete
@@ -794,6 +840,8 @@ Rails.application.routes.draw do
 
   # FAQ
   get '/faqs' => 'faqs#index'
+
+  post 'feedback' => 'feedback#create'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -10,6 +10,10 @@ class Card::Transaction::Create < BaseOperation
 
   end
 
+  def authorized_user_types
+
+  end
+
   def initialize(params, messages={})
     self.params = params
     self.messages = messages
@@ -26,7 +30,7 @@ class Card::Transaction::Create < BaseOperation
 
   def authorize
     unless card and user
-      raise_unauthorized_exception
+      add_message :error, 'Card or User not found in the system'
     end
   end
 
@@ -36,15 +40,19 @@ class Card::Transaction::Create < BaseOperation
 
   def process
     case type
-      when "DEBIT"
+      when 'DEBIT'
         case mode
-          when "POS", "ECOM"
+          when 'POS', 'ECOM'
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
               add_message :error, transaction.errors.full_messages
               return false
             end
+
+            # Check if expense can be created for the card program
+            return true unless card.card_program.create_expense
+
             # create the associated card expense for this transaction
             @result = Expense::ExCard::Create.(transaction, card)
             unless @result.success?
@@ -54,10 +62,12 @@ class Card::Transaction::Create < BaseOperation
               transaction.save
               return false
             end
-            transaction.expense = @result.expense
+            transaction.card_expense = @result.expense.card_expense
+            transaction.expensed = true
             transaction.save
             return true
-          when "ATM"
+
+          when 'ATM'
             # create a transaction out of it
             self.transaction = CardTransaction.new(params)
             unless transaction.save
@@ -83,7 +93,7 @@ class Card::Transaction::Create < BaseOperation
           else
             # In this case it's a manual debit, so do nothing
         end
-      when "CREDIT"
+      when 'CREDIT'
         self.transaction = CardTransaction.new(params)
         unless transaction.save
           add_message :error, transaction.errors.full_messages

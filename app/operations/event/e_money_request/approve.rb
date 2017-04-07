@@ -33,6 +33,10 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_approve)
   end
 
+  def action_name
+    "Money Request Approved"
+  end
+
   def affected_users
     if approved
       if auto_approve
@@ -127,6 +131,16 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
       end
     end
     message
+  end
+
+  def money_request_view_role(user)
+    if user.id == money_request.user_id
+      return UserRole.id_for(:employee)
+    elsif user.id == money_request.controlling_user_id
+      return money_request.controlling_user_role_id
+    elsif user.id == self.money_request.tracks.last.action_user_id
+      return self.money_request.tracks.last.action_user_role_id
+    end
   end
 
 end

@@ -1,6 +1,7 @@
 class CategoriesController < ApplicationController
 
   before_action :authenticate_user!
+  allow_oauth!
 
   def create
     @result = Company::Configuration::Category::Create.(current_user, params)
@@ -31,5 +32,4 @@ class CategoriesController < ApplicationController
       format.json {render json: @categories.as_json(:only => [:id, :name])}
     end
   end
-
 end

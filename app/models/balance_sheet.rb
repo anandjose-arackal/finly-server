@@ -2,24 +2,26 @@
 #
 # Table name: balance_sheets
 #
-#  id                       :integer          not null, primary key
-#  user_id                  :integer
-#  cash_in_hand_id          :integer
-#  pending_reimbursement_id :integer
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  pending_advance_id       :integer
+#  id                        :integer          not null, primary key
+#  user_id                   :integer
+#  cash_in_hand_id           :integer
+#  approved_reports_total_id :integer
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  pending_advance_id        :integer
 #
+
+
 
 
 
 class BalanceSheet < ActiveRecord::Base
   belongs_to :user
   belongs_to :cash_in_hand, class_name: 'Amount'
-  belongs_to :pending_reimbursement, class_name: 'Amount'
+  belongs_to :approved_reports_total, class_name: 'Amount'
   belongs_to :pending_advance, class_name: 'Amount'
 
-  delegate :pending_reimbursement_value, to: :pending_reimbursement
+  delegate :approved_reports_total_value, to: :approved_reports_total
 
   validates :user_id, uniqueness: true, presence: true
 
@@ -28,9 +30,9 @@ class BalanceSheet < ActiveRecord::Base
       amount = Amount.create(value: 0, currency: Currency.first)
       self.cash_in_hand = amount
     end
-    if self.pending_reimbursement.blank?
+    if self.approved_reports_total.blank?
       amount = Amount.create(value: 0, currency: Currency.first)
-      self.pending_reimbursement= amount
+      self.approved_reports_total= amount
     end
     if self.pending_advance.blank?
       amount = Amount.create(value: 0, currency: Currency.first)
@@ -65,7 +67,7 @@ class BalanceSheet < ActiveRecord::Base
 
   def subtract_cash_in_hand(value, currency=nil)
     if value.blank? or value.to_f <= 0
-      return
+      return true
     end
     value = value.to_f
     cih = self.cash_in_hand
@@ -74,22 +76,22 @@ class BalanceSheet < ActiveRecord::Base
     cih.save
   end
 
-  def add_pending_reimbursement(value, currency=nil)
+  def add_approved_reports_total(value, currency=nil)
     if value.present? and value.to_f <= 0
       return
     end
     value = value.to_f
-    pr = self.pending_reimbursement
+    pr = self.approved_reports_total
     pr.value += value
     pr.save
   end
 
-  def subtract_pending_reimbursement(value, currency=nil)
+  def subtract_approved_reports_total(value, currency=nil)
     if value.present? and value.to_f <= 0
       return
     end
     value = value.to_f
-    pr = self.pending_reimbursement
+    pr = self.approved_reports_total
     pr.value -= value
     pr.value = 0 if pr.value < 0
     pr.save

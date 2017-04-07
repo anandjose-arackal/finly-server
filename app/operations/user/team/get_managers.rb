@@ -9,7 +9,7 @@ class User::Team::GetManagers < User::Team::Base
 
   def init
     # the role under which the user is inviting employees
-    self.role_id = UserRole::VALUES[params[:view].to_sym]
+    self.role_id = params[:view].present? ? UserRole::VALUES[params[:view].to_sym] : UserRole.id_for(:employee)
     self.company = user.company
     for_user_id = (params[:for_user_id] or params[:id] or params[:user_id])
     self.for_user = User::Team::Index.(user, params).with_id(for_user_id).first rescue nil if for_user_id.present?

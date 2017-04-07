@@ -21,13 +21,14 @@ class Expense::Base < BaseOperation
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation, :editable, :view
+    attr_accessor :expense, :violation, :editable, :view, :per_diems
 
     def init
       self.expense = params[:expense]
       self.view = params[:view]
       self.violation = retrieve_violation
       self.editable = retrieve_editable
+      self.per_diems = user.per_diems_list
     end
 
     def retrieve_violation

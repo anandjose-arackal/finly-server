@@ -15,3 +15,5 @@
 #
 
 Crono.perform(ReportAutoSubmit).every 1.day, at: {hour: 00, min: 1}
+Crono.perform(UpdateUserBalances).every 1.day, at: {hour: 00, min: 10}
+Crono.perform(UpdateCompanyBalances).every 1.day, at: {hour: 00, min: 20}

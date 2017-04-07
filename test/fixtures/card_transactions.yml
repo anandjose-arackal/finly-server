@@ -1,3 +1,4 @@
+
 # == Schema Information
 #
 # Table name: card_transactions
@@ -20,11 +21,16 @@
 #  serial_id             :string(255)
 #  product_code          :string(255)
 #  transaction_timestamp :datetime
-#  expensed              :boolean          default(TRUE)
+#  expensed              :boolean          default(FALSE)
 #  error_message         :text(65535)
 #  billing_amount_id     :integer
-#  expense_id            :integer
+#  is_deleted            :boolean          default(FALSE)
+#  mcc_code              :string(255)
+#  transaction_status    :string(255)
+#  api_reference_id      :string(255)
 #
+
+
 
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

@@ -4,6 +4,10 @@ class Event::EReport::Unapprove < Event::EReport::Base
     NotifierType.id_for(:report_unapprove)
   end
 
+  def action_name
+    "Report Unapproved"
+  end
+
   def affected_users
     [self.report.controlling_user, self.report.tracks.last.modified_user]
   end
@@ -48,6 +52,14 @@ class Event::EReport::Unapprove < Event::EReport::Base
       "You have successfully unapproved the report : #{self.report.name}"
     else
       "#{self.report.controlling_user.name} has unapproved the report: #{self.report.name}"
+    end
+  end
+
+  def report_view_role
+    if report.controlling_user_id == user.id
+      return report.controlling_user_role_id
+    else
+      return report.tracks.last.modified_user_role_id
     end
   end
 

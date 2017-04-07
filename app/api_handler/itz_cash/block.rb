@@ -1,5 +1,7 @@
 class ItzCash::Block < ItzCash::Base
 
+  attr_accessor :card
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
@@ -9,6 +11,10 @@ class ItzCash::Block < ItzCash::Base
       add_message :error, 'A card has not been assigned to the user'
       return
     end
+    if params.blank? or params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
+      add_message :error, 'Card not found'  
+      return
+    end
   end
 
   def env_key
@@ -16,7 +22,8 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def post_params
-    serial_id = user.cards.first.serial_id
+    self.card = user.cards.with_id(params[:card_id]).first
+    serial_id = card.proxy
     request_type = self.request_type
     itz_module = Constants::ItzCash::MODULE
     remarks = (params[:remarks] or 'nil') rescue 'nil'
@@ -28,19 +35,16 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def post_process
-    user.cards.first.update_attribute(:active, false)
+    card.update_attribute(:active, false)
   end
 
-  # def success_response_code
-  #   [0, -100]
-  # end
 
   def success
     # ResponseCode,SerialID,Description
     params[:response_code] = parsed_response[0]
     params[:serial_id] = parsed_response[1]
     params[:description]=parsed_response[2]
-    ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
+    ItzCash::Block::SuccessPresenter.new(self.user, params, messages)
   end
 
   class ItzCash::Block::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter

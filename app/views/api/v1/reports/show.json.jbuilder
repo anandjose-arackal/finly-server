@@ -4,7 +4,7 @@ manager_name = @result.manager.name if @result.manager.present?
 finance_manager_name = ''
 finance_manager_name = @result.finance_manager.name if @result.finance_manager.present?
 json.manager_name manager_name
-json.finance_manager_name @finance_manager_name
+json.finance_manager_name finance_manager_name
 json.total do
   json.value @result.total
   json.currency do
@@ -31,3 +31,6 @@ json.comments @result.comments do |comment|
 end
 json.policies @result.policies, :id, :name
 json.violations @result.violations
+json.custom_fields do
+  json.array! @result.report.custom_fields
+end

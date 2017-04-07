@@ -176,9 +176,41 @@
   min-height: 550px;
 }
 
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
 
 
+#login-footer{
+  position: absolute;
+  bottom: 0;
+  height: 60px;
+  width: 100%;
 
+  ul.social-links{
+    padding-left: 0;
+    text-align: center;
+
+    li{
+      list-style: none;
+      display: inline-block;
+      margin-right: 15px;
+
+      img{
+        height: 25px;
+      }
+    }
+
+    li:last-child{
+      margin-right: 0;
+    }
+  }
+}
 
 
 

@@ -34,6 +34,18 @@ class MoneyRequest::Update < MoneyRequest::Base
         end
       end
     end
+    if update_param.has_key?(:policy_id) and (update_param[:policy_id].blank? or update_param[:policy_id] == 0) and money_request.user.enforce_policy_enabled?
+      policy_id = money_request.user.policies.non_default.first.id rescue nil
+      update_param[:policy_id] = policy_id
+    end
+  end
+
+  def validate
+    super
+    unless money_request.editable?
+      add_message :error, "Money Request cannot be edited at this stage"
+      return
+    end
   end
 
   def authorize
@@ -48,7 +60,11 @@ class MoneyRequest::Update < MoneyRequest::Base
   end
 
   def process
-    unless money_request.update_attributes(self.update_param)
+    if money_request.update_attributes(self.update_param)
+      if params[:custom_fields].present?
+        CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), custom_fields: params[:custom_fields], save: true)
+      end
+    else
       messages[:error] = money_request.errors.full_messages
     end
   end
@@ -76,9 +92,9 @@ class MoneyRequest::Update < MoneyRequest::Base
           updated_field: 'policy', updated_from: money_request.policy_id_was,
           updated_to: money_request.policy_id
       when :items_attributes
-        value.each do |updating_mapping|
-          # todo test it out and add comments
-        end
+        # value.each do |updating_mapping|
+        #   # todo test it out and add comments
+        # end
       else
       end
     end

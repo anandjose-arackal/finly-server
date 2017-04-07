@@ -26,7 +26,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   end
 
   def update
-    action = (params[:action] or :update)
+    action = (params[:action_type] or :update)
     @result = nil
     case action.to_sym
       when :submit
@@ -44,7 +44,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
       when :remove_expenses
         @result = Report::Expenses::Remove.(current_user, params)
       when :reimbursement_confirm
-        @result = Report::ReimburseConfirm.(current_user, params)
+        @result = Report::SettlementConfirm.(current_user, params)
       when :reject_expense
         @result = Report::Expenses::Reject.(current_user, params)
       else

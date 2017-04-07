@@ -3,15 +3,20 @@ module Constants
   VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}\z/i
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /[MmFf]/i
+  VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
 
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
   ITZCASH_EMAIL_ID = 'veekshith.rai@finly.io'
 
-  PRODUCT_DEMO_EMAIL_ID = 'veekshith.rai@finly.io'
+  # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'balakumar.rajaram@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
 
-  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finlytest.io', 'admin@finlytest.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
+  # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'balakumar.rajaram@finly.io']
+
+  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
 
@@ -29,9 +34,14 @@ module Constants
 
   #########################
 
+  #### Date before which statements won't be accurate
+  BEGINNING_OF_TIME = '10-03-2017'
+  ###################################################
+
+
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
-    url = "http://localhost:3000/#"
+    url = "http://localhost/#"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
   elsif Rails.env.itzcash_uat?
@@ -50,7 +60,8 @@ module Constants
   class Constants::ItzCash
 
 
-    RESTRICTION_CONSTANT = 100000000
+    RESTRICTION_BUDGET_CONSTANT = 1000000
+    RESTRICTION_TRANS_CONSTANT = 1000
 
     MSG_QUEUE_USERNAME = "finly"
     MSG_QUEUE_PASSWORD = "Li3Wp4yk"

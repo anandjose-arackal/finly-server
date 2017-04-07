@@ -47,7 +47,8 @@ class User::Configuration::UpdateDetails < BaseOperation
   def handle_otp
     return if self.changes.blank? or self.changes[:mobile_number].blank? or self.changes[:mobile_number] == user.mobile_number_was
     user.update_attributes(otp: nil, otp_sent_at: nil, otp_verified_at: nil, otp_verified: false)
-    User::Verification::Otp::Create.(user, params)
+    # temporarily commenting out sending the OTP implicitly because we've changed the flow
+    # User::Verification::Otp::Create.(user, params)
   end
 
 end

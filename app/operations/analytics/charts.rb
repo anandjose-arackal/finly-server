@@ -57,14 +57,14 @@ class Analytics::Charts < BaseOperation
 
   def pre_process
     # applying filters for user_id
-    self.team_users = team_users.signed_up.where(id: params[:filter_user_id].to_i) if params[:filter_user_id].present?
+    self.team_users = team_users.signed_up.with_id(params[:filter_user_id].to_i) if params[:filter_user_id].present?
     # extracting the id of the user whose expense breakdown needs to be shown
     if role.nil? or role == 'personal'
       self.user_ids = user.id
-      self.expenses = Expense.where(user_id: user_ids)
+      self.expenses = Expense.with_user_id(user_ids)
     else
       self.user_ids = team_users.signed_up.pluck(:id)
-      self.expenses = Expense.where(user_id: user_ids)
+      self.expenses = Expense.with_user_id(user_ids)
     end
     # applying the filters for which expenses are to be considered
     apply_filters
@@ -150,23 +150,23 @@ class Analytics::Charts < BaseOperation
         case status_id
           when '1'
             # i.e. all unreported expenses
-            exp_ids += expenses.where(expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id, ExpenseStatus.unsubmitted_id]).pluck(:id)
+            exp_ids += expenses.unverified.pluck(:id)
           when '2'
             r = Report.processing.all
-            exp_ids += expenses.where(report_id: r).pluck(:id)
+            exp_ids += expenses.with_report_id(r).pluck(:id)
           when '3'
             r = Report.approved.all
-            exp_ids += expenses.where(report_id: r).pluck(:id)
+            exp_ids += expenses.with_report_id(r).pluck(:id)
           when '4'
-            r = Report.reimbursed_and_closed.all
-            exp_ids += expenses.where(report_id: r).pluck(:id)
+            r = Report.settled_and_closed.all
+            exp_ids += expenses.with_report_id(r).pluck(:id)
           else
             # do nothing
         end
       end
     end
     exp_ids.uniq!
-    Expense.where(id: exp_ids)
+    Expense.with_id(exp_ids)
   end
 
 end

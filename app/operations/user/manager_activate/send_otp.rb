@@ -1,6 +1,8 @@
 class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
-  attr_accessor :selected_user
+  include MathUtil
+
+  attr_accessor :selected_user, :message, :otp, :otp_request_type_id
 
   OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
@@ -17,6 +19,7 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
 
   def init
     self.selected_user = user.company.users.find_by(id: params[:user_id])
+    self.otp_request_type_id = params[:type]
   end
 
   def authorize
@@ -38,16 +41,33 @@ class User::ManagerActivate::SendOtp < User::ManagerActivate::Base
     end
   end
 
+  def pre_process
+    # generating the random 6 digit OTP for a particular user and storing it in the message
+    # if the last OTP was sent less than 15 minutes ago, send the same OTP back
+    if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago
+      self.otp = selected_user.otp
+      self.message = "#{otp} is your verification code."
+      # else send the a new OTP after generating it
+    else
+      self.otp = MathUtil.generate_random_number(6)
+      self.message = "#{otp} is your verification code."
+    end
+  end
+
   def process
-    response = OtpVerification::Create.(selected_user, mobile_number: selected_user.mobile_number)
+    response = CustomMessage::Create.(selected_user, {mobile_number: [selected_user.mobile_number], message: message})
     if response.success?
-      otp = response.otp
       # have to save it without validation because update_attributes considers validations
-      selected_user.assign_attributes(otp: otp, otp_sent_at: DateTime.now, otp_count: (selected_user.otp_count+1))
+      selected_user.assign_attributes(otp_count: (selected_user.otp_count+1), otp_sent_at: DateTime.now)
+      # update the new otp and otp_sent_at only if a new otp has actually been sent
+      if otp != selected_user.otp
+        selected_user.assign_attributes(otp: otp, otp_request_type_id: otp_request_type_id)
+      end
       selected_user.save(validate: false)
     else
       messages[:error] = response.messages[:error]
     end
   end
+
 
 end

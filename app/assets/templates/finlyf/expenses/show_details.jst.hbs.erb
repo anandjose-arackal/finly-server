@@ -114,7 +114,7 @@
         <img src="{{this.image.thumb}}" class="receipt-image img-responsive" style="max-width: 200px; max-height: 200px; display: inline;" />
       {{else}}
         <div class="receipt-placeholder text-center" style="">
-          <img src="<%= image_url('no-receipt-placeholder.png') %>" style="max-width: 200px; max-height: 200px;">
+          <img src="/common/images/no-receipt-placeholder.png" style="max-width: 200px; max-height: 200px;">
         </div>
       {{/each}}
     </div>
@@ -134,7 +134,7 @@
       {{else}}
         <i class="detach-uploaded-receipt fa fa-times-circle hidden" style="font-size: 16px;color: rgba(231 , 76, 60,1.0);position: absolute;top: -14px;right: 20px;font-size: 18px;"></i>
         <label for="edit-expense-receipt-upload">
-        <img class="preview-image img-responsive" id="edit-preview-image" src="<%= image_url('receipt-placeholder.png') %>" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
+        <img class="preview-image img-responsive" id="edit-preview-image" src="/common/images/receipt-placeholder.png" style="max-height: 200px; max-width: 200px; cursor: pointer;"/>
         </label>
         <div class="text-center">
           <button class="btn btn-warning btn-sm btn-attach-existing-receipts" data-attach-receipt-into="expenseShow">Add Existing Receipts</button>

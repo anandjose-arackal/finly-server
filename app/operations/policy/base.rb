@@ -14,7 +14,7 @@ class Policy::Base < BaseOperation
 
   def pre_validate
     if user.blank?
-      messages[:error] << "No user passed."
+      messages[:error] << 'User not found'
     end
   end
 

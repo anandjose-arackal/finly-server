@@ -4,6 +4,10 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_unapprove)
   end
 
+  def action_name
+    "Money Request Unapproved"
+  end
+
   def affected_users
     [self.money_request.controlling_user, self.money_request.tracks.last.modified_user]
   end
@@ -48,6 +52,16 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
       "You have successfully unapproved the Money Request : #{self.money_request.name}"
     else
       "#{self.money_request.controlling_user.name} has unapproved the Money Request: #{self.money_request.name}"
+    end
+  end
+
+  def money_request_view_role(user)
+    def report_view_role
+      if money_request.controlling_user_id == user.id
+        return money_request.controlling_user_role_id
+      else
+        return money_request.tracks.last.modified_user_role_id
+      end
     end
   end
 

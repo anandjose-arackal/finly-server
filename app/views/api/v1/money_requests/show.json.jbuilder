@@ -1,11 +1,7 @@
 json.partial! 'money_request', money_request: @result.money_request
 json.manager_name @result.manager.present? ? @result.manager.name : ''
 json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
-json.actions do
-  @result.actions.each do |key, value|
-    json.set! key, (value[:url].present? or value[:value].present?)
-  end
-end
+json.actions @result.actions
 json.categories @result.items.each do |item|
   json.category do
     json.id item.category.id
@@ -50,4 +46,7 @@ json.payment_modes do
     json.id item.id
     json.name item.name
   end
+end
+json.custom_fields do
+  json.array! @result.money_request.custom_fields
 end

@@ -4,7 +4,7 @@ class Export::CardStatement::AsXls < Export::CardStatement::Base
 
   def init
     super()
-    self.transactions = selected_user.card_transactions.where('transaction_timestamp > ? AND transaction_timestamp <= ?', start_date, end_date)
+    self.transactions = selected_user.card_transactions.with_transaction_timestamp_range(start_date.beginning_of_day, end_date.end_of_day)
   end
 
 

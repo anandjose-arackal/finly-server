@@ -11,6 +11,14 @@ class HomeController < ApplicationController
     end
   end
 
+  def landing
+
+  end
+
+  def resources
+
+  end
+
   def welcome
     if logged_in?
       redirect_to root_path
@@ -21,13 +29,7 @@ class HomeController < ApplicationController
   end
 
   private
-  #
-  # def check_first_login
-  #   # code for redirecting to changing default password
-  #   if current_user and current_user.default_password
-  #     redirect_to edit_default_password_path
-  #   end
-  # end
+
 
   def resolve_layout
     case action_name
@@ -37,8 +39,10 @@ class HomeController < ApplicationController
       else
         "static"
       end
-    when "about"
+    when "about", "resources"
       "static"
+    when "landing"
+      'landing'
     else
       "application"
     end

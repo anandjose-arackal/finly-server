@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style type="text/css">
+    .spacing {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    #editbutton {
+      width: 100px;
+      margin: auto;
+    }
+    #submitbutton {
+      width: 100px;
+      float: right;
+    }
+    body {
+      background-color: #dedede;
+    }
+  </style>
+  <script type="text/javascript">
+
+
+      //$('.datepicker').datepicker({ dateFormat: 'dd-mm-yy' });
+
+
+      function submitfunction(){
+          console.log("submit function is called");
+
+          // the following will hide all the form input fields
+          document.getElementById("expense_amount").style.display = "none";
+          document.getElementById("expense_merchant").style.display = "none";
+          document.getElementById("expense_date").style.display = "none";
+          document.getElementById("expense_category").style.display = "none";
+          document.getElementById("expense_note").style.display = "none";
+
+          // the following will change the css to display all the data
+          document.getElementById("amount_value").style.display = "block";
+          document.getElementById("merchant_value").style.display = "block";
+          document.getElementById("date_value").style.display = "block";
+          document.getElementById("note_value").style.display = "block";
+          document.getElementById("category_value").style.display = "block";
+
+          // the following will extract input value entered by user and show
+          document.getElementById("amount_value").innerHTML = document.getElementById("expense_amount").value;
+          document.getElementById("merchant_value").innerHTML = document.getElementById("expense_merchant").value;
+          document.getElementById("date_value").innerHTML = document.getElementById("expense_date").value;
+          document.getElementById("note_value").innerHTML = document.getElementById("expense_note").value;
+          var e = document.getElementById("expense_category");
+          var category_value = e.options[e.selectedIndex].text;
+          document.getElementById("category_value").innerHTML = category_value;
+
+          // the following will hide the submit button and display the edit button
+          document.getElementById("submitbutton").style.display = "none";
+          document.getElementById("editbutton").style.display = "block";
+      }
+
+
+      function editfunciton(){
+          console.log("edit function is called");
+
+          // the following code is changing the style of the form elements to allow user to edit
+          document.getElementById("expense_amount").style.display = "block";
+          document.getElementById("expense_merchant").style.display = "block";
+          document.getElementById("expense_date").style.display = 'block';
+          document.getElementById("expense_note").style.display = "block";
+          document.getElementById("expense_category").style.display = "block";
+
+          // the following is displaying the submit button and hiding the edit button
+          document.getElementById("submitbutton").style.display = "block";
+          document.getElementById("editbutton").style.display = "none";
+
+          // the following will hide all the data that are displayed once the submit button is clicked
+          document.getElementById("amount_value").style.display = "none";
+          document.getElementById("merchant_value").style.display = "none";
+          document.getElementById("date_value").style.display = "none";
+          document.getElementById("note_value").style.display = "none";
+          document.getElementById("category_value").style.display = "none";
+
+      }
+
+
+  </script>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="col-md-5">
+    <h3>Filter by: </h3>
+
+    <form action="<%=transcriber_untranscribed_receipts_path(@result.company.id)%>" method="get">
+
+      <h4>Parent: </h4>
+      <select class="form-control" id="parent-presence" name="filter_parent">
+          <option value="1"
+          <% if params[:filter_parent] == '1' %>
+          selected="selected"
+          <% end %>
+          >Without parent</option>
+          <option value="2"
+          <% if params[:filter_parent] == '2' %>
+          selected="selected"
+          <% end %>
+          >With parent</option>
+      </select>
+      <br/>
+
+      <h4>User: </h4>
+      <select class="form-control" id="user-filter" name="filter_user">
+        <option value="">None</option>
+        <% @result.users.each do |user| %>
+          <option value="<%=user.id%>"
+          <% if params[:filter_user] && params[:filter_user].to_i == user.id %>
+          selected="selected"
+          <% end %>
+          ><%=user.name%></option>
+        <% end %>
+      </select>
+
+      <br/>
+      <button class="btn btn-primary" id="submitbutton">Apply</button>
+
+    </form>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <%	 @counter = 1 %>
+  <%	@result.receipts.each do |receipt|  %>
+      <h3> <%= @counter %>. <%= receipt.user.name %> - <%	receipt.note %></h3>
+      <%	 @counter += 1 %>
+      <% expense = receipt.parent %>
+      <div class="row">
+        <div class="col-sm-6">
+          <img src="<%= receipt.image.url %>" class="img-responsive">
+        </div>
+        <div class="col-sm-6">
+
+        <% if expense %>
+          <form action="<%= transcriber_transcribed_expenses_update_path(expense.id)%>" method="post" id="transcribe-expense-form">
+              <input hidden="hidden" name="_method" value="patch">
+        <% else %>
+          <form action="<%= transcriber_transcribed_expenses_create_path%>" method="post" id="transcribe-expense-form">
+        <% end %>
+
+
+
+          <input name="receipt_id" value="<%=receipt.id%>" hidden="true">
+          <div class="form-group">
+            <div class="spacing">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5><strong>Amount:</strong></h5>
+                </div>
+                <div class="col-sm-6">
+                  <p id="amount_value"></p>
+                </div>
+              </div>
+              <input type="number" name="expense[amount_attributes][value]" value="<%= expense.amount_value if expense%>" class="form-control" id="expense[amount_attributes][value]">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="spacing">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5><strong>Merchant:</strong></h5>
+                </div>
+                <div class="col-sm-6">
+                  <p id="merchant_value"></p>
+                </div>
+              </div>
+              <input type="text" name="expense[manual_expense_attributes][merchant]" value="<%= expense.merchant_name if expense%>" class="form-control" id="expense[manual_expense_attributes][merchant]">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="spacing">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5><strong>Date:</strong></h5>
+                </div>
+                <div class="col-sm-6">
+                  <p id="date_value"></p>
+                </div>
+              </div>
+              <input type="date" name="expense[date]" value="<%= expense.date if expense%>" class="form-control datepicker" id="expense[date]">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="spacing">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5><strong>Note:</strong></h5>
+                </div>
+                <div class="col-sm-6">
+                  <p id="note_value"></p>
+                </div>
+              </div>
+              <textarea class="form-control" id="expense[note]" name="expense[note]" ><%= expense.note if expense%></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="row">
+              <input type="text" name="" hidden="hidden">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="spacing">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5><strong>Category:</strong></h5>
+                </div>
+                <div class="col-sm-6">
+                  <p id="category_value"></p>
+                </div>
+              </div>
+              <select class="form-control" id="expense[category_id]" name="expense[category_id]">
+                <option value="">None</option>
+                <% @result.categories.each do |category| %>
+                    <option value="<%= category.id %>"
+                    <% if expense && expense.category_id == category.id %>
+                    selected="selected"
+                    <% end %>
+                    ><%=category.name%></option>
+                <% end %>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="spacing">
+              <div class="row">
+                <div class="col-sm-12">
+                  <% if expense %>
+                      <button class="btn btn-primary" id="submitbutton">Update</button>
+                  <% else %>
+                      <button class="btn btn-primary" id="submitbutton">Submit</button>
+                  <% end %>
+                  <button class="btn btn-success" onclick="editfunciton()" id="editbutton" style="display: none;">Edit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        </form>
+        </div>
+      </div>
+  <% end %>
+</div>
+</body>
+</html>

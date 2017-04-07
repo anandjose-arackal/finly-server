@@ -4,6 +4,10 @@ class Event::EReport::TakeControl < Event::EReport::Base
     NotifierType.id_for(:report_take_control)
   end
 
+  def action_name
+    "Report Taken Control of"
+  end
+
   def affected_users
     # [self.report.controlling_user, self.report.controlling_for_user]
     [self.report.controlling_user, self.report.controlling_for_user]
@@ -54,6 +58,11 @@ class Event::EReport::TakeControl < Event::EReport::Base
     else
       "#{self.report.controlling_user.name} has has taken control of the report which was awaiting your review.<br/><br/>Report: \"#{self.report.name}\""
     end
+  end
+
+  def report_view_role(user)
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    roles.first
   end
 
 end

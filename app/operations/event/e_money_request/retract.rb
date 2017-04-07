@@ -4,6 +4,10 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_retract)
   end
 
+  def action_name
+    "Money Request Retracted"
+  end
+
   def affected_users
     users = MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.tracks.last.modified_user)
     users.reject { |r| r == self.user}
@@ -46,6 +50,11 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
     else
       "#{money_request.user.name} has retracted the Money Request '#{self.money_request.name}'."
     end
+  end
+
+  def money_request_view_role(user)
+    roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    roles.first
   end
 
 end

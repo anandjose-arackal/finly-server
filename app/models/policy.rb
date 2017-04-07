@@ -2,16 +2,16 @@
 #
 # Table name: policies
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  company_id :integer
-#  owner_id   :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  default    :boolean          default(FALSE), not null
-#  is_deleted :boolean          default(FALSE), not null
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  company_id  :integer
+#  owner_id    :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  default     :boolean          default(FALSE), not null
+#  is_deleted  :boolean          default(FALSE), not null
+#  description :text(65535)
 #
-
 
 
 class Policy < ActiveRecord::Base
@@ -29,21 +29,32 @@ class Policy < ActiveRecord::Base
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
 
+  has_one :distance_expense_config, as: :parent
+  has_one :time_expense_config, as: :parent
+  has_one :per_diem_expense_config, as: :parent
+
+  has_many :per_diems, as: :configurable
+
   scope :default, -> { where default: true }
   scope :non_default, -> { where default: false }
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
   scope :with_id, -> (id) { where id: id }
-  scope :not_deleted, -> {where is_deleted: false}
+  scope :not_deleted, -> { where is_deleted: false }
+  scope :find_from_id, -> (id) { find_by(id: id) }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
 
+  has_many :field_configurations, as: :configurable
+
   validates :company_id, presence: true
-  validate :valid_name
+  # validate :valid_name
   validate :one_default_per_company
 
   has_paper_trail
+
+  after_create :initialize_expense_configs
 
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
@@ -63,25 +74,44 @@ class Policy < ActiveRecord::Base
   end
 
   def rules_count
-    count = 0
-    count += self.expense_rules.count
-    count += self.budget_rules.count
-    count
+    (self.expense_rules.count + self.budget_rules.count)
+  end
+
+  def distance_expense_enabled?
+    self.distance_expense_config.enabled
+  end
+
+  def time_expense_enabled?
+    self.time_expense_config.enabled
+  end
+
+  def per_diem_expense_enabled?
+    self.per_diem_expense_config.enabled
   end
 
   private
-  def valid_name
-    errors.add(:name, 'cannot be blank') if name.blank? and not default
-    if company_id.present? and name.present?
-      errors.add(:name, 'has to be unique') if Policy.company(company_id).non_default.exclude_deleted.by_name(name).present?
-    end
-  end
+
+  # def valid_name
+  #   errors.add(:name, 'cannot be blank') if name.blank? and not default
+  #   if company_id.present? and name.present?
+  #     errors.add(:name, 'has to be unique') if Policy.company(company_id).non_default.exclude_deleted.by_name(name).present?
+  #   end
+  # end
 
   def one_default_per_company
     if default
       default_policy = Policy.company(company_id).default
       errors.add(:company, 'cannot have more than one default policy') if default_policy.present? and default_policy != self
     end
+  end
+
+  def initialize_expense_configs
+    # building the different expense configurations
+    self.build_distance_expense_config(enabled: false).save
+    self.build_time_expense_config(enabled: false).save
+    self.build_per_diem_expense_config(enabled: false).save
+
+    # todo - change this to mirror the company configuration at this current time
   end
 
 end
