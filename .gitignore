@@ -19,8 +19,19 @@ Gemfile.lock
 # all local executables
 /bin
 
+.idea/*
 /.idea/*
 .vagrant/
 #Vagrantfile
 #bootstrap.sh
 vendor/bundle/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+dump.rdb
