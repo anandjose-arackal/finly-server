@@ -5,7 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
-  attr_accessor :old_amount, :editable_attrs, :receipt, :old_receipt
+  attr_accessor :editable_attrs, :receipt, :old_receipt
 
   def pre_validate
     if params.blank? or user.blank?
@@ -31,7 +31,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
-      if updated_expense_params[:receipts_attributes] == [""]
+      if updated_expense_params[:receipts_attributes] == ['']
         receipt = expense.receipts.first
         if receipt
           receipt.parent = nil
@@ -78,6 +78,19 @@ class Expense::Manual::Update < Expense::Manual::Base
   end
 
   def process
+    # Set custom fields
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:save] = false
+    set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.expense.manual_expense)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
     if expense.update(updated_expense_params)
       if receipt
         receipt.parent = expense
@@ -98,6 +111,16 @@ class Expense::Manual::Update < Expense::Manual::Base
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     add_message :success, 'Expense updated'
+
+    # marking the expense as non-transcribed after the first edit
+    if expense.transcribed
+      expense.update(transcribed: false)
+      if expense.receipts.present?
+        expense.receipts.each do |receipt|
+          receipt.update(to_be_transcribed: false)
+        end
+      end
+    end
   end
 
   private

@@ -10,6 +10,7 @@
 
 
 
+
 class MoneyRequestCommentAction < ActiveRecord::Base
 
   ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4,
@@ -18,7 +19,9 @@ class MoneyRequestCommentAction < ActiveRecord::Base
              credited: 12, credited_from_virtual_account_to_wallet: 13,
              credited_from_virtual_account_to_card: 14,
              credited_from_wallet_to_wallet: 15,
-             credited_from_wallet_to_card: 16}
+             credited_from_wallet_to_card: 16,
+             credited_from_card_to_card: 17,
+             credited_from_card_to_wallet: 18}
 
   self.class.instance_eval do
     ACTIONS.each do |key, value|

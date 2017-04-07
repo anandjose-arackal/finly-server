@@ -39,4 +39,36 @@ namespace :patch do
     PaymentType.second.update(name: "deduct_cash_on_hand")
   end
 
+  desc "27-02-2017: Destroying all the junk transactions that were created by ItzCash's Message Queue Fiasco"
+  task destroy_junk_transactions: :environment do
+    start_time = DateTime.parse('25-02-2017 00:00 +05:30')
+    end_time = DateTime.parse('25-02-2017 05:00 +05:30')
+    company = Company.find_by(name: "Jouska")
+    company.users.each do |user|
+      user.card_transactions.where('created_at >= ? && created_at <= ?', start_time, end_time).each do |trans|
+        trans.destroy
+      end
+    end
+  end
+
+  desc '02-03-2017: Manually updated company d_code from company.d_code to company.itz_cash_property.d_code'
+  task refactor_company_d_code_assignment: :environment do
+    # manually updated company d_code from company.d_code to company.itz_cash_property.d_code
+  end
+
+  desc '07-03-2017: Add field values for custom fields'
+  task add_field_types: :environment do
+    if FieldParentType.count == 0
+      FieldParentType::TYPES.each do |key, value|
+        FieldParentType.create id: value, name: key
+      end
+    end
+
+    if FieldType.count == 0
+      FieldType::TYPES.each do |key, value|
+        FieldType.create id: value, name: key
+      end
+    end
+  end
+
 end

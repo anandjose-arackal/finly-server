@@ -16,6 +16,10 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_comment)
   end
 
+  def action_name
+    "New Money Request Comment"
+  end
+
   def affected_users
     users = MoneyRequest::AssociatedUsers.(self.user, money_request: self.money_request)
     users.reject { |r| r == self.user }
@@ -54,13 +58,17 @@ class Event::EMoneyRequest::EComment::Create < Event::EMoneyRequest::Base
   end
 
   def mailer_body(user)
-    content = comment.content
     comment_user = comment.user
-    "#{comment_user.name} has comment on the Money Request '#{self.money_request.name}'<br/><br/>'#{content}'"
+    "#{comment_user.name} has commented on the Money Request '#{self.money_request.name}'"
   end
 
   def mailer_button_name(user)
     'View Money Request'
+  end
+
+  def set_presenter_params(user)
+    super(user)
+    params[:comment_body] = comment.content
   end
 
 end

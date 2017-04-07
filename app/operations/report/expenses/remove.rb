@@ -27,7 +27,7 @@ class Report::Expenses::Remove < Report::Base
     ids = (params[:expense_ids] or params[:expense_id])
     # Split if IDS are sent as one comma delimited string
     ids= ids.split(',')
-    self.expenses = report.expenses.where(id: ids)
+    self.expenses = report.expenses.with_id(ids)
     # if the report is in retracted stage, comments need to be added
     self.retracted = report.retracted?
   end
@@ -71,6 +71,14 @@ class Report::Expenses::Remove < Report::Base
         expenses.each do |expense|
           comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_remove), expense_id: expense.id
           comment.save
+        end
+      end
+      expenses.each do |expense|
+        # also set the amount for these expense as nil if they're distance/Time/Per Diem
+        unless expense.manual_expense? || expense.card_expense?
+          amount = expense.amount
+          expense.update(amount: nil)
+          amount.destroy if amount
         end
       end
       messages[:success] << "Expenses removed."

@@ -59,7 +59,7 @@ class Export::CardStatement::Base < Export::Base
   end
 
   def transaction_category(transaction)
-    expense = transaction.expense rescue nil
+    expense = transaction.card_expense.expense rescue nil
     unless expense
       return "N/A"
     end
@@ -67,14 +67,14 @@ class Export::CardStatement::Base < Export::Base
   end
 
   def transaction_status(transaction)
-    expense = transaction.expense rescue nil
+    expense = transaction.card_expense.expense rescue nil
     unless expense
       return "N/A"
     end
     if expense.expense_status_id == ExpenseStatus.unreported_id or expense.expense_status_id == ExpenseStatus.unsubmitted_id
       return "Unverified"
     elsif expense.expense_status_id == ExpenseStatus.submitted_id
-      if expense.report.approved? or expense.report.closed? or expense.report.reimbursed? or expense.report.reimbursement_confirmed?
+      if expense.report.approved? or expense.report.closed? or expense.report.settled? or expense.report.settlement_confirmed?
         return "Verified"
       else
         return "Unverified"

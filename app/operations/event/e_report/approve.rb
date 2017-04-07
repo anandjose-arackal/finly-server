@@ -14,6 +14,10 @@ class Event::EReport::Approve < Event::EReport::Base
     end
   end
 
+  def action_name
+    "Report Approved"
+  end
+
   def init
     super
     self.approving_user = self.report.tracks.last.action_user
@@ -120,8 +124,8 @@ class Event::EReport::Approve < Event::EReport::Base
         else
           message = "Congratulations! Your report #{report.name} has been approved"
         end
-        if report.reimbursement_pending?
-          message = "#{message} and is awaiting reimbursement!"
+        if report.settlement_pending?
+          message = "#{message} and is awaiting settlement!"
         else
           message = "#{message} and has been closed"
         end
@@ -130,6 +134,16 @@ class Event::EReport::Approve < Event::EReport::Base
       end
     end
     message
+  end
+
+  def report_view_role(user)
+    if user.id == report.user_id
+      return UserRole.id_for(:employee)
+    elsif user.id == report.controlling_user_id
+      return report.controlling_user_role_id
+    elsif user.id == self.report.tracks.last.action_user_id
+      return self.report.tracks.last.action_user_role_id
+    end
   end
 
 end

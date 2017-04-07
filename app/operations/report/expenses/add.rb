@@ -29,14 +29,15 @@ class Report::Expenses::Add < Report::Base
   def init
     self.report= params[:report]
     self.auto_submit = params[:auto_submit]
-    return if self.report.blank? and params[:report_id].blank?
-    if self.report.blank? and params[:report_id].present?
+    id = (params[:report_id] or params[:id])
+    return if self.report.blank? and id.blank?
+    if self.report.blank? and id.present?
       reports_presenter = Report::Index.(self.user, self.params)
       unless reports_presenter.success?
-        self.messages = index_operation.errors
+        self.messages = reports_presenter.errors
         return false
       end
-      self.report = reports_presenter.reports.with_id(params[:report_id]).first rescue nil
+      self.report = reports_presenter.reports.with_id(id).first rescue nil
     end
     self.expenses = params[:expenses]
     if params[:expenses].blank? and user.present?
@@ -44,7 +45,7 @@ class Report::Expenses::Add < Report::Base
       # Split if IDS are sent as one comma delimited string
       ids= ids.split(',')
       self.expenses = user.expenses.with_id(ids)
-    end
+      end
   end
 
   def authorize
@@ -69,10 +70,13 @@ class Report::Expenses::Add < Report::Base
     unless report.open? or report.retracted? or report.rejected?
       add_message :error, 'Cannot add expenses to report unless report is in open or retracted state'
     end
+
+
   end
 
   def process
     expenses.each do |expense|
+      calculate_amounts # method that calculates the amount for all distance, time and Per Diem expenses
       unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
         messages[:error] = expense.errors.full_messages
       end
@@ -88,6 +92,25 @@ class Report::Expenses::Add < Report::Base
         end
       end
       add_message :success, 'Expenses added'
+    end
+  end
+
+  private
+
+  def calculate_amounts
+    expenses.each do |expense|
+      if expense.card_expense? || expense.manual_expense?
+        next
+      else
+        amount = expense.amount
+        if amount.nil?
+          amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
+          amount = Amount.create(amount_params)
+        else
+          amount.update(value: expense.calculate_amount_value(report.policy))
+        end
+        expense.update_attributes(amount_id: amount.id)
+      end
     end
   end
 end

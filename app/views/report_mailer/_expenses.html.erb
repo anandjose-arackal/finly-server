@@ -1,0 +1,25 @@
+<% @data.expenses_sorted.each do |section| %>
+    <table style="width: 94%; margin: auto;">
+      <tr>
+        <td style="width: 50%; font-size: 20px; font-weight: bold; text-align: left; font-family: Helvetica, Arial, sans-serif;" colspan="2";><%=section[:section_name]%></td>
+        <td style="width: 50%; font-size: 20px; font-weight: bold; text-align: right; font-family: Helvetica, Arial, sans-serif;" colspan="2">Category Total&nbsp;:&nbsp;&#8377;<%=section[:section_total]%></td>
+      </tr>
+    </table><br>
+
+    <table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tr style="background-color: #dcdcdc;">
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">DATE</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">MERCHANT</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">CATEGORY</td>
+        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
+      </tr>
+      <% section[:expenses].each do |expense| %>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.date%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.merchant_name %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.category_name%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=expense.amount_value%></td>
+      </tr>
+      <% end %>
+    </table><br>
+<% end %>

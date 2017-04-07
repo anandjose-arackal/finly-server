@@ -58,8 +58,9 @@ class Report::Violation < Report::Base
   end
 
   def process
-    unless no_policy
-      report.expenses.each do |expense|
+
+    report.expenses.each do |expense|
+      unless no_policy
         policy.expense_rules.each do |rule|
           check_expense_rule rule, expense
         end
@@ -67,6 +68,9 @@ class Report::Violation < Report::Base
           check_budget rule, expense
         end
       end
+      # because the incompatible expense violation needs to be calculated irrespective of the
+      # existence of a policy
+      check_compatible_expenses(expense)
     end
     self.response = warning_messages
   end
@@ -161,17 +165,17 @@ class Report::Violation < Report::Base
     report = expense.report
     total_expenses = 0
     # all user reports with the associated budget
-    user.reports.where(report_status_id: [5, 6, 7, 8]).where(policy_id: rule.policy_id).where.not(id: report.id).each do |budget_report|
+    user.reports.processed.with_policy_id(rule.policy_id).where.not(id: report.id).each do |budget_report|
       if category
-        total_expenses += number_with_precision(budget_report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.where('date >= ? && date <= ?', start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
       end
     end
     if category
-      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).where(category_id: category.id).joins(:amount).sum(:value), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.where('date >= ? && date <= ?', start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
     end
     if total_expenses > rule.amount_value
       return true
@@ -230,6 +234,66 @@ class Report::Violation < Report::Base
           end
         end
       end
+    end
+  end
+
+  # method that checks for whether a Distance/Time/Per Diem expense is enabled for the particular report policy
+  # (or company if no policy is selected) and adds a blocking violation if it's not
+  def check_compatible_expenses(expense)
+    message = "Expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
+    case expense.expense_type_id
+      when ExpenseType.id_for(:distance)
+        if report.policy.nil?
+          unless user.company.distance_expense_config.enabled
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
+            return
+          end
+        else
+          unless report.policy.distance_expense_config.enabled
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
+            return
+          end
+        end
+      when ExpenseType.id_for(:time)
+        if report.policy.nil?
+          unless user.company.time_expense_config.enabled
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
+            return
+          end
+        else
+          unless report.policy.time_expense_config.enabled
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
+            return
+          end
+        end
+      when ExpenseType.id_for(:per_diem)
+        if report.policy.nil?
+          if user.company.per_diem_expense_config.enabled
+            if user.company.per_diems.include?(expense.per_diem_expense.per_diem)
+              return
+            else
+              message = "of some expenses do not belong to the selected policy"
+              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+            end
+          else
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+            return
+          end
+        else
+          if report.policy.per_diem_expense_config.enabled
+            if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
+              return
+            else
+              message = "of some expenses do not belong to the selected policy"
+              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
+            end
+          else
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+            return
+          end
+        end
+      else
+        # do nothing
     end
   end
 end

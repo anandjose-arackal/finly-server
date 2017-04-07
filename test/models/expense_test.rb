@@ -16,8 +16,8 @@
 #  report_id            :integer
 #  category_id          :integer
 #  is_deleted           :boolean          default(FALSE), not null
+#  transcribed          :boolean          default(FALSE)
 #
-
 
 require 'test_helper'
 
@@ -25,4 +25,8 @@ class ExpenseTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
+
+  def setup
+    # creating a bunch of different types of expenses to check the validations
+  end
 end

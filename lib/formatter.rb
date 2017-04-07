@@ -12,7 +12,6 @@ class Formatter
     #     hash[key] = nil
     #   end
     # end
-    
     if value.is_a?(Hash)
       value.each do |key, v|
         value[key] = handle_api_nil v

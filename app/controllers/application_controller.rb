@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
-  protect_from_forgery with: :exception
+  # protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
   before_action :whitelisted_emails
@@ -81,6 +81,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
   # def after_sign_in_path_for(resource)
   #   session[:previous_url] || root_path
   # end
@@ -150,7 +151,7 @@ class ApplicationController < ActionController::Base
   def respond_failure(message=nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
-    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {errors: messages})
+    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
     respond_to do |format|
       format.json { render 'layouts/application' }
     end

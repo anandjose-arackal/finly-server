@@ -1,9 +1,38 @@
 <% provide(:title, "Finly: Log In") %>
+
+<!--Navigation bar-->
+<nav class="navbar navbar-default navbar-fixed-top" style="background-color: #061735; border: none;">
+  <div class="container">
+    <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="/">
+      <img src="/common/images/logos/logo_xs.png" class="img-responsive" style="height: 28px;display: inline;margin-right: 10px;">
+      <img src="/common/images/logos/itzcash_w.png" class="img-responsive" style="height: 31px;display: inline;">
+    </a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <!-- <li><a href="#courses">Resources</a></li>
+      <li><a href="#pricing">FAQ</a></li>
+      <li><a href="#" data-target="#login" data-toggle="modal">Blog</a></li> -->
+      <li class="active"><a href="#">Login to Finly</a></li>
+    </ul>
+    </div>
+  </div>
+</nav>
+<!--/ Navigation bar-->
+
 <div class="brand-logo" style="width: 300px; margin-left: auto; margin-right: auto; margin-bottom: 20px; margin-top: 50px;">
   <img src="<%= image_url('/common/images/logos/logo_lg.png') %>" style="width: 100%;">
 </div>
 
-<div class="container-fluid">
+<div class="container no-padding" style="padding-bottom: 20px;">
   
   <div class="row no-margin">
     <div class="login-container mh-340">
@@ -163,13 +192,113 @@
         </form>
       </div>
     </div>
+    <div class="text-center" style="margin-top: 40px;">
+      <span style="color: white;margin-right: 7px;font-size: 16px;">In partnership with </span><img style="height: 60px;margin-top: -10px;" src="/common/images/logos/itzcash_w.png">
+    </div>
+  </div>
+
+  
+</div>
+<%= render 'shared/login_footer' %>
+
+<!--Modal Demo-->
+<div class="modal fade" id="modal-request-demo" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-center form-title">Request For a Demo</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <form class="form-horizontal form-request-demo">
+              <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
+              <fieldset>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="name">Name</label>  
+                  <div class="col-md-4">
+                  <input id="name" name="preview[name]" placeholder="Your Name" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="email">Email</label>  
+                  <div class="col-md-4">
+                  <input id="email" name="preview[email]" placeholder="Your Work Email" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="phonenumber">Mobile Number</label>  
+                  <div class="col-md-4">
+                  <input id="phonenumber" name="preview[phone_number]" placeholder="Your Contact Number" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Text input-->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="company_name">Company Name</label>  
+                  <div class="col-md-4">
+                  <input id="company_name" name="preview[company]" placeholder="Your Company" class="form-control input-md" type="text">
+                    
+                  </div>
+                </div>
+
+                <!-- Button -->
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="submit"></label>
+                  <div class="col-md-4">
+                    <button id="submit" name="submit" class="btn btn-primary">Request For Demo</button>
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+ 
+          </div>
+        </div>
+      </div>
+    </div> 
   </div>
 </div>
+<!--/ Modal box-->
 
 
 <style type="text/css">
   body{
     background: #061735 !important;
+  }
+  .navbar-default .navbar-nav > li > a{
+    color: white;
+    border-bottom: 2px solid transparent;
+    background-color: transparent;
+  }
+  .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+    background-color: transparent;
+  }
+
+
+  .navbar-default .navbar-nav > li.active > a:hover, .navbar-default .navbar-nav > li.active > a:focus {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+    background-color: transparent;
+  }
+
+
+  .navbar-default .navbar-nav > li.active > a{
+    color: #fff;
+    border-bottom: 2px solid #fff;
+    background-color: transparent;
   }
 </style>
 
@@ -177,6 +306,81 @@
   
 </script>
 
-<style type="text/css">
-  
-</style>
+<script type="text/javascript">
+  $(document).ready(function() {
+    snapNotify = function(obj){
+      // console.log "From snap", obj
+      ohSnapX()
+      for (type in obj) {
+        messages = obj[type];
+        switch (type) {
+          case 'error':
+            color = 'red';
+            container = 'ohsnap-priority';
+            break;
+          case 'success':
+            color = 'green';
+            container = 'ohsnap';
+            break;
+          case 'failure':
+            ({
+              color: 'orange'
+            });
+            container = 'ohsnap-priority';
+            break;
+          case 'message':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          case 'notice':
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+            break;
+          default:
+            ({
+              color: 'blue'
+            });
+            container = 'ohsnap';
+        }
+        if (messages.length) {
+          for (i = 0, len = messages.length; i < len; i++) {
+            message = messages[i];
+            ohSnap(message, {
+              color: color,
+              'duration': '9000',
+              'container-id': container
+            });
+          }
+        }
+      }
+    }
+
+    $(".form-request-demo").on('submit', function(e){
+      e.preventDefault();
+      form = this
+
+      $.ajax({
+        url: '/welcome/preview',
+        data: $(form).serialize(),
+        type: "POST",
+        dataType: 'json',
+        success: function(res){
+          // console.log(res);
+          if(res.success === true){
+            ohSnap("Thank you for the request! We will contact you soon.", {color: 'green', 'duration': '6000'});
+            if($(form).closest('.modal').length >= 0){
+              $(form).closest('.modal').modal('hide')
+            }
+          } else {
+            snapNotify(res.messages)
+            // ohSnap("Something went wrong. Please try again.", {color: 'red', 'duration': '6000'});
+          }
+        }
+      });
+    });
+  });
+</script>

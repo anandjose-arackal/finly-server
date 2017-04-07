@@ -1040,9 +1040,8 @@ class FinlyF.Views.User extends Backbone.View
     $(modal).find(".resend-otp").on('click', (e) ->
       e.preventDefault()
       $.ajax({
-        url: "/otp/resend"
+        url: "/pending_invites/send_otp"
         dataType: "JSON"
-        type: "POST"
         data: {
           user_id: $(modal).find("form").attr('data-user-id'),
           authenticity_token: $("#authenticity_token").val()

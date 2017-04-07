@@ -1,5 +1,7 @@
 class PoliciesController < ApplicationController
-  protect_from_forgery with: :null_session
+  # protect_from_forgery with: :null_session
+
+  allow_oauth!
 
   before_action :authenticate_user!
 
@@ -22,31 +24,36 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
   end
 
+  def update
+    @result = Policy::Update.(current_user, params)
+    respond response: (@result.success? ? :success : :failure)
+  end
+
   def details
     policy = Policy.find(params[:id])
     respond_to do |format|
-      format.json {render json: policy.as_json(:only => [:name, :id]) }
+      format.json { render json: policy.as_json(:only => [:name, :id]) }
     end
   end
 
   def expense_rules
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
-      format.html {render partial: 'expense_rules'}
+      format.html { render partial: 'expense_rules' }
     end
   end
 
   def budget_rules
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
-      format.html {render partial: 'budget_rules'}
+      format.html { render partial: 'budget_rules' }
     end
   end
 
   def policy_members
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
-      format.html {render partial: 'policy_members'}
+      format.html { render partial: 'policy_members' }
     end
   end
 
@@ -54,9 +61,9 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
       if params[:rule_category] == 'expense'
-        format.html {render partial: 'create_expense_rule'}
+        format.html { render partial: 'create_expense_rule' }
       elsif params[:rule_category] == 'budget'
-        format.html {render partial: 'create_budget_rule'}
+        format.html { render partial: 'create_budget_rule' }
       end
     end
   end
@@ -64,8 +71,17 @@ class PoliciesController < ApplicationController
   def invitable_users
     @result = Policy::InvitableUsers.(current_user, params)
     respond_to do |format|
-      format.html {render partial: 'users'}
+      format.html { render partial: 'users' }
     end
+  end
+
+  def show_personal
+    @result = Policy::Index.(current_user, params)
+    respond
+  end
+
+  def show_description
+    @result = Policy::Show.(current_user, params)
   end
 
   def policy_member_settings
@@ -79,7 +95,7 @@ class PoliciesController < ApplicationController
     @managers = User::Team::GetManagers.(current_user, params)
     # respond
     respond_to do |format|
-      format.html {render partial: 'policy_member_settings'}
+      format.html { render partial: 'policy_member_settings' }
     end
   end
 

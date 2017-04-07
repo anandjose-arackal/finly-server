@@ -7,6 +7,7 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
   respond_to :json
 
   def create
+    Formatter.handle_api_nil(params)
     @result = MoneyRequest::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
@@ -29,6 +30,7 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
   end
 
   def update
+    Formatter.handle_api_nil(params)
     # fail
     if params[:type].blank?
       respond_failure 'Invalid update type'

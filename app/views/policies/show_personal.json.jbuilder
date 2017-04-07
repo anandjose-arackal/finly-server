@@ -1,0 +1,1 @@
+json.array! @result.policies, :name, :description

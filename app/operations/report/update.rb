@@ -20,6 +20,10 @@ class Report::Update < Report::Base
     if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
       self.update_param[:policy_id] = nil
     end
+    if update_param.has_key?(:policy_id) and (update_param[:policy_id].blank? or update_param[:policy_id] == 0) and report.user.enforce_policy_enabled?
+      policy_id = report.user.policies.non_default.first.id rescue nil
+      update_param[:policy_id] = policy_id
+    end
   end
 
   def authorize
@@ -44,8 +48,12 @@ class Report::Update < Report::Base
   end
 
   def process
-    return unless update_param.present?
-    unless report.update_attributes(update_param)
+    # return unless update_param.present?
+    if report.update_attributes(update_param)
+      if params[:custom_fields].present?
+        CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:custom_fields], save: true)
+      end
+    else
       messages[:error] = report.errors.full_messages
       false
     end
@@ -53,7 +61,8 @@ class Report::Update < Report::Base
 
   def post_process
     save_comments
-    messages[:success] << "Report updated."
+    calculate_amounts # this method recalculates the amoutns for the various Distance/Time/Per Diem expenses
+    messages[:success] << 'Report updated'
   end
 
   protected
@@ -80,6 +89,14 @@ class Report::Update < Report::Base
       end
     end
     report.comments.create query if query.present?
+  end
+
+  def calculate_amounts
+    report.expenses.each do |expense|
+      if expense.distance_expense? || expense.time_expense? || expense.per_diem_expense?
+        expense.amount.update(value: expense.calculate_amount_value(report.policy))
+      end
+    end
   end
 
 end

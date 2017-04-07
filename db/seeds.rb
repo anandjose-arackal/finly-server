@@ -48,8 +48,8 @@ end
 
 if ReportStatus.count == 0
   ReportStatus.create(id: 1, name: 'Open', order: 1)
-  ReportStatus.create(id: 2, name: 'Processing', order: 2)
-  ReportStatus.create(id: 3, name: 'Retracted', order: 3)
+  ReportStatus.create(id: 2, name: 'Processing', order: 3)
+  ReportStatus.create(id: 3, name: 'Retracted', order: 2)
   ReportStatus.create(id: 4, name: 'Rejected', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
   ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
@@ -101,11 +101,13 @@ if MoneyRequestTrackingAction.count == 0
   end
 end
 
+
 if MoneyRequestStatus.count == 0
   MoneyRequestStatus::VALUES.each do |key, value|
     name = key.to_s
     name[0] = name[0].capitalize
-    MoneyRequestStatus.create id: value, name: name
+    order = MoneyRequestStatus.order_for_id(value)
+    MoneyRequestStatus.create id: value, name: name, order: order
   end
 end
 
@@ -151,22 +153,22 @@ if ExpenseStatus.count ==0
 end
 
 if ExpenseRuleType.count == 0
-  e = ExpenseRuleType.create!(name: "Require Receipt")
-  e = ExpenseRuleType.create!(name: "Require Note")
-  e = ExpenseRuleType.create!(name: "Disallow Expense")
+  ExpenseRuleType.create!(name: "Require Receipt")
+  ExpenseRuleType.create!(name: "Require Note")
+  ExpenseRuleType.create!(name: "Disallow Expense")
 end
 
 if RuleType.count == 0
-  e = RuleType.create!(name: "Warning")
-  e = RuleType.create!(name: "Blocking")
+  RuleType.create!(name: "Warning")
+  RuleType.create!(name: "Blocking")
 end
 
 if Period.count == 0
-  b = Period.create!(name: "Day")
-  b = Period.create!(name: "Week")
-  b = Period.create!(name: "Month")
-  b = Period.create!(name: "Quarter")
-  b = Period.create!(name: "Year")
+  Period.create!(name: "Day")
+  Period.create!(name: "Week")
+  Period.create!(name: "Month")
+  Period.create!(name: "Quarter")
+  Period.create!(name: "Year")
 end
 
 if PaymentType.count == 0
@@ -180,11 +182,6 @@ if CardType.count == 0
   CardType.create(id: 2, name: 'Virtual')
 end
 
-# if ProductCombination.count == 0
-#   ProductCombination::TYPES.each do |type|
-#     ProductCombination.create(name: type)
-#   end
-# end
 
 if MccGroup.count == 0
   MccGroup::CODE_MAP.each do |key, value|
@@ -198,6 +195,45 @@ if ChannelType.count == 0
   end
 end
 
+if OtpRequestType.count == 0
+  OtpRequestType::TYPES.each do |k, v|
+    OtpRequestType.create(id: v, name: k)
+  end
+end
+
+if FieldParentType.count == 0
+  FieldParentType::TYPES.each do |key, value|
+    FieldParentType.create id: value, name: key
+  end
+end
+
+if FieldType.count == 0
+  FieldType::TYPES.each do |key, value|
+    FieldType.create id: value, name: key
+  end
+end
+
+if PhysicalUnit.count == 0
+  PhysicalUnit::VALUES.each do |k, v|
+    PhysicalUnit.create(id: k, name: v[:name], symbol: v[:symbol])
+  end
+end
+
+if CardProgram.count == 0
+  CardProgram.create name: 'Expense', create_expense: true, receive_reimbursement: false,
+                     personal_wallet_fund_transfer: true, spend_restrictions: true,
+                     end_date_restrictions: true, manager_credit: true, manager_debit: true,
+                     manager_blockable: true, manager_view_balance: true, manager_view_eligibility: true,
+                     manager_view_transactions: true, non_personal_fund_transfer: true
+  CardProgram.create name: 'Reimbursement', create_expense: false, receive_reimbursement: true,
+                     personal_wallet_fund_transfer: false, spend_restrictions: false,
+                     end_date_restrictions: true, manager_credit: false, manager_debit: false,
+                     manager_blockable: false, manager_view_balance: false, manager_view_eligibility: true,
+                     manager_view_transactions: false, non_personal_fund_transfer: false
+end
+
+
+
 ##########################
 
 if Amount.count == 0
@@ -205,7 +241,7 @@ if Amount.count == 0
 end
 
 if Company.count == 0
-  c = Company.create(name: 'Finly Test', d_code: 'D000000360')
+  c = Company.create(name: 'Finly Test', itz_cash_property_attributes: {d_code: 'D000000360'})
   c.reload
 else
   c = Company.first
@@ -249,19 +285,19 @@ if User.count == 0
   end
 
   ##############################################################################################################################################
-  ## User's for Venky's iOS testing
+  ## User's for iOS testing
   v = []
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Manager", email: "manager4@finlytest.io",
                    password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.manager_id},{user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{user_role_id: UserRole.manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   v << User.create(company: Company.first, first_name: "Finly", last_name: "Finance", email: "finance4@finlytest.io",
                    password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},{user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
@@ -288,7 +324,7 @@ if User.count == 0
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
 
-  ########################## Employee for Venky's testing ################################################################################
+  ########################## Employee for iOS testing ################################################################################
   User.create(company: Company.first, first_name: "Finly", last_name: "Employee", email: "kaley@finlytest.io",
               password: "mobiletest123", password_confirmation: "mobiletest123", company_id: c.id, mobile_number: random_mobile_number,
               mothers_maiden_name: Faker::Name.first_name,
@@ -297,7 +333,7 @@ if User.count == 0
               team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
-############################################################################################################################################
+  ############################################################################################################################################
 
 
   User.create(company: Company.first, first_name: "Finly", last_name: "King", email: "king@finlytest.io",
@@ -322,6 +358,19 @@ if User.count == 0
     user.confirm
   end
 
+end
+
+if Card.count == 0
+  User.all.each do |user|
+    if user.id < 9
+      number = "S0001774009#{(user.id - 1)}"
+      user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
+                        product_code: Constants::ItzCash::PRODUCT_CODE,
+                        card_type_id: 1, company_id: user.company.id,
+                        ending_number: random(1000, 9999).to_i, active: true,
+                        card_program_id: CardProgram.first.id)
+    end
+  end
 end
 
 if Policy.non_default.count == 0
@@ -446,17 +495,20 @@ if Report.count == 0
 end
 
 unless Rails.env.production?
-  if Card.count == 0
-    User.all.each do |user|
-      if user.id < 9
-        number = "S0001774009#{(user.id - 1)}"
-        user.cards.create(proxy: number, description: "Test physical card for user #{user.id}", product_code: Constants::ItzCash::PRODUCT_CODE,
-                          card_type_id: 1, company_id: user.company.id, ending_number: random(1000, 9999).to_i, active: true)
-      end
-    end
-  end
+  # if Card.count == 0
+  #   User.all.each do |user|
+  #     if user.id < 9
+  #       number = "S0001774009#{(user.id - 1)}"
+  #       user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
+  #                         product_code: Constants::ItzCash::PRODUCT_CODE,
+  #                         card_type_id: 1, company_id: user.company.id,
+  #                         ending_number: random(1000, 9999).to_i, active: true,
+  #                         card_program_id: CardProgram.first.id)
+  #     end
+  #   end
+  # end
 
-# creating some junk transactions and card expenses for testing
+  # creating some junk transactions and card expenses for testing
   if CardTransaction.count == 0
     User.all.each do |user|
       next unless user.cards.present?
@@ -468,7 +520,7 @@ unless Rails.env.production?
         from_date = DateTime.parse("01-01-2017 12:00:00")
         to_date = DateTime.now
         random_amount = random_integer(50, 200) + 0.1234
-        sample_msg_queue_entry = "321744RUPP00035088860000001306,#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
+        sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{Faker::Space.moon},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
 
         data = sample_msg_queue_entry.split(",")
 
@@ -505,6 +557,97 @@ end
 User.all.each do |user|
   user.otp_confirm
   user.update verified: true
+end
+
+if FieldConfiguration.count == 0
+  # Report custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Employee ID',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:report)})
+  # Report mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:report)})
+
+  # Money Request custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Location',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:money_request)})
+  # Money Request mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Project Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:money_request)})
+
+  # Manual Expense custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Location',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:manual_expense)})
+  # Manual Expense mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Duration of Meeting',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:manual_expense)})
+
+  # Distance Expense custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Reason',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:distance_expense)})
+  # Distance Expense mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:distance_expense)})
+
+  # Time Expense custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Reason',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:time_expense)})
+  # Time Expense mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:time_expense)})
+  # Per Diem Expense custom fields
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Reason',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
+  # Per Diem Expense mandatory custom field
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+                                                                        configurable_id: 1, company_id: 1,
+                                                                        field_name: 'Client Name',
+                                                                        field_type_id: FieldType.id_for(:text),
+                                                                        mandatory: false,
+                                                                        field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
 end
 
 if AdminUser.count == 0

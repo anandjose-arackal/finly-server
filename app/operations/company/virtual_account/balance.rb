@@ -16,7 +16,7 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def process
-    response = ItzCash::VirtualAccountBalance.(user)
+    response = ItzCash::VirtualAccountBalance.(user.company)
     unless response.success?
       add_message :error, response.messages[:error]
       return
@@ -25,6 +25,10 @@ class Company::VirtualAccount::Balance < BaseOperation
     itzcash_balance = response.wallets.first[:balance]
     self.account_number = response.wallets.first[:account_number]
     self.balance = (itzcash_balance - total_wallet_balance)
+
+    if response.company.itz_cash_property.easy_account_no.blank? or response.company.itz_cash_property.easy_account_no.blank?
+      response.company.itz_cash_property.update_attribute(:easy_account_no, response.wallets.first[:account_number])
+    end
   end
 
   def success

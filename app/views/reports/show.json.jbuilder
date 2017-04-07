@@ -3,12 +3,15 @@ json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status_name(@result.report)
 json.status_name @result.status_name(@result.report)
-json.manager_name @result.manager.name rescue ''
-json.finance_manager_name @result.finance_manager.name rescue ''
+manager = (@result.manager.name rescue '')
+json.manager_name manager
+finance_manager = (@result.finance_manager.name rescue '')
+json.finance_manager_name finance_manager
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
 json.enforce_policy_enabled @result.report.user.enforce_policy_enabled?
+json.deleted @result.report.is_deleted
 
 policy_id = nil
 policy_name = nil
@@ -48,7 +51,8 @@ json.expense_sections categorized_expense do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id
+    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id,
+                           :distance_value, :distance_rate_value, :time_value, :time_rate_value
     if expense.note
       if expense.note.length < 29
         json.note expense.note
@@ -78,10 +82,9 @@ json.receipts @result.expenses do |expense|
     # json.file_type expense.receipts.first.file_format
     json.date expense.date.strftime('%d %b %Y')
     json.merchant_name expense.merchant_name
-    json.amount_value expense.amount.precision_value
+    json.amount_value expense.amount_value
   end
 end
-
 
 json.actions do
   json.dummy 'dummy'
@@ -95,4 +98,8 @@ json.violations do
   json.warning_present @result.has_warning?
   json.blocking_messages @result.blocking_array
   json.warning_messages @result.warning_array
+end
+
+json.custom_fields do
+  json.array! @result.report.custom_fields
 end

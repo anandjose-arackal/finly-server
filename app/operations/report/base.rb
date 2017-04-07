@@ -15,7 +15,10 @@ class Report::Base < BaseOperation
 
   def init
     id = (params[:id] or params[:report_id])
-    self.report = Report::Index.(user, params).reports.with_id(id).first rescue nil
+    # self.report = Report::Index.(user, params).reports.with_id(id).first rescue nil
+
+    # todo - temporary fix for notifications
+    self.report = Report::Index.(user, params).reports.unscoped.with_id(id).first rescue nil
     # self.report = Report.find_by(id: params[:report_id])
   end
 
@@ -41,7 +44,7 @@ class Report::Base < BaseOperation
 
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
-                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result
+                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present
 
     def init
       self.report = params[:report]
@@ -58,14 +61,15 @@ class Report::Base < BaseOperation
       self.manager = User::Team::Approver.(report.user, report: report, type: :manager)
       self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
+      self.violations_present = has_warning? || has_blocking?
     end
 
     def retrieve_policies
-      if report.user.enforce_policy_enabled?
-        return report.user.policies.non_default
-      else
-        return report.user.policies
+      policies = []
+      unless report.user.enforce_policy_enabled?
+        policies << {id: 0, name: 'None'}
       end
+      policies + report.user.policies.non_default
     end
 
     def status_name(report)
@@ -128,8 +132,8 @@ class Report::Base < BaseOperation
           actions[:submit] = {url: Rails.application.routes.url_helpers.report_submit_path(report_id: report.id, view: params[:view])}
         elsif self.report.processing?
           actions[:retract] = {url: Rails.application.routes.url_helpers.report_retract_path(report_id: report.id, view: params[:view])}
-        elsif self.report.reimbursed?
-          actions[:reimbursement_confirm] = {url: Rails.application.routes.url_helpers.report_reimbursement_confirm_path(report_id: report.id, view: params[:view])}
+        elsif self.report.settled?
+          actions[:settlement_confirm] = {url: Rails.application.routes.url_helpers.report_settlement_confirm_path(report_id: report.id, view: params[:view])}
         end
       end
       actions

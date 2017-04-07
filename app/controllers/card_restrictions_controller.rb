@@ -1,10 +1,13 @@
 class CardRestrictionsController < ApplicationController
+  # before_action :authenticate_user!
+  allow_oauth!
 
   def create
 
   end
 
   def update
+    p "xxxx", current_user
     @result = User::CardRestrictions::Update.(current_user, params)
     respond
   end

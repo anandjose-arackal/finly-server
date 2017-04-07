@@ -11,11 +11,11 @@ json.actions do
   json.take_control @result.actions[:take_control].present?
   json.review @result.actions[:approve].present?
   json.unapprove @result.actions[:unapprove].present?
-  json.reimburse @result.actions[:reimburse].present?
   json.add_expenses @result.actions[:add_expenses].present?
   json.delete @result.actions[:delete].present?
   json.retract @result.actions[:retract].present?
-  json.reimbursement_confirm @result.actions[:reimbursement_confirm].present?
+  json.settle @result.actions[:settle].present?
+  json.settlement_confirm @result.actions[:settlement_confirm].present?
   json.editable @result.actions[:editable].present?
   json.submit @result.actions[:submit].present?
 end
@@ -34,3 +34,6 @@ json.comments @result.comments do |comment|
 end
 json.policies @result.policies, :id, :name
 json.violations @result.violations
+json.custom_fields do
+  json.array! @result.report.custom_fields
+end

@@ -1,6 +1,7 @@
 class OrganizationAccountController < ApplicationController
 
   before_action :authenticate_user!
+  allow_oauth!
 
   def policies_list
     @result = Company::Configuration::Show.(current_user, params)

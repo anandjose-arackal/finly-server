@@ -9,11 +9,15 @@ class Api::V1::BaseApiController < ApplicationController
   def respond(opts={})
     if opts.present?
       if opts[:response] == :failure
-        render 'api/v1/shared/failure'
+        respond_to do |format|
+          format.json { render 'api/v1/shared/failure' }
+        end
         return
       end
       if opts[:response] == :success
-        render 'api/v1/shared/success'
+        respond_to do |format|
+          format.json { render 'api/v1/shared/success' }
+        end
         return
       end
     end

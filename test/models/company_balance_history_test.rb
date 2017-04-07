@@ -1,0 +1,43 @@
+# == Schema Information
+#
+# Table name: company_balance_histories
+#
+#  id                                      :integer          not null, primary key
+#  company_id                              :integer
+#  neft_transfer_id                        :integer
+#  company_balance_id                      :integer
+#  company_withdrawal_to_card_id           :integer
+#  company_load_from_card_id               :integer
+#  card_load_from_wallet_id                :integer
+#  card_withdrawal_to_wallet_id            :integer
+#  card_balance_id                         :integer
+#  card_expenses_id                        :integer
+#  wallet_load_from_wallet_id              :integer
+#  created_at                              :datetime         not null
+#  updated_at                              :datetime         not null
+#  card_atm_withdrawal_id                  :integer
+#  company_withdrawal_to_wallet_id         :integer
+#  company_load_from_wallet_id             :integer
+#  card_withdrawal_to_card_id              :integer
+#  card_withdrawal_to_virtual_account_id   :integer
+#  card_load_from_card_id                  :integer
+#  card_load_from_virtual_account_id       :integer
+#  wallet_withdrawal_to_wallet_id          :integer
+#  wallet_withdrawal_to_card_id            :integer
+#  wallet_withdrawal_to_virtual_account_id :integer
+#  wallet_load_from_card_id                :integer
+#  wallet_load_from_virtual_account_id     :integer
+#  date                                    :date
+#  wallet_balance_id                       :integer
+#  cash_on_hand_load_id                    :integer
+#  cash_on_hand_withdrawal_id              :integer
+#  cash_on_hand_balance_id                 :integer
+#
+
+require 'test_helper'
+
+class CompanyBalanceHistoryTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end

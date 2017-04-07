@@ -4,4 +4,8 @@ class ItzCash::Unblock < ItzCash::Block
     Constants::ItzCash::OPERATION_TYPE_UNBLOCK
   end
 
+  def post_process
+    card.update_attribute(:active, true)
+  end
+
 end

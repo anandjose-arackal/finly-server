@@ -14,15 +14,25 @@ class User::CardRestrictions::Update < User::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      add_message :error, "Invalid input. Please try again"
+      add_message :error, 'Invalid input. Please try again'
+      return
+    end
+    if params[:card_id].blank?
+      add_message :error, 'Card not found'
+    end
+    if params[:user_id].blank? && params[:id].blank?
+      add_message :error, 'User not found'
     end
   end
 
   def init
-    self.selected_user = user.company.users.find_by(id: params[:id])
-    self.selected_card = selected_user.cards.first
+    # self.selected_user = user.company.users.find_by(id: params[:id])
+    self.selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
+    return if selected_user.blank?
+    self.selected_card = selected_user.cards.with_id(params[:card_id]).first
+    return if selected_card.blank?
     self.card_restriction = selected_card.card_restriction
-    self.card_limits = selected_card.card_restriction.card_limits
+    self.card_limits = self.card_restriction.card_limits
     self.update_params = card_restriction_params
     self.atm_enabled = !!update_params[:channel_atm]
     self.ecom_pos_enabled = !!update_params[:channel_ecom_pos]
@@ -32,8 +42,11 @@ class User::CardRestrictions::Update < User::Base
 
   def validate
     unless selected_user
-      add_message :error, "User not found"
+      add_message :error, 'User not found'
       return
+    end
+    if selected_card.blank?
+      add_message :error, 'Card not found'
     end
   end
 
@@ -79,7 +92,7 @@ class User::CardRestrictions::Update < User::Base
   end
 
   def post_process
-    add_message :success, "Limits updated!"
+    add_message :success, 'Limits updated'
   end
 
   private
@@ -147,7 +160,7 @@ class User::CardRestrictions::Update < User::Base
     if card_restriction_params[:mcc_group_id].present?
       api_params[:mcc_restriction_type] = card_restriction_params[:mcc_restriction_type]
     else
-      api_params[:mcc_restriction_type] = "I"
+      api_params[:mcc_restriction_type] = 'I'
     end
     # mcc_group_api = ItzCash::SetMccCode.(selected_user, api_params)
     # unless mcc_group_api.success?
@@ -165,17 +178,17 @@ class User::CardRestrictions::Update < User::Base
       api_params = {dailycount: daily_count, dailyamount: daily_amount,
                     weeklycount: weekly_count, weeklyamount: weekly_amount,
                     monthlycount: monthly_count, monthlyamount: monthly_amount,
-                    channel_type: "ATM", channel_type_allowed: "Y"}
+                    channel_type: 'ATM', channel_type_allowed: 'Y'}
     elsif atm_enabled && !atm_limits_present?
-      api_params = {dailycount: Constants::ItzCash::RESTRICTION_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    weeklycount: Constants::ItzCash::RESTRICTION_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    monthlycount: Constants::ItzCash::RESTRICTION_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    channel_type: "ATM", channel_type_allowed: "I"}
+      api_params = {dailycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    weeklycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    monthlycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    channel_type: 'ATM', channel_type_allowed: 'I'}
     elsif !atm_enabled
-      api_params = {dailycount: Constants::ItzCash::RESTRICTION_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    weeklycount: Constants::ItzCash::RESTRICTION_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    monthlycount: Constants::ItzCash::RESTRICTION_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    channel_type: "ATM", channel_type_allowed: "N"}
+      api_params = {dailycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    weeklycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    monthlycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    channel_type: 'ATM', channel_type_allowed: 'N'}
     end
     restriction_api = ItzCash::CardRestriction.(selected_user, api_params)
     unless restriction_api.success?
@@ -193,17 +206,17 @@ class User::CardRestrictions::Update < User::Base
       api_params = {dailycount: daily_count, dailyamount: daily_amount,
                     weeklycount: weekly_count, weeklyamount: weekly_amount,
                     monthlycount: monthly_count, monthlyamount: monthly_amount,
-                    channel_type: "POS", channel_type_allowed: "Y"}
+                    channel_type: 'POS', channel_type_allowed: 'Y'}
     elsif ecom_pos_enabled && !ecom_pos_limits_present?
-      api_params = {dailycount: Constants::ItzCash::RESTRICTION_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    weeklycount: Constants::ItzCash::RESTRICTION_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    monthlycount: Constants::ItzCash::RESTRICTION_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    channel_type: "POS", channel_type_allowed: "I"}
+      api_params = {dailycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    weeklycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    monthlycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    channel_type: 'POS', channel_type_allowed: 'I'}
     elsif !ecom_pos_enabled
-      api_params = {dailycount: Constants::ItzCash::RESTRICTION_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    weeklycount: Constants::ItzCash::RESTRICTION_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    monthlycount: Constants::ItzCash::RESTRICTION_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_CONSTANT,
-                    channel_type: "POS", channel_type_allowed: "N"}
+      api_params = {dailycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, dailyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    weeklycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, weeklyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    monthlycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
+                    channel_type: 'POS', channel_type_allowed: 'N'}
     end
     restriction_api = ItzCash::CardRestriction.(selected_user, api_params)
     unless restriction_api.success?

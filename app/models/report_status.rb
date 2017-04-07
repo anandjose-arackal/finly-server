@@ -11,6 +11,9 @@
 
 
 
+
+
+
 class ReportStatus < ActiveRecord::Base
 
   scope :open, -> { find_by(id: ReportStatus.open_id) }
@@ -18,8 +21,14 @@ class ReportStatus < ActiveRecord::Base
   scope :rejected, -> { find_by(id: ReportStatus.rejected_id) }
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
+  scope :with_name, -> (name) { find_by(name: name)}
 
-  STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, reimbursed: 6, reimbursement_confirmed: 7, closed: 8}
+  STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, settled: 6, settlement_confirmed: 7, closed: 8}
+
+  def self.personal_sort_order
+    [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:processing), ReportStatus.id_for(:rejected),
+     ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]
+  end
 
   def self.id_for(status)
     STATES[status]
@@ -49,12 +58,12 @@ class ReportStatus < ActiveRecord::Base
     self.id == ReportStatus.approved_id
   end
 
-  def reimbursed?
-    self.id == ReportStatus.reimbursed_id
+  def settled?
+    self.id == ReportStatus.settled_id
   end
 
-  def reimbursement_confirmed?
-    self.id == ReportStatus.reimbursement_confirmed_id
+  def settlement_confirmed?
+    self.id == ReportStatus.settlement_confirmed_id
   end
 
   def closed?
@@ -81,11 +90,11 @@ class ReportStatus < ActiveRecord::Base
     5
   end
 
-  def self.reimbursed_id
+  def self.settled_id
     6
   end
 
-  def self.reimbursement_confirmed_id
+  def self.settlement_confirmed_id
     7
   end
 

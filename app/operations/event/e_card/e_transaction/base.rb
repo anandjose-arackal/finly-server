@@ -8,6 +8,10 @@ class Event::ECard::ETransaction::Base < Event::SetNotifier
     end
   end
 
+  def action_name
+
+  end
+
   def init
     self.transaction = params[:transaction]
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170217113720) do
+ActiveRecord::Schema.define(version: 20170406160406) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -72,16 +72,16 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree
 
   create_table "balance_sheets", force: :cascade do |t|
-    t.integer  "user_id",                  limit: 4
-    t.integer  "cash_in_hand_id",          limit: 4
-    t.integer  "pending_reimbursement_id", limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-    t.integer  "pending_advance_id",       limit: 4
+    t.integer  "user_id",                   limit: 4
+    t.integer  "cash_in_hand_id",           limit: 4
+    t.integer  "approved_reports_total_id", limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "pending_advance_id",        limit: 4
   end
 
+  add_index "balance_sheets", ["approved_reports_total_id"], name: "index_balance_sheets_on_approved_reports_total_id", using: :btree
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
-  add_index "balance_sheets", ["pending_reimbursement_id"], name: "index_balance_sheets_on_pending_reimbursement_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
@@ -128,9 +128,10 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.text     "editable_merchant",   limit: 65535
     t.integer  "card_transaction_id", limit: 4
     t.integer  "expense_id",          limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.integer  "surcharge_id",        limit: 4
+    t.boolean  "is_deleted",                        default: false
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -166,6 +167,24 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "card_limits", ["card_restriction_id"], name: "index_card_limits_on_card_restriction_id", using: :btree
   add_index "card_limits", ["period_id"], name: "index_card_limits_on_period_id", using: :btree
 
+  create_table "card_programs", force: :cascade do |t|
+    t.string   "name",                          limit: 255
+    t.boolean  "create_expense"
+    t.boolean  "receive_reimbursement"
+    t.boolean  "personal_wallet_fund_transfer"
+    t.boolean  "spend_restrictions"
+    t.boolean  "end_date_restrictions"
+    t.boolean  "manager_credit"
+    t.boolean  "manager_debit"
+    t.boolean  "manager_blockable"
+    t.boolean  "manager_view_balance"
+    t.boolean  "manager_view_eligibility"
+    t.boolean  "manager_view_transactions"
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
+  end
+
   create_table "card_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -199,8 +218,8 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.string   "transaction_type",      limit: 255
     t.text     "post_data",             limit: 65535
     t.integer  "transaction_amount_id", limit: 4
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
     t.string   "reference_id",          limit: 255
     t.string   "auth_transaction_id",   limit: 255
     t.string   "transaction_mode",      limit: 255
@@ -210,14 +229,16 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.string   "serial_id",             limit: 255
     t.string   "product_code",          limit: 255
     t.datetime "transaction_timestamp"
-    t.boolean  "expensed",                            default: true
+    t.boolean  "expensed",                            default: false
     t.text     "error_message",         limit: 65535
     t.integer  "billing_amount_id",     limit: 4
-    t.integer  "expense_id",            limit: 4
+    t.boolean  "is_deleted",                          default: false
+    t.string   "mcc_code",              limit: 255
+    t.string   "transaction_status",    limit: 255
+    t.string   "api_reference_id",      limit: 255
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
-  add_index "card_transactions", ["expense_id"], name: "index_card_transactions_on_expense_id", using: :btree
   add_index "card_transactions", ["transaction_amount_id"], name: "index_card_transactions_on_transaction_amount_id", using: :btree
   add_index "card_transactions", ["user_id"], name: "index_card_transactions_on_user_id", using: :btree
 
@@ -242,6 +263,8 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.text     "disable_note",        limit: 65535
     t.string   "product_code",        limit: 255,   null: false
     t.integer  "card_balance_id",     limit: 4
+    t.integer  "card_program_id",     limit: 4,     null: false
+    t.integer  "card_eligibility_id", limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -270,7 +293,6 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.boolean  "active",                 default: true, null: false
-    t.string   "d_code",     limit: 255
   end
 
   create_table "company_accounts", force: :cascade do |t|
@@ -285,16 +307,65 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "company_accounts", ["company_id"], name: "index_company_accounts_on_company_id", using: :btree
   add_index "company_accounts", ["wallet_balance_id"], name: "index_company_accounts_on_wallet_balance_id", using: :btree
 
+  create_table "company_balance_histories", force: :cascade do |t|
+    t.integer  "company_id",                              limit: 4
+    t.integer  "neft_transfer_id",                        limit: 4
+    t.integer  "company_balance_id",                      limit: 4
+    t.integer  "company_withdrawal_to_card_id",           limit: 4
+    t.integer  "company_load_from_card_id",               limit: 4
+    t.integer  "card_load_from_wallet_id",                limit: 4
+    t.integer  "card_withdrawal_to_wallet_id",            limit: 4
+    t.integer  "card_balance_id",                         limit: 4
+    t.integer  "card_expenses_id",                        limit: 4
+    t.integer  "wallet_load_from_wallet_id",              limit: 4
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.integer  "card_atm_withdrawal_id",                  limit: 4
+    t.integer  "company_withdrawal_to_wallet_id",         limit: 4
+    t.integer  "company_load_from_wallet_id",             limit: 4
+    t.integer  "card_withdrawal_to_card_id",              limit: 4
+    t.integer  "card_withdrawal_to_virtual_account_id",   limit: 4
+    t.integer  "card_load_from_card_id",                  limit: 4
+    t.integer  "card_load_from_virtual_account_id",       limit: 4
+    t.integer  "wallet_withdrawal_to_wallet_id",          limit: 4
+    t.integer  "wallet_withdrawal_to_card_id",            limit: 4
+    t.integer  "wallet_withdrawal_to_virtual_account_id", limit: 4
+    t.integer  "wallet_load_from_card_id",                limit: 4
+    t.integer  "wallet_load_from_virtual_account_id",     limit: 4
+    t.date     "date"
+    t.integer  "wallet_balance_id",                       limit: 4
+    t.integer  "cash_on_hand_load_id",                    limit: 4
+    t.integer  "cash_on_hand_withdrawal_id",              limit: 4
+    t.integer  "cash_on_hand_balance_id",                 limit: 4
+  end
+
+  add_index "company_balance_histories", ["card_balance_id"], name: "index_company_balance_histories_on_card_balance_id", using: :btree
+  add_index "company_balance_histories", ["card_expenses_id"], name: "index_company_balance_histories_on_card_expenses_id", using: :btree
+  add_index "company_balance_histories", ["card_load_from_wallet_id"], name: "index_company_balance_histories_on_card_load_from_wallet_id", using: :btree
+  add_index "company_balance_histories", ["card_withdrawal_to_wallet_id"], name: "index_company_balance_histories_on_card_withdrawal_to_wallet_id", using: :btree
+  add_index "company_balance_histories", ["company_balance_id"], name: "index_company_balance_histories_on_company_balance_id", using: :btree
+  add_index "company_balance_histories", ["company_id"], name: "index_company_balance_histories_on_company_id", using: :btree
+  add_index "company_balance_histories", ["company_load_from_card_id"], name: "index_company_balance_histories_on_company_load_from_card_id", using: :btree
+  add_index "company_balance_histories", ["company_withdrawal_to_card_id"], name: "index_company_balance_histories_on_company_withdrawal_to_card_id", using: :btree
+  add_index "company_balance_histories", ["neft_transfer_id"], name: "index_company_balance_histories_on_neft_transfer_id", using: :btree
+  add_index "company_balance_histories", ["wallet_load_from_virtual_account_id"], name: "index_wal_load_on_company_history", using: :btree
+  add_index "company_balance_histories", ["wallet_load_from_wallet_id"], name: "index_company_balance_histories_on_wallet_load_from_wallet_id", using: :btree
+  add_index "company_balance_histories", ["wallet_withdrawal_to_card_id"], name: "index_wal_2_card_on_company_history", using: :btree
+  add_index "company_balance_histories", ["wallet_withdrawal_to_virtual_account_id"], name: "index_wal_2_va_on_company_history", using: :btree
+  add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
+
   create_table "company_configurations", force: :cascade do |t|
-    t.integer  "company_id",        limit: 4,                   null: false
-    t.integer  "contact_id",        limit: 4
-    t.boolean  "verified",                      default: false
-    t.string   "logo_file_name",    limit: 255
-    t.string   "logo_content_type", limit: 255
-    t.integer  "logo_file_size",    limit: 4
+    t.integer  "company_id",          limit: 4,                   null: false
+    t.integer  "contact_id",          limit: 4
+    t.boolean  "verified",                        default: false
+    t.string   "logo_file_name",      limit: 255
+    t.string   "logo_content_type",   limit: 255
+    t.integer  "logo_file_size",      limit: 4
     t.datetime "logo_updated_at"
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.boolean  "ocr_enabled"
+    t.boolean  "other_expense_types",             default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -326,6 +397,25 @@ ActiveRecord::Schema.define(version: 20170217113720) do
 
   add_index "company_tags", ["company_id"], name: "index_company_tags_on_company_id", using: :btree
 
+  create_table "company_transactions", force: :cascade do |t|
+    t.integer  "company_id",            limit: 4,   null: false
+    t.string   "request_id",            limit: 255, null: false
+    t.string   "merchant_name",         limit: 255, null: false
+    t.datetime "transaction_date",                  null: false
+    t.integer  "transaction_amount_id", limit: 4,   null: false
+    t.string   "transaction_type",      limit: 255, null: false
+    t.string   "transaction_id",        limit: 255, null: false
+    t.integer  "balance_amount_id",     limit: 4,   null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.string   "transaction_mode",      limit: 255
+    t.string   "merchant_type_key",     limit: 255
+  end
+
+  add_index "company_transactions", ["balance_amount_id"], name: "index_company_transactions_on_balance_amount_id", using: :btree
+  add_index "company_transactions", ["company_id"], name: "index_company_transactions_on_company_id", using: :btree
+  add_index "company_transactions", ["transaction_amount_id"], name: "index_company_transactions_on_transaction_amount_id", using: :btree
+
   create_table "contacts", force: :cascade do |t|
     t.string   "email",            limit: 255
     t.string   "name",             limit: 255
@@ -355,6 +445,49 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
+
+  create_table "custom_fields", force: :cascade do |t|
+    t.integer  "field_configuration_id", limit: 4,   null: false
+    t.integer  "parent_id",              limit: 4
+    t.string   "parent_type",            limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "value_id",               limit: 4
+    t.string   "value_type",             limit: 255
+  end
+
+  add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
+  add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
+  add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
+
+  create_table "distance_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_km",                     precision: 10, scale: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
+  create_table "distance_expenses", force: :cascade do |t|
+    t.integer  "expense_id",  limit: 4
+    t.boolean  "is_deleted",            default: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "distance_id", limit: 4
+  end
+
+  add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
+
+  create_table "distances", force: :cascade do |t|
+    t.decimal  "value",                      precision: 10, scale: 4
+    t.integer  "physical_unit_id", limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+  end
+
+  add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
@@ -416,6 +549,7 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.integer  "report_id",            limit: 4
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
+    t.boolean  "transcribed",                        default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -442,11 +576,135 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "export_preferences", ["company_id"], name: "index_export_preferences_on_company_id", using: :btree
   add_index "export_preferences", ["export_field_id"], name: "index_export_preferences_on_export_field_id", using: :btree
 
+  create_table "feedback_types", force: :cascade do |t|
+    t.string   "name",        limit: 255,   null: false
+    t.text     "description", limit: 65535, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer  "feedback_type_id", limit: 4,     null: false
+    t.text     "content",          limit: 65535, null: false
+    t.integer  "user_id",          limit: 4,     null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "feedbacks", ["feedback_type_id"], name: "index_feedbacks_on_feedback_type_id", using: :btree
+  add_index "feedbacks", ["user_id"], name: "index_feedbacks_on_user_id", using: :btree
+
+  create_table "field_amounts", force: :cascade do |t|
+    t.integer  "value_id",   limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "field_amounts", ["value_id"], name: "index_field_amounts_on_value_id", using: :btree
+
+  create_table "field_booleans", force: :cascade do |t|
+    t.boolean  "value",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "field_configurations", force: :cascade do |t|
+    t.boolean  "enabled",                          default: true,  null: false
+    t.integer  "field_type_id",        limit: 4,                   null: false
+    t.boolean  "mandatory",                        default: false, null: false
+    t.integer  "company_id",           limit: 4,                   null: false
+    t.integer  "field_parent_type_id", limit: 4,                   null: false
+    t.integer  "configurable_id",      limit: 4,                   null: false
+    t.string   "configurable_type",    limit: 255,                 null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.string   "field_name",           limit: 255,                 null: false
+    t.integer  "default_value_id",     limit: 4
+    t.string   "default_value_type",   limit: 255
+    t.boolean  "is_deleted",                       default: false, null: false
+  end
+
+  add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
+  add_index "field_configurations", ["configurable_id"], name: "index_field_configurations_on_configurable_id", using: :btree
+  add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
+  add_index "field_configurations", ["field_parent_type_id"], name: "index_field_configurations_on_field_parent_type_id", using: :btree
+  add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
+
+  create_table "field_date_times", force: :cascade do |t|
+    t.datetime "value",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "field_dates", force: :cascade do |t|
+    t.date     "value",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "field_decimals", force: :cascade do |t|
+    t.text     "value",      limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "field_drop_down_items", force: :cascade do |t|
+    t.string   "name",                   limit: 255, null: false
+    t.integer  "field_configuration_id", limit: 4,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
+
+  create_table "field_drop_down_selections", force: :cascade do |t|
+    t.integer  "value_id",   limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "field_drop_down_selections", ["value_id"], name: "index_field_drop_down_selections_on_value_id", using: :btree
+
+  create_table "field_numbers", force: :cascade do |t|
+    t.text     "value",      limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "field_parent_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "field_texts", force: :cascade do |t|
+    t.text     "value",      limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "field_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_properties", force: :cascade do |t|
+    t.string   "d_code",          limit: 255
+    t.string   "easy_account_no", limit: 255
+    t.integer  "company_id",      limit: 4,   null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
+
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
     t.string   "merchant",   limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
   end
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
@@ -515,8 +773,9 @@ ActiveRecord::Schema.define(version: 20170217113720) do
 
   create_table "money_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "order",      limit: 4,   default: 1, null: false
   end
 
   create_table "money_request_tracking_actions", force: :cascade do |t|
@@ -685,6 +944,12 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "opro_client_apps", ["app_id", "app_secret"], name: "index_opro_client_apps_on_app_id_and_app_secret", unique: true, using: :btree
   add_index "opro_client_apps", ["app_id"], name: "index_opro_client_apps_on_app_id", unique: true, using: :btree
 
+  create_table "otp_request_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -698,14 +963,18 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",          limit: 4,     null: false
-    t.date     "date",                             null: false
-    t.integer  "payment_type_id",    limit: 4,     null: false
-    t.integer  "initiating_user_id", limit: 4,     null: false
-    t.integer  "receiving_user_id",  limit: 4,     null: false
-    t.text     "note",               limit: 65535
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.integer  "amount_id",               limit: 4,     null: false
+    t.date     "date",                                  null: false
+    t.integer  "payment_type_id",         limit: 4,     null: false
+    t.integer  "initiating_user_id",      limit: 4,     null: false
+    t.integer  "receiving_user_id",       limit: 4,     null: false
+    t.text     "note",                    limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "initiating_account_id",   limit: 4
+    t.string   "initiating_account_type", limit: 255
+    t.integer  "receiving_account_id",    limit: 4
+    t.string   "receiving_account_type",  limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -713,20 +982,60 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
+  create_table "per_diem_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",   limit: 4
+    t.string   "parent_type", limit: 255
+    t.boolean  "enabled"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "per_diem_expenses", force: :cascade do |t|
+    t.integer  "per_diem_id", limit: 4
+    t.integer  "expense_id",  limit: 4
+    t.integer  "quantity",    limit: 4
+    t.boolean  "is_deleted"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree
+  add_index "per_diem_expenses", ["per_diem_id"], name: "index_per_diem_expenses_on_per_diem_id", using: :btree
+
+  create_table "per_diems", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "rate_id",           limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.integer  "configurable_id",   limit: 4
+    t.string   "configurable_type", limit: 255
+    t.boolean  "is_deleted",                    default: false
+  end
+
+  add_index "per_diems", ["rate_id"], name: "index_per_diems_on_rate_id", using: :btree
+
   create_table "periods", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
 
-  create_table "policies", force: :cascade do |t|
+  create_table "physical_units", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.integer  "company_id", limit: 4
-    t.integer  "owner_id",   limit: 4
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "default",                default: false, null: false
-    t.boolean  "is_deleted",             default: false, null: false
+    t.string   "symbol",     limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "policies", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.integer  "company_id",  limit: 4
+    t.integer  "owner_id",    limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "default",                   default: false, null: false
+    t.boolean  "is_deleted",                default: false, null: false
+    t.text     "description", limit: 65535
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -817,8 +1126,8 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   create_table "receipts", force: :cascade do |t|
     t.integer  "expense_id",         limit: 4
     t.integer  "user_id",            limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
     t.string   "image_file_name",    limit: 255
     t.string   "image_content_type", limit: 255
     t.integer  "image_file_size",    limit: 4
@@ -827,6 +1136,7 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.string   "parent_type",        limit: 255
     t.text     "note",               limit: 65535
     t.integer  "receipt_email_id",   limit: 4
+    t.boolean  "to_be_transcribed",                default: false
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
@@ -916,7 +1226,6 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.datetime "created_at",                                                             null: false
     t.datetime "updated_at",                                                             null: false
     t.integer  "reimbursement_id",             limit: 4
-    t.integer  "reimbursement_amount_id",      limit: 4
     t.boolean  "accounted",                                              default: false, null: false
     t.boolean  "archived",                                               default: false, null: false
     t.boolean  "is_deleted",                                             default: false, null: false
@@ -926,6 +1235,8 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.datetime "approved_at"
     t.integer  "cash_in_hand_deduction_id",    limit: 4
     t.integer  "submitted_amount_id",          limit: 4
+    t.integer  "cash_expenses_total_id",       limit: 4
+    t.integer  "card_expenses_total_id",       limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -935,6 +1246,13 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
+
+  create_table "resource_requests", force: :cascade do |t|
+    t.string "name",               limit: 255
+    t.string "email",              limit: 255
+    t.string "mobile_number",      limit: 255
+    t.string "resource_file_name", limit: 255
+  end
 
   create_table "rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -948,6 +1266,84 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "time_expense_configs", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.decimal  "rate_per_hour",                   precision: 10, scale: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.boolean  "enabled"
+    t.integer  "default_category_id", limit: 4
+  end
+
+  create_table "time_expenses", force: :cascade do |t|
+    t.integer  "expense_id",     limit: 4
+    t.boolean  "is_deleted"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "time_object_id", limit: 4
+  end
+
+  add_index "time_expenses", ["expense_id"], name: "index_time_expenses_on_expense_id", using: :btree
+
+  create_table "time_objects", force: :cascade do |t|
+    t.decimal  "value",                      precision: 10, scale: 4
+    t.integer  "physical_unit_id", limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+  end
+
+  add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
+
+  create_table "transcribed_expenses", force: :cascade do |t|
+    t.integer  "amount_id",  limit: 4
+    t.date     "date"
+    t.text     "merchant",   limit: 65535
+    t.text     "note",       limit: 65535
+    t.integer  "receipt_id", limit: 4
+    t.integer  "expense_id", limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "transcribed_expenses", ["amount_id"], name: "index_transcribed_expenses_on_amount_id", using: :btree
+  add_index "transcribed_expenses", ["expense_id"], name: "index_transcribed_expenses_on_expense_id", using: :btree
+  add_index "transcribed_expenses", ["receipt_id"], name: "index_transcribed_expenses_on_receipt_id", using: :btree
+  add_index "transcribed_expenses", ["user_id"], name: "index_transcribed_expenses_on_user_id", using: :btree
+
+  create_table "user_balance_histories", force: :cascade do |t|
+    t.date     "date"
+    t.integer  "user_id",                    limit: 4
+    t.integer  "company_id",                 limit: 4
+    t.integer  "card_balance_id",            limit: 4
+    t.integer  "card_withdrawal_id",         limit: 4
+    t.integer  "card_load_id",               limit: 4
+    t.integer  "card_expenses_id",           limit: 4
+    t.integer  "finly_money_balance_id",     limit: 4
+    t.integer  "finly_money_withdrawal_id",  limit: 4
+    t.integer  "finly_money_load_id",        limit: 4
+    t.integer  "cash_on_hand_balance_id",    limit: 4
+    t.integer  "cash_on_hand_withdrawal_id", limit: 4
+    t.integer  "cash_on_hand_load_id",       limit: 4
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.integer  "card_atm_withdrawal_id",     limit: 4
+  end
+
+  add_index "user_balance_histories", ["card_balance_id"], name: "index_user_balance_histories_on_card_balance_id", using: :btree
+  add_index "user_balance_histories", ["card_expenses_id"], name: "index_user_balance_histories_on_card_expenses_id", using: :btree
+  add_index "user_balance_histories", ["card_load_id"], name: "index_user_balance_histories_on_card_load_id", using: :btree
+  add_index "user_balance_histories", ["card_withdrawal_id"], name: "index_user_balance_histories_on_card_withdrawal_id", using: :btree
+  add_index "user_balance_histories", ["cash_on_hand_balance_id"], name: "index_user_balance_histories_on_cash_on_hand_balance_id", using: :btree
+  add_index "user_balance_histories", ["cash_on_hand_load_id"], name: "index_user_balance_histories_on_cash_on_hand_load_id", using: :btree
+  add_index "user_balance_histories", ["cash_on_hand_withdrawal_id"], name: "index_user_balance_histories_on_cash_on_hand_withdrawal_id", using: :btree
+  add_index "user_balance_histories", ["company_id"], name: "index_user_balance_histories_on_company_id", using: :btree
+  add_index "user_balance_histories", ["finly_money_balance_id"], name: "index_user_balance_histories_on_finly_money_balance_id", using: :btree
+  add_index "user_balance_histories", ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id", using: :btree
+  add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
+  add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
@@ -978,8 +1374,8 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.datetime "avatar_updated_at"
     t.boolean  "kyc_verified"
     t.string   "gcm_sender_id",       limit: 255
-    t.integer  "employee_id",         limit: 4
-    t.integer  "payroll_id",          limit: 4
+    t.string   "employee_id",         limit: 255
+    t.string   "payroll_id",          limit: 255
     t.integer  "default_currency_id", limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
@@ -1094,6 +1490,7 @@ ActiveRecord::Schema.define(version: 20170217113720) do
     t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
     t.boolean  "verified",                           default: false
+    t.integer  "otp_request_type_id",    limit: 4
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -1141,18 +1538,21 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_foreign_key "card_limits", "card_restrictions"
   add_foreign_key "card_restrictions", "cards"
   add_foreign_key "card_transactions", "cards"
-  add_foreign_key "card_transactions", "expenses"
   add_foreign_key "card_transactions", "users"
   add_foreign_key "cards", "card_types"
   add_foreign_key "cards", "companies"
   add_foreign_key "cards", "users"
   add_foreign_key "categories", "companies"
   add_foreign_key "company_accounts", "companies"
+  add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_tags", "companies"
+  add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "distance_expenses", "expenses"
+  add_foreign_key "distances", "physical_units"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -1165,6 +1565,13 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_foreign_key "expenses", "users"
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
+  add_foreign_key "feedbacks", "feedback_types"
+  add_foreign_key "feedbacks", "users"
+  add_foreign_key "field_configurations", "companies"
+  add_foreign_key "field_configurations", "field_parent_types"
+  add_foreign_key "field_configurations", "field_types"
+  add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "itz_cash_properties", "companies"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
   add_foreign_key "money_request_comments", "expenses"
@@ -1189,6 +1596,8 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "per_diem_expenses", "expenses"
+  add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
@@ -1206,6 +1615,14 @@ ActiveRecord::Schema.define(version: 20170217113720) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "time_expenses", "expenses"
+  add_foreign_key "time_objects", "physical_units"
+  add_foreign_key "transcribed_expenses", "amounts"
+  add_foreign_key "transcribed_expenses", "expenses"
+  add_foreign_key "transcribed_expenses", "receipts"
+  add_foreign_key "transcribed_expenses", "users"
+  add_foreign_key "user_balance_histories", "companies"
+  add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"

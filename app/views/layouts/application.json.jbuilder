@@ -7,6 +7,16 @@ if @result.present?
     data = JSON.parse yield rescue nil
     # For handling mobile apis
     if @result.config.present? and @result.config[:mobile_api]
+      json.builds do
+        json.android do
+          json.base MobileAppVersions::ANDROID_BASE_VERSION
+          json.latest MobileAppVersions::ANDROID_LATEST_VERSION
+        end
+        json.ios do
+          json.base MobileAppVersions::IOS_BASE_VERSION
+          json.latest MobileAppVersions::IOS_LATEST_VERSION
+        end
+      end
       json.success true
       if @result.messages.present?
         unless @result.messages[:error].blank?

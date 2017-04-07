@@ -4,6 +4,10 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     NotifierType.id_for(:money_request_take_control)
   end
 
+  def action_name
+    "Money Request Taken Control of"
+  end
+
   def affected_users
     [self.money_request.controlling_for_user]
   end
@@ -57,6 +61,11 @@ class Event::EMoneyRequest::TakeControl < Event::EMoneyRequest::Base
     else
       "#{self.money_request.controlling_user.name} has has taken control of the Money Request which was awaiting your review.<br/><br/>Money Request: \"#{self.money_request.name}\""
     end
+  end
+
+  def money_request_view_role(user)
+    roles = MoneyRequest::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    roles.first
   end
 
 end

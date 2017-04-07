@@ -13,11 +13,12 @@ class Autocomplete::Merchant < BaseOperation
   end
 
   def process
-    expense_ids = Expense::Index.(user, params).expenses.pluck(:id)
+    expense_ids = Expense::Index.(user, params).expenses.unreported.pluck(:id)
 
     # todo - see if there's a better way to do this.
     self.response = ManualExpense.merchant_like(query, expense_ids)
     self.response += CardExpense.merchant_like(query, expense_ids)
+    self.response += PerDiemExpense.per_diem_like(query, expense_ids)
     self.response.uniq! if self.response.present?
   end
 

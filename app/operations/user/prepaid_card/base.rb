@@ -1,16 +1,20 @@
 class User::PrepaidCard::Base < BaseOperation
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :card_id
 
   STATUS = {block: 0, unblock: 1}
 
   def pre_validate
     if user.blank?
-      messages[:error] << 'User not found'
+      add_message :error, 'User not found'
+    end
+    if params.blank?
+      add_message :error, 'Error loading configuration'
     end
   end
 
   def init
     self.params = {} if self.params.blank?
+    self.card_id = params[:card_id]
     self.selected_user = params[:user]
     return unless self.selected_user.blank?
     selected_user_id = (params[:id] or params[:user_id])

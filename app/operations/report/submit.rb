@@ -38,7 +38,7 @@ class Report::Submit < Report::Base
     # checking if policy is added if enforce policy is enabled
     if user.enforce_policy_enabled?
       if report.policy.nil?
-        add_message :error, "You have to select a policy for the report before submission"
+        add_message :error, 'You have to select a policy for the report before submission'
         return false
       end
     end
@@ -53,6 +53,11 @@ class Report::Submit < Report::Base
     if violations_present
       add_message :error, 'Reports with blocking violations cannot be submitted'
     end
+
+    custom_field_validations = CustomField::Validate.(report)
+    unless custom_field_validations.success?
+      add_message :error, custom_field_validations.messages[:error]
+    end
   end
 
   def authorize
@@ -60,13 +65,6 @@ class Report::Submit < Report::Base
       raise_unauthorized_exception
       return false
     end
-    # # if submitting a report for someone else, ensure he has the right to
-    # if params[:controlling_for_user_id]
-    #   unless report.controlling_for_user_id == user.id
-    #     raise_unauthorized_exception
-    #     return false
-    #   end
-    # else
 
     # Only report owners can submit report
     unless report.user_id == user.id

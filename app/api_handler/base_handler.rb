@@ -98,6 +98,8 @@ class BaseHandler
     param = self.post_params
     return unless p.present?
     begin
+      puts "Posting Path : #{p}"
+      puts "Post Params: #{param}"
       self.response = self.connection.post p, param
       puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed

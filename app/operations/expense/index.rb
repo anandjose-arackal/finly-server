@@ -43,7 +43,7 @@ class Expense::Index < Expense::Base
     elsif params.present? and params[:controller].present? and params[:controller] == 'expenses' and params[:action] == 'index'
       # If viewed from expense index screen
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
-      self.expenses = Expense.with_user(team_user_ids).only_card_expenses.unreported.uniq if team_user_ids.present?
+      self.expenses = Expense.with_user(team_user_ids).only_card_expenses.unreported_and_rejected.uniq if team_user_ids.present?
     else
       # For all expenses
       report_ids = Report::Index.(user, params).reports.map(&:id) rescue nil
@@ -98,7 +98,7 @@ class Expense::Index < Expense::Base
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
-        self.unreported_expenses = expenses.unreported
+        self.unreported_expenses = expenses.unreported_and_rejected
         if params[:view] == 'personal' or params[:view].nil?
           self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
         else

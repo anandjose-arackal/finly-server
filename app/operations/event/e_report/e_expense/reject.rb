@@ -1,5 +1,5 @@
 class Event::EReport::EExpense::Reject < Event::EReport::Base
-  attr_accessor :rejected_expense
+  attr_accessor :rejected_expense, :roles
 
   def init
     super
@@ -17,6 +17,10 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
     NotifierType.id_for(:report_expense_reject)
   end
 
+  def action_name
+    "Report Expense Rejected"
+  end
+
   def affected_users
     Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
   end
@@ -28,7 +32,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:expense),
                                              action_type_id: NotificationActionType.id_for(:notify_reject),
                                              action_user_id: self.user.id,
@@ -44,19 +48,29 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    unless user == self.report.controlling_user
-      "#{self.report.controlling_user.name} has rejected expense: #{rejected_expense.merchant_name}"
-    else
+    if user == self.report.controlling_user
       "You rejected the expense : #{rejected_expense.merchant_name}"
+    else
+      "#{self.report.controlling_user.name} has rejected expense: #{rejected_expense.merchant_name}"
     end
   end
 
   def mailer_body(user)
-    unless user == self.report.controlling_user
-      "#{self.report.controlling_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in report: '#{self.report.name}'"
-    else
+    if user == self.report.controlling_user
       "You rejected the expense : #{rejected_expense.merchant_name} in report: #{self.report.name}"
+    else
+      "#{self.report.controlling_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in report: '#{self.report.name}'"
     end
     
   end
+
+  def set_presenter_params(user)
+    super(user)
+    params[:rejected_expenses] = [rejected_expense]
+  end
+
+  def report_view_role
+    roles.first
+  end
+
 end

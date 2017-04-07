@@ -18,6 +18,9 @@ class Api::V1::CardsController < ApplicationController
         # Value = 2
         @result = User::Wallet::Debit.(current_user, params)
     end
+    if @result.present?
+      @result.config[:mobile_api] = true
+    end
     if @result.present? and @result.success?
       respond response: :success
     else
@@ -37,6 +40,9 @@ class Api::V1::CardsController < ApplicationController
         @result = User::PrepaidCard::Unblock.(current_user, params)
       else
         @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: ['Invalid Status Type']})
+    end
+    if @result.present?
+      @result.config[:mobile_api] = true
     end
     if @result.present? and @result.success?
       respond response: :success

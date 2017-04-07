@@ -207,7 +207,7 @@ class Notification < ActiveRecord::Base
         else
           object = " report"
         end
-        r = Report.find_by(id: self.object_id)
+        r = Report.unscoped.find_by(id: self.object_id)
         object_name = " : \"#{r.name}\""
         if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
           object_name += " has been auto approved"
@@ -217,13 +217,16 @@ class Notification < ActiveRecord::Base
         end
       when "Money Request"
         if action_type_id == NotificationActionType.id_for(:notify_credit_advance_request)
-          object = " for an money request"
-          mr = MoneyRequest.find_by(id: self.object_id)
+          object = " for a money request"
+          mr = MoneyRequest.unscoped.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         else
           object = " money request"
-          mr = MoneyRequest.find_by(id: self.object_id)
+          mr = MoneyRequest.unscoped.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
+        end
+        if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
+          object_name += " has been auto approved"
         end
         if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
           object_name += " and is awaiting your further approval"
@@ -263,7 +266,7 @@ class Notification < ActiveRecord::Base
 
   def generate_link(user)
 
-    base = Constants::BASE_URL
+    # base = Constants::BASE_URL
     view = ""
     case view_role_id
       when 3
@@ -279,14 +282,14 @@ class Notification < ActiveRecord::Base
     path = ""
     case self.path_object_type
       when "Report"
-        path_object = Report.find_by(id: self.path_object_id)
+        path_object = Report.unscoped.find_by(id: self.path_object_id)
         if path_object.is_deleted?
           path = "reports"
         else
           path = "reports/#{self.path_object_id}"
         end
       when "Money Request"
-        path_object = MoneyRequest.find_by(id: self.path_object_id)
+        path_object = MoneyRequest.unscoped.find_by(id: self.path_object_id)
         if path_object.is_deleted?
           path = "requests"
         else
@@ -315,7 +318,7 @@ class Notification < ActiveRecord::Base
     end
     suffix += "}"
 
-    return base + path + suffix
+    return "#" + path + suffix
 
   end
 
@@ -330,9 +333,9 @@ class Notification < ActiveRecord::Base
   def retrieve_object_preposition
     case object_type
       when "Report"
-        object = Report.find_by(id: object_id)
+        object = Report.unscoped.find_by(id: object_id)
       when "Money Request"
-        object = MoneyRequest.find_by(id: object_id)
+        object = MoneyRequest.unscoped.find_by(id: object_id)
       else
         return ""
     end
@@ -342,11 +345,6 @@ class Notification < ActiveRecord::Base
     elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)
       return " a" if object_type == "Report"
       return " an" if object_type == "Money Request"
-    # below condition is only if we're showing notification for an action performed on one's own object. eg. Submit, Approve etc.
-    # elsif self.action_user_id == owner.id
-    #   return " your" if self.action_type_id == NotificationActionType.notify_take_control_id
-    #   return " a" if object_type == "Report"
-    #   return " an" if object_type == "Money Request"
     elsif self.user_id == owner.id
       return " your"
     else

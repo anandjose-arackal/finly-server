@@ -1,5 +1,5 @@
 class Event::EReport::EComment::Create < Event::EReport::Base
-  attr_accessor :comment
+  attr_accessor :comment, :roles
 
   def init
     super
@@ -25,6 +25,10 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     affected_users
   end
 
+  def action_name
+    "New Report Comment"
+  end
+
   def send_push_notification(user)
     content = comment.content
     comment_user = comment.user
@@ -37,7 +41,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def set_notification(user)
-    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: self.user.id,
@@ -57,13 +61,21 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def mailer_body(user)
-    content = comment.content
     comment_user = comment.user
-    "#{comment_user.name} has comment on the report '#{self.report.name}'<br/><br/>'#{content}'"
+    "#{comment_user.name} has comment on the report '#{self.report.name}'"
   end
 
   def mailer_button_name(user)
     'View Report'
+  end
+
+  def set_presenter_params(user)
+    super(user)
+    params[:comment_body] = comment.content
+  end
+
+  def report_view_role
+    roles.first
   end
 
 end

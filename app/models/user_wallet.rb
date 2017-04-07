@@ -13,6 +13,9 @@ class UserWallet < ActiveRecord::Base
   belongs_to :user
   belongs_to :balance, class_name: 'Amount'
 
+  has_many :initiating_payments, as: :initiating_account
+  has_many :receiving_payments, as: :receiving_account
+
   validates :user, presence: true
 
   accepts_nested_attributes_for :balance

@@ -22,6 +22,8 @@
 
 
 
+
+
 # todo rename rejected_to_id to modified_user_id
 class MoneyRequestComment < ActiveRecord::Base
 
@@ -60,24 +62,24 @@ class MoneyRequestComment < ActiveRecord::Base
     end
     case comment_action_id
       when MoneyRequestCommentAction.id_for(:retract)
-        comment = "#{name} retracted the advance request"
+        comment = "#{name} retracted the Money Request"
       when MoneyRequestCommentAction.id_for(:submit)
-        comment = "#{name} submitted the advance request"
+        comment = "#{name} submitted the Money Request"
       when MoneyRequestCommentAction.id_for(:approve)
-        comment = "#{name} approved the advance request"
+        comment = "#{name} approved the Money Request"
       when MoneyRequestCommentAction.id_for(:approve_and_forward)
-        comment = "#{name} approved and forwarded the advance request to #{rejected_to.name}"
+        comment = "#{name} approved and forwarded the Money Request to #{rejected_to.name}"
       when MoneyRequestCommentAction.id_for(:auto_approve)
         comment = 'Request auto-approved as no manager is assigned to the user'
       when MoneyRequestCommentAction.id_for(:reject)
-        comment = "#{name} rejected the advance request"
+        comment = "#{name} rejected the Money Request"
         if self.content.present?
           comment += " with a note: '#{self.content}'"
         end
       when MoneyRequestCommentAction.id_for(:unapprove)
-        comment = "#{name} unapproved the advance request"
+        comment = "#{name} unapproved the Money Request"
       when MoneyRequestCommentAction.id_for(:take_control)
-        comment = "#{name} took control of the advance request from #{}"
+        comment = "#{name} took control of the Money Request"
         if self.content.present?
           comment += " with a note: '#{self.content}'"
         end
@@ -85,13 +87,13 @@ class MoneyRequestComment < ActiveRecord::Base
         comment = "#{name} commented : #{content}"
       when MoneyRequestCommentAction.id_for(:update)
         comment = "#{name} updated #{updated_field} from #{updated_from} to #{updated_to}"
-      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_wallet)
+      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_wallet), MoneyRequestCommentAction.id_for(:credited_from_card_to_wallet)
         payment_id = payment.id rescue nil
         comment = "#{name} credited #{name_rec} wallet with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , with a note : #{payment.note}"
         end
-      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_card), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_card)
+      when MoneyRequestCommentAction.id_for(:credited_from_virtual_account_to_card), MoneyRequestCommentAction.id_for(:credited_from_wallet_to_card), MoneyRequestCommentAction.id_for(:credited_from_card_to_card)
         payment_id = payment.id rescue nil
         comment = "#{name} credited #{name_rec} card with Payment ID : #{payment_id}"
         if payment.note.present?
@@ -99,7 +101,7 @@ class MoneyRequestComment < ActiveRecord::Base
         end
       when MoneyRequestCommentAction.id_for(:credited)
         payment_id = payment.id rescue nil
-        comment = "#{name} credited the advance request with Payment ID : #{payment_id}"
+        comment = "#{name} credited the Money Request with Payment ID : #{payment_id}"
         if payment.note.present?
           comment += " , with a note : #{payment.note}"
         end

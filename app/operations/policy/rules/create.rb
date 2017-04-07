@@ -35,13 +35,13 @@ class Policy::Rules::Create < Policy::Rules::Base
   def process
     if params[:expense_rule]
       self.rule = policy.expense_rules.create(rule_params)
-      unless rule
+      unless ExpenseRule.exists?(rule)
         messages[:error] = rule.errors.full_messages
         return false
       end
     else
       self.rule = policy.budget_rules.create(rule_params)
-      unless rule
+      unless BudgetRule.exists?(rule)
         messages[:error] = rule.errors.full_messages
         return false
       end

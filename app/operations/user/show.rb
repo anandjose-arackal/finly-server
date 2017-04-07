@@ -1,5 +1,5 @@
 class User::Show < User::Base
-  attr_accessor :selected_user, :card_presenter
+  attr_accessor :selected_user, :balances
 
   def pre_validate
     unless user.present?
@@ -19,7 +19,9 @@ class User::Show < User::Base
         if self.selected_user.blank?
           add_message :error, 'User not found'
         elsif self.selected_user.cards.present?
-          self.card_presenter = ItzCash::AccountDetails.(selected_user) rescue nil
+          self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
+              target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
+              target_user_cash_in_hand: true, view: params[:view]).balances
         end
       else
         messages[:error] = operation.messages[:error]
@@ -29,7 +31,7 @@ class User::Show < User::Base
 
   def success
     params[:selected_user] = selected_user
-    params[:card_presenter] = card_presenter
+    params[:balances] = balances
     User::Show::Presenter.new(user, params, messages)
   end
 
@@ -38,7 +40,7 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :mcc_groups, :card_limit, :card_periods, :card_limits, :card_restriction
+                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances
 
     def init
       self.selected_user = params[:selected_user]
@@ -47,21 +49,69 @@ class User::Show < User::Base
       self.team_mapping = self.selected_user.team_mapping
       self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
+      self.balances = params[:balances]
       self.policies.each do |policy|
         self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
       end
-      self.actions = load_actions
+      self.actions = load_actions(self.balances)
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
-      self.card = params[:card_presenter].card rescue nil
+      self.cards = []
+      personal = (selected_user == user)
+      if balances.present?
+        selected_user.cards.each do |card|
+          actions = {}
+          # Card Actions
+          show_balance = personal ? true : card.card_program.manager_view_balance
+          show_eligibility = personal ? true : card.card_program.manager_view_eligibility
+          configurable_restrictions = card.card_program.spend_restrictions
+          balance = show_balance ? balances[:target_user][:card][card.id][:balance] : nil
+          eligibility = show_eligibility ? balances[:target_user][:card][card.id][:eligibility] : nil
+          disabled_by = card.disabled_by_role.name rescue nil
+          active = card.active
+          name = "#{card.card_program.name} Card"
+          ending_number = card.ending_number
+          id = card.id
+
+          if not personal_view? and card.card_program.manager_blockable
+            card_params = {}
+            card_params[:view] = params[:view]
+            card_params[:user_id] = selected_user.id
+            card_params[:card_id] = id
+            card_params[:action_type] = nil
+            if card.active
+              card_params[:status_type] = User::PrepaidCard::Base::STATUS[:block]
+              actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            else
+              card_params[:status_type] = User::PrepaidCard::Base::STATUS[:unblock]
+              actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            end
+          elsif personal
+            if card.active
+              card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
+              actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            else
+              if card.disabled_by_role_id == UserRole.id_for(:employee) or user.company_admin?
+                card_params = {status_type: User::PrepaidCard::Base::STATUS[:unblock], user_id: selected_user.id}
+                actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+              end
+            end
+          end
+          self.cards << {card: {show_balance: show_balance,
+                                show_eligibility: show_eligibility,
+                                ending_number: ending_number,
+                                configurable_restrictions: configurable_restrictions,
+                                balance: balance,
+                                eligibility: eligibility,
+                                disabled_by: disabled_by,
+                                active: active, name: name, id: id},
+                         actions: actions, card_restriction: card.card_restriction}
+        end
+      end
       self.auto_submit_config = self.selected_user.auto_submit_config
       self.periods = Period.all
       self.card_periods = Period.limit(3)
       self.mcc_groups = MccGroup.all
-      self.card_limit = params[:card_presenter].available_card_eligibility rescue nil
-      selected_card = selected_user.cards.first rescue nil
-      self.card_restriction = selected_card.card_restriction rescue nil
-      self.card_limits = card_restriction.card_limits rescue nil
     end
 
     private
@@ -70,11 +120,16 @@ class User::Show < User::Base
 
     end
 
-    def load_actions
+
+    def load_cards
+
+    end
+
+    def load_actions(balances)
       actions = {}
       # Check if user has a already signed up, if not give option to delete/resend invite
       if (self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?) or
-        (selected_user.first_name.blank?)
+          (selected_user.first_name.blank?)
         actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
         actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id) unless self.selected_user.mobile_only_invite
       else
@@ -86,119 +141,98 @@ class User::Show < User::Base
         end
       end
 
-      card_assigned = self.selected_user.cards.present?
+      actions[:transfer_options] = load_transfer_options(balances)
 
-      credit_params = {}
-      credit_params[:view] = params[:view]
-      credit_params[:action_type] = User::Wallet::Base::ACTIONS[:credit]
-      credit_params[:to_user_id] = selected_user.id
+      actions
+    end
 
-      debit_params = {}
-      debit_params[:view] = params[:view]
-      debit_params[:action_type] = User::Wallet::Base::ACTIONS[:debit]
-      debit_params[:from_user_id] = selected_user.id
+    def load_transfer_options(balances)
+      credit_actions = {initiating_accounts: [], receiving_accounts: []}
+      debit_actions={receiving_accounts: [], initiating_accounts: []}
 
-      # Wallet Actions
-      if manager_view? or finance_view? or admin_view?
-        if self.user.company_admin?
-          # Virtual Account -> Wallet
-          credit_params[:from_account] = :virtual_account
-          credit_params[:to_account] = :wallet
-          actions[:credit_wallet_from_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+      from_user_transferable_cards = user.cards.with_non_personal_fund_transfer
+      to_user_creditable_cards = selected_user.cards.creditable_cards
+      from_user_name = 'Your'
+      personal_transfer = self.user == self.selected_user
+      to_user_name = personal_transfer ? 'Your' : "#{self.selected_user.name}'s "
 
-          if card_assigned
-            # Virtual Account -> Selected User's Card
-            credit_params[:from_account] = :virtual_account
-            credit_params[:to_account] = :card
-            actions[:credit_card_from_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+      # From Actions
+      # Virtual Account
+      if user.company_admin?
+        balance = balances[:virtual_account][:balance] rescue nil
+        action = {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance, active: true}
+        credit_actions[:initiating_accounts] << action
+        debit_actions[:initiating_accounts] << action
+      end
 
-            # Selected User's card -> Virtual Account
-            debit_params[:from_account] = :card
-            debit_params[:to_account] = :virtual_account
-            actions[:debit_card_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-          end
+      # WalletWallet
+      balance = balances[:current_user][:wallet][:balance] rescue nil
+      action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money", balance: balance, active: true}
+      credit_actions[:initiating_accounts] << action
+      debit_actions[:initiating_accounts] << action
 
-          # Wallet -> Virtual Account
-          debit_params[:from_account] = :wallet
-          debit_params[:to_account] = :virtual_account
-          actions[:debit_wallet_to_virtual_account] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-        end
-        if selected_user != user
-          # User's Wallet -> Selected User's Wallet
-          credit_params[:from_account] = :wallet
-          credit_params[:to_account] = :wallet
-          actions[:credit_wallet_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+      # Cards
+      if from_user_transferable_cards.present?
+        from_user_transferable_cards.each do |card|
+          next if (not personal_transfer and not card.card_program.non_personal_fund_transfer) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
 
-          # Selected User's Wallet -> User's Wallet
-          debit_params[:from_account] = :wallet
-          debit_params[:to_account] = :wallet
-          actions[:debit_wallet_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+          balance = balances[:current_user][:card][card.id][:balance] rescue nil
+          eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
+          action = {type: :card, id: card.id, name: "#{from_user_name} #{card.card_program.name} Card",
+                    balance: balance, eligibility: eligibility,
+                    show_balance: true, show_eligbility: true, active: card.active}
 
-          if card_assigned
-            # User's Card -> Selected User's Card
-            credit_params[:from_account] = :card
-            credit_params[:to_account] = :card
-            actions[:credit_card_from_card] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
-
-            # Selected User's Card -> User's Card
-            debit_params[:from_account] = :card
-            debit_params[:to_account] = :card
-            actions[:debit_card_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+          card_program = card.card_program
+          if personal_transfer
+            next unless card_program.personal_wallet_fund_transfer
+            credit_actions[:initiating_accounts] << action
+            debit_actions[:initiating_accounts] << action
+          else
+            next unless card_program.non_personal_fund_transfer
+            credit_actions[:initiating_accounts] << action
+            debit_actions[:initiating_accounts] << action
           end
         end
       end
 
-      if card_assigned
-        # Credit actions
-        # User's Wallet -> Selected User's Card
-        credit_params[:from_account] = :wallet
-        credit_params[:to_account] = :card
-        actions[:credit_card_from_wallet] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+      # To Actions
+      # Wallet
+      balance = balances[:target_user][:wallet][:balance] rescue nil
+      action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
+      credit_actions[:receiving_accounts] << action
+      debit_actions[:receiving_accounts] << action
 
-        # User's Card -> Selected User's Wallet
-        credit_params[:from_account] = :card
-        credit_params[:to_account] = :wallet
-        actions[:credit_wallet_from_card] = Rails.application.routes.url_helpers.update_balance_path(credit_params)
+      # Cards
+      if to_user_creditable_cards.present?
+        to_user_creditable_cards.each do |card|
+          show_balance = (personal_transfer or card.card_program.manager_view_balance)
+          show_eligibility = (personal_transfer or card.card_program.manager_view_eligibility)
+          balance = balances[:target_user][:card][card.id][:balance] rescue nil
+          eligibility = balances[:target_user][:card][card.id][:balance] rescue nil
 
-        # Debit actions
-        # Selected User's Wallet -> User's Card
-        debit_params[:from_account] = :wallet
-        debit_params[:to_account] = :card
-        actions[:debit_wallet_to_card] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
+          action = {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
+                    balance: balance, eligibility: eligibility, show_balance: show_balance,
+                    show_eligibility: show_eligibility, active: card.active}
 
-        # Selected User's Card -> User's Wallet
-        debit_params[:from_account] = :card
-        debit_params[:to_account] = :wallet
-        actions[:debit_card_to_wallet] = Rails.application.routes.url_helpers.update_balance_path(debit_params)
-
-
-        # Card Actions
-        card = self.selected_user.cards.first
-        if manager_view? or finance_view? or admin_view?
-          card_params = {}
-          card_params[:view] = params[:view]
-          card_params[:user_id] = selected_user.id
-          card_params[:action_type] = nil
-          if card.active
-            card_params[:status_type] = User::PrepaidCard::Base::STATUS[:block]
-            actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+          card_program = card.card_program
+          # Verify is user is allowed to credit / debit from the card based on the card program
+          if personal_transfer
+            next unless card_program.personal_wallet_fund_transfer
+            credit_actions[:receiving_accounts] << action
+            debit_actions[:receiving_accounts] << action
           else
-            card_params[:status_type] = User::PrepaidCard::Base::STATUS[:unblock]
-            actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-          end
-        else
-          if card.active
-            card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
-            actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-          else
-            if card.disabled_by_role_id == UserRole.id_for(:employee)
-              card_params = {status_type: User::PrepaidCard::Base::STATUS[:unblock], user_id: selected_user.id}
-              actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
+            if card_program.manager_credit
+              credit_actions[:receiving_accounts] << action
+            end
+            if card_program.manager_debit
+              debit_actions[:receiving_accounts] << action
             end
           end
+
         end
       end
-      actions
+
+      {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])}, credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
     end
 
   end

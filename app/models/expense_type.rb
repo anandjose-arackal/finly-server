@@ -11,11 +11,18 @@
 
 
 
+
+
 class ExpenseType < ActiveRecord::Base
 
   validates :name, presence: true
 
   VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5}
+
+
+  def self.id_for(type)
+    VALUES[type]
+  end
 
   # delegated from expense model
   def expense_type_name
@@ -42,7 +49,4 @@ class ExpenseType < ActiveRecord::Base
     5
   end
 
-  def self.id_for(item)
-    VALUES[item]
-  end
 end

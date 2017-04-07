@@ -27,11 +27,6 @@
 
 
 
-
-
-
-
-
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -47,6 +42,8 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy
   belongs_to :payment
+
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
@@ -104,9 +101,11 @@ class MoneyRequest < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
-  scope :settlement_viewable, -> {
-    where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)]
-  }
+  scope :settlement_viewable, -> { where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)] }
+
+  scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC')}
+
+  accepts_nested_attributes_for :custom_fields
 
   accepts_nested_attributes_for :items
   delegate :status_name, to: :status
@@ -142,6 +141,10 @@ class MoneyRequest < ActiveRecord::Base
 
   def credited?
     status_id == MoneyRequestStatus.id_for(:credited)
+  end
+
+  def editable?
+    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted)
   end
 
   def can_submit?

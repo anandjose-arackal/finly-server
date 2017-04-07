@@ -8,6 +8,10 @@ class ItzCash::AccountDetails < ItzCash::Base
     end
     unless user.cards.present?
       add_message :error, 'A card has not been assigned to the user'
+      return
+    end
+    if params.blank? or params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
+      add_message :error, 'Card not found'
     end
   end
 
@@ -16,12 +20,12 @@ class ItzCash::AccountDetails < ItzCash::Base
   end
 
   def post_params
-    {serialid: user.cards.first.serial_id, itzmodule: Constants::ItzCash::MODULE}
+    {serialid: card.serial_id, itzmodule: Constants::ItzCash::MODULE}
   end
 
   def init
     super
-    self.card = user.cards.first
+    self.card = user.cards.with_id(params[:card_id]).first
   end
 
   def success
@@ -73,12 +77,22 @@ class ItzCash::AccountDetails < ItzCash::Base
   protected
   def update_card
     if params[:suspended_status] == 'Y'
+      # attributes_to_update[:active] = false if card.active
       card.update_attribute(:active, false) if card.active
     elsif params[:suspended_status] == 'N'
+      # attributes_to_update[:active] = true if card.active
       card.update_attribute(:active, true) unless card.active
     end
-    card.balance = parsed_response[2].to_d
-    card.available_card_eligibility = parsed_response[9].to_d
+    if card.card_balance.blank?
+      id = Amount.create(value: 0, currency_id: Currency.first.id).id
+      card.update_attributes(card_balance_id: id)
+    end
+    if card.card_eligibility.blank?
+      id = Amount.create(value: 0, currency_id: Currency.first.id).id
+      card.update_attributes(card_eligibility_id: id)
+    end
+    card.card_balance.update_attributes(value: parsed_response[2].to_d)
+    card.card_eligibility.update_attributes(value: parsed_response[9].to_d)
   end
 
 end
