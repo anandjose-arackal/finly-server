@@ -24,3 +24,5 @@ Gemfile.lock
 #Vagrantfile
 #bootstrap.sh
 vendor/bundle/
+.DS_Store
+dump.rdb
