@@ -289,12 +289,12 @@ class Expense < ActiveRecord::Base
 
   def merchant_name
     case self.expense_type_id
-      when 1
+      when ExpenseType.id_for(:manual)
         return self.manual_expense.merchant
-      when 2
+      when ExpenseType.id_for(:card)
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
-      when 5
+      when ExpenseType.id_for(:per_diem)
         return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
       else
         if self.report.nil?
@@ -313,9 +313,9 @@ class Expense < ActiveRecord::Base
 
   def surcharge_value
     case self.expense_type_id
-      when 1
+      when ExpenseType.id_for(:manual)
         return 0
-      when 2
+      when ExpenseType.id_for(:card)
         return self.card_expense.surcharge_amount
     end
   end
