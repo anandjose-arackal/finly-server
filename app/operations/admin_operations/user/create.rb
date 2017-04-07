@@ -1,6 +1,6 @@
 class AdminOperations::User::Create < AdminOperations::User::Base
 
-  attr_accessor :company, :user
+  attr_accessor :company, :created_user
 
   def pre_validate
     if user.blank? || params.blank?
@@ -9,14 +9,19 @@ class AdminOperations::User::Create < AdminOperations::User::Base
   end
 
   def init
-    self.company = Company.find_by(id: params[:id])
+    id = params[:id] || params[:company_id]
+    self.company = Company.find_by(id: id)
   end
 
   def process
-    self.user = company.users.build(user_params)
-    unless user.save
+    self.created_user = company.users.build(user_params)
+    unless created_user.save
       add_message :error, user.errors.full_messages
     end
+  end
+
+  def success
+    AdminOperations::User::Base::UserPresenter.new(user, {created_user: created_user}, messages)
   end
 
   private
