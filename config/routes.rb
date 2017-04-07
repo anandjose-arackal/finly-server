@@ -651,6 +651,7 @@ Rails.application.routes.draw do
   get 'policies/policy_member_settings/' => 'policies#policy_member_settings'
 
   get 'policies/details' => 'policies#details'
+  get 'policies/personal' => 'policies#show_personal'
   resources :policies, except: [:new, :edit]
   resources :policies do
     post 'invitable_users' => 'policies#invitable_users', as: :invitable_users

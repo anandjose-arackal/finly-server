@@ -1,4 +1,4 @@
-class Policy::SetDescription < Policy::Base
+class Policy::Update < Policy::Base
   attr_accessor :description
 
   def authorized_user_types
@@ -16,7 +16,7 @@ class Policy::SetDescription < Policy::Base
 
   def init
     self.description = params[:policy][:description] rescue nil
-    self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
+    self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
   end
 
   def process
