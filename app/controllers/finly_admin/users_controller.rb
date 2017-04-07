@@ -1,4 +1,4 @@
-class Superadmin::UsersController < ApplicationController
+class FinlyAdmin::UsersController < ApplicationController
 
   def new
     @states = State.all

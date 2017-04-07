@@ -2,15 +2,14 @@
 #
 # Table name: policies
 #
-#  id          :integer          not null, primary key
-#  name        :string(255)
-#  company_id  :integer
-#  owner_id    :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  default     :boolean          default(FALSE), not null
-#  is_deleted  :boolean          default(FALSE), not null
-#  description :text(65535)
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  company_id :integer
+#  owner_id   :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  default    :boolean          default(FALSE), not null
+#  is_deleted :boolean          default(FALSE), not null
 #
 
 

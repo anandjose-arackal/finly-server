@@ -1,7 +1,6 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                 Controller#Action
-#              transcriber_companies_index GET        /transcriber/companies/index(.:format)                      transcriber/companies#index
 #  transcriber_transcribed_expenses_create POST       /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
 #  transcriber_transcribed_expenses_update PATCH      /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
 #     transcriber_transcribed_receipt_show GET        /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
@@ -262,12 +261,14 @@
 #        api_v1_configuration_gcm_register POST       /api/v1/configuration/gcm/register(.:format)                api/v1/configuration/gcm#create
 #      api_v1_configuration_gcm_unregister POST       /api/v1/configuration/gcm/unregister(.:format)              api/v1/configuration/gcm#delete
 #                          api_v1_balances GET        /api/v1/balances(.:format)                                  api/v1/users#balance
+#           api_v1_available_expense_types GET        /api/v1/available_expense_types(.:format)                   api/v1/expenses#available_expense_types
 #                   policies_expense_rules GET        /policies/expense_rules(.:format)                           policies#expense_rules
 #                    policies_budget_rules GET        /policies/budget_rules(.:format)                            policies#budget_rules
 #                  policies_policy_members GET        /policies/policy_members(.:format)                          policies#policy_members
 #                     policies_create_rule GET        /policies/create_rule(.:format)                             policies#create_rule
 #          policies_policy_member_settings GET        /policies/policy_member_settings(.:format)                  policies#policy_member_settings
 #                         policies_details GET        /policies/details(.:format)                                 policies#details
+#                        policies_personal GET        /policies/personal(.:format)                                policies#show_personal
 #                                 policies GET        /policies(.:format)                                         policies#index
 #                                          POST       /policies(.:format)                                         policies#create
 #                                   policy GET        /policies/:id(.:format)                                     policies#show
@@ -281,6 +282,7 @@
 #                   policy_destroy_mapping DELETE     /policies/:policy_id/remove_mapping/:mapping_id(.:format)   policies#destrot_mapping
 #                          policy_add_rule POST       /policies/:policy_id/add_rule(.:format)                     rules#create
 #                       policy_remove_rule DELETE     /policies/:policy_id/remove_rule(.:format)                  rules#destroy
+#                       policy_description GET        /policies/:policy_id/description(.:format)                  policies#show_description
 #                                          GET        /policies(.:format)                                         policies#index
 #                                          POST       /policies(.:format)                                         policies#create
 #                               new_policy GET        /policies/new(.:format)                                     policies#new
@@ -416,6 +418,7 @@
 #                                          PATCH      /users/:id(.:format)                                        users#update
 #                                          PUT        /users/:id(.:format)                                        users#update
 #                                          DELETE     /users/:id(.:format)                                        users#destroy
+#                        user_user_summary GET        /users/:user_id/summary(.:format)                           users#summary
 #                             user_details POST       /users/:user_id/user_details(.:format)                      users#user_details
 #                         user_update_team PATCH      /users/:user_id/update_user_team(.:format)                  users#update_team
 #                         user_update_role PATCH      /users/:user_id/update_role(.:format)                       users#update_user_role
@@ -433,7 +436,7 @@
 #                                          DELETE     /users/:id(.:format)                                        users#destroy
 #                  available_expense_types GET        /available_expense_types(.:format)                          users#available_expense_types
 #                              user_import POST       /import(.:format)                                           users#import
-#                        superadmin_import POST       /superadmin_import(.:format)                                superadmin/companies#import
+#                        superadmin_import POST       /superadmin_import(.:format)                                admin/companies#import
 #                      initiate_activation GET        /pending_invites/initiate_activation(.:format)              pending_invites#initiate_activation
 #                        activate_employee GET        /pending_invites/activate_employee(.:format)                pending_invites#activate_employee
 #                                 send_otp GET        /pending_invites/send_otp(.:format)                         pending_invites#send_otp
@@ -482,23 +485,23 @@
 #                                          PATCH      /per_diems/:id(.:format)                                    per_diems#update
 #                                          PUT        /per_diems/:id(.:format)                                    per_diems#update
 #                                          DELETE     /per_diems/:id(.:format)                                    per_diems#destroy
-#             superadmin_company_new_admin POST       /superadmin/companies/:company_id/add_admin(.:format)       superadmin/companies#add_admin
-#                 superadmin_company_users GET        /superadmin/companies/:company_id/users(.:format)           superadmin/users#index
-#                                          POST       /superadmin/companies/:company_id/users(.:format)           superadmin/users#create
-#              new_superadmin_company_user GET        /superadmin/companies/:company_id/users/new(.:format)       superadmin/users#new
-#             edit_superadmin_company_user GET        /superadmin/companies/:company_id/users/:id/edit(.:format)  superadmin/users#edit
-#                  superadmin_company_user GET        /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#show
-#                                          PATCH      /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#update
-#                                          PUT        /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#update
-#                                          DELETE     /superadmin/companies/:company_id/users/:id(.:format)       superadmin/users#destroy
-#                     superadmin_companies GET        /superadmin/companies(.:format)                             superadmin/companies#index
-#                                          POST       /superadmin/companies(.:format)                             superadmin/companies#create
-#                   new_superadmin_company GET        /superadmin/companies/new(.:format)                         superadmin/companies#new
-#                  edit_superadmin_company GET        /superadmin/companies/:id/edit(.:format)                    superadmin/companies#edit
-#                       superadmin_company GET        /superadmin/companies/:id(.:format)                         superadmin/companies#show
-#                                          PATCH      /superadmin/companies/:id(.:format)                         superadmin/companies#update
-#                                          PUT        /superadmin/companies/:id(.:format)                         superadmin/companies#update
-#                                          DELETE     /superadmin/companies/:id(.:format)                         superadmin/companies#destroy
+#            finly_admin_company_new_admin POST       /finly_admin/companies/:company_id/create(.:format)         finly_admin/companies#add_admin
+#                    finly_admin_companies GET        /finly_admin/companies(.:format)                            finly_admin/companies#index
+#                                          POST       /finly_admin/companies(.:format)                            finly_admin/companies#create
+#                  new_finly_admin_company GET        /finly_admin/companies/new(.:format)                        finly_admin/companies#new
+#                 edit_finly_admin_company GET        /finly_admin/companies/:id/edit(.:format)                   finly_admin/companies#edit
+#                      finly_admin_company GET        /finly_admin/companies/:id(.:format)                        finly_admin/companies#show
+#                                          PATCH      /finly_admin/companies/:id(.:format)                        finly_admin/companies#update
+#                                          PUT        /finly_admin/companies/:id(.:format)                        finly_admin/companies#update
+#                                          DELETE     /finly_admin/companies/:id(.:format)                        finly_admin/companies#destroy
+#                        finly_admin_users GET        /finly_admin/users(.:format)                                finly_admin/users#index
+#                                          POST       /finly_admin/users(.:format)                                finly_admin/users#create
+#                     new_finly_admin_user GET        /finly_admin/users/new(.:format)                            finly_admin/users#new
+#                    edit_finly_admin_user GET        /finly_admin/users/:id/edit(.:format)                       finly_admin/users#edit
+#                         finly_admin_user GET        /finly_admin/users/:id(.:format)                            finly_admin/users#show
+#                                          PATCH      /finly_admin/users/:id(.:format)                            finly_admin/users#update
+#                                          PUT        /finly_admin/users/:id(.:format)                            finly_admin/users#update
+#                                          DELETE     /finly_admin/users/:id(.:format)                            finly_admin/users#destroy
 #       statements_company_balance_summary GET        /statements/company_balance_summary(.:format)               statements#company_balance_summary
 #  statements_company_transactions_summary GET        /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
 #      statements_company_policies_summary GET        /statements/company_policies_summary(.:format)              statements#company_policies_summary
@@ -528,6 +531,7 @@
 #                     notifications_unread GET        /notifications/unread(.:format)                             notifications#unread
 #              notifications_mark_all_read GET        /notifications/mark_all_read(.:format)                      notifications#mark_all_read
 #                                     faqs GET        /faqs(.:format)                                             faqs#index
+#                                 feedback POST       /feedback(.:format)                                         feedback#create
 #
 
 Rails.application.routes.draw do
@@ -762,7 +766,7 @@ Rails.application.routes.draw do
   # routes for testing import
   # get 'mass_import', to: 'users#mass_import', as: :mass_import
   post 'import', to: 'users#import', as: :user_import
-  post 'superadmin_import', to: 'superadmin/companies#import', as: :superadmin_import
+  post 'superadmin_import', to: 'admin/companies#import', as: :superadmin_import
   # get 'sample_import_file', to: 'users#sample_file', as: :sample_import_file
 
   get 'pending_invites/initiate_activation', to: 'pending_invites#initiate_activation', as: :initiate_activation
@@ -792,10 +796,12 @@ Rails.application.routes.draw do
   
   resources :per_diems
 
-  namespace :superadmin do
+  namespace :finly_admin do
     resources :companies do
-      post 'add_admin', to: 'companies#add_admin', as: :new_admin
-      resources :users
+      post 'create', to: 'companies#add_admin', as: :new_admin
+    end
+    resources :users do
+
     end
   end
 

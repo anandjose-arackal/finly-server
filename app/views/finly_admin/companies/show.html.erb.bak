@@ -36,7 +36,7 @@
 
     <br/><br/>
 
-    <!-- todo - have to add the list of users with respective links to their superadmin show pages -->
+    <!-- todo - have to add the list of users with respective links to thadmindmin show pages -->
     <% @result.company.users.filter_state(1).each do |user| %>
         <%= link_to user.name, superadmin_company_user_path(@result.company, user) %>
 

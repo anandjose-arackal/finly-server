@@ -1,4 +1,5 @@
-class Superadmin::CompaniesController < ApplicationController
+class FinlyAdmin::CompaniesController < ApplicationController
+
 
   before_action :authenticate_user!
   before_action :superadmin_accounts
@@ -8,19 +9,36 @@ class Superadmin::CompaniesController < ApplicationController
   end
 
   def show
-    @result = Company::Show.(current_user, params)
-    @states = State::VALUES
+    # @result = Company::Show.(current_user, params)
+    # @states = State::VALUES
+
+    @result = {
+        balance: "35168161",
+        name: "Jouska",
+        d_code: "51461",
+        logo: {
+            url: "public/common/images/campus-layer-2.png",
+            update_path: "some shit"
+        }
+    }
+    respond_to do |format|
+      format.json {
+        render json: @result.as_json
+      }
+    end
   end
 
   def create
-    @result = Superadmin::Company::Create.(current_user, params)
-    if @result.success?
-      flash[:success] = 'Company created'
-      redirect_to superadmin_companies_path
-    else
-      flash[:error] = @result.messages[:error]
-      redirect_to request.referrer
-    end
+    # @result = AdminOperations::Company::Create.(current_user, params)
+    # if @result.success?
+    #   flash[:success] = 'Company created'
+    #   redirect_to superadmin_companies_path
+    # else
+    #   flash[:error] = @result.messages[:error]
+    #   redirect_to request.referrer
+    # end
+
+
   end
 
   def add_admin
