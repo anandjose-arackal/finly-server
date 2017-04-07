@@ -1,5 +1,8 @@
 class Import::CompanyAdmin::Users < Import::Superadmin::Users
 
+
+  attr_accessor :file_url
+
   def authorized_user_types
     [:company_admin]
   end
@@ -14,8 +17,10 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
   def init
     self.file = params[:file]
     self.result_hash = {}
-    self.sheet = open_spreadsheet(file)
-    self.header = sheet.row(1)
+    if file.present?
+      self.sheet = open_spreadsheet(file)
+      self.header = sheet.row(1)
+    end
   end
 
   def authorize
@@ -23,7 +28,9 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
   end
 
   def validate
-
+    if file.nil? || sheet.nil?
+      add_message :error, "No file uploaded, please attach a file and try again"
+    end
   end
 
   def process
@@ -66,7 +73,21 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
 
   def post_process
     # generating the success csv
-    self.response = generate_response_csv
+    self.file_url = create_response_csv
+  end
+
+  def success
+    params[:file_url] = file_url
+    Import::CompanyAdmin::Users::FilePresenter.new(user, params, messages)
+  end
+
+  class Import::CompanyAdmin::Users::FilePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :file_url
+
+    def init
+      self.file_url = params[:file_url]
+    end
   end
 
   private

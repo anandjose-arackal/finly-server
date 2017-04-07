@@ -13,6 +13,7 @@
 
 
 
+
 class ReportStatus < ActiveRecord::Base
 
   scope :open, -> { find_by(id: ReportStatus.open_id) }

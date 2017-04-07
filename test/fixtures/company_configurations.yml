@@ -2,17 +2,18 @@
 #
 # Table name: company_configurations
 #
-#  id                :integer          not null, primary key
-#  company_id        :integer          not null
-#  contact_id        :integer
-#  verified          :boolean          default(FALSE)
-#  logo_file_name    :string(255)
-#  logo_content_type :string(255)
-#  logo_file_size    :integer
-#  logo_updated_at   :datetime
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  ocr_enabled       :boolean
+#  id                  :integer          not null, primary key
+#  company_id          :integer          not null
+#  contact_id          :integer
+#  verified            :boolean          default(FALSE)
+#  logo_file_name      :string(255)
+#  logo_content_type   :string(255)
+#  logo_file_size      :integer
+#  logo_updated_at     :datetime
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  ocr_enabled         :boolean
+#  other_expense_types :boolean          default(FALSE)
 #
 
 

@@ -1,6 +1,21 @@
 class Import::Base < BaseOperation
 
 
+  def create_response_csv
+    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    CSV.open(file_name, "wb") do |csv|
+      self.header << "Result"
+      csv << header
+      (2..sheet.last_row).each do |i|
+        row = sheet.row(i)
+        row = row.map(&:to_s)
+        row << result_hash[i]
+        csv << row
+      end
+    end
+    return file_name.gsub("public", "")
+  end
+
   def generate_response_csv
     CSV.generate(headers: true) do |csv|
       self.header << "Result"

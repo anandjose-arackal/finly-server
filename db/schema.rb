@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170405125844) do
+ActiveRecord::Schema.define(version: 20170406164755) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -975,10 +975,10 @@ ActiveRecord::Schema.define(version: 20170405125844) do
   create_table "per_diem_expenses", force: :cascade do |t|
     t.integer  "per_diem_id", limit: 4
     t.integer  "expense_id",  limit: 4
-    t.integer  "quantity",    limit: 4
+    t.decimal  "quantity",              precision: 10, scale: 4
     t.boolean  "is_deleted"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
   end
 
   add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree
