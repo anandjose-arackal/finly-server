@@ -30,29 +30,21 @@ class FinlyAdmin::CompaniesController < ApplicationController
   end
 
   def create
-    # @result = AdminOperations::Company::Create.(current_user, params)
-    # if @result.success?
-    #   flash[:success] = 'Company created'
-    #   redirect_to superadmin_companies_path
-    # else
-    #   flash[:error] = @result.messages[:error]
-    #   redirect_to request.referrer
-    # end
-
-
+    @result = AdminOperations::Company::Create.(current_user, params)
+    respond
   end
 
-  def add_admin
-    @result = Company::AddAdmin.(current_user, params)
-    # temporary rendering for html testing.
-    if @result.success?
-      flash[:success] = 'Admin Added'
-      redirect_to superadmin_companies_path
-    else
-      flash[:error] = @result.messages[:error]
-      redirect_to request.referrer
-    end
-  end
+  # def add_admin
+  #   @result = Company::AddAdmin.(current_user, params)
+  #   # temporary rendering for html testing.
+  #   if @result.success?
+  #     flash[:success] = 'Admin Added'
+  #     redirect_to superadmin_companies_path
+  #   else
+  #     flash[:error] = @result.messages[:error]
+  #     redirect_to request.referrer
+  #   end
+  # end
 
   def index
     @companies = Company.all
@@ -80,8 +72,7 @@ class FinlyAdmin::CompaniesController < ApplicationController
   private
 
   def superadmin_accounts
-    unless Constants::SUPERADMIN_ACCOUNTS.include?(current_user.email)
-      flash[:error] = "You are not authorized to perform this action"
+    unless current_user.company.name == "Jouska"
       redirect_to root_url
     end
   end
