@@ -1,5 +1,5 @@
 class FinlyAdmin::CompaniesController < ApplicationController
-
+  allow_oauth!
 
   before_action :authenticate_user!
   before_action :superadmin_accounts

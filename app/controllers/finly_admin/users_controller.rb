@@ -1,4 +1,5 @@
 class FinlyAdmin::UsersController < ApplicationController
+  allow_oauth!
 
   def new
     @states = State.all
