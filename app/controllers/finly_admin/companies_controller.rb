@@ -2,7 +2,7 @@ class FinlyAdmin::CompaniesController < ApplicationController
   allow_oauth!
 
   before_action :authenticate_user!
-  before_action :superadmin_accounts
+  # before_action :superadmin_accounts
 
   def new
     @states = State.all
