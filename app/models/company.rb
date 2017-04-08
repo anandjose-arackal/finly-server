@@ -48,6 +48,14 @@ class Company < ActiveRecord::Base
 
   scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
 
+  scope :filter_search, -> (term) {
+    where('name LIKE (?)', "%#{term}%")
+  }
+
+  scope :created_between, -> (start_date, end_date) {
+    where('created_at >= ? && created_at <= ?', start_date, end_date)
+  }
+
   def default_policy
     self.policies.default
   end

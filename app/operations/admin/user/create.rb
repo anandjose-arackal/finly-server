@@ -1,4 +1,4 @@
-class AdminOperations::User::Create < AdminOperations::User::Base
+class Admin::User::Create < Admin::User::Base
 
   attr_accessor :company, :created_user
 
@@ -15,13 +15,23 @@ class AdminOperations::User::Create < AdminOperations::User::Base
 
   def process
     self.created_user = company.users.build(user_params)
-    unless created_user.save
-      add_message :error, user.errors.full_messages
+    created_user.skip_confirmation_notification!
+    if created_user.save
+      created_user.activate
+      created_user.update_attribute(:verified, true)
+      created_user.otp_verified
+    else
+      add_message :error, created_user.errors.full_messages
+      return
     end
   end
 
+  def post_process
+    add_message :error, "User created"
+  end
+
   def success
-    AdminOperations::User::Base::UserPresenter.new(user, {created_user: created_user}, messages)
+    Admin::User::Base::UserPresenter.new(user, {created_user: created_user}, messages)
   end
 
   private
@@ -32,5 +42,6 @@ class AdminOperations::User::Create < AdminOperations::User::Base
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code],
                                  role_mapping_attributes: [:user_role_id])
+
   end
 end

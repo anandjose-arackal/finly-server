@@ -1,4 +1,4 @@
-class AdminOperations::Company::Create < AdminOperations::Company::Base
+class Admin::Company::Create < Admin::Company::Base
 
   attr_accessor :company
 

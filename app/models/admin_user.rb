@@ -23,4 +23,8 @@ class AdminUser < ActiveRecord::Base
   devise :database_authenticatable, 
          :recoverable, :rememberable, :trackable, :validatable
 
+
+  has_many :admin_user_role_mappings, dependent: :destroy
+  has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
+
 end

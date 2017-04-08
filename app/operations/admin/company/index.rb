@@ -1,4 +1,4 @@
-class AdminOperations::Company::Index < Company::Base
+class Admin::Company::Index < Admin::Company::Base
 
   attr_accessor :companies
 
@@ -21,15 +21,15 @@ class AdminOperations::Company::Index < Company::Base
   end
 
   def success
-    AdminOperations::Company::Index::CompaniesPresenter.new(user, {companies: companies}, messages)
+    Admin::Company::Index::CompaniesPresenter.new(user, {companies: companies}, messages)
   end
 
-  class AdminOperations::Company::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Admin::Company::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :companies
 
     has_scope :filter_search
-    has_scope :created_between
+    has_scope :created_between, using: [:start_date, :end_date], type: :hash
 
 
     def init
