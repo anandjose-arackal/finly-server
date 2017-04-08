@@ -1,6 +1,6 @@
 class AdminOperations::Company::Base < BaseOperation
 
-  def company_attributes
+  def company_params
     params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code])
   end
 
