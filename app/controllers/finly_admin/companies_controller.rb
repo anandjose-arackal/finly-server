@@ -22,12 +22,14 @@ class FinlyAdmin::CompaniesController < ApplicationController
   end
 
   def index
-    @companies = Company.all
-    respond_to do |format|
-      format.json {
-        render json: @companies.as_json
-      }
-    end
+    @result = AdminOperations::Company::Index.(current_user, params)
+    respond
+    # @companies = Company.all
+    # respond_to do |format|
+    #   format.json {
+    #     render json: @companies.as_json
+    #   }
+    # end
   end
 
   def update

@@ -19,7 +19,7 @@ class AdminOperations::Company::Update < AdminOperations::Company::Base
   end
 
   def process
-    unless company.update(company_attributes)
+    unless company.update(company_params)
       add_message :error, company.errors.full_messages
     end
   end
