@@ -28,4 +28,5 @@ class AdminOperations::Company::Update < AdminOperations::Company::Base
     add_message :success, "Company updated"
   end
 
+
 end

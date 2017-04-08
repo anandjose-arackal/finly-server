@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170406160406) do
+ActiveRecord::Schema.define(version: 20170407152916) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -27,6 +27,22 @@ ActiveRecord::Schema.define(version: 20170406160406) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "admin_user_role_mappings", force: :cascade do |t|
+    t.integer  "admin_user_id",      limit: 4
+    t.integer  "admin_user_role_id", limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "admin_user_role_mappings", ["admin_user_id"], name: "index_admin_user_role_mappings_on_admin_user_id", using: :btree
+  add_index "admin_user_role_mappings", ["admin_user_role_id"], name: "index_admin_user_role_mappings_on_admin_user_role_id", using: :btree
+
+  create_table "admin_user_roles", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "admin_users", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -993,10 +1009,10 @@ ActiveRecord::Schema.define(version: 20170406160406) do
   create_table "per_diem_expenses", force: :cascade do |t|
     t.integer  "per_diem_id", limit: 4
     t.integer  "expense_id",  limit: 4
-    t.integer  "quantity",    limit: 4
+    t.decimal  "quantity",              precision: 10, scale: 4
     t.boolean  "is_deleted"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
   end
 
   add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree
@@ -1522,6 +1538,8 @@ ActiveRecord::Schema.define(version: 20170406160406) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
+  add_foreign_key "admin_user_role_mappings", "admin_user_roles"
+  add_foreign_key "admin_user_role_mappings", "admin_users"
   add_foreign_key "amounts", "currencies"
   add_foreign_key "auto_submit_configs", "periods"
   add_foreign_key "balance_sheets", "users"
