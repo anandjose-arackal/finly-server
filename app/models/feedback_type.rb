@@ -20,7 +20,7 @@ class FeedbackType < ActiveRecord::Base
       others: 'Others'
   }
 
-  def self.create_seed_data
+  def self.seed_data
     if FeedbackType.count == 0
       FeedbackType::VALUES.each do |key, value|
         description = FeedbackType::DESCRIPTIONS[key]

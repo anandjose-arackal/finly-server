@@ -6,6 +6,6 @@ class CreateFeedbackTypes < ActiveRecord::Migration
 
       t.timestamps null: false
     end
-    FeedbackType.create_seed_data
+    FeedbackType.seed_data
   end
 end
