@@ -1,3 +1,3 @@
-json.array!(@companies) do |company|
-  json.extract! company, :name, :id
-end
+# json.array!(@result) do |company|
+#   json.extract! company, :name, :id
+# end

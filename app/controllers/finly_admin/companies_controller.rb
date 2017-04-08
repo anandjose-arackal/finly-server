@@ -9,17 +9,25 @@ class FinlyAdmin::CompaniesController < ApplicationController
   end
 
   def show
-    @company = AdminOperations::Company::Show.(current_user, params)
+    @result = AdminOperations::Company::Show.(current_user, params)
   end
 
   def create
     @result = AdminOperations::Company::Create.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+  end
   end
 
   def index
     @companies = Company.all
-    respond
+    respond_to do |format|
+      format.json {
+        render json: @companies.as_json
+      }
+    end
   end
 
   def update
