@@ -415,7 +415,6 @@
 #                                         PATCH  /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         PUT    /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                        admin_users/companies#destroy
-#             admin_users_user_admin_menu GET    /admin_users/users/:user_id/admin_menus(.:format)           admin_users/users#admin_menus
 #                       admin_users_users GET    /admin_users/users(.:format)                                admin_users/users#index
 #                                         POST   /admin_users/users(.:format)                                admin_users/users#create
 #                    new_admin_users_user GET    /admin_users/users/new(.:format)                            admin_users/users#new
@@ -432,6 +431,7 @@
 #                                         PATCH  /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         PUT    /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         DELETE /admin_users/expenses/:id(.:format)                         admin_users/expenses#destroy
+#                              admin_menu GET    /admin_menus(.:format)                                      users#admin_menus
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)               statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
 #     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)              statements#company_policies_summary
@@ -731,10 +731,12 @@ Rails.application.routes.draw do
 
     end
     resources :users do
-      get 'admin_menus', to: 'users#admin_menus', as: :admin_menu
+
     end
     resources :expenses
   end
+
+  get 'admin_menus', to: 'admin/users#admin_menus', as: :admin_menu
 
 
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'

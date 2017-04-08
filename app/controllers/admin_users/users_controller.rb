@@ -44,30 +44,29 @@ class AdminUsers::UsersController < ApplicationController
                     navbar: [
                        {
                            name: "Companies",
-                           url: ""
+                           url: "/companies"
                        },
                        {
                            name: "Users",
-                           url: ""
+                           url: "/users"
                        },
                        {
                            name: "Reports",
-                           url: ""
+                           url: "/reports"
                        },
                        {
                            name: "Expenses",
-                           url: ""
+                           url: "/expenses"
                        },
                        {
                            name: "Cards",
-                           url: ""
+                           url: "/cards"
                        }
                     ]
                 }
             }
         }
     }
-
     respond_to do |format|
       format.json {
         render json: @result.as_json
