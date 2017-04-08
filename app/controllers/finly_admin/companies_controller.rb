@@ -1,4 +1,5 @@
 class FinlyAdmin::CompaniesController < ApplicationController
+
   allow_oauth!
 
   before_action :authenticate_user!
@@ -18,28 +19,21 @@ class FinlyAdmin::CompaniesController < ApplicationController
       respond response: :success
     else
       respond response: :failure, message: @result.messages[:error]
-  end
+    end
   end
 
   def index
     @result = AdminOperations::Company::Index.(current_user, params)
     respond
-    # @companies = Company.all
-    # respond_to do |format|
-    #   format.json {
-    #     render json: @companies.as_json
-    #   }
-    # end
   end
 
   def update
-    @result = Superadmin::Company::Update.(current_user, params)
+    @result = AdminOperations::Company::Update.(current_user, params)
     if @result.success?
-      flash[:success] = "Company updated"
+      respond response: :success
     else
-      flash[:error] = @result.messages[:error]
+      respond response: :failure, message: @result.messages[:error]
     end
-    redirect_to request.referrer
   end
 
   def import

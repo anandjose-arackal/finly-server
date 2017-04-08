@@ -21,7 +21,7 @@ class AdminOperations::Company::Index < Company::Base
   end
 
   def success
-
+    AdminOperations::Company::Index::CompaniesPresenter.new(user, {companies: companies}, messages)
   end
 
   class AdminOperations::Company::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter

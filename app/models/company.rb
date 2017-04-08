@@ -103,6 +103,12 @@ class Company < ActiveRecord::Base
     self.configuration.ocr_enabled
   end
 
+  def balance_amount(date)
+    balance_history = self.company_balance_histories.with_date(date).first rescue nil
+    return 0 if balance_history.nil?
+    return balance_history.company_balance_value
+  end
+
 
   private
 

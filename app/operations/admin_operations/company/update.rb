@@ -1,6 +1,6 @@
 class AdminOperations::Company::Update < AdminOperations::Company::Base
 
-  attr_accessor :company
+  attr_accessor :company, :company_update_params
 
   def pre_validate
     if user.blank? || params.blank?
@@ -10,6 +10,10 @@ class AdminOperations::Company::Update < AdminOperations::Company::Base
 
   def init
     self.company = Company.find_by(id: params[:id])
+    self.company_update_params = company_params
+    if company_update_params[:itz_cash_property_attributes].present? && company_update_params[:itz_cash_property_attributes][:d_code].present?
+      company_update_params[:itz_cash_property_attributes][:id] = company.itz_cash_property.id
+    end
   end
 
   def validate
@@ -19,7 +23,7 @@ class AdminOperations::Company::Update < AdminOperations::Company::Base
   end
 
   def process
-    unless company.update(company_params)
+    unless company.update(company_update_params)
       add_message :error, company.errors.full_messages
     end
   end
