@@ -20,18 +20,18 @@ class User::Lookup < User::Base
 
   def process
     if selected_user.nil?
-      add_message :error, "User not found"
+      add_message :error, 'User not found'
       self.registered = false
       return
     elsif selected_user.first_name.blank?
       self.registered = false
-      add_message :error, "You have not signed up with Finly yet! Plese contact your manager for further details"
+      add_message :error, 'You have not signed up with Finly yet! Plese contact your manager for further details'
       return
     else
       if selected_user.active?
         self.registered = true
       else
-        add_message :error, "Your account has been deactivated"
+        add_message :error, 'Your account has been deactivated'
         self.registered = false
         return
       end
