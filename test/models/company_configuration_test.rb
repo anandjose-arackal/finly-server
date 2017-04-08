@@ -12,7 +12,6 @@
 #  logo_updated_at     :datetime
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  ocr_enabled         :boolean
 #  other_expense_types :boolean          default(FALSE)
 #
 

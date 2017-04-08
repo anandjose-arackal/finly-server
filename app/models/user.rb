@@ -54,6 +54,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -121,10 +122,13 @@ class User < ActiveRecord::Base
 
   has_many :feedbacks
 
+  # has_one :feature_access, as: :accessible
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
+  # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, to: :profile
   delegate :payroll_id, to: :profile

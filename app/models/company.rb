@@ -36,17 +36,20 @@ class Company < ActiveRecord::Base
 
   has_many :field_configurations, as: :configurable
 
+  has_one :feature_subscription, as: :subscribable
+
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
+  accepts_nested_attributes_for :feature_subscription
 
   after_create :init_config_present
 
   validates :name, presence: true
 
-  scope :ocr_enabled, -> {joins(:configuration).select(' companies.*').where('ocr_enabled IS true')}
+  scope :ocr_enabled, (-> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') })
 
   def default_policy
     self.policies.default
@@ -100,9 +103,8 @@ class Company < ActiveRecord::Base
   end
 
   def ocr_enabled?
-    self.configuration.ocr_enabled
+    self.feature_subscription.ocr_enabled
   end
-
 
   private
 
@@ -121,6 +123,10 @@ class Company < ActiveRecord::Base
     self.build_distance_expense_config(enabled: false).save
     self.build_time_expense_config(enabled: false).save
     self.build_per_diem_expense_config(enabled: false).save
+
+    if self.feature_subscription.blank?
+      self.build_feature_subscription.save
+    end
   end
 
 end
