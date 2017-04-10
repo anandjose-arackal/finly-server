@@ -15,7 +15,7 @@ class RequestFormatter
     end
 
     if params[:custom_fields].present?
-      map[:custom_fields] = params[:custom_fields]
+      map[:custom_fields] = JSON.parse params[:custom_fields]
     end
     Formatter.handle_api_nil map
     map
