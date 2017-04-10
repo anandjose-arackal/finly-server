@@ -26,10 +26,14 @@ class ImportUtil
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       map = {}
-      (0..(row.length - 1)).each do |j|
-        next if j >= header_length
+      row_length = row.length
+      (0..(header_length - 1)).each do |j|
         key = header[j].to_sym
-        map[key] = row[j]
+        val = nil
+        unless j >= row_length
+          val = row[j]
+        end
+        map[key] = val
       end
       list << map
     end
