@@ -2,7 +2,7 @@ require 'hooks'
 
 class BaseOperation
   include CallbackHandler, MathUtil, HasScope
-  attr_accessor :user, :params, :messages, :process_complete, :response
+  attr_accessor :user, :company, :params, :messages, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
@@ -11,14 +11,16 @@ class BaseOperation
     self.params = (ActionController::Parameters.new(params) or {})
   end
 
-  # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
   def self.call(user, params={})
     self.new(user, params).run
   end
+  # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
 
   # Used to run the operation
   def run
     clear_messages
+    authorize_subscriptions
+    return failure if has_errors?
     authorize_user authorized_user_types
     return failure if has_errors?
     pre_validate
@@ -41,6 +43,27 @@ class BaseOperation
     post_process
     return failure if has_errors?
     retrieve
+  end
+
+  def subscription
+    nil
+  end
+
+  def authorize_subscriptions
+    required_subscription = subscription
+    return if s.blank? or (user.blank? and company.blank?)
+    allowed_subscriptions = nil
+    if user.present?
+      allowed_subscriptions = user.company.feature_subscription
+    elsif company.present?
+      allowed_subscriptions = company.feature_subscription
+    end
+    if allowed_subscriptions.present? and s.present?
+      unless allowed_subscriptions.send(required_subscription)
+        add_message :error, 'You have not subscribed for this feature'
+        raise_unauthorized_exception
+      end
+    end
   end
 
   # Define the authorized user types for the action
