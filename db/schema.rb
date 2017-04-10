@@ -474,7 +474,7 @@ ActiveRecord::Schema.define(version: 20170407152916) do
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
-  add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
+  add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", length: {"parent_type"=>191}, using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
     t.integer  "parent_id",           limit: 4
@@ -642,7 +642,7 @@ ActiveRecord::Schema.define(version: 20170407152916) do
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
   add_index "field_configurations", ["configurable_id"], name: "index_field_configurations_on_configurable_id", using: :btree
-  add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
+  add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", length: {"configurable_type"=>191}, using: :btree
   add_index "field_configurations", ["field_parent_type_id"], name: "index_field_configurations_on_field_parent_type_id", using: :btree
   add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
 
@@ -1009,10 +1009,10 @@ ActiveRecord::Schema.define(version: 20170407152916) do
   create_table "per_diem_expenses", force: :cascade do |t|
     t.integer  "per_diem_id", limit: 4
     t.integer  "expense_id",  limit: 4
-    t.decimal  "quantity",              precision: 10, scale: 4
+    t.integer  "quantity",    limit: 4
     t.boolean  "is_deleted"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
   end
 
   add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree

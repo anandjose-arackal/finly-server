@@ -6,5 +6,10 @@ class Admin::Companies::Show < Admin::Companies::Base
     self.company = Company.find_by(id: params[:id])
   end
 
+  def validate
+    if company.blank?
+      add_message :error, "Company not found"
+    end
+  end
 
 end

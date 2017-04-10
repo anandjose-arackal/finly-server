@@ -129,6 +129,14 @@ class User < ActiveRecord::Base
   delegate :employee_id, to: :profile
   delegate :payroll_id, to: :profile
   delegate :company_name, to: :company
+  delegate :city, to: :profile
+  delegate :address_1, to: :profile
+  delegate :address_2, to: :profile
+  delegate :date_of_birth, to: :profile
+  delegate :pin_code, to: :profile
+  delegate :gender, to: :profile
+  delegate :state_id, to: :profile
+
 
   has_paper_trail
 

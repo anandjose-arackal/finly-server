@@ -1,6 +1,6 @@
 class Admin::Users::Index < Admin::Users::Base
 
-  attr_accessor :users
+  attr_accessor :users, :company
 
   def pre_validate
     if user.blank? || params.blank?
@@ -17,7 +17,7 @@ class Admin::Users::Index < Admin::Users::Base
   end
 
   def init
-    id = params[:id] || params[:company_id]
+    id = params[:id] || params[:company_id] || params[:filter_company_id]
     self.company = Company.find_by(id: id)
     self.users = company.users
   end
@@ -26,7 +26,7 @@ class Admin::Users::Index < Admin::Users::Base
     Admin::Users::Index::UsersPresenter.new(user, {users: users}, messages)
   end
 
-  class Admin::Users::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Admin::Users::Index::UsersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :users
 
