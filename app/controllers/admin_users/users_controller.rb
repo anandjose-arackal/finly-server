@@ -44,23 +44,23 @@ class AdminUsers::UsersController < ApplicationController
                     navbar: [
                        {
                            name: "Companies",
-                           url: "/companies"
+                           url: "companies"
                        },
                        {
                            name: "Users",
-                           url: "/users"
+                           url: "users"
                        },
                        {
                            name: "Reports",
-                           url: "/reports"
+                           url: "reports"
                        },
                        {
                            name: "Expenses",
-                           url: "/expenses"
+                           url: "expenses"
                        },
                        {
                            name: "Cards",
-                           url: "/cards"
+                           url: "cards"
                        }
                     ]
                 }

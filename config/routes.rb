@@ -431,7 +431,7 @@
 #                                         PATCH  /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         PUT    /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         DELETE /admin_users/expenses/:id(.:format)                         admin_users/expenses#destroy
-#                              admin_menu GET    /admin_menus(.:format)                                      users#admin_menus
+#                              admin_menu GET    /admin_menus(.:format)                                      admin_users/users#admin_menus
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)               statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
 #     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)              statements#company_policies_summary
@@ -736,7 +736,7 @@ Rails.application.routes.draw do
     resources :expenses
   end
 
-  get 'admin_menus', to: 'admin/users#admin_menus', as: :admin_menu
+  get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
 
 
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
