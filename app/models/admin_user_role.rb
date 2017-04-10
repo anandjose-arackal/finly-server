@@ -23,4 +23,8 @@ class AdminUserRole < ActiveRecord::Base
     end
   end
 
+  def self.id_for(role)
+    VALUES[role]
+  end
+
 end

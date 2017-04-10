@@ -5,8 +5,12 @@
 
 class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
 
-  def pre_validate
+  attr_accessor :response
 
+  def pre_validate
+    if user.blank?
+      add_message :error, "No user found"
+    end
   end
 
   def init
@@ -15,7 +19,7 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
 
   def process
     if user.finly_admin?
-      response = {
+      self.response = {
           views: {
               admin: {
                   menus: {
@@ -46,7 +50,7 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
           }
       }
     else
-      response = {
+      self.response = {
           views: {
               admin: {
                   menus: {
@@ -65,7 +69,6 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
           }
       }
     end
-
   end
 
   def success

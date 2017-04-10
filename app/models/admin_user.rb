@@ -28,7 +28,9 @@ class AdminUser < ActiveRecord::Base
   has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
 
   def finly_admin?
-    self.admin_user_role_mappings.finly_admin.present?
+    # todo temporary, will change once roles has been estabilished
+    return true
+    # self.admin_user_role_mappings.finly_admin.present?
   end
 
   def transcriber?

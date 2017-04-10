@@ -35,14 +35,6 @@ class AdminUsers::CompaniesController < ApplicationController
     end
   end
 
-  # def import
-  #   import_op = Import::Superadmin::Users.new(current_user, params)
-  #   @result = import_op.run
-  #   respond_to do |format|
-  #     format.csv { send_data @result, :type => 'text/csv; charset=iso-8859-1; header=present', :disposition => "attachment;data=result.csv" }
-  #   end
-  #   end
-
 
   private
 

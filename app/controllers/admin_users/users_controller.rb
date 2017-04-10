@@ -29,39 +29,16 @@ class AdminUsers::UsersController < ApplicationController
 
   end
 
+  def index
+    @result = Admin::User::Index.(current_user, params)
+    respond
+  end
+
   # returns the respective menus that a particular user has access to
   def admin_menus
+    current_user = AdminUser.first
     # junk data for menu data
-    @result = {
-        views: {
-            admin: {
-                menus: {
-                    navbar: [
-                       {
-                           name: "Companies",
-                           url: "companies"
-                       },
-                       {
-                           name: "Users",
-                           url: "users"
-                       },
-                       {
-                           name: "Reports",
-                           url: "reports"
-                       },
-                       {
-                           name: "Expenses",
-                           url: "expenses"
-                       },
-                       {
-                           name: "Cards",
-                           url: "cards"
-                       }
-                    ]
-                }
-            }
-        }
-    }
+    @result = Admin::AdminRolePermissions::Show.(current_user, params)
     respond_to do |format|
       format.json {
         render json: @result.as_json
