@@ -223,6 +223,10 @@ CardProgram.seed_data
 
 FeedbackType.seed_data
 
+PaymentOrderType.seed_data
+
+PaymentOrderStatus.seed_data
+
 ##########################
 
 if Amount.count == 0
