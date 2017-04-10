@@ -27,11 +27,6 @@ class AdminUsers::UsersController < ApplicationController
 
   def show
 
-    # @states = State.all
-    # @user = User.find_by(id: params[:id])
-    # if @user.nil?
-    #   redirect_to superadmin_company_users_path(params[:company_id])
-    # end
   end
 
   # returns the respective menus that a particular user has access to

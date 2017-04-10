@@ -27,4 +27,13 @@ class AdminUser < ActiveRecord::Base
   has_many :admin_user_role_mappings, dependent: :destroy
   has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
 
+  def finly_admin?
+    self.admin_user_role_mappings.finly_admin.present?
+  end
+
+  def transcriber?
+    self.admin_user_role_mappings.transcriber.present?
+  end
+
+
 end

@@ -11,7 +11,7 @@
 class AdminUserRole < ActiveRecord::Base
 
   VALUES = {
-    admin: 1,
+    finly_admin: 1,
     transcriber: 2
   }
 
