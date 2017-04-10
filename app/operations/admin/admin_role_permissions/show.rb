@@ -3,7 +3,7 @@
 # if a particular user is an admin, he/shw will have permission to do..... everything
 #
 
-class AdminRolePermissions::Show < AdminRolePermissions::Base
+class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
 
   def pre_validate
 
@@ -72,3 +72,4 @@ class AdminRolePermissions::Show < AdminRolePermissions::Base
     response
   end
 end
+
