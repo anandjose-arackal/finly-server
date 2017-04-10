@@ -2,7 +2,7 @@ class RequestFormatter
 
   def self.api_expense(user, params)
     return nil if params.blank? or user.blank?
-    map =format('api/expense.yaml.erb', user, params)
+    map = format('api/expense.yaml.erb', user, params)
     # Load receipt seperately has yaml cannot handle images
     if params[:receipt].present?
       parse_receipt user, params
@@ -12,6 +12,10 @@ class RequestFormatter
       receipt = '' if receipt == 'nil'
       map[:expense][:receipts_attributes]= []
       map[:expense][:receipts_attributes][0] = receipt
+    end
+
+    if params[:custom_fields].present?
+      map[:custom_fields] = params[:custom_fields]
     end
     Formatter.handle_api_nil map
     map
