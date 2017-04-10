@@ -21,6 +21,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
       self.sheet = open_spreadsheet(file)
       self.header = sheet.row(1)
     end
+    debugger
   end
 
   def authorize

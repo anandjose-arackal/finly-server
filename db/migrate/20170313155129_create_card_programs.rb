@@ -18,13 +18,15 @@ class CreateCardPrograms < ActiveRecord::Migration
     end
     add_column :cards, :card_program_id, :integer, null: false, index: true, foreign_key: true, references: 'CardProgram'
 
-    if CardProgram.count == 0
-      CardProgram.create name: 'Expense', create_expense: true, receive_reimbursement: false,
+    if CardProgram.with_name('Expense').blank?
+      CardProgram.create id: CardProgram.id_for(:expense), name: 'Expense', create_expense: true, receive_reimbursement: false,
                          personal_wallet_fund_transfer: true, spend_restrictions: true,
                          end_date_restrictions: true, manager_credit: true, manager_debit: true,
                          manager_blockable: true, manager_view_balance: true, manager_view_eligibility: true,
                          manager_view_transactions: true
-      CardProgram.create name: 'Reimbursement', create_expense: false, receive_reimbursement: true,
+    end
+    if CardProgram.with_name('Reimbursement').blank?
+      CardProgram.create id: CardProgram.id_for(:reimbursement), name: 'Reimbursement', create_expense: false, receive_reimbursement: true,
                          personal_wallet_fund_transfer: false, spend_restrictions: false,
                          end_date_restrictions: true, manager_credit: false, manager_debit: false,
                          manager_blockable: false, manager_view_balance: false, manager_view_eligibility: true,

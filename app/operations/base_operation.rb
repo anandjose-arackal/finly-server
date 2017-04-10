@@ -51,7 +51,7 @@ class BaseOperation
 
   def authorize_subscriptions
     required_subscription = subscription
-    return if s.blank? or (user.blank? and company.blank?)
+    return if required_subscription.blank? or (user.blank? and company.blank?)
     allowed_subscriptions = nil
     if user.present?
       allowed_subscriptions = user.company.feature_subscription
