@@ -8,7 +8,7 @@ class AdminUsers::UsersController < ApplicationController
   end
 
   def create
-    @result = Admin::User::Create.(current_user, params)
+    @result = Admin::Users::Create.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -17,7 +17,7 @@ class AdminUsers::UsersController < ApplicationController
   end
 
   def update
-    @result = Admin::User::Update.(current_user, params)
+    @result = Admin::Users::Update.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -30,7 +30,7 @@ class AdminUsers::UsersController < ApplicationController
   end
 
   def index
-    @result = Admin::User::Index.(current_user, params)
+    @result = Admin::Users::Index.(current_user, params)
     respond
   end
 

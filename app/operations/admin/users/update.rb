@@ -1,4 +1,4 @@
-class Admin::User::Update < Admin::User::Base
+class Admin::Users::Update < Admin::Users::Base
 
   attr_accessor :company, :selected_user
 
@@ -28,7 +28,7 @@ class Admin::User::Update < Admin::User::Base
 
 
   def success
-    Admin::User::Base::UserPresenter.new(user, {selected_user: selected_user}, messages)
+    Admin::Users::Base::UserPresenter.new(user, {selected_user: selected_user}, messages)
   end
 
   private

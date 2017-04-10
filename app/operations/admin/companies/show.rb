@@ -1,4 +1,4 @@
-class Admin::Company::Show < Admin::Company::Base
+class Admin::Companies::Show < Admin::Companies::Base
 
   attr_accessor :company
 

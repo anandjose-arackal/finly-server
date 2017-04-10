@@ -9,11 +9,11 @@ class AdminUsers::CompaniesController < ApplicationController
   end
 
   def show
-    @result = Admin::Company::Show.(current_user, params)
+    @result = Admin::Companies::Show.(current_user, params)
   end
 
   def create
-    @result = Admin::Company::Create.(current_user, params)
+    @result = Admin::Companies::Create.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -22,12 +22,12 @@ class AdminUsers::CompaniesController < ApplicationController
   end
 
   def index
-    @result = Admin::Company::Index.(current_user, params)
+    @result = Admin::Companies::Index.(current_user, params)
     respond
   end
 
   def update
-    @result = Admin::Company::Update.(current_user, params)
+    @result = Admin::Companies::Update.(current_user, params)
     if @result.success?
       respond response: :success
     else

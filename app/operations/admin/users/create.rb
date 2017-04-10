@@ -1,4 +1,4 @@
-class Admin::User::Create < Admin::User::Base
+class Admin::Users::Create < Admin::User::Base
 
   attr_accessor :company, :created_user
 
@@ -31,7 +31,7 @@ class Admin::User::Create < Admin::User::Base
   end
 
   def success
-    Admin::User::Base::UserPresenter.new(user, {created_user: created_user}, messages)
+    Admin::Users::Base::UserPresenter.new(user, {created_user: created_user}, messages)
   end
 
   private

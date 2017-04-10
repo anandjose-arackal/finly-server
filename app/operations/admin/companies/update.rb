@@ -1,4 +1,4 @@
-class Admin::Company::Update < Admin::Company::Base
+class Admin::Companies::Update < Admin::Companies::Base
 
   attr_accessor :company, :company_update_params
 

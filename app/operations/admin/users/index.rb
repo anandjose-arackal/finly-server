@@ -1,4 +1,4 @@
-class Admin::User::Index < Admin::User::Base
+class Admin::Users::Index < Admin::Users::Base
 
   attr_accessor :users
 
@@ -23,10 +23,10 @@ class Admin::User::Index < Admin::User::Base
   end
 
   def success
-    Admin::User::Index::UsersPresenter.new(user, {users: users}, messages)
+    Admin::Users::Index::UsersPresenter.new(user, {users: users}, messages)
   end
 
-  class Admin::Company::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Admin::Users::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :users
 
