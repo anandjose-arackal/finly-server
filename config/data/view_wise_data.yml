@@ -17,8 +17,8 @@ admin:
       - My Account: '#settings'
       # - Expense Policies: '/policies?view=admin'
       # - My Balance: '#modal-balance'
-      - FAQ: '#faq/params={"view":"admin"}'
-      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - FAQ: '#faq/params={"view":"admin"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
 
 personal:
   links:
