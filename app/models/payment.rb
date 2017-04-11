@@ -15,7 +15,9 @@
 #  initiating_account_type :string(255)
 #  receiving_account_id    :integer
 #  receiving_account_type  :string(255)
+#  payment_order_id        :integer
 #
+
 
 
 
@@ -37,6 +39,8 @@ class Payment < ActiveRecord::Base
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
+
+  belongs_to :payment_order
 
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true

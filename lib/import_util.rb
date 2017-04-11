@@ -40,4 +40,13 @@ class ImportUtil
     list
   end
 
+  def self.generate_csv(headers, values)
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+      values.each do |i|
+        csv << values[i]
+      end
+    end
+  end
+
 end

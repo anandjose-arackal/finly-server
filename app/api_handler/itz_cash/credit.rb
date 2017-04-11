@@ -14,7 +14,7 @@ class ItzCash::Credit < ItzCash::Base
       add_message :error, 'Amount cannot be blank'
       return
     end
-    if params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
+    if (params[:card].blank? or params[:card].user_id != user.id) and (params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?)
       add_message :error, 'Card not found'
       return
     end
@@ -28,7 +28,11 @@ class ItzCash::Credit < ItzCash::Base
   end
 
   def post_params
-    card = user.cards.with_id(params[:card_id]).first
+    if params[:card].present? and params[:card].user_id == user.id
+      card = params[:card]
+    else
+      card = user.cards.with_id(params[:card_id]).first
+    end
     serial_id = card.serial_id
     {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: user.company.d_code,
      merchanttypekey: merchant_type_key,

@@ -122,6 +122,8 @@ class User < ActiveRecord::Base
 
   has_many :feedbacks
 
+  has_many :payment_orders, foreign_key: :initiating_user_id
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
