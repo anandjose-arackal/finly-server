@@ -29,9 +29,9 @@ class Benefits::TaxBenefits::Meal::Create < Benefits::TaxBenefits::Meal::Base
   end
 
   def validate
-
-    if scheduled_at < Date.today
-
+    if  scheduled_at && scheduled_at < Date.today
+      add_message :error, 'Scheduled Date cannot be less than the current date'
+      return
     end
 
     if payment_order_type_id.blank? or self.processed_order_data.blank?
@@ -50,21 +50,22 @@ class Benefits::TaxBenefits::Meal::Create < Benefits::TaxBenefits::Meal::Base
   end
 
   def process
-    # payment_order_params = {
-    #     company_id: user.company_id,
-    #     payment_order_type_id: self.payment_order_type_id,
-    #     scheduled_at: (params[:scheduled_at] or Date.today),
-    #     processed_at: DateTime.now,
-    #     initiating_user: user,
-    #     payment_order_status_id: PaymentOrder
-    # }
-    # self.payment_order = user.payment_orders.build(company_id: user.company_id, )
-    # self.processed_order_data.each do |item|
-    #   card = item[:card]
-    #   amount = item[:amount]
-    #   user = item[:user][:user_details]
-    #   resp = ItzCash::Credit.(user, card: card, amount: amount)
-    # end
+    amount_requested = Amount.new(value: self.order_data.requested_amount, currency_id: 1)
+    payment_order_params = {
+        payment_order_type_id: self.payment_order_type_id,
+        scheduled_at: self.scheduled_at,
+        processed_at: DateTime.now,
+        initiating_user: user,
+        payment_order_status_id: PaymentOrderStatus.id_for(:scheduled),
+        company_id: user.company_id,
+        amount_requested: amount_requested
+    }
+    self.payment_order = user.payment_orders.build payment_order_params
+    unless self.payment_order.valid?
+      add_message :error, self.payment_order.errors.full_messages
+      return
+    end
+
   end
 
   # def init

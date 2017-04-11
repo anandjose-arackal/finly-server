@@ -58,7 +58,7 @@ class BaseOperation
     elsif company.present?
       allowed_subscriptions = company.feature_subscription
     end
-    if allowed_subscriptions.present? and s.present?
+    if allowed_subscriptions.present? and required_subscription.present?
       unless allowed_subscriptions.send(required_subscription)
         add_message :error, 'You have not subscribed for this feature'
         raise_unauthorized_exception

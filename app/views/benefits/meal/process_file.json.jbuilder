@@ -11,8 +11,10 @@ json.payment do
         end
       end
       json.card do
-        card_obj = item[:card]
-        json.ending_number card_obj.ending_number
+        if item[:card].present?
+          card_obj = item[:card]
+          json.ending_number card_obj.ending_number
+        end
       end
       json.amount item[:amount]
       json.valid item[:valid]
