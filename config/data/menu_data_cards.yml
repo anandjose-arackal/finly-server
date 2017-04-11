@@ -1,0 +1,14 @@
+views:
+  admin:
+    menus:
+      navbar:
+      - name: Dashboard
+        url: dashboard
+      - name: Meal Cards
+        url: orders
+        sub_menus:
+          - name: New Order
+            url: orders/new
+          - name: Order History
+            url: orders
+      

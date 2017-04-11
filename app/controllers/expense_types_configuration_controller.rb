@@ -26,4 +26,9 @@ class ExpenseTypesConfigurationController < ApplicationController
 
   end
 
+  def menu_data_cards
+    @views = YAML.load_file("#{Rails.root}/config/data/menu_data_cards.yml")
+    render json: @views.as_json 
+  end
+
 end

@@ -843,6 +843,10 @@ Rails.application.routes.draw do
 
   post 'feedback' => 'feedback#create'
 
+  # Cards Module APIS
+  # Getting Menu Data for Cards module
+  get '/menu_data_cards' => 'expense_types_configuration#menu_data_cards'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
