@@ -83,8 +83,9 @@ class ApplicationController < ActionController::Base
 
 
   def after_sign_in_path_for(resource)
+    debugger
     if resource.is_a?(AdminUser)
-      'localhost/admin'
+      'admin'
     else
       root_path
     end

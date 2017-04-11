@@ -37,5 +37,9 @@ class AdminUser < ActiveRecord::Base
     self.admin_user_role_mappings.transcriber.present?
   end
 
+  # overriding devise's default method so that it compares against both email and phone number to authenticate
+  def self.find_for_database_authentication(conditions={})
+    find_by(email: conditions[:email])
+  end
 
 end

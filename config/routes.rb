@@ -35,6 +35,7 @@
 #                                         POST   /oauth_tests(.:format)                                      opro/oauth/tests#create
 #                              oauth_test GET    /oauth_tests/:id(.:format)                                  opro/oauth/tests#show
 #                                         DELETE /oauth_tests/:id(.:format)                                  opro/oauth/tests#destroy
+#              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                admin_users/oauth/token#create {:format=>"json"}
 #                           accept_invite GET    /users/invitation/accept(.:format)                          pending_invites#edit
 #                    preview_registration POST   /welcome/preview(.:format)                                  registrations#preview
 #                       resources_details POST   /resources_details(.:format)                                registrations#resource_requests
@@ -424,6 +425,7 @@
 #                                         PUT    /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         DELETE /admin_users/users/:id(.:format)                            admin_users/users#destroy
 #                    admin_users_set_role POST   /admin_users/users/set_role(.:format)                       admin_users/users#set_role
+#                      admin_users_lookup GET    /admin_users/lookup(.:format)                               admin_users/users#lookup
 #                    admin_users_expenses GET    /admin_users/expenses(.:format)                             admin_users/expenses#index
 #                                         POST   /admin_users/expenses(.:format)                             admin_users/expenses#create
 #                 new_admin_users_expense GET    /admin_users/expenses/new(.:format)                         admin_users/expenses#new
@@ -513,7 +515,8 @@ Rails.application.routes.draw do
       oauth_new: 'oauth/auth',
       oauth_token: 'oauth/token'
   }
-  # get 'policies' => 'policies#index'
+  # adding admin oauth token creation for admin login
+  post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
 
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
@@ -741,6 +744,7 @@ Rails.application.routes.draw do
 
     end
     post 'users/set_role', to: 'users#set_role', as: :set_role
+    get 'lookup', to: 'users#lookup',as: :lookup
     resources :expenses
     resources :cards
   end
