@@ -423,6 +423,7 @@
 #                                         PATCH  /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         PUT    /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         DELETE /admin_users/users/:id(.:format)                            admin_users/users#destroy
+#                    admin_users_set_role POST   /admin_users/users/set_role(.:format)                       admin_users/users#set_role
 #                    admin_users_expenses GET    /admin_users/expenses(.:format)                             admin_users/expenses#index
 #                                         POST   /admin_users/expenses(.:format)                             admin_users/expenses#create
 #                 new_admin_users_expense GET    /admin_users/expenses/new(.:format)                         admin_users/expenses#new
@@ -736,7 +737,10 @@ Rails.application.routes.draw do
 
   namespace :admin_users do
     resources :companies
-    resources :users
+    resources :users do
+
+    end
+    post 'users/set_role', to: 'users#set_role', as: :set_role
     resources :expenses
     resources :cards
   end

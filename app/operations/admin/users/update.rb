@@ -1,6 +1,6 @@
 class Admin::Users::Update < Admin::Users::Base
 
-  attr_accessor :company, :selected_user
+  attr_accessor :company, :selected_user, :roles_to_be_removed, :roles_to_be_added
 
   def pre_validate
     if user.blank? || params.blank?
@@ -14,6 +14,10 @@ class Admin::Users::Update < Admin::Users::Base
   end
 
   def authorize
+
+  end
+
+  def pre_process
 
   end
 
@@ -36,8 +40,7 @@ class Admin::Users::Update < Admin::Users::Base
   def user_params
     params.require(:user).permit(:first_name, :last_name, :mothers_maiden_name,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
-                                                      :address_2, :city, :state_id, :pin_code],
-                                 role_mapping_attributes: [:user_role_id])
+                                                      :address_2, :city, :state_id, :pin_code])
 
   end
 

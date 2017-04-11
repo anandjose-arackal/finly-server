@@ -2,10 +2,6 @@ class Admin::Users::Base < BaseOperation
 
   attr_accessor :selected_user
 
-  def success
-
-  end
-
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :created_user, :selected_user

@@ -27,7 +27,7 @@ class Admin::Users::Create < Admin::Users::Base
   end
 
   def post_process
-    add_message :error, "User created"
+    add_message :success, "User created"
   end
 
   def success
