@@ -431,6 +431,14 @@
 #                                         PATCH  /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         PUT    /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         DELETE /admin_users/expenses/:id(.:format)                         admin_users/expenses#destroy
+#                       admin_users_cards GET    /admin_users/cards(.:format)                                admin_users/cards#index
+#                                         POST   /admin_users/cards(.:format)                                admin_users/cards#create
+#                    new_admin_users_card GET    /admin_users/cards/new(.:format)                            admin_users/cards#new
+#                   edit_admin_users_card GET    /admin_users/cards/:id/edit(.:format)                       admin_users/cards#edit
+#                        admin_users_card GET    /admin_users/cards/:id(.:format)                            admin_users/cards#show
+#                                         PATCH  /admin_users/cards/:id(.:format)                            admin_users/cards#update
+#                                         PUT    /admin_users/cards/:id(.:format)                            admin_users/cards#update
+#                                         DELETE /admin_users/cards/:id(.:format)                            admin_users/cards#destroy
 #                              admin_menu GET    /admin_menus(.:format)                                      admin_users/users#admin_menus
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)               statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
@@ -727,13 +735,10 @@ Rails.application.routes.draw do
   resources :per_diems
 
   namespace :admin_users do
-    resources :companies do
-
-    end
-    resources :users do
-
-    end
+    resources :companies
+    resources :users
     resources :expenses
+    resources :cards
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu

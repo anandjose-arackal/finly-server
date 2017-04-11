@@ -56,9 +56,9 @@ class Card < ActiveRecord::Base
   delegate :card_balance_value, to: :card_balance
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
-  validates :user_id, presence: true
   validates :ending_number, presence: true
   validates :card_program_id, presence: true
+  validate :user_or_company_presence
 
   after_create do
     user = self.user
@@ -77,7 +77,7 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
-  # attr_accessor :balance, :available_card_eligibility
+
   def unblockable?
     if self.active
       false
@@ -93,6 +93,8 @@ class Card < ActiveRecord::Base
     end
   end
 
+
+  # attr_accessor :balance, :available_card_eligibility
   def balance
     if card_balance.blank?
       ItzCash::AccountDetails.(user, card_id: self.id)
@@ -112,5 +114,11 @@ class Card < ActiveRecord::Base
   end
 
   private
+
+  def user_or_company_presence
+    unless self.user.present? || self.company.present?
+      errors.add(:card, "should belong to either company or user")
+    end
+  end
 
 end
