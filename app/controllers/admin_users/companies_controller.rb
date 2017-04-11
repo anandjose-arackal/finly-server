@@ -1,11 +1,11 @@
 class AdminUsers::CompaniesController < ApplicationController
 
-  # allow_oauth!
+  allow_oauth!
 
-  # before_action :authenticate_user!
+  before_action :authenticate_user!
 
   # todo - temporary
-  before_action :set_dummy_user
+  # before_action :set_dummy_user
 
   def new
     @states = State.all
@@ -26,7 +26,8 @@ class AdminUsers::CompaniesController < ApplicationController
   end
 
   def index
-    @result = Admin::Companies::Index.(@dummy_user, params)
+    debugger
+    @result = Admin::Companies::Index.(current_admin_user, params)
     respond
   end
 
