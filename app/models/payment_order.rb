@@ -27,7 +27,7 @@ class PaymentOrder < ActiveRecord::Base
 
   has_many :payments
 
-  has_attached_file :payment_file, default_url: "/images/:style/missing.png"
+  has_attached_file :payment_file, default_url: '/images/:style/missing.png'
   validates_attachment_content_type :payment_file, content_type: %w(application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet text/csv)
 
   validates :payment_order_type_id, presence: true

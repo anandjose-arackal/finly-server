@@ -1,0 +1,2 @@
+module Benefits::MealHelper
+end
