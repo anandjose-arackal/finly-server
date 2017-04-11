@@ -5,7 +5,7 @@
 #  id          :integer          not null, primary key
 #  per_diem_id :integer
 #  expense_id  :integer
-#  quantity    :decimal(10, 4)
+#  quantity    :integer
 #  is_deleted  :boolean
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null

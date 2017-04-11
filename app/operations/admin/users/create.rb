@@ -1,4 +1,4 @@
-class Admin::Users::Create < Admin::User::Base
+class Admin::Users::Create < Admin::Users::Base
 
   attr_accessor :company, :created_user
 
