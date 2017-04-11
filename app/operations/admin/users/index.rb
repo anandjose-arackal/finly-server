@@ -17,9 +17,7 @@ class Admin::Users::Index < Admin::Users::Base
   end
 
   def init
-    id = params[:id] || params[:company_id] || params[:filter_company_id]
-    self.company = Company.find_by(id: id)
-    self.users = company.users
+    self.users = User.all.unscoped
   end
 
   def success

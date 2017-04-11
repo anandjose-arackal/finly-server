@@ -412,6 +412,17 @@ class User < ActiveRecord::Base
     false
   end
 
+  # returns the sate of the particular user - active, inactive or pending
+  def user_state
+    if self.active && self.invitation_token.nil? && !self.first_name.blank? && !self.mobile_only_invite
+      return 1
+    elsif self.mobile_only_invite || self.first_name.nil? || !self.invitation_token.blank?
+      return 2
+    elsif !self.active && !self.first_name.blank? && !self.mobile_only_invite
+      return 3
+    end
+  end
+
   private
 
   # def valid_role
