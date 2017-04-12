@@ -74,9 +74,10 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
 
       # Check if user has a Meal Card
       card = user.cards.with_card_program(card_program_id).first rescue nil
-      if card.blank?
+      if user.present? and card.blank?
         valid = false
-        messages << 'Card not found'
+        program_name = CardProgram.with_id(card_program_id).first.name.humanize rescue nil
+        messages << "#{program_name} Card has not been assigned to the user"
       end
 
       # todo validate card eligibility -> Currently we are not doing this validation

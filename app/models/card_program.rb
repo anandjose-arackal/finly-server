@@ -24,6 +24,7 @@ class CardProgram < ActiveRecord::Base
 
   has_many :cards
 
+  scope :with_id, -> (id){ where id: id }
   scope :with_name, -> (name){ where name: name }
   scope :with_manager_credit, -> { where manager_credit: true }
   scope :with_reimbursement, -> { where receive_reimbursement: true }
