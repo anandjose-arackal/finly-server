@@ -3,12 +3,26 @@ views:
     menus:
       navbar:
       - name: Dashboard
+        id: dashboard
         url: dashboard
       - name: Meal Cards
-        url: orders
+        url: meal/orders
+        id: meal
         sub_menus:
           - name: New Order
-            url: orders/new
+            id: 'new_order'
+            url: meal/orders/new
           - name: Order History
-            url: orders
+            id: orders
+            url: meal/orders
+      - name: Medical Cards
+        url: medical/orders
+        id: medical
+        sub_menus:
+          - name: New Order M
+            id: 'new_order'
+            url: medical/order
+          - name: Order History
+            id: orders
+            url: /medical/orders
       
