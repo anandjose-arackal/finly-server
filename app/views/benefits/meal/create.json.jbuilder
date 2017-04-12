@@ -1,1 +1,3 @@
-json.payment_order_id @result.payment_order.id
+json.payment_order do
+  json.id @result.payment_order.id
+end
