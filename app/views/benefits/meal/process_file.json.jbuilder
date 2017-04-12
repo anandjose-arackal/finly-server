@@ -1,6 +1,6 @@
 json.payment do
   json.items do
-    json.array! @result.payment_order_data.each do |item|
+    json.array! @result.processed_order.each do |item|
       json.user do
         json.identifier item[:user][:identifier]
         user_obj = item[:user][:user_details]
