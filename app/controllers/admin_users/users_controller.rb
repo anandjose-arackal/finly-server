@@ -50,6 +50,11 @@ class AdminUsers::UsersController < ApplicationController
     end
   end
 
+  def lookup
+    @result = Admin::Users::Lookup.(params)
+    respond
+  end
+
   def set_role
     @result = Admin::Users::Role::SetRole.(@dummy_user, params)
     if @result.success?
