@@ -20,4 +20,24 @@ json.array! @result.payment_orders.each do |item|
     json.id item.payment_order_status.id
     json.name item.payment_order_status.name.humanize
   end
+  if item.amount_processed.present?
+    json.amount_processed do
+      json.value item.amount_processed.value
+      json.currency do
+        json.extract! Currency.first, :id, :country, :country_code, :symbol
+      end
+    end
+  else
+    json.amount_processed nil
+  end
+  if item.amount_requested.present?
+    json.amount_requested do
+      json.value item.amount_requested.value
+      json.currency do
+        json.extract! Currency.first, :id, :country, :country_code, :symbol
+      end
+    end
+  else
+    json.amount_requested nil
+  end
 end
