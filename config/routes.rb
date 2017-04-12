@@ -842,7 +842,7 @@ Rails.application.routes.draw do
 
   # Cards Module APIS
   # Getting Menu Data for Cards module
-  get '/menu_data_cards' => 'expense_types_configuration#menu_data_cards'
+  get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
   post 'cards/meal/process_file' => 'benefits/meal#process_file'
 
   # The priority is based upon order of creation: first created -> highest priority.
