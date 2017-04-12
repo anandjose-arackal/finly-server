@@ -3,6 +3,7 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
 
   def pre_validate
     super
+    return if has_errors?
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -13,7 +14,7 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
     end
   end
 
-  def process
+  def init
     self.payment_orders = user.company.payment_orders.with_type_id(payment_order_type_id)
   end
 

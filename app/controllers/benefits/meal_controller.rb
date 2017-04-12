@@ -28,7 +28,8 @@ class Benefits::MealController < ApplicationController
   end
 
   def show
-
+    @result = Benefits::TaxBenefits::Show.(PaymentOrder::CONFIG[:meal_card], current_user, params)
+    respond
   end
 
 end

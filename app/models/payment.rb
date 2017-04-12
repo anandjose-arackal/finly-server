@@ -39,6 +39,7 @@ class Payment < ActiveRecord::Base
   has_many :money_request_tracks
 
   belongs_to :payment_order
+  belongs_to :payment_status
 
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true

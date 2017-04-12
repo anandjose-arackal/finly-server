@@ -90,6 +90,15 @@ class Amount < ActiveRecord::Base
     super(self.value)
   end
 
+  def as_json(options={})
+    {value: self.value,
+     currency: {
+         id: self.currency.id,
+         country: self.currency.country,
+         country_code: self.currency.country_code,
+         symbol: self.currency.symbol}}
+  end
+
   private
 
   def no_negative_amount
