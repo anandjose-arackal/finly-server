@@ -26,7 +26,6 @@ class AdminUsers::CompaniesController < ApplicationController
   end
 
   def index
-    debugger
     @result = Admin::Companies::Index.(@dummy_user, params)
     respond
   end
