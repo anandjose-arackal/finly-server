@@ -3,6 +3,7 @@ class Admin::Users::Create < Admin::Users::Base
   attr_accessor :company, :created_user
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, please try again"
     end

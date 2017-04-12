@@ -487,8 +487,6 @@ Rails.application.routes.draw do
     get 'companies', to: 'companies#index', as: :companies
   end
 
-
-
   get 'menu_data', to: "users#menu_data"
 
 

@@ -3,6 +3,7 @@ class Admin::Users::SetRole < Admin::Users::Base
   attr_accessor :roles_to_add, :roles_to_remove, :being_updated_user
 
   def pre_validate
+    super()
     id = (params[:id] or params[:user_id])
     unless id.present?
       messages[:error] << 'User not found'

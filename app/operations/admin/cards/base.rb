@@ -1,5 +1,5 @@
 
-class Admin::Cards::Base < BaseOperation
+class Admin::Cards::Base < Admin::Base
 
   attr_accessor :card, :company
 

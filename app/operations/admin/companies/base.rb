@@ -1,4 +1,8 @@
-class Admin::Companies::Base < BaseOperation
+class Admin::Companies::Base < Admin::Base
+
+  def pre_validate
+    super()
+  end
 
   def company_params
     params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code])

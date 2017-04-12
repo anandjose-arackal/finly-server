@@ -3,6 +3,7 @@ class Admin::Users::Index < Admin::Users::Base
   attr_accessor :users, :company, :companies
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
     end
@@ -22,10 +23,13 @@ class Admin::Users::Index < Admin::Users::Base
   end
 
   def success
-    Admin::Users::Index::UsersPresenter.new(user, {users: users, companies: companies}, messages)
+    params[:users] = users
+    params[:companies] = companies
+    Admin::Users::Index::UsersPresenter.new(user, params, messages)
   end
 
   class Admin::Users::Index::UsersPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    include HasScope
 
     attr_accessor :users, :companies
 
@@ -35,7 +39,8 @@ class Admin::Users::Index < Admin::Users::Base
 
 
     def init
-      self.users = apply_scopes(params[:users], params)
+      self.users = params[:users]
+      self.users = apply_scopes(users, params)
       self.companies = params[:companies]
     end
   end

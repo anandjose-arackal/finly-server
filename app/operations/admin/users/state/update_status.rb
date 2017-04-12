@@ -5,6 +5,7 @@ class Admin::Users::State::UpdateStatus < Admin::Users::Base
   attr_accessor :selected_user, :update_params
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid params, try again"
     end

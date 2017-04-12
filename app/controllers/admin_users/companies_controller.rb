@@ -1,23 +1,20 @@
 class AdminUsers::CompaniesController < ApplicationController
 
-  allow_oauth!
-
-  # before_action :authenticate_user!
-
   # todo - temporary
-  before_action :set_dummy_user
+  before_action :authenticate_user!
+  allow_oauth!
 
   def new
     @states = State.all
   end
 
   def show
-    @result = Admin::Companies::Show.(@dummy_user, params)
+    @result = Admin::Companies::Show.(current_user, params)
     respond
   end
 
   def create
-    @result = Admin::Companies::Create.(@dummy_user, params)
+    @result = Admin::Companies::Create.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -26,24 +23,17 @@ class AdminUsers::CompaniesController < ApplicationController
   end
 
   def index
-    @result = Admin::Companies::Index.(@dummy_user, params)
+    @result = Admin::Companies::Index.(current_user, params)
     respond
   end
 
   def update
-    @result = Admin::Companies::Update.(@dummy_user, params)
+    @result = Admin::Companies::Update.(current_user, params)
     if @result.success?
       respond response: :success
     else
       respond response: :failure, message: @result.messages[:error]
     end
-  end
-
-
-  private
-
-  def set_dummy_user
-    @dummy_user = AdminUser.first
   end
 
 end

@@ -8,6 +8,7 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
   attr_accessor :response
 
   def pre_validate
+    super()
     if user.blank?
       add_message :error, "No user found"
     end

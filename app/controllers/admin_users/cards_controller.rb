@@ -1,7 +1,8 @@
 class AdminUsers::CardsController < ApplicationController
 
   # todo - temporary
-  before_action :set_dummy_user
+  before_action :authenticate_user!
+  allow_oauth!
 
   def create
     @result = Admin::Cards::Create.(@dummy_user, params)

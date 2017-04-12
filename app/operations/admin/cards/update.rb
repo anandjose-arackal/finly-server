@@ -6,6 +6,7 @@ class Admin::Cards::Update < Admin::Cards::Base
   attr_accessor :selected_card
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, please try again"
     end

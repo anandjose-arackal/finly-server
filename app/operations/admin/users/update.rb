@@ -3,6 +3,7 @@ class Admin::Users::Update < Admin::Users::Base
   attr_accessor :company, :selected_user, :roles_to_be_removed, :roles_to_be_added
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, please try again"
     end

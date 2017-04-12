@@ -7,6 +7,7 @@ class Admin::Cards::Create < Admin::Cards::Base
   attr_accessor :created_card, :selected_user, :card_create_params
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid params, try again"
       return

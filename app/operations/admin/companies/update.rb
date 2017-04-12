@@ -3,6 +3,7 @@ class Admin::Companies::Update < Admin::Companies::Base
   attr_accessor :company, :company_update_params
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
     end

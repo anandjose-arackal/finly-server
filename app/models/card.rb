@@ -53,6 +53,9 @@ class Card < ActiveRecord::Base
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
 
+  scope :expense_cards_only, -> {where card_program_id: CardProgram.id_for(:expense)}
+  scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
+
   delegate :card_balance_value, to: :card_balance
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}

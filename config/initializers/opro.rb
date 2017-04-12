@@ -24,17 +24,10 @@ Opro.setup do |config|
   config.password_exchange_enabled = true
 
   config.find_user_for_auth do |controller, params|
-    if params[:controller].include?('admin')
-      return false if params[:email].blank? or params[:password].blank?
-      admin_user = AdminUser.find_for_database_authentication(params) rescue nil
-      return false if admin_user.blank?
-      admin_user.valid_password?(params[:password]) ? admin_user : false
-    else
-      return false if params[:email].blank? or params[:password].blank?
-      user = User.find_for_database_authentication(params) rescue nil
-      return false if user.blank?
-      user.valid_password?(params[:password]) ? user : false
-    end
+    return false if params[:email].blank? or params[:password].blank?
+    user = User.find_for_database_authentication(params) rescue nil
+    return false if user.blank?
+    user.valid_password?(params[:password]) ? user : false
   end
 
 end

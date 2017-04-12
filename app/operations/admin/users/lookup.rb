@@ -7,7 +7,7 @@ class Admin::Users::Lookup < Admin::Users::Base
   end
 
   def pre_validate
-
+    super()
   end
 
   def init

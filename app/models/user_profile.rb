@@ -44,4 +44,15 @@ class UserProfile < ActiveRecord::Base
     State.name_from_id(self.state_id)
   end
 
+  def gender_name
+    case self.gender
+      when 'f'
+        return "Female"
+      when 'm'
+        return "Male"
+      else
+        # nothing to do, ha!
+    end
+  end
+
 end

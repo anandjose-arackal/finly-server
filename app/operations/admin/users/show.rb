@@ -8,6 +8,7 @@ class Admin::Users::Show < Admin::Users::Base
   end
 
   def success
-    Admin::Users::Base::UserPresenter.new(user, {selected_user: selected_user}, messages)
+    params[:selected_user] = user
+    Admin::Users::Base::UserPresenter.new(user, params, messages)
   end
 end

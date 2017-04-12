@@ -1,4 +1,4 @@
-class Admin::AdminRolePermissions::Base < BaseOperation
+class Admin::AdminRolePermissions::Base < Admin::Base
 
 
 end
