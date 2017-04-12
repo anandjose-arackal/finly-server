@@ -1,13 +1,16 @@
-class Benefits::TaxBenefits::Process < BaseOperation
+# Process validates the request for payment order wrt tax benefits and generates the respective output to be sent for confirmation or for creating payment order
+class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :card_program_id
+                :errors, :payment_order_valid
 
   def pre_validate
+    super
+    return if has_errors?
     if user.blank?
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:card_program_id].blank? or params[:payment_order].blank?
+    if params.blank? or params[:payment_order].blank?
       add_message :error, 'Error loading configuration'
       return
     end
@@ -20,11 +23,10 @@ class Benefits::TaxBenefits::Process < BaseOperation
     self.requested_amount = 0
     self.processable_amount = 0
     self.processed_order = []
-    self.card_program_id = params[:card_program_id]
   end
 
   def validate
-    if payment_order_data.blank? or self.card_program_id.blank?
+    if payment_order_data.blank?
       self.errors << 'Error loading order details'
       return
     end
@@ -84,7 +86,8 @@ class Benefits::TaxBenefits::Process < BaseOperation
   end
 
   def success
-    params[:payment_order_data] = self.processed_order
+    params[:payment_order_data] = self.payment_order_data
+    params[:processed_order] = self.processed_order
     params[:requested_amount] = self.requested_amount
     params[:processable_amount] = self.processable_amount
     params[:errors] = self.errors
