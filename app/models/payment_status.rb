@@ -10,9 +10,9 @@
 
 class PaymentStatus < ActiveRecord::Base
 
-  scope :with_name, ->(name) { where name: name }
-
   VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5}
+
+  scope :with_name, ->(name) { where name: name }
 
   def self.id_for(key)
     VALUES[key]
