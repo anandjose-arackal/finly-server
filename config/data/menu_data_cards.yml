@@ -21,7 +21,7 @@ views:
         sub_menus:
           - name: New Order M
             id: 'new_order'
-            url: medical/order
+            url: medical/orders/new
           - name: Order History
             id: orders
             url: /medical/orders
