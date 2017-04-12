@@ -40,4 +40,8 @@ class UserProfile < ActiveRecord::Base
   validates :state_id, presence: true
   validates :pin_code, presence: true, format: Constants::VALID_PIN_CODE
 
+  def state_name
+    State.name_from_id(self.state_id)
+  end
+
 end

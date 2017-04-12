@@ -138,6 +138,7 @@ class User < ActiveRecord::Base
   delegate :pin_code, to: :profile
   delegate :gender, to: :profile
   delegate :state_id, to: :profile
+  delegate :state_name, to: :profile
 
 
   has_paper_trail

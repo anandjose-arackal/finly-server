@@ -1,6 +1,6 @@
 class Admin::Users::Index < Admin::Users::Base
 
-  attr_accessor :users, :company
+  attr_accessor :users, :company, :companies
 
   def pre_validate
     if user.blank? || params.blank?
@@ -18,15 +18,16 @@ class Admin::Users::Index < Admin::Users::Base
 
   def init
     self.users = User.all.unscoped
+    self.companies = Company.all
   end
 
   def success
-    Admin::Users::Index::UsersPresenter.new(user, {users: users}, messages)
+    Admin::Users::Index::UsersPresenter.new(user, {users: users, companies: companies}, messages)
   end
 
   class Admin::Users::Index::UsersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :users
+    attr_accessor :users, :companies
 
     has_scope :filter_company_id
     has_scope :filter_search
@@ -35,6 +36,7 @@ class Admin::Users::Index < Admin::Users::Base
 
     def init
       self.users = apply_scopes(params[:users], params)
+      self.companies = params[:companies]
     end
   end
 

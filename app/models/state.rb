@@ -37,4 +37,9 @@ class State < ActiveRecord::Base
     nil
   end
 
+  def self.name_from_id(id)
+    return nil if id.blank?
+    VALUES[id-1][:name] rescue nil
+  end
+
 end

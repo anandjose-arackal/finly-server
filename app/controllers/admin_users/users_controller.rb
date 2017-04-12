@@ -51,7 +51,7 @@ class AdminUsers::UsersController < ApplicationController
   end
 
   def set_role
-    @result = Admin::Users::SetRole.(@dummy_user, params)
+    @result = Admin::Users::Role::SetRole.(@dummy_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else
