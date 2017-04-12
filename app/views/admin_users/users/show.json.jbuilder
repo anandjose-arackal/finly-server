@@ -4,20 +4,10 @@ json.date_of_birth @result.selected_user.date_of_birth.strftime("%d-%m-%Y")
 json.gender @result.selected_user.gender_name
 
 json.cards do
-  json.expense_card do
-    @result.cards.expense_cards_only.each do |card|
-      json.proxy card.proxy
-      json.id card.id
-      json.ending_number card.ending_number
-      json.active card.active
-    end
-  end
-  json.reimbursement_card do
-    @result.cards.reimbursement_cards_only.each do |card|
-      json.proxy card.proxy
-      json.id card.id
-      json.ending_number card.ending_number
-      json.active card.active
-    end
+  json.array!(@result.cards) do |card|
+    json.type card.card_program_name
+    json.proxy card.proxy
+    json.ending_number card.ending_number
+    json.active card.active
   end
 end

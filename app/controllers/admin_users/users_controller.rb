@@ -1,5 +1,7 @@
 class AdminUsers::UsersController < ApplicationController
-   
+
+  rescue_from NotAuthorizedException, with: :redirect_to_root
+
   # todo - temporary
   before_action :authenticate_user!
   allow_oauth!
@@ -67,6 +69,13 @@ class AdminUsers::UsersController < ApplicationController
     else
       respond response: :failure, message: @result.messages[:error]
     end
+  end
+
+  private
+
+  # todo - will and should be moved to application controller
+  def redirect_to_root
+    redirect_to root_path
   end
 
 end

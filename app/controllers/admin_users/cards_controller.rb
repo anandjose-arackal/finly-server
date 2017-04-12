@@ -22,6 +22,15 @@ class AdminUsers::CardsController < ApplicationController
     end
   end
 
+  def block
+    @result = Admin::Cards::Block.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   def show
 
   end

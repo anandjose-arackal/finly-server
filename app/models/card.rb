@@ -57,6 +57,7 @@ class Card < ActiveRecord::Base
   scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
 
   delegate :card_balance_value, to: :card_balance
+  delegate :card_program_name, to: :card_program
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
   validates :ending_number, presence: true

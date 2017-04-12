@@ -34,4 +34,8 @@ class CardProgram < ActiveRecord::Base
     PROGRAMS[program]
   end
 
+  def card_program_name
+    self.name
+  end
+
 end
