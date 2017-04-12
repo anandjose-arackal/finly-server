@@ -110,4 +110,18 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     end
   end
 
+  def success
+    params[:payment_order] = self.payment_order
+    Benefits::TaxBenefits::Create::SuccessPresenter.new(user, params, messages)
+  end
+
+  class Benefits::TaxBenefits::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :payment_order
+
+    def init
+      self.payment_order = params[:payment_order]
+    end
+
+  end
+
 end

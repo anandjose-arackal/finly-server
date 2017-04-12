@@ -45,8 +45,14 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   end
 
   def process
-    # headers = [:user, :amount, :status, :message]
-    payment_order_data.each do |item|
+
+    if payment_order_data.is_a?(Hash)
+      arr = []
+      self.payment_order_data.map {|k, v| arr << v }
+      self.payment_order_data = arr
+    end
+
+    self.payment_order_data.each do |item|
       user_email_mob = item[:user]
       user = self.user.company.users.find_for_database_authentication(email: user_email_mob)
       amount = item[:amount].to_d rescue nil
