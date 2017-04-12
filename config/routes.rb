@@ -844,6 +844,7 @@ Rails.application.routes.draw do
   # Getting Menu Data for Cards module
   get '/menu_data_cards' => 'expense_types_configuration#menu_data_cards'
   post 'cards/meal/process_file' => 'benefits/meal#process_file'
+  post 'cards/meal/process_order' => 'benefits/meal#create'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
