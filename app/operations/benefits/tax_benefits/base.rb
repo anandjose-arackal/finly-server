@@ -10,6 +10,10 @@ class Benefits::TaxBenefits::Base < BaseOperation
     self.config = config
   end
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def pre_validate
     if config.blank?
       add_message :error, 'Error loading configuration'

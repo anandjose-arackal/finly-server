@@ -50,4 +50,6 @@ class PaymentOrder < ActiveRecord::Base
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed
 
+  scope :with_type_id, -> (id) {where payment_order_type_id: id}
+
 end

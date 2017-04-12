@@ -846,6 +846,7 @@ Rails.application.routes.draw do
   post 'cards/meal/process_file' => 'benefits/meal#process_file'
   post 'cards/meal/orders' => 'benefits/meal#create'
   patch 'cards/meal/orders' => 'benefits/meal#update'
+  get 'cards/meal/orders' => 'benefits/meal#index'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
