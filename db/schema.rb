@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170407152916) do
+ActiveRecord::Schema.define(version: 20170412150935) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -266,21 +266,22 @@ ActiveRecord::Schema.define(version: 20170407152916) do
 
   create_table "cards", force: :cascade do |t|
     t.integer  "user_id",             limit: 4
-    t.string   "ending_number",       limit: 255,   null: false
-    t.string   "proxy",               limit: 255,   null: false
+    t.string   "ending_number",       limit: 255,                  null: false
+    t.string   "proxy",               limit: 255,                  null: false
     t.integer  "card_type_id",        limit: 4
     t.text     "description",         limit: 65535
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
     t.integer  "company_id",          limit: 4
     t.integer  "disabled_by_role_id", limit: 4
     t.integer  "disabled_by_user_id", limit: 4
     t.boolean  "active"
     t.text     "disable_note",        limit: 65535
-    t.string   "product_code",        limit: 255,   null: false
+    t.string   "product_code",        limit: 255,                  null: false
     t.integer  "card_balance_id",     limit: 4
-    t.integer  "card_program_id",     limit: 4,     null: false
+    t.integer  "card_program_id",     limit: 4,                    null: false
     t.integer  "card_eligibility_id", limit: 4
+    t.boolean  "admin_unblockable",                 default: true
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree

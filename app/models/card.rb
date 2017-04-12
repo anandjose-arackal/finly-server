@@ -19,6 +19,7 @@
 #  card_balance_id     :integer
 #  card_program_id     :integer          not null
 #  card_eligibility_id :integer
+#  admin_unblockable   :boolean          default(TRUE)
 #
 
 class Card < ActiveRecord::Base

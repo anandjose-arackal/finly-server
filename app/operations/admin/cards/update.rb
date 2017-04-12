@@ -3,7 +3,7 @@
 
 class Admin::Cards::Update < Admin::Cards::Base
 
-  attr_accessor :selected_card
+  attr_accessor :selected_card, :selected_user
 
   def pre_validate
     super()
@@ -13,13 +13,14 @@ class Admin::Cards::Update < Admin::Cards::Base
   end
 
   def init
-    id = params[:id] || params[:card_id]
-    self.selected_card = Card.find_by(id: id)
+    id = params[:id]
+    self.selected_user = User.find_by(id: id)
+    self.selected_card = selected_user.cards.find_by(id: params[:card_id]) rescue nil
   end
 
   def validate
-    if selected_card.blank?
-      add_message :error, "Card not found"
+    if selected_user.blank? || selected_card.blank?
+      add_message :error, "Card or User not found"
     end
   end
 
@@ -30,7 +31,7 @@ class Admin::Cards::Update < Admin::Cards::Base
   end
 
   def post_process
-    add_message :error, "Card updated"
+    add_message :success, "Card updated"
   end
 
   def success

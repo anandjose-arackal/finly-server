@@ -9,5 +9,6 @@ json.cards do
     json.proxy card.proxy
     json.ending_number card.ending_number
     json.active card.active
+    json.id card.id
   end
 end

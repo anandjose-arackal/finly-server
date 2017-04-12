@@ -435,6 +435,7 @@
 #                                         PATCH  /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         PUT    /admin_users/expenses/:id(.:format)                         admin_users/expenses#update
 #                                         DELETE /admin_users/expenses/:id(.:format)                         admin_users/expenses#destroy
+#                  admin_users_card_block PATCH  /admin_users/cards/:card_id/block(.:format)                 admin_users/cards#block
 #                       admin_users_cards GET    /admin_users/cards(.:format)                                admin_users/cards#index
 #                                         POST   /admin_users/cards(.:format)                                admin_users/cards#create
 #                    new_admin_users_card GET    /admin_users/cards/new(.:format)                            admin_users/cards#new
@@ -745,7 +746,9 @@ Rails.application.routes.draw do
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
     resources :expenses
-    resources :cards
+    resources :cards do
+      patch 'block', to: 'cards#block', as: :block
+    end
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
