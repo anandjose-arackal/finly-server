@@ -13,8 +13,8 @@
 #  payment_file_file_size    :integer
 #  payment_file_updated_at   :datetime
 #  company_id                :integer          not null
-#  amount_requested_id       :integer          not null
-#  amount_processed_id       :integer          not null
+#  amount_requested_id       :integer
+#  amount_processed_id       :integer
 #  note                      :text(65535)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null

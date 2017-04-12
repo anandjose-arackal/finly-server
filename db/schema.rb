@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170410171659) do
+ActiveRecord::Schema.define(version: 20170411125223) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -996,8 +996,8 @@ ActiveRecord::Schema.define(version: 20170410171659) do
     t.integer  "payment_file_file_size",    limit: 4
     t.datetime "payment_file_updated_at"
     t.integer  "company_id",                limit: 4,     null: false
-    t.integer  "amount_requested_id",       limit: 4,     null: false
-    t.integer  "amount_processed_id",       limit: 4,     null: false
+    t.integer  "amount_requested_id",       limit: 4
+    t.integer  "amount_processed_id",       limit: 4
     t.text     "note",                      limit: 65535
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
@@ -1009,6 +1009,12 @@ ActiveRecord::Schema.define(version: 20170410171659) do
   add_index "payment_orders", ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id", using: :btree
   add_index "payment_orders", ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id", using: :btree
   add_index "payment_orders", ["payment_order_type_id"], name: "index_payment_orders_on_payment_order_type_id", using: :btree
+
+  create_table "payment_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "payment_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -1030,6 +1036,7 @@ ActiveRecord::Schema.define(version: 20170410171659) do
     t.integer  "receiving_account_id",    limit: 4
     t.string   "receiving_account_type",  limit: 255
     t.integer  "payment_order_id",        limit: 4
+    t.integer  "payment_status_id",       limit: 4,     null: false
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

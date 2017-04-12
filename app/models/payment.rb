@@ -16,10 +16,8 @@
 #  receiving_account_id    :integer
 #  receiving_account_type  :string(255)
 #  payment_order_id        :integer
+#  payment_status_id       :integer          not null
 #
-
-
-
 
 
 class Payment < ActiveRecord::Base

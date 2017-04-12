@@ -29,7 +29,7 @@ class Benefits::TaxBenefits::Process < BaseOperation
       return
     end
 
-    company_balance = Company::VirtualAccount::Balance.(user.company).balance rescue 0
+    company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
 
     payment_order_data.each do |item|
       self.requested_amount += item[:amount].to_d rescue 0
@@ -69,14 +69,12 @@ class Benefits::TaxBenefits::Process < BaseOperation
       if card.blank?
         valid = false
         messages << 'Card not found'
-      else
-
       end
 
       # todo validate card eligibility -> Currently we are not doing this validation
 
       if valid
-        self.processable_amount += self.amount
+        self.processable_amount += amount
       end
 
       self.payment_order_valid = false unless valid
@@ -91,10 +89,10 @@ class Benefits::TaxBenefits::Process < BaseOperation
     params[:processable_amount] = self.processable_amount
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
-    Benefits::Meal::Process::SuccessPresenter.new(user, params, messages)
+    Benefits::TaxBenefits::Process::SuccessPresenter.new(user, params, messages)
   end
 
-  class Benefits::Meal::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Benefits::TaxBenefits::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
                   :payment_order_valid
 

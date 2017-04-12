@@ -33,6 +33,9 @@ class ImportUtil
         unless j >= row_length
           val = row[j]
         end
+        if val.present? and val.is_a?(String)
+          # val.to_s.sub!('mailto:','')
+        end
         map[key] = val
       end
       list << map
