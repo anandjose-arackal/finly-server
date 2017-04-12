@@ -4,7 +4,8 @@ class Benefits::MealController < ApplicationController
   allow_oauth!
 
   def create
-
+    @result = Benefits::TaxBenefits::Create.(PaymentOrder::CONFIG[:meal_card], current_user, params)
+    respond
   end
 
   def index
@@ -16,7 +17,7 @@ class Benefits::MealController < ApplicationController
   end
 
   def process_file
-    @result = Benefits::TaxBenefits::Meal::ProcessFile.(current_user, params)
+    @result = Benefits::TaxBenefits::ParseFile.(PaymentOrder::CONFIG[:meal_card], current_user, params)
     respond
   end
 

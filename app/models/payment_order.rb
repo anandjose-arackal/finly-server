@@ -21,11 +21,22 @@
 #
 
 class PaymentOrder < ActiveRecord::Base
+
+  CONFIG = {meal_card: {
+      subscription: :meal_card_enabled,
+      card_program_id: CardProgram.id_for(:meal),
+      payment_type_id: PaymentType.id_for(:credit_meal_card),
+      payment_order_type_id: PaymentOrderType.id_for(:meal_card)
+  }}
+
   belongs_to :payment_order_type
   belongs_to :payment_order_status
   belongs_to :company
+  belongs_to :amount_requested, class_name: 'Amount'
+  belongs_to :amount_processed, class_name: 'Amount'
+  belongs_to :initiating_user, class_name: 'User'
 
-  has_many :payments
+  has_many :payments, dependent: :destroy
 
   has_attached_file :payment_file, default_url: '/images/:style/missing.png'
   validates_attachment_content_type :payment_file,
@@ -35,8 +46,6 @@ class PaymentOrder < ActiveRecord::Base
   validates :initiating_user_id, presence: true
   validates :payment_order_status_id, presence: true
   validates :company_id, presence: true
-  validates :amount_requested_id, presence: true
-  validates :amount_processed_id, presence: true
 
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed

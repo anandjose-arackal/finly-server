@@ -1,7 +1,10 @@
-class Benefits::TaxBenefits::Meal::ProcessFile < Benefits::TaxBenefits::Meal::Base
+# Parse_file parses the given file and extract the users and amounts
+class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
   attr_accessor :file, :parsed_data, :response_presenter
 
   def pre_validate
+    super
+    return if has_errors?
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -25,8 +28,8 @@ class Benefits::TaxBenefits::Meal::ProcessFile < Benefits::TaxBenefits::Meal::Ba
 
   def process
     params[:payment_order] = self.parsed_data
-    params[:card_program_id] = CardProgram.id_for(:meal)
-    self.response_presenter = Benefits::TaxBenefits::Process.(user, params)
+    params[:card_program_id] = card_program_id
+    self.response_presenter = Benefits::TaxBenefits::Process.(config, user, params)
   end
 
   def success
