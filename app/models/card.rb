@@ -118,6 +118,14 @@ class Card < ActiveRecord::Base
     self.proxy
   end
 
+  def inactive?
+    !self.active
+  end
+
+  def active?
+    self.active
+  end
+
   private
 
   def user_or_company_presence

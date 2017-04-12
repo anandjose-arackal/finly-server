@@ -9,7 +9,7 @@ class Admin::Users::Base < Admin::Base
     def init
       self.created_user = params[:created_user]
       self.selected_user = params[:selected_user]
-      self.cards = selected_user.cards
+      self.cards = selected_user.cards if selected_user
     end
 
   end

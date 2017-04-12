@@ -15,11 +15,17 @@ class Admin::Cards::Block < Admin::Cards::Base
     self.block_params = card_block_params
   end
 
+  def validate
+    if selected_card.inactive?
+      add_message :error, "Card is already blocked"
+    end
+  end
+
   def process
-    block_presenter = ItzCash::Block.(card.user, {card_id: card.id})
+    block_presenter = ItzCash::Block.(selected_card.user, {card_id: selected_card.id})
     if block_presenter.success?
       selected_card.update(active: false,
-                           disbled_by_role_id: UserRole.id_for(:admin),
+                           disabled_by_role_id: UserRole.id_for(:admin),
                            disabled_by_user_id: user.id,
                            admin_unblockable: false)
     else
@@ -29,6 +35,10 @@ class Admin::Cards::Block < Admin::Cards::Base
 
   def post_process
     add_message :success, "Card blocked successfully"
+  end
+
+  def success
+    Admin::Cards::Base::CardsPresenter.new(user, {card: selected_card}, messages)
   end
 
   private

@@ -28,7 +28,7 @@ class CardProgram < ActiveRecord::Base
   scope :with_reimbursement, -> { where receive_reimbursement: true }
   scope :with_non_personal_fund_transfer, -> { where non_personal_fund_transfer: true }
 
-  PROGRAMS = {expense: 1, reimbursement: 2}
+  PROGRAMS = {expense: 1, reimbursement: 2, meal: 3}
 
   def self.id_for(program)
     PROGRAMS[program]
