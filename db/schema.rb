@@ -1045,13 +1045,14 @@ ActiveRecord::Schema.define(version: 20170412150935) do
   end
 
   create_table "policies", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "company_id", limit: 4
-    t.integer  "owner_id",   limit: 4
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "default",                default: false, null: false
-    t.boolean  "is_deleted",             default: false, null: false
+    t.string   "name",        limit: 255
+    t.integer  "company_id",  limit: 4
+    t.integer  "owner_id",    limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "default",                   default: false, null: false
+    t.boolean  "is_deleted",                default: false, null: false
+    t.text     "description", limit: 65535
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
