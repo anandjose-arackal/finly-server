@@ -10,10 +10,14 @@ class BackgroundOperation < BaseOperation
   end
 
   def self.call_async(user_id, params)
+    self.perform_async(user_id, params)
+  end
+
+  def self.perform_async(user_id, params)
     if user_id.present? and user_id.is_a?(User)
       user_id = user.id
     end
-    self.perform_async(user_id, params)
+    super(user_id, params)
   end
 
   def initialize

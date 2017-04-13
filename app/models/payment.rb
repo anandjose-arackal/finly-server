@@ -22,7 +22,7 @@
 
 class Payment < ActiveRecord::Base
 
-  class AccountType
+  class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
     WALLET = 'UserWallet'
     CARD = 'Card'
@@ -130,6 +130,8 @@ class Payment < ActiveRecord::Base
   validates :initiating_user_id, presence: true
   validates :receiving_user_id, presence: true
 
+  delegate :completed?, :failed?, :pending?, :in_progress?, :scheduled?, to: :payment_status
+
   def initiating_account_type_name
     name = ""
     unless self.initiating_account_type == 'Company'
@@ -193,4 +195,5 @@ class Payment < ActiveRecord::Base
   def total_amount
     self.amount.value rescue nil
   end
+
 end

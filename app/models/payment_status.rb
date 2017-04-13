@@ -27,4 +27,24 @@ class PaymentStatus < ActiveRecord::Base
     end
   end
 
+  def completed?
+    self.id == PaymentStatus.id_for(:completed)
+  end
+
+  def failed?
+    self.id == PaymentStatus.id_for(:failed)
+  end
+
+  def pending?
+    self.id == PaymentStatus.id_for(:pending)
+  end
+
+  def in_progress?
+    self.id == PaymentStatus.id_for(:in_progress)
+  end
+
+  def scheduled?
+    self.id == PaymentStatus.id_for(:scheduled)
+  end
+
 end

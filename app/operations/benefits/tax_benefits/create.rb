@@ -33,6 +33,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   end
 
   def validate
+
     if scheduled_at && scheduled_at < Date.today
       add_message :error, 'Scheduled Date cannot be less than the current date'
       return
@@ -51,25 +52,26 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     unless self.processed_order_data.payment_order_valid
       add_message :error, 'Please fix the issues before confirming the request'
     end
+
   end
 
   def process
+
     if scheduled_at.present?
       payment_order_status_id = PaymentOrderStatus.id_for(:scheduled)
     else
       payment_order_status_id = PaymentOrderStatus.id_for(:pending)
     end
+
     amount_requested = Amount.new(value: self.processed_order_data.requested_amount, currency_id: 1)
 
-    payment_order_params = {
-        payment_order_type_id: payment_order_type_id,
+    payment_order_params = { payment_order_type_id: payment_order_type_id,
         scheduled_at: self.scheduled_at,
         processed_at: DateTime.now,
         initiating_user: user,
         payment_order_status_id: payment_order_status_id,
         company_id: user.company_id,
-        amount_requested: amount_requested
-    }
+        amount_requested: amount_requested }
 
     self.payment_order = user.payment_orders.build payment_order_params
 
@@ -108,6 +110,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       add_message :error, self.payment_order.errors.full_messages
       self.payment_order.destroy
     end
+
   end
 
   def success
