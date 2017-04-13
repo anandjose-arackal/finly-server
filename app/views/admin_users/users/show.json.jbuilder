@@ -12,3 +12,9 @@ json.cards do
     json.id card.id
   end
 end
+
+json.roles do
+  json.admin @result.selected_user.admin?
+  json.finance_manager @result.selected_user.finance_manager?
+  json.manager @result.selected_user.manager?
+end
