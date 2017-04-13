@@ -1,8 +1,8 @@
 class Transcriber::ReceiptsController < ApplicationController
 
-  # todo - change this before committing
-  # before_action :authenticate_user!
-  # allow_oauth!
+
+  before_action :authenticate_user!
+  allow_oauth!
   # before_action :transcriber_accounts
 
   def create_expense

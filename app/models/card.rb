@@ -69,6 +69,21 @@ class Card < ActiveRecord::Base
     user = self.user
 
     result = ItzCash::AccountDetails.(user, card_id: self.id)
+
+    # marking the card by default as either active or inactive
+    if result.success?
+      case result.status_code
+        when 'A'
+          if result.suspended_status == "N"
+            self.update(active: true)
+          else
+            self.update(active: false)
+          end
+        else
+          self.update(active: false)
+      end
+    end
+    
     balance_amount = result.balance rescue 0
 
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
