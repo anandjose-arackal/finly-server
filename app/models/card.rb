@@ -19,6 +19,7 @@
 #  card_balance_id     :integer
 #  card_program_id     :integer          not null
 #  card_eligibility_id :integer
+#  admin_unblockable   :boolean          default(TRUE)
 #
 
 class Card < ActiveRecord::Base
@@ -53,17 +54,36 @@ class Card < ActiveRecord::Base
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
 
+  scope :expense_cards_only, -> {where card_program_id: CardProgram.id_for(:expense)}
+  scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
+
   delegate :card_balance_value, to: :card_balance
+  delegate :card_program_name, to: :card_program
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
-  validates :user_id, presence: true
   validates :ending_number, presence: true
   validates :card_program_id, presence: true
+  validate :user_or_company_presence
 
   after_create do
     user = self.user
 
     result = ItzCash::AccountDetails.(user, card_id: self.id)
+
+    # marking the card by default as either active or inactive
+    if result.success?
+      case result.status_code
+        when 'A'
+          if result.suspended_status == "N"
+            self.update(active: true)
+          else
+            self.update(active: false)
+          end
+        else
+          self.update(active: false)
+      end
+    end
+
     balance_amount = result.balance rescue 0
 
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
@@ -77,7 +97,7 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
   end
 
-  # attr_accessor :balance, :available_card_eligibility
+
   def unblockable?
     if self.active
       false
@@ -93,6 +113,8 @@ class Card < ActiveRecord::Base
     end
   end
 
+
+  # attr_accessor :balance, :available_card_eligibility
   def balance
     if card_balance.blank?
       ItzCash::AccountDetails.(user, card_id: self.id)
@@ -111,6 +133,20 @@ class Card < ActiveRecord::Base
     self.proxy
   end
 
+  def inactive?
+    !self.active
+  end
+
+  def active?
+    self.active
+  end
+
   private
+
+  def user_or_company_presence
+    unless self.user.present? || self.company.present?
+      errors.add(:card, "should belong to either company or user")
+    end
+  end
 
 end

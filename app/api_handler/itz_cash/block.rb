@@ -43,7 +43,7 @@ class ItzCash::Block < ItzCash::Base
     # ResponseCode,SerialID,Description
     params[:response_code] = parsed_response[0]
     params[:serial_id] = parsed_response[1]
-    params[:description]=parsed_response[2]
+    params[:description] = parsed_response[2]
     ItzCash::Block::SuccessPresenter.new(self.user, params, messages)
   end
 

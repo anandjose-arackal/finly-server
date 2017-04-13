@@ -144,4 +144,6 @@ class CompanyBalanceHistory < ActiveRecord::Base
   delegate :cash_on_hand_load_value, to: :cash_on_hand_load
   delegate :cash_on_hand_withdrawal_value, to: :cash_on_hand_withdrawal
 
+  scope :with_date, -> (date) {where date: date}
+
 end

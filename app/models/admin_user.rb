@@ -22,4 +22,24 @@ class AdminUser < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, 
          :recoverable, :rememberable, :trackable, :validatable
+
+
+  has_many :admin_user_role_mappings, dependent: :destroy
+  has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
+
+  def finly_admin?
+    # todo temporary, will change once roles has been estabilished
+    return true
+    # self.admin_user_role_mappings.finly_admin.present?
+  end
+
+  def transcriber?
+    self.admin_user_role_mappings.transcriber.present?
+  end
+
+  # overriding devise's default method so that it compares against both email and phone number to authenticate
+  def self.find_for_database_authentication(conditions={})
+    find_by(email: conditions[:email])
+  end
+
 end
