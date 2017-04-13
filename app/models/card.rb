@@ -83,7 +83,7 @@ class Card < ActiveRecord::Base
           self.update(active: false)
       end
     end
-    
+
     balance_amount = result.balance rescue 0
 
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
