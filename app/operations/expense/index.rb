@@ -53,7 +53,7 @@ class Expense::Index < Expense::Base
       # todo - slightly dirty method - think of a more elegant way to do this
       admin_expense_ids = []
       admin_expense_ids += Expense.with_report(report_ids).pluck(:id) if report_ids.present?
-      admin_expense_ids += Expense.only_card_expenses.with_user(team_user_ids).pluck(:id) if team_user_ids.present?
+      admin_expense_ids += Expense.with_user(team_user_ids).pluck(:id) if team_user_ids.present?
       self.expenses = Expense.with_id(admin_expense_ids).uniq if admin_expense_ids.present?
     end
     self.expenses = [] if self.expenses.nil?
