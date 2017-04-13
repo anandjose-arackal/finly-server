@@ -1,4 +1,4 @@
-class Admin::Users::SetRole < Admin::Users::Base
+class Admin::Users::Role::SetRole < Admin::Users::Base
 
   attr_accessor :roles_to_add, :roles_to_remove, :being_updated_user
 
@@ -34,7 +34,7 @@ class Admin::Users::SetRole < Admin::Users::Base
     self.roles_to_remove = existing_role_ids - new_role_ids
   end
 
-  def process
+  def process 
     return unless roles_to_add.present? or roles_to_remove.present?
     create = []
     roles_to_add.each do |role_id|
