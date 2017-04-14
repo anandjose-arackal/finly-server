@@ -130,18 +130,8 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :cards
   # accepts_nested_attributes_for :feature_access
 
-  delegate :employee_id, to: :profile
-  delegate :payroll_id, to: :profile
+  delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
-  delegate :city, to: :profile
-  delegate :address_1, to: :profile
-  delegate :address_2, to: :profile
-  delegate :date_of_birth, to: :profile
-  delegate :pin_code, to: :profile
-  delegate :gender_name, to: :profile
-  delegate :state_id, to: :profile
-  delegate :state_name, to: :profile
-
 
   has_paper_trail
 
