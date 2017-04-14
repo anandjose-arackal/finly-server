@@ -69,6 +69,15 @@ class AdminUsers::UsersController < ApplicationController
     end
   end
 
+  def update_mapping
+    @result = Admin::Users::Team::Set.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   private
 
 end

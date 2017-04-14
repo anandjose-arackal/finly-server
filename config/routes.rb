@@ -417,6 +417,7 @@
 #                                         PUT    /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                        admin_users/companies#destroy
 #          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)         admin_users/users#update_status
+#         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)        admin_users/users#update_mapping
 #                       admin_users_users GET    /admin_users/users(.:format)                                admin_users/users#index
 #                                         POST   /admin_users/users(.:format)                                admin_users/users#create
 #                    new_admin_users_user GET    /admin_users/users/new(.:format)                            admin_users/users#new
@@ -742,6 +743,7 @@ Rails.application.routes.draw do
     resources :companies
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
+      patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
     end
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
