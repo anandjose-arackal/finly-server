@@ -40,4 +40,19 @@ class UserProfile < ActiveRecord::Base
   validates :state_id, presence: true
   validates :pin_code, presence: true, format: Constants::VALID_PIN_CODE
 
+  def state_name
+    State.name_from_id(self.state_id)
+  end
+
+  def gender_name
+    case self.gender
+      when 'f'
+        return "Female"
+      when 'm'
+        return "Male"
+      else
+        # nothing to do, ha!
+    end
+  end
+
 end

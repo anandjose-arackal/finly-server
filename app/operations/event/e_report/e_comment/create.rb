@@ -74,7 +74,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     params[:comment_body] = comment.content
   end
 
-  def report_view_role
+  def report_view_role(user)
     roles.first
   end
 

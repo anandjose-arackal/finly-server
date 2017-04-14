@@ -69,7 +69,8 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
     params[:rejected_expenses] = [rejected_expense]
   end
 
-  def report_view_role
+  def report_view_role(user)
+    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     roles.first
   end
 

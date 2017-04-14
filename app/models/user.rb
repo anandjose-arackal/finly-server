@@ -133,8 +133,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :cards
   # accepts_nested_attributes_for :feature_access
 
-  delegate :employee_id, to: :profile
-  delegate :payroll_id, to: :profile
+  delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
 
   has_paper_trail
@@ -191,6 +190,9 @@ class User < ActiveRecord::Base
   scope :filter_role, -> (role) {
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
   }
+
+  scope :filter_company_id, -> (company_id){where company_id: company_id}
+  scope :company_id, -> (company_id) {where company_id: company_id}
 
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true) }
@@ -408,6 +410,32 @@ class User < ActiveRecord::Base
     end
     # if none of the above conditions are satisfied
     false
+  end
+
+  # returns the sate of the particular user - active, inactive or pending
+  def user_state
+    if self.active && self.invitation_token.nil? && !self.first_name.blank? && !self.mobile_only_invite
+      return 1
+    elsif self.mobile_only_invite || self.first_name.nil? || !self.invitation_token.blank?
+      return 2
+    elsif !self.active && !self.first_name.blank? && !self.mobile_only_invite
+      return 3
+    end
+  end
+
+  def finly_admin?
+    if self.company_id == Company.find_by(name: "Jouska")
+      return true
+    end
+    # jugaad for testing
+    # todo - change before deploy
+    if self.company_id == 1
+      return true
+    elsif self.company_id == 2
+      return true
+    else
+      return false
+    end
   end
 
   private

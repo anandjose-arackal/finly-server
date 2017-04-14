@@ -9,7 +9,7 @@ class User::Summary < User::Base
 
   def init
     id = (params[:id] or params[:user_id])
-    if personal_view? or id == user.id
+    if personal_view? or id.to_i == user.id
       self.selected_user = user
     else
       operation = User::Team::Index.new(user, params)

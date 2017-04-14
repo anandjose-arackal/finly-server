@@ -27,10 +27,13 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
     unless selected_user.company.ocr_enabled?
       add_message :error, "OCR not enabled for this company"
     end
+    if receipt.parent.present?
+      add_message :error, "This recept is already associated with an expense"
+    end
   end
 
   def authorize
-    unless user.company_id == Company.find_by(name: "Transcriber").id
+    unless user.company_id == Company.find_by(name: "Transcriber").id || user.company_id == Company.find_by(name: "Jouska").id
       raise_unauthorized_exception
     end
   end

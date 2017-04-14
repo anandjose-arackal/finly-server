@@ -1,8 +1,5 @@
 id: <%= params[:id] %>
 receipt_id: <%= params[:receipt_id] %>
-<% if params[:custom_fields].present? %>
-custom_fields: <%= params[:custom_fields] %>
-<% end %>
 expense:
   note: <%= params[:note] %>
   report_id: <%= params[:report_id] %>

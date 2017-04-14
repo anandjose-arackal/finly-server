@@ -12,6 +12,7 @@
 
 
 
+
 class State < ActiveRecord::Base
 
   VALUES = [{:code => 'S00', :name => 'Outside India'}, {:code => 'S01', :name => 'Maharashtra'}, {:code => 'S02', :name => 'Gujarat'}, {:code => 'S03', :name => 'Andhra Pradesh'},
@@ -35,6 +36,11 @@ class State < ActiveRecord::Base
       end
     end
     nil
+  end
+
+  def self.name_from_id(id)
+    return nil if id.blank?
+    VALUES[id-1][:name] rescue nil
   end
 
 end

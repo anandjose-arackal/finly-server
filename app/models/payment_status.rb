@@ -10,9 +10,9 @@
 
 class PaymentStatus < ActiveRecord::Base
 
-  scope :with_name, ->(name) { where name: name }
-
   VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5}
+
+  scope :with_name, ->(name) { where name: name }
 
   def self.id_for(key)
     VALUES[key]
@@ -25,6 +25,26 @@ class PaymentStatus < ActiveRecord::Base
         PaymentStatus.create id: value, name: key
       end
     end
+  end
+
+  def completed?
+    self.id == PaymentStatus.id_for(:completed)
+  end
+
+  def failed?
+    self.id == PaymentStatus.id_for(:failed)
+  end
+
+  def pending?
+    self.id == PaymentStatus.id_for(:pending)
+  end
+
+  def in_progress?
+    self.id == PaymentStatus.id_for(:in_progress)
+  end
+
+  def scheduled?
+    self.id == PaymentStatus.id_for(:scheduled)
   end
 
 end

@@ -4,10 +4,12 @@ json.payment do
       json.user do
         json.identifier item[:user][:identifier]
         user_obj = item[:user][:user_details]
-        json.details do
-          json.name user_obj.name
-          json.email user_obj.email
-          json.mobile_number user_obj.mobile_number
+        if user_obj.present?
+          json.details do
+            json.name user_obj.name
+            json.email user_obj.email
+            json.mobile_number user_obj.mobile_number
+          end
         end
       end
       json.card do
