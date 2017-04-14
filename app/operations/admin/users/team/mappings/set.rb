@@ -1,4 +1,4 @@
-class Admin::Users::Team::Set < User::Team::Mappings::Set
+class Admin::Users::Team::Mappings::Set < User::Team::Mappings::Set
 
   def pre_validate
     super()
