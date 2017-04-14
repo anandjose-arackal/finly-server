@@ -295,7 +295,7 @@ class Expense < ActiveRecord::Base
         # this will handle cases for deleted expenses as well.
         merchant = self.manual_expense.merchant rescue nil
         if merchant.nil?
-          merchant = ManualExpense.unscoped.find_by(expense_id: self.id) rescue ""
+          merchant = ManualExpense.unscoped.find_by(expense_id: self.id).merchant rescue ""
         end
         return merchant
       when ExpenseType.id_for(:card)
