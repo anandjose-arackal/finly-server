@@ -43,7 +43,7 @@ class Expense::Index < Expense::Base
     elsif params.present? and params[:controller].present? and params[:controller] == 'expenses' and params[:action] == 'index'
       # If viewed from expense index screen
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
-      self.expenses = Expense.with_user(team_user_ids).only_card_expenses.unreported_and_rejected.uniq if team_user_ids.present?
+      self.expenses = Expense.with_user(team_user_ids).unreported_and_rejected.uniq if team_user_ids.present?
     else
       # For all expenses
       report_ids = Report::Index.(user, params).reports.map(&:id) rescue nil
