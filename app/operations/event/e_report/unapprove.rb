@@ -55,7 +55,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
     end
   end
 
-  def report_view_role
+  def report_view_role(user)
     if report.controlling_user_id == user.id
       return report.controlling_user_role_id
     else

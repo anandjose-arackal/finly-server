@@ -1,4 +1,6 @@
 class Oauth::TokenController < Opro::Oauth::TokenController
+
+
   def create
     super()
 
@@ -8,4 +10,5 @@ class Oauth::TokenController < Opro::Oauth::TokenController
       cookies["refresh_token"] = { :value => @auth_grant.refresh_token, :httponly => true }
     end
   end
+
 end

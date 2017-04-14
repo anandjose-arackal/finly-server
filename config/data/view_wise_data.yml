@@ -32,8 +32,8 @@ personal:
     cog:
       - My Account: '#settings'
       # - My Balance: '#modal-balance'
-      - FAQ: '#faq/params={"view":"personal"}'
-      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - FAQ: '#faq/params={"view":"personal"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
 manager:
@@ -50,8 +50,8 @@ manager:
     cog:
       - My Account: '#settings'
       # - My Balance: '#modal-balance'
-      - FAQ: '#faq/params={"view":"manager"}'
-      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - FAQ: '#faq/params={"view":"manager"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'
 
 finance_manager:
@@ -70,6 +70,6 @@ finance_manager:
     cog:
       - My Account: '#settings'
       # - My Balance: '#modal-balance'
-      - FAQ: '#faq/params={"view":"finance"}'
-      - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - FAQ: '#faq/params={"view":"finance"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
       # - Logout: '/users/sign_out'  

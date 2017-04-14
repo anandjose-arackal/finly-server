@@ -1,21 +1,15 @@
 class Transcriber::CompaniesController < ApplicationController
 
   before_action :authenticate_user!
-  # allow_oauth!
-  before_action :transcriber_accounts
+  allow_oauth!
+  # before_action :transcriber_accounts
 
   def index
     @companies = Company.ocr_enabled
   end
 
   def show
-    @result = Transcriber::Receipts::Index.(current_user, params)
-    if @result.success?
-      render 'transcriber/receipts/index'
-    else
-      flash[:error] = @result.messages[:error]
-      redirect_to root_url
-    end
+
   end
 
   private

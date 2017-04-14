@@ -106,7 +106,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       end
     end
     arg_hash[:type] = :finance_manager
-    if user.finance_manager? and role == UserRole.id_for(:manager)
+    if user.finance_manager? and role == UserRole.id_for(:finance_manager)
       arg_hash[:type] = :approves_finance_to
       self.response = User::Team::Approver.(user, arg_hash)
       if self.response.present?
