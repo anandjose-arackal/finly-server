@@ -12,7 +12,7 @@
 class TimeObject < ActiveRecord::Base
   belongs_to :physical_unit
 
-  validates :value, presence: true
+  validate :non_zero_value
   validates :physical_unit, presence: true
 
   before_validation {
@@ -21,6 +21,14 @@ class TimeObject < ActiveRecord::Base
 
   def time_object_value
     self.value
+  end
+
+  private
+
+  def non_zero_value
+    if self.value < 0 || self.value == 0
+      errors.add(:time, "cannot be negative")
+    end
   end
 
 end

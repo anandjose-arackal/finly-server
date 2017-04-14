@@ -51,7 +51,15 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
-  scope :ocr_enabled, (-> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') })
+  scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
+
+  scope :filter_search, -> (term) {
+    where('name LIKE (?)', "%#{term}%")
+  }
+
+  scope :created_between, -> (start_date, end_date) {
+    where('created_at >= ? && created_at <= ?', start_date, end_date)
+  }
 
   def default_policy
     self.policies.default
@@ -107,6 +115,13 @@ class Company < ActiveRecord::Base
   def ocr_enabled?
     self.feature_subscription.ocr_enabled
   end
+
+  def balance_amount(date)
+    balance_history = self.company_balance_histories.with_date(date).first rescue nil
+    return 0 if balance_history.nil?
+    return balance_history.company_balance_value
+  end
+
 
   private
 
