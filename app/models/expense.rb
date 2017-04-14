@@ -292,8 +292,14 @@ class Expense < ActiveRecord::Base
   def merchant_name
     case self.expense_type_id
       when ExpenseType.id_for(:manual)
-        return self.manual_expense.merchant
+        # this will handle cases for deleted expenses as well.
+        merchant = self.manual_expense.merchant rescue nil
+        if merchant.nil?
+          merchant = ManualExpense.unscoped.find_by(expense_id: self.id) rescue ""
+        end
+        return merchant
       when ExpenseType.id_for(:card)
+        # this will handle cases for deleted expenses as well.
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
       when ExpenseType.id_for(:per_diem)
