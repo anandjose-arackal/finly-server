@@ -25,4 +25,5 @@ class CompanyConfiguration < ActiveRecord::Base
 
   validates :company_id, presence: true, uniqueness: true
 
+
 end

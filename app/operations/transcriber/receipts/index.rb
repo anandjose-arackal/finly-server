@@ -21,11 +21,11 @@ class Transcriber::Receipts::Index < BaseOperation
   end
 
   def pre_validate
-
+    super()
   end
 
   def init
-    id = params[:id] || params[:company_id]
+    id = params[:id] || params[:company_id] || params[:filter_company_id]
     self.company = Company.find_by(id)
     self.receipts = []
   end

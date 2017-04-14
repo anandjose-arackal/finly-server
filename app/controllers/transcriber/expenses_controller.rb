@@ -1,5 +1,8 @@
 class Transcriber::ExpensesController < ApplicationController
 
+  before_action :authenticate_user!
+  allow_oauth!
+
   def create
     @result = Transcriber::Expenses::Create.(current_user, params)
     if @result.success?
