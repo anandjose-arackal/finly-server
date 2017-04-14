@@ -43,18 +43,18 @@ class Expense::Index < Expense::Base
     elsif params.present? and params[:controller].present? and params[:controller] == 'expenses' and params[:action] == 'index'
       # If viewed from expense index screen
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
-      self.expenses = Expense.with_user(team_user_ids).unreported_and_rejected.uniq if team_user_ids.present?
+      self.expenses = Expense.with_user(team_user_ids).admin_viewable.uniq if team_user_ids.present?
     else
       # For all expenses
       report_ids = Report::Index.(user, params).reports.map(&:id) rescue nil
       # adding all card expenses of the users in the team
-      team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
+      # team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
 
       # todo - slightly dirty method - think of a more elegant way to do this
-      admin_expense_ids = []
-      admin_expense_ids += Expense.with_report(report_ids).pluck(:id) if report_ids.present?
-      admin_expense_ids += Expense.with_user(team_user_ids).pluck(:id) if team_user_ids.present?
-      self.expenses = Expense.with_id(admin_expense_ids).uniq if admin_expense_ids.present?
+      # admin_expense_ids = []
+      # admin_expense_ids += Expense.with_report(report_ids).pluck(:id) if report_ids.present?
+      # admin_expense_ids += Expense.with_user(team_user_ids).pluck(:id) if team_user_ids.present?
+      self.expenses = Expense.with_report(report_ids).uniq if report_ids.present?
     end
     self.expenses = [] if self.expenses.nil?
   end
