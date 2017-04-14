@@ -27,7 +27,13 @@ class Benefits::TaxBenefits::Execute < BackgroundOperation
   def process
     self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:in_progress))
     self.payment_order.payments.each do |payment|
-
+      validation = Payment::Validate.(user, payment)
+      unless validation.success?
+        validation.messages[:error].each do |message|
+          payment.system_messages.create content: message, message_type_id: SystemMessageType.id_for(:error)
+        end
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+      end
     end
   end
 

@@ -29,26 +29,7 @@ class Payment::Validate < BaseOperation
 
   def process
     validate_transfer_viability
-
-    # Validate balances
-    case payment.initiating_account_type
-      when Payment::AccountType::VIRTUAL_ACCOUNT
-
-      when Payment::AccountType::WALLET
-
-      when Payment::AccountType::CARD
-
-    end
-
-    case payment.receiving_account_type
-      when Payment::AccountType::VIRTUAL_ACCOUNT
-
-      when Payment::AccountType::WALLET
-
-      when Payment::AccountType::CARD
-
-    end
-
+    return if has_errors?
   end
 
   def success
@@ -66,7 +47,26 @@ class Payment::Validate < BaseOperation
 
   protected
   def validate_transfer_viability
+    if payment.initiating_account == payment.receiving_account
+      add_message :error, 'Initiating and receiving accounts cannot be the same'
+      return
+    end
 
+    case payment.initiating_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+      when Payment::AccountType::WALLET
+      when Payment::AccountType::CARD
+    end
+
+    case payment.receiving_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+        if payment.payment_type_id == PaymentType.id_for(:debit)
+          add_message :error, 'Cannot debit from Company Credits'
+          return
+        end
+      when Payment::AccountType::WALLET
+      when Payment::AccountType::CARD
+    end
   end
 
 end

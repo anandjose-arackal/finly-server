@@ -227,6 +227,8 @@ PaymentOrderType.seed_data
 
 PaymentOrderStatus.seed_data
 
+SystemMessageType.seed_data
+
 ##########################
 
 if Amount.count == 0

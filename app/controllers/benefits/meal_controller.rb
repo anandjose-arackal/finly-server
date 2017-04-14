@@ -16,11 +16,14 @@ class Benefits::MealController < ApplicationController
   def update
     @result = Benefits::TaxBenefits::Update.(PaymentOrder::CONFIG[:meal_card], current_user, params)
     if @result.success?
-      render 'benefits/meal/process_file'
+      respond_to do |format|
+        format.json { render 'benefits/meal/process_file' }
+        format.html {}
+      end
       return
     end
     respond
-  end
+   end
 
   def index
     @result = Benefits::TaxBenefits::Index.(PaymentOrder::CONFIG[:meal_card], current_user, params)

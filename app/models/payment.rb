@@ -20,6 +20,7 @@
 #
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -43,6 +44,8 @@ class Payment < ActiveRecord::Base
 
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true
+
+  has_many :system_messages, as: :messagable
 
   accepts_nested_attributes_for :amount
   delegate :amount_value, to: :amount

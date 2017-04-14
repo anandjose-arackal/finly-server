@@ -11,6 +11,7 @@
 
 
 
+
 class PaymentType < ActiveRecord::Base
   has_many :payments
 
@@ -42,6 +43,15 @@ class PaymentType < ActiveRecord::Base
 
   def self.name_for(id)
     TYPES.key(id).to_s.humanize rescue nil
+  end
+
+  def self.seed_data
+    count = PaymentType.count
+    PaymentType::TYPES.each do |key, value|
+      if count == 0 or PaymentType.with_name(key).blank?
+        PaymentType.create id: value, name: key
+      end
+    end
   end
 
 end
