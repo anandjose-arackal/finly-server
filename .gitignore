@@ -17,7 +17,7 @@ dump.rdb
 !/log/.keep
 /tmp
 /public/system/receipts/*
-
+/public/system/company_configurations/*
 # all local executables
 /bin
 

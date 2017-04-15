@@ -196,7 +196,8 @@ class Expense < ActiveRecord::Base
   scope :include_manual_expense, -> { joins :manual_expense }
   scope :filter_user_id, ->(id) { where user_id: id }
 
-
+  scope :transcribed, -> {where transcribed: true}
+  scope :untranscribed, -> {where transcribed: false}
 
   scope :verified, -> {where expense_status_id: ExpenseStatus.submitted_id}
   scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}

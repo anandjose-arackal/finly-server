@@ -7,9 +7,7 @@ class Transcriber::Receipts::Index < BaseOperation
     attr_accessor :receipts, :categories, :companies, :users
 
     # scopes for filters
-    has_scope :filter_parent
     has_scope :filter_user
-    has_scope :filter_company
 
     def init
       self.receipts = params[:receipts]
@@ -23,7 +21,8 @@ class Transcriber::Receipts::Index < BaseOperation
   end
 
   def init
-    self.companies = Company.ocr_enabled
+    id = params[:company_id] || params[:filter_company_id]
+    self.companies = Company.ocr_enabled.with_id(id)
     self.receipts = []
   end
 
@@ -36,7 +35,12 @@ class Transcriber::Receipts::Index < BaseOperation
     companies.each do |company|
       user_ids += company.users.pluck(:id)
     end
-    self.receipts = Receipt.untranscribed.with_user_id(user_ids)
+    if params[:filter_parent] == '0'
+      self.receipts = Receipt.with_user_id(user_ids)
+    elsif params[:filter_parent] == '1'
+      expense_ids = Expense.untranscribed.with_user_id(user_ids)
+      self.receipts = Receipt.with_expense_id(expense_ids)
+    end
   end
 
   def success

@@ -51,6 +51,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
     expense_params[:expense_type_id] = ExpenseType.manual_expense_id
     expense_params[:expense_status_id] = ExpenseStatus.unreported_id
     expense_params[:amount_attributes][:currency_id] = Currency.first.id
+    expense_params[:transcribed] = true
   end
 
   def process
