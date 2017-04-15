@@ -1,0 +1,7 @@
+class AddCardProgramMedicalCard < ActiveRecord::Migration
+  def change
+    if CardProgram.count > 0
+      CardProgram.seed_data
+    end
+  end
+end

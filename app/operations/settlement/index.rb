@@ -1,4 +1,4 @@
-class Settlement::Index < Settlement::Base
+ class Settlement::Index < Settlement::Base
   attr_accessor :users
 
   def pre_validate
@@ -29,6 +29,16 @@ class Settlement::Index < Settlement::Base
     attr_accessor :users
 
     has_scope :filter_search
+    has_scope :filter_state, type: :array
+    has_scope :filter_user_role_id
+    has_scope :filter_reports_awaiting_settlement
+    has_scope :filter_pending_money_requests
+    has_scope :filter_with_cash_on_hand_balance
+    has_scope :filter_with_finly_money_balance
+    has_scope :filter_with_reimbursement_card
+    has_scope :filter_with_expense_card
+    has_scope :filter_with_meal_card
+    has_scope :filter_with_medical_card
 
     def init
       self.users = apply_scopes(params[:users], params).paginate(page: params[:page], per_page: 30)

@@ -47,17 +47,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -158,7 +147,7 @@ class User < ActiveRecord::Base
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
-    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?",
+    where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?',
           "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%"
   end
   scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
@@ -171,26 +160,79 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
 
+  # Users having cards assigned with the given program
+  scope :with_cards_having_card_program, ->(id) do
+    user_ids = pluck(:id)
+    ids = Card.with_user(user_ids).with_card_program(id).pluck(:user_id)
+    self.with_id(ids)
+  end
+
+  # Users having finly money balance greater than 0
+  scope :having_wallet_balance, -> do
+    user_ids = pluck(:id)
+    ids UserWallet.with_user(user_ids).having_balance_value.pluck(:user_id)
+    self.with_id(ids)
+  end
+
+  # Users having finly money balance greater than 0
+  scope :having_cash_on_hand_balance, -> do
+    user_ids = pluck(:id)
+    ids = BalanceSheet.with_user(user_ids).having_cash_in_hand_balance_value.pluck(:user_id)
+    self.with_id(ids)
+  end
+
+  scope :filter_reports_awaiting_settlement, -> do
+    user_ids = pluck(:id)
+    ids = Report.all.with_user(user_ids).approved.pluck(:user_id)
+    self.with_id(ids)
+  end
+
+  scope :filter_pending_money_requests, -> do
+    user_ids = pluck(:id)
+    ids = MoneyRequest.all.with_user(user_ids).approved.pluck(:user_id)
+    self.with_id(ids)
+  end
+
   # scopes for filters
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ?",
+    where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ?',
           "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
   end
 
   scope :filter_state, -> (state) do
-    case (state)
-      when '1', 1
-        # Active
-        # Name nil is to ensure user has signed up
-        where(active: true).where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true)
-      when '2', 2
-        # Pending - i.e. where name is an empty string or when there is an invitation token
-        where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true)
-      when '3', 3
-        # Inactive
-        # Name nil is to ensure user has signed up
-        where(active: false).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true)
+    if state.blank?
+      state = []
+    end
+
+    unless state.is_a?(Array)
+      state = [state]
+    end
+
+    active = (state.include?('1') or state.include?(1))
+    pending = (state.include?('2') or state.include?(2))
+    inactive = (state.include?('3') or state.include?(3))
+
+    query = ''
+    if active
+      query += ' OR ' unless query.blank?
+      query += "`users`.`active` = 1 AND `users`.`invitation_token` IS NULL AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+      # query += '(active = 1 AND invitation_token IS NULL AND (NOT ((first_name = ' ' OR first_name IS NULL))) AND (mobile_only_invite != 1)'
+    end
+    if pending
+      query += ' OR ' unless query.blank?
+      query += "(first_name = '' OR invitation_token IS NOT NULL OR mobile_only_invite = 1)"
+      # query += 'first_name = ' ' OR invitation_token IS NOT NULL OR mobile_only_invite = 1'
+    end
+    if inactive
+      query += ' OR ' unless query.blank?
+      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+      # query += "active = 0 AND (NOT ((first_name = '' OR first_name IS NULL))) AND (mobile_only_invite != 1)"
+    end
+    if query.present?
+      where(query)
+    else
+      self
     end
   end
 
@@ -198,11 +240,11 @@ class User < ActiveRecord::Base
     joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
   }
 
-  scope :filter_company_id, -> (company_id){where company_id: company_id}
-  scope :company_id, -> (company_id) {where company_id: company_id}
+  scope :filter_company_id, -> (company_id) { where company_id: company_id }
+  scope :company_id, -> (company_id) { where company_id: company_id }
 
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
-  scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?',"",nil,true) }
+  scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true) }
   scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
@@ -447,10 +489,10 @@ class User < ActiveRecord::Base
 
   private
 
-  # def valid_role
-  #   if self.role_mapping.count == 0
-  #     errors.add(:user, "must be assigned a role")
-  #   end
-  # end
+# def valid_role
+#   if self.role_mapping.count == 0
+#     errors.add(:user, "must be assigned a role")
+#   end
+# end
 
 end
