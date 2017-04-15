@@ -11,7 +11,8 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
 
   def init
     self.expense_params = manual_expense_params
-    self.expense = Expense.find_by(id: params[:id])
+    id = params[:id] || params[:expense_id]
+    self.expense = Expense.find_by(id: id)
     self.selected_user = expense.user if expense
   end
 
@@ -43,13 +44,13 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
 
   def process
     if expense.update(expense_params)
+      expense.update(transcribed: true)
     else
       messages[:error] = expense.errors.full_messages
     end
   end
 
   def post_process
-    expense.update(transcribed: true)
     add_message :success, "Receipt transcribed"
   end
 end

@@ -62,6 +62,7 @@ class Receipt < ActiveRecord::Base
 
   scope :filter_user, -> (user_id) {where user_id: user_id}
 
+  # this scope is basically to separately retrieve receipts from companies that have OCR enabled
   scope :untranscribed, -> { where(to_be_transcribed: true) }
 
   def receipt_file_name

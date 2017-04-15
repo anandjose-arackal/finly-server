@@ -17,6 +17,7 @@ json.array!(@result.receipts) do |receipt|
   end
   json.expense_id receipt.parent_id
 
+  # debugger
   if receipt.parent.present?
     expense = receipt.parent
     json.expense do
