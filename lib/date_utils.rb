@@ -13,8 +13,9 @@ class DateUtils
   end
 
   def self.validate_date_format?(date_s)
-    d, m, y = date_s.split '-'
-    unless Date.valid_date? y.to_i, m.to_i, d.to_i
+    begin
+      Date.parse date_s
+    rescue ArgumentError
       return false
     end
     true
