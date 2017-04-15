@@ -27,33 +27,32 @@ class Payment::Process < BaseOperation
   end
 
   def process
+    # todo handle other types of payments other than credit meal card, for now we are going with an assumption that this would be called only for crediting meal cards
+    action_type = :credit
+
+    case payment.receiving_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+        # Unreachable as you cannot credit from card/wallet to virtual_account, this can only be debited
+
+      when Payment::AccountType::WALLET
+        
+
+      when Payment::AccountType::CARD
+
+    end
+
     case payment.initiating_account_type
       when Payment::AccountType::VIRTUAL_ACCOUNT
-        case payment.receiving_account_type
-          when Payment::AccountType::VIRTUAL_ACCOUNT
-
-          when Payment::AccountType::WALLET
-
-          when Payment::AccountType::CARD
-
+        if action_type == :credit
+          # Do nothing
         end
       when Payment::AccountType::WALLET
-        case payment.receiving_account_type
-          when Payment::AccountType::VIRTUAL_ACCOUNT
-
-          when Payment::AccountType::WALLET
-
-          when Payment::AccountType::CARD
-
+        if action_type == :credit
+          # Do nothing
         end
       when Payment::AccountType::CARD
-        case payment.receiving_account_type
-          when Payment::AccountType::VIRTUAL_ACCOUNT
-
-          when Payment::AccountType::WALLET
-
-          when Payment::AccountType::CARD
-
+        if action_type == :credit
+          # Do nothing
         end
     end
   end
