@@ -9,6 +9,7 @@ class Transcriber::Receipts::Index < BaseOperation
     # scopes for filters
     has_scope :filter_parent
     has_scope :filter_user
+    has_scope :filter_company
 
     def init
       self.receipts = params[:receipts]
@@ -25,21 +26,18 @@ class Transcriber::Receipts::Index < BaseOperation
   end
 
   def init
-    id = params[:id] || params[:company_id] || params[:filter_company_id]
-    self.company = Company.find_by(id)
+    self.companies = Company.ocr_enabled
     self.receipts = []
   end
 
   def authorize
-    unless company
-      raise_unauthorized_exception
-    end
+
   end
 
   def process
     user_ids = []
-    company.users.each do |user|
-      user_ids << user.id
+    companies.each do |company|
+      user_ids += company.users.pluck(:id)
     end
     self.receipts = Receipt.untranscribed.with_user_id(user_ids)
   end

@@ -121,7 +121,7 @@ class Company < ActiveRecord::Base
   private
 
   def init_config_present
-    self.build_configuration(ocr_enabled: false).save unless self.configuration.present?
+    # self.build_configuration(ocr_enabled: false).save unless self.configuration.present?
 
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
