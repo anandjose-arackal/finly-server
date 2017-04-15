@@ -15,5 +15,17 @@ json.array!(@result.receipts) do |receipt|
     json.original receipt.image.url
     json.thumb receipt.image.url(:thumb)
   end
-  json.parent_id receipt.parent_id
+  json.expense_id receipt.parent_id
+
+  if receipt.parent.present?
+    expense = receipt.parent
+    json.expense do
+      json.amount expense.amount_value
+      json.merchant expense.merchant_name
+      json.date expense.date.strftime("%b %d, %Y")
+      json.note expense.note
+      json.category_id expense.category_id
+      json.category_name expense.category_name
+    end
+  end
 end
