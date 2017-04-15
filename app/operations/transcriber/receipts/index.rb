@@ -4,7 +4,7 @@ class Transcriber::Receipts::Index < BaseOperation
 
   class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receipts, :categories, :company, :users
+    attr_accessor :receipts, :categories, :companies, :users
 
     # scopes for filters
     has_scope :filter_parent
