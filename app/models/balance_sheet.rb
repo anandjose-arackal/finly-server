@@ -12,9 +12,6 @@
 #
 
 
-
-
-
 class BalanceSheet < ActiveRecord::Base
   belongs_to :user
   belongs_to :cash_in_hand, class_name: 'Amount'
@@ -48,10 +45,11 @@ class BalanceSheet < ActiveRecord::Base
     if options and options[:atm_withdrawal]
       # creating an associated payment object for atm withdrawals
       payment = self.user.payments.build(amount_attributes: {value: value, currency_id: 1},
-                               payment_type_id: PaymentType.id_for(:atm_withdrawal),
-                               date: DateUtils.local_date,
-                               initiating_user_id: self.user.id,
-                               receiving_user_id: self.user.id)
+                                         payment_type_id: PaymentType.id_for(:atm_withdrawal),
+                                         date: DateUtils.local_date,
+                                         initiating_user_id: self.user.id,
+                                         receiving_user_id: self.user.id,
+                                         payment_status_id: PaymentStatus.id_for(:completed))
       unless payment.save
         return false
       end

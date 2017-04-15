@@ -2,10 +2,10 @@
 # params:
 # to_user_id or id: user whose reports are being settled
 # payment:
-  # amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
-  # currency_id: currency of the reimbursement
-  # note: optional note to accompany payment
-  # date: date of the payment
+# amount : value of the amount to be reimbursed - should match total of reports referenced via report_ids
+# currency_id: currency of the reimbursement
+# note: optional note to accompany payment
+# date: date of the payment
 
 class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   attr_accessor :role
@@ -67,7 +67,8 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                           payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
                                           date: payment_params[:date], note: payment_params[:note],
-                                  amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]})
+                                          amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]},
+                                          payment_status_id: PaymentStatus.id_for(:completed))
     if self.payment.save and balance_sheet.subtract_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
       return true
     end
@@ -90,7 +91,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
         cash_on_hand_value -= payment_params[:amount].to_f
         cash_on_hand_withdrawal += payment_params[:amount].to_f
         balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
-                                  cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, id: balance_history.cash_on_hand_withdrawal.id})
+                                          cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, id: balance_history.cash_on_hand_withdrawal.id})
       end
     end
   end

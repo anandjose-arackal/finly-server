@@ -80,7 +80,8 @@ class Card::Transaction::Create < BaseOperation
                                     payment_type_id: PaymentType.id_for(:atm_withdrawal),
                                     note: "Atm Withdrawal",
                                     initiating_user: user,
-                                    receiving_user: user)
+                                    receiving_user: user,
+                                    payment_status_id: PaymentStatus.id_for(:completed))
               user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
               return true
             else
@@ -98,7 +99,7 @@ class Card::Transaction::Create < BaseOperation
         unless transaction.save
           add_message :error, transaction.errors.full_messages
         end
-        # gets added to user's card balance, so do nothing
+      # gets added to user's card balance, so do nothing
       else
         # do nothing
     end
