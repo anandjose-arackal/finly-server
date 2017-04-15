@@ -64,7 +64,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
 
   class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :money_request, :user, :body_val, :subject_val, :button_val, :event_id,
-                  :action_name, :comment_body, :role_id, :view_url
+                  :action_name, :comment_body, :role_id, :view_url, :company
 
     def initialize(user, params)
       self.money_request = params[:money_request]
@@ -77,6 +77,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
       self.comment_body = params[:comment_body]
       self.role_id = params[:role_id]
       self.view_url = generate_url(role_id).html_safe
+      self.company = user.company
     end
 
     def generate_url(role_id)

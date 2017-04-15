@@ -56,7 +56,7 @@ class Event::ESettlement::Base < Event::SetNotifier
   end
 
   class Event::ESettlement::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :payment, :user, :body_val, :subject_val, :button_val, :action_name, :payment_note,
+    attr_accessor :payment, :user, :body_val, :subject_val, :button_val, :action_name, :payment_note, :company,
                   :role_id, :view_url
 
     def initialize(user, params)
@@ -69,6 +69,7 @@ class Event::ESettlement::Base < Event::SetNotifier
       self.payment_note = params[:payment_note]
       self.role_id = params[:role_id]
       self.view_url = generate_url(role_id).html_safe
+      self.company = user.company
     end
 
     def generate_url(role_id)
