@@ -1,6 +1,6 @@
 class Transcriber::Receipts::Index < BaseOperation
 
-  attr_accessor :receipts, :company
+  attr_accessor :receipts, :companies
 
   class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -14,9 +14,6 @@ class Transcriber::Receipts::Index < BaseOperation
     def init
       self.receipts = params[:receipts]
       self.receipts = apply_scopes(receipts, params)
-      self.company = params[:company]
-      self.categories = params[:categories]
-      self.users = company.users
     end
 
   end
@@ -44,8 +41,6 @@ class Transcriber::Receipts::Index < BaseOperation
 
   def success
     params[:receipts] = receipts
-    params[:company] = company
-    params[:categories] = company.categories.active
     Transcriber::Receipts::Index::TranscriberPresenter.new(user, params, messages)
   end
 end
