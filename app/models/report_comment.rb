@@ -44,9 +44,11 @@ class ReportComment < ActiveRecord::Base
       name = self.user.name
     end
 
+    expense = Expense.unscoped.find_by(id: self.expense_id)
+
     type = "" # i.e. will form 'an expense...'
     merchant = ""
-    if self.expense
+    if expense
       case expense.expense_type_id
         when ExpenseType.manual_expense_id
           type = "cash"
@@ -74,7 +76,6 @@ class ReportComment < ActiveRecord::Base
       end
 
     end
-
 
     case report_comment_action_id
       when ReportCommentAction.id_for(:report_comment)

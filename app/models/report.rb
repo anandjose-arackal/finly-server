@@ -99,6 +99,8 @@ class Report < ActiveRecord::Base
   scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
   scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
 
+  scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)] ) }
+
   scope :with_approved_at_range, -> (start_time, end_time) { where('approved_at >= ? and approved_at <= ?', start_time, end_time) }
 
   # scope for reports being shown in settlements page

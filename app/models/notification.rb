@@ -233,7 +233,7 @@ class Notification < ActiveRecord::Base
         end
       when "Expense"
         object = " an expense"
-        e = Expense.find_by(id: self.object_id)
+        e = Expense.unscoped.find_by(id: self.object_id)
         object_name = " at #{e.merchant_name}"
       when "Card"
         object = " to your card"

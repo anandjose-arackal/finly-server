@@ -19,13 +19,15 @@ class User::Index < User::Base
   class User::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :team, :users_type_count, :users_status_count, :pending_invites_count, :paginated_team
 
-    has_scope :filter_search
-    has_scope :filter_role
-    has_scope :filter_state
+    # has_scope :filter_search
+    # has_scope :filter_role
+    # has_scope :filter_state
 
     def init
       if params[:team].present?
-        self.team = apply_scopes(params[:team], params)
+        # self.team = apply_scopes(params[:team], params)
+        # Scopes have already been applied by User::Team::Index
+        self.team = params[:team]
         # todo - need to debug below statements. Disabling for now, as we're not using it anywhere
         # self.users_type_count = self.team.joins(:role_mapping).group(:user_role_id).count
         # self.users_status_count = self.team.all.group(:active).count

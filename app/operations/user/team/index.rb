@@ -6,9 +6,18 @@
 class User::Team::Index < User::Team::Base
   attr_accessor :role_id
 
+  # has_scope :filter_search
+  # has_scope :filter_role
+  # has_scope :filter_state
+
   has_scope :filter_search
-  has_scope :filter_role
-  has_scope :filter_state
+  has_scope :filter_state, type: :array
+  has_scope :filter_role, type: :array
+  has_scope :filter_reports_awaiting_settlement
+  has_scope :filter_pending_money_requests
+  has_scope :having_cash_on_hand_balance
+  has_scope :having_wallet_balance
+  has_scope :with_cards_having_card_program, type: :array
 
   def pre_validate
     unless user.present?
@@ -73,6 +82,9 @@ class User::Team::Index < User::Team::Base
   end
 
   def retrieve
+    ScopeUtils.fix_for_scoping(params, :filter_role, :array)
+    ScopeUtils.fix_for_scoping(params, :filter_state, :array)
+    ScopeUtils.fix_for_scoping(params, :with_cards_having_card_program, :array)
     apply_scopes(self.response, params) if self.response.present?
   end
 
