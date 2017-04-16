@@ -18,6 +18,11 @@ class UserWallet < ActiveRecord::Base
 
   validates :user, presence: true
 
+  scope :joins_balance, -> { joins :balance }
+
+  scope :having_balance_value, -> { joins_balance.where('value > 0') }
+  scope :with_user, ->(id) { where user_id: id }
+
   accepts_nested_attributes_for :balance
 
   def balance_value

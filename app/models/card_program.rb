@@ -30,7 +30,7 @@ class CardProgram < ActiveRecord::Base
   scope :with_reimbursement, -> { where receive_reimbursement: true }
   scope :with_non_personal_fund_transfer, -> { where non_personal_fund_transfer: true }
 
-  PROGRAMS = {expense: 1, reimbursement: 2, meal: 3}
+  PROGRAMS = {expense: 1, reimbursement: 2, meal: 3, medical: 4}
 
   PROGRAM_DETAILS = {expense: {id: PROGRAMS[:expense],
                                name: 'Expense',
@@ -62,6 +62,20 @@ class CardProgram < ActiveRecord::Base
                                      non_personal_fund_transfer: false},
                      meal: {id: PROGRAMS[:meal],
                             name: 'Meal',
+                            create_expense: false,
+                            receive_reimbursement: false,
+                            personal_wallet_fund_transfer: false,
+                            spend_restrictions: false,
+                            end_date_restrictions: true,
+                            manager_credit: false,
+                            manager_debit: false,
+                            manager_blockable: false,
+                            manager_view_balance: false,
+                            manager_view_eligibility: false,
+                            manager_view_transactions: false,
+                            non_personal_fund_transfer: false},
+                     medical: {id: PROGRAMS[:medical],
+                            name: 'Medical',
                             create_expense: false,
                             receive_reimbursement: false,
                             personal_wallet_fund_transfer: false,
