@@ -23,6 +23,10 @@ class BalanceSheet < ActiveRecord::Base
 
   delegate :approved_reports_total_value, to: :approved_reports_total
 
+  scope :joins_cash_in_hand, -> { joins :cash_in_hand }
+  scope :having_cash_in_hand_balance_value, -> { joins_cash_in_hand.where('value > 0') }
+  scope :with_user, ->(id) { where user_id: id }
+
   validates :user_id, uniqueness: true, presence: true
 
   before_save do

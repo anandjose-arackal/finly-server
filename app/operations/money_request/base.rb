@@ -96,7 +96,7 @@ class MoneyRequest::Base < BaseOperation
           actions[:editable] = true
           actions[:submit] = true
         elsif self.money_request.processing?
-          actions[:retract] = {url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])}
+          actions[:retract] = true
         end
       end
 
