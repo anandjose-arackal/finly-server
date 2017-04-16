@@ -168,29 +168,45 @@ class User < ActiveRecord::Base
   end
 
   # Users having finly money balance greater than 0
-  scope :having_wallet_balance, -> do
-    user_ids = pluck(:id)
-    ids UserWallet.with_user(user_ids).having_balance_value.pluck(:user_id)
-    self.with_id(ids)
+  scope :having_wallet_balance, ->(required = true) do
+    if required
+      user_ids = pluck(:id)
+      ids = UserWallet.with_user(user_ids).having_balance_value.pluck(:user_id)
+      self.with_id(ids)
+    else
+      self
+    end
   end
 
   # Users having finly money balance greater than 0
-  scope :having_cash_on_hand_balance, -> do
-    user_ids = pluck(:id)
-    ids = BalanceSheet.with_user(user_ids).having_cash_in_hand_balance_value.pluck(:user_id)
-    self.with_id(ids)
+  scope :having_cash_on_hand_balance, -> (required = true) do
+    if required
+      user_ids = pluck(:id)
+      ids = BalanceSheet.with_user(user_ids).having_cash_in_hand_balance_value.pluck(:user_id)
+      self.with_id(ids)
+    else
+      self
+    end
   end
 
-  scope :filter_reports_awaiting_settlement, -> do
-    user_ids = pluck(:id)
-    ids = Report.all.with_user(user_ids).approved.pluck(:user_id)
-    self.with_id(ids)
+  scope :filter_reports_awaiting_settlement, ->(required = true) do
+    if required
+      user_ids = pluck(:id)
+      ids = Report.all.with_user(user_ids).approved.pluck(:user_id)
+      self.with_id(ids)
+    else
+      self
+    end
   end
 
-  scope :filter_pending_money_requests, -> do
-    user_ids = pluck(:id)
-    ids = MoneyRequest.all.with_user(user_ids).approved.pluck(:user_id)
-    self.with_id(ids)
+  scope :filter_pending_money_requests, -> (required = true) do
+    if required
+      user_ids = pluck(:id)
+      ids = MoneyRequest.all.with_user(user_ids).approved.pluck(:user_id)
+      self.with_id(ids)
+    else
+      self
+    end
   end
 
   # scopes for filters

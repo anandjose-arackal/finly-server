@@ -33,12 +33,9 @@
     has_scope :filter_user_role_id
     has_scope :filter_reports_awaiting_settlement
     has_scope :filter_pending_money_requests
-    has_scope :filter_with_cash_on_hand_balance
-    has_scope :filter_with_finly_money_balance
-    has_scope :filter_with_reimbursement_card
-    has_scope :filter_with_expense_card
-    has_scope :filter_with_meal_card
-    has_scope :filter_with_medical_card
+    has_scope :having_cash_on_hand_balance
+    has_scope :having_wallet_balance
+    has_scope :with_cards_having_card_program, type: :array
 
     def init
       self.users = apply_scopes(params[:users], params).paginate(page: params[:page], per_page: 30)
