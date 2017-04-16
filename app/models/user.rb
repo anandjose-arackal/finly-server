@@ -252,16 +252,48 @@ class User < ActiveRecord::Base
     end
   end
 
-  scope :filter_role, -> (role) {
-    joins(:role_mapping).select("users.*").where('user_role_id = ?', role)
-  }
+  scope :filter_role, -> (role) do
+
+    if role.blank?
+      role = []
+    end
+
+    unless role.is_a?(Array)
+      role = [role]
+    end
+
+    # "99" is for filtering only employees who are not admins / managers / finance managers
+    include_employee_only = (role.include?(99) or role.include?('99'))
+
+    users_with_mapping = joins(:role_mapping).select('users.*')
+
+    if include_employee_only
+
+      if role.size == 1
+        # If requested for employee only, then select users who are not managers, admins and finance managers
+        ids = users_with_mapping.where('user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
+        where.not id: ids
+      else
+        # If requested in combination with employees only and (admin or manager or finance manager)
+        ids = users_with_mapping.where('user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
+        users_with_mapping.where('user_role_id IN (?) OR users.id NOT IN (?)', role, ids)
+      end
+
+    else
+
+      # Regular role based search
+      users_with_mapping.where('user_role_id IN (?)', role)
+
+    end
+
+  end
 
   scope :filter_company_id, -> (company_id) { where company_id: company_id }
   scope :company_id, -> (company_id) { where company_id: company_id }
 
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true) }
-  scope :only_employees, -> { where("user_role_mappings.user_role_id = ?", UserRole.employee_id).uniq }
+  scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
 

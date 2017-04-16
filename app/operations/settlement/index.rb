@@ -14,7 +14,8 @@
       self.messages[:error] = operation.messages[:error]
       return
     end
-    self.users = user_team.signed_up.with_balance_sheet.with_roles.only_employees rescue nil
+    self.users = user_team
+    # self.users = user_team.signed_up.with_balance_sheet.with_roles.only_employees rescue nil
     if self.users.nil?
       messages[:error] << 'Users not found'
     end
@@ -28,17 +29,9 @@
   class Settlement::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :users
 
-    has_scope :filter_search
-    has_scope :filter_state, type: :array
-    has_scope :filter_user_role_id
-    has_scope :filter_reports_awaiting_settlement
-    has_scope :filter_pending_money_requests
-    has_scope :having_cash_on_hand_balance
-    has_scope :having_wallet_balance
-    has_scope :with_cards_having_card_program, type: :array
-
     def init
-      self.users = apply_scopes(params[:users], params).paginate(page: params[:page], per_page: 30)
+      # Scopes have already been applied in User::Team::Index operation
+      self.users = params[:users].paginate(page: params[:page], per_page: 30)
     end
   end
 
