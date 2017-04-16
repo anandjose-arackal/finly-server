@@ -212,7 +212,7 @@ class User < ActiveRecord::Base
   # scopes for filters
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ?',
+    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ?",
           "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
   end
 

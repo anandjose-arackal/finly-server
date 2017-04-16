@@ -14,7 +14,7 @@
       self.messages[:error] = operation.messages[:error]
       return
     end
-    self.users = user_team
+    self.users = user_team.signed_up.with_balance_sheet rescue nil
     # self.users = user_team.signed_up.with_balance_sheet.with_roles.only_employees rescue nil
     if self.users.nil?
       messages[:error] << 'Users not found'
