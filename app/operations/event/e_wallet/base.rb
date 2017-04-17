@@ -60,7 +60,8 @@ class Event::EWallet::Base < Event::SetNotifier
   end
 
   class Event::EWallet::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :payment, :user, :body_val, :subject_val, :button_val, :role_id, :view_url, :company, :action_name
+    attr_accessor :payment, :user, :body_val, :subject_val, :button_val, :role_id,
+                  :view_url, :company, :action_name, :payment_note
 
     def initialize(user, params)
       self.payment = params[:payment]
@@ -72,6 +73,7 @@ class Event::EWallet::Base < Event::SetNotifier
       self.view_url = generate_url(role_id).html_safe
       self.company = user.company
       self.action_name = params[:action_name]
+      self.payment_note = params[:payment_note]
     end
 
     def generate_url(role_id)
