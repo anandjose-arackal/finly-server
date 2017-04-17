@@ -17,6 +17,9 @@ class Admin::Companies::Update < Admin::Companies::Base
         company_update_params[:itz_cash_property_attributes][:id] = company.itz_cash_property.id
       end
     end
+    if company_update_params[:configuration_attributes].present?
+      company_update_params[:configuration_attributes][:id] = company.configuration.id
+    end
   end
 
   def validate

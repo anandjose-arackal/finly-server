@@ -44,6 +44,14 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
                           {
                               name: "Cards",
                               url: "cards"
+                          },
+                          {
+                              name: "Untrascribed Receipts",
+                              url: "untranscribed_receipts"
+                          },
+                          {
+                              name: "Transcribed Receipts",
+                              url: "trascribed_receipts"
                           }
                       ]
                   }

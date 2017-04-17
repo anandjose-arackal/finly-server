@@ -23,7 +23,6 @@
 
 
 
-
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
@@ -44,6 +43,7 @@ class Receipt < ActiveRecord::Base
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_id, ->(id) { where id: id }
   scope :without_parent, -> { where(parent_id: nil) }
+  scope :with_expense_id, -> (expense_ids) {where(parent_type: 'Expense').where(parent_id: expense_ids)}
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?
       type_val = :created_at
@@ -56,20 +56,13 @@ class Receipt < ActiveRecord::Base
     end
   end
 
-  scope :filter_parent, -> (type){
-    # 1 - parent absent, 2 - parent present
-    case type
-      when '1', 1
-        where(parent: nil)
-      when '2', 2
-        where(parent_type: 'Expense')
-      else
-
-    end
+  scope :filter_company, -> (company_id) {
+    joins(:users).select('receipts.*').where(company_id: company_id)
   }
 
   scope :filter_user, -> (user_id) {where user_id: user_id}
 
+  # this scope is basically to separately retrieve receipts from companies that have OCR enabled
   scope :untranscribed, -> { where(to_be_transcribed: true) }
 
   def receipt_file_name
