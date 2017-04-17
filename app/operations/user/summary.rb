@@ -197,14 +197,17 @@ class User::Summary < User::Base
 
     def mobile_params
       param = self.params.deep_dup
-      param.delete(:cards)
-      param[:card] = {assigned: false}
-      cards = self.params[:cards]
-      if cards.present?
-        param[:card] = cards.first
-        param[:card][:assigned] = true
-      end
+      param[:virtual_account] = nil
       param
+      # param = self.params.deep_dup
+      # param.delete(:cards)
+      # param[:card] = {assigned: false}
+      # cards = self.params[:cards]
+      # if cards.present?
+      #   param[:card] = cards.first
+      #   param[:card][:assigned] = true
+      # end
+      # param
     end
 
   end
