@@ -75,6 +75,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def report_view_role(user)
+    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
     roles.first
   end
 
