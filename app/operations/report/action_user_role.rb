@@ -12,9 +12,6 @@ class Report::ActionUserRole < Report::Base
 
   def init
     self.roles = []
-    if user.company_admin?
-      self.roles = :admin
-    end
     self.report = params[:report]
     super if self.report.blank?
     self.user_before = params[:user_before]
