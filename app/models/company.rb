@@ -130,6 +130,7 @@ class Company < ActiveRecord::Base
       self.categories.create(name: category)
     end
 
+    self.build_configuration.save if self.configuration.blank?
     self.build_account.save if self.account.blank?
 
     # building the difference expense configurations
