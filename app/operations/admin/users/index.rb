@@ -36,7 +36,9 @@ class Admin::Users::Index < Admin::Users::Base
     has_scope :filter_company_id
     has_scope :filter_search
     has_scope :created_between, using: [:start_date, :end_date], type: :hash
-
+    has_scope :filter_role
+    has_scope :filter_state
+    has_scope :with_cards_having_card_program
 
     def init
       self.users = params[:users]

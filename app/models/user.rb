@@ -291,6 +291,10 @@ class User < ActiveRecord::Base
   scope :filter_company_id, -> (company_id) { where company_id: company_id }
   scope :company_id, -> (company_id) { where company_id: company_id }
 
+  scope :created_between, -> (start_date, end_date) {
+    where('created_at >= ? AND created_at <= ?', start_date, end_date)
+  }
+
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true) }
   scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
