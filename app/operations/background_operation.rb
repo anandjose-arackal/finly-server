@@ -25,9 +25,12 @@ class BackgroundOperation < BaseOperation
   end
 
   def perform(user_id, params)
+    if params.present? and params.is_a?(Hash)
+      params = params.with_indifferent_access
+    end
     self.user = User.find_by_id(user_id)
     self.params = params
-    self.run
+    self.run.messages
   end
 
 end
