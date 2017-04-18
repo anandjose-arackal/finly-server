@@ -521,7 +521,7 @@ class User < ActiveRecord::Base
   end
 
   def finly_admin?
-    if self.company_id == Company.find_by(name: "Jouska") || self.company_id == 1
+    if self.company_id == Company.find_by(name: "Jouska").id || self.company_id == 1
       return true
     else
       return false
