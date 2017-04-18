@@ -36,7 +36,7 @@ class Admin::Companies::Index < Admin::Companies::Base
     has_scope :created_between, using: [:start_date, :end_date], type: :hash
     has_scope :filter_ocr
     has_scope :filter_cards
-    
+
 
     def init
       self.companies = params[:companies]
