@@ -9,7 +9,7 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
   end
 
   def action_name
-    "Cash Advance Added to Cash on Hand"
+    "Money Added to Cash on Hand"
   end
 
   def set_notification(user)
@@ -33,7 +33,7 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
   end
 
   def mailer_body(user)
-    "This is to notify you an amount of ₹#{payment.amount.value} has been added to your Cash on Hand by #{payment.initiating_user.name}"
+    "This is to notify you that an amount of ₹#{payment.amount.value} has been added to your Cash on Hand by #{payment.initiating_user.name}"
   end
 
 end

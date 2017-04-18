@@ -14,7 +14,7 @@ class Report::MarkAsSettled < Report::Base
   def init
     self.report = params[:report]
     self.payment = params[:payment]
-    self.cash_in_hand_deduction = params[:from_cash_in_hand]
+    self.cash_in_hand_deduction = params[:cash_in_hand_deduction]
     self.status = params[:status] || ReportStatus.settled_id
     self.role_id = params[:role_id]
     self.tracking_status = (params[:status]) ? ReportTrackingAction.id_for(:closed) : ReportTrackingAction.id_for(:settled)

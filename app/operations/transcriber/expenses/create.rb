@@ -12,6 +12,12 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
 
   attr_accessor :expense_params, :receipt, :selected_user, :expense
 
+  def pre_validate
+    super()
+    if params.blank?
+      add_message :error, "Invalid parameters, please try again"
+    end
+  end
 
   def init
     self.expense_params = manual_expense_params
@@ -24,8 +30,13 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       add_message :error, "Receipt not found"
       return
     end
+    unless selected_user
+      add_message :error, "Receipt owner not found"
+      return
+    end
     unless selected_user.company.ocr_enabled?
       add_message :error, "OCR not enabled for this company"
+      return
     end
     if receipt.parent.present?
       add_message :error, "This recept is already associated with an expense"
@@ -33,15 +44,14 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   end
 
   def authorize
-    unless user.company_id == Company.find_by(name: "Transcriber").id || user.company_id == Company.find_by(name: "Jouska").id
-      raise_unauthorized_exception
-    end
+
   end
 
   def pre_process
     expense_params[:expense_type_id] = ExpenseType.manual_expense_id
     expense_params[:expense_status_id] = ExpenseStatus.unreported_id
     expense_params[:amount_attributes][:currency_id] = Currency.first.id
+    expense_params[:transcribed] = true
   end
 
   def process

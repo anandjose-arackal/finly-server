@@ -55,7 +55,10 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def report_view_role(user)
-    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
-    roles.first
+    if user.id == report.user_id
+      return nil
+    elsif user.id == report.controlling_user_role_id
+      return report.controlling_user_role_id
+    end
   end
 end

@@ -21,7 +21,9 @@ class CompanyConfiguration < ActiveRecord::Base
 
   # associating receipt with the particular expense
   has_attached_file :logo, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}
+  validates_attachment_content_type :logo, :content_type => ["image/jpg", "image/jpeg", "image/png", "image/gif"]
 
   validates :company_id, presence: true, uniqueness: true
+
 
 end

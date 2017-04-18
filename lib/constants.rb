@@ -10,11 +10,11 @@ module Constants
   # todo - needs to be edited once we get the account details.
   ITZCASH_EMAIL_ID = 'veekshith.rai@finly.io'
 
-  # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'balakumar.rajaram@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io']
+  # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
 
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
-  # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'balakumar.rajaram@finly.io']
+  # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 

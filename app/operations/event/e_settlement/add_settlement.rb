@@ -74,7 +74,7 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
     if reports.nil?
       reports = cash_in_hand_deduction.cash_in_hand_settled_reports rescue []
     end
-    i = 0
+    i = 1
     reports.each do |report|
       body += "<br>#{i}. #{report.name}"
       i += 1

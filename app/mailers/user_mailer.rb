@@ -3,6 +3,7 @@ class UserMailer < ApplicationMailer
 
   def account_activation_instructions(user, token)
     @user = user
+    @data = user
     @token = token
     mail to: user.email, subject: 'Account activation'
   end
@@ -13,6 +14,7 @@ class UserMailer < ApplicationMailer
 
   def password_reset_instructions(user, token)
     @user = user
+    @data = user
     @token = token
     mail to: user.email, subject: 'Password reset instructions'
   end
@@ -25,6 +27,7 @@ class UserMailer < ApplicationMailer
 
   def account_unlock_instructions(user, token)
     @user = user
+    @data = user
     @token = token
     mail to: user.email, subject: 'Account locked'
   end
@@ -35,12 +38,14 @@ class UserMailer < ApplicationMailer
 
   def invite(user, token, note)
     @user = user
+    @data = user
     @token = token
     @note = note
     mail to: user.email, subject: 'Invitation to use Finly!'
   end
 
   def role_updated(user)
+    @data = user
     if user.admin?
       @title = "You are now an Admin"
       @body = "As an admin, you have complete control over all the users and their expenses in the company, from reviewing expenses to setting rules to settlements"
@@ -57,6 +62,7 @@ class UserMailer < ApplicationMailer
   end
 
   def manager_updated(user, manager)
+    @data = user
     if manager.blank?
       @title = "You currently have no manager to manage your accounts"
       @body = "All your expenses will be auto approved"

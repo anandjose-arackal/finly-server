@@ -51,6 +51,7 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
+  scope :with_id, -> (id) {where id: id}
   scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
 
   scope :filter_search, -> (term) {
@@ -126,7 +127,7 @@ class Company < ActiveRecord::Base
   private
 
   def init_config_present
-    self.build_configuration.save unless self.configuration.present?
+    # self.build_configuration(ocr_enabled: false).save unless self.configuration.present?
 
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
@@ -134,6 +135,7 @@ class Company < ActiveRecord::Base
       self.categories.create(name: category)
     end
 
+    self.build_configuration.save if self.configuration.blank?
     self.build_account.save if self.account.blank?
 
     # building the difference expense configurations
