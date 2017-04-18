@@ -291,8 +291,16 @@ class User < ActiveRecord::Base
   scope :filter_company_id, -> (company_id) { where company_id: company_id }
   scope :company_id, -> (company_id) { where company_id: company_id }
 
-  scope :created_between, -> (start_date, end_date) {
-    where('created_at >= ? AND created_at <= ?', start_date, end_date)
+  scope :created_between, -> (date_from, date_to) {
+    unless date_from.blank? && date_to.blank?
+      type_val = :created_at
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      users = arel_table
+      where(users[type_val].gteq(date_from).and(users[type_val].lteq(date_to)))
+    end
   }
 
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }

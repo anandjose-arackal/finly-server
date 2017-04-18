@@ -22,19 +22,25 @@ class Admin::Companies::Index < Admin::Companies::Base
   end
 
   def success
-    Admin::Companies::Index::CompaniesPresenter.new(user, {companies: companies}, messages)
+    params[:companies] = companies
+    Admin::Companies::Index::CompaniesPresenter.new(user, params, messages)
   end
 
   class Admin::Companies::Index::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    include HasScope
 
     attr_accessor :companies
 
     has_scope :filter_search
     has_scope :created_between, using: [:start_date, :end_date], type: :hash
-
+    has_scope :filter_ocr
+    has_scope :filter_cards
+    
 
     def init
-      self.companies = apply_scopes(params[:companies], params)
+      self.companies = params[:companies]
+      self.companies = apply_scopes(companies, params)
     end
   end
 

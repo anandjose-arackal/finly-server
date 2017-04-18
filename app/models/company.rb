@@ -48,13 +48,36 @@ class Company < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
+  scope :filter_ocr, -> (presence) {
+    if presence
+      joins(:configuration).select(' companies.*').where('ocr_enabled IS true')
+    else
+      joins(:configuration).select(' companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
+    end
+  }
+
+  scope :filter_cards, -> (presence) {
+    if presence
+      joins(:configuration).select('companies.*').where.not(d_code: nil)
+    else
+      joins(:configuration).select('companies.*').where(d_code: nil)
+    end
+  }
 
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
   }
 
-  scope :created_between, -> (start_date, end_date) {
-    where('created_at >= ? && created_at <= ?', start_date, end_date)
+  scope :created_between, -> (date_from, date_to) {
+    unless date_from.blank? && date_to.blank?
+      type_val = :created_at
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      companies = arel_table
+      where(companies[type_val].gteq(date_from).and(companies[type_val].lteq(date_to)))
+    end
   }
 
   def default_policy

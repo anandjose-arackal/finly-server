@@ -2,9 +2,9 @@ class Admin::Expenses::Index < Admin::Expenses::Base
 
   attr_accessor :expenses
 
-  class Admin::Expenses::Index::IndexPresenter < BaseOperation::Basepresenter::SuccessPresenter
+  class Admin::Expenses::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :expenses
+    attr_accessor :expenses, :categories
 
     include HasScope
 
@@ -16,12 +16,14 @@ class Admin::Expenses::Index < Admin::Expenses::Base
 
     def init
       self.expenses = params[:expenses]
-      self.expenses = apply_scopes(expenses)
+      self.expenses = apply_scopes(expenses, params)
+      self.categories = user.company.categories.active
     end
 
   end
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
     end
@@ -29,9 +31,9 @@ class Admin::Expenses::Index < Admin::Expenses::Base
 
   def init
     if params[:show_deleted] == '1'
-      self.expenses = Expense.unscoped.all
+      self.expenses = Expense.unscoped.all.paginate(page: params[:page])
     else
-      self.expenses = Expense.all
+      self.expenses = Expense.all.paginate(page: params[:page])
     end
   end
 

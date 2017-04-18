@@ -4,7 +4,8 @@ class AdminUsers::ExpensesController < ApplicationController
   allow_oauth!
 
   def index
-
+    @result = Admin::Expenses::Index.(current_user, params)
+    respond
   end
 
   def show
@@ -16,7 +17,8 @@ class AdminUsers::ExpensesController < ApplicationController
   end
 
   def update
-
+    @result = Admin::Expenses::Update.(current_user, params)
+    respond
   end
 
 end
