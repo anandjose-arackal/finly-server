@@ -113,7 +113,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   end
 
   def post_process
-    Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
+    Benefits::TaxBenefits::Execute.call(user, payment_order_id: self.payment_order.id)
   end
 
   def success

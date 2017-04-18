@@ -30,4 +30,32 @@ class PaymentOrderStatus < ActiveRecord::Base
     end
   end
 
+  def cancelled?
+    self.id == PaymentOrderStatus.id_for(:cancelled)
+  end
+
+  def pending?
+    self.id == PaymentOrderStatus.id_for(:pending)
+  end
+
+  def in_progress?
+    self.id == PaymentOrderStatus.id_for(:in_progress)
+  end
+
+  def completed?
+    self.id == PaymentOrderStatus.id_for(:completed)
+  end
+
+  def partially_completed?
+    self.id == PaymentOrderStatus.id_for(:partially_completed)
+  end
+
+  def failed?
+    self.id == PaymentOrderStatus.id_for(:failed)
+  end
+
+  def scheduled?
+    self.id == PaymentOrderStatus.id_for(:scheduled)
+  end
+
 end

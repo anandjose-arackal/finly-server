@@ -53,6 +53,8 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_type_id, -> (id) {where payment_order_type_id: id}
   scope :with_id, -> (id) {where id: id}
 
+  delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
+
   default_scope {order(created_at: :desc)}
 
 end
