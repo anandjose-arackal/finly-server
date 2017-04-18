@@ -832,7 +832,7 @@ Rails.application.routes.draw do
   get 'cards/meal/orders' => 'benefits/meal#index'
   get 'cards/meal/orders/:id' => 'benefits/meal#show'
 
-  delete 'cards/meal/orders/:id', => 'benefits/meal#destroy'
+  delete 'cards/meal/orders/:id' => 'benefits/meal#destroy'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

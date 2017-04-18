@@ -23,7 +23,7 @@ class Benefits::MealController < ApplicationController
       return
     end
     respond
-   end
+  end
 
   def index
     @result = Benefits::TaxBenefits::Index.(PaymentOrder::CONFIG[:meal_card], current_user, params)
