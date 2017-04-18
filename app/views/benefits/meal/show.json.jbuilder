@@ -44,5 +44,5 @@ json.data do
     end
   end
 
-  # json.actions @result.actions
+  json.actions @result.actions
 end

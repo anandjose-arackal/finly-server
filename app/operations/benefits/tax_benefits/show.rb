@@ -1,5 +1,5 @@
 class Benefits::TaxBenefits::Show < Benefits::TaxBenefits::Base
-  attr_accessor :payment_order
+  attr_accessor :payment_order, :actions
 
   def pre_validate
     super
@@ -16,6 +16,7 @@ class Benefits::TaxBenefits::Show < Benefits::TaxBenefits::Base
 
   def init
     self.payment_order = Benefits::TaxBenefits::Index.(config, user, params).payment_orders.with_id(params[:id]).first rescue nil
+    self.actions = {}
   end
 
   def validate
@@ -24,16 +25,22 @@ class Benefits::TaxBenefits::Show < Benefits::TaxBenefits::Base
     end
   end
 
+  def process
+    actions[:cancel] = true if self.payment_order.scheduled?
+  end
+
   def success
     params[:payment_order] = self.payment_order
+    params[:actions] = self.actions
     Benefits::TaxBenefits::Show::SuccessPresenter.new(user, params, messages)
   end
 
   class Benefits::TaxBenefits::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_order
+    attr_accessor :payment_order, :actions
 
     def init
       self.payment_order = params[:payment_order]
+      self.actions = params[:actions]
     end
   end
 

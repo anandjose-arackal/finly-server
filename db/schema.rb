@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170415120952) do
+ActiveRecord::Schema.define(version: 20170418134823) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1353,12 +1353,13 @@ ActiveRecord::Schema.define(version: 20170415120952) do
   end
 
   create_table "system_messages", force: :cascade do |t|
-    t.text     "content",                limit: 65535, null: false
-    t.integer  "system_message_type_id", limit: 4,     null: false
+    t.text     "content",                limit: 65535,                 null: false
+    t.integer  "system_message_type_id", limit: 4,                     null: false
     t.integer  "messagable_id",          limit: 4
     t.string   "messagable_type",        limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.boolean  "is_deleted",                           default: false
   end
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree

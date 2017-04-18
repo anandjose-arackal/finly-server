@@ -45,7 +45,7 @@ class Payment < ActiveRecord::Base
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true
 
-  has_many :system_messages, as: :messagable
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   accepts_nested_attributes_for :amount
   delegate :amount_value, to: :amount
@@ -197,6 +197,12 @@ class Payment < ActiveRecord::Base
 
   def total_amount
     self.amount.value rescue nil
+  end
+
+  def clear_system_messages
+    if system_messages.present?
+      system_messages.destroy_all
+    end
   end
 
 end

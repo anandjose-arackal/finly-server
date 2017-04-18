@@ -53,4 +53,6 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_type_id, -> (id) {where payment_order_type_id: id}
   scope :with_id, -> (id) {where id: id}
 
+  default_scope {order(created_at: :desc)}
+
 end

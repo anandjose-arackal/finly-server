@@ -110,7 +110,10 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       add_message :error, self.payment_order.errors.full_messages
       self.payment_order.destroy
     end
+  end
 
+  def post_process
+    Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
   end
 
   def success

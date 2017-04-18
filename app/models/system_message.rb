@@ -12,6 +12,8 @@
 #
 
 class SystemMessage < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :system_message_type
   belongs_to :messagable, polymorphic: true
 end

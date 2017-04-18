@@ -40,21 +40,21 @@ class Benefits::TaxBenefits::Execute < BackgroundOperation
       unless payment.scheduled? or payment.pending? or payment.in_progress?
         next
       end
-      process = Payment::Process.(user, payment)
+      process = Payment::ProcessPayment.(user, payment: payment)
       if process.success?
         has_success = true
-        processed_amount += payment.amount.value
+        processed_amount_value += payment.amount.value
       else
-        has_success = true
+        has_success = false
       end
     end
 
     if has_success and has_failure
       # Partial Success
-      payment_status_id = PaymentOrderStatus.id_for(:completed)
+      payment_status_id = PaymentOrderStatus.id_for(:partial_complete)
     elsif has_success
       # Complete success
-      payment_status_id = PaymentOrderStatus.id_for(:partial_complete)
+      payment_status_id = PaymentOrderStatus.id_for(:completed)
     elsif has_failure
       # All payments have failed
       payment_status_id = PaymentOrderStatus.id_for(:failed)
@@ -63,10 +63,7 @@ class Benefits::TaxBenefits::Execute < BackgroundOperation
       payment_status_id = PaymentOrderStatus.id_for(:completed)
     end
 
-    unless self.payment_order.update(payment_order_status_id: payment_status_id,
-                                     amount_processed_attribtues: {value: processed_amount_value,
-                                                                   currency_id: Currency.first.id},
-                                     processed_at: DateTime.now)
+    unless self.payment_order.update(payment_order_status_id: payment_status_id,amount_processed_attributes: {value: processed_amount_value, currency_id: Currency.first.id}, processed_at: DateTime.now)
       add_message :error, self.payment_order.errors.full_messages
     end
   end

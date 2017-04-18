@@ -30,14 +30,16 @@ class Payment::Validate < BaseOperation
   def process
     validate_transfer_viability
     return if has_errors?
+    validate_balances
+    return if has_errors?
   end
 
   def success
     params[:payment] = self.payment
-    Payment::Process::SuccessPresenter.new(user, params, messages)
+    Payment::Validate::SuccessPresenter.new(user, params, messages)
   end
 
-  class Payment::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Payment::Validate::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment
 
     def init
@@ -66,6 +68,74 @@ class Payment::Validate < BaseOperation
         end
       when Payment::AccountType::WALLET
       when Payment::AccountType::CARD
+    end
+  end
+
+  def validate_balances
+    action_type = :credit
+
+    case payment.receiving_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+        # Unreachable
+      when Payment::AccountType::WALLET
+        if action_type == :debit
+          result = User::Balance.(user, target_user: payment.receiving_user, target_user_wallet: true)
+          if result.success?
+            if result.balances[:target_user][:wallet][:balance] < payment.amount.value
+              add_message :error, 'Insufficient amount to initiate the transfer'
+            end
+          else
+            add_message :error, result.messages[:error]
+          end
+        end
+      when Payment::AccountType::CARD
+        if action_type == :debit
+          result = User::Balance.(user, target_user: payment.receiving_user, target_user_card: true, target_user_card_id: payment.receiving_account.id)
+          if result.success?
+            if result.balances[:target_user][:card][payment.receiving_account.id][:balance] < payment.amount.value
+              add_message :error, 'Insufficient amount to initiate the transfer'
+            end
+          else
+            add_message :error, result.messages[:error]
+          end
+        end
+    end
+
+    case payment.initiating_account_type
+      when Payment::AccountType::VIRTUAL_ACCOUNT
+        if action_type == :credit
+          # result = User::Balance.(user, virtual_account: true)
+          # if result.success?
+          #   balance = result.balances[:virtual_account][:balance]
+          #   if balance < payment.amount.value
+          #     add_message :error, 'Insufficient amount to initiate the transfer'
+          #   end
+          # else
+          #   add_message :error, result.messages[:error]
+          # end
+        end
+      when Payment::AccountType::WALLET
+        if action_type == :credit
+          result = User::Balance.(user, current_user_wallet: true)
+          if result.success?
+            if result.balances[:current_user][:wallet][:balance] < payment.amount.value
+              add_message :error, 'Insufficient amount to initiate the transfer'
+            end
+          else
+            add_message :error, result.messages[:error]
+          end
+        end
+      when Payment::AccountType::CARD
+        if action_type == :credit
+          result = User::Balance.(user, current_user_card: true, current_user_card_id: payment.initiating_account.id)
+          if result.success?
+            if result.balances[:current_user][:card][payment.initiating_account.id][:balance] < payment.amount.value
+              add_message :error, 'Insufficient amount to initiate the transfer'
+            end
+          else
+            add_message :error, result.messages[:error]
+          end
+        end
     end
   end
 

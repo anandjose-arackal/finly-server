@@ -35,4 +35,8 @@ class Benefits::MealController < ApplicationController
     respond
   end
 
+  def destroy
+    respond
+  end
+
 end
