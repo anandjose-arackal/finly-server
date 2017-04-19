@@ -15,14 +15,15 @@
 #  initiating_account_type :string(255)
 #  receiving_account_id    :integer
 #  receiving_account_type  :string(255)
+#  payment_order_id        :integer
+#  payment_status_id       :integer          not null
 #
-
 
 
 
 class Payment < ActiveRecord::Base
 
-  class AccountType
+  class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
     WALLET = 'UserWallet'
     CARD = 'Card'
@@ -38,8 +39,13 @@ class Payment < ActiveRecord::Base
   has_many :money_requests
   has_many :money_request_tracks
 
+  belongs_to :payment_order
+  belongs_to :payment_status
+
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true
+
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   accepts_nested_attributes_for :amount
   delegate :amount_value, to: :amount
@@ -127,13 +133,15 @@ class Payment < ActiveRecord::Base
   validates :initiating_user_id, presence: true
   validates :receiving_user_id, presence: true
 
+  delegate :completed?, :failed?, :pending?, :in_progress?, :scheduled?, to: :payment_status
+
   def initiating_account_type_name
     name = ""
     unless self.initiating_account_type == 'Company'
       name += "#{self.initiating_user.name}'s"
     end
 
-    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand) || PaymentType.id_for(:reimbursement) || PaymentType.id_for(:settlement)
+    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand), PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
       return nil
     end
 
@@ -143,7 +151,7 @@ class Payment < ActiveRecord::Base
       when 'Company'
         name += " Company Credits"
       when 'Card'
-        name += " Card"
+        name += " #{self.initiating_account.card_program.name.humanize} Card"
     end
     name
   end
@@ -155,7 +163,7 @@ class Payment < ActiveRecord::Base
       name += "#{self.receiving_user.name}'s"
     end
 
-    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand) || PaymentType.id_for(:reimbursement) || PaymentType.id_for(:settlement)
+    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand), PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
       name += " Cash on Hand"
       return name
     end
@@ -166,7 +174,7 @@ class Payment < ActiveRecord::Base
       when 'Company'
         name += " Company Credits"
       when 'Card'
-        name += " Card"
+        name += " #{self.receiving_account.card_program.name.humanize} Card"
     end
     name
   end
@@ -190,4 +198,11 @@ class Payment < ActiveRecord::Base
   def total_amount
     self.amount.value rescue nil
   end
+
+  def clear_system_messages
+    if system_messages.present?
+      system_messages.destroy_all
+    end
+  end
+
 end

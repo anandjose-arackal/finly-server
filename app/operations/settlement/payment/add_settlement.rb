@@ -235,7 +235,8 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
                                                    date: Date.today,
                                                    note: payment_params[:note],
                                                    amount_attributes: {value: cash_in_hand_deduction_amount,
-                                                                       currency_id: payment_params[:currency_id]})
+                                                                       currency_id: payment_params[:currency_id]},
+                                                   payment_status_id: PaymentStatus.id_for(:completed))
       unless cash_deduction.valid?
         add_message :error, cash_deduction.errors.full_messages
         return
@@ -249,7 +250,8 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
                                             initiating_account: self.initiating_account,
                                             receiving_account: self.reimbursement_card,
                                             amount_attributes: {value: reimbursement_amount,
-                                                                currency_id: payment_params[:currency_id]})
+                                                                currency_id: payment_params[:currency_id]},
+                                            payment_status_id: PaymentStatus.id_for(:completed))
       unless self.payment.valid?
         add_message :error, self.payment.errors.full_messages
         return
@@ -286,7 +288,8 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
                                             payment_type_id: PaymentType.id_for(:reimbursement_outside_finly),
                                             date: Date.today, note: payment_params[:note],
-                                            amount_attributes: {value: outside_settlement_amount, currency_id: payment_params[:currency_id]})
+                                            amount_attributes: {value: outside_settlement_amount, currency_id: payment_params[:currency_id]},
+                                            payment_status_id: PaymentStatus.id_for(:completed))
       if self.payment.save
         balance_sheet.subtract_approved_reports_total report_total, Currency.first.id
       else

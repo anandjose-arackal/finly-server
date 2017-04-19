@@ -500,9 +500,15 @@
 
 Rails.application.routes.draw do
 
+  namespace :transcriber do
+    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
+    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
+    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
+    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
+    get 'companies', to: 'companies#index', as: :companies
+  end
 
-  get 'menu_data', to: "users#menu_data"
-
+  get 'menu_data', to: 'users#menu_data'
 
   devise_for :admin_users, controllers: {sessions: 'admin_users/sessions'}
 
@@ -816,6 +822,27 @@ Rails.application.routes.draw do
   get '/faqs' => 'faqs#index'
 
   post 'feedback' => 'feedback#create'
+
+  # Cards Module APIS
+  # Getting Menu Data for Cards module
+  get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
+
+  # Meal Cards
+  post 'cards/meal/process_file' => 'benefits/meal#process_file'
+  post 'cards/meal/orders' => 'benefits/meal#create'
+  patch 'cards/meal/orders' => 'benefits/meal#update'
+  get 'cards/meal/orders' => 'benefits/meal#index'
+  get 'cards/meal/orders/:id' => 'benefits/meal#show'
+  delete 'cards/meal/orders/:id' => 'benefits/meal#destroy'
+
+  # Medical Cards
+  post 'cards/medical/process_file' => 'benefits/medical#process_file'
+  post 'cards/medical/orders' => 'benefits/medical#create'
+  patch 'cards/medical/orders' => 'benefits/medical#update'
+  get 'cards/medical/orders' => 'benefits/medical#index'
+  get 'cards/medical/orders/:id' => 'benefits/medical#show'
+  delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

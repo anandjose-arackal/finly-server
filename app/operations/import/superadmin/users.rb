@@ -28,7 +28,7 @@ class Import::Superadmin::Users < Import::Base
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "No user or params passed."
+      messages[:error] << 'No user or params passed'
     end
   end
 
@@ -58,7 +58,7 @@ class Import::Superadmin::Users < Import::Base
 
       # validating that the card being assigned is unique Type 2
       User.all.each do |user|
-        proxy = user.cards.first.proxy rescue ""
+        proxy = user.cards.first.proxy rescue ''
         if row[import_fields[:card_serial_id]] == proxy
           result_hash[i] = 2
           next
@@ -79,11 +79,11 @@ class Import::Superadmin::Users < Import::Base
         case result_hash[i]
           when 1
             # i.e. company id not unique
-            result_hash[i] = "Company ID cannot be blank"
+            result_hash[i] = 'Company ID cannot be blank'
             next
           when 2
             # i.e. card has already been taken
-            error_messages << "Card has already been assigned to another user"
+            error_messages << 'Card has already been assigned to another user'
             params.delete(:cards_attributes)
           else
             #code

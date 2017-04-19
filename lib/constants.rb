@@ -56,7 +56,6 @@ module Constants
 
   BASE_URL = url
 
-
   class Constants::ItzCash
 
 

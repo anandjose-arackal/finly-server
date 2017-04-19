@@ -13,7 +13,6 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
     end
   end
 
-
   def init
     self.file = params[:file]
     self.result_hash = {}
@@ -29,7 +28,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
 
   def validate
     if file.nil? || sheet.nil?
-      add_message :error, "No file uploaded, please attach a file and try again"
+      add_message :error, 'No file uploaded, please attach a file and try again'
     end
   end
 
@@ -63,7 +62,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
         if error_messages.present?
           result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
         else
-          result_hash[i] = "Success!"
+          result_hash[i] = "Success"
         end
       else
         result_hash[i] = invitee.errors.full_messages.to_sentence

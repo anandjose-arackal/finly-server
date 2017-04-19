@@ -1,10 +1,9 @@
 class Import::Base < BaseOperation
 
-
   def create_response_csv
     file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    CSV.open(file_name, "wb") do |csv|
-      self.header << "Result"
+    CSV.open(file_name, 'wb') do |csv|
+      self.header << 'Result'
       csv << header
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
@@ -13,12 +12,12 @@ class Import::Base < BaseOperation
         csv << row
       end
     end
-    return file_name.gsub("public", "")
+    return file_name.gsub('public', '')
   end
 
   def generate_response_csv
     CSV.generate(headers: true) do |csv|
-      self.header << "Result"
+      self.header << 'Result'
       csv << header
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
@@ -30,17 +29,12 @@ class Import::Base < BaseOperation
   end
 
   def open_spreadsheet(file)
-    case File.extname(file.original_filename)
-      when ".csv" then Roo::Csv.new(file.path)
-      when ".xls" then Roo::Excel.new(file.path)
-      when ".xlsx" then Roo::Excelx.new(file.path)
-      else raise "Unknown file type: #{file.original_filename}"
-    end
+    ImportUtil.open_spreadsheet file
   end
 
   def mobile_number_valid?(number)
-    return "Moblie number not present" if number.blank?
-    return "Mobile number invalid" unless number.is_a?(String)
+    return 'Moblie number not present' if number.blank?
+    return 'Mobile number invalid' unless number.is_a?(String)
 
     user = User.find_by(mobile_number: number)
 
@@ -49,10 +43,10 @@ class Import::Base < BaseOperation
       if number =~ Constants::VALID_MOBILE_NUMBER
         return true
       else
-        return "Mobile number invalid"
+        return 'Mobile number invalid'
       end
     else
-      return "Mobile number is already taken"
+      return 'Mobile number is already taken'
     end
   end
 

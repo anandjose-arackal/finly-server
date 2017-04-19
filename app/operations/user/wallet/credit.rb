@@ -35,6 +35,7 @@ class User::Wallet::Credit < User::Wallet::Base
     payment_attributes[:amount_attributes]= {value: self.amount, currency_id: Currency.first.id}
     payment_attributes[:initiating_account] = initiating_account
     payment_attributes[:receiving_account] = receiving_account
+    payment_attributes[:payment_status_id] = PaymentStatus.id_for(:completed)
     self.payment = Payment.new payment_attributes
 
     unless self.payment.valid?

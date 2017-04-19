@@ -78,7 +78,8 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
                                           payment_type_id: PaymentType.id_for(:add_cash_on_hand),
                                           date: payment_param[:date], note: payment_param[:note],
                                           amount_attributes: {value: payment_param[:amount],
-                                                              currency_id: payment_param[:currency_id]})
+                                                              currency_id: payment_param[:currency_id]},
+                                          payment_status_id: PaymentStatus.id_for(:completed))
     balance_sheet = to_user.balance_sheet
     if payment.save and balance_sheet.add_cash_in_hand(payment_param[:amount], payment_param[:currency_id])
       # balance_sheet.subtract_pending_reimbursement
@@ -111,7 +112,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         cash_on_hand_value += payment_param[:amount].to_f
         cash_on_hand_load += payment_param[:amount].to_f
         balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
-                                  cash_on_hand_load_attributes: {value: cash_on_hand_load, id: balance_history.cash_on_hand_load.id})
+                                          cash_on_hand_load_attributes: {value: cash_on_hand_load, id: balance_history.cash_on_hand_load.id})
       end
     end
   end

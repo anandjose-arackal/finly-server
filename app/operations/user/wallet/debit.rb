@@ -36,6 +36,7 @@ class User::Wallet::Debit < User::Wallet::Base
     payment_attributes[:payment_type_id] = PaymentType.id_for(:debit)
     payment_attributes[:initiating_account] = initiating_account
     payment_attributes[:receiving_account] = receiving_account
+    payment_attributes[:payment_status_id] = PaymentStatus.id_for(:completed)
     self.payment = Payment.new payment_attributes
 
     unless self.payment.valid?
