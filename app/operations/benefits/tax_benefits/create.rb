@@ -56,7 +56,8 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
   def process
 
-    if scheduled_at.present?
+    # Create payment order
+    if scheduled_at.present? and scheduled_at > Date.today
       payment_order_status_id = PaymentOrderStatus.id_for(:scheduled)
     else
       payment_order_status_id = PaymentOrderStatus.id_for(:pending)
@@ -79,6 +80,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       return
     end
 
+    # Create payment items
     initiating_user = user
     initiating_user_account = user.company
     date = Date.today

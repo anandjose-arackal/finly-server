@@ -10,7 +10,7 @@
 
 class PaymentStatus < ActiveRecord::Base
 
-  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5}
+  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6}
 
   scope :with_name, ->(name) { where name: name }
 
@@ -21,7 +21,7 @@ class PaymentStatus < ActiveRecord::Base
   def self.seed_data
     count == PaymentStatus.count
     VALUES.each do |key, value|
-      if count == 0 or PaymentStatus.with_name(value).blank?
+      if count == 0 or PaymentStatus.with_name(key).blank?
         PaymentStatus.create id: value, name: key
       end
     end

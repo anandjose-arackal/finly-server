@@ -36,7 +36,8 @@ class Benefits::MealController < ApplicationController
   end
 
   def destroy
-    respond
+    @result = Benefits::TaxBenefits::Cancel.(PaymentOrder::CONFIG[:meal_card], current_user, params)
+    respond response: @result.success? ? :success : :failure 
   end
 
 end
