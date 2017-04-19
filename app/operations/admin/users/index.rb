@@ -35,15 +35,24 @@ class Admin::Users::Index < Admin::Users::Base
 
     has_scope :filter_company_id
     has_scope :filter_search
+    has_scope :filter_date_from
+    has_scope :filter_date_to
     has_scope :created_between, using: [:start_date, :end_date], type: :hash
-    has_scope :filter_role
-    has_scope :filter_state
-    has_scope :with_cards_having_card_program
+    has_scope :filter_role, type: :array
+    has_scope :filter_state, type: :array
+    has_scope :with_cards_having_card_program, type: :array
 
     def init
+      convert_scopes
       self.users = params[:users]
       self.users = apply_scopes(users, params)
       self.companies = params[:companies]
+    end
+
+    def convert_scopes
+      ScopeUtils.fix_for_scoping(params, :filter_role, :array)
+      ScopeUtils.fix_for_scoping(params, :filter_state, :array)
+      ScopeUtils.fix_for_scoping(params, :with_cards_having_card_program, :array)
     end
   end
 

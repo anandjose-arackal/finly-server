@@ -48,19 +48,19 @@ class Company < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
-  scope :filter_ocr, -> (presence) {
-    if presence
-      joins(:configuration).select(' companies.*').where('ocr_enabled IS true')
-    else
-      joins(:configuration).select(' companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
+  scope :filter_ocr, -> (flag) {
+    if flag == '1'
+      joins(:configuration).select('companies.*').where('ocr_enabled IS true')
+    elsif flag == '0'
+      joins(:configuration).select('companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
     end
   }
 
-  scope :filter_cards, -> (presence) {
-    if presence
-      joins(:configuration).select('companies.*').where.not(d_code: nil)
-    else
-      joins(:configuration).select('companies.*').where(d_code: nil)
+  scope :filter_cards, -> (flag) {
+    if flag == '1'
+      joins(:itz_cash_property).select('companies.*').where.not("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
+    elsif flag == '0'
+      joins(:itz_cash_property).select('companies.*').where("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
     end
   }
 
@@ -78,6 +78,10 @@ class Company < ActiveRecord::Base
       companies = arel_table
       where(companies[type_val].gteq(date_from).and(companies[type_val].lteq(date_to)))
     end
+  }
+
+  scope :filter_date_from, -> (start_date) {
+
   }
 
   def default_policy
@@ -145,7 +149,6 @@ class Company < ActiveRecord::Base
   private
 
   def init_config_present
-    # self.build_configuration(ocr_enabled: false).save unless self.configuration.present?
 
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
