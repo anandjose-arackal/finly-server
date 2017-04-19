@@ -30,5 +30,4 @@ class Admin::Companies::Create < Admin::Companies::Base
     add_message :success, "Company created!"
   end
 
-
 end

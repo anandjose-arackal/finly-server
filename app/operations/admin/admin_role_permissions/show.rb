@@ -60,7 +60,7 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
     elsif user.company.name == "Transcriber"
       self.response = {
           views: {
-              admin: {
+              transcriber: {
                   menus: {
                       navbar: [
                           {
