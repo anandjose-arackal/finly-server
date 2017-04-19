@@ -64,7 +64,7 @@ class Payment::ProcessPayment < BaseOperation
 
     amount = self.payment.amount.value
 
-    case debit_receiving_account.class.name.to_sym
+    case debit_receiving_account.class.name
       when Payment::AccountType::VIRTUAL_ACCOUNT
         # Unreachable
       when Payment::AccountType::WALLET
@@ -83,7 +83,7 @@ class Payment::ProcessPayment < BaseOperation
       return
     end
 
-    case credit_receiving_account.class.name.to_sym
+    case credit_receiving_account.class.name
       when Payment::AccountType::VIRTUAL_ACCOUNT
         # Unreachable
       when Payment::AccountType::WALLET

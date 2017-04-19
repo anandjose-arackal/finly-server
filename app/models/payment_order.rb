@@ -50,11 +50,12 @@ class PaymentOrder < ActiveRecord::Base
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed
 
-  scope :with_type_id, -> (id) {where payment_order_type_id: id}
-  scope :with_id, -> (id) {where id: id}
+  scope :with_type_id, -> (id) { where payment_order_type_id: id }
+  scope :with_id, -> (id) { where id: id }
+  scope :scheduled_on_or_before, -> (date) { where 'scheduled_at <= ?', date }
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 
-  default_scope {order(created_at: :desc)}
+  default_scope { order(created_at: :desc) }
 
 end

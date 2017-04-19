@@ -1,7 +1,7 @@
 # Process validates the request for payment order wrt tax benefits and generates the respective output to be sent for confirmation or for creating payment order
 class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid
+                :errors, :payment_order_valid, :scheduled_at
 
   def pre_validate
     super
@@ -23,6 +23,15 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     self.requested_amount = 0
     self.processable_amount = 0
     self.processed_order = []
+    self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
+
+    od = []
+    if payment_order_data.is_a?(Hash)
+      payment_order_data.each do |key, value|
+        od << value
+      end
+      self.payment_order_data = od
+    end
   end
 
   def validate
@@ -35,7 +44,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     # company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
 
     payment_order_data.each do |item|
-      self.requested_amount += item[:amount].to_d rescue 0
+      self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
     # todo uncomment - temporary as itzcashs server was slow
@@ -101,12 +110,13 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     params[:processable_amount] = self.processable_amount
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
+    params[:scheduled_at] = self.scheduled_at
     Benefits::TaxBenefits::Process::SuccessPresenter.new(user, params, messages)
   end
 
   class Benefits::TaxBenefits::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid
+                  :payment_order_valid, :scheduled_at
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -115,6 +125,15 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       self.processable_amount = params[:processable_amount]
       self.errors = params[:errors]
       self.payment_order_valid = params[:payment_order_valid]
+      self.scheduled_at = params[:scheduled_at]
+    end
+
+    def scheduled_at_formatted
+      DateUtils.date_formatted self.scheduled_at
+    end
+
+    def created_at_formatted
+      DateUtils.date_formatted Date.today
     end
 
   end

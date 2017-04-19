@@ -27,4 +27,6 @@ json.payment do
   json.payment_order_valid @result.payment_order_valid
   json.requested_amount @result.requested_amount
   json.processable_amount @result.processable_amount
+  json.scheduled_at @result.scheduled_at_formatted
+  json.created_at @result.created_at_formatted
 end

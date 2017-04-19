@@ -1,16 +1,8 @@
 json.data do
   payment_order = @result.payment_order
-
-  scheduled_at = payment_order.scheduled_at
-  if scheduled_at.present?
-    scheduled_at = scheduled_at.strftime('%d %b %Y')
-  end
-  json.scheduled_at scheduled_at
-  processed_date = payment_order.processed_at
-  if processed_date.present?
-    processed_date = processed_date.strftime('%d %b %Y')
-  end
-  json.processed_at processed_date
+  json.created_at DateUtils.date_formatted payment_order.created_at
+  json.scheduled_at DateUtils.date_formatted payment_order.scheduled_at
+  json.processed_at DateUtils.date_formatted payment_order.processed_at
   json.initiating_user do
     json.name payment_order.initiating_user.name
     json.email payment_order.initiating_user.email
@@ -43,6 +35,5 @@ json.data do
       end
     end
   end
-
   json.actions @result.actions
 end

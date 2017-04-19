@@ -27,9 +27,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   def init
     self.order_data = params[:payment_order]
     self.processed_order_data = Benefits::TaxBenefits::Process.(config, user, payment_order: self.order_data, card_program_id: card_program_id)
-    if params[:scheduled_at].present?
-      self.scheduled_at = Date.parse params[:scheduled_at]
-    end
+    self.scheduled_at = self.processed_order_data.scheduled_at
   end
 
   def validate
@@ -64,6 +62,8 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     end
 
     amount_requested = Amount.new(value: self.processed_order_data.requested_amount, currency_id: 1)
+
+    debugger
 
     payment_order_params = { payment_order_type_id: payment_order_type_id,
         scheduled_at: self.scheduled_at,
@@ -104,16 +104,12 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
     if self.payment_order.save
       unless scheduled_at.present?
-        # todo execute
+        Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
       end
     else
       add_message :error, self.payment_order.errors.full_messages
       self.payment_order.destroy
     end
-  end
-
-  def post_process
-    Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
   end
 
   def success

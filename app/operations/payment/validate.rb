@@ -104,6 +104,7 @@ class Payment::Validate < BaseOperation
     case payment.initiating_account_type
       when Payment::AccountType::VIRTUAL_ACCOUNT
         if action_type == :credit
+          # todo uncomment, validation was really slow which is why it was removed
           # result = User::Balance.(user, virtual_account: true)
           # if result.success?
           #   balance = result.balances[:virtual_account][:balance]

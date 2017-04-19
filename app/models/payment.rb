@@ -141,7 +141,7 @@ class Payment < ActiveRecord::Base
       name += "#{self.initiating_user.name}'s"
     end
 
-    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand) || PaymentType.id_for(:reimbursement) || PaymentType.id_for(:settlement)
+    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand), PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
       return nil
     end
 
@@ -151,7 +151,7 @@ class Payment < ActiveRecord::Base
       when 'Company'
         name += " Company Credits"
       when 'Card'
-        name += " Card"
+        name += " #{self.initiating_account.card_program.name.humanize} Card"
     end
     name
   end
@@ -163,7 +163,7 @@ class Payment < ActiveRecord::Base
       name += "#{self.receiving_user.name}'s"
     end
 
-    if self.payment_type_id == PaymentType.id_for(:add_cash_on_hand) || self.payment_type_id == PaymentType.id_for(:deduct_cash_on_hand) || PaymentType.id_for(:reimbursement) || PaymentType.id_for(:settlement)
+    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand), PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
       name += " Cash on Hand"
       return name
     end
@@ -174,7 +174,7 @@ class Payment < ActiveRecord::Base
       when 'Company'
         name += " Company Credits"
       when 'Card'
-        name += " Card"
+        name += " #{self.receiving_account.card_program.name.humanize} Card"
     end
     name
   end
