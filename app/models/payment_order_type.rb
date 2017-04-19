@@ -24,7 +24,7 @@ class PaymentOrderType < ActiveRecord::Base
   def self.seed_data
     count == PaymentOrderType.count
     VALUES.each do |key, value|
-      if count == 0 or PaymentOrderType.with_name(value).blank?
+      if count == 0 or PaymentOrderType.with_name(key).blank?
         PaymentOrderType.create id:value, name: key
       end
     end
