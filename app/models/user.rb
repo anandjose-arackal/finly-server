@@ -303,6 +303,16 @@ class User < ActiveRecord::Base
     end
   }
 
+  scope :filter_date_from, -> (start_date) {
+    start_date = start_date.to_date
+    where('created_at >= ?', start_date)
+  }
+
+  scope :filter_date_to, -> (end_date) {
+    end_date = end_date.to_date + 1
+    where('created_at <= ?', end_date)
+  }
+
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true) }
   scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }

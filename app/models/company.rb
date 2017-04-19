@@ -81,7 +81,13 @@ class Company < ActiveRecord::Base
   }
 
   scope :filter_date_from, -> (start_date) {
+    start_date = start_date.to_date
+    where('created_at >= ?', start_date)
+  }
 
+  scope :filter_date_to, -> (end_date) {
+    end_date = end_date.to_date + 1
+    where('created_at <= ?', end_date)
   }
 
   def default_policy
