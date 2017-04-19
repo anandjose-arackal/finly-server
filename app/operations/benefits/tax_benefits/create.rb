@@ -104,7 +104,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     end
 
     if self.payment_order.save
-      unless scheduled_at.present? or scheduled_at > Date.today
+      if scheduled_at.blank? or scheduled_at <= Date.today
         Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
       end
     else

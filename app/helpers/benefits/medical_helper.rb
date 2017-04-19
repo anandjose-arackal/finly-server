@@ -1,0 +1,2 @@
+module Benefits::MedicalHelper
+end
