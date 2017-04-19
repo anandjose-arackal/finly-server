@@ -44,7 +44,7 @@ class DateUtils
       date = parse_date date
     end
     return date if date.blank?
-    return date unless date.is_a?(Date) or date.is_a?(DateTime)
+    return date unless date.is_a?(Date) or date.is_a?(DateTime) or date.is_a?(ActiveSupport::TimeWithZone)
     date.strftime('%d %b %Y')
   end
 

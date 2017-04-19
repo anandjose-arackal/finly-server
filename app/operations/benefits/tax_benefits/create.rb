@@ -102,7 +102,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
     if self.payment_order.save
       unless scheduled_at.present?
-        Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
+        Benefits::TaxBenefits::Execute.call(user, payment_order_id: self.payment_order.id)
       end
     else
       add_message :error, self.payment_order.errors.full_messages
