@@ -32,7 +32,16 @@ class Admin::Users::Create < Admin::Users::Base
   end
 
   def success
-    Admin::Users::Base::UserPresenter.new(user, {created_user: created_user}, messages)
+    Admin::Users::Base::CreatedUserPresenter.new(user, {created_user: created_user}, messages)
+  end
+
+  class Admin::Users::Base::CreatedUserPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :created_user
+
+    def init
+      self.created_user = params[:created_user]
+    end
   end
 
   private

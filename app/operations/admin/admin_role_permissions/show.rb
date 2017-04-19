@@ -8,7 +8,6 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
   attr_accessor :response
 
   def pre_validate
-    super()
     if user.blank?
       add_message :error, "No user found"
     end
@@ -44,16 +43,24 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
                           {
                               name: "Cards",
                               url: "cards"
+                          },
+                          {
+                              name: "Untrascribed Receipts",
+                              url: "untranscribed_receipts"
+                          },
+                          {
+                              name: "Transcribed Receipts",
+                              url: "trascribed_receipts"
                           }
                       ]
                   }
               }
           }
       }
-    else
+    elsif user.company.name == "Transcriber"
       self.response = {
           views: {
-              admin: {
+              transcriber: {
                   menus: {
                       navbar: [
                           {

@@ -12,10 +12,13 @@ class Admin::Companies::Update < Admin::Companies::Base
   def init
     self.company = Company.find_by(id: params[:id])
     self.company_update_params = company_params
-    if company_update_params[:itz_cash_property_attributes].present? && company_update_params[:itz_cash_property_attributes][:d_code].present?
+    if company_update_params[:itz_cash_property_attributes].present?
       if company.itz_cash_property.present? # if the company has been signed up with the pre paid cards
         company_update_params[:itz_cash_property_attributes][:id] = company.itz_cash_property.id
       end
+    end
+    if company_update_params[:configuration_attributes].present?
+      company_update_params[:configuration_attributes][:id] = company.configuration.id
     end
   end
 

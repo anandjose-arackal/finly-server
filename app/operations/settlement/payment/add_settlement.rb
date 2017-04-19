@@ -306,7 +306,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
 
     reports.each do |report|
-      Report::MarkAsSettled.(user, {payments: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
+      Report::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
     end
 
     # if outside_settlement_amount == 0

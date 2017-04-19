@@ -189,14 +189,15 @@ class Expense < ActiveRecord::Base
   scope :unreported, -> {where expense_status_id: ExpenseStatus.unreported_id}
   scope :rejected, -> {where expense_status_id: ExpenseStatus.rejected_id}
   scope :unsubmitted, -> {where expense_status_id: ExpenseStatus.unsubmitted_id}
-  scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.submitted_id, ExpenseStatus.rejected_id] }
+  scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected), ExpenseStatus.id_for(:unreported)] }
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
   scope :filter_user_id, ->(id) { where user_id: id }
 
-
+  scope :transcribed, -> {where transcribed: true}
+  scope :untranscribed, -> {where transcribed: false}
 
   scope :verified, -> {where expense_status_id: ExpenseStatus.submitted_id}
   scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
@@ -292,8 +293,14 @@ class Expense < ActiveRecord::Base
   def merchant_name
     case self.expense_type_id
       when ExpenseType.id_for(:manual)
-        return self.manual_expense.merchant
+        # this will handle cases for deleted expenses as well.
+        merchant = self.manual_expense.merchant rescue nil
+        if merchant.nil?
+          merchant = ManualExpense.unscoped.find_by(expense_id: self.id).merchant rescue ""
+        end
+        return merchant
       when ExpenseType.id_for(:card)
+        # this will handle cases for deleted expenses as well.
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
       when ExpenseType.id_for(:per_diem)

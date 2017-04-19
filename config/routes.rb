@@ -1,11 +1,6 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                 Controller#Action
-# transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
-# transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
-#    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
-#      transcriber_untranscribed_receipts GET    /transcriber/companies/:id(.:format)                        transcriber/companies#show
-#                   transcriber_companies GET    /transcriber/companies(.:format)                            transcriber/companies#index
 #                               menu_data GET    /menu_data(.:format)                                        users#menu_data
 #                  new_admin_user_session GET    /admin_users/sign_in(.:format)                              admin_users/sessions#new
 #                      admin_user_session POST   /admin_users/sign_in(.:format)                              admin_users/sessions#create
@@ -417,6 +412,8 @@
 #                                         PUT    /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                        admin_users/companies#destroy
 #          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)         admin_users/users#update_status
+#         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)        admin_users/users#update_mapping
+#        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)       admin_users/users#destroy_mapping
 #                       admin_users_users GET    /admin_users/users(.:format)                                admin_users/users#index
 #                                         POST   /admin_users/users(.:format)                                admin_users/users#create
 #                    new_admin_users_user GET    /admin_users/users/new(.:format)                            admin_users/users#new
@@ -445,6 +442,30 @@
 #                                         PUT    /admin_users/cards/:id(.:format)                            admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                            admin_users/cards#destroy
 #                              admin_menu GET    /admin_menus(.:format)                                      admin_users/users#admin_menus
+#                    transcriber_expenses GET    /transcriber/expenses(.:format)                             transcriber/expenses#index
+#                                         POST   /transcriber/expenses(.:format)                             transcriber/expenses#create
+#                 new_transcriber_expense GET    /transcriber/expenses/new(.:format)                         transcriber/expenses#new
+#                edit_transcriber_expense GET    /transcriber/expenses/:id/edit(.:format)                    transcriber/expenses#edit
+#                     transcriber_expense GET    /transcriber/expenses/:id(.:format)                         transcriber/expenses#show
+#                                         PATCH  /transcriber/expenses/:id(.:format)                         transcriber/expenses#update
+#                                         PUT    /transcriber/expenses/:id(.:format)                         transcriber/expenses#update
+#                                         DELETE /transcriber/expenses/:id(.:format)                         transcriber/expenses#destroy
+#                   transcriber_companies GET    /transcriber/companies(.:format)                            transcriber/companies#index
+#                                         POST   /transcriber/companies(.:format)                            transcriber/companies#create
+#                 new_transcriber_company GET    /transcriber/companies/new(.:format)                        transcriber/companies#new
+#                edit_transcriber_company GET    /transcriber/companies/:id/edit(.:format)                   transcriber/companies#edit
+#                     transcriber_company GET    /transcriber/companies/:id(.:format)                        transcriber/companies#show
+#                                         PATCH  /transcriber/companies/:id(.:format)                        transcriber/companies#update
+#                                         PUT    /transcriber/companies/:id(.:format)                        transcriber/companies#update
+#                                         DELETE /transcriber/companies/:id(.:format)                        transcriber/companies#destroy
+#                    transcriber_receipts GET    /transcriber/receipts(.:format)                             transcriber/receipts#index
+#                                         POST   /transcriber/receipts(.:format)                             transcriber/receipts#create
+#                 new_transcriber_receipt GET    /transcriber/receipts/new(.:format)                         transcriber/receipts#new
+#                edit_transcriber_receipt GET    /transcriber/receipts/:id/edit(.:format)                    transcriber/receipts#edit
+#                     transcriber_receipt GET    /transcriber/receipts/:id(.:format)                         transcriber/receipts#show
+#                                         PATCH  /transcriber/receipts/:id(.:format)                         transcriber/receipts#update
+#                                         PUT    /transcriber/receipts/:id(.:format)                         transcriber/receipts#update
+#                                         DELETE /transcriber/receipts/:id(.:format)                         transcriber/receipts#destroy
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)               statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
 #     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)              statements#company_policies_summary
@@ -479,14 +500,6 @@
 
 Rails.application.routes.draw do
 
-
-  namespace :transcriber do
-    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
-    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
-    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
-    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
-    get 'companies', to: 'companies#index', as: :companies
-  end
 
   get 'menu_data', to: "users#menu_data"
 
@@ -742,6 +755,8 @@ Rails.application.routes.draw do
     resources :companies
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
+      patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
+      delete 'destroy_mapping', to: 'users#destroy_mapping', as: :destroy_mapping
     end
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
@@ -753,6 +768,11 @@ Rails.application.routes.draw do
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
 
+  namespace :transcriber do
+    resources :expenses
+    resources :companies
+    resources :receipts
+  end
 
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'

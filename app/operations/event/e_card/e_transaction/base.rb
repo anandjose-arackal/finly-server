@@ -47,7 +47,7 @@ class Event::ECard::ETransaction::Base < Event::SetNotifier
   end
 
   class Event::ECard::ETransaction::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :transaction, :user, :body_val, :subject_val, :button_val, :action_name
+    attr_accessor :transaction, :user, :body_val, :subject_val, :button_val, :action_name, :company
 
     def initialize(user, params)
       self.transaction = params[:transaction]
@@ -56,6 +56,7 @@ class Event::ECard::ETransaction::Base < Event::SetNotifier
       self.subject_val = params[:subject]
       self.button_val = params[:button_name]
       self.action_name = params[:action_name]
+      self.company = user.company
     end
 
     def validate

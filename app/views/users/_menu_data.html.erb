@@ -5,6 +5,7 @@
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <input name="utf8" id="form_utf8" type="hidden" value="&#x2713;"/>
   <input type="hidden" id="data-nav-company" value="<%= current_company.name %>">
+  <input type="hidden" id="company_logo" value="<%= current_company.configuration.logo.url(:thumb) %>">
 
   <ul id="menu-nav-views-dropdown">
     <% if current_user.admin? %>
