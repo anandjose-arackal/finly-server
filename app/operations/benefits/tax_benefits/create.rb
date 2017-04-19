@@ -63,8 +63,6 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
     amount_requested = Amount.new(value: self.processed_order_data.requested_amount, currency_id: 1)
 
-    debugger
-
     payment_order_params = { payment_order_type_id: payment_order_type_id,
         scheduled_at: self.scheduled_at,
         processed_at: DateTime.now,
