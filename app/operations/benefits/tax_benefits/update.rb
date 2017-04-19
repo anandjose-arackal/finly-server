@@ -19,7 +19,9 @@ class Benefits::TaxBenefits::Update < Benefits::TaxBenefits::Base
 
   def process
     order_data = params[:payment_order]
-    self.response_presenter = Benefits::TaxBenefits::Process.(config, user, payment_order: order_data, card_program_id: card_program_id)
+    scheduled_at = params[:scheduled_at]
+    self.response_presenter = Benefits::TaxBenefits::Process.(config, user, scheduled_at: scheduled_at,
+        payment_order: order_data, card_program_id: card_program_id)
     unless self.response_presenter.success?
       add_message :error, self.response_presenter.messages[:error]
     end

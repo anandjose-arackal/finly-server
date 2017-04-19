@@ -27,16 +27,16 @@ class DateUtils
     datetime
   end
 
-  def self.datetime_formatted(datetime)
-    # Todo pending
-  end
-
   def self.parse_date(date_s)
     begin
       return Date.parse date_s
     rescue ArgumentError
       return nil
     end
+  end
+
+  def self.datetime_formatted(datetime)
+    # Todo pending
   end
 
   def self.date_formatted(date)

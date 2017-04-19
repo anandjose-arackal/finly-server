@@ -104,16 +104,15 @@ class Payment::Validate < BaseOperation
     case payment.initiating_account_type
       when Payment::AccountType::VIRTUAL_ACCOUNT
         if action_type == :credit
-          # todo uncomment, validation was really slow which is why it was removed
-          # result = User::Balance.(user, virtual_account: true)
-          # if result.success?
-          #   balance = result.balances[:virtual_account][:balance]
-          #   if balance < payment.amount.value
-          #     add_message :error, 'Insufficient amount to initiate the transfer'
-          #   end
-          # else
-          #   add_message :error, result.messages[:error]
-          # end
+          result = User::Balance.(user, virtual_account: true)
+          if result.success?
+            balance = result.balances[:virtual_account][:balance]
+            if balance < payment.amount.value
+              add_message :error, 'Insufficient amount to initiate the transfer'
+            end
+          else
+            add_message :error, result.messages[:error]
+          end
         end
       when Payment::AccountType::WALLET
         if action_type == :credit

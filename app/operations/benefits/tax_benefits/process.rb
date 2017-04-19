@@ -25,6 +25,10 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
 
+    if scheduled_at.present? and scheduled_at < Date.today
+      self.scheduled_at = Date.today
+    end
+
     od = []
     if payment_order_data.is_a?(Hash)
       payment_order_data.each do |key, value|

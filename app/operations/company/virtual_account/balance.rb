@@ -1,5 +1,5 @@
 class Company::VirtualAccount::Balance < BaseOperation
-  attr_accessor :total_wallet_balance, :balance, :account_number
+  attr_accessor :total_wallet_balance, :balance, :account_number, :scheduled_payment_orders_balance
 
   def authorized_user_types
     [:company_admin]
@@ -13,6 +13,7 @@ class Company::VirtualAccount::Balance < BaseOperation
 
   def init
     self.total_wallet_balance = user.company.account.wallet_balance.value
+    self.scheduled_payment_orders_balance = user.company.payment_orders.scheduled.total_amount_requested
   end
 
   def process
@@ -24,7 +25,7 @@ class Company::VirtualAccount::Balance < BaseOperation
 
     itzcash_balance = response.wallets.first[:balance]
     self.account_number = response.wallets.first[:account_number]
-    self.balance = (itzcash_balance - total_wallet_balance)
+    self.balance = (itzcash_balance - total_wallet_balance - scheduled_payment_orders_balance)
 
     if response.company.itz_cash_property.easy_account_no.blank? or response.company.itz_cash_property.easy_account_no.blank?
       response.company.itz_cash_property.update_attribute(:easy_account_no, response.wallets.first[:account_number])

@@ -52,7 +52,11 @@ class PaymentOrder < ActiveRecord::Base
 
   scope :with_type_id, -> (id) { where payment_order_type_id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
+  scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
   scope :scheduled_on_or_before, -> (date) { where 'scheduled_at <= ?', date }
+  scope :joins_amount_requested, -> { joins :amount_requested }
+  scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 

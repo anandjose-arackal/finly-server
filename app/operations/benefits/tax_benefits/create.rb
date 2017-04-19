@@ -26,7 +26,8 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
   def init
     self.order_data = params[:payment_order]
-    self.processed_order_data = Benefits::TaxBenefits::Process.(config, user, payment_order: self.order_data, card_program_id: card_program_id)
+    self.processed_order_data = Benefits::TaxBenefits::Process.(config, user, scheduled_at: params[:scheduled_at],
+        payment_order: self.order_data, card_program_id: card_program_id)
     self.scheduled_at = self.processed_order_data.scheduled_at
   end
 
@@ -63,13 +64,13 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
     amount_requested = Amount.new(value: self.processed_order_data.requested_amount, currency_id: 1)
 
-    payment_order_params = { payment_order_type_id: payment_order_type_id,
-        scheduled_at: self.scheduled_at,
-        processed_at: DateTime.now,
-        initiating_user: user,
-        payment_order_status_id: payment_order_status_id,
-        company_id: user.company_id,
-        amount_requested: amount_requested }
+    payment_order_params = {payment_order_type_id: payment_order_type_id,
+                            scheduled_at: self.scheduled_at,
+                            processed_at: DateTime.now,
+                            initiating_user: user,
+                            payment_order_status_id: payment_order_status_id,
+                            company_id: user.company_id,
+                            amount_requested: amount_requested}
 
     self.payment_order = user.payment_orders.build payment_order_params
 
@@ -101,8 +102,8 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     end
 
     if self.payment_order.save
-      unless scheduled_at.present?
-        Benefits::TaxBenefits::Execute.call(user, payment_order_id: self.payment_order.id)
+      unless scheduled_at.present? or scheduled_at > Date.today
+        Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
       end
     else
       add_message :error, self.payment_order.errors.full_messages
