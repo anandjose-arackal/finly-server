@@ -826,13 +826,23 @@ Rails.application.routes.draw do
   # Cards Module APIS
   # Getting Menu Data for Cards module
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
+
+  # Meal Cards
   post 'cards/meal/process_file' => 'benefits/meal#process_file'
   post 'cards/meal/orders' => 'benefits/meal#create'
   patch 'cards/meal/orders' => 'benefits/meal#update'
   get 'cards/meal/orders' => 'benefits/meal#index'
   get 'cards/meal/orders/:id' => 'benefits/meal#show'
-
   delete 'cards/meal/orders/:id' => 'benefits/meal#destroy'
+
+  # Medical Cards
+  post 'cards/medical/process_file' => 'benefits/medical#process_file'
+  post 'cards/medical/orders' => 'benefits/medical#create'
+  patch 'cards/medical/orders' => 'benefits/medical#update'
+  get 'cards/medical/orders' => 'benefits/medical#index'
+  get 'cards/medical/orders/:id' => 'benefits/medical#show'
+  delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
