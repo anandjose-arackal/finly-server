@@ -44,18 +44,16 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       return
     end
 
-    # todo uncomment - temporary as itzcashs server was slow
-    # company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
+    company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
 
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
-    # todo uncomment - temporary as itzcashs server was slow
-    # if self.requested_amount > company_balance
-    #   self.errors << 'Insufficient funds to initiate the transfer'
-    #   self.payment_order_valid = false
-    # end
+    if self.requested_amount > company_balance
+      self.errors << 'Insufficient funds to initiate the transfer'
+      self.payment_order_valid = false
+    end
 
   end
 
