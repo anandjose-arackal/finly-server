@@ -515,14 +515,8 @@ class User < ActiveRecord::Base
   end
 
   def finly_admin?
-    if self.company_id == Company.find_by(name: "Jouska")
-      return true
-    end
-    # jugaad for testing
-    # todo - change before deploy
-    if self.company_id == 1
-      return true
-    elsif self.company_id == 2
+    jouska_id = Company.find_by(name: "Jouska").id rescue nil
+    if self.company_id == jouska_id || self.company_id == 1
       return true
     else
       return false

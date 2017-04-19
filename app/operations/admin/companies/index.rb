@@ -3,7 +3,6 @@ class Admin::Companies::Index < Admin::Companies::Base
   attr_accessor :companies
 
   def pre_validate
-    super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
     end
