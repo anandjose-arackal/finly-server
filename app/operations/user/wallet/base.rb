@@ -113,14 +113,14 @@ class User::Wallet::Base < BaseOperation
     # checking of the card being transferred from can be used for debiting / crediting funds
     if initiating_account_type == :card
       unless initiating_account.card_program.non_personal_fund_transfer
-        add_message :error, "This card cannot be used for debiting funds"
+        add_message :error, 'This card cannot be used for debiting funds'
         return
       end
     end
 
     if receiving_account_type == :card
       unless receiving_account.card_program.non_personal_fund_transfer
-        add_message :error, "This card cannot be used for crediting funds manually"
+        add_message :error, 'This card cannot be used for crediting funds manually'
         return
       end
     end

@@ -46,6 +46,7 @@
 #  otp_request_type_id    :integer
 #
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
