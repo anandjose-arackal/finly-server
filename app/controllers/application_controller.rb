@@ -107,7 +107,7 @@ class ApplicationController < ActionController::Base
       elsif type[:response] == :failure
         if @result.blank?
           messages = {}
-          messages[:failure] = [type[:message]] if type[:message].present?
+          messages[:error] = [type[:message]] if type[:message].present?
           @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, messages)
         end
         respond_to do |format|
