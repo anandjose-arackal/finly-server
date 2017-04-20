@@ -9,7 +9,7 @@ class YamlUtils
         b.local_variable_set(key, val)
       end
     end
-    loaded_erb = ERB.new(File.read("#{Rails.root}/config/data/menu_data_cards.yml.erb"))
+    loaded_erb = ERB.new(File.read(path_to_file))
     if b.present?
       loaded_erb = loaded_erb.result(b)
     end

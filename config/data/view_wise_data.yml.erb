@@ -1,0 +1,78 @@
+admin:
+  links:
+    primary_navbar:
+      # - Company Expenses: expenses
+      - <span class="superscript">Company</span><br>Analytics: analytics
+      - <span class="superscript">Company</span><br>Settlements: settlements
+      - <span class="superscript">Company</span><br>Employees: employees
+      - <span class="superscript">Company</span><br>Money Requests: requests
+      - <span class="superscript">Company</span><br>Reports: reports
+      - <span class="superscript">Company</span><br>Expenses: expenses
+
+    cog:
+      - Organization Account: '#organization_account/params={"view":"admin"}'
+      - Company Statements: '#company_statements/params={"view": "admin"}'
+      - Notify NEFT Transfer: '/transfers/register'
+      <% if current_company.feature_subscription.benefits_enabled and current_user.company_admin? %>
+      - Employee Benefits: '/cards'
+      <% end %>
+      # - Policies: '/policies'
+      - My Account: '#settings'
+      # - Expense Policies: '/policies?view=admin'
+      # - My Balance: '#modal-balance'
+      # - FAQ: '#faq/params={"view":"admin"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+
+personal:
+  links:
+    primary_navbar:
+      - Analytics: analytics
+      - Settlements: settlements
+      - Money Requests: requests
+      - Reports: reports
+      - Receipts: receipts
+      - Expenses: expenses
+    cog:
+      - My Account: '#settings'
+      # - My Balance: '#modal-balance'
+      # - FAQ: '#faq/params={"view":"personal"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - Logout: '/users/sign_out'
+
+manager:
+  links:
+    primary_navbar:
+#      - Team Analytics: analytics
+      # - Team Expenses: expenses
+      # - Team Analytics: analytics
+      - <span class="superscript">Team</span><br>Members: employees
+      - <span class="superscript">Team</span><br>Money Requests: requests
+      - <span class="superscript">Team</span><br>Reports: reports
+      - <span class="superscript">Team</span><br>Expenses: expenses
+
+    cog:
+      - My Account: '#settings'
+      # - My Balance: '#modal-balance'
+      # - FAQ: '#faq/params={"view":"manager"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - Logout: '/users/sign_out'
+
+finance_manager:
+  links:
+    primary_navbar:
+#      - <span class="superscript">Team</span><br>Analytics: analytics
+      # - Company Expenses: expenses
+      # - Analytics: analytics
+      - <span class="superscript">Team</span><br>Settlements: settlements
+      - <span class="superscript">Team</span><br>Members: employees
+      - <span class="superscript">Team</span><br>Money Requests: requests
+      - <span class="superscript">Team</span><br>Reports: reports
+      - <span class="superscript">Team</span><br>Expenses: expenses
+
+
+    cog:
+      - My Account: '#settings'
+      # - My Balance: '#modal-balance'
+      # - FAQ: '#faq/params={"view":"finance"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
+      # - Logout: '/users/sign_out'  
