@@ -47,15 +47,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -131,7 +122,6 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
-  # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
@@ -294,6 +284,28 @@ class User < ActiveRecord::Base
 
   scope :filter_company_id, -> (company_id) { where company_id: company_id }
   scope :company_id, -> (company_id) { where company_id: company_id }
+
+  scope :created_between, -> (date_from, date_to) {
+    unless date_from.blank? && date_to.blank?
+      type_val = :created_at
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      users = arel_table
+      where(users[type_val].gteq(date_from).and(users[type_val].lteq(date_to)))
+    end
+  }
+
+  scope :filter_date_from, -> (start_date) {
+    start_date = start_date.to_date
+    where('created_at >= ?', start_date)
+  }
+
+  scope :filter_date_to, -> (end_date) {
+    end_date = end_date.to_date + 1
+    where('created_at <= ?', end_date)
+  }
 
   scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
   scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true) }

@@ -40,7 +40,7 @@ class Company < ActiveRecord::Base
 
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
-  
+
   has_many :payment_orders
 
   accepts_nested_attributes_for :configuration
@@ -52,14 +52,47 @@ class Company < ActiveRecord::Base
   validates :name, presence: true
 
   scope :with_id, -> (id) {where id: id}
+  scope :filter_ocr, -> (flag) {
+    if flag == '1'
+      joins(:feature_subscriptions).select('companies.*').where('ocr_enabled IS true')
+    elsif flag == '0'
+      joins(:feature_subscriptions).select('companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
+    end
+  }
+
+  scope :filter_cards, -> (flag) {
+    if flag == '1'
+      joins(:itz_cash_property).select('companies.*').where.not("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
+    elsif flag == '0'
+      joins(:itz_cash_property).select('companies.*').where("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
+    end
+  }
   scope :ocr_enabled, -> { joins(:feature_subscriptions).select(' companies.*').where('ocr_enabled IS true') }
 
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
   }
 
-  scope :created_between, -> (start_date, end_date) {
-    where('created_at >= ? && created_at <= ?', start_date, end_date)
+  scope :created_between, -> (date_from, date_to) {
+    unless date_from.blank? && date_to.blank?
+      type_val = :created_at
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      companies = arel_table
+      where(companies[type_val].gteq(date_from).and(companies[type_val].lteq(date_to)))
+    end
+  }
+
+  scope :filter_date_from, -> (start_date) {
+    start_date = start_date.to_date
+    where('created_at >= ?', start_date)
+  }
+
+  scope :filter_date_to, -> (end_date) {
+    end_date = end_date.to_date + 1
+    where('created_at <= ?', end_date)
   }
 
   def default_policy
@@ -131,7 +164,6 @@ class Company < ActiveRecord::Base
   private
 
   def init_config_present
-    # self.build_configuration(ocr_enabled: false).save unless self.configuration.present?
 
     self.policies.build(default: true).save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
