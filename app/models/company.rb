@@ -54,9 +54,9 @@ class Company < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :filter_ocr, -> (flag) {
     if flag == '1'
-      joins(:configuration).select('companies.*').where('ocr_enabled IS true')
+      joins(:feature_subscriptions).select('companies.*').where('ocr_enabled IS true')
     elsif flag == '0'
-      joins(:configuration).select('companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
+      joins(:feature_subscriptions).select('companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
     end
   }
 
