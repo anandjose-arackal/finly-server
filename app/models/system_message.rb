@@ -17,4 +17,10 @@ class SystemMessage < ActiveRecord::Base
 
   belongs_to :system_message_type
   belongs_to :messagable, polymorphic: true
+
+  def as_json(options={})
+    {type: {id: system_message_type.id,
+            name: system_message_type.name},
+     content: content}
+  end
 end
