@@ -21,7 +21,6 @@
 #
 
 class CardProgram < ActiveRecord::Base
-
   has_many :cards
 
   scope :with_id, -> (id){ where id: id }
