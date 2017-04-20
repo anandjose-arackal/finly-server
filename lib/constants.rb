@@ -34,6 +34,8 @@ module Constants
 
   #########################
 
+  TRANSCRIBER_EMAILS = ['veekshith.rai@finly.io']
+
   #### Date before which statements won't be accurate
   BEGINNING_OF_TIME = '10-03-2017'
   ###################################################
