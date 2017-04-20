@@ -5,7 +5,7 @@ class Admin::Companies::Base < Admin::Base
   end
 
   def company_params
-    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo], subscribable_attributes: [:ocr_enabled])
+    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo], feature_subscription_attributes: [:ocr_enabled])
   end
 
   def success

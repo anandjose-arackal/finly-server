@@ -20,6 +20,9 @@ class Admin::Companies::Update < Admin::Companies::Base
     if company_update_params[:configuration_attributes].present?
       company_update_params[:configuration_attributes][:id] = company.configuration.id
     end
+    if company_update_params[:feature_subscription_attributes].present?
+      company_update_params[:feature_subscription_attributes][:id] = company.feature_subscription.id
+    end
   end
 
   def validate
