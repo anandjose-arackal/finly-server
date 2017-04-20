@@ -13,7 +13,9 @@ class ImportUtil
     end
   end
 
-  def self.load_spreadsheet(file, header = [])
+  # Options
+  # skip_empty_lines -> Skips lines which are completely empty
+  def self.load_spreadsheet(file, header = [], options={})
     return unless header.nil? or header.is_a?(Array)
 
     sheet = open_spreadsheet file
@@ -38,7 +40,16 @@ class ImportUtil
         end
         map[key] = val
       end
-      list << map
+      if options.present? and options[:skip_empty_lines]
+        add_line = false
+        map.each do |key, val|
+          if val.present?
+            add_line = true
+            break
+          end
+        end
+      end
+      list << map if add_line
     end
     list
   end
