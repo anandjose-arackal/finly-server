@@ -1,0 +1,39 @@
+cards_enabled: <%= (current_company.feature_subscription.benefits_enabled and current_user.company_admin?) %>
+company:
+  name: <%= current_company.name %>
+  logo:
+    url: <%= current_company.configuration.logo.present? ? current_company.configuration.logo.url(:thumb) : nil %>
+user:
+ name: <%= current_user.name %>
+ id: <%= current_user.id %>
+views:
+  admin:
+    menus:
+      navbar:
+#      - name: Dashboard
+#        id: dashboard
+#        url: dashboard
+      <% if current_company.feature_subscription.meal_card_enabled %>
+      - name: Meal Cards
+        url: meal/orders
+        id: meal
+        sub_menus:
+          - name: New Order
+            id: 'new_order'
+            url: meal/orders/new
+          - name: Order History
+            id: orders
+            url: meal/orders
+      <% end %>
+      <% if current_company.feature_subscription.medical_card_enabled %>
+      - name: Medical Cards
+        url: medical/orders
+        id: medical
+        sub_menus:
+          - name: New Order
+            id: 'new_order'
+            url: medical/orders/new
+          - name: Order History
+            id: orders
+            url: /medical/orders
+      <% end %>

@@ -32,10 +32,7 @@ class RequestFormatter
 
   def self.format(path_to_file, user, params)
     return nil if params.blank?
-    b = binding
-    b.local_variable_set(:user, user)
-    b.local_variable_set(:params, params)
-    map = YAML.load(ERB.new(File.read("./app/formatter/#{path_to_file}")).result(b))
+    map = YamlUtils.load_yaml_erb("./app/formatter/#{path_to_file}", {user: user, params: params})
     Formatter.remove_blanks map
     Formatter.symbolize_hash_keys map
     map
