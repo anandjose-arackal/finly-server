@@ -28,12 +28,13 @@ class Receipt::Create < Receipt::Base
       receipt.update(to_be_transcribed: true)
 
       ########## Mailer being triggered ###########
-      Constants::TRANSCRIBER_EMAILS.each do |email|
-        ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+      if Rails.env.production?
+        Constants::TRANSCRIBER_EMAILS.each do |email|
+          ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+        end
       end
       #############################################
     end
-
   end
 
   def success

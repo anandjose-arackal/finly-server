@@ -4,6 +4,8 @@ class ReceiptMailer < ApplicationMailer
     @company = company
     @owner = owner
     @receipt = receipt
-    mail to: recipient_email, subject: "New receipt to be transcribed", template: 'notifier'
+    @url = Constants::BASE_URL + "admin"
+    mail to: recipient_email, subject: "New receipt to be transcribed", template_name: 'notifier'
   end
+
 end

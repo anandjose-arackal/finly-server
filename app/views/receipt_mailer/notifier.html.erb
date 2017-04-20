@@ -8,12 +8,12 @@
     </div>
     <div style="margin: auto; height: 300px; width: 100%; background-color: white;">
       <!--<p style="font-size: 18px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">'sreeram.nr</span> Expenses to 2016-06-02' rejected</p>-->
-      <p style="font-size: 17px; margin-left: 3%; text-align: left"><%=@user %> from company <%=@company%> has uploaded a receipt that needs to be transcribed</p>
+      <p style="font-size: 17px; margin-left: 3%; text-align: left"><%=@owner.name%> from company <%=@company.name%> has uploaded a receipt that needs to be transcribed</p>
 
       <!-- <div style="height: 50px; width: 560px; background-color: #dcdcdc; margin: auto; display: table;"><p style="display: table-cell; vertical-align: middle; color: #778899;">MESSAGE</p></div> -->
 
       <div style="text-align: center;">
-        <a href="" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+        <a href="<%=@url%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
             border-radius: 2px;
             text-decoration: none;">View Receipts</a>
       </div>
