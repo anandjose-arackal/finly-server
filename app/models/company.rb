@@ -123,6 +123,10 @@ class Company < ActiveRecord::Base
     return balance_history.company_balance_value
   end
 
+  def d_code_assigned?
+    self.itz_cash_property&.d_code.present?
+  end
+
 
   private
 
