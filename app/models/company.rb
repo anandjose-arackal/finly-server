@@ -52,7 +52,7 @@ class Company < ActiveRecord::Base
   validates :name, presence: true
 
   scope :with_id, -> (id) {where id: id}
-  scope :ocr_enabled, -> { joins(:configuration).select(' companies.*').where('ocr_enabled IS true') }
+  scope :ocr_enabled, -> { joins(:feature_subscriptions).select(' companies.*').where('ocr_enabled IS true') }
 
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
