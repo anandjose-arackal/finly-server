@@ -45,7 +45,7 @@ class Benefits::TaxBenefits::Execute < BackgroundOperation
         has_success = true
         processed_amount_value += payment.amount.value
       else
-        has_success = false
+        has_failure = true
       end
     end
 
