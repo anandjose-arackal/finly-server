@@ -17,7 +17,7 @@ class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
 
   def init
     self.file = params[:file]
-    self.parsed_data = ImportUtil.load_spreadsheet(file, [:user, :amount])
+    self.parsed_data = ImportUtil.load_spreadsheet(file, [:user, :amount], {skip_empty_lines: true})
   end
 
   def validate

@@ -106,8 +106,8 @@ class Payment::Validate < BaseOperation
         if action_type == :credit
           result = User::Balance.(user, virtual_account: true)
           if result.success?
-            balance = result.balances[:virtual_account][:balance]
-            if balance < payment.amount.value
+            balance = result.balances[:virtual_account][:balance] rescue nil
+            if balance.present? and balance < payment.amount.value
               add_message :error, 'Insufficient amount to initiate the transfer'
             end
           else
