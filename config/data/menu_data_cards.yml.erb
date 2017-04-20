@@ -3,7 +3,7 @@ company:
   name: <%= current_company.name %>
   logo:
   <% if current_company.configuration.logo.present? %>
-    url: current_company.configuration.logo.url(:thumb)%>
+    url: <%= current_company.configuration.logo.url(:thumb)%>
   <% end %>
 user:
  name: <%= current_user.name %>
