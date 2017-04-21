@@ -18,7 +18,7 @@ class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
   def query_xml_params
     self.username = "finlyuser_#{user.id}"
     {
-        user_name: self.username,
+        username: self.username,
         icw_code: Constants::ItzCash::ICW_CODE,
         first_name: user.first_name,
         middle_name: '',
@@ -27,8 +27,7 @@ class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
         address: "#{user.address_1}, #{user.address_2}",
         state_id: user.state_id,
         city_id: '12901',
-        pin_code: user.pin_code,
-        check_sum: nil
+        pin_code: user.pin_code
     }
   end
 

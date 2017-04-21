@@ -16,6 +16,10 @@ class ItzCash::Dmt::Base < BaseHandler
 
   end
 
+  def check_sum
+
+  end
+
   def query_xml_path
 
   end
@@ -32,6 +36,7 @@ class ItzCash::Dmt::Base < BaseHandler
     xml_params[:session_id] = session_id
     xml_params[:source_id] = source_id
     xml_params[:request_type] = request_type
+    xml_params[:check_sum] = check_sum
 
     b = nil
     if xml_params.present?

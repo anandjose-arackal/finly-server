@@ -27,15 +27,14 @@ class ItzCash::Dmt::Sender::OtpVerification < ItzCash::Dmt::Base
   def query_xml_params
     self.password = (user.itz_cash_dmt_sender.password or SecureRandom.hex(13))
     {
-        user_name: user.itz_cash_dmt_sender.username,
+        username: user.itz_cash_dmt_sender.username,
         icw_code: Constants::ItzCash::ICW_CODE,
         mobile_number: user.mobile_number,
         registration_id: user.itz_cash_dmt_sender.registration_id,
         otp: params[:otp],
         password: self.password,
-        wallet_id: nil,
-        wallet_type: nil,
-        check_sum: nil
+        wallet_id: Constants::ItzCash::EASY_WALLET_ID,
+        wallet_type: Constants::ItzCash::EASY_WALLET_TYPE
     }
   end
 
