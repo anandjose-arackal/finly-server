@@ -72,7 +72,7 @@ class CardTransaction < ActiveRecord::Base
 
   scope :filter_refunds, -> (flag){
     if ['1', 1].include?(flag)
-      where('UPPER(merchant_name) = ?', "REVERSAL")
+      credits.where('UPPER(merchant_name) like ?', "%Refund%")
     else
       # do nothing
     end

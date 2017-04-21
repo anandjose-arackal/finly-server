@@ -666,7 +666,7 @@ if CardTransaction.filter_refunds(1).count == 0
       from_date = DateTime.parse("01-01-2017 12:00:00")
       to_date = DateTime.now
       random_amount = random_integer(50, 200) + 0.1234
-      sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{"REVERSAL"},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
+      sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,Refund #{Faker::University.name},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
 
       data = sample_msg_queue_entry.split(",")
 
