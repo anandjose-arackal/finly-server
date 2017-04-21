@@ -58,6 +58,8 @@ module Constants
 
   class Constants::ItzCash
 
+    ICW_CODE = 'D000000010'
+
 
     RESTRICTION_BUDGET_CONSTANT = 1000000
     RESTRICTION_TRANS_CONSTANT = 1000

@@ -1,4 +1,20 @@
-class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
+require 'securerandom'
+class ItzCash::Dmt::Sender::OtpVerification < ItzCash::Dmt::Base
+  attr_accessor :password
+
+  def pre_validate
+    if user.blank?
+      add_message :error, 'User not found'
+      return
+    end
+    if user.itz_cash_dmt_sender.blank?
+      add_message :error, 'Registration not found'
+      return
+    end
+    if params.blank? or params[:otp].blank?
+      add_message :error, 'Please enter the OTP received on your mobile phone to complete the registration'
+    end
+  end
 
   def request_type
     201
@@ -9,28 +25,28 @@ class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
   end
 
   def query_xml_params
+    self.password = (user.itz_cash_dmt_sender.password or SecureRandom.hex(13))
     {
-        user_name: 'ITZIC03000',
-        icw_code: 'D000000010',
-        first_name: 'Tom',
-        middle_name: 'David',
-        last_name: 'Cruise',
-        mobile_number: '9141516121',
-        address: 'Mumbai',
-        state_id: '21',
-        city_id: '12901',
-        pin_code: '414141',
+        user_name: user.itz_cash_dmt_sender.username,
+        icw_code: Constants::ItzCash::ICW_CODE,
+        mobile_number: user.mobile_number,
+        registration_id: user.itz_cash_dmt_sender.registration_id,
+        otp: params[:otp],
+        password: self.password,
+        wallet_id: nil,
+        wallet_type: nil,
         check_sum: nil
     }
   end
 
-  # def success
-  #   params[:parsed_response] = self.parsed_response
-  #   ItzCash::Dmt::Sender::Registration::SuccessPresenter.new(user, params, messages)
-  # end
-  #
-  # class ItzCash::Dmt::Sender::Registration::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-  #   # attr_accessor :
-  # end
+  def success
+    update_password
+    super
+  end
+
+  protected
+  def update_password
+    user.itz_cash_dmt_sender.update(password: self.password)
+  end
 
 end

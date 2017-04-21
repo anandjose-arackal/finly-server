@@ -1,5 +1,3 @@
-require 'faraday_middleware'
-
 class BaseHandler
   attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout, :parsed_response
 

@@ -56,6 +56,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -125,12 +126,15 @@ class User < ActiveRecord::Base
 
   has_many :payment_orders, foreign_key: :initiating_user_id
 
+  has_one :itz_cash_dmt_sender
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
+  accepts_nested_attributes_for :itz_cash_dmt_sender
   # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile

@@ -2,11 +2,13 @@
 #
 # Table name: amounts
 #
-#  id          :integer          not null, primary key
-#  value       :decimal(64, 12)
-#  currency_id :integer          not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  id             :integer          not null, primary key
+#  value          :decimal(64, 12)
+#  currency_id    :integer          not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  money_paisas   :integer          default(0), not null
+#  money_currency :string(255)      default("INR"), not null
 #
 
 
