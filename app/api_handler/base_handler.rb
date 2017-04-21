@@ -33,6 +33,10 @@ class BaseHandler
     end
   end
 
+  def query_params
+
+  end
+
   def post_params
 
   end
@@ -95,12 +99,18 @@ class BaseHandler
 
   def process
     p = self.path
-    param = self.post_params
+    query_param = self.query_params
+    body_param = self.post_params
     return unless p.present?
     begin
       puts "Posting Path : #{p}"
-      puts "Post Params: #{param}"
-      self.response = self.connection.post p, param
+      puts "Post Params: #{body_param}"
+      # self.response = self.connection.post p, body_param
+      self.response = self.connection.post do |req|
+        req.url p
+        req.params = query_param
+        req.body = body_param
+      end
       puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
