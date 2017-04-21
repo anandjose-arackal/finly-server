@@ -1,5 +1,7 @@
+require 'faraday_middleware'
+
 class BaseHandler
-  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout
+  attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout, :parsed_response
 
   def self.call(user, params={})
     self.new(user, params).run

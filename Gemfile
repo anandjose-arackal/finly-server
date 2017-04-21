@@ -124,6 +124,7 @@ gem 'devise', '4.2.0'
 gem 'devise_invitable', '1.7.0'
 
 gem 'faraday', '0.10.0'
+# gem 'faraday_middleware', '0.11.0.1'
 
 gem 'hooks', '0.4.1'
 

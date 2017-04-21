@@ -1,5 +1,5 @@
 class ItzCash::Base < BaseHandler
-  attr_accessor :response_code, :parsed_response
+  attr_accessor :response_code
 
   def parse
     self.parsed_response = self.response.body.split(',') rescue []
