@@ -653,3 +653,44 @@ if AdminUser.count == 0
   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
 end
+
+if CardTransaction.filter_refunds(1).count == 0
+  User.all.each do |user|
+    next unless user.cards.present?
+    card = user.cards.first
+
+    10.times do
+
+      trans_types = ["null"]
+      trans_modes = ["Credit"]
+      from_date = DateTime.parse("01-01-2017 12:00:00")
+      to_date = DateTime.now
+      random_amount = random_integer(50, 200) + 0.1234
+      sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,#{"REVERSAL"},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
+
+      data = sample_msg_queue_entry.split(",")
+
+      # for the split between merchant city and merchant name
+      name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
+      merchant_name = name_city[0]
+      merchant_city = name_city[1]
+
+      trans_params = {reference_id: data[0],
+                      transaction_timestamp: data[1],
+                      transaction_amount_attributes: {value: data[2], currency_id: 1},
+                      billing_amount_attributes: {value: data[3], currency_id: 1},
+                      auth_transaction_id: data[4],
+                      transaction_mode: data[5],
+                      itzcash_merchant_key: data[6],
+                      merchant_name: merchant_name,
+                      merchant_city: merchant_city,
+                      response_code: data[8],
+                      transaction_type: data[9],
+                      serial_id: data[10],
+                      product_code: data[11]
+      }
+
+      Card::Transaction::Create.(trans_params)
+    end
+  end
+end

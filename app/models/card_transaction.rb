@@ -70,6 +70,14 @@ class CardTransaction < ActiveRecord::Base
   scope :online_expenses, -> {where('UPPER(transaction_mode) = ?', "ECOM")}
   scope :expensed_transactions, -> {where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"])}
 
+  scope :filter_refunds, -> (flag){
+    if ['1', 1].include?(flag)
+      where('UPPER(merchant_name) = ?', "REVERSAL")
+    else
+      # do nothing
+    end
+  }
+
   def credit?
     self.transaction_type == 'Credit'
   end
