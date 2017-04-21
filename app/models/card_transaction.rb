@@ -27,6 +27,7 @@
 #  mcc_code              :string(255)
 #  transaction_status    :string(255)
 #  api_reference_id      :string(255)
+#  cancelled             :boolean          default(FALSE)
 #
 
 class CardTransaction < ActiveRecord::Base
@@ -96,6 +97,15 @@ class CardTransaction < ActiveRecord::Base
 
   def expense?
     debit? and (transaction_mode == 'POS' or transaction_mode == 'ECOM')
+  end
+
+  def refund?
+    if self.merchant_name.include?('Refund') || self.merchant_name.include?('refund')
+      if self.transaction_type == 'Credit'
+        return true
+      end
+    end
+    false
   end
 
 end

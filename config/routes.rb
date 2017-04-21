@@ -308,6 +308,8 @@
 #                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)              expenses#attach_receipt
 #                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)              expenses#detach_receipt
 #                     expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)                 expenses#add_receipt
+#               expense_mark_as_cancelled PATCH  /expenses/:expense_id/mark_as_cancelled(.:format)           expenses#mark_as_cancelled
+#                expense_mark_as_personal PATCH  /expenses/:expense_id/mark_as_personal(.:format)            expenses#mark_as_personal
 #                                expenses GET    /expenses(.:format)                                         expenses#index
 #                                         POST   /expenses(.:format)                                         expenses#create
 #                             new_expense GET    /expenses/new(.:format)                                     expenses#new
@@ -714,6 +716,8 @@ Rails.application.routes.draw do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
     post 'add_receipt', to: 'expenses#add_receipt'
+    patch 'mark_as_cancelled', to: 'expenses#mark_as_cancelled', as: :mark_as_cancelled
+    patch 'mark_as_personal', to: 'expenses#mark_as_personal', as: :mark_as_personal
   end
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 

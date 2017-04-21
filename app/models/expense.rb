@@ -28,6 +28,8 @@
 
 
 
+
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -274,22 +276,6 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  # def custom_fields
-  #   case self.expense_type_id
-  #     when ExpenseType.id_for(:manual)
-  #       return self.manual_expense.custom_fields
-  #     when ExpenseType.id_for(:card)
-  #       return self.card_expense.custom_fields
-  #     when ExpenseType.id_for(:distance)
-  #       return self.distance_expense.custom_fields
-  #     when ExpenseType.id_for(:time)
-  #       return
-  #     when ExpenseType.id_for(:per_diem)
-  #       return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
-  #     else
-  #       return "- -"
-  #   end
-  # end
 
   def merchant_name
     case self.expense_type_id
@@ -457,6 +443,31 @@ class Expense < ActiveRecord::Base
 
   def rejected?
     expense_status_id == ExpenseStatus.rejected_id
+  end
+
+  def cancellable?
+    unless self.expense_status_id == ExpenseStatus.id_for(:unreported)
+      return false
+    end
+    # i.e. check if the expense is a card expense
+    unless self.expense_type_id == ExpenseType.id_for(:card)
+      return false
+    end
+    # i.e. if it has already been cancelled
+    if self.card_expense.cancelled
+      return false
+    end
+    true
+  end
+
+  def cancelled?
+    unless self.expense_type_id == ExpenseType.id_for(:card)
+      return false
+    end
+    if self.card_expense.cancelled
+      return false
+    end
+    true
   end
 
   private

@@ -47,6 +47,10 @@ class ExpensesController < ApplicationController
     respond response: :success
   end
 
+  def update_status
+
+  end
+
   def destroy
     @result = Expense::Destroy.(current_user, params)
     if @result.success?
@@ -58,6 +62,16 @@ class ExpensesController < ApplicationController
 
   def add_receipt
     @result = Expense::Manual::AddExpense.(current_user, params)
+    respond
+  end
+
+  def mark_as_cancelled
+    @result = Expense::ExCard::MarkAsCancelled.(current_user, params)
+    respond
+  end
+
+  def mark_as_personal
+    @result = Expense::MarkAsPersonal.(current_user, params)
     respond
   end
 

@@ -658,7 +658,6 @@ if CardTransaction.filter_refunds(1).count == 0
   User.all.each do |user|
     next unless user.cards.present?
     card = user.cards.first
-
     10.times do
 
       trans_types = ["null"]
