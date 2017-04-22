@@ -13,6 +13,16 @@ class ExpensesController < ApplicationController
         @result = Expense::ExTime::Create.(current_user, params)
       when '5'
         @result = Expense::ExPerDiem::Create.(current_user, params)
+      when '6'
+        @result = Expense::Manual::Multiple::Create.(current_user, params)
+        unless @result.success?
+          # respond render: "multiple_errors"
+          render json: @result.formatted_messages.values
+          return
+        end
+
+        # ap params
+        # debugger
       else
         respond response: :failure, message: "Invalid input"
     end
