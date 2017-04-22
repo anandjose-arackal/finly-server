@@ -1,5 +1,6 @@
 # this will take expense id of the card expense that needs to be cancelled along with the
 # associated transaction that needs to be marked against it and mark the expense as cancelled
+# if params[:unmark] is set as true, unmark the expense as cancellation
 
 class Expense::ExCard::MarkAsCancelled < Expense::ExCard::Base
 
@@ -43,11 +44,20 @@ class Expense::ExCard::MarkAsCancelled < Expense::ExCard::Base
   end
 
   def process
-    if selected_expense.card_expense.update(cancelled: true)
-      cancelled_transaction.update(cancelled: true)
-      selected_expense.card_expense.update(cancelled_against_transaction: cancelled_transaction)
+    if params[:unmark] == '1' || params[:unmark] == true
+      if selected_expense.card_expense.update(cancelled: false)
+        self.cancelled_transaction = selected_expense.card_expense.cancelled_transaction
+        self.cancelled_transaction.update(cancelled: false)
+        self.selected_expense.update(cancelled_against_transaction: nil)
+      else
+        add_message :error, selected_expense.card_expense.errors.full_messages
+      end
     else
-      add_message :error, selected_expense.card_expense.errors.full_messages
+      if selected_expense.card_expense.update(cancelled: true, cancelled_against_transaction: self.cancelled_transaction)
+        self.cancelled_transaction.update(cancelled: true)
+      else
+        add_message :error, selected_expense.card_expense.errors.full_messages
+      end
     end
   end
 
@@ -55,6 +65,11 @@ class Expense::ExCard::MarkAsCancelled < Expense::ExCard::Base
     add_message :success, "Expense marked as cancelled"
 
     # mailer maybe?
+  end
+
+  def success
+    params[:expense] = selected_expense
+    Expense::ExCard::Base::CardExpensePresenter.new(user, params, messages)
   end
 
 end

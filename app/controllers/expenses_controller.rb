@@ -67,12 +67,20 @@ class ExpensesController < ApplicationController
 
   def mark_as_cancelled
     @result = Expense::ExCard::MarkAsCancelled.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def mark_as_personal
     @result = Expense::MarkAsPersonal.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
 end

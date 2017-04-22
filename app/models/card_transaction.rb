@@ -71,13 +71,13 @@ class CardTransaction < ActiveRecord::Base
   scope :online_expenses, -> {where('UPPER(transaction_mode) = ?', "ECOM")}
   scope :expensed_transactions, -> {where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"])}
   scope :refunds, -> {
-    credits.where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
+    credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
   }
 
   # this will include manual refunds from ItzCash as well as transaction cancellations from any merchant or vendor
   scope :filter_refunds, -> (flag){
     if ['1', 1].include?(flag)
-      credits.where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
+      credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
     else
       # do nothing
     end
