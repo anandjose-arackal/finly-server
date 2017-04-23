@@ -229,6 +229,10 @@ PaymentOrderStatus.seed_data
 
 SystemMessageType.seed_data
 
+ItzCashDmtBeneficiaryType.seed_data
+
+ItzCashDmtBeneficiaryStatus.seed_data
+
 ##########################
 
 if Amount.count == 0
