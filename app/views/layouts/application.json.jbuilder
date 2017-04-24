@@ -3,8 +3,9 @@ if @result.present?
     json.success false
     return
   end
+  data = JSON.parse yield rescue nil
   if @result.success?
-    data = JSON.parse yield rescue nil
+
     # For handling mobile apis
     if @result.config.present? and @result.config[:mobile_api]
       json.builds do
@@ -33,8 +34,11 @@ if @result.present?
       json.merge! data
     end
   else
-    json.success false
-    json.messages @result.messages
+    unless data.present? and data.is_a?(Array)
+      json.success false
+      json.messages @result.messages
+    end
+    json.merge! data
   end
 else
   json.merge! JSON.parse yield rescue nil
