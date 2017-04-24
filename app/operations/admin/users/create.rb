@@ -20,6 +20,7 @@ class Admin::Users::Create < Admin::Users::Base
     if created_user.save
       created_user.activate
       created_user.otp_confirm
+      created_user.update(verified: true)
     else
       add_message :error, created_user.errors.full_messages
       return
