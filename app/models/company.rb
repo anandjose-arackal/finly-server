@@ -54,9 +54,9 @@ class Company < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :filter_ocr, -> (flag) {
     if flag == '1'
-      joins(:feature_subscriptions).select('companies.*').where('ocr_enabled IS true')
+      joins(:feature_subscription).select('companies.*').where('ocr_enabled IS true')
     elsif flag == '0'
-      joins(:feature_subscriptions).select('companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
+      joins(:feature_subscription).select('companies.*').where('ocr_enabled IS false OR ocr_enabled IS NULL')
     end
   }
 
@@ -67,7 +67,7 @@ class Company < ActiveRecord::Base
       joins(:itz_cash_property).select('companies.*').where("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
     end
   }
-  scope :ocr_enabled, -> { joins(:feature_subscriptions).select(' companies.*').where('ocr_enabled IS true') }
+  scope :ocr_enabled, -> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') }
 
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
@@ -154,6 +154,10 @@ class Company < ActiveRecord::Base
     balance_history = self.company_balance_histories.with_date(date).first rescue nil
     return 0 if balance_history.nil?
     return balance_history.company_balance_value
+  end
+
+  def d_code_assigned?
+    self.itz_cash_property&.d_code.present?
   end
 
 
