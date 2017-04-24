@@ -60,9 +60,6 @@ class Expense::Manual::Create < Expense::Manual::Base
     return if has_errors?
 
     if self.expense.save
-      # Set custom fields
-      set_custom_fields true
-
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
@@ -98,7 +95,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.manual_expense.custom_fields.destroy_all
+      # self.expense.manual_expense.custom_fields.destroy_all
     end
   end
 

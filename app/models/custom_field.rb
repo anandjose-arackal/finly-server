@@ -24,8 +24,7 @@ class CustomField < ActiveRecord::Base
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
-  validates :parent_id, presence: true
-  validates :parent_type, presence: true, :inclusion => {:in => ['ManualExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest']}
+  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest']}
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
 
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
