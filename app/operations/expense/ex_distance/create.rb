@@ -76,9 +76,6 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     return if has_errors?
 
     if self.expense.save
-      # Set custom fields
-      set_custom_fields true
-
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
@@ -127,7 +124,6 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.distance_expense.custom_fields.destroy_all
     end
   end
 
