@@ -59,6 +59,15 @@ class MoneyRequest::Update < MoneyRequest::Base
     before_save self.money_request, &method(:generate_comments)
   end
 
+  # if the amounts are left as blank, they're assumed to be 0
+  def pre_process
+    update_param[:items_attributes].each do |item|
+      unless item[:amount_attributes][:value].present?
+        item[:amount_attributes][:value] = 0
+      end
+    end
+  end
+
   def process
     if money_request.update_attributes(self.update_param)
       if params[:custom_fields].present?

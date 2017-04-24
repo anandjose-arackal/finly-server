@@ -24,7 +24,7 @@ class Receipt::Create < Receipt::Base
 
     # if the company has receipt transcription enabled, it will be marked on the receipt and trigger a mailer
     # to notify us about  receipt being uploaded
-    if user.company.configuration.ocr_enabled
+    if user.company.ocr_enabled?
       receipt.update(to_be_transcribed: true)
 
       ########## Mailer being triggered ###########

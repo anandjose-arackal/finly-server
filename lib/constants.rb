@@ -35,7 +35,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = ['veekshith.rai@finly.io']
+    TRANSCRIBER_EMAILS = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end
@@ -64,7 +64,6 @@ module Constants
 
   class Constants::ItzCash
 
-
     RESTRICTION_BUDGET_CONSTANT = 1000000
     RESTRICTION_TRANS_CONSTANT = 1000
 
@@ -77,6 +76,8 @@ module Constants
       MERCHANT_TYPE_KEY_CREDIT = 'OLCEXP_CARDTOPUP'
       MERCHANT_TYPE_KEY_DEBIT = 'OLCEXP_CARDDEBIT'
       PRODUCT_CODE = 'HDFFIN'
+      PRODUCT_CODE_HDFC_EXPENSE_CARD = 'HDFFIN'
+      PRODUCT_CODE_RBL_EXPENSE_CARD = 'RBLRFN'
     else
       MERCHANT_TYPE_KEY_CREDIT = 'DEFAULT_ITIL'
       MERCHANT_TYPE_KEY_DEBIT = 'DEFAULT_ITIL'
