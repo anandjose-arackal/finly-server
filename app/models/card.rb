@@ -2,24 +2,25 @@
 #
 # Table name: cards
 #
-#  id                  :integer          not null, primary key
-#  user_id             :integer
-#  ending_number       :string(255)      not null
-#  proxy               :string(255)      not null
-#  card_type_id        :integer
-#  description         :text(65535)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  company_id          :integer
-#  disabled_by_role_id :integer
-#  disabled_by_user_id :integer
-#  active              :boolean
-#  disable_note        :text(65535)
-#  product_code        :string(255)      not null
-#  card_balance_id     :integer
-#  card_program_id     :integer          not null
-#  card_eligibility_id :integer
-#  admin_unblockable   :boolean          default(TRUE)
+#  id                       :integer          not null, primary key
+#  user_id                  :integer
+#  ending_number            :string(255)      not null
+#  proxy                    :string(255)      not null
+#  card_type_id             :integer
+#  description              :text(65535)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  company_id               :integer
+#  disabled_by_role_id      :integer
+#  disabled_by_user_id      :integer
+#  active                   :boolean
+#  disable_note             :text(65535)
+#  product_code             :string(255)      not null
+#  card_balance_id          :integer
+#  card_program_id          :integer          not null
+#  card_eligibility_id      :integer
+#  admin_unblockable        :boolean          default(TRUE)
+#  itz_cash_card_program_id :integer
 #
 
 class Card < ActiveRecord::Base
@@ -29,6 +30,7 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_role, class_name: 'UserRole'
   belongs_to :disabled_by_user, class_name: 'User'
   belongs_to :card_program
+  belongs_to :itz_cash_card_program
   has_many :transactions, class_name: 'CardTransaction'
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
@@ -64,6 +66,7 @@ class Card < ActiveRecord::Base
   validates :ending_number, presence: true
   validates :card_program_id, presence: true
   validate :user_or_company_presence
+  # validates :itz_cash_card_program_id, presence: true
 
   after_create do
     user = self.user
@@ -111,6 +114,10 @@ class Card < ActiveRecord::Base
         return true
       end
     end
+  end
+
+  def product_code
+    self.itz_cash_card_program.product_code
   end
 
 

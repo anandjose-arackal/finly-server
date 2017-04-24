@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170420095203) do
+ActiveRecord::Schema.define(version: 20170424120051) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -141,13 +141,15 @@ ActiveRecord::Schema.define(version: 20170420095203) do
   add_index "card_configurations", ["prepaid_card_id"], name: "index_card_configurations_on_prepaid_card_id", using: :btree
 
   create_table "card_expenses", force: :cascade do |t|
-    t.text     "editable_merchant",   limit: 65535
-    t.integer  "card_transaction_id", limit: 4
-    t.integer  "expense_id",          limit: 4
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-    t.integer  "surcharge_id",        limit: 4
-    t.boolean  "is_deleted",                        default: false
+    t.text     "editable_merchant",                limit: 65535
+    t.integer  "card_transaction_id",              limit: 4
+    t.integer  "expense_id",                       limit: 4
+    t.datetime "created_at",                                                     null: false
+    t.datetime "updated_at",                                                     null: false
+    t.integer  "surcharge_id",                     limit: 4
+    t.boolean  "is_deleted",                                     default: false
+    t.boolean  "cancelled",                                      default: false
+    t.integer  "cancelled_against_transaction_id", limit: 4
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -252,6 +254,7 @@ ActiveRecord::Schema.define(version: 20170420095203) do
     t.string   "mcc_code",              limit: 255
     t.string   "transaction_status",    limit: 255
     t.string   "api_reference_id",      limit: 255
+    t.boolean  "cancelled",                           default: false
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -265,23 +268,24 @@ ActiveRecord::Schema.define(version: 20170420095203) do
   end
 
   create_table "cards", force: :cascade do |t|
-    t.integer  "user_id",             limit: 4
-    t.string   "ending_number",       limit: 255,                  null: false
-    t.string   "proxy",               limit: 255,                  null: false
-    t.integer  "card_type_id",        limit: 4
-    t.text     "description",         limit: 65535
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "company_id",          limit: 4
-    t.integer  "disabled_by_role_id", limit: 4
-    t.integer  "disabled_by_user_id", limit: 4
+    t.integer  "user_id",                  limit: 4
+    t.string   "ending_number",            limit: 255,                  null: false
+    t.string   "proxy",                    limit: 255,                  null: false
+    t.integer  "card_type_id",             limit: 4
+    t.text     "description",              limit: 65535
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "company_id",               limit: 4
+    t.integer  "disabled_by_role_id",      limit: 4
+    t.integer  "disabled_by_user_id",      limit: 4
     t.boolean  "active"
-    t.text     "disable_note",        limit: 65535
-    t.string   "product_code",        limit: 255,                  null: false
-    t.integer  "card_balance_id",     limit: 4
-    t.integer  "card_program_id",     limit: 4,                    null: false
-    t.integer  "card_eligibility_id", limit: 4
-    t.boolean  "admin_unblockable",                 default: true
+    t.text     "disable_note",             limit: 65535
+    t.string   "product_code",             limit: 255,                  null: false
+    t.integer  "card_balance_id",          limit: 4
+    t.integer  "card_program_id",          limit: 4,                    null: false
+    t.integer  "card_eligibility_id",      limit: 4
+    t.boolean  "admin_unblockable",                      default: true
+    t.integer  "itz_cash_card_program_id", limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -566,6 +570,7 @@ ActiveRecord::Schema.define(version: 20170420095203) do
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
     t.boolean  "transcribed",                        default: false
+    t.boolean  "personal",                           default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -720,6 +725,15 @@ ActiveRecord::Schema.define(version: 20170420095203) do
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_card_programs", force: :cascade do |t|
+    t.string   "product_code", limit: 255
+    t.string   "charge_code",  limit: 255
+    t.string   "name",         limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "bank",         limit: 255
   end
 
   create_table "itz_cash_properties", force: :cascade do |t|

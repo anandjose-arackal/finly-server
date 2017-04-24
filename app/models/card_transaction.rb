@@ -27,6 +27,7 @@
 #  mcc_code              :string(255)
 #  transaction_status    :string(255)
 #  api_reference_id      :string(255)
+#  cancelled             :boolean          default(FALSE)
 #
 
 class CardTransaction < ActiveRecord::Base
