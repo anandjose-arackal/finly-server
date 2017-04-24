@@ -74,9 +74,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     return if has_errors?
 
     if self.expense.save
-      # Attach an existing receipt to the expense
-      set_custom_fields true
-
       if self.receipt.present?
         self.receipt.parent = expense
         self.receipt.save
@@ -124,7 +121,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.time_expense.custom_fields.destroy_all
     end
   end
 
