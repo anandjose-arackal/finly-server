@@ -8,7 +8,7 @@ class Admin::Users::WelcomeMail < Admin::Base
   end
 
   def validate
-    unless selected_user.default_password
+    unless selected_user&.default_password
       add_message :error, "This user has already changed their default passsword"
     end
   end
@@ -21,6 +21,6 @@ class Admin::Users::WelcomeMail < Admin::Base
   end
 
   def post_process
-    UserMailer.admin_welcome(selected_user, raw_token).deliver
+    UserMailer.delay.admin_welcome(selected_user, raw_token)
   end
 end
