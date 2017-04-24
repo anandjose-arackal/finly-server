@@ -87,6 +87,15 @@ class AdminUsers::UsersController < ApplicationController
     end
   end
 
+  def admin_welcome
+    @result = Admin::Users::WelcomeMail.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   private
 
 end

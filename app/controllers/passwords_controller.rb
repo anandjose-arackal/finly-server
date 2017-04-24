@@ -35,6 +35,8 @@ class PasswordsController < Devise::PasswordsController
     respond_to do |format|
       format.json {
         if resource.errors.empty?
+          # set the default password flag to be false
+          resource.update(default_password: false)
           respond response: :success, message: "Password reset successfully"
         else
           respond response: :failure, message: resource.errors.full_messages.to_sentence

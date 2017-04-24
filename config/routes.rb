@@ -427,6 +427,7 @@
 #                                         PATCH  /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         PUT    /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         DELETE /admin_users/users/:id(.:format)                            admin_users/users#destroy
+#                     admin_users_welcome POST   /admin_users/welcome(.:format)                              admin_users/users#admin_welcome
 #                    admin_users_set_role POST   /admin_users/users/set_role(.:format)                       admin_users/users#set_role
 #                      admin_users_lookup GET    /admin_users/lookup(.:format)                               admin_users/users#lookup
 #                    admin_users_expenses GET    /admin_users/expenses(.:format)                             admin_users/expenses#index
@@ -782,6 +783,7 @@ Rails.application.routes.draw do
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
       delete 'destroy_mapping', to: 'users#destroy_mapping', as: :destroy_mapping
     end
+    post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
     resources :expenses
