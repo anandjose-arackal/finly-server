@@ -17,7 +17,12 @@ class ExpensesController < ApplicationController
         @result = Expense::Manual::Multiple::Create.(current_user, params)
         unless @result.success?
           # respond render: "multiple_errors"
-          render json: @result.formatted_messages.values
+          # debugger
+          if @result.formatted_messages
+            render json: @result.formatted_messages.values
+          else
+            respond
+          end
           return
         end
 

@@ -58,7 +58,7 @@ class Expense::Manual::Validate < Expense::Manual::Base
 
   def process
     # debugger
-    self.expense = user.expenses.build(expense_params)
+    self.expense = user.expenses.new(expense_params)
     add_message :error, self.expense.errors.full_messages unless self.expense.valid?
 
     # Create custom fields only for validations. Fields will be saved later

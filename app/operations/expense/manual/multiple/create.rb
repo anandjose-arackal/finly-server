@@ -35,10 +35,12 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   end
 
   def process
+    # debugger
     if @valid
       expenses = params[:multiple]
       for key, value in expenses
         expense = Expense::Manual::Create.(user, value)
+        # debugger
       end
       add_message :success, "Created #{expenses.values.length} expenses successfully."
     else
