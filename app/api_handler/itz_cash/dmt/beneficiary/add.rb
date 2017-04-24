@@ -78,23 +78,22 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
   end
 
   def success
-    create_user_dmt_sender
+    create_user_dmt_beneficiary
     params[:parsed_response] = self.parsed_response
-    ItzCash::Dmt::Sender::Registration::SuccessPresenter.new(user, params, messages)
+    ItzCash::Dmt::Beneficiary::Registration::SuccessPresenter.new(user, params, messages)
   end
 
-  class ItzCash::Dmt::Sender::Registration::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :parsed_response, :registration_id
+  class ItzCash::Dmt::Beneficiary::Registration::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :parsed_response
 
     def init
       self.parsed_response = params[:parsed_response]
-      self.registration_id = parsed_response[:SenderRegResponse][:registrationId]
     end
 
   end
 
   protected
-  def create_user_dmt_sender
+  def create_user_dmt_beneficiary
     param = {username: self.username, mobile_number: user.mobile_number, registration_id: parsed_response[:SenderRegResponse][:registrationId]}
     if user.itz_cash_dmt_sender.present?
       user.itz_cash_dmt_sender.update param
