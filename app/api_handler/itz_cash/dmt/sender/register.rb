@@ -1,4 +1,4 @@
-class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
+class ItzCash::Dmt::Sender::Register < ItzCash::Dmt::Base
   attr_accessor :username
 
   def pre_validate
@@ -12,7 +12,7 @@ class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
   end
 
   def query_xml_path
-    "#{Rails.root}/app/api_handler/itz_cash/dmt/sender/registration.xml.erb"
+    "#{Rails.root}/app/api_handler/itz_cash/dmt/sender/register.xml.erb"
   end
 
   def query_xml_params
@@ -34,10 +34,10 @@ class ItzCash::Dmt::Sender::Registration < ItzCash::Dmt::Base
   def success
     create_user_dmt_sender
     params[:parsed_response] = self.parsed_response
-    ItzCash::Dmt::Sender::Registration::SuccessPresenter.new(user, params, messages)
+    ItzCash::Dmt::Sender::Register::SuccessPresenter.new(user, params, messages)
   end
 
-  class ItzCash::Dmt::Sender::Registration::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ItzCash::Dmt::Sender::Register::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :parsed_response, :registration_id
 
     def init

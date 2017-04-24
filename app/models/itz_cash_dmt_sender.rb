@@ -13,6 +13,7 @@
 
 class ItzCashDmtSender < ActiveRecord::Base
   belongs_to :user
+  has_many :beneficiaries, class_name: 'ItzCashDmtBeneficiary'
 
   validates :username, presence: true
   validates :user_id, presence: true

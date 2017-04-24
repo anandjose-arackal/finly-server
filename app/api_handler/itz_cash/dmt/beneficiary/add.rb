@@ -94,12 +94,26 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
 
   protected
   def create_user_dmt_beneficiary
-    param = {username: self.username, mobile_number: user.mobile_number, registration_id: parsed_response[:SenderRegResponse][:registrationId]}
-    if user.itz_cash_dmt_sender.present?
-      user.itz_cash_dmt_sender.update param
-    else
-      user.build_itz_cash_dmt_sender(param).save
-    end
+    beneficiary_add_response = parsed_response[:beneAddResponse]
+    param = {
+        first_name: beneficiary_add_response[:firstName],
+        middle_name: beneficiary_add_response[:middleName],
+        last_name: beneficiary_add_response[:lastName],
+        mobile_number: beneficiary_add_response[:mobileNumber],
+        relation: beneficiary_add_response[:relation],
+        ifsc_options: beneficiary_add_response[:ifscOption],
+        ifsc_code: beneficiary_add_response[:ifscCode],
+        bank_name: beneficiary_add_response[:bankName],
+        branch_name: beneficiary_add_response[:branchName],
+        bank_city: beneficiary_add_response[:bankCity],
+        bank_state: beneficiary_add_response[:bankState],
+        account_number: beneficiary_add_response[:accountNo],
+        registration_id: beneficiary_add_response[:beneficiaryId],
+        is_updatable: beneficiary_add_response[:isUpdatable],
+        beneficiary_name: beneficiary_add_response[:beneName],
+        beneficiary_id: beneficiary_add_response[:beneficiaryId]
+    }
+
   end
 
 end
