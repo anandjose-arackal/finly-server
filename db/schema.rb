@@ -63,12 +63,10 @@ ActiveRecord::Schema.define(version: 20170422104136) do
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "amounts", force: :cascade do |t|
-    t.decimal  "value",                      precision: 64, scale: 12
-    t.integer  "currency_id",    limit: 4,                                             null: false
-    t.datetime "created_at",                                                           null: false
-    t.datetime "updated_at",                                                           null: false
-    t.integer  "money_paisas",   limit: 4,                             default: 0,     null: false
-    t.string   "money_currency", limit: 255,                           default: "INR", null: false
+    t.decimal  "value",                 precision: 64, scale: 12
+    t.integer  "currency_id", limit: 4,                           null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
@@ -198,9 +196,9 @@ ActiveRecord::Schema.define(version: 20170422104136) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
+    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
-    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -598,6 +596,7 @@ ActiveRecord::Schema.define(version: 20170422104136) do
     t.integer  "subscribable_id",            limit: 4,                   null: false
     t.string   "subscribable_type",          limit: 255,                 null: false
     t.boolean  "ocr_enabled",                            default: false, null: false
+    t.boolean  "d_code_assigned",                        default: false, null: false
     t.boolean  "expense_management_enabled",             default: false, null: false
     t.boolean  "gift_card_enabled",                      default: false, null: false
     t.boolean  "gift_voucher_enabled",                   default: false, null: false
@@ -735,9 +734,11 @@ ActiveRecord::Schema.define(version: 20170422104136) do
     t.string   "bank_name",              limit: 255
     t.string   "branch_name",            limit: 255
     t.string   "bank_city",              limit: 255
-    t.integer  "state_id",               limit: 4,   null: false
+    t.string   "bank_state",             limit: 255
     t.string   "account_number",         limit: 255, null: false
-    t.integer  "processing_bank_id",     limit: 4,   null: false
+    t.string   "beneficiary_name",       limit: 255, null: false
+    t.string   "beneficiary_id",         limit: 255, null: false
+    t.boolean  "is_updatable",                       null: false
     t.integer  "itz_cash_dmt_sender_id", limit: 4,   null: false
     t.integer  "status_id",              limit: 4,   null: false
     t.integer  "type_id",                limit: 4,   null: false

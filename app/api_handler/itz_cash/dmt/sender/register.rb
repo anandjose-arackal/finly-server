@@ -48,6 +48,7 @@ class ItzCash::Dmt::Sender::Register < ItzCash::Dmt::Base
   end
 
   protected
+  # todo move create outside
   def create_user_dmt_sender
     param = {username: self.username, mobile_number: user.mobile_number, registration_id: parsed_response[:SenderRegResponse][:registrationId]}
     if user.itz_cash_dmt_sender.present?

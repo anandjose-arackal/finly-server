@@ -108,8 +108,8 @@ class BaseHandler
       # self.response = self.connection.post p, body_param
       self.response = self.connection.post do |req|
         req.url p
-        req.params = query_param
-        req.body = body_param
+        req.params = query_param if query_param.present?
+        req.body = body_param if body_param.present?
       end
       puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed

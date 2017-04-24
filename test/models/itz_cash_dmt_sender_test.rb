@@ -9,6 +9,7 @@
 #  user_id         :integer          not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  password        :string(255)
 #
 
 require 'test_helper'

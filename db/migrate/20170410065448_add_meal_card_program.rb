@@ -1,6 +1,6 @@
 class AddMealCardProgram < ActiveRecord::Migration
   def change
-    if CardProgram.with_name('Meal').blank?
+    if CardProgram.with_name('Meal').blank? and Company.count > 0
       CardProgram.create id: CardProgram.id_for(:meal),
                          name: 'Meal',
                          create_expense: false,

@@ -43,6 +43,10 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
     end
     if params[:account_number] != params[:account_number_confirmation]
       add_message :error, 'Account numbers do not match'
+      return
+    end
+    if params[:type_id].blank? or ItzCashDmtBeneficiaryType.name(params[:type_id]).blank?
+      add_message :error, 'Error loading configuration. Type not found'
     end
   end
 
@@ -80,10 +84,10 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
   def success
     create_user_dmt_beneficiary
     params[:parsed_response] = self.parsed_response
-    ItzCash::Dmt::Beneficiary::Registration::SuccessPresenter.new(user, params, messages)
+    ItzCash::Dmt::Beneficiary::Add::SuccessPresenter.new(user, params, messages)
   end
 
-  class ItzCash::Dmt::Beneficiary::Registration::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ItzCash::Dmt::Beneficiary::Add::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :parsed_response
 
     def init
@@ -101,7 +105,7 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
         last_name: beneficiary_add_response[:lastName],
         mobile_number: beneficiary_add_response[:mobileNumber],
         relation: beneficiary_add_response[:relation],
-        ifsc_options: beneficiary_add_response[:ifscOption],
+        ifsc_option: beneficiary_add_response[:ifscOption],
         ifsc_code: beneficiary_add_response[:ifscCode],
         bank_name: beneficiary_add_response[:bankName],
         branch_name: beneficiary_add_response[:branchName],
@@ -111,9 +115,10 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
         registration_id: beneficiary_add_response[:beneficiaryId],
         is_updatable: beneficiary_add_response[:isUpdatable],
         beneficiary_name: beneficiary_add_response[:beneName],
-        beneficiary_id: beneficiary_add_response[:beneficiaryId]
+        beneficiary_id: beneficiary_add_response[:beneficiaryId],
+        type_id: params[:type_id]
     }
-
+    user.itz_cash_dmt_sender.beneficiaries.build(param).save
   end
 
 end
