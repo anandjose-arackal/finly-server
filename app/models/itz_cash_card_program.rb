@@ -44,4 +44,8 @@ class ItzCashCardProgram < ActiveRecord::Base
     BANKS[name]
   end
 
+  def itz_cash_card_program_name
+    self.name
+  end
+
 end

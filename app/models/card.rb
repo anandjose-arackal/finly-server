@@ -45,8 +45,8 @@ class Card < ActiveRecord::Base
   accepts_nested_attributes_for :card_balance
   accepts_nested_attributes_for :card_eligibility
 
-  scope :with_id, ->(id) { where id: id }
-  scope :with_user, ->(user_id) { where user_id: user_id }
+  scope :with_id, -> (id) { where id: id }
+  scope :with_user, -> (user_id) { where user_id: user_id }
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
@@ -60,6 +60,7 @@ class Card < ActiveRecord::Base
 
   delegate :card_balance_value, to: :card_balance
   delegate :card_program_name, to: :card_program
+  delegate :itz_cash_card_program_name, to: :itz_cash_card_program
 
   validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
   validates :ending_number, presence: true
