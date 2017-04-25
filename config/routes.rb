@@ -788,6 +788,7 @@ Rails.application.routes.draw do
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
     post 'import', to: 'users#import', as: :import
+    get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
       patch 'block', to: 'cards#block', as: :block

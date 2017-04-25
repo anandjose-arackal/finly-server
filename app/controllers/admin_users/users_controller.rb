@@ -95,8 +95,12 @@ class AdminUsers::UsersController < ApplicationController
     end
   end
 
+  def temp_import
+
+  end
+
   def import
-    import_op = Admin::Users::Import.(current_user, params)
+    import_op = Admin::Users::Import.new(current_user, params)
     @result = import_op.run
     if @result.success?
       @response = {

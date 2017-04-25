@@ -21,7 +21,8 @@
 require 'roo'
 class Admin::Users::Import < Admin::Base
 
-  attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee
+  attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee,
+                :file_url
 
   def authorized_user_types
 
@@ -88,7 +89,9 @@ class Admin::Users::Import < Admin::Base
         end
       end
 
-      self.invitee = User.create(params)
+      self.invitee = User.new(params)
+      invitee.skip_confirmation_notification!
+      invitee.save
 
       if User.exists?(invitee.id)
         if error_messages.present?
@@ -231,10 +234,11 @@ class Admin::Users::Import < Admin::Base
 
     # generating a password for the user
     generated_password = generate_default_password
+    email = row[import_fields[:email]].to_s.sub!('mailto:','') rescue ''
 
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
-                    email: row[import_fields[:email]],
+                    email: email,
                     mobile_number: mobile,
                     password: generated_password,
                     password_confirmation: generated_password,
