@@ -69,7 +69,6 @@ class Admin::Users::Import < Admin::Base
   def process
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
-      type = retrieve_invite_type(row)
       self.params = process_row(row)
       error_messages = params[:error_messages]
       params.delete(:error_messages)
@@ -89,48 +88,11 @@ class Admin::Users::Import < Admin::Base
         end
       end
 
-      unique = mobile_number_valid?(row[import_fields[:mobile_number]])
+      self.invitee = User.create(params)
 
-      # below needs to be changed to creating a user
-
-      if unique == true
-        if type == 'email'
-          self.invitee = User.invite!(params) do |u|
-            u.skip_invitation
-          end
-        elsif type == 'mobile'
-          self.invitee = User.invite!(params, user) do |u|
-            u.skip_invitation
-            u.update_attribute(:email, "")
-            u.update_attribute(:mobile_only_invite, true)
-            # send welcome message to invitee
-            CustomMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
-          end
-        end
-      end
-
-      # if unique == true
-      #   if type == 'email'
-      #     self.invitee = User.invite!(params) do |u|
-      #       u.skip_invitation
-      #     end
-      #   elsif type == 'mobile'
-      #     self.invitee = User.invite!(params, user) do |u|
-      #       u.skip_invitation
-      #       u.update_attribute(:email, "")
-      #       u.update_attribute(:mobile_only_invite, true)
-      #       # send welcome message to invitee
-      #       CustomMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
-      #     end
-      #   end
-      # end
-
-
-      if unique.is_a?(String)
-        result_hash[i] = unique
-      elsif User.exists?(invitee.id)
+      if User.exists?(invitee.id)
         if error_messages.present?
-          result_hash[i] = "User invited, but with the following errors: " + error_messages.to_sentence
+          result_hash[i] = "User created, but with the following errors: " + error_messages.to_sentence
         else
           result_hash[i] = "Success!"
         end
@@ -141,11 +103,39 @@ class Admin::Users::Import < Admin::Base
   end
 
   def post_process
-    # generating the success csv
-    self.response = ImportUtil.generate_csv(header, 2..sheet.last_row)
+    self.file_url = create_response_csv
+  end
+
+  def success
+    params[:file_url] = file_url
+    Admin::Users::Import::FilePresenter.new(user, messages, params)
+  end
+
+  class Admin::Users::Import::FilePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :file_url
+
+    def init
+      self.file_url = params[:file_url]
+    end
   end
 
   private
+
+  def create_response_csv
+    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    CSV.open(file_name, 'wb') do |csv|
+      self.header << 'Result'
+      csv << header
+      (2..sheet.last_row).each do |i|
+        row = sheet.row(i)
+        row = row.map(&:to_s)
+        row << result_hash[i]
+        csv << row
+      end
+    end
+    return file_name.gsub('public', '')
+  end
 
   def retrieve_invite_type(row)
     if row[import_fields[:email]].present?
@@ -242,7 +232,6 @@ class Admin::Users::Import < Admin::Base
     # generating a password for the user
     generated_password = generate_default_password
 
-
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
                     email: row[import_fields[:email]],
@@ -307,8 +296,8 @@ class Admin::Users::Import < Admin::Base
     }
   end
 
-  def generate_default_password
-
+  def generate_default_password(length = 8)
+    (0...length).map { (65 + rand(26)).chr }.join
   end
 
 end
