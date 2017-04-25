@@ -10,15 +10,16 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  password        :string(255)
+#  status_id       :integer          not null
 #
 
 class ItzCashDmtSender < ActiveRecord::Base
   belongs_to :user
   has_many :beneficiaries, class_name: 'ItzCashDmtBeneficiary'
+  belongs_to :status, class_name: 'ItzCashDmtSenderStatus'
 
   validates :username, presence: true
   validates :user_id, presence: true
   validates :mobile_number, presence: true
   validates :registration_id, presence: true
-
 end

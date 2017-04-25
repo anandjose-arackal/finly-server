@@ -6,6 +6,7 @@
 #  subscribable_id            :integer          not null
 #  subscribable_type          :string(255)      not null
 #  ocr_enabled                :boolean          default(FALSE), not null
+#  d_code_assigned            :boolean          default(FALSE), not null
 #  expense_management_enabled :boolean          default(FALSE), not null
 #  gift_card_enabled          :boolean          default(FALSE), not null
 #  gift_voucher_enabled       :boolean          default(FALSE), not null

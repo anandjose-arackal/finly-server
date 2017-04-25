@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170422104136) do
+ActiveRecord::Schema.define(version: 20170425120032) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -762,14 +762,22 @@ ActiveRecord::Schema.define(version: 20170422104136) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "itz_cash_dmt_sender_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "itz_cash_dmt_senders", force: :cascade do |t|
-    t.string   "username",        limit: 255, null: false
-    t.string   "mobile_number",   limit: 255, null: false
-    t.string   "registration_id", limit: 255, null: false
-    t.integer  "user_id",         limit: 4,   null: false
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.string   "username",        limit: 255,                 null: false
+    t.string   "mobile_number",   limit: 255,                 null: false
+    t.string   "registration_id", limit: 255,                 null: false
+    t.integer  "user_id",         limit: 4,                   null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
     t.string   "password",        limit: 255
+    t.integer  "status_id",       limit: 4,                   null: false
+    t.boolean  "otp_verified",                default: false, null: false
   end
 
   add_index "itz_cash_dmt_senders", ["user_id"], name: "index_itz_cash_dmt_senders_on_user_id", using: :btree

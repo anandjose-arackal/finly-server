@@ -4,6 +4,7 @@
 #
 #  id                  :integer          not null, primary key
 #  user_id             :integer
+#  ending_number       :string(255)      not null
 #  proxy               :string(255)      not null
 #  card_type_id        :integer
 #  description         :text(65535)

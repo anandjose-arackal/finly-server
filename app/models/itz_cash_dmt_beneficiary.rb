@@ -13,9 +13,11 @@
 #  bank_name              :string(255)
 #  branch_name            :string(255)
 #  bank_city              :string(255)
-#  state_id               :integer          not null
+#  bank_state             :string(255)
 #  account_number         :string(255)      not null
-#  processing_bank_id     :integer          not null
+#  beneficiary_name       :string(255)      not null
+#  beneficiary_id         :string(255)      not null
+#  is_updatable           :boolean          not null
 #  itz_cash_dmt_sender_id :integer          not null
 #  status_id              :integer          not null
 #  type_id                :integer          not null
