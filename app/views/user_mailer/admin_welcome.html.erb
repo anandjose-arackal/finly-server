@@ -1,4 +1,4 @@
-<% path = "localhost/set_password?reset_password_token=#{@token}" %>
+<% path = "www.finly.io/set_password?reset_password_token=#{@token}" %>
 <% content_for :body do %>
     <div class="primary block center" style="background-color: white; text-align: center;">
       <br>
@@ -21,7 +21,7 @@
       <p style="color: #999999; line-height: 160%; margin: 0 0 20px 0;">Finly, powered by ItzCash is the easiest way to get
         reimbursed by <%= @user.company.name %> for company expenses you incur. In just a few seconds, you can submit
         expenses
-        from your phone or computer, then sit back and wait for the money to hit your bank account.</p>
+        from your phone or computer. </p>
     </div>
 <% end %>
 
@@ -32,7 +32,11 @@
   <div style="height: 70px">
     <!--<a href="" style="border:none;text-decoration:none; display:block;" target="_blank">-->
 
-    <img src="https://www.finly.io/common/images/logos/logo_md1.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+    <% if @user && @user.company_id == 7 %>
+
+    <% else %>
+        <img src="https://www.finly.io/common/images/logos/logo_md1.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+    <% end %>
 
     <!-- todo - ultimate jugaad for itzcash's logo - needs to be changed -->
     <% if @user && @user.company.id == 7%>

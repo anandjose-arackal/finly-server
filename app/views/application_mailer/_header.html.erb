@@ -1,13 +1,16 @@
 <div style="height: 70px">
   <!--<a href="" style="border:none;text-decoration:none; display:block;" target="_blank">-->
-  <img src="https://www.finly.io/common/images/logos/logo_md1.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+
+  <% company_id = @data.company.id rescue nil %>
+  <% unless company_id == 7 %>
+    <img src="https://www.finly.io/common/images/logos/logo_md1.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+  <% end %>
 
   <!-- todo - ultimate jugaad for itzcash's logo - needs to be changed -->
-  <% if @data && @data.company.id == 7%>
-      <img src="https://www.finly.io/common/images/logos/itzcash-white.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: left">
-      <!--<h2 style="font-size: 40px;text-align: right;font-weight: normal;margin-bottom: 10px"></h2>-->
+  <% if @data && @data.company.id == 7 %>
+    <img src="https://www.finly.io/common/images/logos/itzcash-white.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: left">
   <% else %>
-      <h2 style="font-size: 40px;text-align: left;font-weight: normal;margin-bottom: 10px"><%=@data.company.name if @data.present?%></h2>
+    <h2 style="font-size: 40px;text-align: left;font-weight: normal;margin-bottom: 10px"><%=@data.company.name if @data.present?%></h2>
   <% end %>
 
 </div>

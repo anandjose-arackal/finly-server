@@ -25,6 +25,7 @@ class Admin::Users::WelcomeMail < Admin::Base
   end
 
   def post_process
+    add_message :success, "Email notifier sent"
     UserMailer.delay.admin_welcome(selected_user, raw_token)
   end
 end
