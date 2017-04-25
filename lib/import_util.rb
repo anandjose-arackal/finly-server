@@ -63,4 +63,9 @@ class ImportUtil
     end
   end
 
+  def self.create_response_csv(header, values)
+
+
+  end
+
 end

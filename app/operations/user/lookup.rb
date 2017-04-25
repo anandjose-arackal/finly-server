@@ -25,7 +25,7 @@ class User::Lookup < User::Base
       return
     elsif selected_user.first_name.blank?
       self.registered = false
-      add_message :error, 'You have not signed up with Finly yet! Plese contact your manager for further details'
+      add_message :error, 'You have not signed up with Finly yet! Please contact your manager for further details'
       return
     else
       if selected_user.active?

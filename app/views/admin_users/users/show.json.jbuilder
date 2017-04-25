@@ -13,10 +13,13 @@ end
 json.cards do
   json.array!(@result.cards) do |card|
     json.type card.card_program_name
+    json.card_program_id card.card_program_id
     json.proxy card.proxy
     json.ending_number card.ending_number
     json.active card.active
     json.id card.id
+    json.itz_cash_card_program_name card.itz_cash_card_program_name rescue nil
+    json.itz_cash_card_program_id card.itz_cash_card_program_id rescue nil
   end
 end
 
