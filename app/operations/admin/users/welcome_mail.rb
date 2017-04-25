@@ -8,6 +8,10 @@ class Admin::Users::WelcomeMail < Admin::Base
   end
 
   def validate
+    unless selected_user
+      add_message :error, "User not found"
+      return
+    end
     unless selected_user&.default_password
       add_message :error, "This user has already changed their default passsword"
     end
@@ -17,7 +21,7 @@ class Admin::Users::WelcomeMail < Admin::Base
     raw, enc = Devise.token_generator.generate(User, :reset_password_token)
     self.raw_token = raw
     selected_user.update_attribute(:reset_password_token, enc)
-    selected_user.update_attribute(:reset_password_sent_at, Time.now.utc)
+    selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
   end
 
   def post_process

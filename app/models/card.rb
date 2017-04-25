@@ -15,7 +15,6 @@
 #  disabled_by_user_id      :integer
 #  active                   :boolean
 #  disable_note             :text(65535)
-#  product_code             :string(255)      not null
 #  card_balance_id          :integer
 #  card_program_id          :integer          not null
 #  card_eligibility_id      :integer

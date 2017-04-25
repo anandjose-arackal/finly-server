@@ -1,6 +1,5 @@
 class AdminUsers::UsersController < ApplicationController
 
-  # todo - temporary
   before_action :authenticate_user!
   allow_oauth!
 

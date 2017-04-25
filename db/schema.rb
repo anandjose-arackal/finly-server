@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170424193318) do
+ActiveRecord::Schema.define(version: 20170425072600) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -280,7 +280,6 @@ ActiveRecord::Schema.define(version: 20170424193318) do
     t.integer  "disabled_by_user_id",      limit: 4
     t.boolean  "active"
     t.text     "disable_note",             limit: 65535
-    t.string   "product_code",             limit: 255,                  null: false
     t.integer  "card_balance_id",          limit: 4
     t.integer  "card_program_id",          limit: 4,                    null: false
     t.integer  "card_eligibility_id",      limit: 4
