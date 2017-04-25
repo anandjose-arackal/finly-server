@@ -55,15 +55,6 @@ class Admin::Users::Import < Admin::Base
         result_hash[i] = 1
         next
       end
-
-      # validating that the card being assigned is unique Type 2
-      User.all.each do |user|
-        proxy = user.cards.first.proxy rescue ''
-        if row[import_fields[:card_serial_id]] == proxy
-          result_hash[i] = 2
-          next
-        end
-      end
     end
   end
 
@@ -94,6 +85,7 @@ class Admin::Users::Import < Admin::Base
       invitee.save
 
       if User.exists?(invitee.id)
+        invitee.update_attribute(:default_password, true)
         if error_messages.present?
           result_hash[i] = "User created, but with the following errors: " + error_messages.to_sentence
         else
@@ -103,6 +95,7 @@ class Admin::Users::Import < Admin::Base
         result_hash[i] = invitee.errors.full_messages.to_sentence
       end
     end
+
   end
 
   def post_process
@@ -111,7 +104,7 @@ class Admin::Users::Import < Admin::Base
 
   def success
     params[:file_url] = file_url
-    Admin::Users::Import::FilePresenter.new(user, messages, params)
+    Admin::Users::Import::FilePresenter.new(user, params, messages)
   end
 
   class Admin::Users::Import::FilePresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -261,15 +254,13 @@ class Admin::Users::Import < Admin::Base
                     error_messages: errors
     }
 
-    # i.e. add cards only when the user
-    if row[import_fields[:card_serial_id]].present?
-      user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
-                                         card_type_id: 1,
-                                         product_code: Constants::ItzCash::PRODUCT_CODE,
-                                         ending_number: row[import_fields[:card_ending_numbers]],
-                                         company_id: row[import_fields[:company_id]]
-                                        }]
-    end
+    # # i.e. add cards only when the user
+    # if row[import_fields[:card_serial_id]].present?
+    #   user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
+    #                                      ending_number: row[import_fields[:card_ending_numbers]],
+    #                                      company_id: row[import_fields[:company_id]]
+    #                                     }]
+    # end
     return user_params
   end
 
@@ -293,10 +284,8 @@ class Admin::Users::Import < Admin::Base
         :reporting_finance_manager => 15,
         :approves_to => 16,
         :approves_finance_to => 17,
-        :card_serial_id => 18,
-        :card_ending_numbers => 19,
-        :company_id => 20,
-        :mothers_maiden_name => 21
+        :company_id => 18,
+        :mothers_maiden_name => 19
     }
   end
 
