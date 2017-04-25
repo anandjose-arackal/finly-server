@@ -786,6 +786,7 @@ Rails.application.routes.draw do
     post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
+    post 'import', to: 'users#import', as: :import
     resources :expenses
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
