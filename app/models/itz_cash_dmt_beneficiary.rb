@@ -29,7 +29,6 @@
 class ItzCashDmtBeneficiary < ActiveRecord::Base
   belongs_to :itz_cash_dmt_sender
   belongs_to :status, class_name: 'ItzCashDmtBeneficiaryStatus'
-  belongs_to :type, class_name: 'ItzCashDmtBeneficiaryType'
 
   scope :reimbursement_accounts, -> { where type_id: ItzCashDmtBeneficiaryType.id_for(:reimbursement_account) }
 
