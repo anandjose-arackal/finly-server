@@ -2,4 +2,7 @@
 # json.set! :author do
 #   json.set! :name, 'David'
 # end
-json.expense_errors @result.formatted_messages.values
+
+if @result.formatted_messages
+  json.expense_errors @result.formatted_messages.values
+end

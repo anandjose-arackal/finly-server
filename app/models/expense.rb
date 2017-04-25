@@ -532,5 +532,4 @@ class Expense < ActiveRecord::Base
       end
     end
   end
-
 end
