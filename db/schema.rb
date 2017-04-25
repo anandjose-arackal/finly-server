@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170425125842) do
+ActiveRecord::Schema.define(version: 20170425134653) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -596,7 +596,6 @@ ActiveRecord::Schema.define(version: 20170425125842) do
     t.integer  "subscribable_id",            limit: 4,                   null: false
     t.string   "subscribable_type",          limit: 255,                 null: false
     t.boolean  "ocr_enabled",                            default: false, null: false
-    t.boolean  "d_code_assigned",                        default: false, null: false
     t.boolean  "expense_management_enabled",             default: false, null: false
     t.boolean  "gift_card_enabled",                      default: false, null: false
     t.boolean  "gift_voucher_enabled",                   default: false, null: false
@@ -741,7 +740,6 @@ ActiveRecord::Schema.define(version: 20170425125842) do
     t.boolean  "is_updatable",                                       null: false
     t.integer  "itz_cash_dmt_sender_id", limit: 4,                   null: false
     t.integer  "status_id",              limit: 4,                   null: false
-    t.integer  "type_id",                limit: 4,                   null: false
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.boolean  "default"
@@ -750,7 +748,6 @@ ActiveRecord::Schema.define(version: 20170425125842) do
 
   add_index "itz_cash_dmt_beneficiaries", ["itz_cash_dmt_sender_id"], name: "index_itz_cash_dmt_beneficiaries_on_itz_cash_dmt_sender_id", using: :btree
   add_index "itz_cash_dmt_beneficiaries", ["status_id"], name: "index_itz_cash_dmt_beneficiaries_on_status_id", using: :btree
-  add_index "itz_cash_dmt_beneficiaries", ["type_id"], name: "index_itz_cash_dmt_beneficiaries_on_type_id", using: :btree
 
   create_table "itz_cash_dmt_beneficiary_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false

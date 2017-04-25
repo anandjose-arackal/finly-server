@@ -20,16 +20,16 @@
 #  is_updatable           :boolean          not null
 #  itz_cash_dmt_sender_id :integer          not null
 #  status_id              :integer          not null
-#  type_id                :integer          not null
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  default                :boolean
+#  reimbursement          :boolean          default(FALSE)
 #
 
 class ItzCashDmtBeneficiary < ActiveRecord::Base
   belongs_to :itz_cash_dmt_sender
   belongs_to :status, class_name: 'ItzCashDmtBeneficiaryStatus'
 
-  scope :reimbursement_accounts, -> { where type_id: ItzCashDmtBeneficiaryType.id_for(:reimbursement_account) }
+  scope :reimbursement_accounts, -> { where reimbursement: true }
 
 end

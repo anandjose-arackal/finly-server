@@ -1,4 +1,4 @@
-class BankTransfer::Reimbursement::AddBeneficiary < BankTransfer::Reimbursement::Base
+class BankTransfer::Reimbursement::Beneficiary::Add < BankTransfer::Reimbursement::Base
 
   def pre_validate
     if user.blank?
@@ -7,6 +7,10 @@ class BankTransfer::Reimbursement::AddBeneficiary < BankTransfer::Reimbursement:
     end
     if params.blank?
       add_message :error, 'Please enter your bank details to add a Reimbursement Account'
+      return
+    end
+    if params[:bank_name].blank?
+      add_message :error, 'Bank name cannot be blank'
       return
     end
     if params[:account_number].blank?
@@ -31,7 +35,25 @@ class BankTransfer::Reimbursement::AddBeneficiary < BankTransfer::Reimbursement:
   end
 
   def process
-
+    existing_beneficiary = user.itz_cash_dmt_sender.beneficiaries.with_account_number(params[:account_number])&.first
+    if existing_beneficiary.present?
+      existing_beneficiary.update(reimbursement: true)
+    else
+      param = {
+          first_name: user.first_name,
+          middle_name: user.middle_name,
+          last_name: user.last_name,
+          mobile_number: user.mobile_number,
+          bank_name: params[:bank_name],
+          ifsc_code: params[:ifsc_code],
+          account_number: params[:account_number],
+          account_number_confirmation: params[:account_number_confirmation]
+      }
+      result = ItzCash::Dmt::Beneficiary::Add.(user, param)
+      unless result.success?
+        add_message :error, result.messages[:error]
+      end
+    end
   end
 
 end

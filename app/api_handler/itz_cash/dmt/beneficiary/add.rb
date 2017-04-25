@@ -21,12 +21,16 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
       add_message :error, 'First Name cannot be blank'
       return
     end
-    if params[:beneficiary_mobile_number].blank?
+    if params[:mobile_number].blank?
       add_message :error, 'Mobile Number cannot be blank'
       return
     end
-    if params[:beneficiary_mobile_number].size != 10
+    if params[:mobile_number].size != 10
       add_message :error, 'Invalid mobile number'
+      return
+    end
+    if params[:bank_name].blank?
+      add_message :error, 'Bank name cannot be blank'
       return
     end
     if params[:ifsc_code].blank?
@@ -44,9 +48,6 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
     if params[:account_number] != params[:account_number_confirmation]
       add_message :error, 'Account numbers do not match'
       return
-    end
-    if params[:type_id].blank? or ItzCashDmtBeneficiaryType.name(params[:type_id]).blank?
-      add_message :error, 'Error loading configuration. Type not found'
     end
   end
 
@@ -67,7 +68,7 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
         first_name: params[:first_name],
         middle_name: params[:middle_name],
         last_name: params[:last_name],
-        beneficiary_mobile_number: params[:beneficiary_mobile_number],
+        mobile_number: params[:mobile_number],
         relation: Constants::ItzCash::BENEFICIARY_REGISTRATION_RELATION,
         ifsc_option: Constants::ItzCash::IFSC_OPTION,
         ifsc_code: params[:ifsc_code],
@@ -116,7 +117,7 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
         is_updatable: beneficiary_add_response[:isUpdatable],
         beneficiary_name: beneficiary_add_response[:beneName],
         beneficiary_id: beneficiary_add_response[:beneficiaryId],
-        type_id: params[:type_id]
+        reimbursement: !!params[:reimbursement]
     }
     user.itz_cash_dmt_sender.beneficiaries.build(param).save
   end
