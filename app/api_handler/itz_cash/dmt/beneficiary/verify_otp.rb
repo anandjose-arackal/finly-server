@@ -1,6 +1,5 @@
 class ItzCash::Dmt::Beneficiary::VerifyOtp < ItzCash::Dmt::Base
 
-  # todo - Untested, incomplete as we are currently waiting for ItzCash to get back to see if this is even required
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'

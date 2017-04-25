@@ -23,6 +23,7 @@
 #  type_id                :integer          not null
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  default                :boolean
 #
 
 class ItzCashDmtBeneficiary < ActiveRecord::Base
@@ -30,5 +31,6 @@ class ItzCashDmtBeneficiary < ActiveRecord::Base
   belongs_to :status, class_name: 'ItzCashDmtBeneficiaryStatus'
   belongs_to :type, class_name: 'ItzCashDmtBeneficiaryType'
 
+  scope :reimbursement_accounts, -> { where type_id: ItzCashDmtBeneficiaryType.id_for(:reimbursement_account) }
 
 end
