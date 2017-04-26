@@ -1,10 +1,7 @@
 id: <%= params[:id] %>
 receipt_id: <%= params[:receipt_id] %>
 expense:
-  note: <%= params[:note] %>
-  <% if params[:report_id].present? %>
   report_id: <%= params[:report_id] %>
-  <% end %>
   date: <%= params[:date] %>
   category_id: <%= params[:category_id] %>
   <% type = params[:type].present? ? params[:type] : nil %>
