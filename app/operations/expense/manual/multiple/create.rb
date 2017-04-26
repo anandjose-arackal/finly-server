@@ -99,7 +99,21 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
       end
       add_message :success, "Created #{self.multiple_expenses.values.length} expenses successfully."
     else
+      # Hack
+      make_expenses_invalid(self.multiple_expenses)
       add_message :failure, 'Cannot create expenses. Please fix the errors and try again.' 
+    end
+  end
+
+
+  # Hack
+  def make_expenses_invalid(h)
+    # WEIRD BUG: JIRA TICKET ID: FIN-411
+    # After rendering the error json file, its saving the valid expenses
+    # Making expenses invalid is the only way to stop this from happening
+    # Needs further investigation to remove the bug
+    for key, expense in h
+      expense[:expense].amount = nil
     end
   end
 
