@@ -70,11 +70,7 @@ class CustomField::SetFields < CustomField::Base
       end
     end
 
-    self.save = false
-    if params.present? and params.has_key?(:save)
-      self.save = params[:save]
-    end
-
+    self.save = !!params&.dig(:save)
   end
 
   def process
