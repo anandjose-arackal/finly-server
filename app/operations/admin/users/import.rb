@@ -86,6 +86,7 @@ class Admin::Users::Import < Admin::Base
 
       if User.exists?(invitee.id)
         invitee.update_attribute(:default_password, true)
+        invitee.update_attribute(:verified, true)
         if error_messages.present?
           result_hash[i] = "User created, but with the following errors: " + error_messages.to_sentence
         else
@@ -178,43 +179,51 @@ class Admin::Users::Import < Admin::Base
     end
 
     manager = finance_manager = approves_to = approves_finance_to = nil
+    manager_email = finance_manager_email = approves_to_email = approves_finance_to_email = nil
+    manager_email = ImportUtil.cleanup_email(row[import_fields[:reporting_manager]]) if row[import_fields[:reporting_manager]].present?
+    finance_manager_email = ImportUtil.cleanup_email(row[import_fields[:reporting_finance_manager]]) if row[import_fields[:reporting_finance_manager]].present?
+    approves_to_email = ImportUtil.cleanup_email(row[import_fields[:approves_to]]) if row[import_fields[:approves_to]].present?
+    approves_finance_to_email = ImportUtil.cleanup_email(row[import_fields[:approves_finance_to]]) if row[import_fields[:approves_finance_to]].present?
+    user_email = ImportUtil.cleanup_email(row[import_fields[:email]])
+    company_id = row[import_fields[:company_id]].to_i rescue nil
+
     # creating team mapping attributes
-    if row[import_fields[:reporting_manager]]
-      manager = User.find_by(email: row[import_fields[:reporting_manager]]) rescue nil
+    if manager_email
+      manager = User.find_by(email: manager_email) rescue nil
       if manager.nil?
-        manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
+        manager = User.find_by(mobile_number: manager_email) rescue nil
       end
-      unless manager&.manager? and manager.company_id == row[import_fields[:company_id]]
+      unless manager&.manager? and manager.company_id == company_id
         errors << "Reporting Manager not found / isn't a manager"
         manager = nil
       end
     end
-    if row[import_fields[:reporting_finance_manager]]
-      finance_manager = User.find_by(email: row[import_fields[:reporting_finance_manager]]) rescue nil
+    if finance_manager_email
+      finance_manager = User.find_by(email: finance_manager_email) rescue nil
       if finance_manager.nil?
-        finance_manager = User.find_by(mobile_number: row[import_fields[:reporting_manager]]) rescue nil
+        finance_manager = User.find_by(mobile_number: finance_manager_email) rescue nil
       end
-      unless finance_manager&.finance_manager? and finance_manager.company_id == row[import_fields[:company_id]]
+      unless finance_manager&.finance_manager? and finance_manager.company_id == company_id
         errors << "Reporting Finance Manager not found / isn't a finance manager"
         finance_manager = nil
       end
     end
-    if row[import_fields[:approves_to]]
-      approves_to = User.find_by(email: row[import_fields[:approves_to]]) rescue nil
+    if approves_to_email
+      approves_to = User.find_by(email: approves_to_email) rescue nil
       if approves_to.nil?
-        approves_to = User.find_by(mobile_number: row[import_fields[:mobile_number]])
+        approves_to = User.find_by(mobile_number: approves_to_email)
       end
-      unless approves_to&.manager? and approves_to.company_id == row[import_fields[:company_id]]
+      unless approves_to&.manager? and approves_to.company_id == company_id
         errors << "Approves to not found / isn't a manager"
         approves_to = nil
       end
     end
-    if row[import_fields[:approves_finance_to]]
-      approves_finance_to = User.find_by(email: row[import_fields[:approves_finance_to]]) rescue nil
+    if approves_finance_to_email
+      approves_finance_to = User.find_by(email: approves_finance_to_email) rescue nil
       if approves_finance_to.nil?
-        approves_finance_to = User.find_by(mobile_number: row[import_fields[:approves_finance_to]]) rescue nil
+        approves_finance_to = User.find_by(mobile_number: approves_finance_to_email) rescue nil
       end
-      unless approves_finance_to&.finance_manager? and approves_finance_to.company_id == row[import_fields[:company_id]]
+      unless approves_finance_to&.finance_manager? and approves_finance_to.company_id == company_id
         errors << "Approves finance to not found / isn't a finance manager"
         approves_finance_to = nil
       end
@@ -227,11 +236,10 @@ class Admin::Users::Import < Admin::Base
 
     # generating a password for the user
     generated_password = generate_default_password
-    email = row[import_fields[:email]].to_s.sub!('mailto:','') rescue ''
 
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
-                    email: email,
+                    email: user_email,
                     mobile_number: mobile,
                     password: generated_password,
                     password_confirmation: generated_password,
