@@ -94,7 +94,10 @@ class CustomField::SetFields < CustomField::Base
           if config.default_value.present?
             default_value =config.default_value.deep_clone
           end
-          item.custom_fields.build(field_configuration: config, value: default_value).save
+          field = item.custom_fields.build(field_configuration: config, value: default_value)
+          if self.save
+            field.save
+          end
         end
       end
     end
