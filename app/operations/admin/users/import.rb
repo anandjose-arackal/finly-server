@@ -86,6 +86,7 @@ class Admin::Users::Import < Admin::Base
 
       if User.exists?(invitee.id)
         invitee.update_attribute(:default_password, true)
+        invitee.update_attribute(:verified, true)
         if error_messages.present?
           result_hash[i] = "User created, but with the following errors: " + error_messages.to_sentence
         else
