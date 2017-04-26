@@ -16,77 +16,87 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   end
 
   def init
+    # Multiple Expense params
     self.multiple_expenses_params = params[:multiple]
+
+    # Will hold errors for each expense when validating
     self.errors_by_expenses = {}
+
+    # Will contain all initialized expenses created from params
     self.multiple_expenses = {}
+
+    # If valid is true then will start creating expenses
     self.valid = true
 
     for key, params_each_expense  in multiple_expenses_params #value is params for Validate Class
 
+      # creating strong params out of params received
       current_expense_params = manual_multiple_expense_params(params_each_expense)
+
       current_expense_params[:expense_type_id] = ExpenseType.manual_expense_id
+
+      # Setting index for current expense to initialize
       multiple_expenses[key] = {}
 
-      # Removing receipt_attrib if empty
-      if current_expense_params[:receipt_id].present?
-        self.multiple_expenses[key][:receipt] = user.receipts.with_id(current_expense_params[:receipt_id]).first rescue nil
+      # Creating receipt object if receipt id is sent
+      if params_each_expense[:receipt_id].present?
+        self.multiple_expenses[key][:receipt] = user.receipts.with_id(params_each_expense[:receipt_id]).first rescue nil
       end
+
+      # Removing receipts attributes from strong params, if empty
       if current_expense_params[:receipts_attributes] == [nil] or current_expense_params[:receipts_attributes] == ['']
-        current_expense_params.delete(:receipts_attributes)
+        current_expense_params.except!(:receipts_attributes)
       end
 
-
+      # Initializing expense out of strong params
       self.multiple_expenses[key][:expense] = user.expenses.new(current_expense_params)
-      
+     
+      # Storing strong params for reference
       self.multiple_expenses[key][:params] = current_expense_params
+
+      # Initializing custom fields for current expense
       set_custom_fields_multiple(self.multiple_expenses[key][:expense], params_each_expense)
 
-      # self.errors_by_expenses[key] = expense.messages
-      # unless self.errors_by_expenses[key][:error].blank? && self.errors_by_expenses[key][:failure].blank?
-      #   self.valid = false
-      # end
     end
 
   end
 
   def validate
-    # debugger
-    # # self.valid = true
     for key, value in self.multiple_expenses
-      self.errors_by_expenses[key] = {}
-      self.errors_by_expenses[key][:error] = []
+      # Setting errors for the current expense
+      self.errors_by_expenses[key] = { error: [] }
+
+      # Adding model level validation errors
       self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
+
       valid = CustomField::Validate.(value[:expense].manual_expense)
       unless valid.success?
-        # self.errors_by_expenses[key][:error] ||= []
+        # Adding custom field validation errors
         self.errors_by_expenses[key][:error] += valid.messages[:error]
       end
+
+      # Setting flag false if errors are found
       if self.errors_by_expenses[key][:error].present?
         self.valid = false
       end
     end
-
-    # debugger
   end
 
   def process
-    debugger
     if self.valid
-
+      # Will start creating expenses, since no errors are found
       for key, value in self.multiple_expenses
         if value[:expense].save
+
           # Attach an existing receipt to the expense
           if value[:receipt].present?
-            value[:receipt].parent = expense
+            value[:receipt].parent = value[:expense]
+
+            # Updating receipt
             value[:receipt].save
           end
         end
       end
-      # expenses = params[:multiple]
-      # for key, value in expenses
-      #   expense = Expense::Manual::Create.(user, value)
-      #   # debugger
-      # end
       add_message :success, "Created #{self.multiple_expenses.values.length} expenses successfully."
     else
       add_message :failure, 'Cannot create expenses. Please fix the errors and try again.' 
@@ -98,7 +108,6 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   end
 
   def set_custom_fields_multiple(expense, current_params)
-    # debugger
     custom_fields = {custom_fields: (current_params[:custom_fields] or current_params[:expense][:custom_fields])}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
