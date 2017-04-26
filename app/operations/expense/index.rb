@@ -45,18 +45,6 @@ class Expense::Index < Expense::Base
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
       self.expenses = Expense.with_user(team_user_ids).admin_viewable.uniq if team_user_ids.present?
     else
-      # For all expenses
-      # adding all card expenses of the users in the team
-      # team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
-
-      # todo - slightly dirty method - think of a more elegant way to do this
-      # admin_expense_ids = []
-      # admin_expense_ids += Expense.with_report(report_ids).pluck(:id) if report_ids.present?
-      # admin_expense_ids += Expense.with_user(team_user_ids).pluck(:id) if team_user_ids.present?
-
-      # report_ids = Report::Index.(user, params).reports.map(&:id) rescue nil
-      # self.expenses = Expense.with_report(report_ids).uniq if report_ids.present?
-
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
       self.expenses = Expense.with_user(team_user_ids).uniq if team_user_ids.present?
     end
@@ -102,7 +90,7 @@ class Expense::Index < Expense::Base
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
-        self.unreported_expenses = expenses.unreported_and_rejected
+        self.unreported_expenses = expenses.unreported_and_rejected&.non_personal&.non_cancelled
         if params[:view] == 'personal' or params[:view].nil?
           self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
         else
