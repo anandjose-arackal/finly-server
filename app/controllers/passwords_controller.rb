@@ -29,6 +29,8 @@ class PasswordsController < Devise::PasswordsController
   end
 
   def update
+    set_params
+
     self.resource = resource_class.reset_password_by_token(resource_params)
     yield resource if block_given?
 
@@ -41,6 +43,18 @@ class PasswordsController < Devise::PasswordsController
         else
           respond response: :failure, message: resource.errors.full_messages.to_sentence
         end
+      }
+    end
+  end
+
+  private
+
+  def set_params
+    if params[:user].blank?
+      params[:user] = {
+          password: params[:password],
+          password_confirmation: params[:password_confirmation],
+          reset_password_token: params[:reset_password_token]
       }
     end
   end

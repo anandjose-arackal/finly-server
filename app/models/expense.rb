@@ -30,10 +30,6 @@
 
 
 
-
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -49,12 +45,15 @@ class Expense < ActiveRecord::Base
 
   has_many :receipts, as: :parent
 
+  has_many :system_messages, as: :messagable, dependent: :destroy
+
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
   has_one :distance_expense, dependent: :destroy
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
 
+  accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :manual_expense
   accepts_nested_attributes_for :card_expense
@@ -75,7 +74,6 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validate :no_future_date
-  # validate :report_status
   validate :valid_expense_type
   validate :valid_amount_value
   validate :at_least_one_type
@@ -557,7 +555,7 @@ class Expense < ActiveRecord::Base
     if self.manual_expense? || self.card_expense?
       if self.amount.blank? or self.amount.value.blank?
         errors.add(:amount, "can't be blank")
-      elsif self.amount.value <= 0
+      elsif self.amount.value < 0
         errors.add(:amount, "can't be less than or equal to 0")
       end
     end

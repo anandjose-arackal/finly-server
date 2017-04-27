@@ -41,3 +41,7 @@ json.custom_fields do
       json.array! @result.expense.per_diem_expense.custom_fields
   end
 end
+
+json.system_messages do
+  json.array!(@result.expense.system_messages)
+end
