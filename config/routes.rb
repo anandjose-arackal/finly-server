@@ -1,6 +1,11 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                 Controller#Action
+# transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
+# transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
+#    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
+#      transcriber_untranscribed_receipts GET    /transcriber/companies/:id(.:format)                        transcriber/companies#show
+#                   transcriber_companies GET    /transcriber/companies(.:format)                            transcriber/companies#index
 #                               menu_data GET    /menu_data(.:format)                                        users#menu_data
 #                  new_admin_user_session GET    /admin_users/sign_in(.:format)                              admin_users/sessions#new
 #                      admin_user_session POST   /admin_users/sign_in(.:format)                              admin_users/sessions#create
@@ -422,8 +427,10 @@
 #                                         PATCH  /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         PUT    /admin_users/users/:id(.:format)                            admin_users/users#update
 #                                         DELETE /admin_users/users/:id(.:format)                            admin_users/users#destroy
+#                     admin_users_welcome POST   /admin_users/welcome(.:format)                              admin_users/users#admin_welcome
 #                    admin_users_set_role POST   /admin_users/users/set_role(.:format)                       admin_users/users#set_role
 #                      admin_users_lookup GET    /admin_users/lookup(.:format)                               admin_users/users#lookup
+#                      admin_users_import POST   /admin_users/import(.:format)                               admin_users/users#import
 #                    admin_users_expenses GET    /admin_users/expenses(.:format)                             admin_users/expenses#index
 #                                         POST   /admin_users/expenses(.:format)                             admin_users/expenses#create
 #                 new_admin_users_expense GET    /admin_users/expenses/new(.:format)                         admin_users/expenses#new
@@ -450,7 +457,7 @@
 #                                         PATCH  /transcriber/expenses/:id(.:format)                         transcriber/expenses#update
 #                                         PUT    /transcriber/expenses/:id(.:format)                         transcriber/expenses#update
 #                                         DELETE /transcriber/expenses/:id(.:format)                         transcriber/expenses#destroy
-#                   transcriber_companies GET    /transcriber/companies(.:format)                            transcriber/companies#index
+#                                         GET    /transcriber/companies(.:format)                            transcriber/companies#index
 #                                         POST   /transcriber/companies(.:format)                            transcriber/companies#create
 #                 new_transcriber_company GET    /transcriber/companies/new(.:format)                        transcriber/companies#new
 #                edit_transcriber_company GET    /transcriber/companies/:id/edit(.:format)                   transcriber/companies#edit
@@ -496,6 +503,19 @@
 #             notifications_mark_all_read GET    /notifications/mark_all_read(.:format)                      notifications#mark_all_read
 #                                    faqs GET    /faqs(.:format)                                             faqs#index
 #                                feedback POST   /feedback(.:format)                                         feedback#create
+#                         menu_data_cards GET    /menu_data_cards(.:format)                                  expense_types_configuration#menu_data_cards
+#                 cards_meal_process_file POST   /cards/meal/process_file(.:format)                          benefits/meal#process_file
+#                       cards_meal_orders POST   /cards/meal/orders(.:format)                                benefits/meal#create
+#                                         PATCH  /cards/meal/orders(.:format)                                benefits/meal#update
+#                                         GET    /cards/meal/orders(.:format)                                benefits/meal#index
+#                                         GET    /cards/meal/orders/:id(.:format)                            benefits/meal#show
+#                                         DELETE /cards/meal/orders/:id(.:format)                            benefits/meal#destroy
+#              cards_medical_process_file POST   /cards/medical/process_file(.:format)                       benefits/medical#process_file
+#                    cards_medical_orders POST   /cards/medical/orders(.:format)                             benefits/medical#create
+#                                         PATCH  /cards/medical/orders(.:format)                             benefits/medical#update
+#                                         GET    /cards/medical/orders(.:format)                             benefits/medical#index
+#                                         GET    /cards/medical/orders/:id(.:format)                         benefits/medical#show
+#                                         DELETE /cards/medical/orders/:id(.:format)                         benefits/medical#destroy
 #
 
 Rails.application.routes.draw do
@@ -764,8 +784,11 @@ Rails.application.routes.draw do
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
       delete 'destroy_mapping', to: 'users#destroy_mapping', as: :destroy_mapping
     end
+    post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup',as: :lookup
+    post 'import', to: 'users#import', as: :import
+    get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
       patch 'block', to: 'cards#block', as: :block

@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_paper_trail_whodunnit
 
   before_action :whitelisted_emails
-  before_action :verify_otp
+  # before_action :verify_otp
   # before_action :check_first_time_login
 
   # to add custom parameters to the user hash being taken as input

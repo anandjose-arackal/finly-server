@@ -1,0 +1,66 @@
+<% path = "www.finly.io/set_password?reset_password_token=#{@token}" %>
+<% content_for :body do %>
+    <div class="primary block center" style="background-color: white; text-align: center;">
+      <br>
+      <p style="line-height: 160%; margin: 0 0 20px 0;">We welcome you to your Finly account</p>
+      <p style="line-height: 160%; margin: 0 0 20px 0;">
+        <a style="background-color: #374F76; border: none; color: white; display: inline-block; font-size: 14px;
+            font-weight: 700; letter-spacing: 1px; padding: 13px 25px; text-decoration: none;
+            text-transform: uppercase;"
+           href="<%= "#{path}" %>"
+           class="primaryButton">Create Account</a>
+      </p>
+      <p style="line-height: 160%; margin: 0 0 20px 0;">
+        Or click the link below:<br>
+        <a style="border: none; color: #374F76; text-decoration: none;" href="<%= "#{path}" %>"><%= "#{path}" %></a>
+      </p>
+      <br>
+
+      <p style="color: #999999; line-height: 160%; margin: 0 0 20px 0;">That's it - say goodbye to expense reports
+        forever!</p>
+      <p style="color: #999999; line-height: 160%; margin: 0 0 20px 0;">Finly, powered by ItzCash is the easiest way to get
+        reimbursed by <%= @user.company.name %> for company expenses you incur. In just a few seconds, you can submit
+        expenses
+        from your phone or computer. </p>
+    </div>
+<% end %>
+
+<div style="background-color:#f8f8f8;font-family:'Helvetica Neue',Helvetica,sans-serif;font-size:14px;min-width:340px;padding:20px;text-align:center;max-width:600px;width:600px;margin: 0 auto;">
+
+  <!-- insert code for header here -->
+
+  <div style="height: 70px">
+    <!--<a href="" style="border:none;text-decoration:none; display:block;" target="_blank">-->
+
+    <% if @user && @user.company_id == 7 %>
+
+    <% else %>
+        <img src="https://www.finly.io/common/images/logos/logo_md1.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+    <% end %>
+
+    <!-- todo - ultimate jugaad for itzcash's logo - needs to be changed -->
+    <% if @user && @user.company.id == 7%>
+        <img src="https://www.finly.io/common/images/logos/itzcash-white.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: left">
+        <!--<h2 style="font-size: 40px;text-align: right;font-weight: normal;margin-bottom: 10px"></h2>-->
+    <% else %>
+        <h2 style="font-size: 40px;text-align: left;font-weight: normal;margin-bottom: 10px"><%=@user.company.name if @user.present?%></h2>
+    <% end %>
+
+  </div>
+
+  <!-- ########################### -->
+
+  <%= render 'application_mailer/body' %>
+
+  <div style="border:1px solid transparent;color:#2980b9;margin:0 auto 0 auto;padding:10px 0;text-align:left;width:420px">
+
+    <% if @user.company_id == 7 %>
+    <p style="line-height:160%;margin:0 0 0 0">Thanks!<br>ItzCash & Finly Team</p>
+    <% else %>
+    <p style="line-height:160%;margin:0 0 0 0">Thanks!<br>Team Finly</p>
+    <% end %>
+
+    <p style="text-align: center; font-size: 11px;">Download our app: <a style="font-size: 12px; color: #2980b9;" href="https://itunes.apple.com/us/app/finly/id1219281468" target="_blank">iOS</a>&nbsp;&nbsp;<a style="font-size: 12px; color: #2980b9;" href="https://play.google.com/store/apps/details?id=io.finly.finlyapp" target="_blank">Android</a></p>
+  </div>
+
+</div>

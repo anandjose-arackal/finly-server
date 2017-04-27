@@ -33,6 +33,8 @@ class RequestFormatter
   def self.format(path_to_file, user, params)
     return nil if params.blank?
     map = YamlUtils.load_yaml_erb("./app/formatter/#{path_to_file}", {user: user, params: params})
+    # Was crashing when note had a new line break. Fix was to remove it from YAML and add it here
+    map['expense']['note'] = params[:note] if map.dig('expense') and params.dig(:note)
     Formatter.remove_blanks map
     Formatter.symbolize_hash_keys map
     map

@@ -18,12 +18,12 @@ dump.rdb
 /tmp
 /public/system/receipts/*
 /public/system/company_configurations/*
+/public/common/files/temp_files/*
 
 # all local executables
 /bin
 
 .idea/*
-/.idea/*
 .vagrant/
 #Vagrantfile
 #bootstrap.sh
@@ -37,3 +37,4 @@ vendor/bundle/
 ehthumbs.db
 Thumbs.db
 dump.rdb
+.idea/
