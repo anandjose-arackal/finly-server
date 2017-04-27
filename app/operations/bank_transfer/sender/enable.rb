@@ -8,7 +8,7 @@ class BankTransfer::Sender::Enable < BankTransfer::Sender::Base
   end
 
   def validate
-    if user.itz_cash_dmt_sender.present? and user.itz_cash_dmt_sender.otp_verified
+    if user.itz_cash_dmt_sender&.otp_verified
       add_message :error, 'You have already enabled Bank Transfers'
       return
     end

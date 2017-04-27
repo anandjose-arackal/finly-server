@@ -1,4 +1,5 @@
 class BankTransfer::Sender::VerifyOtp < BankTransfer::Sender::Base
+  attr_accessor :otp
 
   def pre_validate
     if user.blank?
@@ -9,28 +10,20 @@ class BankTransfer::Sender::VerifyOtp < BankTransfer::Sender::Base
       add_message :error, 'Please enter your OTP to enable Bank Transfers'
       return
     end
-  end
-
-  def validate
     if user.itz_cash_dmt_sender&.otp_verified
       add_message :error, 'You have already enabled Bank Transfers'
       return
     end
   end
 
+  def init
+    self.otp = params[:otp]
+  end
+
   def process
-    if user.itz_cash_dmt_sender.blank?
-      # Register for DMT
-      result = ItzCash::Dmt::Sender::Register.(user)
-      unless result.success?
-        add_message :error, result.messages[:error]
-      end
-    else
-      # Resend OTP
-      result = ItzCash::Dmt::Otp::Resend.(user, type: ItzCash::Dmt::Otp::Resend::TYPE[:sender_registration])
-      unless result.success?
-        add_message :error, result.messages[:error]
-      end
+    result = ItzCash::Dmt::Sender::OtpVerification.(user, otp: self.otp)
+    unless result.success?
+      add_message :error, result.messages[:error]
     end
   end
 

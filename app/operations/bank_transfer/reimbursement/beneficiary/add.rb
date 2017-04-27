@@ -29,7 +29,11 @@ class BankTransfer::Reimbursement::Beneficiary::Add < BankTransfer::Reimbursemen
       add_message :error, 'IFSC Code cannot be blank'
       return
     end
-    if user.itz_cash_dmt_sender.beneficiaries.reimbursement_accounts.with_account_number(params[:account_number]).present?
+    if user.itz_cash_dmt_sender.blank?
+      add_message :error, 'You have not yet enabled this functionality'
+      return
+    end
+    if user.itz_cash_dmt_sender.beneficiaries&.reimbursement_accounts&.with_account_number(params[:account_number]).present?
       add_message :error, 'Account has already been added as a Reimbursement Account'
     end
   end
@@ -41,7 +45,7 @@ class BankTransfer::Reimbursement::Beneficiary::Add < BankTransfer::Reimbursemen
     else
       param = {
           first_name: user.first_name,
-          middle_name: user.middle_name,
+          middle_name: '',
           last_name: user.last_name,
           mobile_number: user.mobile_number,
           bank_name: params[:bank_name],
