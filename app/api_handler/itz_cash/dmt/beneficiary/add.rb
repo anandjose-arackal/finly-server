@@ -117,7 +117,8 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
         is_updatable: beneficiary_add_response[:isUpdatable],
         beneficiary_name: beneficiary_add_response[:beneName],
         beneficiary_id: beneficiary_add_response[:beneficiaryId],
-        reimbursement: !!params[:reimbursement]
+        reimbursement: !!params[:reimbursement],
+        default: !!params[:default]
     }
     user.itz_cash_dmt_sender.beneficiaries.build(param).save
   end

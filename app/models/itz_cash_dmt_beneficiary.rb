@@ -31,6 +31,7 @@ class ItzCashDmtBeneficiary < ActiveRecord::Base
   belongs_to :status, class_name: 'ItzCashDmtBeneficiaryStatus'
 
   scope :reimbursement_accounts, -> { where reimbursement: true }
+  scope :default, -> { where default: true }
   scope :with_account_number, -> (account_number) { where account_number: account_number }
 
   def viewable_account_number

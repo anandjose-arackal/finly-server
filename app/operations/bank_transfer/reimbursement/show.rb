@@ -19,9 +19,10 @@ class BankTransfer::Reimbursement::Show < BankTransfer::Reimbursement::Base
   end
 
   class BankTransfer::Reimbursement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reimbursement_accounts, :enabled
+    attr_accessor :reimbursement_accounts, :enabled, :mobile_number
 
     def init
+      self.mobile_number = user.mobile_number
       self.enabled = params[:enabled]
       self.reimbursement_accounts = params[:reimbursement_accounts]
     end
