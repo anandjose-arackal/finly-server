@@ -50,10 +50,12 @@ class PasswordsController < Devise::PasswordsController
   private
 
   def set_params
-    params[:user] = {
-        password: params[:password],
-        password_confirmation: params[:password_confirmation],
-        reset_password_token: params[:reset_password_token]
-    }
+    if params[:user].blank?
+      params[:user] = {
+          password: params[:password],
+          password_confirmation: params[:password_confirmation],
+          reset_password_token: params[:reset_password_token]
+      }
+    end
   end
 end
