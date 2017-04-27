@@ -530,7 +530,7 @@ class Expense < ActiveRecord::Base
     if self.manual_expense? || self.card_expense?
       if self.amount.blank? or self.amount.value.blank?
         errors.add(:amount, "can't be blank")
-      elsif self.amount.value <= 0
+      elsif self.amount.value < 0
         errors.add(:amount, "can't be less than or equal to 0")
       end
     end

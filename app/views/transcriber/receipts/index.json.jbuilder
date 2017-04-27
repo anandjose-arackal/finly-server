@@ -26,6 +26,9 @@ json.array!(@result.receipts) do |receipt|
       json.note expense.note
       json.category_id expense.category_id
       json.category_name expense.category_name
+      json.system_messages do
+        json.array!(expense.system_messages)
+      end
     end
   end
 end

@@ -72,7 +72,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   private
 
   def set_system_messages
-    expense_params[:system_messages_attributes] = {}
+    expense_params[:system_messages_attributes] = []
     if expense_params[:amount_attributes][:value] == "--"
       expense_params[:system_messages_attributes] << {
         content: "Amount is illegible",
@@ -93,6 +93,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       }
       expense_params[:date] = DateUtils.local_date # setting the date as today by default
     end
+    expense_params.permit!
   end
 
 end
