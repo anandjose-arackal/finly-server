@@ -15,7 +15,7 @@ class Expense::Cancelled::Mark < Expense::Base
   def init
     id = params[:id] || params[:expense_id]
     # because the expense will always belong to a particular user
-    self.selected_expense = user.expenses.find_by(id: id)
+    self.selected_expense = user.expenses.only_card_expenses.find_by(id: id)
     transactions_ids = params[:transaction_id] # can be an array or integer
     self.cancelled_transactions = user.card_transactions.where(id: transactions_ids)
   end
@@ -24,6 +24,10 @@ class Expense::Cancelled::Mark < Expense::Base
     unless selected_expense
       add_message :error, "Expense not found"
       return
+    end
+
+    unless selected_expense.card_expense?
+      add_message :error, "Only card expenses can be cancelled"
     end
 
     # check if the expense is cancellable
@@ -51,8 +55,8 @@ class Expense::Cancelled::Mark < Expense::Base
   end
 
   def process
-    if selected_expense.card_expense.update(cancelled: false)
-      cancelled_transactions.update_all(cancelled_against_expense_id: selected_expense.id, cancelled: true)
+    if selected_expense.card_expense.update(cancelled: true)
+      cancelled_transactions.update_all(cancelled_against_expense_id: selected_expense.card_expense.id, cancelled: true)
     else
       add_message :error, selected_expense.card_expense.errors.full_messages
     end
