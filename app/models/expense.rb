@@ -18,7 +18,10 @@
 #  is_deleted           :boolean          default(FALSE), not null
 #  transcribed          :boolean          default(FALSE)
 #  personal             :boolean          default(FALSE)
+#  reimbursable         :boolean          default(TRUE)
 #
+
+
 
 
 

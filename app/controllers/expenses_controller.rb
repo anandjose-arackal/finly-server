@@ -74,6 +74,48 @@ class ExpensesController < ApplicationController
     end
   end
 
+  def mark
+    case params[:type]
+      when 1, '1'
+        # insert logic for expense cancellation
+        @result = Expense::Cancelled::Mark.(current_user, params)
+      when 2, '2'
+        # insert logic for marking expense as personal
+        @result = Expense::Personal::Mark.(current_user, params)
+      when 3, '3'
+        # insert logic for marking expense as non-reimbursable - because by defualt all expenses are reimbursable
+        @result = Expense::Reimbursable::Unmark.(current_user, params)
+      else
+        @result = Expense::Reimbursable::Unmark.(current_user, params)
+    end
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def unmark
+    case params[:type]
+      when 1, '1'
+        # insert logic for expense cancellation
+        @result = Expense::Cancelled::Unmark.(current_user, params)
+      when 2, '2'
+        # insert logic for marking expense as personal
+        @result = Expense::Personal::Unmark.(current_user, params)
+      when 3, '3'
+        # insert logic for marking expense as non-reimbursable - because by defualt all expenses are reimbursable
+        @result = Expense::Reimbursable::Mark.(current_user, params)
+      else
+        @result = Expense::Reimbursable::Mark.(current_user, params)
+    end
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   def mark_as_personal
     @result = Expense::MarkAsPersonal.(current_user, params)
     if @result.success?

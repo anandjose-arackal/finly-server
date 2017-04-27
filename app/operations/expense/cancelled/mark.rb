@@ -4,7 +4,7 @@
 
 class Expense::Cancelled::Mark < Expense::Base
 
-  attr_accessor :selected_expense, :cancelled_transaction, :selected_card_expense
+  attr_accessor :selected_expense, :cancelled_transactions, :selected_card_expense
 
   def pre_validate
     if user.blank? || params.blank?
@@ -16,10 +16,16 @@ class Expense::Cancelled::Mark < Expense::Base
     id = params[:id] || params[:expense_id]
     # because the expense will always belong to a particular user
     self.selected_expense = user.expenses.find_by(id: id)
-    self.cancelled_transaction = user.card_transactions.find_by(id: params[:transaction_id])
+    transactions_ids = params[:transaction_id] # can be an array or integer
+    self.cancelled_transactions = user.card_transactions.where(id: transactions_ids)
   end
 
   def validate
+    unless selected_expense
+      add_message :error, "Expense not found"
+      return
+    end
+
     # check if the expense is cancellable
     unless selected_expense.cancellable?
       add_message :error, "This expense cannot be cancelled"
@@ -27,37 +33,28 @@ class Expense::Cancelled::Mark < Expense::Base
     end
 
     # check if the transaction that is being marked as cancelled is a refund at all
-    unless cancelled_transaction.refund?
-      add_message :error, "This transaction is not a refund"
-      return
+    # also check if the respective transactions are already cancelled by any chance
+    cancelled_transactions.each do |transaction|
+      unless transaction.refund?
+        add_message :error, "This transaction is not a refund"
+        return
+      end
+      if transaction.cancelled
+        add_message :error, "One of these transactions has already been marked as cancelled"
+      end
     end
 
-    if cancelled_transaction.cancelled
-      add_message :error, "This transaction has already been marked as cancelled"
-    end
   end
 
   def authorize
-    unless selected_expense
-      raise_unauthorized_exception
-    end
+
   end
 
   def process
-    if params[:unmark] == '1' || params[:unmark] == true
-      if selected_expense.card_expense.update(cancelled: false)
-        self.cancelled_transaction = selected_expense.card_expense.cancelled_transaction
-        self.cancelled_transaction.update(cancelled: false)
-        self.selected_expense.update(cancelled_against_transaction: nil)
-      else
-        add_message :error, selected_expense.card_expense.errors.full_messages
-      end
+    if selected_expense.card_expense.update(cancelled: false)
+      cancelled_transactions.update_all(cancelled_against_expense_id: selected_expense.id, cancelled: true)
     else
-      if selected_expense.card_expense.update(cancelled: true, cancelled_against_transaction: self.cancelled_transaction)
-        self.cancelled_transaction.update(cancelled: true)
-      else
-        add_message :error, selected_expense.card_expense.errors.full_messages
-      end
+      add_message :error, selected_expense.card_expense.errors.full_messages
     end
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170426123954) do
+ActiveRecord::Schema.define(version: 20170427035504) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -141,15 +141,14 @@ ActiveRecord::Schema.define(version: 20170426123954) do
   add_index "card_configurations", ["prepaid_card_id"], name: "index_card_configurations_on_prepaid_card_id", using: :btree
 
   create_table "card_expenses", force: :cascade do |t|
-    t.text     "editable_merchant",                limit: 65535
-    t.integer  "card_transaction_id",              limit: 4
-    t.integer  "expense_id",                       limit: 4
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
-    t.integer  "surcharge_id",                     limit: 4
-    t.boolean  "is_deleted",                                     default: false
-    t.boolean  "cancelled",                                      default: false
-    t.integer  "cancelled_against_transaction_id", limit: 4
+    t.text     "editable_merchant",   limit: 65535
+    t.integer  "card_transaction_id", limit: 4
+    t.integer  "expense_id",          limit: 4
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.integer  "surcharge_id",        limit: 4
+    t.boolean  "is_deleted",                        default: false
+    t.boolean  "cancelled",                         default: false
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -230,31 +229,32 @@ ActiveRecord::Schema.define(version: 20170426123954) do
   end
 
   create_table "card_transactions", force: :cascade do |t|
-    t.integer  "user_id",               limit: 4
-    t.integer  "card_id",               limit: 4
-    t.string   "merchant_name",         limit: 255
-    t.string   "transaction_type",      limit: 255
-    t.text     "post_data",             limit: 65535
-    t.integer  "transaction_amount_id", limit: 4
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
-    t.string   "reference_id",          limit: 255
-    t.string   "auth_transaction_id",   limit: 255
-    t.string   "transaction_mode",      limit: 255
-    t.string   "itzcash_merchant_key",  limit: 255
-    t.string   "merchant_city",         limit: 255
-    t.string   "response_code",         limit: 255
-    t.string   "serial_id",             limit: 255
-    t.string   "product_code",          limit: 255
+    t.integer  "user_id",                      limit: 4
+    t.integer  "card_id",                      limit: 4
+    t.string   "merchant_name",                limit: 255
+    t.string   "transaction_type",             limit: 255
+    t.text     "post_data",                    limit: 65535
+    t.integer  "transaction_amount_id",        limit: 4
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
+    t.string   "reference_id",                 limit: 255
+    t.string   "auth_transaction_id",          limit: 255
+    t.string   "transaction_mode",             limit: 255
+    t.string   "itzcash_merchant_key",         limit: 255
+    t.string   "merchant_city",                limit: 255
+    t.string   "response_code",                limit: 255
+    t.string   "serial_id",                    limit: 255
+    t.string   "product_code",                 limit: 255
     t.datetime "transaction_timestamp"
-    t.boolean  "expensed",                            default: false
-    t.text     "error_message",         limit: 65535
-    t.integer  "billing_amount_id",     limit: 4
-    t.boolean  "is_deleted",                          default: false
-    t.string   "mcc_code",              limit: 255
-    t.string   "transaction_status",    limit: 255
-    t.string   "api_reference_id",      limit: 255
-    t.boolean  "cancelled",                           default: false
+    t.boolean  "expensed",                                   default: false
+    t.text     "error_message",                limit: 65535
+    t.integer  "billing_amount_id",            limit: 4
+    t.boolean  "is_deleted",                                 default: false
+    t.string   "mcc_code",                     limit: 255
+    t.string   "transaction_status",           limit: 255
+    t.string   "api_reference_id",             limit: 255
+    t.boolean  "cancelled",                                  default: false
+    t.integer  "cancelled_against_expense_id", limit: 4
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree

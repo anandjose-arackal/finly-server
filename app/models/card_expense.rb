@@ -2,16 +2,15 @@
 #
 # Table name: card_expenses
 #
-#  id                               :integer          not null, primary key
-#  editable_merchant                :text(65535)
-#  card_transaction_id              :integer
-#  expense_id                       :integer
-#  created_at                       :datetime         not null
-#  updated_at                       :datetime         not null
-#  surcharge_id                     :integer
-#  is_deleted                       :boolean          default(FALSE)
-#  cancelled                        :boolean          default(FALSE)
-#  cancelled_against_transaction_id :integer
+#  id                  :integer          not null, primary key
+#  editable_merchant   :text(65535)
+#  card_transaction_id :integer
+#  expense_id          :integer
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  surcharge_id        :integer
+#  is_deleted          :boolean          default(FALSE)
+#  cancelled           :boolean          default(FALSE)
 #
 
 class CardExpense < ActiveRecord::Base
@@ -20,8 +19,8 @@ class CardExpense < ActiveRecord::Base
   belongs_to :card_transaction
   belongs_to :expense # foreign key would be expense_id
   belongs_to :surcharge, class_name: 'Amount'
-  belongs_to :cancelled_against_transaction, class_name: "CardTransaction"
 
+  has_many :cancelled_against_transactions, class_name: 'CardTransaction', foreign_key: :cancelled_against_expense_id
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 

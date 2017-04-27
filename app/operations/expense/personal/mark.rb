@@ -5,7 +5,9 @@ class Expense::Personal::Mark < Expense::Base
   attr_accessor :selected_expense
 
   def pre_validate
-
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters, please try again"
+    end
   end
 
   def init
@@ -14,20 +16,26 @@ class Expense::Personal::Mark < Expense::Base
   end
 
   def validate
+    unless selected_expense
+      add_message :error, "Expense not found"
+    end
+
     if selected_expense.personal
+      add_message :error, "This expense is already marked as personal"
+      return
+    end
+    unless selected_expense.unreported?
       add_message :error, "This expense cannot be marked as personal"
     end
+  end
+
+  def authorize
+
   end
 
   def process
     unless selected_expense.update(personal: true)
       add_message :error, selected_expense.errors.full_messages
-    end
-  end
-
-  def authorize
-    unless selected_expense
-      raise_unauthorized_exception
     end
   end
 
