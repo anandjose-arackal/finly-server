@@ -17,7 +17,7 @@ class BankTransfer::Reimbursement::Beneficiary::SetDefault < BankTransfer::Reimb
 
   def init
     self.current_default_account = user.itz_cash_dmt_sender.beneficiaries.reimbursement_accounts.default
-    self.account = user.itz_cash_dmt_sender.beneficiaries.reimbursement_accounts.with_id(params[:id])
+    self.account = user.itz_cash_dmt_sender.beneficiaries.reimbursement_accounts.with_id(params[:id])&.first
   end
 
   def validate

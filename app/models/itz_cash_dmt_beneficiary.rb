@@ -30,6 +30,7 @@ class ItzCashDmtBeneficiary < ActiveRecord::Base
   belongs_to :itz_cash_dmt_sender
   belongs_to :status, class_name: 'ItzCashDmtBeneficiaryStatus'
 
+  scope :with_id, -> (id) { where id: id }
   scope :reimbursement_accounts, -> { where reimbursement: true }
   scope :default, -> { where default: true }
   scope :with_account_number, -> (account_number) { where account_number: account_number }
