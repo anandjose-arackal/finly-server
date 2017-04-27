@@ -8,7 +8,7 @@ class BankTransfer::Reimbursement::Show < BankTransfer::Reimbursement::Base
   end
 
   def process
-    self.enabled = user.itz_cash_dmt_sender.present?
+    self.enabled = !!user.itz_cash_dmt_sender&.otp_verified
     self.reimbursement_accounts = user.itz_cash_dmt_sender&.reimbursement_accounts
   end
 

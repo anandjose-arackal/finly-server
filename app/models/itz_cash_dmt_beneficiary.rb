@@ -32,4 +32,9 @@ class ItzCashDmtBeneficiary < ActiveRecord::Base
 
   scope :reimbursement_accounts, -> { where reimbursement: true }
 
+  def viewable_account_number
+    return nil if account_number.blank?
+    "#{('X'* (account_number.length - 4))}#{account_number.split(//).last(5).join}"
+  end
+
 end
