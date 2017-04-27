@@ -33,10 +33,11 @@ class ItzCashDmtBeneficiary < ActiveRecord::Base
   scope :reimbursement_accounts, -> { where reimbursement: true }
   scope :default, -> { where default: true }
   scope :with_account_number, -> (account_number) { where account_number: account_number }
+  scope :active, -> { where active: true }
 
   def viewable_account_number
     return nil if account_number.blank?
-    "#{('X'* (account_number.length - 4))}#{account_number.split(//).last(5).join}"
+    "#{('X'* (account_number.length - 4))}#{account_number.split(//).last(4).join}"
   end
 
 end

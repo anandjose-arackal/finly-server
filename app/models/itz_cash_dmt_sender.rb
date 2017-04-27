@@ -15,12 +15,13 @@
 #
 
 class ItzCashDmtSender < ActiveRecord::Base
-  belongs_to :user
-  has_many :beneficiaries, class_name: 'ItzCashDmtBeneficiary'
-  belongs_to :status, class_name: 'ItzCashDmtSenderStatus'
 
-  validates :username, presence: true
+  belongs_to :user
+  belongs_to :status, class_name: 'ItzCashDmtSenderStatus'
+  has_many :beneficiaries, class_name: 'ItzCashDmtBeneficiary'
+
   validates :user_id, presence: true
   validates :mobile_number, presence: true
   validates :registration_id, presence: true
+
 end

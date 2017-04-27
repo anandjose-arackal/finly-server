@@ -61,7 +61,7 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
 
   def query_xml_params
     {
-        username: user.itz_cash_dmt_sender.username,
+        username: Constants::ItzCash::DMT_USERNAME,
         icw_code: Constants::ItzCash::ICW_CODE,
         sender_mobile_number: user.mobile_number,
         sender_id: user.itz_cash_dmt_sender.registration_id,
@@ -78,7 +78,7 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
         beneficiary_check: 'N',
         easy_wallet_id: Constants::ItzCash::EASY_WALLET_ID,
         easy_wallet_type: Constants::ItzCash::EASY_WALLET_TYPE,
-        account_password: user.itz_cash_dmt_sender.password
+        account_password: Constants::ItzCash::DMT_PASSWORD
     }
   end
 
@@ -101,24 +101,25 @@ class ItzCash::Dmt::Beneficiary::Add < ItzCash::Dmt::Base
   def create_user_dmt_beneficiary
     beneficiary_add_response = parsed_response[:beneAddResponse]
     param = {
-        first_name: beneficiary_add_response[:firstName],
-        middle_name: beneficiary_add_response[:middleName],
-        last_name: beneficiary_add_response[:lastName],
-        mobile_number: beneficiary_add_response[:mobileNumber],
+        first_name: params[:first_name],
+        middle_name: params[:middle_name],
+        last_name: params[:last_name],
+        mobile_number: params[:mobile_number],
         relation: beneficiary_add_response[:relation],
         ifsc_option: beneficiary_add_response[:ifscOption],
-        ifsc_code: beneficiary_add_response[:ifscCode],
+        ifsc_code: params[:ifsc_code],
         bank_name: beneficiary_add_response[:bankName],
         branch_name: beneficiary_add_response[:branchName],
         bank_city: beneficiary_add_response[:bankCity],
         bank_state: beneficiary_add_response[:bankState],
         account_number: beneficiary_add_response[:accountNo],
-        registration_id: beneficiary_add_response[:beneficiaryId],
         is_updatable: beneficiary_add_response[:isUpdatable],
-        beneficiary_name: beneficiary_add_response[:beneName],
+        beneficiary_name: params[:bank_name],
         beneficiary_id: beneficiary_add_response[:beneficiaryId],
         reimbursement: !!params[:reimbursement],
-        default: !!params[:default]
+        default: !!params[:default],
+        status_id: ItzCashDmtBeneficiaryStatus.id_for(:active)
+
     }
     user.itz_cash_dmt_sender.beneficiaries.build(param).save
   end

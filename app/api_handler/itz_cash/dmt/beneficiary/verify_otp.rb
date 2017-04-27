@@ -16,7 +16,7 @@ class ItzCash::Dmt::Beneficiary::VerifyOtp < ItzCash::Dmt::Base
 
   def query_xml_params
     {
-        username: user.itz_cash_dmt_sender.username,
+        username: Constants::ItzCash::DMT_USERNAME,
         icw_code: Constants::ItzCash::ICW_CODE,
         sender_mobile_number: user.mobile_number,
         sender_id: user.itz_cash_dmt_sender.registration_id,

@@ -64,7 +64,9 @@ module Constants
 
   class Constants::ItzCash
 
-    ICW_CODE = 'D000000010'
+    ICW_CODE = 'D000000360'
+    DMT_USERNAME = 'itzic20000'
+    DMT_PASSWORD = '03jqURp0OO0aVkssyuy01g=='
     EASY_WALLET_ID = 'IFTSPL IMPS Wallet'
     EASY_WALLET_TYPE = 'IMPS'
 

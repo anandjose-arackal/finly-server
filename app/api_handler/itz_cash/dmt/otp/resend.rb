@@ -30,7 +30,7 @@ class ItzCash::Dmt::Otp::Resend < ItzCash::Dmt::Base
 
   def query_xml_params
     {
-        username: self.user.itz_cash_dmt_sender.username,
+        username: Constants::ItzCash::DMT_USERNAME,
         icw_code: Constants::ItzCash::ICW_CODE,
         otp_type: params[:type],
         mobile_number: self.user.mobile_number,

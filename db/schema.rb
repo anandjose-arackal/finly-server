@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170425134653) do
+ActiveRecord::Schema.define(version: 20170427134208) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -265,23 +265,23 @@ ActiveRecord::Schema.define(version: 20170425134653) do
   end
 
   create_table "cards", force: :cascade do |t|
-    t.integer  "user_id",             limit: 4
-    t.string   "ending_number",       limit: 255,                  null: false
-    t.string   "proxy",               limit: 255,                  null: false
-    t.integer  "card_type_id",        limit: 4
-    t.text     "description",         limit: 65535
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "company_id",          limit: 4
-    t.integer  "disabled_by_role_id", limit: 4
-    t.integer  "disabled_by_user_id", limit: 4
+    t.integer  "user_id",                  limit: 4
+    t.string   "ending_number",            limit: 255,                  null: false
+    t.string   "proxy",                    limit: 255,                  null: false
+    t.integer  "card_type_id",             limit: 4
+    t.text     "description",              limit: 65535
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "company_id",               limit: 4
+    t.integer  "disabled_by_role_id",      limit: 4
+    t.integer  "disabled_by_user_id",      limit: 4
     t.boolean  "active"
-    t.text     "disable_note",        limit: 65535
-    t.string   "product_code",        limit: 255,                  null: false
-    t.integer  "card_balance_id",     limit: 4
-    t.integer  "card_program_id",     limit: 4,                    null: false
-    t.integer  "card_eligibility_id", limit: 4
-    t.boolean  "admin_unblockable",                 default: true
+    t.text     "disable_note",             limit: 65535
+    t.integer  "card_balance_id",          limit: 4
+    t.integer  "card_program_id",          limit: 4,                    null: false
+    t.integer  "card_eligibility_id",      limit: 4
+    t.boolean  "admin_unblockable",                      default: true
+    t.integer  "itz_cash_card_program_id", limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -722,6 +722,15 @@ ActiveRecord::Schema.define(version: 20170425134653) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "itz_cash_card_programs", force: :cascade do |t|
+    t.string   "product_code", limit: 255
+    t.string   "charge_code",  limit: 255
+    t.string   "name",         limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "bank",         limit: 255
+  end
+
   create_table "itz_cash_dmt_beneficiaries", force: :cascade do |t|
     t.string   "first_name",             limit: 255,                 null: false
     t.string   "middle_name",            limit: 255
@@ -762,13 +771,11 @@ ActiveRecord::Schema.define(version: 20170425134653) do
   end
 
   create_table "itz_cash_dmt_senders", force: :cascade do |t|
-    t.string   "username",        limit: 255,                 null: false
     t.string   "mobile_number",   limit: 255,                 null: false
     t.string   "registration_id", limit: 255,                 null: false
     t.integer  "user_id",         limit: 4,                   null: false
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.string   "password",        limit: 255
     t.integer  "status_id",       limit: 4,                   null: false
     t.boolean  "otp_verified",                default: false, null: false
   end
@@ -1640,6 +1647,7 @@ ActiveRecord::Schema.define(version: 20170425134653) do
     t.string   "mothers_maiden_name",    limit: 255
     t.boolean  "verified",                           default: false
     t.integer  "otp_request_type_id",    limit: 4
+    t.boolean  "default_password",                   default: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

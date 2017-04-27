@@ -29,7 +29,7 @@ class ItzCash::Dmt::Transfer::Create < ItzCash::Dmt::Base
 
   def query_xml_params
     {
-        username: user.itz_cash_dmt_sender.username,
+        username: Constants::ItzCash::DMT_USERNAME,
         icw_code: Constants::ItzCash::ICW_CODE,
         processing_bank_id: Constants::ItzCash::PROCESSING_BANK_ID,
         processing_bank_name: Constants::ItzCash::PROCESSING_BANK_NAME,

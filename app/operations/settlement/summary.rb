@@ -96,8 +96,10 @@ class Settlement::Summary < Settlement::Base
 
   def load_reimbursement(personal, balances)
     to_user_reimbursable_card = selected_user.cards.reimbursable_cards.first rescue nil
-    reimbursement = {associated_reimbursement_card: (to_user_reimbursable_card.present? && to_user_reimbursable_card.active),
+    to_user_reimbursement_bank_account = selected_user.itz_cash_dmt_sender&.beneficiaries.active.reimbursement_accounts.default
+    reimbursement = {associated_reimbursement_card: (!!to_user_reimbursable_card&.active),
                      card: {},
+                     associated_reimbursement_bank_account: (),
                      initiating_accounts: []
                     }
 

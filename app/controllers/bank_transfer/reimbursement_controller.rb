@@ -44,6 +44,12 @@ class BankTransfer::ReimbursementController < ApplicationController
         @result = BankTransfer::Reimbursement::Beneficiary::SetDefault.(current_user, params)
       when 'resend_otp'
         @result = BankTransfer::ResendOtp.(current_user, params)
+      when 'request_otp'
+        @result = BankTransfer::Reimbursement::Beneficiary::RequestOtp.(current_user, params)
+      when 'verify_otp'
+        @result = BankTransfer::Reimbursement::Beneficiary::VerifyOtp.(current_user, params)
+      when 'add'
+        @result = BankTransfer::Reimbursement::Beneficiary::Add.(current_user, params)
     end
     if @result&.success?
       respond response: :success

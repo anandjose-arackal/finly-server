@@ -867,7 +867,7 @@ Rails.application.routes.draw do
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
   namespace :bank_transfer do
-    get 'reimbursements/:id' => 'reimbursement#show'
+    get 'reimbursements' => 'reimbursement#show'
     patch 'reimbursements' => 'reimbursement#update'
     post 'reimbursements' => 'reimbursement#create'
   end

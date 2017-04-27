@@ -16,9 +16,8 @@ class ItzCash::Dmt::Sender::Register < ItzCash::Dmt::Base
   end
 
   def query_xml_params
-    self.username = "finlyuser_#{user.id}"
     {
-        username: self.username,
+        username: Constants::ItzCash::DMT_USERNAME,
         icw_code: Constants::ItzCash::ICW_CODE,
         first_name: user.first_name,
         middle_name: '',
@@ -50,7 +49,6 @@ class ItzCash::Dmt::Sender::Register < ItzCash::Dmt::Base
   protected
   def create_user_dmt_sender
     param = {
-        username: self.username,
         mobile_number: user.mobile_number,
         registration_id: parsed_response[:SenderRegResponse][:registrationId],
         status_id: ItzCashDmtSenderStatus.id_for(:active),

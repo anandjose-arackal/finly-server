@@ -53,7 +53,7 @@ class BankTransfer::Reimbursement::Beneficiary::Add < BankTransfer::Reimbursemen
           account_number: params[:account_number],
           account_number_confirmation: params[:account_number_confirmation],
           reimbursement: true,
-          default: user.itz_cash_dmt_sender.beneficiaries.reimbusement_accounts.blank?
+          default: user.itz_cash_dmt_sender.beneficiaries.reimbursement_accounts.blank?
       }
       result = ItzCash::Dmt::Beneficiary::Add.(user, param)
       unless result.success?
